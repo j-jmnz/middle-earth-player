@@ -14,9 +14,9 @@ Scenario piles that place cards with no record (quest: 05072 The Defense; quest:
   05030:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if there is a location (any player controls) named "The Citadel" to choose: choose location (any player controls) named "The Citadel"
+    - if not (there is a location (any player controls) named "The Citadel" to choose): the attacking enemy: stat attack 2, until the end of the attack
+    - then, if there is a location (any player controls) named "The Citadel" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (any player controls) named "The Citadel"
     - then, if there is a location (any player controls) named "The Citadel" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
-    - then, if not (there is a location (any player controls) named "The Citadel" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 05031 Battering Ram
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -32,9 +32,9 @@ Scenario piles that place cards with no record (quest: 05072 The Defense; quest:
   05031:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if there is a location (any player controls) named "The Approach" to choose: choose location (any player controls) named "The Approach"
+    - if not (there is a location (any player controls) named "The Approach" to choose): the attacking enemy: stat attack 2, until the end of the attack
+    - then, if there is a location (any player controls) named "The Approach" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (any player controls) named "The Approach"
     - then, if there is a location (any player controls) named "The Approach" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
-    - then, if not (there is a location (any player controls) named "The Approach" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 05032 Siege Raft
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -49,9 +49,9 @@ Scenario piles that place cards with no record (quest: 05072 The Defense; quest:
   05032:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if there is a location (any player controls) named "The Banks" to choose: choose location (any player controls) named "The Banks"
+    - if not (there is a location (any player controls) named "The Banks" to choose): the attacking enemy: stat attack 2, until the end of the attack
+    - then, if there is a location (any player controls) named "The Banks" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (any player controls) named "The Banks"
     - then, if there is a location (any player controls) named "The Banks" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
-    - then, if not (there is a location (any player controls) named "The Banks" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 05033 The Citadel
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -147,8 +147,8 @@ Scenario piles that place cards with no record (quest: 05072 The Defense; quest:
   05058:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
-    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+    - the attacking enemy is dealt a shadow card
+    - the attacking enemy is dealt a shadow card
 
 ## 05059 Orc War Camp
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -203,7 +203,7 @@ Scenario piles that place cards with no record (quest: 05072 The Defense; quest:
   05062:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - repeat the number of players times:
-      - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+      - the attacking enemy is dealt a shadow card
 
 ## 05063 Orc Arsonist
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -219,7 +219,7 @@ Scenario piles that place cards with no record (quest: 05072 The Defense; quest:
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
-    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+    - the attacking enemy is dealt a shadow card
 
 ## 05064 Scourge of Mordor
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -236,7 +236,7 @@ Scenario piles that place cards with no record (quest: 05072 The Defense; quest:
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
-    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+    - the attacking enemy is dealt a shadow card
 
 ## 05072 The Defense
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -299,7 +299,7 @@ Scenario piles that place cards with no record (quest: 05072 The Defense; quest:
 05076:B:1 (back): Siege. (Characters quest using Defense instead of Willpower.)
   (the keyword part is owned by the card's keywords; the records cover: (Characters quest using Defense instead of Willpower.))
   05076:constant:1: Constant
-    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
+    (no instructions: the record only names the printed keyword reminder; the keyword is the card's own and the engine reads it from the card)
 
 05076:B:2 (back): When Revealed: Reveal 1 card per player from the encounter deck and add it to the staging area.
   05076:whenRevealed:1: When revealed

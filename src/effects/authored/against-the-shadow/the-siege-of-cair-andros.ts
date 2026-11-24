@@ -21,14 +21,15 @@ const ARCHERY_ICON = (sphere: (typeof SPHERES)[number]): Instruction => ({
   when: { kind: "count", pick: { type: "hero", control: "any", sphere }, min: 1 },
 });
 
-// A Shadow effect that damages the named location if it is in play (in the staging area or active) and otherwise gives the attacker +2 Attack ("Deal 2 damage to The Citadel if it is in play. Otherwise, attacking enemy gets +2 Attack").
+// A Shadow effect that damages the named location if it is in play (in the staging area or active) and otherwise gives the attacker +2 Attack ("Deal 2 damage to The Citadel if it is in play. Otherwise, attacking enemy gets +2 Attack"). The "otherwise" is read once, when the shadow resolves (rr.shadow-effects): the +2 comes first, so the
+// 2 damage that removes the location (removedAtDamage) cannot make a second check find it missing.
 const SHADOW_TO = (name: string): Instruction[] => {
   const named: PickSpec = { type: "location", control: "any", names: [name] };
   const inPlay: Condition = { kind: "canPick", pick: named };
   return [
+    { ...PLUS_TWO_ATTACK, when: { kind: "not", condition: inPlay } },
     { verb: "Pick", pick: named, when: inPlay },
     { verb: "DamageCard", amount: 2, target: "picked", when: inPlay },
-    { ...PLUS_TWO_ATTACK, when: { kind: "not", condition: inPlay } },
   ];
 };
 // "Response: After <location> leaves play as an explored location, remove stage N from the quest deck, if able": the location hears its own exploring (a location removed from the game by damage is not explored, so it hears nothing).
@@ -99,7 +100,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       condition: { kind: "sourceIn", zone: "staging" },
       instructions: [{ verb: "ModifyStat", stat: "cannotSpendResources", amount: 1, until: "whileSourceInPlay", holders: { type: "hero", control: "any", spheres: ["leadership", "spirit", "lore"] } }],
     },
-    { id: "05058:shadow:1", cardCode: "05058", lines: ["05058:A:2"], timing: "shadow", instructions: [{ verb: "DealShadow", additional: true }, { verb: "DealShadow", additional: true }] },
+    { id: "05058:shadow:1", cardCode: "05058", lines: ["05058:A:2"], timing: "shadow", instructions: [{ verb: "DealShadowTo", target: "attacker" }, { verb: "DealShadowTo", target: "attacker" }] },
 
     // 05059 Orc War Camp (a location). A:1: while an Orc enemy is in play and it is in the staging area no progress token can be placed on it from any source (as the active location it takes progress). A:2 (Shadow): +1 Attack for each shadow card dealt to the attacking enemy, this one included.
     {
@@ -145,7 +146,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 05062 Orc Rabble. A:1: each time it is dealt a shadow card (an additional card too) it gets +2 Attack until the end of the phase. A:2 (Shadow): one additional shadow card for each player in the game.
     { id: "05062:forced:1", cardCode: "05062", lines: ["05062:A:1"], timing: "forced", trigger: "shadowDealtTo", subject: "self", instructions: [{ verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfPhase", target: "self" }] },
-    { id: "05062:shadow:1", cardCode: "05062", lines: ["05062:A:2"], timing: "shadow", instructions: [{ verb: "Repeat", times: { players: true }, instructions: [{ verb: "DealShadow", additional: true }] }] },
+    { id: "05062:shadow:1", cardCode: "05062", lines: ["05062:A:2"], timing: "shadow", instructions: [{ verb: "Repeat", times: { players: true }, instructions: [{ verb: "DealShadowTo", target: "attacker" }] }] },
 
     // 05063 Orc Arsonist. A:1: when it engages a player (forced or optional), 1 shadow card is dealt to each enemy engaged with that player at that moment, itself included. A:2 (Shadow): +1 Attack and another shadow card for the attacking enemy.
     {
@@ -157,7 +158,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       subject: "self",
       instructions: [{ verb: "Each", pick: { type: "enemy", control: "any", engaged: "you" }, instructions: [{ verb: "DealShadowTo", target: "picked" }] }],
     },
-    { id: "05063:shadow:1", cardCode: "05063", lines: ["05063:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfAttack", target: "attacker" }, { verb: "DealShadow", additional: true }] },
+    { id: "05063:shadow:1", cardCode: "05063", lines: ["05063:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfAttack", target: "attacker" }, { verb: "DealShadowTo", target: "attacker" }] },
 
     // 05064 Scourge of Mordor. A:1: each player discards the top card of his deck; the Threat of the staging area is raised by the total printed cost of the cards discarded until the end of the phase. A:2 (Shadow): as 05063's.
     { id: "05064:whenRevealed:1", cardCode: "05064", lines: ["05064:A:1"], timing: "whenRevealed", instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "DiscardFromDeck", amount: 1 }] }, { verb: "RaiseStagingThreat", amount: { discarded: "cost" }, until: "endOfPhase" }] },
