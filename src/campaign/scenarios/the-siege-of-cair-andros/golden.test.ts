@@ -23,15 +23,14 @@ const pathOf = (state: ScenarioState, steps: readonly EngineStep[]) => ["05072",
 // The path each win takes (the stages played, a Battleground location explored or removed by damage) and the keyword The Last Battle counts by.
 const PATHS: Record<string, { path: string[]; explored: string[]; destroyed: string[]; lastBattle: "Siege" | "Battle" }> = {
   "solo win, all five stages": { path: STAGES, explored: [], destroyed: [], lastBattle: "Siege" },
-  "solo win, Citadel explored": { path: ["05072", "05073", "05074", "05076"], explored: [CITADEL], destroyed: [], lastBattle: "Siege" },
   "two-handed win, Banks destroyed": { path: ["05072", "05073", "05074", "05076"], explored: [CITADEL], destroyed: [BANKS], lastBattle: "Siege" },
   "two-handed win, Last Battle as Battle": { path: ["05072", "05073", "05074", "05076"], explored: [CITADEL, APPROACH, BANKS], destroyed: [], lastBattle: "Battle" },
   "Easy solo win, all three locations explored": { path: ["05072", "05073", "05074", "05076"], explored: [CITADEL, APPROACH, BANKS], destroyed: [], lastBattle: "Battle" },
 };
 
 // A permanent golden: whole standalone games of The Siege of Cair Andros played by the auto-player (test/scenarios/the-siege-of-cair-andros/game.ts) on fixed seeds. A cycle has no Campaign Mode, so a win settles at once with a score and nothing earned.
-// The wins take four paths through the five stages, true solo and two-handed (the table of PATHS says which, and the checks read it from each game): no travel, so all five stages are played and The Last Battle is a Siege stage; The Citadel explored, so its
-// Response removes stage 4; The Banks removed from the game by 3 damage and The Citadel explored; and the three locations explored, so The Last Battle counts Attack with 4 or more victory points. One win is Easy. The losses are the two ways to lose here:
+// The wins take three paths through the five stages, true solo and two-handed (the table of PATHS says which, and the checks read it from each game): no travel, so all five stages are played and The Last Battle is a Siege stage; The Banks removed from the game by
+// 3 damage and The Citadel explored, so its Response removes stage 4; and the three locations explored, so The Last Battle counts Attack with 4 or more victory points. One win is Easy. The losses are the two ways to lose here:
 // every player's threat at 50 (heroes too weak to quest) and every hero destroyed (heroes too brittle). The opening, the causes, a replay and the scoring are checked for each. Update the snapshot only when the change is meant.
 describe("The Siege of Cair Andros golden", () => {
   goldenSuite<AndrosGolden, AndrosDecks>({
@@ -59,10 +58,11 @@ describe("The Siege of Cair Andros golden", () => {
       expect(ended, golden.name).toBe("05076");
       const path = PATHS[golden.name];
       if (!path) throw new Error(`no path for ${golden.name}`);
-      // A Battleground location explored is in the victory display; one removed from the game by its damage is gone, with no points.
+      // A Battleground location explored is in the victory display, and one that was not is not; one removed from the game by its damage is gone, with no points.
       for (const code of [CITADEL, APPROACH, BANKS]) {
         const zone = zoneOf(state, code);
-        if (path.explored.includes(code)) expect(zone, `${golden.name} ${code}`).toBe("victory");
+        expect(zone === "victory", `${golden.name} ${code} in the victory display`).toBe(path.explored.includes(code));
+        expect(state.victory.some((id) => codeOf(state, id) === code), `${golden.name} ${code} in the display`).toBe(path.explored.includes(code));
         expect(zone === "removed", `${golden.name} ${code} removed`).toBe(path.destroyed.includes(code));
       }
       const points = state.victory.reduce((sum, id) => sum + victoryPointsOf(state, id, world.cards), 0);

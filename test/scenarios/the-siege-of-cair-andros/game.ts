@@ -73,15 +73,13 @@ export type AndrosGame = PlayedGame;
 // The goldens (src/campaign/scenarios/the-siege-of-cair-andros/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type AndrosGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: AndrosDecks; outcome: "won" | "lost"; policy?: Partial<AndrosPolicy>; lossReason?: string };
 
-// The games to pin (.claude/rules/code-standards.md, Test cost): five wins on the paths of the five stages and one Easy win, and a loss for each way to lose. The paths:
+// The games to pin (.claude/rules/code-standards.md, Test cost): three wins on three paths through the five stages and one Easy win, and a loss for each way to lose. The paths:
 // - "all five stages": the players never travel (`travel: false`), so no Battleground location is explored, no stage is removed and The Last Battle (Siege, no victory points) ends the game;
-// - "Citadel explored": The Citadel is explored, its Response removes stage 4 (Breakthrough at the Citadel), and The Last Battle is a Siege stage with 3 victory points;
-// - "Banks destroyed": The Banks takes 3 damage and is removed from the game, The Citadel is explored (stage 4 removed);
-// - "Last Battle as Battle": the three Battleground locations are explored (stages 2, 3 and 4 removed, 6 victory points), so The Last Battle counts Attack.
-// The losses are the two ways to lose here: the threat of every player at 50 (heroes too weak to quest, solo) and every hero destroyed (heroes too brittle, two-handed).
+// - "Banks destroyed": The Banks takes 3 damage and is removed from the game (no victory points, no stage set aside by it), and The Citadel is explored: its Response removes stage 4 (Breakthrough at the Citadel), so The Last Battle follows stage 3 as a Siege stage with 3 victory points;
+// - "Last Battle as Battle": the three Battleground locations are explored (6 victory points). The Citadel's Response removes stage 4; the Responses of The Approach and The Banks find stages 3 and 2 already played, so they remove nothing, and The Last Battle counts Attack.
+// The Easy win follows the same path as "Last Battle as Battle". The losses are the two ways to lose here: the threat of every player at 50 (heroes too weak to quest, solo) and every hero destroyed (heroes too brittle, two-handed).
 export const ANDROS_GOLDENS: readonly AndrosGolden[] = [
   { name: "solo win, all five stages", seatCount: 1, seed: 3, difficulty: "Normal", decks: "strong", outcome: "won", policy: { travel: false } },
-  { name: "solo win, Citadel explored", seatCount: 1, seed: 6, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed win, Banks destroyed", seatCount: 2, seed: 9, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed win, Last Battle as Battle", seatCount: 2, seed: 6, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "Easy solo win, all three locations explored", seatCount: 1, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won" },

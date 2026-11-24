@@ -10,7 +10,6 @@ import { goldenState } from "../../../../test/harness/golden-state.ts";
 const andros = loadAnyScenario("the-siege-of-cair-andros");
 const NORMAL = "solo win, all five stages";
 const EASY = "Easy solo win, all three locations explored";
-const CITADEL_EXPLORED = "solo win, Citadel explored";
 const BANKS_DESTROYED = "two-handed win, Banks destroyed";
 const countOf = (code: string, name: string) => Object.values(goldenState(andros.id, name).cards).filter((card) => card.code === code).length;
 const zoneOf = (code: string, name: string) => Object.values(goldenState(andros.id, name).cards).find((card) => card.code === code)?.zone;
@@ -39,10 +38,10 @@ describe("The Siege of Cair Andros in the against-the-shadow cycle", () => {
   });
 
   it("sets stage 4 aside without playing it once The Citadel is explored, and keeps The Citadel in the victory display", () => {
-    const state = goldenState(andros.id, CITADEL_EXPLORED);
-    expect(zoneOf("05075", CITADEL_EXPLORED)).toBe("setAside");
+    const state = goldenState(andros.id, BANKS_DESTROYED);
+    expect(zoneOf("05075", BANKS_DESTROYED)).toBe("setAside");
     expect(state.victory.map((id) => state.cards[id]?.code)).toContain("05033");
-    expect(zoneOf("05033", CITADEL_EXPLORED)).toBe("victory");
+    expect(zoneOf("05033", BANKS_DESTROYED)).toBe("victory");
   });
 
   it("removes a Battleground location from the game at its total of damage: no victory points, no stage set aside by it", () => {

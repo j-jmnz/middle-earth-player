@@ -291,7 +291,6 @@ export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
   ],
   "the-siege-of-cair-andros": [
     "Easy solo win, all three locations explored",
-    "solo win, Citadel explored",
     "solo win, all five stages",
     "two-handed win, Banks destroyed",
   ],
