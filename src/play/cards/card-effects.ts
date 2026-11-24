@@ -133,6 +133,9 @@ function printedValue(printed: PrintedCard, stat: BadgeStat): number | null {
 // A card's edge shows this many effect pills, then "+n" for the rest (the preview lists all of them).
 export const BADGE_CAP = 2;
 
+/** The words on the night pill that stands for the effect pills left out ("2 more"): a count with no sign, so it cannot be read as a change to a number the way "+2" is. */
+export const moreText = (hidden: number): string => `${hidden} more`;
+
 /** How many of `total` effect pills are drawn and how many hide behind "+n", given the rows that fit on the card's edge. */
 export function badgeSplit(total: number, room: number): { shown: number; hidden: number } {
   const fit = Math.max(1, room);
@@ -301,8 +304,10 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
   // A character committed to the quest, or an ally objective committed by its own text in the staging area (05025:A:1), shows the stat the quest counts (hon.battle, hon.siege).
   const committed = card != null && (card.committed || committedInStaging(game, cardId));
   const commitStat = committed ? questStatOf(game, cardId, ctx.cards) : "willpower";
+  // A staged enemy's foot chip shows the engagement cost it has now, so a cost the effects took to 0 is not told a second time by a bare "0" among the +n and -n chips (the preview line still says "Engagement cost is 0").
+  const shown = cost == null ? effects : { ...effects, stats: effects.stats.filter((badge) => !(badge.stat === "engagementCost" && badge.floored)) };
   return {
-    effects,
+    effects: shown,
     willpower: card != null && committed ? modifiedStat(game, card, commitStat, ctx.cards) : null,
     commitStat,
     // A stage that progress never defeats has no strip (objective.ts): "25 / 0" would read as a stage that should be won.

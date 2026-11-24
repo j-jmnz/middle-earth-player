@@ -24,6 +24,9 @@ export type LogNames = {
 // high-resolution source of those tokens exists; docs/design-system.md, Icons).
 export type LogMark = "threat" | "willpower" | "attack" | "defense" | "damage" | "progress" | "resource" | null;
 
+/** The stat the quest counted at a quest step, given the stage the quest advanced to right after it (null: it did not advance in the round's steps). */
+export type QuestStatAt = (advancedTo: string | null) => "willpower" | "attack" | "defense";
+
 export type LogLine = { key: string; text: string; cause: string | null; mark: LogMark };
 
 /** What a screen reader hears of a log line, as one element: the step, then its cause ("3 damage on Aragorn. Enemy attack, rr.step-6-4-3"). */
@@ -31,14 +34,16 @@ export function logLineSpeech(line: Pick<LogLine, "text" | "cause">): string {
   return line.cause ? `${line.text}. ${line.cause}` : line.text;
 }
 
-function markOf(step: EngineStep): LogMark {
+function markOf(step: EngineStep, stat: LogMark = null): LogMark {
   switch (step.kind) {
     case "threat":
       return "threat";
     case "hideTest":
     case "fortitudeTest":
-    case "quest":
       return "willpower";
+    // The quest's mark is the stat the stage counted (Attack under Battle, Defense under Siege).
+    case "quest":
+      return stat ?? "willpower";
     case "escapeTest":
       return step.stat ?? "willpower";
     case "strike":
@@ -79,7 +84,7 @@ export function causeText(cause: Cause, names: LogNames): string {
   return line ? `${card}: ${line}` : card;
 }
 
-function words(step: EngineStep, names: LogNames): string | null {
+function words(step: EngineStep, names: LogNames, questStat: string): string | null {
   switch (step.kind) {
     case "push":
     case "pop":
@@ -126,7 +131,7 @@ function words(step: EngineStep, names: LogNames): string | null {
     case "hideTest":
       return `Hide test ${step.success ? "passed" : "failed"}: willpower ${step.willpower} against threat ${step.threat}`;
     case "quest":
-      return `Quest: willpower ${step.willpower} against threat ${step.threat}`;
+      return `Quest: ${questStat} ${step.willpower} against threat ${step.threat}`;
     case "strike":
       return step.undefended ? `Attack ${step.attack}, undefended, on ${names.card(step.targetId)}` : `Attack ${step.attack} against defense ${step.defense} on ${names.card(step.targetId)}`;
     case "advance":
@@ -162,12 +167,15 @@ function words(step: EngineStep, names: LogNames): string | null {
 }
 
 /** The round's steps as log lines, oldest first. Frame pushes and pops are bookkeeping and are left out. */
-export function logLines(steps: readonly EngineStep[], names: LogNames): LogLine[] {
+export function logLines(steps: readonly EngineStep[], names: LogNames, questStat?: QuestStatAt): LogLine[] {
   const lines: LogLine[] = [];
   steps.forEach((step, index) => {
-    const text = words(step, names);
+    // A quest step names the stat the stage counted: the stage that was current then, which is the one the quest advanced from when an advance follows in the round.
+    const advanced = step.kind === "quest" ? steps.slice(index + 1).find((later) => later.kind === "advance" && later.stormcaller !== true) : undefined;
+    const stat = step.kind === "quest" && questStat ? questStat(advanced?.kind === "advance" ? advanced.cardId : null) : null;
+    const text = words(step, names, stat ?? "willpower");
     if (!text) return;
-    lines.push({ key: `${index}`, text, cause: "cause" in step ? causeText(step.cause, names) : null, mark: markOf(step) });
+    lines.push({ key: `${index}`, text, cause: "cause" in step ? causeText(step.cause, names) : null, mark: markOf(step, stat) });
   });
   return lines;
 }

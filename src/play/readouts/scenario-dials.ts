@@ -5,7 +5,7 @@ import { useMemo } from "react";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
 import { angmarDials, angmarHands } from "./angmar.ts";
-import { cairAndrosDials } from "./cair-andros.ts";
+import { cairAndrosDials } from "./against-the-shadow/cair-andros.ts";
 import { armiesDials } from "./the-hobbit/armies.ts";
 import { blackGateDials, blackGateHands } from "./black-gate.ts";
 import { companyDials, companyHands } from "./company.ts";

@@ -4,7 +4,7 @@
 import { Circle, Group, Image, Line, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
 
 import { cardCorner } from "../../ui/card-corner.ts";
-import { chipText, MUST_COMMIT_WORD, type CardEffects, type CombatNumber } from "../cards/card-effects.ts";
+import { BADGE_CAP, chipText, moreText, MUST_COMMIT_WORD, type CardEffects, type CombatNumber } from "../cards/card-effects.ts";
 import { DETERMINED_WORD } from "../words/scenarios/angmar/wastes-table.ts";
 import { type IconName } from "../../ui/icon-map.ts";
 import { glyphCells, type PlaceMark } from "../store/island-place.ts";
@@ -149,13 +149,16 @@ export function DeterminedMarkView({ rect, word, clear, fonts, t, s }: { rect: R
   return <WordPill rect={rect} text={word} short={word === DETERMINED_WORD ? "D" : undefined} clear={clear} fonts={fonts} t={t} s={s} />;
 }
 
-/** How far the widest effect badge reaches from the card's left edge, so a word pill keeps clear of the badge column (the rows are drawn by `Badges`: a stat is the icon, the number and 5 pt, a flag the pill and 4 pt (the must-commit pill is a stat's width), the "more" pill 24 pt). */
+/** How far the widest effect badge reaches from the card's left edge, so a word pill keeps clear of the badge column (the rows are drawn by `Badges`: a stat is the icon, the number and 5 pt, a flag the pill and 4 pt (the must-commit pill is a stat's width), the "more" pill its words and 12 pt, at least 24 pt). */
 export function badgeReach(effects: CardEffects, fonts: Fonts, s: number): number {
   const widths = [
     ...effects.stats.map((badge) => 15 * s + fonts.badge.getTextWidth(chipText(badge)) + 5 * s),
     ...effects.flags.map((flag) => (flag.flag === "mustCommit" ? 15 * s + fonts.badge.getTextWidth(MUST_COMMIT_WORD) + 5 * s : BADGE_H * s + 4 * s)),
   ];
-  return widths.length === 0 ? 0 : 2 * s + Math.max(24 * s, ...widths);
+  // The pill for the effects left out ("2 more") is as wide as its words and 12 pt; it is drawn only past the cap, and the count is at most all of them.
+  const left = effects.stats.length + effects.flags.length - BADGE_CAP + 1;
+  const more = left > 1 ? fonts.badge.getTextWidth(moreText(left)) + 12 * s : 0;
+  return widths.length === 0 ? 0 : 2 * s + Math.max(24 * s, more, ...widths);
 }
 
 // An accent pill with a word inside the card's top edge, upright, clear of the effect badges' column; where the word does not fit, a short accent dot in its place (a round pill with `short` in it when the word has one).

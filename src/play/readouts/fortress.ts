@@ -11,7 +11,7 @@ import { resolveQuest } from "../../rules/quest/quest.ts";
 import { DEFENSE_STAGE, defenseFillsWords, type DefenseOutcome } from "../words/scenarios/fortress.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
-import { cairAndrosStageLines } from "./cair-andros.ts";
+import { cairAndrosStageLines } from "./against-the-shadow/cair-andros.ts";
 
 /** The tokens on The Defense of Helm's Deep, the number that ends it, the quest stage the players advance to and its name, for the top bar's Defense dial. */
 export type DefenseTokens = { name: string; value: number; limit: number; stage: number };

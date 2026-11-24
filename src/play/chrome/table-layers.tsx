@@ -22,6 +22,7 @@ import { useDialsEdge } from "./bar-edge.ts";
 import { PEEK_TOP, PeekBanner } from "../readouts/peek-banner.tsx";
 import { carouselHeight } from "../phases/carousel-size.ts";
 import { PhaseCarousel } from "../phases/phase-carousel.tsx";
+import { questStatThen } from "../phases/quest-stat.ts";
 import { PhaseSweep } from "../phases/phase-sweep.tsx";
 import type { Reading } from "./reading.ts";
 import { copiesLabel, copiesSaid, facedownWords, keptWords, kindWords, SET_ASIDE_TITLE, setAsideHead, setAsideWords, threatSourceSaid, threatSourceWords, victorySaid, victoryWords } from "../words/list.ts";
@@ -143,10 +144,12 @@ function ThreatSourceReading({ store, ctx, names, picture, onRead, onClose }: { 
   return <ThreatSourceList title={title} total={read.total} cards={cards} adjust={adjustWords(read.adjust)} onRead={onRead} onClose={onClose} />;
 }
 
-function LogReading({ store, logNames, onClose }: { store: TableStore; logNames: LogNames; onClose: () => void }) {
-  const round = useStore(store, (state) => state.game.round);
+function LogReading({ store, ctx, logNames, onClose }: { store: TableStore; ctx: ReduceContext; logNames: LogNames; onClose: () => void }) {
+  const game = useStore(store, (state) => state.game);
+  const round = game.round;
   const roundSteps = useStore(store, (state) => state.roundSteps);
-  const lines = useMemo(() => logLines(roundSteps, logNames), [roundSteps, logNames]);
+  // The quest line names the stat the stage counted, Attack under Battle and Defense under Siege (phases/quest-stat.ts).
+  const lines = useMemo(() => logLines(roundSteps, logNames, (advancedTo) => questStatThen(game, ctx, advancedTo)), [roundSteps, logNames, game, ctx]);
   return <LogPanel round={round} lines={lines} onClose={onClose} />;
 }
 
@@ -301,7 +304,7 @@ export function TableLayers({
         {held?.kind === "row" ? <RowReading store={store} ctx={ctx} row={held.row} names={names} picture={picture} onRead={onPreview} onClose={close} /> : null}
         {held?.kind === "setAside" ? <SetAsideReading store={store} ctx={ctx} names={names} picture={picture} onRead={onPreview} onClose={close} /> : null}
         {held?.kind === "stagingThreat" ? <ThreatSourceReading store={store} ctx={ctx} names={names} picture={picture} onRead={onPreview} onClose={close} /> : null}
-        {held?.kind === "log" ? <LogReading store={store} logNames={logNames} onClose={close} /> : null}
+        {held?.kind === "log" ? <LogReading store={store} ctx={ctx} logNames={logNames} onClose={close} /> : null}
         {held?.kind === "threat" ? <ThreatReading store={store} ctx={ctx} names={names} seat={held.seat} onClose={close} /> : null}
         {held?.kind === "dial" ? <DialReading store={store} ctx={ctx} nameOf={nameOf} id={held.id} onClose={close} /> : null}
         {held?.kind === "island" ? <IslandReading store={store} ctx={ctx} width={shown} maxHeight={room - (trayShown ? WAITING * s : 0)} onRead={onPreview} onClose={close} /> : null}

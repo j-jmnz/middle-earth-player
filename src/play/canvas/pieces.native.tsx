@@ -6,7 +6,7 @@ import { Circle, DashPathEffect, FilterMode, Group, Image, Line, MipmapMode, Pat
 import type { ReactElement } from "react";
 
 import { cardCorner } from "../../ui/card-corner.ts";
-import { badgeSplit, chipText, MUST_COMMIT_WORD, type CardEffects } from "../cards/card-effects.ts";
+import { badgeSplit, chipText, moreText, MUST_COMMIT_WORD, type CardEffects } from "../cards/card-effects.ts";
 import { SPHERE_TINT, type IconName } from "../../ui/icon-map.ts";
 import { ICONS } from "../../ui/icons/generated.ts";
 import type { CardSlot, Rect } from "../layout/layout.ts";
@@ -338,10 +338,12 @@ export function Badges({
   });
   if (hidden > 0) {
     const top = y + 3 * s + shown.length * (pill + 2 * s);
+    const more = moreText(hidden);
+    const width = fonts.badge.getTextWidth(more) + 12 * s;
     rows.push(
       <Group key="more">
-        <RoundedRect x={x + 2 * s} y={top} width={24 * s} height={pill} r={pill / 2} color={t.night} />
-        <Text x={x + 6 * s} y={top + 11.5 * s} text={`+${hidden}`} font={fonts.badge} color={t.bone} />
+        <RoundedRect x={x + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={t.night} />
+        <Text x={x + 8 * s} y={top + 11.5 * s} text={more} font={fonts.badge} color={t.bone} />
       </Group>,
     );
   }

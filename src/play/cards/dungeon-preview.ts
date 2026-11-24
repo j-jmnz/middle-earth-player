@@ -24,7 +24,7 @@ import { ungolDetail } from "./ungol-preview.ts";
 import { stoneDetail } from "./stone-preview.ts";
 import { flameDetail } from "./flame-preview.ts";
 import { rhovanionDetail } from "./rhovanion-preview.ts";
-import { cairAndrosDetail } from "./cair-andros-preview.ts";
+import { cairAndrosDetail } from "./against-the-shadow/cair-andros-preview.ts";
 
 /**
  * The text of the engine's Orc Guard stand-in, and of a hero Fallen Into Evil made an enemy (`<code>~enemy`; its card shows the hero's art and its game text

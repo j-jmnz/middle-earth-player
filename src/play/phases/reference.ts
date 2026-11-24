@@ -95,7 +95,7 @@ export function turnReference(game: ScenarioState, title: (id: string) => string
       titles: NAMES[row.id] ? [NAMES[row.id] ?? ""] : row.entries.map((entry) => (title(entry) ?? entry).replace(/^[0-9.ab]+\s*/, "")),
       decision,
       current: row.id === now,
-      windows: (WINDOWS[row.id] ?? []).map((id) => ({ id, title: pointTitle(id) ?? id, note: pointNote(id) ?? "" })),
+      windows: (WINDOWS[row.id] ?? []).map((id) => ({ id, title: pointTitle(id) ?? id, note: pointNote(id, stat) ?? "" })),
     };
     const last = phases[phases.length - 1];
     if (last && last.phase === row.phase) phases[phases.length - 1] = { phase: row.phase, steps: [...last.steps, step] };

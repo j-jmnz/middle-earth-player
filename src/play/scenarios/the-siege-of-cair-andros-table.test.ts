@@ -1,9 +1,12 @@
 // Rules: ats.cair-andros-location-damage, ats.cair-andros-remove-stage, ats.cair-andros-defense-carry-over, hon.battle, hon.siege, hon.archery, rr.cannot, rr.removed-from-game (data/rules/entries.json); ledger lines 05033:A:1, 05034:A:1, 05035:A:1, 05033:A:2, 05072:B:2, 05073:B:1, 05075:B:2, 05076:B:3, 05057:A:2, 05058:A:1.
 // What the table says for The Siege of Cair Andros: the damage on each Battleground location against the number that removes it from the game, the lines of each stage, the stages the Responses removed, the Undefended choice naming the location, a hero whose resources cannot be spent and Orc Arbalesters' Archery X.
 // The engine decided each number; nothing here changes one.
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import type { ScenarioState } from "../../rules/core/state.ts";
+import { UNATTRIBUTED } from "../../rules/core/cause.ts";
+import type { EngineStep } from "../../rules/core/intents.ts";
 import { updateCard } from "../../rules/core/state.ts";
 import { legalIntents } from "../../rules/engine/legal.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
@@ -11,14 +14,19 @@ import { heroCard, idOf, send, start, type Layout } from "../../../test/harness/
 import type { Run } from "../../../test/harness/scene.ts";
 import { hurt, run as runInstruction, table } from "../../../test/scenarios/the-siege-of-cair-andros/table.ts";
 
+import { BADGE_CAP, badgeSplit, moreText, slotNumbers } from "../cards/card-effects.ts";
 import { cardKeywords } from "../cards/card-keywords.ts";
 import { dungeonDetail } from "../cards/dungeon-preview.ts";
 import { questTitle } from "../cards/table-preview.ts";
 import { defenseSheet } from "../choice/combat-sheets.ts";
 import type { PickSheet, SheetNames } from "../choice/sheet-types.ts";
 import { playRequest } from "../choice/pay.ts";
-import { questStatNow } from "../phases/quest-stat.ts";
+import { pointNote } from "../phases/rail.ts";
+import { turnReference } from "../phases/reference.ts";
+import { questStatNow, questStatThen } from "../phases/quest-stat.ts";
 import { advanceWords } from "../readouts/quest-advance.ts";
+import { momentOf } from "../store/outcome.ts";
+import { logLines } from "../store/log.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
 import { adjustWords, threatSourcesOf } from "../readouts/threat-sources.ts";
 
@@ -191,5 +199,77 @@ describe("Orc Arbalesters' Archery X (05057:A:2)", () => {
     expect(say(made, made.state, "05057")).toMatch(/^Archery X: X is the number of different resource icons .* on the heroes in play\. It is \d now$/);
     const x = Number(/It is (\d) now/.exec(say(made, made.state, "05057") ?? "")?.[1]);
     expect(cardKeywords(made.state, made.ctx, id).find((chip) => chip.key === "archery")?.word).toBe(`Archery ${x}`);
+  });
+});
+
+// Words and marks of a stage that counts Attack (Battle) or Defense (Siege) instead of Willpower. A stage with neither keyword is worded as it always was.
+describe("the quest's words follow the stat the stage counts", () => {
+  const quest: EngineStep = { kind: "quest", willpower: 16, threat: 13, cause: UNATTRIBUTED };
+  const logNames = { card: (id: string) => id, code: (code: string) => code, effectCard: () => null, rule: () => null, line: () => null };
+  const bannerLine = (code: string) => {
+    const made = table({ stage: code });
+    const moment = momentOf(made.state, made.state, [quest], { card: (id) => id, questStat: (state) => questStatNow(state, made.ctx) });
+    return moment?.lines[0] ?? null;
+  };
+
+  it("the banner counts Attack on a Battle stage, Defense on a Siege stage and Willpower on a stage with neither", () => {
+    expect(bannerLine("05074")).toEqual({ text: "Attack 16 against threat 13", mark: "attack" });
+    expect(bannerLine("05072")).toEqual({ text: "Defense 16 against threat 13", mark: "defense" });
+    expect(bannerLine("05073")).toEqual({ text: "Willpower 16 against threat 13", mark: "willpower" });
+  });
+
+  it("the log says the same, and a quest that advanced the stage is worded by the stage it left", () => {
+    const made = table({ stage: "05074" });
+    const stat = (advancedTo: string | null) => questStatThen(made.state, made.ctx, advancedTo);
+    expect(logLines([quest], logNames, stat)[0]).toMatchObject({ text: "Quest: attack 16 against threat 13", mark: "attack" });
+    // Stage 3 (Battle) was beaten, and stage 4 (Siege) is the stage now: the quest step before the advance counted Attack.
+    const after = table({ stage: "05075" });
+    const state = updateCard(played(after.state), idOf(after.state, "05074"), { progress: 7 });
+    const advance: EngineStep = { kind: "advance", cardId: state.questStage ?? "" };
+    const lines = logLines([quest, advance], logNames, (advancedTo) => questStatThen(state, after.ctx, advancedTo));
+    expect(lines[0]).toMatchObject({ text: "Quest: attack 16 against threat 13", mark: "attack" });
+    expect(logLines([quest], logNames, (advancedTo) => questStatThen(state, after.ctx, advancedTo))[0]).toMatchObject({ text: "Quest: defense 16 against threat 13" });
+    const plain = table({ stage: "05073" });
+    expect(logLines([quest], logNames, (advancedTo) => questStatThen(plain.state, plain.ctx, advancedTo))[0]).toMatchObject({ text: "Quest: willpower 16 against threat 13", mark: "willpower" });
+    expect(logLines([quest], logNames)[0]).toMatchObject({ text: "Quest: willpower 16 against threat 13", mark: "willpower" });
+  });
+
+  it("the stop before the quest resolves names the stat, in the window point and in the reference", () => {
+    expect(pointNote("3.3")).toBe("Staging is done. Willpower raised now counts against its threat.");
+    expect(pointNote("3.3", "willpower")).toBe(pointNote("3.3"));
+    expect(pointNote("3.3", "attack")).toBe("Staging is done. Attack raised now counts against its threat.");
+    expect(pointNote("3.3", "defense")).toBe("Staging is done. Defense raised now counts against its threat.");
+    const made = table({ stage: "05074" });
+    const windows = turnReference(made.state, () => null, "attack").flatMap((phase) => phase.steps).find((step) => step.id === "3.3")?.windows ?? [];
+    expect(windows.map((window) => window.note)).toEqual(["Staging is done. Attack raised now counts against its threat."]);
+    const plain = turnReference(made.state, () => null).flatMap((phase) => phase.steps).find((step) => step.id === "3.3")?.windows ?? [];
+    expect(plain.map((window) => window.note)).toEqual([pointNote("3.3")]);
+  });
+
+  it("the quest meter's test id names no stat", () => {
+    const view = readFileSync(new URL("../readouts/quest-meter-view.tsx", import.meta.url), "utf8");
+    expect(view).toContain('testID="quest-meter-stat"');
+    expect(view).not.toContain("quest-meter-willpower");
+  });
+});
+
+describe("the pills down a card's edge", () => {
+  it("a staged enemy whose engagement cost an effect took to 0 shows it once, at its foot, and no bare 0 among the changes", () => {
+    const made = table({ stage: "05073", staging: ["05057"] });
+    const id = idOf(made.state, "05057");
+    const modify = (amount: number) => ({ ...made.state, modifiers: [...made.state.modifiers, { instanceId: id, sourceId: id, stat: "engagementCost" as const, amount, until: "endOfPhase" as const }] });
+    const floored = slotNumbers(modify(-99), made.ctx, id);
+    expect(floored.engagement?.cost).toBe(0);
+    expect(floored.effects.stats.map((badge) => badge.stat)).not.toContain("engagementCost");
+    const lowered = slotNumbers(modify(-5), made.ctx, id);
+    expect(lowered.engagement?.cost).toBe((made.cards.get("05057")?.engagementCost ?? 0) - 5);
+    expect(lowered.effects.stats.map((badge) => badge.stat)).toContain("engagementCost");
+  });
+
+  it("the pill for the effects left out says a count of more, never a signed number", () => {
+    expect(moreText(1)).toBe("1 more");
+    expect(moreText(3)).toBe("3 more");
+    expect(badgeSplit(BADGE_CAP + 1, 5)).toEqual({ shown: BADGE_CAP, hidden: 1 });
+    expect(moreText(badgeSplit(BADGE_CAP + 1, 5).hidden)).not.toMatch(/[+-]/);
   });
 });

@@ -8,7 +8,7 @@ import { defenseAsDefender, modifiedStat } from "../../rules/core/keywords.ts";
 import { attackStatAgainst } from "../../rules/families/attack/spectral.ts";
 import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 
-import { undefendedRedirectWords } from "../readouts/cair-andros.ts";
+import { undefendedRedirectWords } from "../readouts/against-the-shadow/cair-andros.ts";
 import { fateAttackNote, fateTargetNote } from "../words/scenarios/fate.ts";
 import { attackSource } from "../words/scenarios/grapple.ts";
 import { nightDefenderExcess, nightStageAttack } from "../words/scenarios/night.ts";

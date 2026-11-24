@@ -2,18 +2,18 @@
 //
 // The pieces The Siege of Cair Andros' cards hold on the table: the damage on each Battleground location against the number that removes it from the game (a top-bar dial and the card's preview), the lines of the current stage (where undefended damage goes, the extra Threat and reveal, the
 // victory points toward Battle), the stages the Responses removed from the quest deck, a hero whose resources cannot be spent and the number Orc Arbalesters' Archery X counts now. The engine decided every number; nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
-import type { Effect } from "../../catalog/boundary.ts";
-import { victoryPointsOf } from "../../rules/core/printed-stat.ts";
-import { printedOf } from "../../rules/core/printed.ts";
-import { heldAmount, type CardInstance, type ScenarioState } from "../../rules/core/state.ts";
-import type { ReduceContext } from "../../rules/engine/reduce.ts";
-import { battlegroundsInPlay, undefendedBattlegrounds } from "../../rules/families/pelargir/siege.ts";
-import { stagePlace } from "../../rules/families/quest/branch.ts";
-import { questPointsOf } from "../../rules/quest/quest.ts";
-import { effectsOf } from "../../rules/windows/listen.ts";
+import type { Effect } from "../../../catalog/boundary.ts";
+import { victoryPointsOf } from "../../../rules/core/printed-stat.ts";
+import { printedOf } from "../../../rules/core/printed.ts";
+import { heldAmount, type CardInstance, type ScenarioState } from "../../../rules/core/state.ts";
+import type { ReduceContext } from "../../../rules/engine/reduce.ts";
+import { battlegroundsInPlay, undefendedBattlegrounds } from "../../../rules/families/pelargir/siege.ts";
+import { stagePlace } from "../../../rules/families/quest/branch.ts";
+import { questPointsOf } from "../../../rules/quest/quest.ts";
+import { effectsOf } from "../../../rules/windows/listen.ts";
 
-import { battleTurnWords, battlegroundDialWords, battlegroundNearWords, extraRevealWords, removedStagesWords, stagingThreatWords, undefendedSheetWords, undefendedWords } from "../words/scenarios/cair-andros.ts";
-import type { TableDial } from "./dials.ts";
+import { battleTurnWords, battlegroundDialWords, battlegroundNearWords, extraRevealWords, removedStagesWords, stagingThreatWords, undefendedSheetWords, undefendedWords } from "../../words/scenarios/against-the-shadow/cair-andros.ts";
+import type { TableDial } from "../dials.ts";
 
 /** The number of damage that removes this card from the game (`removedAtDamage`), or 0 for a card without it. */
 export const removalLimit = (game: ScenarioState, id: string): number => (game.modifiers.length > 0 ? heldAmount(game, id, "removedAtDamage") : 0);

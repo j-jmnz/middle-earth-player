@@ -78,7 +78,7 @@ function FullMeter({ scale, height }: { scale: QuestScale; height: number }) {
           {marker.caption ?? ""}
         </Text>
       </View>
-      <View testID="quest-meter-willpower" className="items-center" style={{ width: 64 * s }}>
+      <View testID="quest-meter-stat" className="items-center" style={{ width: 64 * s }}>
         <Text className="font-display" style={{ height: NUMBER * s, fontSize: 20 * s, lineHeight: NUMBER * s, color: t.bone }}>
           {String(scale.willpower)}
         </Text>
