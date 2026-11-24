@@ -25,6 +25,7 @@ const STAGE = "05073";
 const DEFENSE = "05072";
 const AT_APPROACH = "05074";
 const AT_CITADEL = "05075";
+const LIEUTENANT = "05056";
 const LAST_BATTLE = "05076";
 const MALICE = "05060";
 const THREE = [CITADEL, APPROACH, BANKS];
@@ -53,6 +54,10 @@ const ROWS: readonly Row[] = [
   { line: "05036:A:1", name: "When Revealed: each hero gets -2 Attack and -2 Defense until the end of the round (still in force after the phase ends)", layout: { stage: STAGE }, act: [resolve(ASSAULT, "whenRevealed"), endPhase], expect: [stat("dh1", "attack", 0), stat("dh1", "defense", 0), stat("dh2", "attack", 0), stat("dh2", "defense", 0)] },
   { line: "05036:A:2", name: "Shadow: 2 damage to each Battleground location in play, staging or active, and no +2 Attack", layout: { stage: STAGE, active: { code: BANKS, damage: 1 }, staging: [CITADEL, APPROACH, WAR_CAMP] }, act: attack("f3", { shadow: ASSAULT, undefended: true }), expect: [zone(BANKS, "removed"), damageOn(CITADEL, 2), damageOn(APPROACH, 2), damageOn(WAR_CAMP, 0), damageOn("dh1", 1)] },
 
+
+  // 05056 Lieutenant of Mordor: the topmost treachery of the encounter discard pile is the last one placed there.
+  { line: "05056:A:2", name: "When Revealed: the When Revealed effect of the topmost treachery in the encounter discard pile resolves (Orc Assault, under an enemy), and the card stays there", layout: { stage: STAGE, discard: [ASSAULT, "f0"] }, act: resolve(LIEUTENANT, "whenRevealed"), expect: [stat("dh1", "attack", 0), zone(ASSAULT, "encounterDiscard")] },
+  { line: "05056:A:2", name: "When Revealed: only the topmost treachery resolves, not the one below it (Scourge of Mordor below it does not discard a card or raise the Threat: 3 + 2 of the Lieutenant)", layout: { stage: STAGE, staging: ["f3"], deckOf: ["event"], discard: [SCOURGE, ASSAULT] }, act: resolve(LIEUTENANT, "whenRevealed"), expect: [stat("dh1", "attack", 0), stagingThreat(5)] },
 
   { line: "05058:A:2", name: "Shadow: the attacking enemy is dealt two additional shadow cards (the 3 other cards of the deck are down to 1)", layout: { stage: STAGE }, act: attack("f3", { shadow: VANGUARD, undefended: true }), expect: deckCount(1) },
 
