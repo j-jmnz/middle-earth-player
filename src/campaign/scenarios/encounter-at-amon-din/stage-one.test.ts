@@ -2,26 +2,10 @@
 // Savagery of the Orcs (stage 1, 06066:B:2, 06066:B:3): the progress that would reach the quest becomes a move of villager tokens to Rescued Villagers, and the quest advances when its last token leaves. The quest phases are played with the scene kit's quest commit on a stage-1 table whose quest card holds its tokens.
 import { describe, expect, it } from "vitest";
 
-import type { ScenarioState } from "../../../rules/core/state.ts";
-import { idOf, legalIntents, send, start } from "../../../../test/harness/scene-kit.ts";
-import type { Run } from "../../../../test/harness/scene-kit.ts";
-import { CODES, damageOn, runSettled, table, villagers, withVillagers } from "../../../../test/scenarios/encounter-at-amon-din/table.ts";
+import { idOf } from "../../../../test/harness/scene-kit.ts";
+import { CODES, damageOn, quested, runSettled, table, villagers, withVillagers } from "../../../../test/scenarios/encounter-at-amon-din/table.ts";
 
 const { savagery, protect, rescued, dead, farmhouse, alcaron, hamlet } = CODES;
-
-type Table = ReturnType<typeof table>;
-
-// The two heroes commit (4 Willpower in all) and the quest is played to its end.
-function quested(made: Table, state: ScenarioState): Run {
-  let run = send(start(state), { type: "Commit", cardIds: [made.hero, made.hero2] }, made.ctx);
-  run = send(run, { type: "Pass" }, made.ctx);
-  for (let guard = 0; guard < 16 && run.state.phase === "Quest" && !run.state.lost; guard += 1) {
-    const pass = legalIntents(run.state, made.ctx).find((intent) => intent.type === "Pass");
-    if (!pass || run.state.mode === "travel") break;
-    run = send(run, pass, made.ctx);
-  }
-  return run;
-}
 
 const stageOne = (layout: Parameters<typeof table>[0] = {}) => {
   const made = table({ staging: [rescued, dead], ...layout });
