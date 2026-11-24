@@ -185,7 +185,7 @@ export function logLines(steps: readonly EngineStep[], names: LogNames): LogLine
     controlOf(step)?.changes.forEach((change, at) => lines.push({ key: `${index}-c${at}`, text: changeWords(change, controlOf(step)?.seatCount ?? 1, names.card(change.id)), cause: null, mark: null }));
     // The hidden cards of The Blood of Gondor taken, turned or discarded and the allies placed under Captured! in the intent this step ended (readouts/against-the-shadow/blood-steps.ts).
     const hidden = hiddenOf(step);
-    if (hidden) hiddenLines(hidden, names.card).forEach((text, at) => lines.push({ key: `${index}-h${at}`, text, cause: null, mark: null }));
+    if (hidden) hiddenLines(hidden, names.card, true).forEach((text, at) => lines.push({ key: `${index}-h${at}`, text, cause: null, mark: null }));
   });
   return lines;
 }

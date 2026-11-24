@@ -14,8 +14,8 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   },
   "06117:forced:2 @0.0 turn": {
     label: [
-      { when: MANY, text: "Turn your {held} hidden cards faceup: each enemy engages you, any other card is discarded" },
-      { when: HELD, text: "Turn your hidden card faceup: an enemy engages you, any other card is discarded" },
+      { when: MANY, text: "Turn your {held} hidden cards faceup: each enemy among them engages you and attacks this phase; any other card is discarded. This cannot be undone." },
+      { when: HELD, text: "Turn your hidden card faceup: if it is an enemy, it engages you and attacks this phase; any other card is discarded. This cannot be undone." },
       { text: "Turn nothing: you hold no hidden card" },
     ],
     bind: { held: { hidden: "own" } },

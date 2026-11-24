@@ -4,13 +4,14 @@
 // the Travel cost lines of the locations, The Cross-roads, Black Númenorean, Conflict at the Crossroads' lasting Threat in the quest readout and Brutal Uruk's line on the attack sheet. A hidden card is never named, typed or pictured here: only the count of each seat. Every hook
 // keys on this scenario's id and is empty in another. The engine decided every number; nothing here changes one. Pure, so a test reads it.
 import type { Effect } from "../../../catalog/boundary.ts";
-import { flagged, heldAmount, livingSeats, type ScenarioState } from "../../../rules/core/state.ts";
+import { flagged, livingSeats, type ScenarioState } from "../../../rules/core/state.ts";
+import { syncConstants } from "../../../rules/interpret/constants.ts";
+import { questPointsOf } from "../../../rules/quest/quest.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
-import { engagedOrcRaise } from "../../../rules/families/pelargir/engaged-threat.ts";
 import { hiddenIds, hiddenSupply } from "../../../rules/families/pelargir/hidden.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 
-import { ALCARON_ACTION, BEFORE_COMBAT_NOTE, COMBAT_START_DECISION, allyWords, bonusWords, capturedWords, crossroadsWords, exploredWords, FARAMIR_ACTION, hiddenLabel, hiddenNote, hiddenWarn, numenoreanWords, orcThreatWords, totalName, totalNote, totalWarn, travelWords, urukAttackWords, ambushWords } from "../../words/scenarios/against-the-shadow/blood.ts";
+import { ALCARON_ACTION, BEFORE_COMBAT_NOTE, COMBAT_START_DECISION, allyWords, bonusWords, capturedWords, crossroadsWords, exploredWords, FARAMIR_ACTION, hiddenLabel, hiddenNote, hiddenWarn, numenoreanWords, totalName, totalNote, totalWarn, travelWords, travelCostWords, urukAttackWords, ambushWords, dockWords } from "../../words/scenarios/against-the-shadow/blood.ts";
 import type { TableDial } from "../dials.ts";
 import type { HandMark } from "../isengard.ts";
 
@@ -38,8 +39,8 @@ export const holdings = (game: ScenarioState): number[] => (live(game) ? Array.f
 // Whether the current stage turns a player's hidden cards at 5 (the flag Captured! holds).
 const limited = (game: ScenarioState): boolean => live(game) && game.questStage != null && game.modifiers.length > 0 && flagged(game, game.questStage, "turnsAtFiveHidden");
 
-// The seats a fifth card would turn: living seats at 4 while the limit holds.
-const atFour = (game: ScenarioState): number[] => (limited(game) ? livingSeats(game).filter((seat) => hiddenIds(game, seat).length === FIVE_LIMIT) : []);
+// The seats a fifth card would turn (at 4) or whose turn is waiting (5 or more), with their counts: living seats while the limit holds.
+const atFour = (game: ScenarioState): { seat: number; count: number }[] => (limited(game) ? livingSeats(game).map((seat) => ({ seat, count: hiddenIds(game, seat).length })).filter((entry) => entry.count >= FIVE_LIMIT) : []);
 
 const inPlayCode = (game: ScenarioState, code: string): boolean => Object.values(game.cards).some((card) => card.code === code && (card.zone === "staging" || card.zone === "activeLocation" || card.zone === "secondActiveLocation"));
 
@@ -49,7 +50,7 @@ export function bloodHands(game: ScenarioState): readonly HandMark[] {
   const limit = limited(game);
   return livingSeats(game).map((seat) => {
     const count = hiddenIds(game, seat).length;
-    const warn = limit && count === FIVE_LIMIT ? { level: "near" as const, words: hiddenWarn(game.seatCount, seat) } : undefined;
+    const warn = limit && count >= FIVE_LIMIT ? { level: "near" as const, words: hiddenWarn(game.seatCount, seat, count) } : undefined;
     return { seat, label: hiddenLabel(game.seatCount > 1 ? seat : null, count), note: hiddenNote(game.seatCount, seat, count, limit), ...(warn ? { warn } : {}) };
   });
 }
@@ -89,6 +90,20 @@ export function travelShort(game: ScenarioState, ctx: ReduceContext, locationId:
   return amount != null && hiddenSupply(game) < amount ? amount : null;
 }
 
+/**
+ * What the travel readout says of a location of this scenario: the quest points it has once it is the active location (the +5 of Western and Eastern Road holds in the staging area only, so the progress that must fall on it first is
+ * the printed number) and the hidden cards the first player takes to travel. Null for any other scenario, where the readout reads the location where it lies.
+ */
+export function bloodTravel(game: ScenarioState, ctx: ReduceContext, locationId: string): { points: number | null; cost: string | null } | null {
+  const location = game.cards[locationId];
+  if (!live(game) || !location) return null;
+  const active = syncConstants({ ...game, cards: { ...game.cards, [locationId]: { ...location, zone: "activeLocation" } } }, ctx);
+  const amount = travelAmount(ctx, location.code);
+  const first = game.firstPlayer;
+  const held = hiddenIds(game, first).length;
+  return { points: questPointsOf(active, active.cards[locationId] ?? location, ctx.cards), cost: amount == null ? null : travelCostWords(amount, game.seatCount, first, held) };
+}
+
 /** The card preview's line for a card of this scenario: a Travel cost as its consequence, The Cross-roads, the +5 quest points, the Dark Woods' Forced line, Black Númenorean and the two allies. Null for any other card. */
 export function bloodDetail(game: ScenarioState, ctx: ReduceContext, cardId: string): string | null {
   const card = game.cards[cardId];
@@ -109,17 +124,30 @@ export function bloodDetail(game: ScenarioState, ctx: ReduceContext, cardId: str
   return parts.length > 0 ? parts.join(" ") : null;
 }
 
-/** The quest readout's addition while Conflict at the Crossroads' lasting effect holds: the Threat the engaged Orcs add now. Empty otherwise. */
-export function bloodQuestNote(game: ScenarioState, ctx: ReduceContext): string {
-  if (!live(game) || game.modifiers.length === 0 || heldAmount(game, "table", "engagedOrcThreat") <= 0) return "";
-  return `; ${orcThreatWords(engagedOrcRaise(game, ctx.cards))}`;
+// The seat whose hidden cards a character destroyed by this attack turns: its controller, the defender's (a Sentinel defender of the other seat) or the hero's, else the player attacked.
+function destroyedControllerSeat(game: ScenarioState, attack: NonNullable<ScenarioState["pendingAttack"]>): number {
+  const character = attack.defenderId ?? attack.heroId;
+  return (character != null ? game.cards[character]?.controller : null) ?? attack.seat;
 }
 
-/** Brutal Uruk's line on the attack sheet, or null for any other attacker. */
+/** Brutal Uruk's line on the attack sheet, or null for any other attacker. It names the player whose cards turn: the controller of the defender once one is declared, else the player attacked. */
 export function bloodAttackLine(game: ScenarioState): string | null {
   const attack = game.pendingAttack;
   if (!live(game) || !attack || game.cards[attack.enemyId]?.code !== URUK) return null;
-  return urukAttackWords(game.seatCount, attack.seat, hiddenIds(game, attack.seat).length);
+  const seat = destroyedControllerSeat(game, attack);
+  return urukAttackWords(game.seatCount, seat, hiddenIds(game, seat).length);
+}
+
+/** The caution on a defense that would destroy Faramir or Lord Alcaron: the players lose when either leaves play (06132:A:3, 06133:A:3), which the shared caution does not read. Empty for any other card and scenario. */
+export const bloodLossNote = (game: ScenarioState, characterId: string): string => (live(game) && (game.cards[characterId]?.code === FARAMIR || game.cards[characterId]?.code === ALCARON) ? "; the players lose the game if he is destroyed" : "");
+
+/** The clause the dock readout adds to a defense that destroys a character: "a hero destroyed turns your 1 hidden card" (Brutal Uruk, 06121:A:1). Empty for any other attacker and when the controller holds none. */
+export function bloodDockClause(game: ScenarioState, characterId?: string): string {
+  const attack = game.pendingAttack;
+  if (!live(game) || !attack || game.cards[attack.enemyId]?.code !== URUK) return "";
+  const controller = characterId != null ? game.cards[characterId]?.controller : null;
+  const seat = controller ?? destroyedControllerSeat(game, attack);
+  return dockWords(game.seatCount, seat, hiddenIds(game, seat).length);
 }
 
 // Stage 1 holds the choice at the beginning of the combat phase.

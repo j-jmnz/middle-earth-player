@@ -11,7 +11,7 @@ import { deckTopFaceUp } from "../../rules/player/deck-play.ts";
 import { clashesOf } from "./clash.ts";
 import { stampVillagers } from "./villager-steps.ts";
 import { stampControl } from "../readouts/against-the-shadow/osgiliath-steps.ts";
-import { stampHidden, typeIn } from "../readouts/against-the-shadow/blood-steps.ts";
+import { carryHidden, stampHidden, typeIn } from "../readouts/against-the-shadow/blood-steps.ts";
 import { stampCounted } from "./counted.ts";
 import { finishedRoundSteps } from "./outcome.ts";
 import { peekSeat } from "./peek.ts";
@@ -99,7 +99,8 @@ export type Kept = { roundSteps: readonly EngineStep[]; history: readonly Undoab
  * One more accepted intent folded into what the table keeps. The store calls it for each intent sent, and reopening a save
  * calls it for each intent replayed, so both keep the same log and the same Undo list.
  */
-export function keepIntent(kept: Kept, before: ScenarioState, after: ScenarioState, steps: readonly EngineStep[], intent: PlayerIntent, ctx?: ReduceContext): Kept {
+export function keepIntent(kept: Kept, before: ScenarioState, after: ScenarioState, given: readonly EngineStep[], intent: PlayerIntent, ctx?: ReduceContext): Kept {
+  const steps = carryHidden(given, before, after);
   return {
     roundSteps: nextRoundSteps(kept.roundSteps, before, after, steps, ctx),
     history: nextUndoable(kept.history, after, { before, roundSteps: kept.roundSteps, intent, steps }),
@@ -165,19 +166,21 @@ export function createTableStore(input: TableInput): TableStore {
         return false;
       }
       accepted?.();
+      // A choice of The Blood of Gondor that moved a hidden card and returned no step still shows (blood-steps.ts).
+      const steps = carryHidden(result.steps, before, result.state);
       // A round ends with its refresh: setup (round 0) ends with no summary.
       const crossed = result.state.round !== before.round && before.round > 0;
-      const ended = crossed ? { ended: { round: before.round, steps: finishedRoundSteps([...get().roundSteps, ...result.steps]) } } : {};
-      const moment: TableMoment = { seq: (get().moment?.seq ?? 0) + 1, kind: "sent", before, after: result.state, steps: result.steps, ...ended };
-      const shows = result.steps.length > 0 || crossed;
+      const ended = crossed ? { ended: { round: before.round, steps: finishedRoundSteps([...get().roundSteps, ...steps]) } } : {};
+      const moment: TableMoment = { seq: (get().moment?.seq ?? 0) + 1, kind: "sent", before, after: result.state, steps, ...ended };
+      const shows = steps.length > 0 || crossed;
       set({
         ...showing(result.state),
-        ...keepIntent(get(), before, result.state, result.steps, intent, ctx),
+        ...keepIntent(get(), before, result.state, steps, intent, ctx),
         moment,
         shown: shows ? moment : get().shown,
         // The attacks this moment resolved play on the canvas before its banner; a pass that shows nothing, or a moment with no attacks
         // while the last one's still wait to play, leaves the last gate be (gate.ts, nextGate).
-        spotlight: shows ? nextGate(get().spotlight, moment.seq, clashesOf(before, result.state, result.steps, ctx.cards), before, result.state) : get().spotlight,
+        spotlight: shows ? nextGate(get().spotlight, moment.seq, clashesOf(before, result.state, steps, ctx.cards), before, result.state) : get().spotlight,
       });
       input.onCommit?.(intent, result.state);
       return true;

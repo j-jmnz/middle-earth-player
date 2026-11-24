@@ -18,8 +18,14 @@ export const hiddenLabel = (seat: number | null, count: number): string => `${se
 export const hiddenNote = (seatCount: number, seat: number, count: number, limit: boolean): string =>
   `${capital(ownerWords(seatCount, seat))} play area holds ${hiddenCards(count)}, facedown. Nobody sees which they are.${limit ? ` At ${FIVE} the player turns them all faceup.` : ""}`;
 
-/** The warning when one more card brings a player to 5 on stage 2: near. */
-export const hiddenWarn = (seatCount: number, seat: number): string => `${seatCount > 1 ? `Player ${seat + 1} holds` : "You hold"} 4 hidden cards: one more turns them all faceup`;
+// What the turn at 5 waits for: the effect or the attack that gave the fifth card is finished first, and every window but an action window is passed.
+const WAITS = "they turn faceup when the effect or attack in progress is done";
+
+/** The warning when a player sits at 4 on stage 2 (one more card turns them all faceup), or at 5 or more (the turn is waiting): near. */
+export const hiddenWarn = (seatCount: number, seat: number, count = 4): string => {
+  const who = seatCount > 1 ? `Player ${seat + 1} holds` : "You hold";
+  return count >= FIVE ? `${who} ${hiddenCards(count)}: ${WAITS}` : `${who} 4 hidden cards: one more turns them all faceup`;
+};
 
 /** Who holds how many, as a sentence part: "You hold 2 hidden cards", "Hidden cards: Player 1 holds 2, Player 2 holds 0". */
 export function holdingWords(counts: readonly number[]): string {
@@ -32,21 +38,20 @@ export const totalName = (total: number): string => `Hidden cards in all play ar
 export const totalNote = (counts: readonly number[], numenorean: boolean): string =>
   `${holdingWords(counts)}. ${numenorean ? "Black Númenorean counts every hidden card for its Threat. " : ""}Nobody sees the cards, only how many each player holds.`;
 
-/** The dial's warning while a seat sits at 4 under Captured!. */
-export const totalWarn = (seats: readonly number[], seatCount: number): string =>
-  `${seats.map((seat) => (seatCount > 1 ? `Player ${seat + 1}` : "You")).join(" and ")} ${seats.length > 1 || seatCount === 1 ? "hold" : "holds"} 4 hidden cards: one more turns them all faceup`;
+/** The dial's warning while a seat sits at 4 (or holds 5 or more) under Captured!. */
+export const totalWarn = (seats: readonly { seat: number; count: number }[], seatCount: number): string => seats.map((entry) => hiddenWarn(seatCount, entry.seat, entry.count)).join("; ");
 
-const TURN_RULE = "an enemy engages him, any other card is discarded";
+const turnRule = (self: boolean): string => `an enemy engages ${self ? "you" : "that player"}, any other card is discarded`;
 
-/** Stage 1's line: the counts, what each phase does, what stage 2 does when it is revealed and the loss. Last in the stage's preview, so it ends with its period. */
+/** Stage 1's line: the counts, what starts each phase and the loss. Last in the stage's preview, so it ends with its period. */
 export const ambushWords = (counts: readonly number[]): string =>
-  `${holdingWords(counts)}. At the beginning of the quest phase each player takes 1 hidden card. At the beginning of the combat phase each player, the first player first, chooses: turn each of his hidden cards faceup (${TURN_RULE}), or take 1 hidden card. Defeating this stage reveals Captured!: Faramir and Lord Alcaron go under it with nobody to control them, and every player turns his hidden cards faceup. The players lose if Faramir or Lord Alcaron leaves play.`;
+  `${holdingWords(counts)}. Each quest phase starts with 1 hidden card for each player; each combat phase starts with the choice: turn them faceup or take 1 more. The players lose if Faramir or Lord Alcaron leaves play.`;
 
-/** Stage 2's line. `crossroads`: The Cross-roads is in play, so the stage has Siege and no Battle. `four`: the seats at 4. */
-export function capturedWords(counts: readonly number[], crossroads: boolean, four: readonly number[]): string {
+/** Stage 2's line. `crossroads`: The Cross-roads is in play, so the stage has Siege and no Battle. `four`: the seats at 4 or more, each with its count. */
+export function capturedWords(counts: readonly number[], crossroads: boolean, four: readonly { seat: number; count: number }[]): string {
   const near = four.length > 0 ? ` ${totalWarn(four, counts.length)}.` : "";
-  const stat = crossroads ? " The Cross-roads is in play, so this stage has Siege and no Battle: characters count Defense when questing." : "";
-  return `${holdingWords(counts)}. At the beginning of the quest phase each player takes 1 hidden card. A player who holds ${FIVE} hidden cards turns them all faceup at once (${TURN_RULE}).${near} Faramir and Lord Alcaron lie under this stage: in play, controlled by nobody, with no Action to use.${stat} Defeating this stage wins the game. The players lose if either ally leaves play.`;
+  const stat = crossroads ? " The Cross-roads gives this stage Siege and no Battle." : "";
+  return `${holdingWords(counts)}. Each quest phase starts with 1 hidden card for each player; a player at ${FIVE} turns them all faceup.${near}${stat} The players lose if Faramir or Lord Alcaron, held under this stage and controlled by nobody, leaves play.`;
 }
 
 /** An objective ally's preview: whose it is, who may use its Action, the loss. `action`: what its Action does. Held under Captured! it is told by the stage (capturedWords). */
@@ -62,14 +67,20 @@ export const ALCARON_ACTION = "exhaust it to return an enemy engaged with the pl
 export function travelWords(amount: number, seatCount: number, seat: number, held: number, supply: number, limit: boolean): string {
   const who = seatCount > 1 ? `Player ${seat + 1}` : "you";
   const first = seatCount > 1 ? `the first player (${who})` : "you";
-  const cost = `To travel here ${first} ${seatCount > 1 ? "takes" : "take"} ${hiddenCards(amount)}: the top of the encounter deck, facedown, not revealed (${who} ${seatCount > 1 ? "holds" : "hold"} ${held} now).`;
+  const cost = `To travel here ${first} ${seatCount > 1 ? "takes" : "take"} ${hiddenCards(amount)}: the top of the encounter deck, facedown, not revealed (${who} ${seatCount > 1 ? "holds" : "hold"} ${held} now, ${held + amount} after).`;
   const cannot = supply < amount ? ` The players cannot travel here now: the encounter deck and its discard pile hold ${supply === 0 ? "no card" : plural(supply, "card")}.` : "";
   const turn = limit && held + amount >= FIVE ? ` That brings ${who} to ${FIVE} or more: all turn faceup at once.` : "";
   return `${cost}${cannot}${turn}`;
 }
 
+/** The travel readout's cost clause: who takes how many hidden cards and what they hold before and after. */
+export function travelCostWords(amount: number, seatCount: number, seat: number, held: number): string {
+  const who = seatCount > 1 ? `Player ${seat + 1} takes` : "You take";
+  return `${who} ${hiddenCards(amount)} (${seatCount > 1 ? "holds" : "hold"} ${held}, then ${held + amount})`;
+}
+
 /** The reason the engine's refusal gets when the Travel cost is a hidden card with nothing left to take. */
-export const noHiddenSupply = (amount: number): string => `The players cannot travel here: the encounter deck and its discard pile hold fewer than ${hiddenCards(amount)} to take`;
+export const noHiddenSupply = (amount: number): string => `The players cannot travel here: the encounter deck and its discard pile hold ${amount === 1 ? "no card" : `fewer than ${hiddenCards(amount)}`} to take`;
 
 /** The Cross-roads' preview: what it gives the current stage, and its Threat. */
 export const crossroadsWords = (players: number): string => `While it is in play, in the staging area or active, the current quest stage has Siege and no Battle: characters count Defense when questing. Its Threat is ${players}, the number of players.`;
@@ -79,7 +90,7 @@ export const bonusWords = (inStaging: boolean): string => (inStaging ? "It has +
 
 /** The Dark Woods' Forced line: who discards what once it is explored. */
 export const exploredWords = (seatCount: number, seat: number, held: number): string =>
-  `When it leaves play explored, ${seatCount > 1 ? `the first player (Player ${seat + 1})` : "you"} discard${seatCount > 1 ? "s" : ""} 1 hidden card at random, unseen: it is not turned faceup, so nothing engages and no When Revealed resolves (${seatCount > 1 ? `Player ${seat + 1} holds` : "you hold"} ${held} now).`;
+  `When it leaves play explored, ${seatCount > 1 ? `the first player (Player ${seat + 1})` : "you"} discard${seatCount > 1 ? "s" : ""} 1 hidden card at random, unseen: it is not turned faceup, so nothing engages and no When Revealed resolves (${seatCount > 1 ? `Player ${seat + 1} holds` : "you hold"} ${held} now${held > 0 ? `, ${held - 1} after` : ""}).`;
 
 /** Black Númenorean's preview: X now, and what the end of the round raises for each seat. */
 export function numenoreanWords(total: number, counts: readonly number[]): string {
@@ -87,15 +98,15 @@ export function numenoreanWords(total: number, counts: readonly number[]): strin
   return `X is ${total}, every hidden card in the game. At the end of the round each player raises his threat by his own hidden cards: ${raises}.`;
 }
 
-/** Conflict at the Crossroads' lasting effect, said in the quest readout: the engaged Orcs' Threat now. */
-export const orcThreatWords = (threat: number): string => `Conflict at the Crossroads: the engaged Orcs add ${threat} Threat to the staging area until the end of the phase`;
-
 /** Brutal Uruk's line on the attack sheet: what its attack does to the player if it destroys a character. `held`: the hidden cards of the defending player. */
 export const urukAttackWords = (seatCount: number, seat: number, held: number): string => {
   const who = seatCount > 1 ? `Player ${seat + 1}` : "You";
   const holds = held === 0 ? `${who} ${seatCount > 1 ? "holds" : "hold"} no hidden card, so nothing is turned` : `${who} ${seatCount > 1 ? "holds" : "hold"} ${hiddenCards(held)}: all are turned faceup, one at a time`;
   return `If this attack destroys a character, its controller turns all his hidden cards faceup. Each enemy turned is dealt a shadow card and attacks as normal. ${holds}.`;
 };
+
+/** The short clause of the dock readout: a character destroyed turns its controller's hidden cards. Empty with none. */
+export const dockWords = (seatCount: number, seat: number, held: number): string => (held === 0 ? "" : `; a hero destroyed turns ${seatCount > 1 ? `Player ${seat + 1}'s` : "your"} ${hiddenCards(held)}`);
 
 const SOURCE = (count: number | undefined): string => (count === 1 || count == null ? "1 hidden card" : `${count} hidden cards`);
 const WHO: Readonly<Record<string, string>> = { actor: "the acting player", firstPlayer: "the first player", eachPlayer: "each player, the first player first," };
@@ -106,7 +117,7 @@ export function hiddenWords(instruction: Instruction): string | null {
     case "TakeHiddenCard":
       return `${instruction.who === "firstPlayer" ? "the first player" : "you"} take${instruction.who === "firstPlayer" ? "s" : ""} ${SOURCE(instruction.amount)}: the top of the encounter deck, facedown`;
     case "TurnHiddenCards":
-      return `${instruction.who === "eachPlayer" ? WHO.eachPlayer : instruction.who === "firstPlayer" ? "the first player" : "you"} turn${instruction.who === "actor" ? "" : "s"} each hidden card faceup, one at a time (${TURN_RULE})`;
+      return `${instruction.who === "eachPlayer" ? WHO.eachPlayer : instruction.who === "firstPlayer" ? "the first player" : "you"} turn${instruction.who === "actor" ? "" : "s"} each hidden card faceup, one at a time (${turnRule(instruction.who === "actor")})`;
     case "TurnHiddenCard":
       return `turn 1 hidden card of the player chosen faceup${instruction.damageEnemy != null ? ` (an enemy takes ${instruction.damageEnemy} damage first)` : ""}`;
     case "DiscardHiddenCard":

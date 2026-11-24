@@ -101,6 +101,10 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
     boarded.set(shipAt, (boarded.get(shipAt) ?? 0) + 1);
   });
 
+  // The cards of The Blood of Gondor turned faceup in this intent: an enemy among them engages under its turn line (hiddenLines), not in a beat of its own.
+  const hidden = hiddenChanges(before, after, steps, after.questStage != null && after.cards[after.questStage]?.code === "06118", names.typeOf);
+  const turnedEngaged = new Set(hidden?.seats.flatMap((entry) => entry.turned.filter((turned) => turned.fate.kind === "engaged").map((turned) => turned.id)) ?? []);
+
   steps.forEach((step, index) => {
     switch (step.kind) {
       case "quest": {
@@ -265,7 +269,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         line(detachLine(names.card(step.enemyId), names.card(step.locationId)), null, [step.enemyId]);
         return;
       case "engage": {
-        if (joined.has(index)) return;
+        if (joined.has(index) || turnedEngaged.has(step.enemyId)) return;
         open(4, `${names.card(step.enemyId)} engages`, "bad");
         line(after.seatCount > 1 ? `${names.card(step.enemyId)} engages Player ${step.seat + 1}` : `${names.card(step.enemyId)} engages you`);
         const count = boarded.get(index);
@@ -349,8 +353,8 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   const control = controlChanges(before, after).map((change) => changeWords(change, after.seatCount, names.card(change.id)));
   if (control.length > 0) groups.push({ rank: 8, title: "", tone: "plain", lines: control.map((text) => ({ text, mark: null })), firm: true });
   // The hidden cards of The Blood of Gondor taken or turned in this intent: a count and a name only once a card is faceup, never a facedown card.
-  const hidden = hiddenChanges(before, after, steps, after.questStage != null && after.cards[after.questStage]?.code === "06118", names.typeOf);
-  if (hidden) groups.push({ rank: 8, title: HIDDEN_TITLE, tone: "plain", lines: hiddenLines(hidden, names.card).map((text) => ({ text, mark: null })), firm: true });
+  // It leads the banner (rank 3, before the engage and damage lines), and tells each enemy it turned under its own turn line.
+  if (hidden) groups.push({ rank: 3, title: HIDDEN_TITLE, tone: "plain", lines: hiddenLines(hidden, names.card).map((text) => ({ text, mark: null })) });
   const held = heldBeat(before, after);
   if (held) groups.push({ rank: 8, title: held.title, tone: "plain", lines: held.lines.map((text) => ({ text, mark: null })) });
 

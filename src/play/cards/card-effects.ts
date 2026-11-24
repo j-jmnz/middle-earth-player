@@ -379,7 +379,8 @@ function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): Unde
   if (kept ?? hidden) return kept ?? hidden;
   // The objective allies of The Blood of Gondor lie under Captured!, in play and controlled by nobody: "2 held".
   const allies = alliesUnder(game, cardId);
-  if (allies.length > 0) return heldWords(allies.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
+  // The count lifts the pill clear of the quest points ("0 / 15") like the other held marks (underMarkBox).
+  if (allies.length > 0) return { ...heldWords(allies.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name)), count: allies.length };
   const captives = captivesUnder(game, cardId);
   if (captives.length > 0) return heldWords(captives.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
   const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);
