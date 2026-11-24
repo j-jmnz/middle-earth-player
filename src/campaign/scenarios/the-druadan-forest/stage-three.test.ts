@@ -84,7 +84,7 @@ describe("06044:B:3 and 06045:A:3 the win needs Drû-buri-Drû in the victory di
   // The quest holds 13 of 14 progress and a Hunter full of progress lies in the staging area: when it goes to the victory display its progress defeats the stage, if the stage may be defeated.
   const filled = (where: "victory" | "staging" | "discard"): { made: LayoutTable; settled: ScenarioState } => {
     const hunter = { code: HUNTER, progress: 3 };
-    const made = table({ stage: STAGE_3, progress: 13, ...(where === "victory" ? { victory: [DRU], staging: [hunter] } : { staging: [hunter, ...(where === "victory" ? [] : [DRU])] }) });
+    const made = table({ stage: STAGE_3, progress: 13, ...(where === "victory" ? { victory: [DRU], staging: [hunter] } : { staging: [hunter, DRU] }) });
     const state = where === "discard" ? { ...made.state, cards: { ...made.state.cards, [idOf(made.state, DRU)]: { ...made.state.cards[idOf(made.state, DRU)]!, zone: "encounterDiscard" as const } } } : made.state;
     return { made, settled: settle(state, made.ctx, []) };
   };

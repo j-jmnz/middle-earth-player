@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { EFFECTS } from "../../../effects/index.ts";
-import { legalIntents } from "../../../rules/engine/reduce.ts";
+import { legalIntents, type PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { idOf, revealFromTop, send, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
 import { CODES, run as runEffect, table } from "../../../../test/scenarios/the-druadan-forest/table.ts";
 
@@ -24,7 +24,7 @@ function play(made: LayoutTable, code: string, answers: readonly Answer[], trigg
   for (let guard = 0; guard < 40 && run.state.window; guard += 1) {
     const window = run.state.window;
     const cancel = window.kind === "response" ? legalIntents(run.state, made.ctx).find((intent) => intent.type === "Trigger" && intent.effectId === trigger) : undefined;
-    if (cancel) run = send(run, cancel, made.ctx);
+    if (cancel) run = send(run, cancel as PlayerIntent, made.ctx);
     else if (window.kind === "response" || window.kind === "pass") run = send(run, { type: "Pass" }, made.ctx);
     else if (window.kind === "choose") {
       asked.push([...window.options]);
