@@ -1,7 +1,8 @@
 // The vocabulary Peril in Pelargir (Against the Shadow part 1) adds to effect records: Alcaron's Scroll, an objective that hops from a hero to the enemy that damages him, and the cards that look for the hero that holds it; a treachery that
 // attaches to the hero with the highest threat cost that has none; the discards from the top of the encounter deck that Collateral Damage counts in two steps; and the first enemy revealed each round. Into Ithilien (part 2) adds the ally objectives that are
 // committed to the quest from the staging area, the stage that bypasses the next one, and the first player's taking of every Ranger objective in the staging area. Simple verbs and stat flags; effect-schema-verbs.ts,
-// effect-schema.ts and effect-schema-stats.ts compose them. Encounter at Amon Dîn (part 6) adds the villager tokens (their discard and their move, the trigger that hears a discard), the character with the fewest hit points left, and the flags that end the game or hold it. src/rules/families/pelargir/ runs them.
+// effect-schema.ts and effect-schema-stats.ts compose them. Encounter at Amon Dîn (part 6) adds the villager tokens (their discard and their move, the trigger that hears a discard), the character with the fewest hit points left, and the flags that end the game or hold it. Assault on Osgiliath (part 7) adds the
+// control of locations (a location lies in the first player's play area; the verbs that take and lose control, the two triggers that hear an undefended attack and a loss of control, the table's bar on a player card's progress in the staging area). src/rules/families/pelargir/ runs them.
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
@@ -84,12 +85,27 @@ const VERBS = [
   // "Discard the character with the fewest remaining hit points. That character's controller may ..." (06074:A:1): the hero or ally in play (any player's, an objective ally too) with the fewest hit points left, as modified, is the picked card, the first player choosing among those tied; the player who
   // controls it acts for the instructions after it. Nothing is picked when no character is in play. src/rules/families/pelargir/fewest.ts.
   z.strictObject({ verb: z.literal("PickFewestHitPointsLeft"), ...when }),
+  // "The first player takes control of that location" (06091:B:2; 06105:A:1, ats.controlling-locations): the location the reference names (`subject`, the explored location the Forced effect hears, by default; `picked`, the location a discard stopped at) goes from the discard pile, the victory display,
+  // the staging area or the active slot into the first player's play area: faceup, ready, with no progress, its text working there. The table notes who controls it (the flag `controlSeat`), so the loss of that control is seen wherever it comes from. A location already in a play area, or a card that is no location, is left as it is.
+  z.strictObject({ verb: z.literal("TakeControlOfLocation"), card: cardRefSchema.optional(), ...when }),
+  // "Return a location he controls to the staging area" (06093:A:1, 06100:A:2, 06106:A:2; ats.losing-control-of-locations): the location the reference names (`picked` by default) goes to the staging area with its progress removed and nobody controls it; the table announces `controlLost`. A card that is not controlled is left as it is.
+  z.strictObject({ verb: z.literal("LoseControlOfLocation"), card: cardRefSchema.optional(), ...when }),
+  // "that character's controller must ..." (06100:A:2, 06101:A:2, 06104:A:2; a Shadow effect the attack leaves for its end): the player who controlled the character the attack destroyed (a Sentinel defender may belong to another player than the one attacked) acts for the instructions that follow in the effect. Nothing changes when the attack destroyed no character.
+  z.strictObject({ verb: z.literal("ActForDestroyedController"), ...when }),
+  // "Add it to the staging area" read as an entry the card's own Forced effect hears (05053:A:1, ats.setup-assault-on-osgiliath, 06091:A:1): the card the reference names (`picked`: the card an earlier SearchMove with `remember` put in the staging area) is announced as added to the staging area. SearchMove announces it for an ambush enemy alone, so a record opts in with this verb; a card not in the staging area is left as it is.
+  z.strictObject({ verb: z.literal("AnnounceAddedToStaging"), card: cardRefSchema.optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [
   // About a card that held villager tokens: one of them was just discarded (the subject is the card it left; the event names no card, so every card in play hears it), once for each token ("After a villager token is discarded", 06070:A:2; "If a villager token is discarded from a location, objective, or quest stage", 06069:A:1).
   // The tokens of one discard are one occurrence. A move is not heard (src/rules/families/pelargir/villagers.ts).
   "villagerDiscarded",
+  // About the player who let an enemy attack go undefended (no defender was declared, or the defender left play before the damage): announced once the attack's damage is dealt, with the enemy as the other card (06096:A:2, ats.losing-control-of-locations). Announced in a game with a record that names it
+  // (src/rules/families/pelargir/undefended.ts), for any enemy attack whatever its damage, even none.
+  "attackUndefended",
+  // About a location a player controlled that left his play area for any reason: returned to the staging area, traveled to, made the active location, or sent to the discard pile with an eliminated player's cards ("loses control of a location", 06103:A:2). The seat is the player who controlled it, the subject the
+  // location (src/rules/families/pelargir/location-control.ts, a settle sweep).
+  "controlLost",
 ] as const;
 
 const FLAGS = [
@@ -150,6 +166,10 @@ const FLAGS = [
   "gameEnding",
   // On the table until the end of the game: Lord Alcaron left play, so the players lose as soon as Ghulat is not in play ("If Lord Alcaron leaves play, the players have lost the game", 06070:A:3; a settle sweep, families/pelargir/ending.ts).
   "endingLost",
+  // On the table while a stage is in play: progress placed by a player card's effect on a location in the staging area is not placed ("Player card effects cannot place progress tokens on locations in the staging area", 06091:B:1). Read where an effect places progress on a location (src/rules/families/pelargir/progress-bar.ts).
+  "noProgressInStagingByPlayer",
+  // On a location a player controls: the seat that took control, plus 1 (no record sets it; TakeControlOfLocation writes it and a settle sweep reads it to see the control lost). Held until the control is lost.
+  "controlSeat",
 ] as const;
 
 // The underworld deck lies set aside facedown, and the Villain and the Plot the Setup hides stay set aside facedown (06011:A:1): the table lists them as facedown cards without a name.

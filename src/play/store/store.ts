@@ -10,6 +10,7 @@ import { legalIntents, reduce, type EngineStep, type LegalIntent, type PlayerInt
 import { deckTopFaceUp } from "../../rules/player/deck-play.ts";
 import { clashesOf } from "./clash.ts";
 import { stampVillagers } from "./villager-steps.ts";
+import { stampControl } from "../readouts/against-the-shadow/osgiliath-steps.ts";
 import { stampCounted } from "./counted.ts";
 import { finishedRoundSteps } from "./outcome.ts";
 import { peekSeat } from "./peek.ts";
@@ -110,7 +111,7 @@ export function keepIntent(kept: Kept, before: ScenarioState, after: ScenarioSta
  */
 export function nextRoundSteps(previous: readonly EngineStep[], before: ScenarioState, after: ScenarioState, steps: readonly EngineStep[], ctx?: ReduceContext): readonly EngineStep[] {
   if (steps.length === 0) return previous;
-  const kept = stampVillagers(stampCounted(steps, before, ctx), before, after);
+  const kept = stampControl(stampVillagers(stampCounted(steps, before, ctx), before, after), before, after);
   return after.round !== before.round ? [...kept] : [...previous, ...kept];
 }
 

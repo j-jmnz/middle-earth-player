@@ -26,6 +26,7 @@ import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poiso
 import { hostName, playWords, type PlayInto } from "../cards/host-words.ts";
 import { STAT_WORD } from "../cards/card-effects.ts";
 import { progressAttack, willpowerAttack } from "../readouts/against-the-shadow/druadan.ts";
+import { controlChanges, changeWords } from "../readouts/against-the-shadow/osgiliath.ts";
 import { deadVillagers, heldBeat, onVillagers, villagerLines } from "../readouts/against-the-shadow/amon-din.ts";
 import { stackTakes, underHost } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { NO_HERO_DAMAGE, VILLAGERS_TITLE } from "../words/scenarios/against-the-shadow/amon-din.ts";
@@ -59,9 +60,9 @@ function seatWord(state: ScenarioState, seat: number): string {
   return state.seatCount > 1 ? `Player ${seat + 1} threat` : "Threat";
 }
 
-// `whole`: the group's lines are kept together, uncut, and come last (Discover's, whose last line lays the look strip).
+// `whole`: the group's lines are kept together, uncut, and come last (Discover's, whose last line lays the look strip). `firm`: the group's lines are never cut, the cut falls on the other lines (a location taken or lost in Assault on Osgiliath).
 // `early`: the group is told right after the lead, ahead of the other groups (the villager tokens of Encounter at Amon Dîn, which the quest result moved).
-type Group = { rank: number; title: string; tone: MomentTone; lines: MomentLine[]; whole?: boolean; early?: true };
+type Group = { rank: number; title: string; tone: MomentTone; lines: MomentLine[]; whole?: boolean; early?: true; firm?: true };
 
 /**
  * The banner for one accepted intent, or null when it changed nothing worth one (a draw, a resource, a pass that only moved
@@ -342,6 +343,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   // The villager tokens of Encounter at Amon Dîn that moved or were discarded in this intent, and the defeat of stage 2B that Ghulat holds: no step of their own.
   const villagers = villagerLines(before, after, names.card);
   if (villagers.length > 0) groups.push({ rank: 8, title: VILLAGERS_TITLE, tone: "plain", lines: villagers.map((text) => ({ text, mark: null })), early: true });
+  // The locations a player took control of or lost in this intent (Assault on Osgiliath): the location is moved by the engine without a step.
+  const control = controlChanges(before, after).map((change) => changeWords(change, after.seatCount, names.card(change.id)));
+  if (control.length > 0) groups.push({ rank: 8, title: "", tone: "plain", lines: control.map((text) => ({ text, mark: null })), firm: true });
   const held = heldBeat(before, after);
   if (held) groups.push({ rank: 8, title: held.title, tone: "plain", lines: held.lines.map((text) => ({ text, mark: null })) });
 
@@ -384,9 +388,14 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   if (!lead) return null;
   const told = (group: Group): MomentLine[] => (group === lead || !group.title ? group.lines : [{ text: group.title, mark: null }, ...group.lines]);
   const rest = flow.filter((group) => group !== lead);
-  const lines = (flow.includes(lead) ? [lead, ...rest.filter((group) => group.early), ...rest.filter((group) => !group.early)] : []).flatMap(told);
-  const kept = lines.slice(0, MOST);
-  if (lines.length > MOST) kept.push({ text: `And ${lines.length - MOST} more in the log`, mark: null });
+  const ordered = flow.includes(lead) ? [lead, ...rest.filter((group) => group.early), ...rest.filter((group) => !group.early)] : [];
+  // A firm group's lines stay whole, so the cut takes the others' (the line that says who took control of the location a quest just explored is never behind "more in the log").
+  const firm = ordered.filter((group) => group.firm).flatMap(told);
+  const loose = ordered.filter((group) => !group.firm).flatMap(told);
+  const kept = loose.slice(0, Math.max(MOST - firm.length, 1));
+  kept.push(...firm);
+  const cut = loose.length - (kept.length - firm.length);
+  if (cut > 0) kept.push({ text: `And ${cut} more in the log`, mark: null });
   return { title: lead.title || "This turn", tone: lead.tone, lines: [...kept, ...shown.filter((group) => group.whole).flatMap(told)] };
 }
 

@@ -14,10 +14,12 @@ import { addModifier, modifiedStat } from "../../core/keywords.ts";
 import { pickedList } from "../../interpret/player-verbs.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import { isLocationId } from "../../core/printed.ts";
+import { pickBarred } from "../pelargir/progress-bar.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
 import { fireForced } from "../../windows/triggers.ts";
 import { effectsOfCard } from "../misc/text.ts";
+import { playerSource } from "./threat.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import type { Focus } from "../index.ts";
@@ -70,6 +72,8 @@ export function moveProgress(
   const toId = refCard(state, "picked", scope);
   const from = fromId ? state.cards[fromId] : undefined;
   if (!from || !fromId || !toId || !isLocationId(state, toId, ctx.cards) || fromId === toId) return state;
+  // Progress the destination may not take stays where it is (06091:B:1): the pick leaves such a location out, and nothing is removed here either.
+  if (pickBarred(state, toId, focus.sourceId, ctx.cards)) return state;
   const limit = instruction.amount == null ? from.progress : Math.min(from.progress, resolveAmount(state, instruction.amount, scope, ctx));
   const moved = instruction.all ? from.progress : limit;
   if (moved <= 0) return state;
@@ -78,7 +82,7 @@ export function moveProgress(
     return askNumber(state, moved, (n) => ({ ...rest, amount: n }));
   }
   steps.push({ kind: "progress", targetId: fromId, amount: -moved, cause: currentCause(steps, UNATTRIBUTED) });
-  return placeProgress(updateCard(state, fromId, { progress: from.progress - moved }), toId, moved, ctx, steps, progressPlacer(state, ctx, focus.seat, focus.sourceId));
+  return placeProgress(updateCard(state, fromId, { progress: from.progress - moved }), toId, moved, ctx, steps, progressPlacer(state, ctx, focus.seat, focus.sourceId), false, playerSource(state, focus.sourceId, ctx));
 }
 
 // The card gets -amount Threat until the phase or round ends, and the effect's X records whether that took its Threat from above

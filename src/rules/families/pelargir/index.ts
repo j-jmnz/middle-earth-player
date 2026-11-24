@@ -8,6 +8,8 @@ import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { takeControlOfStagedObjectives } from "./control.ts";
 import { alcaronLoss } from "./ending.ts";
+import { actForDestroyedController, announceAddedToStaging, controlSweep, controlledTravelCost, controlledTravelReach, loseControlOfLocation, takeControlOfLocation, towerSecond } from "./location-control.ts";
+import { undefendedAnnounced } from "./undefended.ts";
 import { archeryOfAmount } from "./archery-of.ts";
 import { discardEncounterTopMore, raiseThreatPerDiscarded } from "./discard.ts";
 import { noteFirstEnemy, pelargirCondition } from "./first-enemy.ts";
@@ -79,6 +81,14 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return moveVillagerTokens(state, instruction, focus, ctx);
     case "PickFewestHitPointsLeft":
       return pickFewestHitPointsLeft(state, focus, ctx, steps);
+    case "TakeControlOfLocation":
+      return takeControlOfLocation(state, instruction, focus, ctx);
+    case "LoseControlOfLocation":
+      return loseControlOfLocation(state, instruction, focus);
+    case "ActForDestroyedController":
+      return actForDestroyedController(state);
+    case "AnnounceAddedToStaging":
+      return announceAddedToStaging(state, instruction, focus);
     default:
       return null;
   }
@@ -86,12 +96,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "pelargir",
-  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives", "RemoveStage", "ResolveTopmostTreachery", "ShuffleStagingIntoEncounterDeck", "BuildUnderworldDeck", "HideOneAside", "TakeUnderworld", "RevealSetAside", "RevealUnderworld", "ShuffleUnderworldIntoEncounterDeck", "RevealTopThenDiscard", "PickRandom", "RemoveQuestTokens", "EachPlayerSpends", "GroupDiscardResources", "DamageCardThenSetX", "DiscardVillagerTokens", "MoveVillagerTokens", "PickFewestHitPointsLeft"],
+  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives", "RemoveStage", "ResolveTopmostTreachery", "ShuffleStagingIntoEncounterDeck", "BuildUnderworldDeck", "HideOneAside", "TakeUnderworld", "RevealSetAside", "RevealUnderworld", "ShuffleUnderworldIntoEncounterDeck", "RevealTopThenDiscard", "PickRandom", "RemoveQuestTokens", "EachPlayerSpends", "GroupDiscardResources", "DamageCardThenSetX", "DiscardVillagerTokens", "MoveVillagerTokens", "PickFewestHitPointsLeft", "TakeControlOfLocation", "LoseControlOfLocation", "AnnounceAddedToStaging", "ActForDestroyedController"],
   run,
   condition: (state, condition, scope) => pelargirCondition(state, condition, scope),
   revealed: noteFirstEnemy,
-  settle: { sweep: (state, ctx, steps) => alcaronLoss(advanceWithoutVillagers(progressesToVictory(releaseUnderworldStacks(sieges(state, ctx, steps), ctx, steps), ctx, steps), ctx, steps), ctx) },
-  travel: { unpayable: (state, instruction, ctx, locationId) => eachPlayerSpendsUnpayable(state, instruction, ctx, locationId) },
+  settle: { sweep: (state, ctx, steps) => alcaronLoss(advanceWithoutVillagers(progressesToVictory(releaseUnderworldStacks(controlSweep(sieges(state, ctx, steps), ctx, steps), ctx, steps), ctx, steps), ctx, steps), ctx) },
+  travel: { unpayable: (state, instruction, ctx, locationId) => eachPlayerSpendsUnpayable(state, instruction, ctx, locationId), reach: controlledTravelReach, cost: controlledTravelCost, second: towerSecond },
   pick: (state, id, spec) => noResourcesMatches(state, id, spec),
   amount: (state, amount, scope, ctx) => archeryOfAmount(state, amount, scope, ctx),
   combat: {
@@ -99,6 +109,6 @@ export const manifest: RulesFamily = {
       const battlegrounds = undefendedBattlegrounds(state, cards);
       return battlegrounds.length > 0 ? battlegrounds : undefendedVillagers(state);
     },
-    damaged: villagersDamaged,
+    damaged: (before, after, ctx, steps) => undefendedAnnounced(before, villagersDamaged(before, after, ctx, steps), ctx, steps),
   },
 };

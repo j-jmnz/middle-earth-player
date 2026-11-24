@@ -18,6 +18,10 @@ export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
     "true solo, won, a safe location in the victory display",
     "two-handed, won, a safe location in the victory display",
   ],
+  "assault-on-osgiliath": [
+    "Easy solo win",
+    "solo win",
+  ],
   "conflict-at-the-carrock": [
     "Nightmare two-handed win",
   ],

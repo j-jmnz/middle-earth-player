@@ -101,12 +101,16 @@ export function smaugBranchWords(choose: Choose, optionId: string, game: Scenari
     if (step?.verb !== "SplitProgress") return null;
     const onFirst = step.onFirst ?? 0;
     const rest = (step.amount ?? 0) - onFirst;
-    const place = (id: string | null, count: number): string => {
+    // Assault on Osgiliath only: two Ruined Towers share a name, so each row says which active location it is, and a location the share fills is explored and goes to the first player (06091:B:2).
+    const osgiliath = game.scenarioId === "assault-on-osgiliath";
+    const twins = osgiliath && game.activeLocation != null && game.secondActiveLocation != null && game.cards[game.activeLocation]?.code === game.cards[game.secondActiveLocation]?.code;
+    const place = (id: string | null, count: number, which: string): string => {
       const card = id == null ? undefined : game.cards[id];
       const points = card == null ? null : questPointsOf(game, card, ctx.cards);
-      return `${count} on ${id == null ? "the location" : names.card(id)}${card != null && points != null ? ` (${card.progress + count} of ${points})` : ""}`;
+      const explored = osgiliath && card != null && points != null && card.progress + count >= points;
+      return `${count} on ${id == null ? "the location" : names.card(id)}${twins ? ` (${which} active location)` : ""}${card != null && points != null ? ` (${card.progress + count} of ${points})` : ""}${explored ? ", explored: the first player takes control" : ""}`;
     };
-    return `${place(game.activeLocation, onFirst)}, ${place(game.secondActiveLocation, rest)}`;
+    return `${place(game.activeLocation, onFirst, "first")}, ${place(game.secondActiveLocation, rest, "second")}`;
   }
   if (kind === "offer") {
     if (optionId !== "keep") return null;

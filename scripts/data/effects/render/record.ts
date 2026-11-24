@@ -67,6 +67,8 @@ const TRIGGER: Readonly<Record<string, string>> = {
   escapeFailed: "after an escape test that this card's own effect made is failed (no other card hears it; the event happened to the player who made the test)",
   burgleFailed: "after the first player's burgle attempt fails (every card in play hears it)",
   escapePassed: "after an escape test that this card's own effect made is passed (no other card hears it; the event happened to the player who made the test)",
+  attackUndefended: "after an enemy attack on a player has dealt its damage with no defender declared (any enemy attack, whatever its damage; the event happened to the defending player)",
+  controlLost: "after a player loses control of a location (it left his play area for any reason; the event happened to that player, about that location)",
   questProgressPlaced: "once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)",
 };
 

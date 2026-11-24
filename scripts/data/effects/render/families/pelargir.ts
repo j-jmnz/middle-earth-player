@@ -84,6 +84,22 @@ export const PELARGIR_TEMPLATES: Templates = {
     text: "the hero or ally in play (any player's, an objective ally too) with the fewest hit points left, as modified, becomes the picked card (the first player chooses among those tied); the player who controls it acts for the instructions after this one; with no character in play nothing is picked",
     read: [],
   }),
+  TakeControlOfLocation: (i) => ({
+    text: `the first player takes control of ${cardRef(str(i.card ?? "subject"))}, a location in the discard pile, the victory display, the staging area or the active slot: it comes into his play area faceup and ready with no progress, its text working there, and the table notes that he controls it; a location already in a play area, or a card that is no location, stays as it is`,
+    read: ["card"],
+  }),
+  LoseControlOfLocation: (i) => ({
+    text: `the player who controls ${cardRef(str(i.card ?? "picked"))}, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is`,
+    read: ["card"],
+  }),
+  AnnounceAddedToStaging: (i) => ({
+    text: `${cardRef(str(i.card ?? "picked"))}, if it lies in the staging area, is announced as added to the staging area, so its own Forced effect that hears it resolves (a search puts a card there without that announcement unless the record opts in with this instruction)`,
+    read: ["card"],
+  }),
+  ActForDestroyedController: () => ({
+    text: "the player who controlled the character the attack destroyed acts for the instructions that follow in this effect (he may not be the defending player: a Sentinel defender belongs to another player); with no character destroyed the acting player stays",
+    read: [],
+  }),
   GroupDiscardResources: (i, ctx) => ({
     text: `the players as a group discard ${amt(i.amount, ctx)} resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)`,
     read: ["amount", "rest", "turns"],
@@ -115,6 +131,10 @@ export const PELARGIR_SAMPLES: Samples = {
   DiscardVillagerTokens: [{ verb: "DiscardVillagerTokens", from: "activeLocation", amount: 1 }, { verb: "DiscardVillagerTokens", from: { code: "06068" }, amount: { players: true } }],
   MoveVillagerTokens: [{ verb: "MoveVillagerTokens", from: { code: "06068" }, to: "picked", amount: 2 }, { verb: "MoveVillagerTokens", from: "subject", to: { code: "06068" }, all: true }],
   PickFewestHitPointsLeft: [{ verb: "PickFewestHitPointsLeft" }],
+  TakeControlOfLocation: [{ verb: "TakeControlOfLocation" }, { verb: "TakeControlOfLocation", card: "previous" }],
+  LoseControlOfLocation: [{ verb: "LoseControlOfLocation", card: "self" }, { verb: "LoseControlOfLocation" }],
+  ActForDestroyedController: [{ verb: "ActForDestroyedController" }],
+  AnnounceAddedToStaging: [{ verb: "AnnounceAddedToStaging" }, { verb: "AnnounceAddedToStaging", card: "previous" }],
 };
 
 export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {
@@ -139,5 +159,7 @@ export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {
   undefendedToVillagers: " (held by the current quest stage: an undefended attack is aimed at Rescued Villagers, no hero takes it, and the damage it would deal becomes that many villager tokens discarded from Rescued Villagers, all of them when fewer)",
   gameEnding: " (held by the table until the end of the game: the game is ending; Rescued Villagers and Dead Villagers compare their tokens once Ghulat is not in play)",
   endingLost: " (held by the table until the end of the game: Lord Alcaron left play; the players lose once Ghulat is not in play, checked at every settle)",
+  noProgressInStagingByPlayer: " (held by the table while the stage is in play: progress a player card's effect would place on a location in the staging area is not placed; an active location, a location in a play area and any encounter card's or location's own effect are not barred)",
+  controlSeat: " (held by a location a player controls, the amount is the seat plus 1: written by TakeControlOfLocation and read by a settle sweep that sees the control lost; not set by a record)",
   firstEnemyNoted: " (held by the table until the end of the round: an enemy was already marked firstEnemy this round)",
 };

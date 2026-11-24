@@ -192,7 +192,7 @@ export function runPlayerVerb(
           : [refCard(state, instruction.target === "self" ? "self" : instruction.target, scope) ?? ""];
       const amount = resolveAmount(state, instruction.amount, scope, ctx);
       let next = state;
-      for (const id of targets) if (next.cards[id] && amount > 0) next = placeProgress(next, id, amount, ctx, steps, progressPlacer(next, ctx, focus.seat, focus.sourceId));
+      for (const id of targets) if (next.cards[id] && amount > 0) next = placeProgress(next, id, amount, ctx, steps, progressPlacer(next, ctx, focus.seat, focus.sourceId), false, playerSource(next, focus.sourceId, ctx));
       return next;
     }
     case "GiveControl": {

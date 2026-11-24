@@ -47,6 +47,7 @@ import { fortitudePool } from "../families/mount-doom/pick.ts";
 import { seatPickMatches } from "../families/wilderland/seat-pick.ts";
 import { mostResources } from "../families/burgle/pick.ts";
 import { committedInStaging } from "../families/pelargir/committed.ts";
+import { pickBarred } from "../families/pelargir/progress-bar.ts";
 import { resourcesLocked } from "../families/pelargir/spending.ts";
 
 // What a filter is read against: who is choosing or counting, the effect's source, what it has picked, its X, and the
@@ -66,6 +67,8 @@ export type PickContext = {
   discards?: boolean;
   // The cards chosen pay resources for the instruction after the pick (SpendFrom, SpendFromPool): a pool Orc Vanguard locks cannot pay, so it is not offered (families/pelargir/spending.ts).
   spends?: boolean;
+  // The cards chosen get progress from the instruction after the pick (PlaceProgressOn picked): the bar on player cards leaves out a staged location (families/pelargir/progress-bar.ts).
+  places?: boolean;
 };
 
 export function seatsOf(state: ScenarioState, spec: PickSpec, asking: number): number[] {
@@ -162,11 +165,16 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     // An enemy in the staging area that is considered engaged with one of those players is engaged with him too (the Watcher, the Balrog, Bolg at stage 5: rr.engaged); only a filter that names the engaged player reads it (after the staging area a `staging` filter lists, so none is listed twice).
     if (spec.engaged != null && !spec.stagingOnly) raw.push(...state.staging.filter((id) => !raw.includes(id) && consideredEngagedSeats(state, id, engagedSeats).length > 0));
     if (spec.inStormcallerArea) raw.push(...Object.values(state.cards).filter((card) => card.zone === "stormcallerArea").map((card) => card.id));
+  } else if (spec.type === "location" && spec.controlled) {
+    // The locations a player controls lie in his play area, not in the staging area and not as the active location (families/pelargir/location-control.ts).
+    for (const index of seats) raw.push(...(state.seats[index]?.play ?? []).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location"));
   } else if (spec.type === "location") {
     if (!spec.active) raw.push(...stagingFor(state, spec, asking).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location"));
     if (!spec.stagingOnly) raw.push(...activeFor(state, asking, spec.stagingArea === "any"));
     // The locations of the Island Map outside the staging area are in play too (families/island/pick.ts).
     if (!spec.stagingOnly && !spec.active) raw.push(...outsideCells(state));
+    // A location a player controls lies in his play area and is a location in play: "a location" names it too (06091:B:2, researched reading; families/pelargir/location-control.ts). Only a game that holds a controlled location reads it.
+    if (!spec.stagingOnly && !spec.active && state.modifiers.some((modifier) => modifier.stat === "controlSeat")) raw.push(...seats.flatMap((index) => (state.seats[index]?.play ?? []).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location")));
   } else if (spec.type === "objective") {
     // The objectives in the staging area (any player's filter sees them) and, unless it asks for the staging area only, the ones a
     // player claimed: attached to a hero, controlled by that player (families/objectives.ts).
@@ -248,6 +256,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.damaged != null && instance.damage > 0 !== spec.damaged) return false;
   if (spec.hasResources && instance.resources <= 0) return false;
   if (at.spends && resourcesLocked(state, id)) return false;
+  if (at.places && pickBarred(state, id, at.sourceId, ctx.cards)) return false;
   // The costs family's filters: a pool's size, a Valour ability, a lower threat cost, a pool that paid (families/costs/pick.ts).
   if (!costsPickMatches(state, id, spec, at.picked, ctx, at.subject)) return false;
   if (spec.on && !onHost(state, instance.host, spec.on, asking, ctx)) return false;
@@ -359,7 +368,7 @@ export function pickCandidates(
   x?: number,
   participants?: readonly string[],
   counting = false,
-  event?: { subject?: string | null; other?: string | null; discards?: boolean; spends?: boolean },
+  event?: { subject?: string | null; other?: string | null; discards?: boolean; spends?: boolean; places?: boolean },
 ): string[] {
   const found = candidatesOf(state, spec, seat, picked, sourceId, ctx, x, participants, counting, event);
   // "The opposing team chooses" (docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, reading 3): the first of the cards the ranking fields left (with `highestThreat` on enemies, the one with the highest Attack among those level on Threat), the order of seats and then of play breaking a tie, and nobody is asked. A count is not a choice.
@@ -384,7 +393,7 @@ function candidatesOf(
   participants?: readonly string[],
   counting = false,
   // The answered event's subject and other card, for a condition read about it (families/attack/pick.ts).
-  event?: { subject?: string | null; other?: string | null; discards?: boolean; spends?: boolean },
+  event?: { subject?: string | null; other?: string | null; discards?: boolean; spends?: boolean; places?: boolean },
 ): string[] {
   const asking = spec.who === "firstPlayer" ? firstPlayerFor(state, seat) : seat;
   if (spec.type === "player") return seatsOf(state, spec, asking).filter((index) => !state.seats[index]?.eliminated && seatPickMatches(state, index, spec, ctx)).map((index) => `seat:${index}`);

@@ -28,6 +28,7 @@ import { plotLine, underworldLine } from "../readouts/against-the-shadow/steward
 import { cairAndrosDetail } from "./against-the-shadow/cair-andros-preview.ts";
 import { amonDinDetail } from "../readouts/against-the-shadow/amon-din.ts";
 import { druadanDetail } from "./against-the-shadow/druadan-preview.ts";
+import { osgiliathControlSpeech, osgiliathDetail } from "../readouts/against-the-shadow/osgiliath.ts";
 
 /**
  * The text of the engine's Orc Guard stand-in, and of a hero Fallen Into Evil made an enemy (`<code>~enemy`; its card shows the hero's art and its game text
@@ -83,6 +84,9 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   if (poisoned) return poisoned;
   const ithilien = ithilienDetail(game, ctx, cardId);
   if (ithilien) return ithilien;
+  // Assault on Osgiliath: a location a player controls, a unique location's undefended Forced line, Ruined Tower, Pinned Down and Southron Commander (keyed on the scenario).
+  const osgiliath = osgiliathDetail(game, ctx, cardId);
+  if (osgiliath) return osgiliath;
   const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card) ?? pelennorDetail(game, ctx, card) ?? barrowDetail(game, ctx, cardId, name) ?? cairAndrosDetail(game, ctx, cardId) ?? druadanDetail(game, ctx, cardId, name) ?? underworldLine(game, ctx, cardId) ?? plotLine(game, cardId) ?? amonDinDetail(game, cardId);
   if (lost) return lost;
   const everyone = engagedWithAllWords(game, card);
@@ -240,5 +244,5 @@ function playersControl(card: ScenarioState["cards"][string]): boolean {
 /** What a screen reader hears of a card the table shows by its picture alone: "controlled by the players" for a tower the players control, whether or not a Ship enemy guards it again. Null for any other card. */
 export function controlSpeech(game: ScenarioState, cardId: string): string | null {
   const card = game.cards[cardId];
-  return card && playersControl(card) ? "controlled by the players" : null;
+  return card && playersControl(card) ? "controlled by the players" : osgiliathControlSpeech(game, cardId);
 }

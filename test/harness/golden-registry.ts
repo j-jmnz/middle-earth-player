@@ -90,6 +90,7 @@ import * as andros from "../scenarios/the-siege-of-cair-andros/game.ts";
 import * as fear from "../scenarios/the-stewards-fear/game.ts";
 import * as druadan from "../scenarios/the-druadan-forest/game.ts";
 import * as din from "../scenarios/encounter-at-amon-din/game.ts";
+import * as assault from "../scenarios/assault-on-osgiliath/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -192,6 +193,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-stewards-fear", "The Steward's Fear", fear.FEAR_GOLDENS, fear.fearWorld, fear.playGolden),
   entry("the-druadan-forest", "The Drúadan Forest", druadan.DRUADAN_GOLDENS, druadan.druadanWorld, druadan.playGolden),
   entry("encounter-at-amon-din", "Encounter at Amon Dîn", din.DIN_GOLDENS, din.dinWorld, din.playGolden),
+  entry("assault-on-osgiliath", "Assault on Osgiliath", assault.ASSAULT_GOLDENS, assault.assaultWorld, assault.playGolden),
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
   entry("the-battle-of-lake-town", "The Battle of Lake-town", town.TOWN_GOLDENS, town.townWorld, town.playGolden),
   entry("the-stone-of-erech", "The Stone of Erech", erech.ERECH_GOLDENS, erech.erechWorld, erech.playGolden),

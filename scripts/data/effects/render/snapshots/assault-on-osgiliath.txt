@@ -1,0 +1,282 @@
+Scenario piles that place cards with no record (quest: 06091 Retake the City)
+
+## 06091 Retake the City
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+06091:A:1 (front): Setup: Each player chooses 1 enemy and 1 unique location and add them to the staging area. Shuffle the encounter deck.
+  06091:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one enemy in the encounter deck and adds it to the staging area (it is not revealed); it is the picked card afterward
+      - the picked card, if it lies in the staging area, is announced as added to the staging area, so its own Forced effect that hears it resolves (a search puts a card there without that announcement unless the record opts in with this instruction)
+      - the acting player chooses one of:
+        * option "06096" (only if the encounter deck or its discard pile holds a location with code 06096 (the deck alone)):
+          - the acting player finds one card with code 06096 in the encounter deck and adds it to the staging area (it is not revealed)
+        * option "06097" (only if the encounter deck or its discard pile holds a location with code 06097 (the deck alone)):
+          - the acting player finds one card with code 06097 in the encounter deck and adds it to the staging area (it is not revealed)
+        * option "06098" (only if the encounter deck or its discard pile holds a location with code 06098 (the deck alone)):
+          - the acting player finds one card with code 06098 in the encounter deck and adds it to the staging area (it is not revealed)
+        * option "06099" (only if the encounter deck or its discard pile holds a location with code 06099 (the deck alone)):
+          - the acting player finds one card with code 06099 in the encounter deck and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+06091:B:1 (back): Player card effects cannot place progress tokens on locations in the staging area.
+  06091:constant:1: Constant
+    - the table: stat noProgressInStagingByPlayer (held by the table while the stage is in play: progress a player card's effect would place on a location in the staging area is not placed; an active location, a location in a play area and any encounter card's or location's own effect are not barred) 1, while this card is in play
+
+06091:B:2 (back): Forced: When an Osgiliath location leaves play as an explored location, the first player takes control of that location.
+  06091:forced:1: Forced after a card leaves play (heard about Osgiliath location (any player controls))
+    only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the first player takes control of the card the event is about, a location in the discard pile, the victory display, the staging area or the active slot: it comes into his play area faceup and ready with no progress, its text working there, and the table notes that he controls it; a location already in a play area, or a card that is no location, stays as it is
+
+06091:B:3 (back): If the players control all Osgiliath locations in play at the end of the round, they have won the game.
+  06091:forced:2: Forced at the end of the round
+    only if all of: (the number of Osgiliath location (any player controls) in the staging area only is at most 0) and (the number of Osgiliath location (any player controls) that is the active location is at most 0)
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the players win the game
+
+## 06092 Uruk Lieutenant
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06092:A:1 (front): When Revealed: Add the topmost Orc enemy from the encounter discard pile to the staging area.
+  06092:whenRevealed:1: When revealed
+    - return the topmost 1 Orc enemies of the encounter discard pile to the staging area (they are not revealed: no When Revealed; one with the ambush keyword makes its engagement checks on entering the staging area; the number returned is counted)
+
+06092:A:2 (shadow): Shadow: Defending player discards an attachment he controls. (All attachments he controls instead if undefended.)
+  06092:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): choose attachment (you control)
+    - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): for each attachment (you control):
+      - discard the picked card
+
+## 06093 Uruk Soldier
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06093:A:1 (front): Forced: After Uruk Soldier attacks and destroys a character, that character's controller returns a location he controls to the staging area, if able.
+  06093:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active)
+    - the player who controls the picked card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+
+06093:A:2 (shadow): Shadow: Defending player raises his threat by 1 for each location he controls.
+  06093:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - raise threat by the number of location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active) (the acting player)
+
+## 06094 Southron Phalanx
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06094:A:1 (front): While engaged with a player, Southron Phalanx gets +1 Attack for each location that player controls.
+  06094:constant:1: Constant
+    only if this card is engaged with a player (that player is who "you" means in this record)
+    - this card: stat attack the number of location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active), while this card is in play
+
+06094:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each location the defending player controls.
+  06094:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack the number of location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active), until the end of the attack
+
+## 06095 Southron Commander
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06095:A:1 (front): When Revealed: Southron Commander makes an immediate attack from the staging area against each player who controls at least 1 location.
+  06095:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - if the number of location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active) is at least 1: this card attacks the acting player now, from the staging area, dealt a shadow card
+
+## 06096 West Gate
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06096:A:1 (front): Action: If there is no active location, search the encounter deck and discard pile for an Osgiliath location, reveal it and add it to the staging area. Then, make West Gate the active location. Shuffle the encounter deck.
+  06096:action:1: Action (any player may use it)
+    only if not (the number of location (any player controls) that is the active location is at least 1)
+    who acts: any player may trigger it; the acting player is the one who does
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player chooses one of:
+      * option "found" (only if the encounter deck or its discard pile holds an Osgiliath location):
+        - the acting player searches the encounter deck and discard pile for a Osgiliath location, reveals it and adds it to the staging area
+        - the player who controls this card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+        - this card (a location in the staging area) becomes the active location without traveling (another active location goes back to the staging area); a Forced effect "after it becomes the active location" resolves
+      * option "none" (only if not (the encounter deck or its discard pile holds an Osgiliath location)):
+    - shuffle the encounter deck
+
+06096:A:2 (front): Forced: After the player who controls West Gate lets an attack go undefended, return West Gate to the staging area.
+  06096:forced:1: Forced after an enemy attack on a player has dealt its damage with no defender declared (any enemy attack, whatever its damage; the event happened to the defending player)
+    only if the number of location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active), that is this card itself is at least 1
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the player who controls this card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+
+## 06097 The King's Library
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06097:A:1 (front): Travel: Reveal the top card of the encounter deck and add it to the staging area to travel here.
+  06097:travel:1: Travel
+    - the acting player reveals an encounter card
+
+06097:A:2 (front): Forced: After the player who controls The King's Library lets an attack go undefended, return The King's Library to the staging area.
+  06097:forced:1: Forced after an enemy attack on a player has dealt its damage with no defender declared (any enemy attack, whatever its damage; the event happened to the defending player)
+    only if the number of location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active), that is this card itself is at least 1
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the player who controls this card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+
+## 06098 Ancient Harbor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06098:A:1 (front): The players cannot travel here.
+  06098:constant:1: Constant
+    - the players cannot travel to this location while this holds
+
+06098:A:2 (front): Combat Action: Exhaust a hero to place 1 progress token on Ancient Harbor.
+  06098:action:1: Action (any player may use it)
+    only if all of: (it is the Combat phase) and (there is a ready hero (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready hero (you control)
+    - exhaust the picked card
+    - place 1 progress on this card
+
+06098:A:3 (front): Forced: After the player who controls Ancient Harbor lets an attack go undefended, return Ancient Harbor to the staging area.
+  06098:forced:1: Forced after an enemy attack on a player has dealt its damage with no defender declared (any enemy attack, whatever its damage; the event happened to the defending player)
+    only if the number of location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active), that is this card itself is at least 1
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the player who controls this card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+
+## 06099 The Old Bridge
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06099:A:1 (front): The players cannot travel here.
+  06099:constant:1: Constant
+    - the players cannot travel to this location while this holds
+
+06099:A:2 (front): Planning Action: Spend 2 resources to place 1 progress token on The Old Bridge. (1 resource instead if there is another Osgiliath location in the staging area.)
+  06099:action:1: Action (cost: pay 2 resource(s); any player may use it)
+    only if all of: (it is the Planning phase) and (the number of Osgiliath location (any player controls) in the staging area only, other than this card is at most 0)
+    who acts: any player may trigger it; the acting player is the one who does
+    - place 1 progress on this card
+  06099:action:2: Action (cost: pay 1 resource(s); any player may use it)
+    only if all of: (it is the Planning phase) and (the number of Osgiliath location (any player controls) in the staging area only, other than this card is at least 1)
+    who acts: any player may trigger it; the acting player is the one who does
+    - place 1 progress on this card
+
+06099:A:3 (front): Forced: After the player who controls The Old Bridge lets an attack go undefended, return The Old Bridge to the staging area.
+  06099:forced:1: Forced after an enemy attack on a player has dealt its damage with no defender declared (any enemy attack, whatever its damage; the event happened to the defending player)
+    only if the number of location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active), that is this card itself is at least 1
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the player who controls this card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+
+## 06100 West Quarter
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06100:A:1 (front): While West Quarter is the active location, the current quest gains siege. (Characters quest using Defense instead of Willpower.)
+  06100:constant:1: Constant
+    - currentQuest: stat siege 1, while this card is active
+
+06100:A:2 (shadow): Shadow: If this attack destroys a character, that character's controller must return a location he controls with the highest Threat to the staging area.
+  06100:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the player who controlled the character the attack destroyed acts for the instructions that follow in this effect (he may not be the defending player: a Sentinel defender belongs to another player); with no character destroyed the acting player stays
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (you control) with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), that lies in a player's play area (a location the first player took control of, not one in the staging area or active)
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the player who controls the picked card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+
+## 06101 East Quarter
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06101:A:1 (front): While East Quarter is the active location, the current quest gains battle. (Characters quest using Attack instead of Willpower.)
+  06101:constant:1: Constant
+    - currentQuest: stat battle 1, while this card is active
+
+06101:A:2 (shadow): Shadow: If this attack destroys a character, that character's controller must return a location he controls with the highest Threat to the staging area.
+  06101:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the player who controlled the character the attack destroyed acts for the instructions that follow in this effect (he may not be the defending player: a Sentinel defender belongs to another player); with no character destroyed the acting player stays
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (you control) with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), that lies in a player's play area (a location the first player took control of, not one in the staging area or active)
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the player who controls the picked card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+
+## 06102 Ruined Square
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06102:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+06102:A:2 (front): Response: After an enemy is defeated, place 1 progress token on Ruined Square.
+  06102:response:1: Response after an enemy is destroyed (heard about enemy (any player controls); any player may use it)
+    - place 1 progress on this card
+
+06102:A:3 (front): Forced: If a player controls Ruined Square when a character leaves play, return Ruined Square to the staging area.
+  06102:forced:1: Forced after a card leaves play (heard about character (any player controls))
+    only if the number of location (any player controls) that lies in a player's play area (a location the first player took control of, not one in the staging area or active), that is this card itself is at least 1
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the player who controls this card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+
+## 06103 Ruined Tower
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06103:A:1 (front): Travel: If there is 1 active location, exhaust a character to travel here. (There are now 2 active locations.)
+  06103:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the line's choose step finds fewer cards than it must exhaust (owed only while the number of location (any player controls) that is the active location is at least 1)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the number of location (any player controls) that is the active location is at least 1: choose ready character (you control)
+    - then, if the number of location (any player controls) that is the active location is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): exhaust the picked card
+
+06103:A:2 (front): Forced: After the player who controls Ruined Tower loses control of a location, return Ruined Tower to the staging area.
+  06103:forced:1: Forced after a player loses control of a location (it left his play area for any reason; the event happened to that player, about that location) (heard about location (any player controls) other than this card)
+    only if the number of location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active), that is this card itself is at least 1
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the player who controls this card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+
+## 06104 Pinned Down
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06104:A:1 (front): When Revealed: Add X to the archery total this round. X is the number of locations the players control. If the players control less than 4 locations, Pinned Down gains surge.
+  06104:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - actorSeat: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) the number of location (any player controls) that lies in a player's play area (a location the first player took control of, not one in the staging area or active), until the end of the round
+    - then, if the number of location (any player controls) that lies in a player's play area (a location the first player took control of, not one in the staging area or active) is at most 3 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+06104:A:2 (shadow): Shadow: If this attack destroys a character, that character's controller must return a location he controls with the highest Threat to the staging area.
+  06104:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the player who controlled the character the attack destroyed acts for the instructions that follow in this effect (he may not be the defending player: a Sentinel defender belongs to another player); with no character destroyed the acting player stays
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (you control) with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), that lies in a player's play area (a location the first player took control of, not one in the staging area or active)
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the player who controls the picked card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+
+## 06105 Street Fighting
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06105:A:1 (front): When Revealed: Discard cards from the top of the encounter deck until an Osgiliath location is discarded. The first player may exhaust a hero to take control of that location. Otherwise, add that location to the staging area. This effect cannot be canceled.
+  06105:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - cards are discarded from the top of the encounter deck until a location with the trait Osgiliath is discarded, or the deck is empty (a deck that runs out has the encounter discard pile shuffled into it first, when it holds one); that card becomes the picked card
+    - the first player chooses one of:
+      * option "take" (only if all of: (the picked card is a location (any player controls)) and (there is a ready hero (you control) chosen by the first player to choose)):
+        - choose ready hero (you control) chosen by the first player
+        - exhaust the picked card
+        - the first player takes control of the card picked before, a location in the discard pile, the victory display, the staging area or the active slot: it comes into his play area faceup and ready with no progress, its text working there, and the table notes that he controls it; a location already in a play area, or a card that is no location, stays as it is
+      * option "stage" (only if the picked card is a location (any player controls)):
+        - the picked card goes to the staging area (it is not revealed)
+
+## 06106 Counter-attack
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06106:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+06106:A:2 (front): When Revealed: Each player must either return the location he controls with the highest Threat to the staging area, or raise his threat by the total Threat of all locations he controls.
+  06106:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "return" (only if there is a location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active) to choose):
+          - choose location (you control) with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), that lies in a player's play area (a location the first player took control of, not one in the staging area or active)
+          - the player who controls the picked card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+        * option "raise":
+          - raise threat by the threat as the table shows it now of every location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active) added up, read live (the acting player)
+
+(rendered pieces: 222 by template, 0 as JSON)
