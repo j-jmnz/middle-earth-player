@@ -9,6 +9,7 @@ import steps from "../../../data/rules/steps.json";
 import { flagged, type ModeName, type ScenarioState } from "../../rules/core/state.ts";
 
 import { UNDEFENDED_VILLAGERS_GUIDE } from "../words/scenarios/against-the-shadow/amon-din.ts";
+import { UNDEFENDED_GUIDE as OSGILIATH_GUIDE } from "../words/scenarios/against-the-shadow/osgiliath.ts";
 import { UNDEFENDED_GUIDE } from "../words/scenarios/against-the-shadow/cair-andros.ts";
 import { pointNote, pointTitle } from "./rail.ts";
 import type { QuestStat } from "./quest-stat.ts";
@@ -45,6 +46,8 @@ function decisionOf(step: string, stat: QuestStat | undefined, game: ScenarioSta
   if (step === "6.E" && game.questStage != null && flagged(game, game.questStage, "undefendedToBattleground")) return UNDEFENDED_GUIDE;
   // While stage 2B of Encounter at Amon Dîn is current the undefended attack discards villager tokens from Rescued Villagers, not a hero (06067:B:1).
   if (step === "6.E" && game.questStage != null && game.modifiers.length > 0 && flagged(game, game.questStage, "undefendedToVillagers")) return UNDEFENDED_VILLAGERS_GUIDE;
+  // Assault on Osgiliath: the undefended attack still damages a hero, and returns the unique locations a player controls (06096:A:2).
+  if (step === "6.E" && game.scenarioId === "assault-on-osgiliath") return OSGILIATH_GUIDE;
   return quest && stat ? quest(stat) : DECISIONS[step];
 }
 

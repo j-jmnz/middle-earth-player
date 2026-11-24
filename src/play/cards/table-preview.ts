@@ -19,6 +19,7 @@ import { stageDetail } from "../readouts/fortress.ts";
 import { removalLimit } from "../readouts/against-the-shadow/cair-andros.ts";
 import { enemyProgress } from "../readouts/against-the-shadow/druadan.ts";
 import { amonDinStageLines, amonDinWin, damageUnit, villagerUnit } from "../readouts/against-the-shadow/amon-din.ts";
+import { osgiliathStageLines, osgiliathWin } from "../readouts/against-the-shadow/osgiliath.ts";
 import { stewardsFearStageLines } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { advanceHold, questObjective, stagePoints } from "../readouts/objective.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
@@ -56,8 +57,8 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
   // A stage 2 of The Old Forest has no quest points: it says what its Victory points test sends the quest to.
   const forest = forestScore(game, ctx);
   // Stages 1 and 2 of The Steward's Fear have no quest points either: their tokens against the 4 that advance them follow (06011:B:3, 06012:B:3).
-  const own = amonDinWin(game) ?? (objective ? `To win: ${objective}` : forest ? forestStageWords(forest) : "No quest points");
-  return { title: name, detail: [own, ...stewardsFearStageLines(game, ctx, stage.code), ...amonDinStageLines(game, stage.code)].join(". ") };
+  const own = amonDinWin(game) ?? osgiliathWin(game, ctx, stage.code) ?? (objective ? `To win: ${objective}` : forest ? forestStageWords(forest) : "No quest points");
+  return { title: name, detail: [own, ...stewardsFearStageLines(game, ctx, stage.code), ...amonDinStageLines(game, stage.code), ...osgiliathStageLines(game, stage.code)].join(". ") };
 }
 
 /**

@@ -3,6 +3,8 @@
 import { plural } from "../words/list.ts";
 import { countedOf } from "./counted.ts";
 import { villagersOf } from "./villager-steps.ts";
+import { controlOf } from "../readouts/against-the-shadow/osgiliath-steps.ts";
+import { changeWords } from "../readouts/against-the-shadow/osgiliath.ts";
 import { changedWords } from "../words/scenarios/against-the-shadow/amon-din.ts";
 import { reshuffleWords } from "./pile-ids.ts";
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
@@ -171,10 +173,14 @@ export function logLines(steps: readonly EngineStep[], names: LogNames): LogLine
   const lines: LogLine[] = [];
   steps.forEach((step, index) => {
     const stat = countedOf(step);
-    const text = words(step, names, stat);
+    // A location a player took control of is explored, not destroyed: the intent's last step says who took it (osgiliath-steps.ts).
+    const explored = step.kind === "destroy" && steps.some((other) => controlOf(other)?.changes.some((change) => change.kind === "took" && change.id === step.targetId));
+    const text = explored && step.kind === "destroy" ? `${names.card(step.targetId)} is explored` : words(step, names, stat);
     if (text) lines.push({ key: `${index}`, text, cause: "cause" in step ? causeText(step.cause, names) : null, mark: markOf(step, stat) });
     // The villager tokens of Encounter at Amon Dîn that moved in the intent this step ended: no engine step tells them (villager-steps.ts).
     villagersOf(step).forEach((change, at) => lines.push({ key: `${index}-v${at}`, text: changedWords(names.card(change.id), change.was, change.now), cause: null, mark: "resource" }));
+    // The control of Osgiliath locations taken or lost in the intent this step ended (Assault on Osgiliath): no engine step tells it (readouts/against-the-shadow/osgiliath-steps.ts).
+    controlOf(step)?.changes.forEach((change, at) => lines.push({ key: `${index}-c${at}`, text: changeWords(change, controlOf(step)?.seatCount ?? 1, names.card(change.id)), cause: null, mark: null }));
   });
   return lines;
 }

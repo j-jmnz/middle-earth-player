@@ -2,6 +2,7 @@
 import type { Effect } from "../../../src/catalog/boundary.ts";
 import type { ScenarioState } from "../../../src/rules/core/state.ts";
 import type { PlayerIntent } from "../../../src/rules/engine/reduce.ts";
+import { takeControlOfLocation } from "../../../src/rules/families/pelargir/location-control.ts";
 import { syncConstants } from "../../../src/rules/interpret/constants.ts";
 
 import { idOf, legalIntents, send, start as begin, tableFromLayout, type Layout, type LayoutTable, type Run } from "../../harness/scene-kit.ts";
@@ -79,3 +80,11 @@ export const controlled = (state: ScenarioState): string[] => state.modifiers.fi
 
 /** The id of the first card with this code, whatever its zone. */
 export const idByCode = (state: ScenarioState, code: string): string => Object.values(state.cards).find((card) => card.code === code)?.id ?? "";
+
+/** The state after the first player takes control of each location with these codes, by the family's own verb (progress cleared, in his play area, the seat noted). */
+export function controlling(made: LayoutTable, state: ScenarioState, codes: readonly string[]): ScenarioState {
+  return codes.reduce((now, code) => {
+    const id = idByCode(now, code);
+    return takeControlOfLocation(now, { verb: "TakeControlOfLocation", card: "self" }, { seat: now.firstPlayer, sourceId: id }, made.ctx);
+  }, state);
+}

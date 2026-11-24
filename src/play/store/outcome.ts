@@ -26,6 +26,7 @@ import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poiso
 import { hostName, playWords, type PlayInto } from "../cards/host-words.ts";
 import { STAT_WORD } from "../cards/card-effects.ts";
 import { progressAttack, willpowerAttack } from "../readouts/against-the-shadow/druadan.ts";
+import { controlChanges, changeWords } from "../readouts/against-the-shadow/osgiliath.ts";
 import { deadVillagers, heldBeat, onVillagers, villagerLines } from "../readouts/against-the-shadow/amon-din.ts";
 import { stackTakes, underHost } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { NO_HERO_DAMAGE, VILLAGERS_TITLE } from "../words/scenarios/against-the-shadow/amon-din.ts";
@@ -342,6 +343,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   // The villager tokens of Encounter at Amon Dîn that moved or were discarded in this intent, and the defeat of stage 2B that Ghulat holds: no step of their own.
   const villagers = villagerLines(before, after, names.card);
   if (villagers.length > 0) groups.push({ rank: 8, title: VILLAGERS_TITLE, tone: "plain", lines: villagers.map((text) => ({ text, mark: null })), early: true });
+  // The locations a player took control of or lost in this intent (Assault on Osgiliath): the location is moved by the engine without a step.
+  const control = controlChanges(before, after).map((change) => changeWords(change, after.seatCount, names.card(change.id)));
+  if (control.length > 0) groups.push({ rank: 8, title: "Control", tone: "plain", lines: control.map((text) => ({ text, mark: null })), early: true });
   const held = heldBeat(before, after);
   if (held) groups.push({ rank: 8, title: held.title, tone: "plain", lines: held.lines.map((text) => ({ text, mark: null })) });
 
