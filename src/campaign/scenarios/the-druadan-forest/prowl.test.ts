@@ -6,37 +6,14 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { EFFECTS } from "../../../effects/index.ts";
-import { legalIntents, type PlayerIntent } from "../../../rules/engine/reduce.ts";
-import { idOf, revealFromTop, send, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
-import { CODES, run as runEffect, table } from "../../../../test/scenarios/the-druadan-forest/table.ts";
+import { idOf } from "../../../../test/harness/scene-kit.ts";
+import { CODES, revealPlay as play, run as runEffect, table } from "../../../../test/scenarios/the-druadan-forest/table.ts";
 
 const { elite: ELITE, hunter: HUNTER, thief: THIEF, stars: STARS } = CODES;
 
 const heroesOf = (state: ScenarioState, seat: number): string[] => [...(state.seats[seat]?.heroes ?? [])];
 const held = (state: ScenarioState, ids: readonly string[]): number[] => ids.map((id) => state.cards[id]?.resources ?? 0);
 const total = (state: ScenarioState): number => [0, 1].flatMap((seat) => held(state, heroesOf(state, seat))).reduce((sum, amount) => sum + amount, 0);
-
-// The windows the reveal opens, answered in turn by `answers` (an option id, or a rule that picks one from the options): a response window is passed, a choice must offer the answer, and a window left over fails the test.
-type Answer = string | ((options: readonly string[]) => string);
-function play(made: LayoutTable, code: string, answers: readonly Answer[], trigger?: string): { run: Run; asked: string[][] } {
-  let run: Run = { state: revealFromTop(made.state, made.ctx, code, []).state, steps: [] };
-  const asked: string[][] = [];
-  for (let guard = 0; guard < 40 && run.state.window; guard += 1) {
-    const window = run.state.window;
-    const cancel = window.kind === "response" ? legalIntents(run.state, made.ctx).find((intent) => intent.type === "Trigger" && intent.effectId === trigger) : undefined;
-    if (cancel) run = send(run, cancel as PlayerIntent, made.ctx);
-    else if (window.kind === "response" || window.kind === "pass") run = send(run, { type: "Pass" }, made.ctx);
-    else if (window.kind === "choose") {
-      asked.push([...window.options]);
-      const next = answers[asked.length - 1];
-      if (next === undefined) throw new Error(`Unanswered choice ${window.options.join("/")}`);
-      const optionId = typeof next === "function" ? next(window.options) : next;
-      expect(window.options).toContain(optionId);
-      run = send(run, { type: "Choose", optionId }, made.ctx);
-    } else break;
-  }
-  return { run, asked };
-}
 
 describe("06047:A:1 Prowl X", () => {
   it("06047:A:1 the players as a group discard X resources, each player deciding for his own heroes in turn: resources leave the heroes of both seats", () => {

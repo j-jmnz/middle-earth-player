@@ -4,7 +4,8 @@ import type { ScenarioState } from "../../../src/rules/core/state.ts";
 import { settle } from "../../../src/rules/engine/machine.ts";
 import { runInstruction } from "../../../src/rules/interpret/interpret.ts";
 
-import { tableFromLayout, type Layout, type LayoutTable } from "../../harness/scene-kit.ts";
+import { legalIntents, type PlayerIntent } from "../../../src/rules/engine/reduce.ts";
+import { revealFromTop, send, tableFromLayout, type Layout, type LayoutTable, type Run } from "../../harness/scene-kit.ts";
 
 export const SCENARIO = "the-druadan-forest";
 export const CODES = {
@@ -33,3 +34,30 @@ export const run = (made: LayoutTable, state: ScenarioState, instruction: Instru
 
 /** The state after the instruction ran and the frames it opened were settled. */
 export const runSettled = (made: LayoutTable, state: ScenarioState, instruction: Instruction, sourceId: string | null = null): ScenarioState => settle(run(made, state, instruction, sourceId), made.ctx, []);
+
+/** An answer to a choice the reveal opens: an option id, or a rule that picks one of the options. */
+export type Answer = string | ((options: readonly string[]) => string);
+
+/**
+ * The card is revealed from the top of the encounter deck of `made` and the windows it opens are answered in turn by `answers` (a choice must offer the answer; one left unanswered throws). A response window is passed, unless a Response with the effect id `trigger` is offered: that one is used.
+ * `asked` holds the options of each choice that was opened.
+ */
+export function revealPlay(made: LayoutTable, code: string, answers: readonly Answer[], trigger?: string): { run: Run; asked: string[][] } {
+  let run: Run = { state: revealFromTop(made.state, made.ctx, code, []).state, steps: [] };
+  const asked: string[][] = [];
+  for (let guard = 0; guard < 60 && run.state.window; guard += 1) {
+    const window = run.state.window;
+    const used = window.kind === "response" ? legalIntents(run.state, made.ctx).find((intent) => intent.type === "Trigger" && intent.effectId === trigger) : undefined;
+    if (used) run = send(run, used as PlayerIntent, made.ctx);
+    else if (window.kind === "response" || window.kind === "pass") run = send(run, { type: "Pass" }, made.ctx);
+    else if (window.kind === "choose") {
+      asked.push([...window.options]);
+      const next = answers[asked.length - 1];
+      if (next === undefined) throw new Error(`Unanswered choice ${window.options.join("/")}`);
+      const optionId = typeof next === "function" ? next(window.options) : next;
+      if (!window.options.includes(optionId)) throw new Error(`The answer ${optionId} is not among ${window.options.join("/")}`);
+      run = send(run, { type: "Choose", optionId }, made.ctx);
+    } else break;
+  }
+  return { run, asked };
+}
