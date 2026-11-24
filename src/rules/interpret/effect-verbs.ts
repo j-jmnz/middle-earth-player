@@ -6,7 +6,6 @@ import { holdPlacement, holdsProgress } from "../families/long-dark/hold.ts";
 import { effectProgressBarredOn } from "../families/quest/effect-progress.ts";
 import { frameScope, resolveAmount } from "./amounts.ts";
 import { hasTrait } from "./conditions.ts";
-import { runQuestResolution } from "../quest/explore.ts";
 import type { EngineStep } from "../core/intents.ts";
 import { drawMany, type ReduceContext } from "./interpret.ts";
 import { destroyCard, playerCardEffectCanChoose } from "../core/keywords.ts";
@@ -15,7 +14,7 @@ import { cancelAttack } from "../families/defense/defenders.ts";
 import { printedOf } from "../core/printed.ts";
 import { questPointsOf } from "../quest/quest.ts";
 import { notePlaced, progressRoom, reducedProgress } from "../families/south/locations.ts";
-import { announceLeftPlay } from "../quest/stage-reveal.ts";
+import { announceExplored } from "../quest/stage-reveal.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { livingSeats, updateCard } from "../core/state.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
@@ -162,5 +161,5 @@ export function placeProgress(state: ScenarioState, id: string, amount: number, 
   // Under Exploration a location with progress equal to its quest points is not explored; it remains in play (dcce.exploration).
   if (points == null || location.progress + placed < points || exploring(next)) return next;
   const explored = destroyCard(next, id, ctx.cards, steps, true);
-  return announceLeftPlay(runQuestResolution(explored, id, ctx, steps), id, ctx, steps, true);
+  return announceExplored(explored, id, ctx, steps);
 }

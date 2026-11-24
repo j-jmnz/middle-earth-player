@@ -32,7 +32,7 @@ const ROWS: readonly Row[] = [
   { line: "900706:A:2", name: "Shadow: +X Attack, X the Threat of the active location", layout: { active: "place" }, act: attack("f3", { shadow: "900706", undefended: true }), expect: [damageOn("dh1", 3)] },
 
   // 900707:A:3 "Shadow: Remove all progress from each Emyn Muil location in play." The active location and one in the staging area (both Emyn Muil) lose all their progress; Enchanted Stream (a Forest) keeps its own.
-  { line: "900707:A:3", name: "Shadow: each Emyn Muil location in play, active or in the staging area, loses all its progress", layout: { active: { code: "02085", progress: 2 }, staging: [{ code: "02086", progress: 3 }, { code: "01095", progress: 1 }] }, act: attack("f0", { shadow: "900707" }), expect: [progressOn("02085", 0), progressOn("02086", 0), progressOn("01095", 1)] },
+  { line: "900707:A:3", name: "Shadow: each Emyn Muil location in play, active or in the staging area, loses all its progress", layout: { active: { code: "02085", progress: 1 }, staging: [{ code: "02086", progress: 2 }, { code: "01095", progress: 1 }] }, act: attack("f0", { shadow: "900707" }), expect: [progressOn("02085", 0), progressOn("02086", 0), progressOn("01095", 1)] },
 ];
 
 if (ROWS.length > 0) cardSpecs("the-hills-of-emyn-muil", ROWS);

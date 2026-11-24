@@ -30,12 +30,12 @@ describe("02013:B:1 On the Trail", () => {
   it("02013:B:1 resets the quest deck to stage 2B when no hero holds a Clue, keeping the progress on the active location", () => {
     const made = table({ stage: "02013", progress: 5, active: "02016", phase: "Quest" });
     const active = first(made.state, "02016");
-    const withProgress = updateCard(made.state, active, { progress: 2 });
+    const withProgress = updateCard(made.state, active, { progress: 1 });
     const settled = settle({ ...withProgress, window: null }, made.ctx, []);
     expect(settled.cards[settled.questStage ?? ""]?.code).toBe("02012");
     expect(settled.cards[settled.questStage ?? ""]?.progress).toBe(0);
     expect(settled.cards[first(settled, "02013")]?.zone).toBe("questDeck");
-    expect(settled.cards[active]?.progress).toBe(2);
+    expect(settled.cards[active]?.progress).toBe(1);
     expect(settled.activeLocation).toBe(active);
   });
 
