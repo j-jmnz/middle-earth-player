@@ -115,7 +115,7 @@ export function defenseSheet(game: ScenarioState, ctx: ReduceContext, legal: rea
   const onHill = numbers ? nightStageAttack(game, ctx, numbers.enemyId, defenders.length) : null;
   const cautious = onHill ? onHill.caution : loneCaution;
   // The damage step of an undefended attack with several heroes to take it: the hero pick is the whole sheet.
-  if ("kind" in undefended && game.pendingAttack?.undefended && defenders.length === 0) return undefended;
+  if ("kind" in undefended && game.pendingAttack?.undefended) return undefended;
   const leave: Alternative =
     "kind" in undefended
       ? { label: "Leave undefended", next: undefended }

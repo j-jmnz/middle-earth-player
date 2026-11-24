@@ -7,6 +7,7 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { cardMap, expectOk, fixtureDefinition, hero } from "../core/test-fixture.ts";
 import { definePrinted } from "../core/printed.ts";
 import { legalIntents, legalTargets, reduce } from "../engine/reduce.ts";
+import { resolveAttack } from "./shadow.ts";
 import { blankScenario, withThreat, type ScenarioState } from "../core/state.ts";
 import { spawn } from "../core/zones.ts";
 
@@ -58,5 +59,23 @@ describe("an undefended attack", () => {
     const early = expectOk(reduce(opened.state, { type: "Undefended", heroId: aragorn }, ctx));
     expect([early.state.cards[aragorn]?.damage, early.state.cards[gimli]?.damage]).toEqual([2, 0]);
     expect(early.state.pendingAttack).toBeNull();
+  });
+
+  it("asks the defending player for the hero when an action window left another seat active", () => {
+    const orc = definePrinted({ code: "orc", name: "Orc", type: "enemy", attack: 2, defense: 0, health: 8, engagementCost: 20, threat: 1 });
+    const ctx = { effects: [], cards: cardMap([orc, hero("aragorn", "leadership", 10, 1), hero("gimli", "leadership", 10, 1), hero("legolas", "tactics", 10, 1)]) };
+    let state = blankScenario({ seatCount: 2, seed: 6, definition: fixtureDefinition(["stage"]) });
+    const ids: Record<string, string> = {};
+    for (const row of [{ code: "aragorn", at: { zone: "heroes", seat: 0 } }, { code: "gimli", at: { zone: "heroes", seat: 0 } }, { code: "legolas", at: { zone: "heroes", seat: 1 } }, { code: "orc", at: { zone: "engaged", seat: 0 } }] as const) {
+      const spawned = spawn(state, row.code, row.at);
+      state = spawned.state;
+      ids[row.code] = spawned.id;
+    }
+    // The damage step of an attack on seat 0, left undefended with no hero named; the last seat to pass the window before it was seat 1.
+    const waiting: ScenarioState = { ...state, phase: "Combat", mode: "enemyAttacks", activeSeat: 1, window: null, pendingAttack: { enemyId: ids.orc ?? "", seat: 0, undefended: true, shadowResolved: true, shadowsDone: true } };
+    const asked = resolveAttack(waiting, ctx, []);
+    expect(asked.window).toEqual({ kind: "defense", enemyId: ids.orc, seat: 0 });
+    expect(asked.activeSeat).toBe(0);
+    expect(legalTargets(asked, { type: "Undefended" }, ctx)).toEqual([ids.aragorn, ids.gimli]);
   });
 });

@@ -252,7 +252,8 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
   if (aimed) return aimed.window ? aimed : resolveAttack(aimed, ctx, steps);
   // No hero is named yet (the attack was left undefended with several heroes to take it, or a shadow effect made a defended attack undefended): the
   // defending player names the hero now, with the shadow effect resolved (rr.step-6-4-3).
-  if (attack.heroId == null) return { ...next, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
+  // The action windows between the attack's steps may have left another seat active: the defending player answers.
+  if (attack.heroId == null) return { ...next, activeSeat: attack.seat, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
   // No hero is left to take the attack (every hero of the seat is held, 18074): it deals no damage.
   if (!next.cards[attack.heroId]) return afterDamage(next, ctx, steps);
   const strength = modifiedStat(next, enemy, "attack", ctx.cards);
