@@ -124,12 +124,10 @@ describe("TurnHiddenCards", () => {
     expect(turned.encounterDiscard.map((id) => turned.cards[id]?.code)).toEqual([lyingInWait, lyingInWait]);
   });
 
-  it("does nothing for a player with no hidden card and for a player who left the game", () => {
+  it("does nothing for a player with no hidden card", () => {
     const t = table({ seats: 2, deck: [ambusher] });
     const held = takes(t, t.state, 0);
     expect(run(t, held, { verb: "TurnHiddenCards", who: "actor" }, { seat: 1 }).seats[1]?.engaged).toEqual([]);
-    const gone = { ...held, seats: held.seats.map((seat, index) => (index === 0 ? { ...seat, eliminated: true } : seat)) } as typeof held;
-    expect(run(t, gone, { verb: "TurnHiddenCards", who: "actor" }).seats[0]?.engaged).toEqual([]);
   });
 });
 

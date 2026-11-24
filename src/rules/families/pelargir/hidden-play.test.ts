@@ -6,11 +6,12 @@ import { describe, expect, it } from "vitest";
 import { UNATTRIBUTED } from "../../core/cause.ts";
 import { placeDamage } from "../../core/keywords.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { settle } from "../../engine/machine.ts";
 import { stagingThreat } from "../../quest/quest.ts";
 import { idOf, legalIntents, legalTargets, revealedTop, send } from "../../../../test/harness/scene-kit.ts";
 import { BOROMIR, CODES, drive, fight, hiddenCodes, idByCode, opened, run, table, takes, where } from "../../../../test/scenarios/the-blood-of-gondor/table.ts";
 
-const { ambusher, uruk, rabble, arsonist, crow, southern, eastern, faramir, alcaron, captured, ambush, crossroads, looms, conflict } = CODES;
+const { ambusher, uruk, rabble, arsonist, crow, southern, eastern, faramir, alcaron, captured, ambush, crossroads, conflict } = CODES;
 const hurt = (made: ReturnType<typeof table>, state: ScenarioState, hero: string, amount: number): ScenarioState => placeDamage({ ...state, window: null }, idOf(state, hero), amount, made.ctx.cards, [], "framework", UNATTRIBUTED);
 const engagedCodes = (state: ScenarioState, seat = 0) => state.seats[seat]?.engaged.map((id) => state.cards[id]?.code);
 
@@ -63,7 +64,7 @@ describe("Brutal Uruk (06121:A:1)", () => {
     const done = fight(t, opened(t, { ...state, window: { kind: "pass" } as never }), (now) => now.window?.kind === "chooseEnemy");
     expect(hiddenCodes(done.state)).toEqual([]);
     expect(engagedCodes(done.state)).toEqual([uruk, ambusher, rabble]);
-    expect(Object.values(done.state.cards).filter((card) => card.zone === "shadow" && [ambusher, rabble].includes(done.state.cards[card.host ?? ""]?.code ?? ""))).toHaveLength(2);
+    expect(Object.values(done.state.cards).filter((card) => card.zone === "shadow" && [ambusher, rabble].includes(done.state.cards[card.host ?? ""]?.code as typeof ambusher))).toHaveLength(2);
     expect(done.state.window).toMatchObject({ kind: "chooseEnemy" });
   });
 
@@ -197,12 +198,14 @@ describe("5 hidden cards (06118:B:3)", () => {
 });
 
 describe("the player who left the game (hidden.owner)", () => {
-  it("has his hidden cards discarded when his last hero falls", () => {
+  it("has his hidden cards discarded when his last hero falls, and the other player keeps his", () => {
     const t = table({ seats: 2, phase: "Combat", deck: [ambusher, rabble, "f0"] });
     const held = takes(t, takes(t, t.state, 0), 1);
-    const dead = hurt(t, hurt(t, held, "dh1", 6), "dh2", 0);
-    const done = run(t, dead, { verb: "TakeHiddenCard", who: "firstPlayer", amount: 1 }, { seat: 0 });
-    expect(hiddenCodes(done, 1).length + hiddenCodes(done, 0).length).toBeGreaterThan(0);
+    const fallen = settle(hurt(t, held, t.state.cards[t.seat1Hero ?? ""]?.code ?? "", 6), t.ctx, []);
+    expect(fallen.seats[1]?.eliminated).toBe(true);
+    expect(hiddenCodes(fallen, 1)).toEqual([]);
+    expect(hiddenCodes(fallen, 0)).toEqual([ambusher]);
+    expect(fallen.encounterDiscard.map((id) => fallen.cards[id]?.code)).toContain(rabble);
   });
 });
 
