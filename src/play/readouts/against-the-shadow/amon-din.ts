@@ -4,8 +4,7 @@
 // Villagers with Dead Villagers, the lines of the two stages (the progress that moves tokens, the undefended attack that discards them, the held end), the readout of an undefended attack on Rescued Villagers, the quest readout of stage 1B, the preview lines of the objectives, Lord
 // Alcaron and Ghulat, and the banner's lines for tokens that moved or were discarded. Every hook keys on this scenario's id, so a card of another scenario that holds resource tokens still says resources. The engine decided every number; nothing here changes one. Pure, so a test reads it.
 import type { Effect } from "../../../catalog/boundary.ts";
-import type { GameEvent } from "../../../rules/core/state.ts";
-import { inPlay, flagged, type CardInstance, type ScenarioState } from "../../../rules/core/state.ts";
+import { inPlay, flagged, type CardInstance, type GameEvent, type ScenarioState } from "../../../rules/core/state.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { placeQuestProgress } from "../../../rules/quest/quest.ts";
