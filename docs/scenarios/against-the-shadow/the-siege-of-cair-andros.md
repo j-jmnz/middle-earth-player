@@ -75,16 +75,16 @@ The statuses are those of the Readings bullet of `docs/scenarios/against-the-sha
 
 ## Table
 
-Each piece is made by a line above. The words and widgets are written by the Words task; the pieces to show are:
+Each piece is made by a line above and drawn only while that line makes it; none is a control (no control types damage, resources, threat, progress or life). Code: `src/play/readouts/against-the-shadow/cair-andros.ts`, `src/play/cards/against-the-shadow/cair-andros-preview.ts`, `src/play/words/scenarios/against-the-shadow/cair-andros.ts`; test `src/play/scenarios/the-siege-of-cair-andros-table.test.ts`; the design system is `docs/design-system-table.md`, The Siege of Cair Andros' Battlegrounds and stages.
 
-- **Damage on a Battleground location and its limit** (`05033:A:1`, `05034:A:1`, `05035:A:1`): the damage token of the staged or active location, a readout "N of 11, 7 or 3" that warms one before the limit (the limit is the amount of the card's `removedAtDamage` flag), and the card preview saying the card is removed from the game at that damage, not explored. Damage is not progress: its words never say "progress".
-- **The redirect** (`05072:B:2`): the Undefended choice lists the Battleground location, not the heroes, and the stage preview says so.
-- **Removed stages** (`05033:A:2`, `05034:A:2`, `05035:A:2`): the quest deck and the stage ladder show a removed stage as set aside; the advance names the stage it goes to.
-- **Quest stat on Battle and Siege stages** (`05076:B:3`): The Last Battle shows Siege until 4 victory points, then Battle, with the count toward 4 as a line on the stage.
-- **Extra reveal and extra Threat** (`05073:B:1`, `05075:B:2`): the staging total includes the 5; a note on the stage says "adds 5 Threat".
-- **Locked resources** (`05058:A:1`): a locked hero shows "resources cannot be spent" on the card and in the payment tray.
-- **Archery X** (`05057:A:2`): the live count in the archery assignment.
-- **Asks**: the Response of each Battleground location, the sphere of `05060:A:1`, the character each player discards for `05074:B:2`, the Undefended target for `05072:B:2` and the lowest Threat on a tie for `05032:A:1`.
+- **Damage on a Battleground location and its limit** (`05033:A:1`, `05034:A:1`, `05035:A:1`, `ats.cair-andros-location-damage`): the damage token on the card, a top-bar dial "N of 11, 7 or 3" (the card's `removedAtDamage` amount) that warms one short of it, and the preview line "5 of 11 damage. At 11 The Citadel is removed from the game: it is not explored, its Response is not used and its victory points are not collected". It says damage, never progress.
+- **The redirect** (`05072:B:2`, `ats.cair-andros-defense-carry-over`): the attack's sheet on stage 1B names the location ("Undefended: The Banks takes all of it, and no hero does. It holds 0 of 3 damage") and says when this attack removes it; the stage preview names the lowest Threat Battleground location in play, or says the quest advances at once when none is. No tie is possible (Banks 1, Approach 2, Citadel 3), so no Undefended choice among locations is reached; the sheet words a tie anyway.
+- **Removed stages** (`05033:A:2`, `05034:A:2`, `05035:A:2`, `ats.cair-andros-remove-stage`): the Response is the window's own printed line (no Pick; the verb `RemoveStage` has no choice). The current stage's preview and the advance screen say "Stages 3 and 4 were removed from the quest deck" for stages set aside with less progress than their quest points. The earlier-stage list of the preview keeps its role "Earlier stage" for a removed stage (the role drives the list's layout); the stage's own line says which were removed.
+- **Quest stat** (`05076:B:3`, `hon.battle`, `hon.siege`, `faq.errata.06123`): The Last Battle shows the Siege chip and counts Defense under 4 victory points; at 4 the Siege chip is struck through beside Battle and the quest counts Attack, with the line "3 of 4 victory points in the victory display. At 4 it has Battle and not Siege".
+- **Extra reveal and extra Threat** (`05073:B:1`, `05075:B:2`): the stage's lines say "Reveals 1 more encounter card in each staging step" and "Adds 5 Threat to the staging area"; the staging total and its threat list include the 5 ("Other effects: +5 Threat").
+- **Locked resources** (`05058:A:1`): the hero's preview says its resources cannot be spent, and the payment tray offers its pool no more.
+- **Archery X** (`05057:A:2`): the preview says what X counts and its value now; the chip and the archery total read the same number (`cardArchery`).
+- **Asks** (`src/play/words/asks/the-siege-of-cair-andros.ts`): the Shadow picks of `05030:A:3`, `05031:A:3` and `05032:A:2`, the tie pick of `05032:A:1`, the Southron Support search of `05055:A:2`, the sphere of `05060:A:1` (one question for each player, four rows) and the character each player discards for `05074:B:2`.
 
 ## Engine notes
 
