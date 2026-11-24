@@ -35,8 +35,10 @@ export type DruadanPolicy = {
   reserve: number;
   // The most enemies a seat engages by choice.
   engage: number;
+  // The seats play the cards of their hands (a saved decklist's allies take the archery damage); the stand-in heroes' decks hold only free events.
+  play: boolean;
 };
-export const DEFAULT_POLICY: DruadanPolicy = { choose: "first", reserve: 2, engage: 3 };
+export const DEFAULT_POLICY: DruadanPolicy = { choose: "first", reserve: 2, engage: 3, play: false };
 const DRU = "06045";
 const PASSAGE_OUT = "06044";
 // The quest points of stage 3 (14).
@@ -69,7 +71,7 @@ export function druadanIntent(state: ScenarioState, ctx: ReduceContext, memory: 
   if (attack) return attack;
   const engage = engageOneEach(state, ctx, policy.engage);
   if (engage) return engage;
-  return nextIntent(state, ctx, DRUADAN_POLICY, memory, legalIntents(state, ctx));
+  return nextIntent(state, ctx, policy.play ? { ...DRUADAN_POLICY, play: true } : DRUADAN_POLICY, memory, legalIntents(state, ctx));
 }
 
 // The option of a Choose window: the pay of a pay-or-suffer card (and the discard of a Prowl) when it is offered, else the first or the last as the policy says.
