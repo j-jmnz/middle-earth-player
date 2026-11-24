@@ -49,8 +49,11 @@ const VERBS = [
   // Rolled once for each call, so one seed always hides the same card.
   verbFlags(z.strictObject({ verb: z.literal("HideOneAside"), codes: z.array(code).min(2), ...when }), { setupRuns: "top" }),
   // "Underworld X" (ats.underworld; 06018:A:1, 06021:A:1): the top `amount` cards of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under the host, out of play. `host: self` is the source location that entered play; `host: activeLocation` is the active location
-  // ("Place the top card of the underworld deck facedown underneath the active location, if able", 06018:A:2), and with none nothing happens. The cards are staged again when the location leaves play (ReturnUnderToStaging).
+  // ("Place the top card of the underworld deck facedown underneath the active location, if able", 06018:A:2), and with none nothing happens. The cards are revealed one at a time and staged when the location leaves play, whatever location it is (a settle sweep of the family, no record).
   z.strictObject({ verb: z.literal("TakeUnderworld"), amount: positiveAmountSchema, host: z.enum(["self", "activeLocation"]), ...when }),
+  // "Reveal the set aside Plot card and add it to the staging area" (06012:A:1), "Reveal the set aside Villain card ..." (06013:A:1): the set-aside card with this Trait (the hidden one) is revealed by the actor as an encounter card (its Doomed, When Revealed, Surge, and the Forced effects that hear a reveal) and so added to the staging area
+  // (faq.reveal-and-add). Nothing happens with none set aside.
+  z.strictObject({ verb: z.literal("RevealSetAside"), trait: z.string().min(1), ...when }),
   // "Reveal 1 card from the underworld deck and add it to the staging area. If it is a Clue card, discard it instead" (06023:A:2): the top card of the underworld deck is revealed by the actor in full (its When Revealed effects, Surge, Doomed and the Forced effects that hear a reveal) and added to the staging area. A card with the
   // Trait `discardTrait` is placed in the encounter discard pile instead (ats.underworld: "placed in the encounter deck discard pile"). With the deck empty nothing happens.
   z.strictObject({ verb: z.literal("RevealUnderworld"), discardTrait: z.string().min(1).optional(), ...when }),

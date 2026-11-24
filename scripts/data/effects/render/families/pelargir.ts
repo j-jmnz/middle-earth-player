@@ -45,9 +45,10 @@ export const PELARGIR_TEMPLATES: Templates = {
     read: ["codes"],
   }),
   TakeUnderworld: (i, ctx) => ({
-    text: `the top ${amt(i.amount, ctx)} card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under ${i.host === "self" ? "this location (self)" : i.host === "activeLocation" ? "the active location (activeLocation: nothing with no active location)" : "no location"}, out of play; they are added to the staging area when that location leaves play`,
+    text: `the top ${amt(i.amount, ctx)} card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under ${i.host === "self" ? "this location (self)" : i.host === "activeLocation" ? "the active location (activeLocation: nothing with no active location)" : "no location"}, out of play; when that location leaves play (any location, explored or not, set by the family's settle sweep), the cards under it are revealed one at a time by the first player (the staging steps: keywords, When Revealed, effects that hear a reveal) and added to the staging area`,
     read: ["amount", "host"],
   }),
+  RevealSetAside: (i) => ({ text: `the set-aside card with the Trait ${str(i.trait)} is revealed by the actor as an encounter card (its Doomed, When Revealed effects, Surge and the effects that hear a reveal resolve) and so added to the staging area; with none set aside nothing happens`, read: ["trait"] }),
   RevealUnderworld: (i) => ({
     text: `the top card of the underworld deck is revealed in full (its When Revealed effects, Surge and Doomed resolve) and added to the staging area${i.discardTrait != null ? `; a card with the Trait ${str(i.discardTrait)} is placed in the encounter discard pile instead` : ""}; with the deck empty nothing happens`,
     read: ["discardTrait"],
@@ -77,6 +78,7 @@ export const PELARGIR_SAMPLES: Samples = {
   BuildUnderworldDeck: [{ verb: "BuildUnderworldDeck", codes: ["05037", "06026"] }],
   HideOneAside: [{ verb: "HideOneAside", codes: ["06015", "06016", "06017"] }],
   TakeUnderworld: [{ verb: "TakeUnderworld", amount: 2, host: "self" }, { verb: "TakeUnderworld", amount: 1, host: "activeLocation" }],
+  RevealSetAside: [{ verb: "RevealSetAside", trait: "Plot" }],
   RevealUnderworld: [{ verb: "RevealUnderworld", discardTrait: "Clue" }],
   ShuffleUnderworldIntoEncounterDeck: [{ verb: "ShuffleUnderworldIntoEncounterDeck" }],
   RevealTopThenDiscard: [{ verb: "RevealTopThenDiscard" }],

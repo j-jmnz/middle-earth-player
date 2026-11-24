@@ -18,7 +18,7 @@ import { revealTopThenDiscard } from "./reveal-discard.ts";
 import { sieges, undefendedBattlegrounds } from "./siege.ts";
 import { removeStage } from "./stage-remove.ts";
 import { resolveTopmostTreachery, shuffleStagingIntoEncounterDeck } from "./staging.ts";
-import { buildUnderworldDeck, hideOneAside, revealUnderworld, shuffleUnderworldIntoEncounterDeck, takeUnderworld } from "./underworld.ts";
+import { buildUnderworldDeck, hideOneAside, releaseUnderworldStacks, revealSetAside, revealUnderworld, shuffleUnderworldIntoEncounterDeck, takeUnderworld } from "./underworld.ts";
 
 // The verbs src/catalog/families/pelargir.ts adds. Null when the verb is not one of them.
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
@@ -47,6 +47,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return hideOneAside(state, instruction);
     case "TakeUnderworld":
       return takeUnderworld(state, instruction, focus, ctx);
+    case "RevealSetAside":
+      return revealSetAside(state, instruction, focus, ctx, steps);
     case "RevealUnderworld":
       return revealUnderworld(state, instruction, focus, ctx, steps);
     case "ShuffleUnderworldIntoEncounterDeck":
@@ -64,10 +66,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "pelargir",
-  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives", "RemoveStage", "ResolveTopmostTreachery", "ShuffleStagingIntoEncounterDeck", "BuildUnderworldDeck", "HideOneAside", "TakeUnderworld", "RevealUnderworld", "ShuffleUnderworldIntoEncounterDeck", "RevealTopThenDiscard", "PickRandom", "RemoveQuestTokens"],
+  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives", "RemoveStage", "ResolveTopmostTreachery", "ShuffleStagingIntoEncounterDeck", "BuildUnderworldDeck", "HideOneAside", "TakeUnderworld", "RevealSetAside", "RevealUnderworld", "ShuffleUnderworldIntoEncounterDeck", "RevealTopThenDiscard", "PickRandom", "RemoveQuestTokens"],
   run,
   condition: (state, condition, scope) => pelargirCondition(state, condition, scope),
   revealed: noteFirstEnemy,
-  settle: { sweep: (state, ctx, steps) => lossesAtEmptyDeck(sieges(state, ctx, steps), ctx, steps) },
+  settle: { sweep: (state, ctx, steps) => lossesAtEmptyDeck(releaseUnderworldStacks(sieges(state, ctx, steps), ctx, steps), ctx, steps) },
   combat: { undefended: (state, _candidates, cards) => undefendedBattlegrounds(state, cards) },
 };

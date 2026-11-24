@@ -2,7 +2,7 @@ import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/
 
 // Records for The Steward's Fear (Against the Shadow part 4, no campaign card). Every line is read from the scan ledger (data/printed/against-the-shadow.json); Surge on the Unwelcome Discovery and A Knife in the Back is the card's keyword, and the enemies, locations and treacheries of Streets of
 // Gondor and Brigands keep the records of Peril in Pelargir. Underworld X is written as records on each Underworld location (it is not a parsed keyword): a Forced effect on the entry (`encounterEnteredPlay` for a card revealed or put into play as the active location, `searchedIntoPlay` for a card a search
-// found) takes the top cards of the underworld deck under the location, and the cards under it are staged by its Forced `leftPlay` effect when a location leaves play (ReturnUnderToStaging, as 141049:A:2). The readings are in docs/scenarios/against-the-shadow/the-stewards-fear.md (Readings).
+// found) takes the top cards of the underworld deck under the location, and the cards under a location that leaves play (any location, Sewers stacks under the active one) are revealed one at a time and staged by the family's settle sweep (families/pelargir/underworld.ts releaseUnderworldStacks), which needs no record. The readings are in docs/scenarios/against-the-shadow/the-stewards-fear.md (Readings).
 // The underworld deck, the hidden Villain and Plot and the empty-deck loss are in families/pelargir/ (underworld.ts, empty-deck.ts).
 // Rules: ats.underworld, ats.underworld-example, ats.setup-the-stewards-fear, ats.setup-the-stewards-fear-underworld-deck, rr.active-location, rr.explored, rr.forced, rr.in-play-and-out-of-play, rr.running-out-of-cards, rr.encounter-deck, rr.staging, rr.reveal, rr.surge, rr.victory, rr.destroy,
 // rr.player-elimination, rr.quest-advancement, rr.objective-cards, rr.constant-ability, rr.step-6-4b, rr.attacks-outside-the-combat-phase, rr.optional-engagement, faq.cancel-encounter-card, faq.progress-without-advancing (data/rules/entries.json).
@@ -72,18 +72,18 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   EXPLORED_TOKEN("06011", "06011:B:2"),
   FOUR_TOKENS("06011", "06011:B:3"),
 
-  // 06012 The Grand Design (stage 2). A:1: the hidden Plot is turned faceup and added to the staging area. B:1: Roots of Mindolluin becomes the active location and enters play (Underworld 1); the old active location returns to the staging area. B:2 and B:3 as stage 1.
-  { id: "06012:whenRevealed:1", cardCode: "06012", lines: ["06012:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSetAsideToStaging", trait: "Plot" }] },
+  // 06012 The Grand Design (stage 2). A:1: the hidden Plot is revealed and so added to the staging area. B:1: Roots of Mindolluin becomes the active location and enters play (Underworld 1); the old active location returns to the staging area. B:2 and B:3 as stage 1.
+  { id: "06012:whenRevealed:1", cardCode: "06012", lines: ["06012:A:1"], timing: "whenRevealed", instructions: [{ verb: "RevealSetAside", trait: "Plot" }] },
   { id: "06012:whenRevealed:2", cardCode: "06012", lines: ["06012:B:1"], timing: "whenRevealed", instructions: [{ verb: "MakeSetAsideActive", code: "06019" }] },
   EXPLORED_TOKEN("06012", "06012:B:2"),
   FOUR_TOKENS("06012", "06012:B:3"),
 
-  // 06013 The Confrontation (stage 3, the last). A:1: the hidden Villain is turned faceup and staged. B:1: the underworld deck is shuffled into the encounter deck. B:2: no advance while a Villain is in play; the last stage defeated wins the game.
-  { id: "06013:whenRevealed:1", cardCode: "06013", lines: ["06013:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSetAsideToStaging", trait: "Villain" }] },
+  // 06013 The Confrontation (stage 3, the last). A:1: the hidden Villain is revealed and so staged. B:1: the underworld deck is shuffled into the encounter deck. B:2: no advance while a Villain is in play; the last stage defeated wins the game.
+  { id: "06013:whenRevealed:1", cardCode: "06013", lines: ["06013:A:1"], timing: "whenRevealed", instructions: [{ verb: "RevealSetAside", trait: "Villain" }] },
   { id: "06013:whenRevealed:2", cardCode: "06013", lines: ["06013:B:1"], timing: "whenRevealed", instructions: [{ verb: "ShuffleUnderworldIntoEncounterDeck" }] },
   { id: "06013:constant:1", cardCode: "06013", lines: ["06013:B:2"], timing: "constant", condition: { kind: "enemyInPlay", trait: "Villain", is: true }, instructions: [{ verb: "Restrict", what: "advance" }] },
 
-  // 06014 Underworld Dissident (Brigand). A:1: +1 Attack for each location with the Trait Underworld in the staging area or active. A:2 (Shadow): undefended, the defending player removes 1 token from the current quest: a progress token or a resource token when the card holds both.
+  // 06014 Underworld Dissident (Brigand). A:1: +1 Attack for each location with the Trait Underworld in the staging area or active. A:2 (Shadow): undefended, the first player (who decides for the group) removes 1 token from the current quest: a progress token or a resource token when the card holds both.
   { id: "06014:constant:1", cardCode: "06014", lines: ["06014:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "attack", amount: { count: UNDERWORLD_LOCATION }, until: "whileSourceInPlay", target: "self" }] },
   {
     id: "06014:shadow:1",
@@ -93,7 +93,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [
       {
         verb: "Choose",
-        who: "actor",
+        who: "firstPlayer",
         options: [
           { id: "progress", requires: REMOVABLE("progress"), instructions: [{ verb: "RemoveQuestTokens", kind: "progress", amount: 1 }] },
           { id: "resource", requires: REMOVABLE("resources"), instructions: [{ verb: "RemoveQuestTokens", kind: "resource", amount: 1 }] },
@@ -116,20 +116,15 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 06016 The Hand of Castamir (Villain). A:1: after it attacks the top card of the encounter deck is revealed, resolved and discarded (it never enters play). A:2: after a treachery card is revealed from the encounter deck it makes an immediate attack against the first player.
   { id: "06016:forced:1", cardCode: "06016", lines: ["06016:A:1"], timing: "forced", trigger: "attackResolved", subject: "self", instructions: [{ verb: "RevealTopThenDiscard" }] },
-  { id: "06016:forced:2", cardCode: "06016", lines: ["06016:A:2"], timing: "forced", trigger: "revealed", byEncounterDeck: true, subject: { type: "treachery", control: "any" }, instructions: [{ verb: "ImmediateAttack" }] },
+  { id: "06016:forced:2", cardCode: "06016", lines: ["06016:A:2"], timing: "forced", trigger: "revealed", byEncounterDeck: true, subject: { type: "treachery", control: "any" }, instructions: [{ verb: "AttackFirstPlayer" }] },
 
   // 06017 Telemnar's Bane (Villain). A:1: each time it attacks, the top 3 cards of every player's deck are discarded. A:2: after any player plays an event card it makes an immediate attack against the first player.
   { id: "06017:forced:1", cardCode: "06017", lines: ["06017:A:1"], timing: "forced", trigger: "attacks", subject: "self", instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "DiscardFromDeck", amount: 3 }] }] },
-  { id: "06017:forced:2", cardCode: "06017", lines: ["06017:A:2"], timing: "forced", trigger: "played", subject: { type: "card", control: "any", cardType: "event" }, instructions: [{ verb: "ImmediateAttack" }] },
+  { id: "06017:forced:2", cardCode: "06017", lines: ["06017:A:2"], timing: "forced", trigger: "played", subject: { type: "card", control: "any", cardType: "event" }, instructions: [{ verb: "AttackFirstPlayer" }] },
 
   // 06018 Sewers. A:1: Underworld 1. A:2 (When Revealed, resolved before the card enters play): the top card of the underworld deck goes facedown under the active location, if able.
   ...UNDERWORLD("06018", ["06018:A:1"], 1),
   { id: "06018:whenRevealed:1", cardCode: "06018", lines: ["06018:A:2"], timing: "whenRevealed", instructions: [{ verb: "TakeUnderworld", amount: 1, host: "activeLocation" }] },
-  // The cards under an Underworld location are staged when it leaves play, explored or not (ats.underworld): Sewers, Storehouse, Houses of the Dead, Roots of Mindolluin and The Fourth Star.
-  ...["06018", "06019", "06020", "06021", "06022"].map(
-    (code): Effect => ({ id: `${code}:forced:3`, cardCode: code, lines: [`${code}:A:1`], timing: "forced", trigger: "leftPlay", subject: "self", instructions: [{ verb: "ReturnUnderToStaging" }] }),
-  ),
-
   // 06019 Roots of Mindolluin (set aside, made active by stage 2B). A:1: Underworld 1 (it enters play through MakeSetAsideActive, no search). A:2: each location in the staging area gets +2 quest points, itself included while it lies there.
   { id: "06019:forced:1", cardCode: "06019", lines: ["06019:A:1"], timing: "forced", trigger: "encounterEnteredPlay", subject: "self", instructions: [{ verb: "TakeUnderworld", amount: 1, host: "self" }] },
   { id: "06019:constant:1", cardCode: "06019", lines: ["06019:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: 2, until: "whileSourceInPlay", holders: { type: "location", control: "any", stagingOnly: true } }] },

@@ -32,7 +32,7 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
 
 06012:A:1 (front): When Revealed: Reveal the set aside Plot card and add it to the staging area.
   06012:whenRevealed:1: When revealed
-    - one set-aside card with the trait Plot joins the staging area (it is not revealed)
+    - the set-aside card with the Trait Plot is revealed by the actor as an encounter card (its Doomed, When Revealed effects, Surge and the effects that hear a reveal resolve) and so added to the staging area; with none set aside nothing happens
 
 06012:B:1 (back): When Revealed: Make Roots of Mindolluin the active location, returning any other active location to the staging area.
   06012:whenRevealed:2: When revealed
@@ -53,7 +53,7 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
 
 06013:A:1 (front): When Revealed: Reveal the set aside Villain card and add it to the staging area.
   06013:whenRevealed:1: When revealed
-    - one set-aside card with the trait Villain joins the staging area (it is not revealed)
+    - the set-aside card with the Trait Villain is revealed by the actor as an encounter card (its Doomed, When Revealed effects, Surge and the effects that hear a reveal resolve) and so added to the staging area; with none set aside nothing happens
 
 06013:B:1 (back): When Revealed: Shuffle the underworld deck into the encounter deck.
   06013:whenRevealed:2: When revealed
@@ -74,7 +74,7 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
 06014:A:2 (shadow): Shadow: If this attack is undefended, remove 1 token from the current quest.
   06014:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - the acting player chooses one of:
+    - the first player chooses one of:
       * option "progress" (only if all of: (the attack has no defender) and (0 is less than progress of the current quest stage)):
         - 1 progress token(s) leave the current quest card (progress first when both kinds are named; at most the card holds)
       * option "resource" (only if all of: (the attack has no defender) and (0 is less than resources of the current quest stage)):
@@ -107,7 +107,7 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
 06016:A:2 (front): Forced: After a treachery card is revealed from the encounter deck, The Hand of Castamir makes an immediate attack against the first player.
   06016:forced:2: Forced after a card is revealed (heard about treachery (any player controls); only when the encounter deck revealed it)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+    - this enemy, in the staging area or engaged with any player, attacks the first player now, dealt a shadow card for the attack
 
 ## 06017 Telemnar's Bane
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -121,7 +121,7 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
 06017:A:2 (front): Forced: After a player plays an event card, Telemnar's Bane makes an immediate attack against the first player.
   06017:forced:2: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+    - this enemy, in the staging area or engaged with any player, attacks the first player now, dealt a shadow card for the attack
 
 ## 06018 Sewers
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -129,28 +129,22 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
 06018:A:1 (front): Underworld 1.
   06018:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the top 1 card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; they are added to the staging area when that location leaves play
+    - the top 1 card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; when that location leaves play (any location, explored or not, set by the family's settle sweep), the cards under it are revealed one at a time by the first player (the staging steps: keywords, When Revealed, effects that hear a reveal) and added to the staging area
   06018:forced:2: Forced on the event searchedIntoPlay (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the top 1 card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; they are added to the staging area when that location leaves play
-  06018:forced:3: Forced after a card leaves play (heard about this card)
-    who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - each card under this location returns to the staging area faceup
+    - the top 1 card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; when that location leaves play (any location, explored or not, set by the family's settle sweep), the cards under it are revealed one at a time by the first player (the staging steps: keywords, When Revealed, effects that hear a reveal) and added to the staging area
 
 06018:A:2 (front): When Revealed: Place the top card of the underworld deck facedown underneath the active location, if able.
   06018:whenRevealed:1: When revealed
-    - the top 1 card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under the active location (activeLocation: nothing with no active location), out of play; they are added to the staging area when that location leaves play
+    - the top 1 card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under the active location (activeLocation: nothing with no active location), out of play; when that location leaves play (any location, explored or not, set by the family's settle sweep), the cards under it are revealed one at a time by the first player (the staging steps: keywords, When Revealed, effects that hear a reveal) and added to the staging area
 
 ## 06019 Roots of Mindolluin
 (the scenario deals it into the setAside pile; the piles place it, no record does)
 
 06019:A:1 (front): Underworld 1.
-  06019:forced:3: Forced after a card leaves play (heard about this card)
-    who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - each card under this location returns to the staging area faceup
   06019:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the top 1 card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; they are added to the staging area when that location leaves play
+    - the top 1 card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; when that location leaves play (any location, explored or not, set by the family's settle sweep), the cards under it are revealed one at a time by the first player (the staging steps: keywords, When Revealed, effects that hear a reveal) and added to the staging area
 
 06019:A:2 (front): Each location in the staging area gets +2 quest points.
   06019:constant:1: Constant
@@ -160,15 +154,12 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 06020:A:1 (front): Underworld 1.
-  06020:forced:3: Forced after a card leaves play (heard about this card)
-    who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - each card under this location returns to the staging area faceup
   06020:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the top 1 card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; they are added to the staging area when that location leaves play
+    - the top 1 card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; when that location leaves play (any location, explored or not, set by the family's settle sweep), the cards under it are revealed one at a time by the first player (the staging steps: keywords, When Revealed, effects that hear a reveal) and added to the staging area
   06020:forced:2: Forced on the event searchedIntoPlay (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the top 1 card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; they are added to the staging area when that location leaves play
+    - the top 1 card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; when that location leaves play (any location, explored or not, set by the family's settle sweep), the cards under it are revealed one at a time by the first player (the staging steps: keywords, When Revealed, effects that hear a reveal) and added to the staging area
 
 06020:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if undefended.)
   06020:shadow:1: Shadow
@@ -181,15 +172,12 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 06021:A:1 (front): Underworld 2.
-  06021:forced:3: Forced after a card leaves play (heard about this card)
-    who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - each card under this location returns to the staging area faceup
   06021:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the top 2 card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; they are added to the staging area when that location leaves play
+    - the top 2 card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; when that location leaves play (any location, explored or not, set by the family's settle sweep), the cards under it are revealed one at a time by the first player (the staging steps: keywords, When Revealed, effects that hear a reveal) and added to the staging area
   06021:forced:2: Forced on the event searchedIntoPlay (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the top 2 card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; they are added to the staging area when that location leaves play
+    - the top 2 card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; when that location leaves play (any location, explored or not, set by the family's settle sweep), the cards under it are revealed one at a time by the first player (the staging steps: keywords, When Revealed, effects that hear a reveal) and added to the staging area
 
 06021:A:2 (front): Forced: After Houses of the Dead becomes the active location, exhaust all characters.
   06021:forced:4: Forced after this location becomes the active location (heard about this card)
@@ -200,23 +188,20 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 06022:A:1 (front): Underworld X.
-  06022:forced:3: Forced after a card leaves play (heard about this card)
-    who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - each card under this location returns to the staging area faceup
   06022:forced:1: Forced on the event encounterEnteredPlay (heard about this card) (record also names 06022:A:2)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the top the number of players card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; they are added to the staging area when that location leaves play
+    - the top the number of players card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; when that location leaves play (any location, explored or not, set by the family's settle sweep), the cards under it are revealed one at a time by the first player (the staging steps: keywords, When Revealed, effects that hear a reveal) and added to the staging area
   06022:forced:2: Forced on the event searchedIntoPlay (heard about this card) (record also names 06022:A:2)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the top the number of players card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; they are added to the staging area when that location leaves play
+    - the top the number of players card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; when that location leaves play (any location, explored or not, set by the family's settle sweep), the cards under it are revealed one at a time by the first player (the staging steps: keywords, When Revealed, effects that hear a reveal) and added to the staging area
 
 06022:A:2 (front): X is the number of players in the game.
   06022:forced:1: Forced on the event encounterEnteredPlay (heard about this card) (record also names 06022:A:1)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the top the number of players card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; they are added to the staging area when that location leaves play
+    - the top the number of players card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; when that location leaves play (any location, explored or not, set by the family's settle sweep), the cards under it are revealed one at a time by the first player (the staging steps: keywords, When Revealed, effects that hear a reveal) and added to the staging area
   06022:forced:2: Forced on the event searchedIntoPlay (heard about this card) (record also names 06022:A:1)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the top the number of players card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; they are added to the staging area when that location leaves play
+    - the top the number of players card(s) of the underworld deck (fewer when fewer remain, none when it is empty) are stacked facedown under this location (self), out of play; when that location leaves play (any location, explored or not, set by the family's settle sweep), the cards under it are revealed one at a time by the first player (the staging steps: keywords, When Revealed, effects that hear a reveal) and added to the staging area
 
 06022:A:3 (front): Response: When The Fourth Star leaves play as an explored location, each player may draw 1 card.
   06022:response:1: Response after a card leaves play (heard about this card)
@@ -341,4 +326,4 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
     who acts: the acting player is the first player (a phase has no player of its own)
     - raise threat by 2 (each player)
 
-(rendered pieces: 201 by template, 0 as JSON)
+(rendered pieces: 191 by template, 0 as JSON)

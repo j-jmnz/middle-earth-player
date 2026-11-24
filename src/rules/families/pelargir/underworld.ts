@@ -8,7 +8,8 @@ import { printedOf } from "../../core/printed.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import { resolveAmount, frameScope } from "../../interpret/amounts.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { updateCard } from "../../core/state.ts";
+import { inPlay, updateCard } from "../../core/state.ts";
+import { gameReads } from "../../core/game-reads.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { shuffleEncounterDeck } from "../../interpret/verbs.ts";
@@ -85,4 +86,25 @@ export function shuffleUnderworldIntoEncounterDeck(state: ScenarioState): Scenar
   let next = state;
   for (const id of underworldDeck(state)) next = updateCard(leaveDeck(moveCard(next, id, { zone: "encounterDeck" }), id), id, { face: "down", controller: null });
   return shuffleEncounterDeck(next);
+}
+
+/** RevealSetAside: the set-aside card with the Trait is revealed by the actor as an encounter card (the staging steps, rr.reveal and faq.reveal-and-add) and so added to the staging area. Nothing happens with none set aside. */
+export function revealSetAside(state: ScenarioState, instruction: Verb<"RevealSetAside">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const id = state.setAside.find((candidate) => state.cards[candidate]?.stackedAt == null && printedOf(ctx.cards, state.cards[candidate]?.code ?? "").traits.includes(instruction.trait));
+  return id ? startReveal(state, focus.seat, ctx, steps, id) : state;
+}
+
+/**
+ * The settle sweep that ends Underworld X (ats.underworld: "When a location leaves play, any facedown cards stacked underneath that location are revealed one at a time, and added to the staging area"): the facedown cards under a location that is no longer in play, whatever location it is
+ * (Sewers stacks a card under the active location, a City Street or a Market Square too) and however it left. The first player reveals one card (the staging steps, as RevealUnderworld does) and the next is revealed once that reveal is over. It waits while anything is resolving.
+ * Inert in a game whose records do not take underworld cards.
+ */
+export function releaseUnderworldStacks(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  if (state.lost || state.stack.length > 0 || state.window || state.pendingAttack || state.pendingStrike || !gameReads(state, ctx, '"TakeUnderworld"')) return state;
+  const orphan = Object.values(state.cards)
+    .filter((card) => card.zone === "under" && card.face === "down" && card.host != null && state.cards[card.host] != null && !inPlay(state.cards[card.host]?.zone ?? "removed"))
+    .sort((left, right) => left.id.localeCompare(right.id, undefined, { numeric: true }))[0];
+  if (!orphan) return state;
+  const seat = state.seats[state.firstPlayer]?.eliminated ? state.seats.findIndex((candidate, index) => index < state.seatCount && !candidate.eliminated) : state.firstPlayer;
+  return seat < 0 ? state : startReveal(updateCard(state, orphan.id, { host: null }), seat, ctx, steps, orphan.id);
 }
