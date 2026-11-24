@@ -73,3 +73,9 @@ export const cardOf = (state: ScenarioState, code: string) => state.cards[idOf(s
 
 /** The ids in the play area of a seat. */
 export const playOf = (state: ScenarioState, seat = 0): readonly string[] => state.seats[seat]?.play ?? [];
+
+/** The codes of the locations a player controls (the table notes the control on the card). */
+export const controlled = (state: ScenarioState): string[] => state.modifiers.filter((modifier) => modifier.stat === "controlledBy").map((modifier) => state.cards[modifier.instanceId]?.code ?? "");
+
+/** The id of the first card with this code, whatever its zone. */
+export const idByCode = (state: ScenarioState, code: string): string => Object.values(state.cards).find((card) => card.code === code)?.id ?? "";

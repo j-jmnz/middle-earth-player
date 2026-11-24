@@ -7,7 +7,8 @@ Scenario piles that place cards with no record (quest: 06091 Retake the City)
   06091:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one enemy in the encounter deck and adds it to the staging area (it is not revealed)
+      - the acting player finds one enemy in the encounter deck and adds it to the staging area (it is not revealed); it is the picked card afterward
+      - the picked card, if it lies in the staging area, is announced as added to the staging area, so its own Forced effect that hears it resolves (a search puts a card there without that announcement unless the record opts in with this instruction)
       - the acting player chooses one of:
         * option "06096" (only if the encounter deck or its discard pile holds a location with code 06096 (the deck alone)):
           - the acting player finds one card with code 06096 in the encounter deck and adds it to the staging area (it is not revealed)
@@ -96,8 +97,12 @@ Scenario piles that place cards with no record (quest: 06091 Retake the City)
     only if not (the number of location (any player controls) that is the active location is at least 1)
     who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player searches the encounter deck and discard pile for a Osgiliath location, reveals it and adds it to the staging area
-    - this card (a location in the staging area) becomes the active location without traveling (another active location goes back to the staging area); a Forced effect "after it becomes the active location" resolves
+    - the acting player chooses one of:
+      * option "found" (only if the encounter deck or its discard pile holds an Osgiliath location):
+        - the acting player searches the encounter deck and discard pile for a Osgiliath location, reveals it and adds it to the staging area
+        - the player who controls this card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+        - this card (a location in the staging area) becomes the active location without traveling (another active location goes back to the staging area); a Forced effect "after it becomes the active location" resolves
+      * option "none" (only if not (the encounter deck or its discard pile holds an Osgiliath location)):
     - shuffle the encounter deck
 
 06096:A:2 (front): Forced: After the player who controls West Gate lets an attack go undefended, return West Gate to the staging area.
@@ -175,7 +180,8 @@ Scenario piles that place cards with no record (quest: 06091 Retake the City)
   06100:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose location (you control) with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), that lies in a player's play area (a location the first player took control of, not one in the staging area or active)
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the player who controlled the character the attack destroyed acts for the instructions that follow in this effect (he may not be the defending player: a Sentinel defender belongs to another player); with no character destroyed the acting player stays
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (you control) with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), that lies in a player's play area (a location the first player took control of, not one in the staging area or active)
       - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the player who controls the picked card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
 
 ## 06101 East Quarter
@@ -189,7 +195,8 @@ Scenario piles that place cards with no record (quest: 06091 Retake the City)
   06101:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose location (you control) with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), that lies in a player's play area (a location the first player took control of, not one in the staging area or active)
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the player who controlled the character the attack destroyed acts for the instructions that follow in this effect (he may not be the defending player: a Sentinel defender belongs to another player); with no character destroyed the acting player stays
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (you control) with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), that lies in a player's play area (a location the first player took control of, not one in the staging area or active)
       - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the player who controls the picked card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
 
 ## 06102 Ruined Square
@@ -237,7 +244,8 @@ Scenario piles that place cards with no record (quest: 06091 Retake the City)
   06104:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose location (you control) with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), that lies in a player's play area (a location the first player took control of, not one in the staging area or active)
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the player who controlled the character the attack destroyed acts for the instructions that follow in this effect (he may not be the defending player: a Sentinel defender belongs to another player); with no character destroyed the acting player stays
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (you control) with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), that lies in a player's play area (a location the first player took control of, not one in the staging area or active)
       - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the player who controls the picked card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
 
 ## 06105 Street Fighting
@@ -271,4 +279,4 @@ Scenario piles that place cards with no record (quest: 06091 Retake the City)
         * option "raise":
           - raise threat by the threat as the table shows it now of every location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active) added up, read live (the acting player)
 
-(rendered pieces: 205 by template, 0 as JSON)
+(rendered pieces: 219 by template, 0 as JSON)
