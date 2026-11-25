@@ -1,13 +1,13 @@
-// Rules: ats.setup-the-morgul-vale-to-the-tower, rr.removed-from-game, rr.in-play-and-out-of-play, rr.reveal, rr.engaged, rr.surge, faq.reveal-and-add (data/rules/entries.json); ledger lines 06144:A:1, 06147:A:2, 06149:A:1, 06149:A:2, 06151:A:1, 06152:A:1
-// The engine facts of the three verbs The Morgul Vale adds to the pelargir family, each on the table of the scenario with its own records: progress tokens placed on To the Tower by title, every Faramir removed from the game at Setup, and the card Murzag reveals put into play engaged with the defending player.
+// Rules: ats.setup-the-morgul-vale-to-the-tower, rr.removed-from-game, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 06147:A:2, 06149:A:1
+// The engine facts of the two verbs of The Morgul Vale that work on a card by its title, each on the table of the scenario with its own records: progress tokens placed on To the Tower by title, and every Faramir removed from the game at Setup. The cards that use them are tested on their lines in src/campaign/scenarios/the-morgul-vale/.
 import { describe, expect, it } from "vitest";
 
 import type { EngineStep } from "../../../core/intents.ts";
 import { shadowCards } from "../../../core/zones.ts";
-import { idOf, resolveRecords, statOf } from "../../../../../test/harness/scene-kit.ts";
-import { CODES, engagedCodes, fight, opened, run, table, tokens, where } from "../../../../../test/scenarios/the-morgul-vale/table.ts";
+import { idOf, resolveRecords } from "../../../../../test/harness/scene-kit.ts";
+import { CODES, run, table, tokens, where } from "../../../../../test/scenarios/the-morgul-vale/table.ts";
 
-const { rearguard, tower, bodyguard, sorcerer, tracker, murzag, deadCity, fog, vale, bridge } = CODES;
+const { rearguard, tower, sorcerer, tracker, murzag } = CODES;
 const TOWER_NAME = "To the Tower";
 const FARAMIRS = { hero: "06081", otherHero: "144002", ally: "01014", otherAlly: "21005" } as const;
 
@@ -80,78 +80,5 @@ describe("RemoveAllNamedFromGame", () => {
     const done = resolveRecords(t.state, t.ctx, rearguard, "setup", source);
     for (const code of extra) expect(where(done.state, code)).toBe("removed");
     expect(where(done.state, tower)).toBe("staging");
-  });
-});
-
-describe("RevealTopEngaging", () => {
-  // Murzag is engaged with the second player; the top of the encounter deck is a Morgul Tracker; the attack is left undefended.
-  const attacked = (deck: readonly string[], layout: Parameters<typeof table>[0] = {}, extra?: readonly string[]) => {
-    const t = table({ seats: 2, phase: "Combat", staging: [tower], engaged: [{ code: murzag, seat: 1 }], deck, ...layout }, undefined, extra);
-    return { t, start: opened(t) };
-  };
-  const untilEnemyEngaged = (code: string) => (state: { seats: readonly { engaged: readonly string[] }[]; cards: Record<string, { code: string } | undefined> }) => state.seats.some((seat) => seat.engaged.some((id) => state.cards[id]?.code === code));
-
-  it("puts an enemy into play engaged with the defending player, not staged, and it attacks in the same phase with no shadow card", () => {
-    const { t, start } = attacked([tracker, bodyguard]);
-    // The attack of the enemy just revealed is the next one the combat phase makes: stop as it is declared.
-    const after = fight(t, start, (state) => state.pendingAttack != null && state.cards[state.pendingAttack.enemyId]?.code === tracker, { heroCode: "dh3" });
-    expect(after.state.pendingAttack).toMatchObject({ seat: 1 });
-    expect(after.state.cards[idOf(after.state, tracker)]).toMatchObject({ zone: "engaged", controller: 1 });
-    expect(after.state.staging.map((id) => after.state.cards[id]?.code)).not.toContain(tracker);
-    expect(after.state.cards[idOf(after.state, tracker)]?.shadowId).toBeNull();
-  });
-
-  it("is a reveal in full: a treachery is resolved and discarded, a location goes to the staging area", () => {
-    const fogged = attacked([fog, vale]);
-    const afterFog = fight(fogged.t, fogged.start, (state) => state.encounterDiscard.some((id) => state.cards[id]?.code === fog), { heroCode: "dh3", choose: () => "tokens" });
-    expect(where(afterFog.state, fog)).toBe("encounterDiscard");
-    expect(tokens(afterFog.state)).toBe(3);
-    const located = attacked([vale, bodyguard]);
-    const afterVale = fight(located.t, located.start, (state) => state.staging.some((id) => state.cards[id]?.code === vale), { heroCode: "dh3" });
-    expect(where(afterVale.state, vale)).toBe("staging");
-  });
-
-  it("resolves the surge of the card it reveals, and the card that surge reveals is staged as any other (a Dead City Looms with no token gains surge, 06160:A:1)", () => {
-    const { t, start } = attacked([deadCity, tracker, bodyguard]);
-    const after = fight(t, start, (state) => state.staging.some((id) => state.cards[id]?.code === tracker), { heroCode: "dh3" });
-    expect(where(after.state, deadCity)).toBe("encounterDiscard");
-    expect(where(after.state, tracker)).toBe("staging");
-    expect(engagedCodes(after.state, 1)).toEqual([murzag]);
-  });
-
-  it("reveals nothing from an empty deck in the combat phase, and leaves the discard pile where it is: the deck is reset in the quest phase only (rr.running-out-of-cards)", () => {
-    const empty = attacked([], { discard: [tracker, tracker] });
-    const after = fight(empty.t, empty.start, (state) => state.phase !== "Combat", { heroCode: "dh3" });
-    expect(engagedCodes(after.state, 1)).toEqual([murzag]);
-    expect(after.state.encounterDiscard).toHaveLength(2);
-  });
-
-  it("engages the player attacked, also when the character of another player defended the attack (a Sentinel, 06151:A:1)", () => {
-    const { t, start } = attacked([tracker, bodyguard], { play: [{ code: "01029", seat: 0 }] }, ["01029"]);
-    const after = fight(t, start, (state) => state.phase !== "Combat" || untilEnemyEngaged(tracker)(state), { defender: "01029" });
-    expect(engagedCodes(after.state, 1)).toContain(tracker);
-    expect(engagedCodes(after.state, 0)).toEqual([]);
-  });
-});
-
-describe("The White Bridge's Threat X and quest points X (06156:A:1)", () => {
-  it("takes the tokens on To the Tower as its Threat and quest points in the staging area, though it prints no Threat, and follows them live", () => {
-    const t = table({ staging: [{ code: tower, progress: 3 }, bridge] });
-    expect(statOf(t.state, t.cards, bridge, "threat")).toBe(3);
-    expect(statOf(t.state, t.cards, bridge, "questPoints")).toBe(3);
-    const more = run(t, t.state, { verb: "PlaceProgressOnNamed", name: TOWER_NAME, amount: 2 });
-    expect(statOf(more, t.cards, bridge, "threat")).toBe(5);
-    expect(statOf(more, t.cards, bridge, "questPoints")).toBe(5);
-  });
-
-  it("takes them as the active location too: the quest explores it with progress equal to the tokens, and with no token it has no quest points and stays active", () => {
-    const explored = table({ phase: "Quest", staging: [{ code: tower, progress: 2 }, murzag], active: bridge, committed: ["dh1", "dh2"] });
-    expect(statOf(explored.state, explored.cards, bridge, "threat")).toBe(2);
-    const afterQuest = fight(explored, opened(explored), (state) => state.phase !== "Quest");
-    expect(where(afterQuest.state, bridge)).toBe("encounterDiscard");
-    const empty = table({ phase: "Quest", staging: [tower, murzag], active: bridge, committed: ["dh1", "dh2"] });
-    expect(statOf(empty.state, empty.cards, bridge, "questPoints")).toBe(0);
-    const afterEmpty = fight(empty, opened(empty), (state) => state.phase !== "Quest");
-    expect(where(afterEmpty.state, bridge)).toBe("activeLocation");
   });
 });

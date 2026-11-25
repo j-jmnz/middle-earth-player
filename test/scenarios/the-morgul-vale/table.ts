@@ -6,6 +6,9 @@ import type { PlayerIntent } from "../../../src/rules/engine/reduce.ts";
 import { settle } from "../../../src/rules/engine/machine.ts";
 import { syncConstants } from "../../../src/rules/interpret/constants.ts";
 import { runInstruction } from "../../../src/rules/interpret/interpret.ts";
+import { playCost } from "../../../src/rules/player/attach.ts";
+import { paymentsFor } from "../../harness/auto-player.ts";
+import { sendUnledgered } from "../../harness/player-table.ts";
 
 import { idOf, legalIntents, send, start as begin, tableFromLayout, type Layout, type LayoutTable, type Run } from "../../harness/scene-kit.ts";
 
@@ -78,6 +81,19 @@ export function fight(made: LayoutTable, from: Run, stop: (state: ScenarioState)
       if (!pass) break;
       answer(pass as PlayerIntent);
     }
+  }
+  return current;
+}
+
+/** The card `code` of the hand is played now (the intent the engine offers for it; the player card has no line in this scenario's ledger, so its steps are not checked against one), and every choice it opens is answered by `choose` (the first option by default); a window of the enemy picker takes its first enemy. */
+export function playCard(made: LayoutTable, from: Run, code: string, choose?: (state: ScenarioState) => string): Run {
+  const cardId = idOf(from.state, code);
+  if (!legalIntents(from.state, made.ctx).some((offered) => offered.type === "PlayCard" && offered.cardId === cardId)) throw new Error(`no play of ${code} is offered`);
+  const cost = playCost(from.state, cardId, 0, made.ctx) ?? 0;
+  let current = sendUnledgered(from, { type: "PlayCard", cardId, payments: paymentsFor(from.state, made.ctx, 0, cardId, cost) ?? (() => { throw new Error(`seat 0 cannot pay ${String(cost)} for ${code}`); })() }, made.ctx);
+  for (let guard = 0; guard < 30 && (current.state.window?.kind === "choose" || current.state.window?.kind === "chooseEnemy"); guard += 1) {
+    const window = current.state.window;
+    current = window.kind === "choose" ? sendUnledgered(current, { type: "Choose", optionId: choose ? choose(current.state) : (window.options[0] ?? "") }, made.ctx) : sendUnledgered(current, { type: "ChooseEnemy", enemyId: window.options[0] ?? "" }, made.ctx);
   }
   return current;
 }
