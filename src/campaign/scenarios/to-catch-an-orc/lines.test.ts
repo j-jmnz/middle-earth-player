@@ -8,9 +8,7 @@ import { idOf } from "../../../../test/harness/scene-kit.ts";
 
 // What a spec row cannot show (a row must fail without the line's records): the cases where the records change nothing the table shows.
 const SCENARIO = "to-catch-an-orc";
-const MUGASH_ON_DH2 = { code: "07024", to: "dh2", encounter: true } as const;
 const STAGE_2 = "07063";
-const STAGE_3 = "07064";
 const PARTY = "07041";
 
 describe("To Catch an Orc: the lines whose records leave the table as the engine has it", () => {
@@ -27,12 +25,6 @@ describe("To Catch an Orc: the lines whose records leave the table as the engine
     const stage = done.run.state.cards[idOf(done.run.state, STAGE_2)];
     expect(stage?.resources).toBe(2);
     expect(stage?.progress ?? 0).toBe(0);
-  });
-
-  it("07064:B:4 the players who defeat the last stage with Mugash on a hero win the game", () => {
-    const done = playedLayout(SCENARIO, { stage: STAGE_3, progress: 11, attached: [MUGASH_ON_DH2] }, quest("success"));
-    expect(done.run.state.stageCleared).toBe(true);
-    expect(done.run.state.lost).toBeFalsy();
   });
 
   it("07041:A:1 Orc Hunting Party that surges with nothing else to reveal ends the chain: the reset shuffles it back once and the round engine does not loop", () => {

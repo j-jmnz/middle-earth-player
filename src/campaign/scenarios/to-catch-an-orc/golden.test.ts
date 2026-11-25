@@ -49,6 +49,11 @@ describe("To Catch an Orc golden", () => {
       expect(mugash?.zone, golden.name).toBe("attached");
       expect(state.cards[mugash?.host ?? ""] && codeOf(state, mugash?.host), golden.name).toBeTruthy();
       expect(state.seats.slice(0, golden.seatCount).some((seat) => !seat.eliminated), golden.name).toBe(true);
+      // Two-handed, the Guard engages the player who holds Mugash (07025:A:1): the Guard lies engaged with that seat.
+      if (golden.seatCount > 1) {
+        const holder = state.cards[mugash?.host ?? ""]?.controller;
+        expect(cardsOf(state, "07025").some((guard) => guard.zone === "engaged" && guard.controller === holder), golden.name).toBe(true);
+      }
     },
     lost(state, golden) {
       const seats = state.seats.slice(0, golden.seatCount);

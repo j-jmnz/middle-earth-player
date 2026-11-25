@@ -31,13 +31,15 @@ describe("the out-of-play deck of each seat", () => {
   it("07062:A:1 is a count, one deck solo and both decks two-handed with each player named, and never names a card", () => {
     const solo = built({ piles: { outOfPlay0: [...pile(12), MUGASH] } });
     expect(outDials(solo)).toHaveLength(1);
-    expect(outDials(solo)[0]).toMatchObject({ label: "Out of play", value: 13, name: "Cards in your out-of-play deck:" });
+    expect(outDials(solo)[0]).toMatchObject({ label: "Out of play", value: 13, name: "Out-of-play deck" });
     expect(outDials(solo)[0]?.note).toBe("Your out-of-play deck holds 13 cards, facedown. Mugash is in one of the decks until a reveal finds him.");
+    expect(outDials(solo)[0]?.lists).toEqual([{ heading: "Cards left", lines: ["Your deck: 13 cards"] }]);
+    expect(outDials(solo)[0]?.foot).toBe(outDials(solo)[0]?.note);
     const two = built({ seats: 2, piles: { outOfPlay0: [...pile(9), MUGASH], outOfPlay1: [...pile(11), GUARD] } });
     // Two-handed one dial holds both, so the top bar keeps its room; its panel names each player's deck.
     expect(outDials(two)).toHaveLength(1);
-    expect(outDials(two)[0]).toMatchObject({ label: "Out of play", value: 22, name: "Cards in the out-of-play decks:" });
-    expect(outDials(two)[0]?.lists).toEqual([{ heading: "Out-of-play decks", lines: ["Player 1: 10 cards", "Player 2: 12 cards"] }]);
+    expect(outDials(two)[0]).toMatchObject({ label: "Out of play", value: 22, name: "Out-of-play decks" });
+    expect(outDials(two)[0]?.lists).toEqual([{ heading: "Cards left", lines: ["Player 1: 10 cards", "Player 2: 12 cards"] }]);
     expect(outDials(two)[0]?.note).toBe("Player 1's out-of-play deck holds 10 cards and Player 2's out-of-play deck holds 12 cards, facedown. Mugash is in one of the decks until a reveal finds him.");
   });
 
@@ -45,6 +47,7 @@ describe("the out-of-play deck of each seat", () => {
     expect(outDials(built({ piles: { outOfPlay0: [...pile(5), MUGASH] } }))[0]?.warn).toBeUndefined();
     const low = outDials(built({ piles: { outOfPlay0: [...pile(4), MUGASH] } }))[0];
     expect(low?.warn).toMatchObject({ level: "near", words: "Your out-of-play deck is running low: 5 cards left, and Mugash is not found." });
+    expect(low?.foot).toBe(`${low?.warn?.words} ${low?.note}`);
     // A seat whose deck is empty warms the dial and says so; the other seat's cards still count.
     const two = built({ seats: 2, piles: { outOfPlay1: [MUGASH] } });
     const empty = { ...two, state: { ...two.state, piles: { ...two.state.piles, outOfPlay0: [] } } };

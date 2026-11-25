@@ -28,16 +28,22 @@ export function orcDials(game: ScenarioState): readonly TableDial[] {
   const total = counts.reduce((sum, count) => sum + count, 0);
   const lowest = counts.findIndex((count) => count <= LOW);
   const owner = (seat: number): string | null => (game.seatCount > 1 ? `Player ${seat + 1}` : null);
+  const note = outOfPlayNote(counts, !hidden);
+  const warn = hidden && lowest >= 0 ? { level: "near" as const, words: outOfPlayLowWords(counts[lowest] ?? 0, owner(lowest)) } : null;
+  // A tap opens the same panel alone and two-handed: a list of each deck's count, with the warning and the note at its foot. A noun title names the panel, as the Sack and Underworld dials do.
+  const lines = counts.map((count, seat) => outOfPlayLine(count, owner(seat) ?? "Your deck"));
   return [
     {
       id: "out-of-play",
       testID: "ring-maker-out-of-play",
       label: "Out of play",
-      name: game.seatCount > 1 ? "Cards in the out-of-play decks:" : "Cards in your out-of-play deck:",
+      name: game.seatCount > 1 ? "Out-of-play decks" : "Out-of-play deck",
       value: total,
-      ...(hidden && lowest >= 0 ? { warn: { level: "near" as const, words: outOfPlayLowWords(counts[lowest] ?? 0, owner(lowest)) } } : {}),
-      note: outOfPlayNote(counts, !hidden),
-      ...(game.seatCount > 1 ? { lists: [{ heading: "Out-of-play decks", lines: counts.map((count, seat) => outOfPlayLine(count, owner(seat) ?? "")) }], said: outOfPlayNote(counts, !hidden) } : {}),
+      ...(warn ? { warn } : {}),
+      note,
+      lists: [{ heading: "Cards left", lines }],
+      said: note,
+      foot: warn ? `${warn.words} ${note}` : note,
     },
   ];
 }

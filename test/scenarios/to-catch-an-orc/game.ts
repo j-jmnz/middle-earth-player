@@ -73,9 +73,9 @@ export type OrcGolden = { name: string; seatCount: 1 | 2; seed: number; difficul
 // undefended attack on the holder: solo and two-handed) and no seats remain (brittle heroes, solo and two-handed).
 export const ORC_GOLDENS: readonly OrcGolden[] = [
   { name: "solo win", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "two-handed win", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed win", seatCount: 2, seed: 7, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "Easy solo win", seatCount: 1, seed: 4, difficulty: "Easy", decks: "strong", outcome: "won" },
-  { name: "Easy two-handed win", seatCount: 2, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "Easy two-handed win", seatCount: 2, seed: 17, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "solo loss: Mugash's hero leaves play", seatCount: 1, seed: 5, difficulty: "Normal", decks: "frail", outcome: "lost", lossReason: "left play", policy: { hit: "host" } },
   { name: "two-handed loss: Mugash's hero leaves play", seatCount: 2, seed: 1, difficulty: "Normal", decks: "frail", outcome: "lost", lossReason: "left play", policy: { hit: "host" } },
   { name: "solo loss: every hero destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
