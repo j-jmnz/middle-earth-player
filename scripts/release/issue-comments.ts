@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { requiredFlag as flag } from "../args.ts";
 import { runScript, type Log } from "../log.ts";
 import { changesSince, releasedTag, repository } from "./plan.ts";
-import type { Change } from "./version.ts";
+import { plainMarkdown, type Change } from "./version.ts";
 
 // The comment each issue gets when a release ships a commit that names it (docs/releasing.md, Issue comments): the release's
 // tag and link, and the lines of the notes that settle it or refer to it. Run by release.yml's publish job after the release is
@@ -30,10 +30,10 @@ export function issueComments(changes: readonly Change[], tag: string, repositor
     const out: string[] = [];
     if (closing.length > 0) {
       const verb = closing.some((change) => change.type === "fix") ? "Fixed" : "Released";
-      out.push(`${verb} in ${release}:`, "", ...closing.map((change) => `- ${change.summary}`), "");
+      out.push(`${verb} in ${release}:`, "", ...closing.map((change) => `- ${plainMarkdown(change.summary)}`), "");
     }
     if (referring.length > 0) {
-      out.push(closing.length > 0 ? "Work on this issue in the same release:" : `Work on this issue is in ${release}:`, "", ...referring.map((change) => `- ${change.summary}`), "");
+      out.push(closing.length > 0 ? "Work on this issue in the same release:" : `Work on this issue is in ${release}:`, "", ...referring.map((change) => `- ${plainMarkdown(change.summary)}`), "");
     }
     out.push(markerOf(tag));
     return { issue, body: `${out.join("\n")}\n`, close: closing.length > 0 };

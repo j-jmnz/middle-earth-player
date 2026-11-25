@@ -1,6 +1,8 @@
 {
   "name": "middle-earth-player",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  // Pinned by digest, so the image cannot change under the tag. To move it, read the tag's digest
+  // (docker buildx imagetools inspect mcr.microsoft.com/devcontainers/javascript-node:22) and change it here.
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22@sha256:cd275c65a4b27a7790de915909be221d585fe645cf976cb1113b1ea9f62610d3",
   "hostRequirements": {
     "cpus": 4
   },

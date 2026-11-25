@@ -124,9 +124,22 @@ export function recordChanges(previous: SourceRecord | undefined, next: SourceRe
   return `${head}; pin ${previous.pin.value.slice(0, 12)} -> ${next.pin.value.slice(0, 12)}${parts.length > 0 ? `: ${parts.join(", ")}` : ""}`;
 }
 
+/**
+ * The file under data/raw that `relative` names. A part of the name can come from a source's own answer (a pack code, a
+ * scenario slug), so a name that leaves data/raw (`..`, an absolute path) or holds a NUL is refused before anything is written.
+ */
+export function rawPath(relative: string, root: string = RAW_DIR): string {
+  const file = path.resolve(root, relative);
+  const inside = path.relative(root, file);
+  if (relative.includes("\0") || inside === "" || inside.startsWith("..") || path.isAbsolute(inside)) {
+    throw new Error(`A source named a file outside data/raw: ${JSON.stringify(relative)}`);
+  }
+  return file;
+}
+
 // Writes the payload verbatim under data/raw/<relative> and returns its record.
 export function writeRaw(relative: string, url: string, body: string): SourceFile {
-  const file = path.join(RAW_DIR, relative);
+  const file = rawPath(relative);
   mkdirSync(path.dirname(file), { recursive: true });
   writeFileSync(file, body);
   return { path: `raw/${relative}`, url, sha256: sha256(body), bytes: Buffer.byteLength(body) };
@@ -138,7 +151,7 @@ export function combinedPin(files: readonly SourceFile[]): string {
 
 // Writes binary bytes verbatim under data/raw/<relative> (an image) and returns its record.
 export function writeRawBytes(relative: string, url: string, body: Uint8Array): SourceFile {
-  const file = path.join(RAW_DIR, relative);
+  const file = rawPath(relative);
   mkdirSync(path.dirname(file), { recursive: true });
   writeFileSync(file, body);
   return { path: `raw/${relative}`, url, sha256: sha256(body), bytes: body.byteLength };

@@ -8,7 +8,7 @@ import { BodyText, ListRow, NavBar, PrimaryButton, Screen, ScreenTitle, SearchFi
 import { startNewDeck } from "../deck/draft";
 import { savedDeckName } from "../deck/status";
 import { listDecks, readDeck, writeDeck } from "../deck/store";
-import { buildDecklist, cardUrl, deckRefusal, droppedSentence, fetchFailureMessage, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, ringsDbUrl, type BuiltDecklist, type FetchFailure, type PrebuiltRow } from "../deck/import";
+import { buildDecklist, cardUrl, deckRefusal, droppedLabel, droppedLookups, droppedSentence, REQUEST_TIMEOUT_MS, fetchFailureMessage, parseDecklistRef, prebuiltBody, prebuiltList, prebuiltNotApplied, withNotApplied, prebuiltDetail, readDecklistBody, ringsDbUrl, type BuiltDecklist, type FetchFailure, type PrebuiltRow } from "../deck/import";
 import { useDatabases } from "../data/databases";
 import { poolOf } from "../pool/cache";
 import type { PrebuiltDeck } from "../../catalog/prebuilt-deck";
@@ -29,28 +29,39 @@ class RingsDbFailure extends Error {
 const PRIVATE_DECK = "That deck is not shared. Its owner turns on Share my decks in their RingsDB account settings.";
 const MISSING_DECK = "RingsDB has no deck with that number.";
 
+// One request, given up after REQUEST_TIMEOUT_MS: a server that never answers, or never ends its answer, counts as no answer.
 async function readJson(url: string): Promise<unknown> {
-  let response: Response;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    response = await fetch(url);
-  } catch {
-    throw new RingsDbFailure({ kind: "no-answer" });
+    let response: Response;
+    try {
+      response = await fetch(url, { signal: controller.signal });
+    } catch {
+      throw new RingsDbFailure({ kind: "no-answer" });
+    }
+    if (!response.ok) throw new RingsDbFailure({ kind: "status", status: response.status });
+    try {
+      return (await response.json()) as unknown;
+    } catch (error) {
+      if (controller.signal.aborted) throw new RingsDbFailure({ kind: "no-answer" });
+      throw error;
+    }
+  } finally {
+    clearTimeout(timer);
   }
-  if (!response.ok) throw new RingsDbFailure({ kind: "status", status: response.status });
-  return response.json() as Promise<unknown>;
 }
 
+// The name of a card outside the pool, asked of RingsDB; its code when the code is not a card code or RingsDB gives no name.
 async function droppedName(code: string): Promise<string> {
+  const url = cardUrl(code);
+  if (!url) return droppedLabel(code, null);
   try {
-    const payload = await readJson(cardUrl(code));
-    if (typeof payload === "object" && payload !== null && "name" in payload && typeof payload.name === "string") {
-      const name = payload.name.trim();
-      if (name.length > 0) return name;
-    }
+    const payload = await readJson(url);
+    return droppedLabel(code, typeof payload === "object" && payload !== null && "name" in payload ? payload.name : null);
   } catch {
-    return code;
+    return droppedLabel(code, null);
   }
-  return code;
 }
 
 // The try/catch and try/finally below live here because the React Compiler cannot compile them inside a component.
@@ -122,8 +133,10 @@ export default function DeckImportScreen() {
         return;
       }
       const built = buildDecklist(body, pool);
-      const names = await Promise.all(built.droppedCodes.map((code) => droppedName(code)));
-      save(built, names);
+      // The first few unknown cards are looked up by name; the rest, and a code that is not a card code, are only counted.
+      const lookups = [...droppedLookups(built.droppedCodes)];
+      const names = await Promise.all(lookups.map((code) => droppedName(code)));
+      save(built, names, new Set(built.droppedCodes).size - lookups.length);
     });
   }
 
@@ -146,7 +159,7 @@ export default function DeckImportScreen() {
 
   // Saves an imported deck, ready to play or not, and goes back to the deck list. A hero listed twice is refused: the list
   // itself is wrong.
-  function save(built: BuiltDecklist, names: readonly string[]): void {
+  function save(built: BuiltDecklist, names: readonly string[], unnamed: number): void {
     if (built.heroLimit) {
       setMessage(formatDeckRefusal({ cardName: built.heroLimit.cardName, rule: "Deck limit is 1." }));
       return;
@@ -156,7 +169,7 @@ export default function DeckImportScreen() {
     if (!readDeck(user, id)) return;
     opening.current = true;
     // Back on the deck list, which reads the new deck on focus; the toast names what was dropped.
-    const dropped = droppedSentence(names);
+    const dropped = droppedSentence(names, unnamed);
     showToast(dropped ? `Imported ${name}. ${dropped}` : `Imported ${name}`, { carry: true });
     goBack(router, "/decks");
   }

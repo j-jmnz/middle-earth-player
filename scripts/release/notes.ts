@@ -1,6 +1,6 @@
 import { BUNDLE_ID, sourceUrl } from "./sideload-source.ts";
 import { joinNames } from "./reach.ts";
-import type { Change, CommitType } from "./version.ts";
+import { plainMarkdown, type Change, type CommitType } from "./version.ts";
 
 // The release notes, written from the commits since the last release (docs/agents/release-standards.md, Release notes).
 // Pure: plan.ts gathers the commits, the versions and the APK's checksums.
@@ -44,9 +44,9 @@ export function obtainiumUrl(repository: string): string {
   return `https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/${encodeURIComponent(JSON.stringify(app))}`;
 }
 
-/** A change's line in its section: its summary, then the issues it closes and the ones it refers to (GitHub links each `#n`). */
+/** A change's line in its section: its summary as plain text (plainMarkdown), then the issues it closes and the ones it refers to (GitHub links each `#n`). */
 function changeLine(change: Change): string {
-  const parts = [change.summary];
+  const parts = [plainMarkdown(change.summary)];
   if (change.closes.length > 0) parts.push(`closes ${change.closes.map((n) => `#${n}`).join(", ")}`);
   if (change.refs.length > 0) parts.push(`see ${change.refs.map((n) => `#${n}`).join(", ")}`);
   return `- ${parts.join(" · ")}`;
@@ -54,7 +54,7 @@ function changeLine(change: Change): string {
 
 export function renderNotes(input: NotesInput): string {
   const out: string[] = [];
-  const warnings = input.changes.flatMap((change) => change.breaking);
+  const warnings = input.changes.flatMap((change) => change.breaking.map(plainMarkdown));
   if (input.previousTag && input.reach?.all) warnings.push("Open games of any scenario may ask you to continue or restart; the campaign log is kept.");
   else if (input.previousTag && input.reach && input.reach.names.length > 0) warnings.push(`Open games of ${joinNames(input.reach.names)} may ask you to continue or restart; the campaign log is kept.`);
   if (!input.previousTag) out.push("The first release.", "");
