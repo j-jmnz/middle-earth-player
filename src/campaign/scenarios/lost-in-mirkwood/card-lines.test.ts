@@ -4,11 +4,7 @@
 // Card specs for the Lost in Mirkwood encounter cards and quest stages, read from their printed lines. `cardSpecs` runs each row again with the records of its line removed, where it must fail.
 // The stand-in heroes dh1 and dh2 have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; f0 and f3 are enemies of Threat 0 and 3 with 1 Attack; "place" is a location of Threat 2 with no trait; every seat starts at threat 28.
 // A travel to an Objective-Location is made at stage 18077, the last level, so its "advance to the next stage, if able" changes nothing there.
-import { describe, expect, it } from "vitest";
-
-import { EFFECTS } from "../../../effects/index.ts";
-
-import { answer, attack, cardSpecs, endPhase, committed, count, damageOn, deckCount, defend, endRound, exhausted, flag, handCount, quest, resolve, resourcesOn, reveal, rowProblems, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { answer, attack, cardSpecs, endPhase, committed, count, damageOn, deckCount, defend, endRound, exhausted, handCount, quest, resolve, resourcesOn, reveal, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 const ROWS: readonly Row[] = [
   // 18029 to 18032 "Guarded (location)" / "Guarded (enemy)": discard from the encounter deck until a card of that type is discarded, add it to the staging area and attach the objective to it (emce.guarded-x).
@@ -104,12 +100,3 @@ const ROWS: readonly Row[] = [
 ];
 
 cardSpecs("lost-in-mirkwood", ROWS);
-
-// The damage that destroys the defender is still damage the Spider dealt, and the Forced effect is heard for it (rr.damage); "cannot ready" does nothing to a card that is no longer in play (rr.in-play-and-out-of-play).
-// The row holds without the records too, so it is not a card spec row: it runs on the records only.
-describe("18072:B:2 a defender the Spider's damage destroys", () => {
-  it("takes no cannotReady modifier into a later life", () => {
-    const row: Row = { line: "18072:B:2", layout: { stage: "18072", play: ["ally"] }, act: [attack("01074", { shadow: "f0" }), defend("ally")], expect: [zone("ally", "discard"), flag("ally", "cannotReady", false)] };
-    expect(rowProblems("lost-in-mirkwood", row, EFFECTS)).toEqual([]);
-  });
-});

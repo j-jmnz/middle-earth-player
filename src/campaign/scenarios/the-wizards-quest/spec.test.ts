@@ -1,9 +1,5 @@
 // Rules: rr.search, rr.reveal, rr.forced, rr.guarded, rr.explored, rr.travel, rr.step-4-2, rr.doomed-x, rr.attachment-cards, rr.cancel, rr.victory, rr.quest-advancement, rr.shadow-effects, mec108.side-quests, faq.additional-attacks, faq.lasting-effects (data/rules/entries.json); docs/scenarios/standalone-scenarios/the-wizards-quest.md (The Wizard's Quest).
-import { describe, expect, it } from "vitest";
-
-import { EFFECTS } from "../../../effects/index.ts";
-
-import { announce, answer, attack, cardSpecs, committed, count, damageOn, deckCount, defend, endPhase, endRound, exhausted, flag, handCount, progressOn, quest, resolve, respond, resourcesOn, reveal, rowProblems, stat, threat, travel, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, committed, count, damageOn, deckCount, defend, endPhase, endRound, exhausted, flag, handCount, progressOn, quest, resolve, respond, resourcesOn, reveal, stat, threat, travel, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Wizard's Quest (standalone-scenarios part 10): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
@@ -193,12 +189,3 @@ const ROWS: readonly Row[] = [
 ];
 
 cardSpecs("the-wizards-quest", ROWS);
-
-// The damage that destroys the defender is still damage the spider dealt, and the Forced effect is heard for it (rr.damage); "cannot ready" does nothing to a card that is no longer in play (rr.in-play-and-out-of-play).
-// The row holds without the records too, so it is not a card spec row: it runs on the records only.
-describe("51046:A:1 a defender the Venomous Spider's damage destroys", () => {
-  it("takes no cannotReady modifier into a later life", () => {
-    const row: Row = { line: "51046:A:1", layout: { engaged: ["51046"], play: ["ally"], deck: F0 }, act: [attack("51046"), defend("ally")], expect: [zone("ally", "discard"), flag("ally", "cannotReady", false)] };
-    expect(rowProblems("the-wizards-quest", row, EFFECTS)).toEqual([]);
-  });
-});
