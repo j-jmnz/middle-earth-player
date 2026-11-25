@@ -1,5 +1,5 @@
-// Rules: hrd.heat-tracker, rr.blank, rr.cannot (data/rules/entries.json); ledger lines 16068:A:1, 16068:B:3, 16069:B:2, 16070:B:3, 16053:A:1, 16048:A:1 (docs/scenarios/haradrim/desert-crossing.md, Table).
-// What the table says of Desert Crossing's pieces (src/play/readouts/haradrim/heat.ts): the temperature against its limit of 60, the blank text box of a damaged character under Craft Remedy and the bar on readying under Find Water.
+// Rules: hrd.heat-tracker (data/rules/entries.json); ledger lines 16068:A:1, 16068:B:3, 16069:B:2, 16070:B:3 (docs/scenarios/haradrim/desert-crossing.md, Table).
+// What the table says of Desert Crossing's pieces (src/play/readouts/haradrim/heat.ts): the temperature against its limit of 60. The blank text box and the bar on readying are shared (src/play/words/card-bars.ts).
 import { LOSE_AT_60 } from "../../../../effects/authored/haradrim/desert-crossing.ts";
 
 // The engine decided every number; these only say it. Each sentence stays at about 25 words (docs/design-system-table.md, Choice tray, Plain words).
@@ -24,12 +24,3 @@ export const heatPanel = (value: number): readonly string[] => [`The temperature
 
 /** The warning near the limit: the temperature and what is left before it. */
 export const heatNearWords = (value: number): string => `${HEAT_LIMIT - value} from the limit of ${HEAT_LIMIT}`;
-
-/** The pill on a damaged character whose text box is blank under Craft Remedy. */
-export const BLANK_WORD = "Blank";
-
-/** What the preview and the reader say of that character. */
-export const blankWords = (source: string): string => `Its text box is blank (${source}): none of its text applies.`;
-
-/** The line in the preview of a character under Find Water: player card effects cannot ready it. */
-export const noReadyWords = (source: string): string => `Player card effects cannot ready it (${source}). The refresh phase still readies it.`;

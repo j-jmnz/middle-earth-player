@@ -115,7 +115,7 @@ export function useTableChoice({
   onPile: (pile: string) => void;
   // The scenario is over and the player goes to its resolution.
   onOutcome: () => void;
-  // A screen over the table holds the moment (the quest advance screen): the table answers nothing for the player meanwhile.
+  // A screen over the table holds the moment (the quest advance screen): the table answers nothing for the player meanwhile, and the options sit on that screen, so the dock's waiting words say "above" (dockFor, surface panel).
   hold?: boolean;
 }): TableChoice {
   const game = useStore(store, (state) => state.game);
@@ -173,7 +173,7 @@ export function useTableChoice({
   // Pass to stop is offered while stops are on, naming where the run ends at the latest (a choice on the way ends it sooner).
   const stopPass = settings.stopsOn && !live && !single && passableWindow(game, sheet, legal) ? `Tap again: pass until ${nextStopTitle(game, settings, pointTitle)}` : null;
   const free = useMemo(() => new Set(sheet.kind === "trigger" && game.window?.kind === "response" ? sheet.options.filter((item) => isFreeResponse(effectById(ctx, item.effectId))).map((item) => item.effectId) : []), [sheet, game, ctx]);
-  const plainDock = dockFor(sheet, choice, table, { overlay: live != null, passLegal, surface: panelOpen ? "panel" : "table", single, stopPass, free });
+  const plainDock = dockFor(sheet, choice, table, { overlay: live != null, passLegal, surface: panelOpen || hold ? "panel" : "table", single, stopPass, free });
   // No card glows on a reader's table: the sentence under a waiting primary names the list instead (reader-moment.ts, readerDock).
   const dock = readerDock(plainDock, sheet, readerMode);
   const readout = useMemo(() => readoutFor(game, ctx, sheet, choice, names.card), [game, ctx, sheet, choice, names]);

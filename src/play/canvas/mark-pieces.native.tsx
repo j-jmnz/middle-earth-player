@@ -6,7 +6,7 @@ import { Circle, Group, Image, Line, RoundedRect, Text, type SkFont, type SkImag
 import { cardCorner } from "../../ui/card-corner.ts";
 import { chipText, moreText, MUST_COMMIT_WORD, type CardEffects, type CombatNumber } from "../cards/card-effects.ts";
 import { DETERMINED_WORD } from "../words/scenarios/angmar/wastes-table.ts";
-import { BLANK_WORD } from "../words/scenarios/haradrim/heat-table.ts";
+import { BLANK_WORD } from "../words/card-bars.ts";
 import { CHAMPION_WORD } from "../words/scenarios/haradrim/umbar-table.ts";
 import { type IconName } from "../../ui/icon-map.ts";
 import { glyphCells, type PlaceMark } from "../store/island-place.ts";

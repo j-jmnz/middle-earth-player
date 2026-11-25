@@ -141,11 +141,16 @@ describe("the loss at 60 (16068:B:3, 16069:B:2, 16070:B:3)", () => {
     expect(apply(made, state, { verb: "RaiseTemperature", amount: 2 }).lost).toBe(true);
   });
 
-  it("a stage's own When Revealed that reaches 60 loses at once: 16069 at 58 +2", () => {
-    const { made, state } = heated(58, { stage: "16069" });
+  it("a stage's own When Revealed that reaches 60 loses at once: 16069 at 58 +2, before the discard pile is shuffled in and before any encounter card is revealed", () => {
+    const { made, state } = heated(58, { stage: "16069", discard: ["16023"], deck: ["16025"] });
     const revealed = resolveRecords(state, made.ctx, "16069", "whenRevealed", idOf(state, "16069"));
     expect(temperatureOf(revealed.state)).toBe(60);
     expect(revealed.state.lost).toBe(true);
+    expect(revealed.state.lossReason).toBe("The temperature reached 60");
+    // The loss came first: the discarded card was not shuffled into the deck, and the deck's card was not revealed.
+    expect(revealed.state.cards[idOf(revealed.state, "16023")]?.zone).toBe("encounterDiscard");
+    expect(revealed.state.cards[idOf(revealed.state, "16025")]?.zone).toBe("encounterDeck");
+    expect(revealed.state.staging.map((id) => revealed.state.cards[id]?.code)).not.toContain("16025");
   });
 
   it("a stage at 59 is not lost while nothing changes the temperature, and a lowering at 0 changes nothing", () => {

@@ -59,7 +59,18 @@ describe("a damaged character under Craft Remedy", () => {
   it("16053:A:1 wears the pill \"Blank\" and says in its preview that its text box is blank", () => {
     const { t, state } = damaged();
     expect(slotNumbers(state, t.ctx, idOf(state, "ally")).determined?.word).toBe("Blank");
-    expect(lines(t, state, "ally")).toContain("Its text box is blank (");
+    // The cards behind it with how long, and what stays: Craft Remedy keeps Traits only.
+    expect(lines(t, state, "ally")).toContain("Its text box is blank (Craft Remedy, while it is in play): only its Traits stay.");
+  });
+
+  it("rr.blank says what stays from the modifiers' own facts: keywords too under a keepsKeywords, nothing under a blanksTraits", () => {
+    const { t, state } = damaged();
+    const blank = state.modifiers.find((modifier) => modifier.stat === "blankText");
+    if (!blank) throw new Error("no blankText modifier");
+    const keeps = { ...state, modifiers: [...state.modifiers, { ...blank, stat: "keepsKeywords" as const }] };
+    expect(lines(t, keeps, "ally")).toContain("only its keywords and Traits stay");
+    const none = { ...state, modifiers: [...state.modifiers, { ...blank, stat: "blanksTraits" as const }] };
+    expect(lines(t, none, "ally")).toContain("none of its text applies");
   });
 
   it("16053:A:1 wears no pill with no damage on it, and none without Craft Remedy", () => {
@@ -85,7 +96,7 @@ describe("a character under Find Water", () => {
     const state = syncConstants(moria.state, moria.ctx);
     const name = (id: string) => moria.state.cards[id]?.code ?? id;
     const line = JSON.stringify(previewCards(state, moria.ctx, idOf(state, "ally"), (key) => ({ name: name(idOf(state, key)), source: null, text: "" }), name));
-    expect(line).toContain("Player card effects cannot ready it (");
+    expect(line).toContain("Player card effects cannot ready it (Fouled Well");
   });
 });
 

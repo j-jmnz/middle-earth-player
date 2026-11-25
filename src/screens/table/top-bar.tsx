@@ -2,7 +2,7 @@
 // Life and the Burden deck), the phase rail centered on the screen, and the menu button at the right. Back, Log, Rules, Booklet
 // and Table settings are in the menu (src/play/chrome/table-menu.tsx). The bar holds no state of its own beyond measurements; the
 // table view passes the numbers and the handlers.
-import { useEffect, useRef, useState, type ComponentRef } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ComponentRef } from "react";
 import { Pressable, ScrollView, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
 
 import { setDialsEdge } from "../../play/chrome/bar-edge";
@@ -124,15 +124,16 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
   const zones = bar.width > 0 && (dials > 0 || waited) ? dialZones(bar.width - 2 * BAR_PAD, dials, withWords, s, center) : null;
   const wordless = zones?.wordless === true;
   // The row's width with the words is kept from the layout event, while the words show.
-  // A layout event can reach the handler of the render before the one that dropped the words (the web build does), so the handler reads the words' state through a ref the effect keeps current.
-  const dropped = useRef(false);
-  useEffect(() => {
-    dropped.current = wordless;
-  }, [wordless]);
+  // A layout event can reach the handler of the render before the one that dropped the words or changed the row (the web build does), so the handler reads the row's key and its words' state through a ref that a layout effect keeps current: the key travels with the value, so a width measured on one row is never kept for another.
+  const latest = useRef({ key: rowKey, wordless });
+  useLayoutEffect(() => {
+    latest.current = { key: rowKey, wordless };
+  }, [rowKey, wordless]);
   const onDials = (event: LayoutChangeEvent) => {
     const width = Math.round(event.nativeEvent.layout.width);
     setDials(width);
-    if (!wordless && !dropped.current && width > 0 && scenario.length > 0) setLabelled((was) => (was.key === rowKey && was.width === width ? was : { key: rowKey, width }));
+    const now = latest.current;
+    if (!now.wordless && width > 0 && scenario.length > 0) setLabelled((was) => (was.key === now.key && was.width === width ? was : { key: now.key, width }));
   };
   // The Heading dial drops its word and lays its badge under the disc when the dial at its full width would make the dials scroll; that is told from the other dials' width, not the dial's own.
   const others = heading ? dials - headingBox.w - DIAL_GAP * s : dials;

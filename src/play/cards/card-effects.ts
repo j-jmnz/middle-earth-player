@@ -1,4 +1,4 @@
-// Rules: rr.modifiers, rr.lasting-effects (data/rules/entries.json).
+// Rules: rr.modifiers, rr.lasting-effects, rr.blank, rr.cannot (data/rules/entries.json).
 //
 // What effects do to a card right now, so the table can show it on the card: each printed number an effect raised or
 // lowered (the engine's value against the printed one), each "cannot" an effect put on it, and the effects themselves in
@@ -16,9 +16,9 @@ import { areaRoleOf, stageFactsOf } from "../store/stormcaller-table.ts";
 import { AREA_APART, AREA_TOGETHER, stageLines } from "../words/scenarios/stormcaller.ts";
 import { shipLoss, type ShipLoss } from "../words/scenarios/grapple.ts";
 import { heldWords } from "../words/scenarios/sea.ts";
+import { BLANK_WORD, blankWords, noReadyWords, type BlankKeeps } from "../words/card-bars.ts";
 import { lootDeckWords, lootGuardWords } from "../words/loot.ts";
 import { lootUnder } from "../../rules/families/sidequests/loot.ts";
-import { blankMark } from "../readouts/haradrim/heat.ts";
 import { alleywayMark, championMark, seizeMark } from "../readouts/haradrim/umbar.ts";
 import { stackMark } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { capturedPill } from "../words/scenarios/angmar/gram-table.ts";
@@ -28,6 +28,7 @@ import { areaStanding } from "../../rules/families/stormcaller/values.ts";
 import { placedLimit } from "../../rules/families/uncharted/limit.ts";
 import { modifiedStat, printedStat } from "../../rules/core/keywords.ts";
 import { heldBy } from "../../rules/core/holder-classes.ts";
+import { keywordsKept } from "../../rules/families/angmar/blank.ts";
 import { isLocationCard, printedOf, type PrintedCard } from "../../rules/core/printed.ts";
 import { effectById } from "../../rules/windows/listen.ts";
 import { engagementCostOf, questPointsOf, questStatOf } from "../../rules/quest/quest.ts";
@@ -248,6 +249,37 @@ export function effectLines(game: ScenarioState, ctx: ReduceContext, cardId: str
     if (flag && modifier.amount > 0) lines.push(`${flagWord(flag.word, modifier.amount)}: ${source}, ${UNTIL[untilOf(ctx, modifier)]}`);
   }
   return lines;
+}
+
+// The active modifiers of a stat that reach a card in play (its own or its class's): the engine's own facts, whichever scenario's card made them.
+function reaching(game: ScenarioState, ctx: ReduceContext, cardId: string, stat: ModifierStat): readonly ScenarioState["modifiers"][number][] {
+  const card = game.cards[cardId];
+  if (!card || !inPlay(card.zone) || card.face === "down" || !game.modifiers.some((modifier) => modifier.stat === stat)) return [];
+  const printed = printedOf(ctx.cards, card.code);
+  return game.modifiers.filter((modifier) => modifier.stat === stat && modifier.amount > 0 && modifierActive(game, modifier) && heldBy(modifier, card, printed));
+}
+
+// The cards behind those modifiers, each with how long, as effectLines words it: "Craft Remedy, while it is in play".
+function barSources(game: ScenarioState, ctx: ReduceContext, modifiers: readonly ScenarioState["modifiers"][number][]): string {
+  const words = modifiers.flatMap((modifier) => {
+    const source = game.cards[modifier.sourceId];
+    return source ? [`${printedOf(ctx.cards, source.code).name}, ${UNTIL[untilOf(ctx, modifier)]}`] : [];
+  });
+  return Array.from(new Set(words)).join("; ");
+}
+
+/** The pill on a card whose text box a `blankText` modifier blanks (Craft Remedy on a damaged character, Cold from Angmar, any scenario's), with the line its preview and the reader say, or null. */
+export function blankMark(game: ScenarioState, ctx: ReduceContext, cardId: string): { word: string; speech: string } | null {
+  const modifiers = reaching(game, ctx, cardId, "blankText");
+  if (modifiers.length === 0) return null;
+  const keeps: BlankKeeps = reaching(game, ctx, cardId, "blanksTraits").length > 0 ? "none" : keywordsKept(game, cardId, ctx.cards) ? "keywordsAndTraits" : "traits";
+  return { word: BLANK_WORD, speech: blankWords(barSources(game, ctx, modifiers), keeps) };
+}
+
+/** The line in the preview of a card a `cannotReadyByPlayerCard` modifier bars from readying by player card effects (Find Water, and the other scenarios' bars), or null. */
+export function noReadyLine(game: ScenarioState, ctx: ReduceContext, cardId: string): string | null {
+  const modifiers = reaching(game, ctx, cardId, "cannotReadyByPlayerCard");
+  return modifiers.length > 0 ? noReadyWords(barSources(game, ctx, modifiers)) : null;
 }
 
 // What a delayed effect will do, in words (rr.delayed-effects).
