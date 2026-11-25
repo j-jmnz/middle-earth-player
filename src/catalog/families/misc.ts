@@ -89,12 +89,12 @@ const FLAGS = [
   // The holder is immune to the effects of player cards that are not Fellowship cards ("Immune to non-Fellowship player card effects", 144075:A:1): no such card's effect chooses or affects it (families/misc/guards.ts).
   "immuneToNonFellowship",
   // The holder is immune to card effects ("Messenger of the King is immune to card effects while attached character is in play", 22134:B:3): no other
-  // card's effect chooses or affects it (families/misc/guards.ts, and the player card path in core/keywords.ts).
+  // card's effect chooses or affects it (families/misc/guards.ts, and the player card path in core/keyword-flags.ts).
   "immuneToCardEffects",
   // The holder cannot be readied more than once per phase (22134:B:2): a ready in the phase it was last readied is refused (core/holder-classes.ts, readyBarred).
   "readyOncePerPhase",
   // The holder, an attachment, is removed from the game instead of discarded when the card it is attached to leaves play ("If attached
-  // character leaves play, remove Messenger of the King from the game", 22134:B:4; core/keywords.ts, releaseAttachments).
+  // character leaves play, remove Messenger of the King from the game", 22134:B:4; core/destroy.ts, releaseAttachments).
   "removedWithHost",
   // The holder gains no resources from player card effects (1), or from cards that are not treasures (2).
   "noPlayerCardResources",

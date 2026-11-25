@@ -32,7 +32,7 @@ const FLAGS = [
   // phase (src/rules/families/south/watcher.ts, which also reads `engagedWithAll`) (142044:A:2).
   "engagedWithFirst",
   // On a card: all its printed keywords are lost for the rest of the game ("The Balrog loses all keywords", 142050:A:2): it is no longer
-  // Indestructible (rules/core/keywords.ts).
+  // Indestructible (rules/core/keyword-flags.ts).
   "losesKeywords",
   // On an enemy: the shadow cards dealt to it are immune to player card effects, so no Response cancels their effects (142044:A:1; rules/combat/shadow.ts).
   "shadowsImmune",

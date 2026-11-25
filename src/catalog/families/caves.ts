@@ -30,7 +30,7 @@ const FLAGS = [
   // 41037:A:1). Read by progressRoom (families/south/locations.ts).
   "noProgressPlaced",
   // On an enemy: it loses the text "Cannot take damage." ("While there are at least 8 progress tokens on this stage, Goblin Chieftain loses
-  // the text", 41007:B:1): the cannotTakeDamage it holds is not read (rules/core/keywords.ts).
+  // the text", 41007:B:1): the cannotTakeDamage it holds is not read (rules/core/damage.ts).
   "losesNoDamage",
   // On an enemy: the excess of its combat damage (damage beyond the remaining hit points of the character it damages) removes that much progress
   // from the current quest ("remove 1 progress from the current quest", 41030:A:2; families/defense/excess.ts).
@@ -45,7 +45,7 @@ const FLAGS = [
   "trackQuestPlaced",
   "noQuestProgress",
   // On an enemy, until the end of the attack: the combat damage dealt to it is canceled ("Cancel all combat damage dealt to attacking enemy",
-  // 41033:A:2; rules/core/keywords.ts placeDamage).
+  // 41033:A:2; rules/core/damage.ts placeDamage).
   "combatDamageCanceled",
   // On a location in the staging area: the first player may declare an attack against it during the combat phase as if it were an enemy engaged
   // with him (41028:A:1). Its Defense for the attack comes from a ModifyStat record (rules/combat/combat.ts canAttack).

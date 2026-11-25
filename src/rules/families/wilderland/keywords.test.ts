@@ -1,5 +1,5 @@
 // Rules: emce.immune, emce.indestructible (data/rules/entries.json). The two keywords the Ered Mithrin cards print, read against the engine's: "Immune to player card effects" (on enemies, locations and objectives: the card ignores the effects of
-// player cards and cannot be chosen as a target of one; an encounter card's effects still reach it) and Indestructible (an enemy with damage equal to its hit points is not destroyed). Both exist (core/keywords.ts); these tests pin them for the
+// player cards and cannot be chosen as a target of one; an encounter card's effects still reach it) and Indestructible (an enemy with damage equal to its hit points is not destroyed). Both exist (core/keyword-flags.ts); these tests pin them for the
 // card types Ered Mithrin prints them on.
 import { describe, expect, it } from "vitest";
 
