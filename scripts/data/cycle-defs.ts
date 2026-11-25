@@ -139,7 +139,7 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
       // DragnCards' deck Q99.15 has no Easy twin: the Easy Mode card (not the deck) sets two Black Sails and a Corsair Warship aside. Its sharedEncounterDeck2 is the Corsair deck; Standard Mode is the mode card the scenario deals.
       { id: "the-hunt-for-the-dreadnaught", product: "The Hunt for the Dreadnaught", deck: { normal: "Q99.15", easy: "Q99.15" }, modeCard: "Standard Mode", easyModeCard: "Easy Mode", groups: { sharedEncounterDeck2: "corsairDeck" } },
     ],
-    // The other products of the cycle, in release order (README.md, Roadmap): the file's `later` lists them. An entry may name one title of a product that holds several (Hall of Beorn's scenarios under that product), so it is not always a whole product's name.
+    // The other products of the cycle, in release order (guide/roadmap.md, Roadmap): the file's `later` lists them. An entry may name one title of a product that holds several (Hall of Beorn's scenarios under that product), so it is not always a whole product's name.
     later: [],
     saga: false,
     ledger: "standalone-scenarios",

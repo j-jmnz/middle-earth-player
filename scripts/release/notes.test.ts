@@ -75,7 +75,7 @@ describe("release notes (docs/agents/release-standards.md, Release notes)", () =
     expect(renderNotes({ ...base, testflightUrl: "https://testflight.apple.com/join/abc" })).toContain("[its public link](https://testflight.apple.com/join/abc)");
   });
 
-  it("links the app into Obtainium for Android updates, with the link the README gives", () => {
+  it("links the app into Obtainium for Android updates, with the link the install guide gives", () => {
     const url = obtainiumUrl(base.repository);
     expect(JSON.parse(decodeURIComponent(url.split("obtainium://app/")[1] ?? ""))).toEqual({
       id: "com.middleearth.player",
@@ -84,7 +84,7 @@ describe("release notes (docs/agents/release-standards.md, Release notes)", () =
       name: "Middle-Earth Player",
     });
     expect(renderNotes(base)).toContain(`[Add to Obtainium](${url})`);
-    expect(readFileSync(new URL("../../README.md", import.meta.url), "utf8")).toContain(`[Add to Obtainium](${url})`);
+    expect(readFileSync(new URL("../../guide/install.md", import.meta.url), "utf8")).toContain(`[Add to Obtainium](${url})`);
   });
 
   it("gives a Windows, a Mac and a Linux install line, and each desktop file's checksum", () => {

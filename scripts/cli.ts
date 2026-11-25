@@ -42,6 +42,7 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     capture: { steps: [{ script: "showcase/capture.ts" }], about: "takes the README showcase's captures on the iOS simulators (--app <App.app>, macOS)" },
     showcase: { steps: [{ script: "showcase/build.ts" }], about: "turns the captures into the README's images, GIFs and contact sheet" },
     banner: { steps: [{ script: "showcase/banner.ts" }], about: "draws the README's banner in both themes into .github/readme" },
+    "readme-art": { steps: [{ script: "showcase/readme-art.ts" }], about: "draws the README's tagline and download buttons into .github/readme" },
   },
   data: {
     sync: { steps: [{ script: "data/sync.ts" }], about: "refreshes data/raw and .cache (the only networked command)" },
