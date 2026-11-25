@@ -181,9 +181,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 44, scenarios: ["foundations-of-stone", "into-the-pit", "shadow-and-flame", "the-seventh-level", "the-caves-of-nibin-dum"], note: "Watchful Eyes is attached to a hero of the first player, who chooses it, also when another player revealed the card." },
   { version: 44, scenarios: ["into-the-pit"], note: "The first player, not the player who revealed Goblin Ambush of the Nightmare deck, searches for its Orc enemies and chooses them." },
   { version: 44, scenarios: ["the-wizards-quest"], note: "Necromancer's Pass reads the first player's hand, not the hand of the player who revealed it, to keep a card and to see whether a second card is there to hold." },
+  { version: 45, scenarios: "all", note: "A surge chain whose passes change nothing, like a lone Take Cover! shuffled back again and again, ends instead of repeating for ever." },
 ];
 
-export const ENGINE_VERSION = 44;
+export const ENGINE_VERSION = 45;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

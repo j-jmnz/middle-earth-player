@@ -98,6 +98,7 @@ import assaultFixtures from "./fixtures/assault-on-osgiliath.json";
 import bloodFixtures from "./fixtures/the-blood-of-gondor.json";
 import valeFixtures from "./fixtures/the-morgul-vale.json";
 import isenFixtures from "./fixtures/the-fords-of-isen.json";
+import orcFixtures from "./fixtures/to-catch-an-orc.json";
 import umbarFixtures from "./fixtures/escape-from-umbar.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
@@ -215,6 +216,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-lonely-mountain": mountainFixtures,
   "the-battle-of-five-armies": armiesFixtures,
   "the-fords-of-isen": isenFixtures,
+  "to-catch-an-orc": orcFixtures,
   "escape-from-umbar": umbarFixtures,
 };
 

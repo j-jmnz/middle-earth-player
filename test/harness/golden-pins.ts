@@ -377,6 +377,12 @@ export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
     "two-handed, Easy, won, Melanwar's and Isolde's lines, 4 Dragon Signs",
     "two-handed, won, after the earlier parts, an Accolade boon for each player, 4 Dragon Signs",
   ],
+  "to-catch-an-orc": [
+    "Easy solo win",
+    "Easy two-handed win",
+    "solo win",
+    "two-handed win",
+  ],
   "we-must-away-ere-break-of-day": [
     "two-handed win, the Sack cards are drawn and the encounter deck runs out",
   ],

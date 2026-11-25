@@ -90,6 +90,7 @@ import { assaultFixtures } from "./against-the-shadow/assault-on-osgiliath.ts";
 import { bloodFixtures } from "./against-the-shadow/the-blood-of-gondor.ts";
 import { valeFixtures } from "./against-the-shadow/the-morgul-vale.ts";
 import { isenFixtures } from "./the-ring-maker/the-fords-of-isen.ts";
+import { orcFixtures } from "./the-ring-maker/to-catch-an-orc.ts";
 import { umbarFixtures } from "./haradrim/escape-from-umbar.ts";
 
 // The scenarios scenario 1's block writes by hand (`won` is the one fixture not committed that the registry names, `knife-lost` starts from its log).
@@ -192,5 +193,6 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "the-lonely-mountain": () => mountainFixtures(),
   "the-battle-of-five-armies": () => armiesFixtures(),
   "the-fords-of-isen": () => isenFixtures(),
+  "to-catch-an-orc": () => orcFixtures(),
   "escape-from-umbar": () => umbarFixtures(),
 };

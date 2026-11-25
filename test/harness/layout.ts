@@ -76,7 +76,7 @@ export type Layout = {
   // `"easy"`: the scenario's Easy Mode card instead (The Hunt for the Dreadnaught, 40001:B:1).
   modeCard?: true | "easy";
   // Cards attached to the first card of `to`, wherever it lies (an attachment is spawned in play and attached).
-  // `encounter`: an encounter card attached the way its own effect attaches it (zone attached, controlled by no one, not claimed): the Sack cards, the Troll Key and the Troll Purse.
+  // `encounter`: an encounter card attached the way its own effect attaches it (zone attached, controlled by no one, not claimed): the Sack cards, the Troll Key and the Troll Purse; an enemy lies as an attachment (Mugash, 07024:A:2).
   attached?: readonly { code: string; to: string; encounter?: true }[];
   // The codes of the cards committed to the quest (a hero stand-in, an ally of `play`).
   committed?: readonly string[];
@@ -102,7 +102,7 @@ export type Layout = {
   hidden?: readonly Dealt[];
   // The locations of Assault on Osgiliath the first player controls: each is added to the staging area and taken by the family's own verb (families/pelargir/location-control.ts), so it lies in his play area, faceup and noted as controlled.
   controlled?: readonly string[];
-  // Other zones that hold a list of cards (a second deck, a named pile).
+  // Other zones that hold a list of cards (a second deck, a named pile); a seat's out-of-play deck (To Catch an Orc) lies facedown.
   piles?: Partial<Record<PileZone, readonly Entry[]>>;
 };
 
@@ -226,13 +226,13 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     const spawned = spawn(state, modeCode, { zone: "modeCard" });
     state = updateCard(spawned.state, spawned.id, { face: "B" });
   }
-  for (const [zone, items] of Object.entries(layout.piles ?? {}) as [PileZone, readonly Entry[]][]) for (const item of items) put(entry(item).code, { zone }, item);
+  for (const [zone, items] of Object.entries(layout.piles ?? {}) as [PileZone, readonly Entry[]][]) for (const item of items) put(entry(item).code, { zone }, item, zone === "outOfPlay0" || zone === "outOfPlay1" ? "down" : undefined);
   for (const attachment of layout.attached ?? []) {
     const host = idOf(state, attachment.to);
     if (attachment.encounter) {
       const spawned = spawn(state, attachment.code, { zone: "play", seat: 0 });
       state = attachTo(moveCard(spawned.state, spawned.id, { zone: "attached" }), spawned.id, host);
-      state = updateCard(state, spawned.id, { controller: null });
+      state = updateCard(state, spawned.id, { controller: null, ...(cards.get(attachment.code)?.type === "enemy" ? { asAttachment: true } : {}) });
       continue;
     }
     const spawned = spawn(state, attachment.code, { zone: "play", seat: 0 });
