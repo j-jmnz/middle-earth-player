@@ -13,6 +13,7 @@ const env: Env = {
   GITHUB_TOKEN: "gh",
   GITHUB_WEBHOOK_SECRET: "hook",
   GITHUB_REPO: "owner/repo",
+  GITHUB_ISSUE_AUTHOR: "Issue-Bot",
 };
 
 afterEach(() => vi.unstubAllGlobals());
@@ -41,9 +42,9 @@ function stubFetch(routes: Record<string, unknown>): Call[] {
   return calls;
 }
 
-const fromMessage = { number: 42, title: "Gandalf costs 5", html_url: "https://github.com/owner/repo/issues/42", body: "Text\n<!-- discord issue:m:200:300 -->" };
+const fromMessage = { number: 42, title: "Gandalf costs 5", html_url: "https://github.com/owner/repo/issues/42", user: { login: "issue-bot" }, body: "Text\n<!-- discord issue:m:200:300 -->" };
 const fromThread = { ...fromMessage, body: "Text\n<!-- discord issue:t:500:0 -->" };
-const run = (request: Request) => worker.fetch(request, env, { waitUntil: () => {} });
+const run = (request: Request, bindings = env) => worker.fetch(request, bindings, { waitUntil: () => {} });
 
 describe("issue updates", () => {
   it("refuses a delivery GitHub did not sign with the secret", async () => {
@@ -52,7 +53,7 @@ describe("issue updates", () => {
   });
 
   it("posts in the thread on the report message when its issue is closed as fixed", async () => {
-    const calls = stubFetch({ "GET discord.com/channels/300": { id: "300" }, "POST discord.com/channels/300/messages": {} });
+    const calls = stubFetch({ "GET discord.com/channels/300": { id: "300", type: 11, parent_id: "200" }, "POST discord.com/channels/300/messages": {} });
     const response = await run(await delivery("issues", { action: "closed", issue: { ...fromMessage, state_reason: "completed" } }));
     expect(response.status).toBe(200);
     expect(calls.map((call) => `${call.method} ${new URL(call.url).pathname}`)).toEqual(["GET /api/v10/channels/300", "POST /api/v10/channels/300/messages"]);
@@ -72,6 +73,20 @@ describe("issue updates", () => {
     const threadAsked = calls.find((call) => call.url.endsWith("/threads"))!;
     expect(threadAsked.body).toEqual({ name: "#42 Gandalf costs 5", auto_archive_duration: 10080 });
     expect(calls.at(-1)!.body).toMatchObject({ content: expect.stringContaining("has been reopened"), message_reference: { message_id: "300" } });
+  });
+
+  it("never posts in a channel that is not a thread of the report's channel, whatever the marker's message id names", async () => {
+    for (const other of [{ id: "300", type: 0, guild_id: "9" }, { id: "300", type: 11, parent_id: "777" }]) {
+      const calls = stubFetch({
+        "GET discord.com/channels/300": other,
+        "POST discord.com/channels/300/messages": {},
+        "POST discord.com/channels/200/messages": {},
+      });
+      await run(await delivery("issues", { action: "reopened", issue: fromMessage }));
+      const posts = calls.filter((call) => call.method === "POST").map((call) => new URL(call.url).pathname);
+      expect(posts).toEqual(["/api/v10/channels/200/messages"]);
+      vi.unstubAllGlobals();
+    }
   });
 
   it("posts in the thread when a person comments, quoting the comment", async () => {
@@ -100,11 +115,28 @@ describe("issue updates", () => {
     expect(calls).toEqual([]);
   });
 
+  it("follows no marker in an issue that another account wrote, and none while the author is unset", async () => {
+    const calls = stubFetch({
+      "GET api.github.com/repos/owner/repo/issues/42": { ...fromMessage, user: { login: "stranger" } },
+      "POST discord.com/channels/500/messages": {},
+      "POST discord.com/channels/200/messages": {},
+    });
+    const comment = { body: "@everyone free cards", html_url: "x", user: { login: "stranger", type: "User" } };
+    const strangers = { ...fromThread, user: { login: "stranger" } };
+    expect(await (await run(await delivery("issue_comment", { action: "created", issue: strangers, comment }))).text()).toBe("Nothing to post.");
+    await run(await delivery("issues", { action: "reopened", issue: { ...fromMessage, user: null } }));
+    const release = { tag_name: "v0.4.0", html_url: "x", body: "- A (closes #42)", prerelease: false, draft: false };
+    await run(await delivery("release", { action: "published", release }));
+    await run(await delivery("issues", { action: "reopened", issue: fromThread }), { ...env, GITHUB_ISSUE_AUTHOR: undefined });
+    await run(await delivery("issues", { action: "reopened", issue: fromThread }), { ...env, GITHUB_ISSUE_AUTHOR: " " });
+    expect(calls.filter((call) => call.method !== "GET")).toEqual([]);
+  });
+
   it("tells each report that a published release closes which version has its fix, then stops following it", async () => {
     const calls = stubFetch({
       "GET api.github.com/repos/owner/repo/issues/42": fromMessage,
       "GET api.github.com/repos/owner/repo/issues/7": { ...fromThread, number: 7, body: "Not from Discord" },
-      "GET discord.com/channels/300": { id: "300" },
+      "GET discord.com/channels/300": { id: "300", type: 11, parent_id: "200" },
       "POST discord.com/channels/300/messages": {},
       "PATCH api.github.com/repos/owner/repo/issues/42": {},
     });
@@ -127,7 +159,7 @@ describe("issue updates", () => {
   });
 
   it("answers 500 when Discord refuses the post, so GitHub can send it again", async () => {
-    stubFetch({ "GET discord.com/channels/300": { id: "300" }, "POST discord.com/channels/300/messages": new Response("Missing Permissions", { status: 403 }) });
+    stubFetch({ "GET discord.com/channels/300": { id: "300", type: 11, parent_id: "200" }, "POST discord.com/channels/300/messages": new Response("Missing Permissions", { status: 403 }) });
     const response = await run(await delivery("issues", { action: "reopened", issue: fromMessage }));
     expect(response.status).toBe(500);
   });

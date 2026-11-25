@@ -69,15 +69,23 @@ export function withoutNodeOptions<Env extends Readonly<Record<string, string | 
   return { ...env, NODE_OPTIONS: undefined };
 }
 
+// One argument as cmd takes it (pnpmCommand).
+function quotedForCmd(arg: string): string {
+  if (/[%"\r\n]/.test(arg)) throw new Error(`cmd cannot take the argument ${JSON.stringify(arg)}: it holds %, a quote or a line break`);
+  return /[\s&|^<>()]/.test(arg) || arg === "" ? `"${arg}"` : arg;
+}
+
 /**
  * How to run `pnpm <args>` from a script with no shell, so a path with a space stays one argument on every OS. Under pnpm, `npm_execpath` is pnpm's own script, run
- * with this Node; on Windows `pnpm` alone is `pnpm.cmd`, which only a shell finds, so without `npm_execpath` the arguments are quoted for cmd instead.
+ * with this Node; on Windows `pnpm` alone is `pnpm.cmd`, which only a shell finds, so without `npm_execpath` the arguments are quoted for cmd instead: one with
+ * a space or a character cmd acts on (`& | ^ < > ( )`) goes in double quotes, where cmd reads those as text. cmd expands `%NAME%` and ends a command at a
+ * line break even inside quotes, and no escape keeps a `"` from ending them, so an argument with `%`, `"` or a line break is refused.
  */
 export function pnpmCommand(args: readonly string[], env: Readonly<Record<string, string | undefined>> = process.env, platform: string = process.platform): { command: string; args: string[]; shell: boolean } {
   const runner = env["npm_execpath"];
   if (runner && /\.c?js$/.test(runner)) return { command: process.execPath, args: [runner, ...args], shell: false };
   if (platform !== "win32") return { command: "pnpm", args: [...args], shell: false };
-  return { command: "pnpm", args: args.map((arg) => (/[\s"]/.test(arg) ? `"${arg.replace(/"/g, '\\"')}"` : arg)), shell: true };
+  return { command: "pnpm", args: args.map(quotedForCmd), shell: true };
 }
 
 export type ExportOptions = { out: string; env?: Record<string, string> };

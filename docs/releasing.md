@@ -78,7 +78,17 @@ Deleting an entry by hand (Actions, Caches) is safe too: the next run is as slow
 
 ## Signing
 
-A release needs the Android key; `plan` refuses without it. The IPA needs no project signing; the Apple setup is only for TestFlight. Agents cannot create or read these secrets. Add them under Settings, Secrets and variables, Actions, and keep the originals in a password manager. Never commit a key (`.gitignore` refuses `*.jks`, `*.p8`, `*.p12`).
+A release needs the Android key; `plan` refuses without it. The IPA needs no project signing; the Apple setup is only for TestFlight. Agents cannot create or read these secrets. Add them to the `release` environment (Release environment), and keep the originals in a password manager. Never commit a key (`.gitignore` refuses `*.jks`, `*.p8`, `*.p12`).
+
+### Release environment
+
+The signing secrets and the asset mirror's secrets live in an environment named `release`, not among the repository secrets: a repository secret can be read by a run of any branch, so a branch that changes a workflow could print it. The owner sets it up once, under Settings, Environments:
+
+1. Make the environment `release`.
+2. Under Deployment branches and tags, choose Selected branches and tags, and add the branch rules `main` and `release/*`.
+3. Add every secret of this section (`ANDROID_*`, `APP_STORE_CONNECT_*`, `WINDOWS_CERT_*`, `R2_*`) as an environment secret, then delete the repository secrets of the same names. The variables (`APPLE_TEAM_ID`, `ANDROID_CERT_SHA256`, `TESTFLIGHT_URL`, `TESTFLIGHT_GROUP`, `R2_BUCKET`) are not secret and can stay repository variables.
+
+Each job that reads one of those secrets names the environment when it runs on `main` or a `release/*` branch, in `release.yml`, `mirror.yml` and `showcase.yml` alike (`scripts/checks/release-trigger.test.ts` fails for a job that reads a secret without it). On any other branch they name no environment, so a dry run there finds no secret: it signs the APK with the debug key, skips TestFlight and packs from the sources. A secret left among the repository secrets still reaches every branch, so step 3's delete is what closes the gap.
 
 ### Desktop signing (optional)
 
@@ -94,7 +104,7 @@ keytool -genkeypair -v -keystore middle-earth-player-release.jks -alias release 
 base64 -w0 middle-earth-player-release.jks > keystore.b64
 ```
 
-Secrets: `ANDROID_KEYSTORE_BASE64` (the contents of `keystore.b64`), `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` (`release`) and `ANDROID_KEY_PASSWORD`. Delete `keystore.b64` afterwards. Without them a dry run signs with the debug key and says so.
+Secrets: `ANDROID_KEYSTORE_BASE64` (the contents of `keystore.b64`), `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS` (`release`) and `ANDROID_KEY_PASSWORD`. Delete `keystore.b64` afterwards. Without them, or on a branch the `release` environment does not allow, a dry run signs with the debug key and says so.
 
 After the first release, set the variable `ANDROID_CERT_SHA256` to the certificate fingerprint the `android` job printed (also in the release notes). From then on a build signed with any other key fails before it is published, since players could not update over the last release. Until it is set, each signed build warns with the value to use.
 

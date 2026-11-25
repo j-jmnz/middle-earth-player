@@ -1,4 +1,5 @@
 import Database from "better-sqlite3";
+import { sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { describe, expect, it } from "vitest";
 
@@ -106,5 +107,17 @@ describe("deck order", () => {
     expect(listDecks(user).map((deck) => deck.id)).toEqual([mine, WISDOM_ID, STEALTH_ID]);
     deleteDeck(user, mine);
     expect(listDecks(user).map((deck) => deck.id)).toEqual([WISDOM_ID, STEALTH_ID]);
+  });
+
+  it("leaves out a row that does not read as a deck, and reads the others", () => {
+    const user = openUser();
+    const good = writeDeck(user, { id: null, name: "Good", heroes: ["01001"], cards: [{ code: "01073", count: 2 }] }, 1000);
+    for (const [id, heroes, cards] of [["bad-json", "not json", "[]"], ["bad-shape", "{}", "[]"], ["bad-card", "[]", '[{"code":1,"count":"x"}]']]) {
+      user.run(sql`INSERT INTO decks (id, name, heroes, cards) VALUES (${id}, 'Bad', ${heroes}, ${cards})`);
+    }
+    expect(listDecks(user).map((deck) => deck.id)).toEqual([good]);
+    expect(readDeck(user, "bad-json")).toBeNull();
+    expect(readDeck(user, "bad-shape")).toBeNull();
+    expect(readDeck(user, good)).toMatchObject({ heroes: ["01001"], cards: [{ code: "01073", count: 2 }], side: [] });
   });
 });

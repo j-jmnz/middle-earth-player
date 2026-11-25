@@ -2,7 +2,7 @@
 // after each wait; another status, or the last failure, is thrown.
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { createLog } from "../../log.ts";
-import { fetchBytesRetrying } from "./fetch.ts";
+import { fetchBytesRetrying, rawPath, writeRaw, writeRawBytes } from "./fetch.ts";
 
 const log = createLog("fetch-test");
 const NO_WAIT = [0, 0, 0];
@@ -46,5 +46,22 @@ describe("fetchBytesRetrying", () => {
     const stub = answers(500, 500, 500, 502);
     await expect(fetchBytesRetrying("https://example.test/a", 1_000, log, NO_WAIT)).rejects.toThrow("answered 502");
     expect(stub).toHaveBeenCalledTimes(4);
+  });
+});
+
+describe("rawPath", () => {
+  const root = "/repo/data/raw";
+
+  it("keeps a source's file under data/raw", () => {
+    expect(rawPath("ringsdb/cards/Core.json", root)).toBe("/repo/data/raw/ringsdb/cards/Core.json");
+    expect(rawPath("hallofbeorn/scenarios/a-b/../c.json", root)).toBe("/repo/data/raw/hallofbeorn/scenarios/c.json");
+  });
+
+  it("refuses a name that leaves data/raw, with nothing written", () => {
+    for (const name of ["ringsdb/cards/../../../../etc/passwd.json", "../raw-other/x.json", "/etc/passwd", "..", "", "ringsdb/a\0.json"]) {
+      expect(() => rawPath(name, root), name).toThrow("outside data/raw");
+    }
+    expect(() => writeRaw("ringsdb/cards/../../../../../tmp/escaped.json", "https://example.test", "{}")).toThrow("outside data/raw");
+    expect(() => writeRawBytes("../escaped.png", "https://example.test", new Uint8Array(1))).toThrow("outside data/raw");
   });
 });
