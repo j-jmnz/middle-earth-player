@@ -43,12 +43,17 @@ describe("16031:A:2 If the objective-hero leaves play, you are eliminated", () =
     expect(gone.seats[0]?.eliminated).toBeFalsy();
   });
 
-  it("the player is eliminated even while an enemy holds their only other hero", () => {
-    const made = table({ seats: 1 });
-    const staged = runInstruction(made, opened(made).state, { verb: "MoveHeroesToStaging" });
-    const withHero = { ...staged, seats: staged.seats.map((seat) => seat) } as ScenarioState;
-    expect(captivesOf(withHero).length).toBeGreaterThan(0);
-    expect(withHero.seats[0]?.eliminated).toBeFalsy();
+  it("the player is eliminated though every other hero they own is held in the staging area, and a player whose only hero is held there is not eliminated", () => {
+    const made = table({ seats: 1, heroes: [{ code: "16031", seat: 0 }] });
+    const kahliel = idOf(made.state, "16031");
+    const synced = opened(made, { ...made.state, modifiers: [...made.state.modifiers, { instanceId: kahliel, sourceId: kahliel, stat: "heroType", amount: 1, until: "endOfGame" }] }).state;
+    const held = runInstruction(made, synced, { verb: "MoveHeroesToStaging" });
+    expect(held.seats[0]?.heroes).toEqual([]);
+    expect(settle(held, made.ctx, [] as EngineStep[]).seats[0]?.eliminated).toBeFalsy();
+    const bare = table({ seats: 1 });
+    const alone = settle(runInstruction(bare, opened(bare).state, { verb: "MoveHeroesToStaging" }), bare.ctx, [] as EngineStep[]);
+    expect(alone.seats[0]?.eliminated).toBeFalsy();
+    expect(captivesOf(alone).length).toBeGreaterThan(0);
   });
 });
 
@@ -123,6 +128,20 @@ describe("16064 Mordor Warg", () => {
     const steps: EngineStep[] = [];
     const gone = settle(destroyCard(opened(made, state).state, orc, made.ctx.cards, steps), made.ctx, steps);
     expect(gone.cards[warg]?.zone).toBe("staging");
+  });
+});
+
+describe("16064 Mordor Warg with no host and with one already", () => {
+  it("with no Orc in play it is discarded, and an Orc that carries a Warg is not chosen for a second", () => {
+    const none = table({ stage: "16073" });
+    const lone = resolveRecords(opened(none).state, none.ctx, "16064", "whenRevealed");
+    expect(settle(lone.state, none.ctx, [] as EngineStep[]).cards[lone.id]?.zone).toBe("encounterDiscard");
+    const one = table({ stage: "16073", engaged: ["16062"] });
+    const first = resolveRecords(opened(one).state, one.ctx, "16064", "whenRevealed");
+    const second = resolveRecords(settle(first.state, one.ctx, [] as EngineStep[]), one.ctx, "16064", "whenRevealed");
+    const state = settle(second.state, one.ctx, [] as EngineStep[]);
+    const attached = Object.values(state.cards).filter((card) => card.code === "16064" && card.zone === "attached");
+    expect(attached).toHaveLength(1);
   });
 });
 
