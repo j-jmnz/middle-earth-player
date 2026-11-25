@@ -88,7 +88,6 @@ export function bodyProblem(message: string): string | undefined {
   const found = attributionMatch(lines.join("\n"));
   if (found?.kind === "session") return `"${subjectOf(message)}" names a Claude Code session ("${found.line}"); leave the link out`;
   if (found?.kind === "co-author") return `"${subjectOf(message)}" has "${found.line}"; no commit or pull request names Claude as a co-author`;
-  if (found) return `"${subjectOf(message)}" has an attribution line ("${found.line}"); no commit or pull request description carries one (commit-standards.md, Body)`;
   const body = lines.join("\n");
   if (PIPELINE_MEASURE.test(body) && !PIPELINE_PARTS.every((part) => part.test(body)))
     return `"${subjectOf(message)}" has a Pipeline measure without each task's wait minutes, writing minutes and the review findings (docs/agents/agent-brief.md, Measure); a measure of any other change is "Measure:"`;
