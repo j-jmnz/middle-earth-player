@@ -96,6 +96,7 @@ import * as vale from "../scenarios/the-morgul-vale/game.ts";
 import * as isen from "../scenarios/the-fords-of-isen/game.ts";
 import * as orc from "../scenarios/to-catch-an-orc/game.ts";
 import * as umbar from "../scenarios/escape-from-umbar/game.ts";
+import * as crossing from "../scenarios/desert-crossing/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -204,6 +205,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-fords-of-isen", "The Fords of Isen", isen.ISEN_GOLDENS, isen.isenWorld, isen.playGolden),
   entry("to-catch-an-orc", "To Catch an Orc", orc.ORC_GOLDENS, orc.orcWorld, orc.playGolden),
   entry("escape-from-umbar", "Escape from Umbar", umbar.UMBAR_GOLDENS, umbar.umbarWorld, umbar.playGolden),
+  entry("desert-crossing", "Desert Crossing", crossing.CROSSING_GOLDENS, crossing.crossingWorld, crossing.playGolden),
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
   entry("the-battle-of-lake-town", "The Battle of Lake-town", town.TOWN_GOLDENS, town.townWorld, town.playGolden),
   entry("the-stone-of-erech", "The Stone of Erech", erech.ERECH_GOLDENS, erech.erechWorld, erech.playGolden),

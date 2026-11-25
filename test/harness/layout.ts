@@ -16,6 +16,7 @@ import { markCapture } from "../../src/rules/families/captured/entry.ts";
 import { markEnemyDamage } from "../../src/rules/families/encounter/patrol.ts";
 import { takeHidden } from "../../src/rules/families/pelargir/hidden.ts";
 import { takeControlOfLocation } from "../../src/rules/families/pelargir/location-control.ts";
+import { withTemperature } from "../../src/rules/families/haradrim/heat.ts";
 import { markSeatedRows } from "../../src/rules/families/encounter/seated.ts";
 
 import { gameCodes, loadAnyScenario, loadCampaigns } from "../../scripts/data/load-scenarios.ts";
@@ -51,6 +52,8 @@ export type Layout = {
   progress?: number;
   // The side the current quest stage shows (B by default; A for a stage 2 of a quest deck that has not flipped yet, 03070:A:1).
   side?: "A" | "B";
+  // The heat tracker of Desert Crossing, as its Setup left it (16068:A:1): one table modifier with this value.
+  temperature?: number;
   // A code, or a code with its tokens.
   active?: Entry;
   // The Nightmare setup card, side A faceup next to the quest deck, with its tokens (901001:A:2 counts on it).
@@ -80,6 +83,8 @@ export type Layout = {
   attached?: readonly { code: string; to: string; encounter?: true }[];
   // The codes of the cards committed to the quest (a hero stand-in, an ally of `play`).
   committed?: readonly string[];
+  // The codes of the cards that lie exhausted (every card of the code: a hero stand-in, an ally of `play`).
+  exhaustedCards?: readonly string[];
   // The pursuit value of The Uruk-hai, as its quest card's Setup set it (mec112.pursuit); absent: no tracker.
   pursuit?: number;
   // A hero stand-in lies faceup as a Captive under the card with the code `under` (The Uruk-hai, 143069:A:1).
@@ -199,6 +204,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     for (const item of layout.deckOf ?? []) if (dealtTo(item, seat)) state = spawn(state, dealtCode(item), { zone: "deck", seat }, "down").state;
   }
   if (layout.heroResources) for (const id of Object.keys(state.cards)) if (state.cards[id]?.zone === "heroes") state = updateCard(state, id, { resources: layout.heroResources });
+  if (layout.temperature != null) state = withTemperature(state, layout.temperature);
   if (layout.noteEncounterDiscards) state = { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "table", stat: "noteEncounterDiscards", amount: 1, until: "endOfGame" }] };
   if (layout.sagaHero && "hero" in (world.data.sagaStart ?? {})) {
     const saga = spawn(state, (world.data.sagaStart as { hero: string }).hero, { zone: "heroes", seat: 0 });
@@ -252,6 +258,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   }
   if (layout.captive) state = holdCaptive(state, idOf(state, layout.captive.hero), idOf(state, layout.captive.under));
   if (layout.pursuit != null) state = { ...state, pursuit: layout.pursuit };
+  for (const code of layout.exhaustedCards ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { exhausted: true });
   if (layout.timeCounters != null && state.questStage) state = updateCard(state, state.questStage, { resources: layout.timeCounters });
   for (const code of layout.heldInHand ?? []) for (const id of idsOf(state, code)) state = addModifier(state, id, id, "cannotLeaveHand", 1, "endOfGame");
   for (const code of layout.committed ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { committed: true });

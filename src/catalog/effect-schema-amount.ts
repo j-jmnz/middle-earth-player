@@ -129,6 +129,8 @@ export const amountExprSchema = z.strictObject({
   captured: z.enum(["under", "cardsWith", "questsAndSides", "players"]).optional(),
   // The pursuit value (mec112.pursuit; `pursuit`), 0 while no tracker is set: "X is the pursuit value" (143069:B:1). Read by the pursuit family.
   pursuit: z.literal(true).optional(),
+  // The temperature of the heat tracker (hrd.heat-tracker), 0 while no tracker is set: `value` the temperature, `tens` its tens digit ("X is the tens digit of the temperature", 16026:A:1). Read by the haradrim family.
+  temperature: z.enum(["value", "tens"]).optional(),
   // The highest threat among the living players ("X is the threat of the player with the highest threat", 145064:B:1), and the number of living players whose threat is at least this ("+1 Threat for each player with a threat of 35 or higher",
   // 145021:A:1). Read by the grey-company family (src/rules/families/grey-company/amounts.ts).
   highestThreat: z.literal(true).optional(),

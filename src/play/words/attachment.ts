@@ -29,7 +29,7 @@ export function attachmentWords(instruction: Instruction, codeName?: (code: stri
     case "AttachSourceTo":
       return "attach this card to that card";
     case "HealAmong":
-      return `heal up to ${amountWords(verb.amount)} damage from among characters you control`;
+      return `heal ${verb.exact ? "" : "up to "}${amountWords(verb.amount)} damage from among characters you control`;
     case "ChooseAttackers":
       return "declare an attack against the attached enemy";
     case "QuestProgressFirst":
@@ -53,7 +53,7 @@ export function attachmentWords(instruction: Instruction, codeName?: (code: stri
 export function attachmentPickWords(asked: Instruction): { verb: string; prompt: string } | null {
   switch (asked.verb) {
     case "HealAmong":
-      return { verb: "Heal", prompt: "Choose a character to heal 1 damage from, or Done to stop." };
+      return { verb: "Heal", prompt: asked.exact ? "Choose a character to heal 1 damage from." : "Choose a character to heal 1 damage from, or Done to stop." };
     case "ChooseAttackers":
       return { verb: "Attack", prompt: "Choose a character to attack the enemy, or Done once all attackers are declared." };
     default:
