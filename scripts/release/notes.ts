@@ -37,7 +37,7 @@ const SECTIONS: readonly { types: readonly (CommitType | undefined)[]; title: st
   { types: ["repo", undefined], title: "Project (docs, tests, tooling, data refreshes)" },
 ];
 
-/** The link that adds the app to Obtainium, which then installs each release from the Releases page (README, Install). The
+/** The link that adds the app to Obtainium, which then installs each release from the Releases page (guide/install.md, Install). The
  * Android package is the iOS bundle id. */
 export function obtainiumUrl(repository: string): string {
   const app = { id: BUNDLE_ID, url: `https://github.com/${repository}`, author: repository.split("/")[0], name: "Middle-Earth Player" };
@@ -68,7 +68,7 @@ export function renderNotes(input: NotesInput): string {
     "",
     "- Android: download the `.apk` below and open it. Allow your browser or file manager to install unknown apps when it asks. It installs over an earlier release and keeps your campaigns.",
     `- Android, with automatic updates: install [Obtainium](https://obtainium.imranr.dev), then tap [Add to Obtainium](${obtainiumUrl(input.repository)}) on your phone, or add \`https://github.com/${input.repository}\` in Obtainium yourself. It installs each new release over the last and keeps your campaigns.`,
-    `- iPhone and iPad: in SideStore or AltStore, add the source \`${sourceUrl(input.repository)}\` and install Middle-Earth Player from it, or install the \`.ipa\` below. It is signed with your own Apple ID, updates over an earlier release and keeps your campaigns. The README (Install) has the steps.`,
+    `- iPhone and iPad: in SideStore or AltStore, add the source \`${sourceUrl(input.repository)}\` and install Middle-Earth Player from it, or install the \`.ipa\` below. It is signed with your own Apple ID, updates over an earlier release and keeps your campaigns. The [install guide](https://github.com/${input.repository}/blob/main/guide/install.md) has the steps.`,
     ...(input.desktopMissing
       ? ["- Windows, Mac and Linux: the desktop app is not part of this release, because its build did not finish. The next release brings it."]
       : [
