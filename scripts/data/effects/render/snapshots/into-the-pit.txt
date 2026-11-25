@@ -432,6 +432,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 901002:A:1 (front): When Revealed: The first player must search the encounter deck and discard pile for X Orc enemies and add them to the staging area, where X is 1 plus the number of players in the game. One of these choices must be Patrol Sentry and one must be Patrol Leader, if able.
   901002:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the rest of the effect is carried out by the first player
     - the acting player finds one Orc enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); while the card with code 901003 is there to be found, the search must take it (the first search of the effect that can)
