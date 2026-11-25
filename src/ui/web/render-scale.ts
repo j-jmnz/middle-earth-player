@@ -80,14 +80,15 @@ function watchErrors(show: (text: string) => void): void {
  * each took beyond a sixtieth of a second), and how long the animation frame callbacks ran (`raf`: the animations and the canvases' drawing). A second whose `late`
  * is far over its `raf` lost its time outside the drawing: React's work, the engine, a save, or the browser's own layout, painting and graphics. `draw` is how
  * long Skia took to record the canvases' scenes again, and `draws` how many times it did (watchDraws). `db` is how long the page waited on the database worker and
- * `dbs` how many calls that was; `save` is how long copies of the saves to storage ran and `saves` how many (meter-span.ts).
+ * `dbs` how many calls that was; `save` is how long copies of the saves to storage ran and `saves` how many; `audio` is how long the audio players' blessing in a gesture and their making took, and
+ * `audios` how many times (meter-span.ts).
  */
-export type Second = { fps: number; worst: number; slow: number; late: number; raf: number; draw: number; draws: number; db: number; dbs: number; save: number; saves: number };
+export type Second = { fps: number; worst: number; slow: number; late: number; raf: number; draw: number; draws: number; db: number; dbs: number; save: number; saves: number; audio: number; audios: number };
 
 /** What the page did in a second beside drawing frames: the sums the meter reads and clears. */
-export type Work = { raf: number; draw: number; draws: number; db: number; dbs: number; save: number; saves: number };
+export type Work = { raf: number; draw: number; draws: number; db: number; dbs: number; save: number; saves: number; audio: number; audios: number };
 
-const NO_WORK: Work = { raf: 0, draw: 0, draws: 0, db: 0, dbs: 0, save: 0, saves: 0 };
+const NO_WORK: Work = { raf: 0, draw: 0, draws: 0, db: 0, dbs: 0, save: 0, saves: 0, audio: 0, audios: 0 };
 
 // A frame over this is one the eye sees as a stutter at 60 frames a second.
 const SLOW_MS = 34;
@@ -111,6 +112,8 @@ export function secondOf(gaps: readonly number[], work: Work = NO_WORK): Second 
     dbs: work.dbs,
     save: Math.round(work.save),
     saves: work.saves,
+    audio: Math.round(work.audio),
+    audios: work.audios,
   };
 }
 
@@ -124,7 +127,7 @@ export function summaryLine(log: readonly Second[]): string {
 
 /** The log as text to send: the summary, then each second's frame rate and longest frame, oldest first. */
 export function logText(log: readonly Second[], scale: number): string {
-  return [`x${scale}  ${summaryLine(log)}`, ...log.map((second, index) => `${String(index + 1).padStart(2)}  ${second.fps} fps  worst ${second.worst} ms  late ${second.late}  raf ${second.raf}  draw ${second.draw}/${second.draws}  db ${second.db}/${second.dbs}  save ${second.save}/${second.saves}`)].join("\n");
+  return [`x${scale}  ${summaryLine(log)}`, ...log.map((second, index) => `${String(index + 1).padStart(2)}  ${second.fps} fps  worst ${second.worst} ms  late ${second.late}  raf ${second.raf}  draw ${second.draw}/${second.draws}  db ${second.db}/${second.dbs}  save ${second.save}/${second.saves}  audio ${second.audio}/${second.audios}`)].join("\n");
 }
 
 // What the page did since the meter last read it. Every caller asks the window for a frame at call time, so wrapping it in watchFrames times the callbacks all.
@@ -174,6 +177,9 @@ function startMeter(): void {
     if (name === "db") {
       work.db += ms;
       work.dbs += 1;
+    } else if (name === "audio") {
+      work.audio += ms;
+      work.audios += 1;
     } else {
       work.save += ms;
       work.saves += 1;

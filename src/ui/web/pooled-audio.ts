@@ -4,6 +4,7 @@
 // elements are kept and used again. Every gesture gives each element that has not had one its play() ("blessed": a play and a pause in the same breath, which sounds
 // nothing), and a few blessed spares are kept for the players made between gestures. Each element plays through a gain node of one AudioContext, because iOS ignores
 // an element's own volume, and the music's fades need one. No browser here: `AudioHost` is the page (browserHost), so a test runs the rest.
+import { span } from "./meter-span.ts";
 
 /** The part of an audio element the players use. */
 export type PoolElement = {
@@ -45,6 +46,8 @@ export type PooledPlayer = {
 
 type Slot = { element: PoolElement; gain: { gain: { value: number } }; blessed: boolean; used: boolean; wanted: boolean };
 
+// The web app's test meter is told how long a gesture's blessing and a new player took (meter-span.ts).
+
 // How many blessed elements wait unused. A loop's next copy and a scenario's two pieces are made between gestures.
 export const SPARES = 4;
 // A sound effect is at most a few seconds (scripts/build/sound-picks.ts); a refused one is not played late, a refused loop is.
@@ -84,14 +87,17 @@ export function pooledAudio(host: AudioHost, spares: number = SPARES): { create(
   };
 
   host.onGesture(() => {
+    const started = performance.now();
     host.resume();
     for (const slot of slots) if (!slot.blessed) bless(slot);
-    if (sample === null) return;
-    for (let idle = slots.filter((slot) => !slot.used && slot.blessed).length; idle < spares; idle += 1) bless(add());
+    // One new spare a gesture at most: a new element costs the page time (a media player and its file), a tap fires several gestures, and the tap's own work comes next.
+    if (sample !== null && slots.filter((slot) => !slot.used && slot.blessed).length < spares) bless(add());
+    span("audio", performance.now() - started);
   });
 
   return {
     create(uri) {
+      const started = performance.now();
       sample ??= uri;
       const slot = slots.find((each) => !each.used && each.blessed) ?? slots.find((each) => !each.used) ?? add();
       slot.used = true;
@@ -100,6 +106,7 @@ export function pooledAudio(host: AudioHost, spares: number = SPARES): { create(
       slot.element.src = uri;
       const { element, gain } = slot;
       const length = () => (Number.isFinite(element.duration) ? element.duration : 0);
+      span("audio", performance.now() - started);
       return {
         get playing() {
           return slot.used && !element.paused && !element.ended;

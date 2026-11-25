@@ -102,6 +102,9 @@ describe("the web app's audio players", () => {
     const { pool, elements, tap } = setup(2);
     pool.create("/tick.m4a");
     tap();
+    // One new spare for each gesture.
+    expect(elements).toHaveLength(2);
+    tap();
     expect(elements).toHaveLength(3);
     expect(elements.slice(1).every((each) => each.allowed && each.paused && each.src === "/tick.m4a")).toBe(true);
     const next = pool.create("/shire.m4a");
@@ -110,9 +113,11 @@ describe("the web app's audio players", () => {
     next.play();
     await settle();
     expect(next.playing).toBe(true);
-    // The next gesture tops the spares up again.
+    // The next gesture makes one more spare.
     tap();
     expect(elements.filter((each) => each.allowed)).toHaveLength(4);
+    tap();
+    expect(elements).toHaveLength(4);
   });
 
   it("uses a removed player's element again, at full volume", () => {
