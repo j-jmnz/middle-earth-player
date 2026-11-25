@@ -10,6 +10,7 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard } from "../../rules/core/state.ts";
+import { legalIntents } from "../../rules/engine/reduce.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
@@ -18,6 +19,7 @@ import { answerFirst, atDefense, choices, enter, fillers, hosts, passAll, play, 
 
 const BILBO = "02001";
 const MARK = "02002";
+const BRAND = "18001"; // a Dale hero: "After you play an attachment on a Dale character without an attachment, draw a card."
 const GUARDIAN = "02004";
 const EAGLES = "02005";
 const HORSE_BREAKER = "02006";
@@ -49,7 +51,7 @@ const hero = (code: string, sphere: "leadership" | "tactics" | "lore" | "spirit"
 
 beforeAll(async () => {
   const starter = await starterBase();
-  const cards = new Map([...starter.cards, ...(await loadPrinted([BILBO, MARK, GUARDIAN, EAGLES, HORSE_BREAKER, MUSTERING, MINSTREL, SONG_OF_KINGS, LANDROVAL, SONG_OF_HOPE]))]);
+  const cards = new Map([...starter.cards, ...(await loadPrinted([BILBO, MARK, GUARDIAN, EAGLES, HORSE_BREAKER, MUSTERING, MINSTREL, SONG_OF_KINGS, LANDROVAL, SONG_OF_HOPE, BRAND]))]);
   for (const card of [hero(LEAD, "leadership"), hero(TAC, "tactics"), hero(SPI, "spirit"), hero(LORE, "lore")]) cards.set(card.code, card);
   cards.set(ROHAN_ALLY, definePrinted({ code: ROHAN_ALLY, name: "Rohan Ally", type: "ally", sphere: "spirit", cost: 1, willpower: 1, attack: 1, defense: 1, health: 2, traits: ["Rohan"] }));
   cards.set(ROHAN_RIDER, definePrinted({ code: ROHAN_RIDER, name: "Rohan Rider", type: "ally", sphere: "tactics", cost: 2, willpower: 1, attack: 2, defense: 1, health: 2, traits: ["Rohan"] }));
@@ -105,6 +107,15 @@ describe("Dúnedain Mark moved to another player's hero (02002:A:3)", () => {
     const mark = idsOf(tab, MARK);
     const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: mark, effectId: "02002:action:1", payments: [{ heroId: idsOf(tab, LEAD), amount: 1 }] }, tab.ctx);
     expect(run.state.cards[mark]).toMatchObject({ host: idsOf(tab, TAC), controller: 1 });
+  });
+
+  // Brand's "After you play an attachment on a Dale character without an attachment": the Mark's move onto Brand is no play, so Brand's Response is not offered (rr.play-and-put-into-play).
+  it("02002:A:3 Dúnedain Mark moved onto a Dale hero is not played: Brand's 18001:A:2 is not offered", () => {
+    const tab = table(EFFECTS, { seats: 2, heroes: [{ code: LEAD, seat: 0 }, { code: BRAND, seat: 1 }], attached: [{ code: MARK, host: LEAD }], playerDeck: [{ code: CARD, seat: 1 }] });
+    const mark = idsOf(tab, MARK);
+    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: mark, effectId: "02002:action:1", payments: [{ heroId: idsOf(tab, LEAD), amount: 1 }] }, tab.ctx);
+    expect(run.state.cards[mark]).toMatchObject({ host: idsOf(tab, BRAND), controller: 1 });
+    expect(legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Trigger" && intent.effectId === "18001:response:1")).toBe(false);
   });
 });
 

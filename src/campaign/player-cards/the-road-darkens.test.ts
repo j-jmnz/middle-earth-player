@@ -19,6 +19,7 @@ import { attach, choices, endRound, hosts, play, playerTableFor, sendUnledgered 
 const GALADRIEL = "142003";
 const ELROND = "142005";
 const PIPE = "142009";
+const BRAND = "18001"; // a Dale hero: "After you play an attachment on a Dale character without an attachment, draw a card."
 const FELLOWSHIP = "142010";
 // Gandalf (core) and Radagast (Journey to Rhosgobel): Istari allies.
 const GANDALF = "01073";
@@ -33,7 +34,7 @@ const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
-  const cards = new Map([...starter.cards, ...(await loadPrinted([GALADRIEL, ELROND, PIPE, FELLOWSHIP, GANDALF, RADAGAST]))]);
+  const cards = new Map([...starter.cards, ...(await loadPrinted([GALADRIEL, ELROND, PIPE, FELLOWSHIP, GANDALF, RADAGAST, BRAND]))]);
   cards.set(WEAK, definePrinted({ code: WEAK, name: "Weak", type: "enemy", threat: 1, engagementCost: 30, attack: 1, defense: 0, health: 3 }));
   base = { ...starter, cards };
 });
@@ -67,6 +68,20 @@ describe("Galadriel puts an attachment found into play (142003:A:2)", () => {
     expect(choices(run.state, tab).sort()).toEqual([mine, theirs, idsOf(tab, ALLY), idsOf(tab, GALADRIEL)].sort());
     run = sendUnledgered(run, { type: "Choose", optionId: theirs }, tab.ctx);
     expect(run.state.cards[idsOf(tab, "plain")]).toMatchObject({ zone: "play", host: theirs, controller: 1 });
+  });
+});
+
+describe("Galadriel's put into play is no play for Brand (142003:A:2, 18001:A:2)", () => {
+  // "After you play an attachment on a Dale character": an attachment Galadriel puts into play on Brand is not played, so Brand's Response is not offered (rr.play-and-put-into-play).
+  it("18001:A:2 Brand does not draw for an attachment Galadriel puts into play on him", () => {
+    const tab = table(EFFECTS, { seats: 2, heroes: [{ code: BRAND, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: GALADRIEL, seat: 0 }], playerDeck: [{ code: "plain", seat: 0 }, { code: ALLY, seat: 0 }] });
+    const brand = idsOf(tab, BRAND);
+    let run = play(begin(tab.state), tab, idsOf(tab, GALADRIEL));
+    const trigger = legalIntents(run.state, tab.ctx).find((intent) => intent.type === "Trigger");
+    if (trigger) run = sendUnledgered(run, trigger, tab.ctx);
+    run = sendUnledgered(run, { type: "Choose", optionId: brand }, tab.ctx);
+    expect(run.state.cards[idsOf(tab, "plain")]).toMatchObject({ zone: "play", host: brand });
+    expect(legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Trigger" && intent.effectId === "18001:response:1")).toBe(false);
   });
 });
 

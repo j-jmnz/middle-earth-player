@@ -81,7 +81,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"17064:constant:1","cardCode":"17064","lines":["17064:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":{"kind":"distinctTraits","min":9}}]},
   {"id":"17064:action:1","cardCode":"17064","lines":["17064:A:2"],"timing":"action","instructions":[{"verb":"Ready","target":"allCharacters"},{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"endOfPhase","holders":{"type":"character","control":"you"}}]},
   // 18001 Brand son of Bain: the attachment was played on a Dale character that had none before it.
-  {"id":"18001:response:1","cardCode":"18001","lines":["18001:A:2"],"timing":"response","trigger":"attached","eventSeat":"you","subject":{"type":"attachment","control":"you"},"condition":{"kind":"matches","card":"other","pick":{"type":"character","control":"any","trait":"Dale","maxAttachments":1}},"instructions":[{"verb":"Draw","amount":1}]},
+  {"id":"18001:response:1","cardCode":"18001","lines":["18001:A:2"],"timing":"response","trigger":"attached","eventSeat":"you","byPlay":true,"subject":{"type":"attachment","control":"any"},"condition":{"kind":"matches","card":"other","pick":{"type":"character","control":"any","trait":"Dale","maxAttachments":1}},"instructions":[{"verb":"Draw","amount":1}]},
   // 02080 Gildor's Counsel: played in the commitment window, before any character is committed.
   {"id":"02080:constant:1","cardCode":"02080","lines":["02080:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":{"kind":"all","conditions":[{"kind":"step","is":"beforeStaging"},{"kind":"count","pick":{"type":"character","control":"any","committed":true},"max":0}]}}]},
   // 08010 The White Council: X is the number of players.

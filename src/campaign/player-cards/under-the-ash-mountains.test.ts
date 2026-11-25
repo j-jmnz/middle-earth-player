@@ -35,6 +35,7 @@ const EOWYN = "01007";
 const BERAVOR = "01012";
 const STEWARD = "01026";
 const SPYGLASS = "11180"; // an Item that prints no "Attach to" line
+const INTIMIDATION = "143015"; // a Permanent boon: "Setup: Attach to a Warrior hero."
 const PAL = "pal";
 const ALLY = "ally";
 const CARD = "card";
@@ -52,7 +53,7 @@ const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
-  const cards = new Map([...starter.cards, ...(await loadPrinted([GILDOR, EXILE, BOWMASTER, RECKLESS, ODO, DEFIANT, HELM, COUNCIL, ARAGORN, LEGOLAS, EOWYN, BERAVOR, STEWARD, SPYGLASS]))]);
+  const cards = new Map([...starter.cards, ...(await loadPrinted([GILDOR, EXILE, BOWMASTER, RECKLESS, ODO, DEFIANT, HELM, COUNCIL, ARAGORN, LEGOLAS, EOWYN, BERAVOR, STEWARD, SPYGLASS, INTIMIDATION]))]);
   cards.set(HOBBIT, definePrinted({ code: HOBBIT, name: "Hobbit Ally", type: "ally", sphere: "spirit", cost: 1, willpower: 1, attack: 1, defense: 1, health: 2, traits: ["Hobbit"] }));
   for (const code of [HOBBIT_TWO, HOBBIT_THREE]) cards.set(code, definePrinted({ code, name: code, type: "ally", sphere: "spirit", cost: 1, willpower: 1, attack: 1, defense: 1, health: 2, traits: ["Hobbit"] }));
   cards.set(MAN, definePrinted({ code: MAN, name: "Man Ally", type: "ally", sphere: "spirit", cost: 1, willpower: 1, attack: 1, defense: 1, health: 2 }));
@@ -262,6 +263,19 @@ describe("Helm of Secrecy moves another player's attachment (22090:A:2)", () => 
     const eowyn = choices(run.state, tab).find((id) => run.state.cards[id]?.code === EOWYN) ?? "";
     run = sendUnledgered(run, { type: "Choose", optionId: eowyn }, tab.ctx);
     expect(run.state.cards[spyglass]).toMatchObject({ host: eowyn, zone: "play" });
+  });
+});
+
+describe("Helm of Secrecy moves a boon whose Setup named a host (22090:A:2)", () => {
+  // "moving all eligible attachments to the hero from your collection": the Warrior host in Intimidation's Setup line is checked as it enters play (rr.attachment-cards), not as a lasting limit, so the boon moves to the swapped-in hero, who is no Warrior.
+  it("22090:A:2 Intimidation (Setup: Attach to a Warrior hero) goes with the swap to a hero that is no Warrior", () => {
+    const tab = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }, { code: BERAVOR, seat: 0 }], attached: [{ code: INTIMIDATION, host: BERAVOR }], hand: [{ code: HELM, seat: 0 }] });
+    const [beravor, boon] = [idsOf(tab, BERAVOR), idsOf(tab, INTIMIDATION)];
+    let run = play(begin(tab.state), tab, idsOf(tab, HELM));
+    run = sendUnledgered(run, { type: "Choose", optionId: beravor }, tab.ctx);
+    const eowyn = choices(run.state, tab).find((id) => run.state.cards[id]?.code === EOWYN) ?? "";
+    run = sendUnledgered(run, { type: "Choose", optionId: eowyn }, tab.ctx);
+    expect(run.state.cards[boon]).toMatchObject({ host: eowyn, zone: "play" });
   });
 });
 
