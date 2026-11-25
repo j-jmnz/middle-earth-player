@@ -1,4 +1,5 @@
 import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
+import { timeOption } from "./time-option.ts";
 
 // Records for To Catch an Orc (The Ring-maker part 2, The Voice of Isengard, no campaign card): the out-of-play decks and Mugash with his Guards, the Searches X locations, the encounter cards no template reads and the three quest stages.
 // Every line is read from the scan ledger (data/printed/the-ring-maker.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here. Time X is the angmar family's (src/catalog/families/angmar.ts: a constant `Time`, the Forced
@@ -18,9 +19,6 @@ const STAGED_LOCATIONS: PickSpec = { type: "location", control: "any", stagingOn
 const HERO_WITH_MUGASH: PickSpec = { type: "hero", control: "any", hasAttachment: { names: [MUGASH_NAME] } };
 const MUGASH_IN_PLAY: PickSpec = { type: "card", control: "any", names: [MUGASH_NAME], allInPlay: true };
 const MUGASH_ATTACHED: Condition = { kind: "canPick", pick: HERO_WITH_MUGASH };
-// A time counter lies on the current quest: the second option of an "Either ... or remove 1 time counter" is offered only then (rr.effects: an option that cannot change the game is not offered).
-const HAS_TIME: Condition = { kind: "less", left: 0, right: { stat: "resources", of: "questStage" } };
-const REMOVE_TIME: Instruction = { verb: "RemoveTimeFromQuest", amount: 1 };
 const EXHAUSTED_CHARACTER: PickSpec = { type: "character", control: "any", state: "exhausted" };
 const READY_CHARACTER: PickSpec = { type: "character", control: "you", state: "ready" };
 // "Searches X" (07027:A:2, 07028:A:1): the actor reveals the top X cards of his out-of-play deck and picks 1 of the others for his hand.
@@ -76,7 +74,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 07029 Mugash's Lair. Forced: at the beginning of the encounter phase each player reveals the top card of his out-of-play deck; an enemy joins the staging area, any other card is discarded. Shadow: the defending player discards an attachment he controls.
   { id: "07029:forced:1", cardCode: "07029", lines: ["07029:A:1"], timing: "forced", trigger: "beginningOfPhase", condition: { kind: "phase", is: "Encounter" }, instructions: [EACH_PLAYER([{ verb: "RevealOutOfPlay", amount: 1 }])] },
-  { id: "07029:shadow:1", cardCode: "07029", lines: ["07029:A:2"], timing: "shadow", instructions: [{ verb: "Pick", pick: { type: "attachment", control: "you" } }, { verb: "Discard", target: { kind: "picked" } }] },
+  { id: "07029:shadow:1", cardCode: "07029", lines: ["07029:A:2"], timing: "shadow", instructions: [{ verb: "Pick", pick: { type: "attachment", control: "you", controlled: true } }, { verb: "Discard", target: { kind: "picked" } }] },
 
   // 07030 Orc Territory. When Revealed: each player adds a location from the deck or the discard pile to the staging area and the deck is shuffled; if the staging area's total Threat is below the total Willpower committed, each engaged Orc attacks.
   {
@@ -105,7 +103,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
         who: "actor",
         options: [
           { id: "damage", instructions: [{ verb: "Pick", pick: { type: "character", control: "you" } }, { verb: "DamageCard", amount: 3, target: "picked" }] },
-          { id: "time", requires: HAS_TIME, instructions: [REMOVE_TIME] },
+          timeOption(),
         ],
       },
     ],
@@ -117,7 +115,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "07039",
     lines: ["07039:A:1"],
     timing: "whenRevealed",
-    instructions: [{ verb: "Choose", who: "firstPlayer", options: [{ id: "reveal", instructions: [{ verb: "RevealEncounter" }] }, { id: "time", requires: HAS_TIME, instructions: [REMOVE_TIME] }] }],
+    instructions: [{ verb: "Choose", who: "firstPlayer", options: [{ id: "reveal", instructions: [{ verb: "RevealEncounter" }] }, timeOption()] }],
   },
 
   // 07040 Orc Hound. Forced: after it engages a player, that player exhausts a character he controls.
@@ -156,7 +154,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
         who: "firstPlayer",
         options: [
           { id: "damage", requires: { kind: "canPick", pick: EXHAUSTED_CHARACTER }, instructions: [{ verb: "DamageEach", amount: 1, pick: EXHAUSTED_CHARACTER }] },
-          { id: "time", requires: HAS_TIME, instructions: [REMOVE_TIME] },
+          timeOption(),
         ],
       },
     ],
