@@ -19,13 +19,17 @@ import { payFor } from "../../../../test/scenarios/a-shadow-of-the-past/starter-
 const SCENARIO = "the-drowned-ruins";
 const BLESSING = "11205";
 const SPYGLASS = "11180"; // an Item that prints no "Attach to" line
+const FATE = "01134"; // a boon: "Attached hero collects 1 additional resource during each resource phase."
+const PHIAL = "142015"; // a boon: "Setup: Attach to a hero in play."
+const ARMOR = "11172"; // "Attached Ship gets +1 Defense"
+const WARSHIP = "110137"; // Dawn Star, a Ship objective
 const BRAND = "18001"; // a Dale hero: "After you play an attachment on a Dale character without an attachment, draw a card."
 const SEA_SCORPION = "12096";
 const REVENANT = "11181"; // a unique enemy
 
 // Command `code` in hand, its level in the Campaign Log `level`, and the codes the campaign card's Setup let the players choose.
 function commandTable(code: string, effects: readonly Effect[], level: number, layout: Layout = {}, chosen: readonly string[] = []) {
-  const made = tableFromLayout(SCENARIO, { phase: "Combat", hand: [code], heroResources: 2, ...layout }, { effects, extra: [SPYGLASS, BRAND] });
+  const made = tableFromLayout(SCENARIO, { phase: "Combat", hand: [code], heroResources: 2, ...layout }, { effects, extra: [SPYGLASS, BRAND, ARMOR, WARSHIP, FATE, PHIAL] });
   const state: ScenarioState = { ...made.state, campaignFacts: { prisoner: null, usedOnce: [], counters: {}, levels: { [code]: level } }, ...(chosen.length > 0 ? { chosenAtSetup: chosen.map((one) => ({ code: one, seat: 0 })) } : {}) };
   return { ...made, state: syncConstants(state, made.ctx), card: idOf(state, code) };
 }
@@ -228,5 +232,24 @@ describe("Spyglass played from the hand (11203:A:5)", () => {
     const made = withState(commandTable("11203", EFFECTS, 1, { seats: 2, phase: "Planning", play: ["ally"] }), (state) => spawn(state, SPYGLASS, { zone: "hand", seat: 0 }).state);
     const hosts = [...legalTargets(made.state, { type: "PlayCard", cardId: idOf(made.state, SPYGLASS) }, made.ctx)].sort();
     expect(hosts).toEqual([made.hero, made.hero2, idOf(made.state, "ally")].sort());
+  });
+});
+
+describe("an attachment that prints its host stays on it when Command moves it (11204:A:5)", () => {
+  // "Attached hero ..." / "Setup: Attach to a hero": Appointed by Fate (a record) and Phial of Galadriel (the host its Setup line names) may go to another hero, of either player, and not to an ally.
+  for (const [line, code] of [["01134:A:1", FATE], ["142015:A:1", PHIAL]] as const) {
+    lineSpec(line, "a boon that names a hero moved by Command goes to a hero of any player, not to an ally", (effects) => {
+      const made = commandTable("11204", effects, 1, { seats: 2, play: ["ally"], attached: [{ code, to: "dh1" }] });
+      expect([...options(answer(made, play(made), "attachment", "moveIt"))].sort()).toEqual([made.hero2, made.seat1Hero ?? ""].sort());
+    });
+  }
+
+  // "Attached Ship gets ...": the Modification boons go on a Ship. A ship-objective is immune to player card effects, so Command has no eligible host for Armor Plating and leaves it where it is, never on a hero or an ally.
+  // Both sides of the card carry the host, so this is not a lineSpec check (it passes without one side's record).
+  it("11172:A:2 Armor Plating moved by Command does not go to a hero or an ally", () => {
+    const made = commandTable("11204", EFFECTS, 1, { seats: 2, play: ["ally", WARSHIP], attached: [{ code: ARMOR, to: WARSHIP }] });
+    const done = answer(made, play(made), "attachment", "moveIt");
+    expect(done.state.window?.kind).not.toBe("choose");
+    expect(done.state.cards[idOf(done.state, ARMOR)]?.host).toBe(idOf(made.state, WARSHIP));
   });
 });

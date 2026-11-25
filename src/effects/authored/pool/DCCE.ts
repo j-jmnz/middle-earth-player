@@ -12,7 +12,8 @@ const hostGets = (code: string, line: string, id: number, stat: "defense" | "att
   cardCode: code,
   lines: [line],
   timing: "constant",
-  instructions: [{ verb: "ModifyStat", stat, amount, until: "whileSourceInPlay", target: "host" }],
+  // "Attached Ship gets ...": the Modification boons go on a Ship, so no other character takes one when an effect moves it.
+  instructions: [{ verb: "AttachesTo", host: { kind: "character", trait: "Ship" } }, { verb: "ModifyStat", stat, amount, until: "whileSourceInPlay", target: "host" }],
 });
 
 // A threat raise the Hard/Expert Mode card makes when a character is healed or readied by a player card effect (the refresh phase and a rule's ready are not one).
@@ -102,6 +103,8 @@ const weaponBonus = (code: string, line: string, id: number, stat: "defense" | "
   lines: [line],
   timing: "constant",
   instructions: [
+    // "Attached hero gets ...": a weapon goes on a hero, whoever moves it.
+    { verb: "AttachesTo", host: { kind: "hero" } },
     { verb: "ModifyStat", stat, amount: base, until: "whileSourceInPlay", target: "host" },
     { verb: "ModifyStat", stat, amount: extra, until: "whileSourceInPlay", target: "host" },
   ],

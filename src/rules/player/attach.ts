@@ -35,13 +35,31 @@ export function attachRule(ctx: ReduceContext, code: string): AttachRule | undef
   return undefined;
 }
 
-// The cards an attachment with this code may be attached to. A card with an "Attach to" record may go on a card of any
+// The host an attachment with no "Attach to" record names in its own Setup line ("Setup: Attach to a Warrior hero.", the card's AttachSelf record): the same filter, so an effect that moves or puts it into play offers no card its printed words exclude.
+function setupRule(ctx: ReduceContext, code: string): AttachRule | undefined {
+  if (printedOf(ctx.cards, code).type !== "attachment") return undefined;
+  for (const effect of effectsOf(ctx, code)) {
+    if (effect.timing !== "setup") continue;
+    for (const instruction of effect.instructions) {
+      if (instruction.verb === "AttachToRingBearer" || instruction.verb === "AttachSelfToRingBearer") return { verb: "AttachesTo", host: { kind: "ringBearer" } };
+      if (instruction.verb === "AttachSelfToNamed") return { verb: "AttachesTo", host: { kind: "character", name: instruction.name } };
+      if (instruction.verb !== "AttachSelf") continue;
+      const to = instruction.to;
+      if (to.kind === "hero") return { verb: "AttachesTo", host: { kind: "hero", ...(to.trait ? { trait: to.trait } : {}) } };
+      if (to.kind === "character") return { verb: "AttachesTo", host: { kind: "character", ...(to.trait ? { trait: to.trait } : {}), ...(to.name ? { name: to.name } : {}) } };
+      if (to.kind === "ship") return { verb: "AttachesTo", host: { kind: "character", trait: "Ship" } };
+    }
+  }
+  return undefined;
+}
+
+// The cards an attachment with this code may be attached to. A card with an "Attach to" record (or a Setup line that names its host) may go on a card of any
 // seat; one without goes on a character of the seat that plays it, or of any seat when `options.anySeat` says the asking effect names no player. `options.byEffect`: an effect attaches a card already in play or set aside
 // (Reattach, an "attach to" pick), which a bar on playing attachment cards does not reach.
 export function attachmentHostIds(state: ScenarioState, seat: number, code: string, ctx: ReduceContext, options: { byEffect?: boolean; anySeat?: boolean } = {}): string[] {
   // A card played unattached or onto a threat dial goes on no card (families/attachments/play.ts).
   if (playIntoRule(ctx, code)) return [];
-  const rule = attachRule(ctx, code);
+  const rule = attachRule(ctx, code) ?? setupRule(ctx, code);
   const named = rule?.host ?? { kind: "character" as const };
   const candidates: string[] = [];
   if (rule?.hosts) {
