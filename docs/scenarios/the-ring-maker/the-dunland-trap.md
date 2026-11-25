@@ -25,8 +25,4 @@ The statuses are those of the Readings bullet of `docs/scenarios/the-ring-maker.
 - `08014:A:3` (span-settled). Each time any enemy engages a player a time counter is removed from the current quest; the Boar Clan enemies the Setup puts into play engaged are engaged by an effect and trigger it. Not taken: only an engagement check triggers it. Basis: `rr.engaged`, the printed line.
 - `08012:A:1`, `08012:B:2` (span-settled). Stage 2B advances to stage 3A at the end of the combat phase; each player discards each Item and each Mount attachment and all allies but one at 2A. Basis: the printed lines.
 - `08021:A:1`, `08022:A:1` (span-settled). While the location is the active location the resource phase draw is none (Plains of Enedwaith) or 2 cards (Hithaeglir Stream) for every player. Basis: the printed lines.
-- `08005:A:1` (Close Call, Doomed X) (recommended). The reading is in the cycle file, Player card readings, under the key `08005:A:1`.
-
-## Readings to confirm
-
-- `08014:A:3`: recommended. An engagement by a card effect triggers it. See Readings.
+- `08005:A:1` (Close Call, Doomed X) (settled). The reading is in the cycle file, Player card readings, under the key `08005:A:1`.

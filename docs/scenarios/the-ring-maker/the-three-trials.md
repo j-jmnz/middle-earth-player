@@ -20,14 +20,10 @@ The statuses are those of the Readings bullet of `docs/scenarios/the-ring-maker.
 - Choosing a stage (`08035:B:1`, `08036:B:2`) (span-settled). The players choose the stage 2A by group decision; a stage defeated earlier is not offered again, and when all three are defeated the quest advances to stage 3A. Basis: the printed lines, `rm.current-trial`.
 - Random choices (`08036:A:1`, `08037:A:1`, `08038:A:1`) (span-settled). "Randomly choose 1 of the remaining set aside" picks among the cards still set aside, which excludes those of earlier trials. The Key that shares a Trait with the Guardian (Boar, Wolf or Raven) is found among the set-aside Keys. Basis: `rm.current-trial` and its example.
 - `08038:A:1` (span-settled). The Key is shuffled into the bottom 10 cards of the encounter deck after the encounter discard pile is shuffled into the deck. The ledger corrects "suffle" to "shuffle". Basis: the scan.
-- `08038:B:1` (recommended). "Any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead (progress is placed on the active location before triggering this effect)": the progress still goes to the active location first and only the excess is replaced, one card for each progress. Not taken: all the progress is replaced. Basis: the parenthesis. Sources: none found.
+- `08038:B:1` (span-settled). "Any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead (progress is placed on the active location before triggering this effect)": the progress still goes to the active location first and only the excess is replaced, one card for each progress. Not taken: all the progress is replaced. Basis: the printed parenthesis.
 - `08040:A:1` to `08042:A:1` (span-settled). The Guardians cannot have non-Key attachments, so the Key attached by the stage stays. Basis: the printed lines.
 - `08037:B:1` (span-settled). The Guardians cannot be damaged and do not leave play except by a quest effect. Basis: the printed line.
 - `08043:A:1` to `08045:A:3` (span-settled). Each Key must be claimed by the first player and attached to a hero; a discarded Key returns to the staging area; a Key dealt as a shadow card shuffles back into the encounter deck. Basis: the printed lines.
 - `08049:A:2` (span-settled). The three Keys are exhausted for the Travel cost of Hallowed Circle; the hero each is attached to is not exhausted. Basis: the printed line.
 - `08052:A:1`, `08052:A:3` (span-settled). Grim Foothills has Doomed 2, which raises each player's threat by 2 when it is revealed (`rr.doomed-x`), and progress is placed on it before the active location while it is in the staging area. Basis: `rr.doomed-x`, the printed line.
 - `08055:A:1` (span-settled). Wild Tenacity removes X time counters from each enemy that has the Time keyword, where X is the number of players. Basis: the printed line, `rm.time-x`.
-
-## Readings to confirm
-
-- `08038:B:1`: recommended. Only the excess progress is replaced. See Readings.
