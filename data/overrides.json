@@ -4445,6 +4445,136 @@
       "pile": "encounter",
       "reason": "DragnCards loads The Fourth Star set aside (Q03.4). The quest card Conspiracy (06011) sets aside only Roots of Mindolluin, the Villain cards and the Plot cards, and the Steward's Fear rulesheet's Setup paragraph names no other card, so The Fourth Star is in the encounter deck at the start.",
       "source": "scan 06011.B (\"When Revealed: Search the encounter deck for The Fourth Star and make it the active location. Shuffle the encounter deck.\"); Steward's Fear rulesheet MEC18 (ats.setup-the-stewards-fear-underworld-deck); dragncards preBuiltDecks.json (Q03.4)"
+    },
+    {
+      "scenario": "the-long-arm-of-mordor",
+      "code": "16035",
+      "pile": "staging",
+      "reason": "DragnCards loads the four Sauron's Enforcers set aside (Q07.3, E07.3). The quest card (16071) prints \"Setup: ... Each player adds 1 copy of Sauron's Enforcers to the staging area.\", one copy for each player, so they are dealt for the Setup to stage.",
+      "source": "scan 16071.A; dragncards preBuiltDecks.json (Q07.3, E07.3)"
+    },
+    {
+      "scenario": "the-mumakil",
+      "code": "17020",
+      "pile": "staging",
+      "reason": "DragnCards loads one copy of Mûmak Trail set aside (Q07.4, E07.4). The quest card (17026) prints \"Setup: ... Each player adds 1 different location to the staging area.\", which the staging pile deals as a location searched for (the other copies stay in the encounter deck).",
+      "source": "scan 17026.A; dragncards preBuiltDecks.json (Q07.4, E07.4)"
+    },
+    {
+      "scenario": "the-mumakil",
+      "code": "16056",
+      "pile": "staging",
+      "reason": "DragnCards loads one copy of Jungle Trail set aside (Q07.4, E07.4). The quest card (17026) prints \"Setup: ... Each player adds 1 different location to the staging area.\", which the staging pile deals as a location searched for (the other copies stay in the encounter deck).",
+      "source": "scan 17026.A; dragncards preBuiltDecks.json (Q07.4, E07.4)"
+    },
+    {
+      "scenario": "the-mumakil",
+      "code": "16057",
+      "pile": "staging",
+      "reason": "DragnCards loads one copy of Forest Clearing set aside (Q07.4, E07.4). The quest card (17026) prints \"Setup: ... Each player adds 1 different location to the staging area.\", which the staging pile deals as a location searched for (the other copies stay in the encounter deck).",
+      "source": "scan 17026.A; dragncards preBuiltDecks.json (Q07.4, E07.4)"
+    },
+    {
+      "scenario": "the-mumakil",
+      "code": "16058",
+      "pile": "staging",
+      "reason": "DragnCards loads one copy of Dense Jungle set aside (Q07.4, E07.4). The quest card (17026) prints \"Setup: ... Each player adds 1 different location to the staging area.\", which the staging pile deals as a location searched for (the other copies stay in the encounter deck).",
+      "source": "scan 17026.A; dragncards preBuiltDecks.json (Q07.4, E07.4)"
+    },
+    {
+      "scenario": "race-across-harad",
+      "code": "17040",
+      "pile": "encounter",
+      "from": "setAside",
+      "reason": "DragnCards loads one copy of Expanse of Harad set aside (Q07.5, E07.5). No Setup line of the quest card (17047) sets it aside: stage 1B has each player search the encounter deck for a different location (17047:B:1), so every copy is part of the encounter deck.",
+      "source": "scan 17047.A and 17047.B; dragncards preBuiltDecks.json (Q07.5, E07.5)"
+    },
+    {
+      "scenario": "race-across-harad",
+      "code": "17041",
+      "pile": "encounter",
+      "from": "setAside",
+      "reason": "DragnCards loads one copy of Blistering Erg set aside (Q07.5, E07.5). No Setup line of the quest card (17047) sets it aside: stage 1B has each player search the encounter deck for a different location (17047:B:1), so every copy is part of the encounter deck.",
+      "source": "scan 17047.A and 17047.B; dragncards preBuiltDecks.json (Q07.5, E07.5)"
+    },
+    {
+      "scenario": "race-across-harad",
+      "code": "17042",
+      "pile": "encounter",
+      "from": "setAside",
+      "reason": "DragnCards loads one copy of Harad Road set aside (Q07.5, E07.5). No Setup line of the quest card (17047) sets it aside: stage 1B has each player search the encounter deck for a different location (17047:B:1), so every copy is part of the encounter deck.",
+      "source": "scan 17047.A and 17047.B; dragncards preBuiltDecks.json (Q07.5, E07.5)"
+    },
+    {
+      "scenario": "race-across-harad",
+      "code": "16049",
+      "pile": "encounter",
+      "from": "setAside",
+      "reason": "DragnCards loads one copy of Towering Dunes set aside (Q07.5, E07.5). No Setup line of the quest card (17047) sets it aside: stage 1B has each player search the encounter deck for a different location (17047:B:1), so every copy is part of the encounter deck.",
+      "source": "scan 17047.A and 17047.B; dragncards preBuiltDecks.json (Q07.5, E07.5)"
+    },
+    {
+      "scenario": "race-across-harad",
+      "code": "16050",
+      "pile": "encounter",
+      "from": "setAside",
+      "reason": "DragnCards loads one copy of Desert Oasis set aside (Q07.5, E07.5). No Setup line of the quest card (17047) sets it aside: stage 1B has each player search the encounter deck for a different location (17047:B:1), so every copy is part of the encounter deck.",
+      "source": "scan 17047.A and 17047.B; dragncards preBuiltDecks.json (Q07.5, E07.5)"
+    },
+    {
+      "scenario": "the-dungeons-of-cirith-gurat",
+      "code": "17121",
+      "pile": "encounter",
+      "from": "staging",
+      "reason": "DragnCards stages one copy of Jailer of Cirith Gurat (Q07.8, E07.8). The quest card (17132) prints \"Setup: ... Each player searches the encounter deck for a different Orc enemy and adds it to the staging area.\", so the Setup finds the enemies in the encounter deck.",
+      "source": "scan 17132.A; dragncards preBuiltDecks.json (Q07.8, E07.8)"
+    },
+    {
+      "scenario": "the-dungeons-of-cirith-gurat",
+      "code": "17122",
+      "pile": "encounter",
+      "from": "staging",
+      "reason": "DragnCards stages one copy of Prison Guard (Q07.8, E07.8). The quest card (17132) prints \"Setup: ... Each player searches the encounter deck for a different Orc enemy and adds it to the staging area.\", so the Setup finds the enemies in the encounter deck.",
+      "source": "scan 17132.A; dragncards preBuiltDecks.json (Q07.8, E07.8)"
+    },
+    {
+      "scenario": "the-dungeons-of-cirith-gurat",
+      "code": "16062",
+      "pile": "encounter",
+      "from": "staging",
+      "reason": "DragnCards stages one copy of Uruk of Mordor (Q07.8, E07.8). The quest card (17132) prints \"Setup: ... Each player searches the encounter deck for a different Orc enemy and adds it to the staging area.\", so the Setup finds the enemies in the encounter deck.",
+      "source": "scan 17132.A; dragncards preBuiltDecks.json (Q07.8, E07.8)"
+    },
+    {
+      "scenario": "the-dungeons-of-cirith-gurat",
+      "code": "16063",
+      "pile": "encounter",
+      "from": "staging",
+      "reason": "DragnCards stages one copy of Uruk Warg-rider (Q07.8, E07.8). The quest card (17132) prints \"Setup: ... Each player searches the encounter deck for a different Orc enemy and adds it to the staging area.\", so the Setup finds the enemies in the encounter deck.",
+      "source": "scan 17132.A; dragncards preBuiltDecks.json (Q07.8, E07.8)"
+    },
+    {
+      "scenario": "the-dungeons-of-cirith-gurat",
+      "code": "17120",
+      "pile": "setAside",
+      "reason": "DragnCards loads Abaan (objective-ally) in the staging area (Q07.8, E07.8). The quest card (17132) prints \"Setup: ... Attach Abaan to Dungeon Cell.\", so he starts attached to Dungeon Cell, not staged.",
+      "source": "scan 17132.A; dragncards preBuiltDecks.json (Q07.8, E07.8)"
+    },
+    {
+      "scenario": "the-crossings-of-poros",
+      "code": "17145",
+      "pile": "setAside",
+      "from": "encounter",
+      "reason": "DragnCards' Normal deck (Q07.9) shuffles Poros Garrison into the encounter deck, and its Easy deck (E07.9) sets it aside. The quest card (17157) prints \"Setup: Set Poros Garrison and each of the following encounter sets aside, out of play\", so it is set aside at both difficulties.",
+      "source": "scan 17157.A; dragncards preBuiltDecks.json (Q07.9, E07.9)"
+    },
+    {
+      "scenario": "the-crossings-of-poros",
+      "code": "17146",
+      "pile": "staging",
+      "from": "encounter",
+      "reason": "DragnCards' Easy deck (E07.9) leaves The Black Serpent in the encounter deck, and its Normal deck (Q07.9) stages it. The quest card (17157) prints \"The first player adds The Black Serpent to the staging area\", so it is staged at both difficulties.",
+      "source": "scan 17157.A; dragncards preBuiltDecks.json (Q07.9, E07.9)"
     }
   ],
   "scenarioRemovals": [
@@ -4790,26 +4920,33 @@
       "easy": 4,
       "reason": "The Setup (05068:A) has each player search the encounter deck for a copy of Southron Company and add it to the staging area. The set holds 4 copies; DragnCards' Q03.2 stages all 4 and E03.2 stages 1 and leaves 3 in the encounter deck, though the Easy Mode sheet changes no Setup. The staging pile holds the 4 copies (one for each of up to 4 players), so the encounter pile's copies are dropped.",
       "source": "scan 05068.A (hallofbeorn-resources Images/Cards/Heirs-of-Numenor/Ambush-in-Ithilien-1A.jpg); dragncards preBuiltDecks.json (Q03.2, E03.2); hallofbeorn.com/Export/Scenarios/Into-Ithilien (Southron Company 4 Normal, 4 Easy)"
+    },
+    {
+      "scenario": "escape-from-umbar",
+      "code": "16021",
+      "pile": "encounter",
+      "normal": 2,
+      "reason": "Hall of Beorn's scenario file and its card export agree on 2 copies of Enemy Pursuit at Normal; DragnCards' Q07.1 loads 1. The printed count wins over a load list that leaves a copy out.",
+      "source": "hallofbeorn.com/Export/Scenarios/Escape-from-Umbar and Export/EncounterCards (Quantity); dragncards preBuiltDecks.json (Q07.1, E07.1)"
+    },
+    {
+      "scenario": "escape-from-umbar",
+      "code": "16015",
+      "pile": "encounter",
+      "normal": 5,
+      "reason": "Hall of Beorn's scenario file and its card export agree on 5 copies of Umbar Sentry at Normal (Easy 4); DragnCards' Q07.1 loads 4. The Setup puts 1 copy into play engaged with each player, so the fifth stays in the encounter deck.",
+      "source": "hallofbeorn.com/Export/Scenarios/Escape-from-Umbar and Export/EncounterCards (Quantity); dragncards preBuiltDecks.json (Q07.1, E07.1)"
+    },
+    {
+      "scenario": "escape-from-umbar",
+      "code": "16017",
+      "pile": "encounter",
+      "easy": 0,
+      "reason": "Hall of Beorn lists Umbar Street with 2 copies at Normal and 1 at Easy; DragnCards' E07.1 stages 1 and leaves 1 in the encounter deck, 2 in all. The Easy deck holds the staged copy only.",
+      "source": "hallofbeorn.com/Export/Scenarios/Escape-from-Umbar and Export/EncounterCards (Quantity); dragncards preBuiltDecks.json (Q07.1, E07.1)"
     }
   ],
   "campaigns": [
-    {
-      "id": "haradrim",
-      "name": "Haradrim",
-      "kind": "cycle",
-      "products": [
-        "The Sands of Harad",
-        "The Mûmakil",
-        "Race Across Harad",
-        "Beneath the Sands",
-        "The Black Serpent",
-        "The Dungeons of Cirith Gurat",
-        "The Crossings of Poros"
-      ],
-      "released": "2016-11-23",
-      "reason": "No source names a cycle. Hall of Beorn lists the scenarios of The Sands of Harad and of its six Adventure Packs under each product; RingsDB numbers the deluxe expansion and the six packs as cycles 23 and 24. The cycle has no Campaign Mode, so it is a cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 23 and 24; hallofgondor.com/release-dates (released: US release of the first product)"
-    },
     {
       "id": "vengeance-of-mordor",
       "name": "Vengeance of Mordor",
@@ -5197,6 +5334,22 @@
       "code": "51211",
       "reason": "The second name of the DragnCards card number 10 is Chamber of Mazarbul, which Hall of Beorn numbers 11. See the side A entry.",
       "source": "dragncards cardDb.tsv (The Mines of Moria 10); hallofbeorn.com/Export/EncounterCards (Chamber-of-Mazarbul-TMoM)"
+    },
+    {
+      "dragncards": "The Mumakil",
+      "number": 27,
+      "side": "a",
+      "code": "17027",
+      "reason": "DragnCards spells the stage 2A card \"Capture the Mumakil\"; Hall of Beorn's title is \"Capture the Oliphaunts\", so no title and type match finds it. Collector number 27 of The Mûmakil is the stage 2 card.",
+      "source": "dragncards cardDb.tsv (The Mumakil 27, both sides) and preBuiltDecks.json (Q07.4, E07.4); hallofbeorn.com/Export/QuestCards (The Mûmakil 27)"
+    },
+    {
+      "dragncards": "Beneath the Sands",
+      "number": 80,
+      "side": "b",
+      "code": "17079",
+      "reason": "The Search objective is one card with two sides, On Track (side A, found by its OCTGN guid as #80) and Off Track (side B). Hall of Beorn files them as two objectives, #79 Off Track and #80 On Track, and the two names are within two letters of each other, so the title match finds both. Side B is the Off Track card.",
+      "source": "dragncards cardDb.tsv (Beneath the Sands 80, both rows) and preBuiltDecks.json (Q07.6, E07.6); hallofbeorn.com/Export/EncounterCards (Off-Track-BtS 79, On-Track-BtS 80)"
     }
   ],
   "encounterSetAliases": [

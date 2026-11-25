@@ -3,8 +3,6 @@ import type { Effect } from "../../../catalog/boundary.ts";
 // Records for the BtS player cards whose lines no template reads (data/cards/BtS.json). An id here that a template also
 // produces replaces the generated record; list it in REPLACES.
 export const RECORDS: readonly Effect[] = [
-  // 17056 Haradrim Spear: the scan prints "Attach to a Harad character"; RingsDB and Hall of Beorn print "Haradrim", a trait no card has.
-  {"id":"17056:constant:1","cardCode":"17056","lines":["17056:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character","trait":"Harad"}}]},
   // 17057 Hunting Party: a unique Warrior and another unique Scout. Two different characters fill the two roles exactly when
   // each role has a candidate and the candidates together are at least two cards. Line 2 (after the players commit
   // characters) has no trigger yet.
@@ -20,7 +18,4 @@ export const RECORDS: readonly Effect[] = [
   {"id":"17063:response:1","cardCode":"17063","lines":["17063:A:2"],"timing":"response","trigger":"played","subject":"self","eventSeat":"you","instructions":[{"verb":"Draw","amount":1}]},
 ];
 
-export const REPLACES: readonly string[] = [
-  // Haradrim Spear: the generated host record reads the sources' "Haradrim" trait, not the printed "Harad".
-  "17056:constant:1",
-];
+export const REPLACES: readonly string[] = [];

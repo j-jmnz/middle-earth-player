@@ -86,14 +86,12 @@ describe("Fierce Defense (17113:A:1, A:2)", () => {
     expect(canPlay(combat(tab.state, tab).state, tab, idsOf(tab, FIERCE))).toBe(false);
   });
 
-  // "Valour Action: Discard a non-unique enemy engaged with you.": at threat 40 in the planning phase, the Grunt is discarded.
-  lineSpec("17113:A:2", "Fierce Defense: at threat 40, discard a non-unique enemy engaged with you", (effects) => {
+  // "Valour Combat Action: Discard a non-unique enemy engaged with you.": at threat 40 it is not played in the planning phase, and it is
+  // played in the combat phase.
+  lineSpec("17113:A:2", "Fierce Defense: at threat 40, a Combat Action only", (effects) => {
     const tab = fierce(effects, 40);
-    const grunt = idsOf(tab, GRUNT);
-    let run = playCode(tab, FIERCE);
-    expect(choices(run.state, tab).sort()).toEqual(mine(tab));
-    run = sendUnledgered(run, { type: "Choose", optionId: grunt }, tab.ctx);
-    expect(run.state.cards[grunt]?.zone).toBe("encounterDiscard");
+    expect(canPlay(begin(tab.state).state, tab, idsOf(tab, FIERCE))).toBe(false);
+    expect(canPlay(combat(tab.state, tab).state, tab, idsOf(tab, FIERCE))).toBe(true);
   });
 
   // An event with an Action and a Valour Action uses one of them (bts.valour): at threat 40 in the combat phase the player chooses which,

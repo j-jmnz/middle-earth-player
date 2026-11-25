@@ -3,6 +3,7 @@ import type { CardFace, CardInstance, ScenarioState, ZoneName } from "./state.ts
 import { queueEvent } from "../windows/queue.ts";
 import { leaveWith } from "../families/play/zones.ts";
 import { heldInHand } from "../families/ring-maker/hand.ts";
+import { endLastingOn } from "./lasting.ts";
 import { releaseOrcGuard } from "../families/dungeon/guard.ts";
 import { dealtFace } from "../families/dreamchaser/facts.ts";
 import { routeDestination } from "../families/sea/routes.ts";
@@ -389,6 +390,8 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   if (dest.zone === "sackDeck" && current.zone !== "sackDeck") moved = shufflePile(moved, "sackDeck");
   // The enemies grappled with a location that leaves the staging area: detached as it becomes the active location, discarded with it on every other exit (an explored location released them first, destroyCard).
   if (current.zone === "staging" && dest.zone !== "staging") moved = dest.zone === "activeLocation" || dest.zone === "secondActiveLocation" ? releaseGrappled(moved, id) : discardGrappled(moved, id);
+  // The lasting modifiers it held end with its time in play (rr.in-play-and-out-of-play, core/lasting.ts).
+  if (inPlay(current.zone) && !inPlay(dest.zone)) moved = endLastingOn(moved, id);
   // Its attachments leave play with it, however it left (rr.attachment-cards, families/play/zones.ts).
   if (inPlay(current.zone) && !inPlay(dest.zone)) moved = leaveWith(moved, current, released);
   // An Orc Guard that leaves play takes the deck card it is made of to its owner's discard pile and leaves the game (families/dungeon/guard.ts).

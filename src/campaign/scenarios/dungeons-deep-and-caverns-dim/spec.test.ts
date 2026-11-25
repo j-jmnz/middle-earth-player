@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";
 
-import { answer, attack, cardSpecs, classFlag, damageOn, endPhase, offers, progressOn, reveal, resolve, rowProblems, stat, withoutLine, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { answer, attack, cardSpecs, classFlag, damageOn, defend, endPhase, offers, progressOn, reveal, resolve, rowProblems, stat, withoutLine, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Dungeons Deep and Caverns Dim (the-hobbit part 3): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The riddle area and the answering of a riddle need a table with
@@ -19,6 +19,8 @@ const FILLERS = ["f0", "f0", "f0", "f0", "f0"];
 const ROWS: readonly Row[] = [
   { line: "131076:A:1", name: "Wild Wargs is dealt a shadow card with a riddle and gets +2 Attack for the attack: 5 damage on an undefended hero", layout: { engaged: [WARGS], deck: FILLERS }, act: attack(WARGS, { shadow: GLADE, undefended: true }), expect: [damageOn("dh1", 5)] },
   { line: "131077:A:1", name: "after a character takes damage from an attack made by an engaged Creature enemy, 1 progress comes off the current quest", layout: { staging: [GLADE], engaged: [WARGS], progress: 3, deck: FILLERS }, act: attack(WARGS, { undefended: true }), expect: [progressOn("131029", 2)] },
+  // The damage that destroys the defender is still damage the attack dealt: the Forced effect is heard after it (rr.damage), the character no longer in play.
+  { line: "131077:A:1", name: "a defender the Creature's damage destroys is still a character that took damage from its attack: 1 progress comes off the quest", layout: { staging: [GLADE], engaged: [WARGS], play: ["ally"], progress: 3, deck: FILLERS }, act: [attack(WARGS), defend("ally")], expect: [zone("ally", "discard"), progressOn("131029", 2)] },
   { line: "131078:A:1", name: "its Threat is twice the number of players", layout: { seats: 2, staging: [LAKE] }, act: [], expect: [stat(LAKE, "threat", 4)] },
   { line: "131078:A:2", name: "the players cannot travel to it: no travel is offered with it alone in the staging area", layout: { phase: "Travel", staging: [LAKE] }, act: [], expect: [offers("Travel", undefined, false)] },
   { line: "131082:A:1", name: "When Revealed: characters get -1 Willpower and cannot attack until the end of the round", layout: { deck: FILLERS }, act: [reveal("131082"), answer("resolve")], expect: [stat("dh1", "willpower", 1), classFlag("dh1", "cannotAttack")] },
