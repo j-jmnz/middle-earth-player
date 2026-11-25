@@ -103,16 +103,28 @@ describe("Time counters that a card removes (07020:A:2, 07022:A:1)", () => {
     expect(shadowed("f0", 1)).toBe(1);
   });
 
-  // Down from the Hills with 2 players who both remove a counter from a stage that holds 1: the Forced effect of the last counter (2 counters back) waits for the end of the When Revealed, so the second player's choice finds none to remove.
+  // Down from the Hills with 2 players who both remove a counter from a stage that holds 1: the Forced effect of the last counter (2 counters back) waits for the end of the When Revealed, so the second player is not offered the time option (rr.effects) and asks nothing.
   it("07022:A:1 the players choose in turn and the Forced effect of the last counter resolves after the whole When Revealed", () => {
     const t = table({ seats: 2, stage: STAGE_2, deckOf: DECKS, deck: ["f0", "f0", "f0"] });
     const stage = t.state.questStage ?? "";
     const steps: EngineStep[] = [];
     const revealed = revealFromTop(updateCard(t.state, stage, { resources: 1 }), t.ctx, "07022", steps);
-    const asked = ["time", "time"];
+    const asked = ["time"];
     const done = finish({ state: revealed.state, steps }, t.ctx, (state) => (state.window?.kind === "choose" ? (asked.shift() ?? state.window.options[0] ?? "") : ""));
     expect(asked).toEqual([]);
     expect(done.state.cards[stage]?.resources).toBe(2);
+  });
+
+  it("07022:A:1 the time option is not offered while no time counter lies on the current quest", () => {
+    const t = table({ stage: STAGE_2, deckOf: DECKS, deck: ["07042", "f0", "f0"] });
+    const stage = t.state.questStage ?? "";
+    const offered: string[][] = [];
+    const revealed = revealFromTop(updateCard(t.state, stage, { resources: 0 }), t.ctx, "07022", []);
+    finish({ state: revealed.state, steps: [] }, t.ctx, (state) => {
+      if (state.window?.kind === "choose") offered.push([...state.window.options]);
+      return state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "";
+    });
+    expect(offered.flat()).not.toContain("time");
   });
 
   it("07022:A:1 a player who chooses to search adds a Dunland enemy to the staging area and no counter comes off", () => {

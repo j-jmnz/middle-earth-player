@@ -102,7 +102,7 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the acting player chooses one of:
-        * option "time":
+        * option "time" (only if 0 is less than resources of the current quest stage):
           - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
         * option "search":
           - the acting player searches the encounter deck and discard pile for a Dunland enemy, reveals it and adds it to the staging area
@@ -312,4 +312,4 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
   07061:questResolution:1: Quest resolution
     - the players win the game
 
-(rendered pieces: 165 by template, 4 as JSON)
+(rendered pieces: 167 by template, 4 as JSON)

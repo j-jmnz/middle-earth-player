@@ -78,7 +78,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
           verb: "Choose",
           who: "actor",
           options: [
-            { id: "time", instructions: [{ verb: "RemoveTimeFromQuest", amount: 1 }] },
+            { id: "time", requires: { kind: "less", left: 0, right: { stat: "resources", of: "questStage" } }, instructions: [{ verb: "RemoveTimeFromQuest", amount: 1 }] },
             { id: "search", instructions: [{ verb: "SearchReveal", trait: "Dunland", type: "enemy", who: "actor", to: "staging" }] },
           ],
         },
