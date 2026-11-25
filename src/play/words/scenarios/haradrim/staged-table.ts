@@ -21,7 +21,3 @@ export const stagedDialWords = (hero: string, guard: string | null): string => (
 /** The preview line of an objective-hero: the loss its own record holds, said for the seat that controls it ("you" when one player plays). */
 export const objectiveWords = (seatCount: number, seat: number | null): string =>
   `If it leaves play, ${seat == null || seatCount < 2 ? "you are" : `Player ${seat + 1} is`} eliminated from the game, however it leaves play.`;
-
-/** The preview line of a card whose X is the stage number: each number it gives X now. */
-export const stageXWords = (values: readonly { name: string; value: number }[], staged: boolean): string =>
-  `X is the stage number of the main quest${staged ? "" : " (no stage in play)"}: ${values.map((one) => `${one.name} ${one.value}`).join(", ")} now.`;

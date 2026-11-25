@@ -21,7 +21,8 @@ import { keptDetail } from "../readouts/standalone-scenarios/wizards-quest.ts";
 import { angmarDetail } from "./angmar-preview.ts";
 import { ringMakerDetail } from "./ring-maker/preview.ts";
 import { barrowDetail } from "../readouts/standalone-scenarios/barrow-downs.ts";
-import { objectiveDetail, stageXDetail, stagedDetail } from "../readouts/haradrim/staged.ts";
+import { objectiveDetail, stagedDetail } from "../readouts/haradrim/staged.ts";
+import { stageXDetail } from "./stage-x-preview.ts";
 import { ungolDetail } from "./ungol-preview.ts";
 import { stoneDetail } from "./stone-preview.ts";
 import { flameDetail } from "./flame-preview.ts";
@@ -63,8 +64,14 @@ function ithilienDetail(game: ScenarioState, ctx: ReduceContext, cardId: string)
   return `Committed to the quest from the staging area, adding ${value} ${STAT_WORD[stat]} to the quest total. No player controls the card: it cannot attack, defend or pay a cost.`;
 }
 
-/** The muted line under a card's name in its preview, or null: what only the table knows about it. */
+/** The muted line under a card's name in its preview, or null: what only the table knows about it. A stat read from the stage number is told after any other line the card has. */
 export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name: (id: string) => string): string | null {
+  const own = ownDetail(game, ctx, cardId, name);
+  const stage = stageXDetail(game, ctx, cardId);
+  return own != null && stage != null ? `${own} ${stage}` : own ?? stage;
+}
+
+function ownDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name: (id: string) => string): string | null {
   const card = game.cards[cardId];
   if (!card) return null;
   if (card.code === ORC_GUARD_CODE) return "The facedown card under it returns to its owner's discard pile when it leaves play.";
@@ -85,7 +92,7 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   const kept = keptDetail(game, cardId, name);
   if (kept) return kept;
   // The heroes in the staging area, the heroes an Orc guards and the objective-heroes (The Long Arm of Mordor) are told before the Captives' words, which would call them Captives of The Uruk-hai.
-  const staged = stagedDetail(game, cardId, name) ?? objectiveDetail(game, ctx, cardId) ?? stageXDetail(game, ctx, cardId);
+  const staged = stagedDetail(game, cardId, name) ?? objectiveDetail(game, ctx, cardId);
   if (staged) return staged;
   const captive = captiveDetail(game, ctx, card, name);
   if (captive) return captive;

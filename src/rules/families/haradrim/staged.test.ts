@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { gameReads } from "../../core/game-reads.ts";
-import { flagged, heldHero, type ScenarioState } from "../../core/state.ts";
+import { flagged, heldHero, updateCard, type ScenarioState } from "../../core/state.ts";
 import { opened, run as runInstruction, tableFromLayout, idOf, idsOf, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { send } from "../../../../test/harness/scene.ts";
 import { settle } from "../../engine/machine.ts";
@@ -13,8 +13,8 @@ import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { matchesPick, pickCandidates } from "../../interpret/pick.ts";
 import { holdCaptive, rescueCaptives } from "../captives/index.ts";
 import { captivesOf } from "../captives/values.ts";
-import { heroGuardedBy } from "../wilderland/carried.ts";
-import { markStagedHeroes, stagedHeroes, undefendedStaged } from "./staged.ts";
+import { heroGuardedBy, releaseGuardedHero } from "../wilderland/carried.ts";
+import { markStagedHeroes, releaseStagedHero, stagedHeroes, undefendedStaged } from "./staged.ts";
 
 const table = (layout: Layout = {}) => tableFromLayout("the-long-arm-of-mordor", { seats: 1, stage: "16071", ...layout });
 const OBJECTIVE = ["16031", "16032", "16033", "16034"];
@@ -215,6 +215,25 @@ describe("16073:A:1 GuardStagedHeroes: each hero in the staging area is attached
     expect(guarded.cards[heroes[0] ?? ""]?.attachments).toHaveLength(1);
     const gone = settle({ ...guarded, cards: { ...guarded.cards } }, made.ctx, [] as EngineStep[]);
     expect(heroGuardedBy(gone, guard)).toBe(heroes[0]);
+  });
+});
+
+describe("16073:B:2 an attachment another player controls", () => {
+  it("goes to the hero's owner with the hero, whether a stage or a guard releases it (rr.ownership-and-control)", () => {
+    const { made, state, heroes } = staged({ seats: 2, staging: [ENEMY], attached: [{ code: "attachment", to: "dh1" }] });
+    const attachment = idOf(state, "attachment");
+    // Player 2 played it on Player 1's hero: it stays in play under Player 2's control while the hero is held.
+    const played = updateCard(state, attachment, { controller: 1 });
+    const guarded = inFrame(made, played, [{ verb: "GuardStagedHeroes" }]);
+    expect(guarded.cards[attachment]?.controller).toBe(1);
+    const guard = idOf(guarded, ENEMY);
+    const freed = releaseGuardedHero(guarded, guard);
+    expect(freed.seats[0]?.heroes).toContain(heroes[0]);
+    expect(freed.cards[heroes[0] ?? ""]).toMatchObject({ exhausted: true, controller: 0 });
+    expect(freed.cards[attachment]).toMatchObject({ host: heroes[0], controller: 0 });
+    // A stage's release (ReleaseStagedHero) gives the same answer.
+    const stage = releaseStagedHero(played, { verb: "ReleaseStagedHero" }, { seat: 0, sourceId: null, chosen: heroes[0] ?? "" }, []);
+    expect(stage.cards[attachment]).toMatchObject({ host: heroes[0], controller: 0 });
   });
 });
 

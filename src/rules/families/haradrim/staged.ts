@@ -15,10 +15,8 @@ import { moveCard } from "../../core/zones.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { effectData } from "../encounter/moves.ts";
-import { backInPlace } from "../prisoner/index.ts";
-import { holdCaptive } from "../captives/index.ts";
+import { holdCaptive, releaseCaptive } from "../captives/index.ts";
 import { captivesOf } from "../captives/values.ts";
-import { releaseHero } from "../south/captive.ts";
 import { heroGuardedBy } from "../wilderland/carried.ts";
 import type { Focus } from "../index.ts";
 
@@ -61,22 +59,13 @@ export function takeObjectiveHero(state: ScenarioState, instruction: Extract<Ins
   return { ...taken, modifiers: [...taken.modifiers, { instanceId: chosen, sourceId: chosen, stat: "heroType", amount: 1, until: "endOfGame" }] };
 }
 
-/** The hero comes back among its owner's heroes where it was, controlled by its owner again, with its tokens and attachments; `exhausted` as the stage says. */
-function release(state: ScenarioState, heroId: string): ScenarioState {
-  const hero = state.cards[heroId];
-  if (!hero || hero.owner == null) return state;
-  const seat = hero.owner;
-  const released = releaseHero(state, heroId, seat, { exhausted: true, face: "up", captive: undefined, owner: undefined, heroSlot: undefined, host: null }, { owner: undefined }, true);
-  return hero.heroSlot == null ? released : backInPlace(released, seat, heroId, hero.heroSlot);
-}
-
 /** ReleaseStagedHero: the actor takes control of one of the heroes in the staging area they own, exhausted (the actor is asked when they own several); nothing changes when they own none. */
 export function releaseStagedHero(state: ScenarioState, instruction: Instruction, focus: Focus, steps: EngineStep[]): ScenarioState {
   if (state.seats[focus.seat]?.eliminated) return state;
   const options = stagedHeroes(state).filter((card) => card.owner === focus.seat).map((card) => card.id);
   if (options.length === 0) return state;
   const chosen = chosenOf(options, focus);
-  return chosen ? release(state, chosen) : ask(state, instruction, focus.seat, options, steps);
+  return chosen ? releaseCaptive(state, chosen, { exhausted: true }) : ask(state, instruction, focus.seat, options, steps);
 }
 
 // The heroes in the staging area, the first player's first, each seat's in the order it held them.

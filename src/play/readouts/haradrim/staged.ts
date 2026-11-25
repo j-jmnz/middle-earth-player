@@ -1,15 +1,13 @@
 // Rules: hrd.heroes-in-the-staging-area, hrd.guarded-heroes, hrd.objective-hero-elimination, rr.blank, rr.immune (data/rules/entries.json); ledger lines 16071:A:1, 16071:B:3, 16072:B:3, 16073:A:1, 16073:B:2, 16031:A:2 (docs/scenarios/haradrim/the-long-arm-of-mordor.md, Table).
 // The pieces The Long Arm of Mordor's records create: the heroes in the staging area (a Captive that no card holds, drawn in the staging area), the heroes an Orc guards (a Captive under it with the guarded flag, drawn under it as every held card is) and the objective-heroes
 // (a hero whose own record eliminates its seat when it leaves play). Each is read from the state's own facts, never the scenario id; the engine decided every one and nothing here changes one. Pure, so a test reads it.
-import { modifiedStat } from "../../../rules/core/keywords.ts";
-import { inPlay, flagged, type CardInstance, type ScenarioState } from "../../../rules/core/state.ts";
+import { flagged, type CardInstance, type ScenarioState } from "../../../rules/core/state.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
-import { printedOf } from "../../../rules/core/printed.ts";
 import { captivesOf, captivesUnder } from "../../../rules/families/captives/values.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 
 import { ownerWords } from "../../words/owner.ts";
-import { guardedWords, guardsWords, objectiveWords, stageXWords, stagedDialWords, stagedReturnWords, stagedWords } from "../../words/scenarios/haradrim/staged-table.ts";
+import { guardedWords, guardsWords, objectiveWords, stagedDialWords, stagedReturnWords, stagedWords } from "../../words/scenarios/haradrim/staged-table.ts";
 
 /** The heroes in the staging area: the Captives no card holds, in card order (none unless a record moved a hero there). */
 export const stagedHeroes = (game: ScenarioState): readonly CardInstance[] => captivesOf(game).filter((card) => card.host == null);
@@ -62,30 +60,4 @@ export function stagedDial(game: ScenarioState, card: CardInstance, nameOf: (cod
   if (card.host == null) return stagedDialWords(nameOf(card.code), null);
   const host = game.cards[card.host];
   return card.guardedHero === true && host ? stagedDialWords(nameOf(card.code), nameOf(host.code)) : null;
-}
-
-const X_STATS = ["threat", "attack", "defense"] as const;
-const STAT_NAME = { threat: "Threat", attack: "Attack", defense: "Defense" } as const;
-
-/**
- * The preview line of a card in play whose Threat, Attack or Defense is X and whose constant record says X is the stage number (ModifyStat of the main quest's stage number on itself): the number each is now.
- * The card prints "X", so no badge says the value (a badge is a change to a printed number). Null for any other card.
- */
-export function stageXDetail(game: ScenarioState, ctx: ReduceContext, cardId: string): string | null {
-  const card = game.cards[cardId];
-  if (!card || !inPlay(card.zone) || card.face === "down") return null;
-  const printed = printedOf(ctx.cards, card.code);
-  const read = new Set<(typeof X_STATS)[number]>();
-  for (const effect of effectsOf(ctx, card.code)) {
-    if (effect.timing !== "constant") continue;
-    for (const instruction of effect.instructions) {
-      if (instruction.verb === "ModifyStat" && instruction.target === "self" && instruction.amount != null && typeof instruction.amount === "object" && "stage" in instruction.amount && instruction.amount.stage === true) {
-        const stat = X_STATS.find((one) => one === instruction.stat);
-        if (stat && printed[stat] == null) read.add(stat);
-      }
-    }
-  }
-  if (read.size === 0) return null;
-  const stage = game.questStage ? game.cards[game.questStage] : undefined;
-  return stageXWords([...read].map((stat) => ({ name: STAT_NAME[stat], value: modifiedStat(game, card, stat, ctx.cards) })), stage != null);
 }
