@@ -103,6 +103,9 @@ export type IdleHook = (state: ScenarioState, instruction: Instruction, sourceId
 /** The cards an instruction of the family's verbs makes for the steps after it, as a Pick does (PlayFrom: the cards of its pick that could be played now), or null when the verb is not the family's. With any card the step can change the game. */
 export type IdleCardsHook = (state: ScenarioState, instruction: Instruction, sourceId: string, frame: IdleFrame, ctx: ReduceContext) => readonly string[] | null;
 
+/** Whether a family keeps the encounter discard pile from being shuffled back into an empty encounter deck now (resetEncounterDeck in verbs.ts): true holds the reset. Asked after the core's own checks; with no family answering true the reset runs as the rules read. */
+export type DeckResetHook = { readonly hold?: (state: ScenarioState, ctx: ReduceContext) => boolean };
+
 export type RulesFamily = {
   /** The folder name, which is also the catalog file name in src/catalog/families. */
   readonly name: string;
@@ -124,6 +127,7 @@ export type RulesFamily = {
   readonly playReason?: PlayReasonHook;
   readonly revealed?: RevealHook;
   readonly optionalEngage?: OptionalEngageHook;
+  readonly deckReset?: DeckResetHook;
   readonly questResult?: QuestResultHook;
   readonly idle?: IdleHook;
   readonly idleCards?: IdleCardsHook;

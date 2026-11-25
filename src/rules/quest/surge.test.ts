@@ -104,34 +104,47 @@ describe("surge", () => {
     expect(revealed.state.encounterDiscard).toEqual([]);
   });
 
-  function surgeAlone(otherInDiscard: boolean) {
-    const loom = definePrinted({ code: "loom", name: "Loom", type: "treachery", threat: 0, keywords: { surge: true } });
-    const later = definePrinted({ code: "later", name: "Later", type: "enemy", threat: 0, engagementCost: 50 });
-    const cards = cardMap([loom, later, hero("aragorn", "leadership")]);
+  // The reset is the rules' (rr.running-out-of-cards): no family of these scenes holds it back, so a surging card that is the only card of the game is shuffled back and revealed inside its own surge. Only a family hook can stop that (families/pelargir/surge-chain.ts), and only in its own game.
+  function surgeScene(keywords: { surge: true; doomed?: number }, threat: number) {
+    const loom = definePrinted({ code: "loom", name: "Loom", type: "treachery", threat: 0, keywords });
+    const cards = cardMap([loom, hero("aragorn", "leadership")]);
     let state = blankScenario({ seatCount: 1, seed: 4, definition: fixtureDefinition(["stage"]) });
     state = spawn(state, "aragorn", { zone: "heroes", seat: 0 }).state;
     const surging = spawn(state, "loom", { zone: "encounterDeck" });
-    state = surging.state;
-    const other = otherInDiscard ? spawn(state, "later", { zone: "encounterDiscard" }) : null;
-    if (other) state = other.state;
-    state = { ...state, phase: "Quest", mode: "questCommit", window: { kind: "pass" }, activeSeat: 0, firstPlayer: 0 };
-    return { revealed: expectOk(reduce(state, { type: "Pass" }, { effects: [], cards })), loom: surging.id, later: other?.id };
+    state = { ...surging.state, phase: "Quest", mode: "questCommit", window: { kind: "pass" }, activeSeat: 0, firstPlayer: 0 };
+    state = { ...state, seats: [{ ...state.seats[0], threat }, state.seats[1]] };
+    return { state, cards, loom: surging.id };
   }
 
-  it("ends the surge chain when the only card left is the surging one: it is not shuffled back to be revealed inside its own surge (rr.surge, rr.running-out-of-cards, faq.last-encounter-card)", () => {
-    const { revealed, loom } = surgeAlone(false);
-    expect(revealed.state.stack).toEqual([]);
-    expect(revealed.steps.filter((step) => step.kind === "reveal")).toHaveLength(1);
-    // The reset after the last reveal runs as usual.
-    expect(revealed.state.encounterDeck).toEqual([loom]);
+  it("shuffles a surging card that is the only card left back and reveals it again, for the doomed one until the threat is 50 (rr.surge, rr.running-out-of-cards)", () => {
+    const { state, cards } = surgeScene({ surge: true, doomed: 2 }, 30);
+    const revealed = expectOk(reduce(state, { type: "Pass" }, { effects: [], cards }));
+    expect(revealed.steps.filter((step) => step.kind === "reveal")).toHaveLength(10);
+    expect(revealed.state.seats[0]?.threat).toBe(50);
+    expect(revealed.state.lost).toBe(true);
   });
 
-  it("still shuffles the discard pile in the middle of a surge chain when it holds other cards (rr.running-out-of-cards)", () => {
-    const { revealed, later } = surgeAlone(true);
-    expect(revealed.steps.some((step) => step.kind === "resetEncounterDeck" && step.count === 2)).toBe(true);
-    // The pile came back with the surging card and the other card: the chain went on until the other card was revealed, and the surging card was revealed again on the way or not.
-    expect(revealed.state.staging).toContain(later);
-    expect(revealed.state.stack).toEqual([]);
+  it("does not guard a surging card with nothing else in the game: the reveal loop runs into the round engine's step limit", () => {
+    const { state, cards } = surgeScene({ surge: true }, 0);
+    expect(() => reduce(state, { type: "Pass" }, { effects: [], cards })).toThrow(/step limit/);
+  });
+
+  it("shuffles the discard pile back in the middle of a surge chain when a Hide card follows the surging one (rr.running-out-of-cards)", () => {
+    const loom = definePrinted({ code: "loom", name: "Loom", type: "treachery", threat: 0, keywords: { surge: true } });
+    const hider = definePrinted({ code: "hider", name: "Hider", type: "enemy", threat: 1, engagementCost: 50, keywords: { hide: 1 } });
+    const cards = cardMap([loom, hider, hero("aragorn", "leadership")]);
+    let state = blankScenario({ seatCount: 1, seed: 4, definition: fixtureDefinition(["stage"]) });
+    state = spawn(state, "aragorn", { zone: "heroes", seat: 0 }).state;
+    state = spawn(spawn(state, "loom", { zone: "encounterDeck" }).state, "hider", { zone: "encounterDeck" }).state;
+    state = { ...state, phase: "Quest", mode: "questCommit", window: { kind: "pass" }, activeSeat: 0, firstPlayer: 0 };
+    const ctx = { effects: [], cards };
+    let step = expectOk(reduce(state, { type: "Pass" }, ctx));
+    expect(step.state.window?.kind).toBe("hideCommit");
+    step = expectOk(reduce(step.state, { type: "CommitHide", cardIds: [] }, ctx));
+    for (let pass = 0; pass < 5 && step.state.stack.length > 0; pass += 1) step = expectOk(reduce(step.state, { type: "Pass" }, ctx));
+    expect(step.steps.filter((entry) => entry.kind === "resetEncounterDeck")).toEqual([expect.objectContaining({ count: 1 })]);
+    expect(step.state.encounterDeck.map((id) => step.state.cards[id]?.code)).toEqual(["loom"]);
+    expect(step.state.window?.kind).toBe("travel");
   });
 
   it("does not surge after the revealing seat is eliminated", () => {

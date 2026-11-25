@@ -12,6 +12,7 @@ import { actForDestroyedController, announceAddedToStaging, controlSweep, contro
 import { discardHiddenCard, hiddenAmount, takeHiddenCard, takeHiddenUnpayable } from "./hidden.ts";
 import { gainControlOfSelf, hiddenSweep, holdUnderStage } from "./hidden-sweep.ts";
 import { discardResolved, turnHiddenCard, turnHiddenCards } from "./hidden-turn.ts";
+import { inOwnSurgeChain } from "./surge-chain.ts";
 import { undefendedAnnounced } from "./undefended.ts";
 import { archeryOfAmount } from "./archery-of.ts";
 import { discardEncounterTopMore, raiseThreatPerDiscarded } from "./discard.ts";
@@ -117,6 +118,7 @@ export const manifest: RulesFamily = {
   run,
   condition: (state, condition, scope) => pelargirCondition(state, condition, scope),
   revealed: noteFirstEnemy,
+  deckReset: { hold: inOwnSurgeChain },
   settle: { sweep: (state, ctx, steps) => hiddenSweep(alcaronLoss(advanceWithoutVillagers(progressesToVictory(releaseUnderworldStacks(controlSweep(sieges(state, ctx, steps), ctx, steps), ctx, steps), ctx, steps), ctx, steps), ctx), ctx, steps) },
   travel: { unpayable: (state, instruction, ctx, locationId) => eachPlayerSpendsUnpayable(state, instruction, ctx, locationId) || takeHiddenUnpayable(state, instruction), reach: controlledTravelReach, cost: controlledTravelCost, second: towerSecond },
   pick: (state, id, spec) => noResourcesMatches(state, id, spec),
