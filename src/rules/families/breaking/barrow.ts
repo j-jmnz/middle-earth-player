@@ -9,6 +9,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { flagged, livingSeats, updateCard, withSeat } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { headOf, mirrorActive, parkedStage, sharedStaging } from "./areas.ts";
+import { noteBypassedStage } from "../quest/branch.ts";
 
 // The quest deck's card with the printed code.
 function inDeck(state: ScenarioState, code: string): string | undefined {
@@ -65,7 +66,7 @@ export function splitOff(state: ScenarioState, code: string, seat: number, keepA
   const left = leaveShared(state, seat, keepActive);
   const placed = mirrorActive(updateCard(moveCard(left, id, { zone: "questStage", seat }), id, { face: "B", controller: seat, progress: 0 }));
   // The stage it left is not defeated: it stays in play for the others, so no "when this stage is defeated" effect hears the advance (emce.bypassing).
-  return { state: shared ? { ...placed, stageLeft: { to: id, from: shared, bypassed: true } } : placed, stageId: id };
+  return { state: shared ? noteBypassedStage(placed, id, shared) : placed, stageId: id };
 }
 
 // Every living seat shares one area (`head` holds it): the stage, the staging cards and the active location are the shared ones again and the ordinary code runs.

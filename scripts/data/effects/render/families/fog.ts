@@ -13,8 +13,8 @@ export const FOG_TEMPLATES: Readonly<Record<string, (i: Obj) => Made>> = {
     read: ["code"],
   }),
   AdvanceToStage: (i) => ({
-    text: `the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code ${str(i.code)} becomes the stage, side B up with no progress, its When Revealed effects resolving${i.again === true ? "; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it" : ""} (nothing when no such card is there)`,
-    read: ["code", "again"],
+    text: `the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code ${str(i.code)} becomes the stage, side B up with no progress, its When Revealed effects resolving${i.again === true ? "; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it" : ""} (nothing when no such card is there)${i.bypassed === true ? "; the stage left is not defeated: no 'after a quest card is defeated' effect hears it, and its attachments are not told their host was defeated" : ""}`,
+    read: ["code", "again", "bypassed"],
   }),
   CancelRevealed: () => ({ text: "the effects of the location the event is about, just revealed, are canceled and it goes to the encounter discard pile instead of staying in the staging area; the reveal is over (no other card is revealed in its place)", read: [] }),
 };
@@ -34,7 +34,7 @@ export const FOG_SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   SplitToOwnStage: [{ verb: "SplitToOwnStage", code: "148004" }, { verb: "SplitToOwnStage", code: "132069", keepActive: true }],
   ReturnToSharedStage: [{ verb: "ReturnToSharedStage", code: "148003" }],
   CancelRevealed: [{ verb: "CancelRevealed" }],
-  AdvanceToStage: [{ verb: "AdvanceToStage", code: "142067" }, { verb: "AdvanceToStage", code: "50903", again: true }],
+  AdvanceToStage: [{ verb: "AdvanceToStage", code: "142067" }, { verb: "AdvanceToStage", code: "50903", again: true }, { verb: "AdvanceToStage", code: "07067", again: true, bypassed: true }],
 };
 
 export const FOG_CONDITION_SAMPLES: Readonly<Record<string, readonly Obj[]>> = {

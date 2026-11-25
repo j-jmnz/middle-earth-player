@@ -20,7 +20,7 @@ import { manifest as catalog } from "../../../catalog/families/breaking.ts";
 import { areaOf, mergeView, sharing, viewOf } from "./areas.ts";
 import { returnToSharedStage, splitOff } from "./barrow.ts";
 import { allAtStageHolds, eventFrozen } from "./conditions.ts";
-import { noteSkippedStage, questCardDefeatedHeard } from "../quest/branch.ts";
+import { noteBypassedStage, noteSkippedStage, questCardDefeatedHeard } from "../quest/branch.ts";
 import { addTableModifier } from "../encounter/index.ts";
 import { runCards } from "./cards.ts";
 import { ringBearerId } from "../burden/deck.ts";
@@ -66,7 +66,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 const WHOLE_STATE_VERBS = catalog.verbs.map((schema) => schema.shape.verb.value).filter((verb) => verb !== "AdvanceToStage");
 
 // AdvanceToStage ("advance to stage 4A", 142063:B:2): runs on the acting seat's view, so the stage is that seat's. The stage left is defeated (its attachments are
-// released, rr.attachment-cards) and set aside, the new stage is side B up with no progress, and its When Revealed effects are pushed as frames for the seat.
+// released, rr.attachment-cards, and hear that their host was defeated) and set aside; with `bypassed` it is not defeated, so its attachments are released without that announcement (emce.bypassing). The new stage is side B up with no progress, and its When Revealed effects are pushed as frames for the seat.
 export function advanceToStage(state: ScenarioState, code: string, ctx: ReduceContext, steps: EngineStep[], again = false, bypassed = false): ScenarioState {
   // With `again`, a stage the quest already left lies set aside and may come back to (Attack on Dol Guldur's four stage 3s), with no tokens left on it.
   const fromDeck = state.questDeck.find((id) => state.cards[id]?.code === code);
@@ -77,7 +77,7 @@ export function advanceToStage(state: ScenarioState, code: string, ctx: ReduceCo
   let next = state;
   const currentId = state.questStage;
   if (currentId && state.cards[currentId]) {
-    next = releaseAttachments(noteHostDefeated(next, currentId), currentId, ctx.cards, steps);
+    next = releaseAttachments(bypassed ? next : noteHostDefeated(next, currentId), currentId, ctx.cards, steps);
     next = moveCard(next, currentId, { zone: "setAside" });
   }
   // The seat controls its own stage once stages are separate: the Forced effects and Responses of a stage are about its own seat (mec109.multiple-staging-areas).
@@ -85,7 +85,7 @@ export function advanceToStage(state: ScenarioState, code: string, ctx: ReduceCo
   steps.push({ kind: "advance", cardId: nextId });
   // Only a game with a card that hears "after a quest card is defeated" keeps the stage it left (Lost in Mirkwood's letters), so every other game's state stays as it was.
   // `bypassed`: the stage was left by an effect, not defeated, so nothing that hears a defeat is told (stageLeft `bypassed`).
-  if (currentId && bypassed) next = { ...next, stageLeft: { to: nextId, from: currentId, bypassed: true } };
+  if (currentId && bypassed) next = noteBypassedStage(next, nextId, currentId);
   else if (currentId && questCardDefeatedHeard(next, ctx)) next = noteSkippedStage(next, nextId, currentId);
   return afterProgress(next, before, ctx, steps);
 }

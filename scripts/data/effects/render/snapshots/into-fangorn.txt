@@ -56,7 +56,7 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the current quest card has progress on it): remove 1 progress from the active location
-    - then, if the current quest card has progress on it (checked when this step runs, after the steps above; not tied to whether they did anything): remove 1 progress from the current quest card (all of it when it holds less)
+    - then, if the current quest card has progress on it (checked when this step runs, after the steps above; not tied to whether they did anything): remove 1 progress from the main quest (all of it when it holds less)
 
 07033:A:2 (front): Forced: At the beginning of each resource phase, the engaged player must raise his threat by 2.
   07033:forced:2: Forced when a phase begins
@@ -81,7 +81,7 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the current quest card has progress on it): remove 1 progress from the active location
-    - then, if the current quest card has progress on it (checked when this step runs, after the steps above; not tied to whether they did anything): remove 1 progress from the current quest card (all of it when it holds less)
+    - then, if the current quest card has progress on it (checked when this step runs, after the steps above; not tied to whether they did anything): remove 1 progress from the main quest (all of it when it holds less)
 
 07034:A:2 (front): Forced: At the beginning of each resource phase, Angry Huorn attacks the engaged player.
   07034:forced:2: Forced when a phase begins
@@ -105,7 +105,7 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the current quest card has progress on it): remove 1 progress from the active location
-    - then, if the current quest card has progress on it (checked when this step runs, after the steps above; not tied to whether they did anything): remove 1 progress from the current quest card (all of it when it holds less)
+    - then, if the current quest card has progress on it (checked when this step runs, after the steps above; not tied to whether they did anything): remove 1 progress from the main quest (all of it when it holds less)
 
 07035:A:2 (front): Forced: At the beginning of each resource phase, the engaged player must deal 3 damage to a character he controls.
   07035:forced:2: Forced when a phase begins
@@ -172,6 +172,7 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
 
 07052:A:1 (front): When Revealed: Either remove 1 time counter from a card in play, or return the active location to the staging area.
   07052:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "time" (only if 0 is less than resources of the current quest stage):
         - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
@@ -262,7 +263,7 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
     - then, if there is a card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not
     - then, if there is a card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is shuffled into the encounter deck
     - then, if a copy of the card with code 07031 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game) (checked when this step runs, after the steps above; not tied to whether they did anything): one out-of-play copy of the card with code 07031 (set aside, in the encounter discard pile, in the victory display or under a card) joins the encounter deck, which is shuffled (when copies are out of play in more than one zone the first player chooses which; nothing with no copy left)
-    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 07067 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there) [also {"bypassed":true}]
+    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 07067 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there); the stage left is not defeated: no 'after a quest card is defeated' effect hears it, and its attachments are not told their host was defeated
 
 07065:B:3 (back): The players cannot advance to stage 2 unless Mugash is attached to a hero.
   07065:constant:2: Constant
@@ -291,7 +292,7 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
     - then, if there is a card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not
     - then, if there is a card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is shuffled into the encounter deck
     - then, if a copy of the card with code 07031 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game) (checked when this step runs, after the steps above; not tied to whether they did anything): one out-of-play copy of the card with code 07031 (set aside, in the encounter discard pile, in the victory display or under a card) joins the encounter deck, which is shuffled (when copies are out of play in more than one zone the first player chooses which; nothing with no copy left)
-    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 07067 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there) [also {"bypassed":true}]
+    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 07067 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there); the stage left is not defeated: no 'after a quest card is defeated' effect hears it, and its attachments are not told their host was defeated
 
 07066:B:3 (back): The players cannot defeat this stage unless Mugash is attached to a hero.
   07066:constant:2: Constant
@@ -325,6 +326,6 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
   07067:forced:2: Forced on the event progressPlaced (heard about this card)
     only if all of: (5 is less than progress of this card) and (there is a hero (any player controls) with an attachment named "Mugash" to choose)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 07066 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there) [also {"bypassed":true}]
+    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 07066 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there); the stage left is not defeated: no 'after a quest card is defeated' effect hears it, and its attachments are not told their host was defeated
 
-(rendered pieces: 248 by template, 3 as JSON)
+(rendered pieces: 251 by template, 0 as JSON)

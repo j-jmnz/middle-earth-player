@@ -8,6 +8,7 @@ import { placeDamage } from "../../../rules/core/damage.ts";
 import { destroyCard } from "../../../rules/core/keywords.ts";
 import { updateCard } from "../../../rules/core/state.ts";
 import { moveEncounter } from "../../../rules/families/encounter/moves.ts";
+import { advanceToStage } from "../../../rules/families/breaking/index.ts";
 import { timeOnReveal } from "../../../rules/families/angmar/time.ts";
 import { drive, finish, idOf, opened, resolveRecords, revealedTop, run, tableFromLayout, zoneOf, type Layout } from "../../../../test/harness/scene-kit.ts";
 
@@ -108,7 +109,7 @@ describe("Mugash and the quest stages (07031, 07065 to 07067)", () => {
     expect([zoneOf(done, DARK), zoneOf(done, ANGRY)]).toEqual(["staging", "staging"]);
   });
 
-  it("07065:B:3 no progress is placed on the stage without Mugash on a hero, and 07066:B:3 the second stage cannot be defeated either, the progress staying on it", () => {
+  it("07065:B:3 stage 1 does not advance without Mugash on a hero and does with him, and 07066:B:3 stage 2 cannot be defeated without him, the progress staying on it", () => {
     const first = table({ stage: STAGE_1, phase: "Quest", progress: 8 });
     const stalled = run(first, first.state, { verb: "PlaceQuestProgress", perPlayer: 3 });
     expect(stalled.cards[stalled.questStage ?? ""]?.code).toBe(STAGE_1);
@@ -128,17 +129,18 @@ describe("Mugash and the quest stages (07031, 07065 to 07067)", () => {
     expect(done.stageLeft?.bypassed).toBe(true);
   });
 
-  it("07066:B:4 defeating stage 2 by progress with Mugash on a hero still wins once the jumps are bypasses", () => {
-    const t = table({ stage: STAGE_2, phase: "Quest", progress: 11, attached: [onHero] });
-    const done = run(t, t.state, { verb: "PlaceQuestProgress", perPlayer: 3 });
-    expect(done.stageCleared).toBe(true);
-  });
-
-  it("07066:B:4 defeating the second stage wins the game, and does not advance to stage 3", () => {
+  it("07066:B:4 defeating stage 2 by progress with Mugash on a hero wins the game and does not advance to stage 3", () => {
     const t = table({ stage: STAGE_2, phase: "Quest", progress: 11, attached: [onHero] });
     const done = run(t, t.state, { verb: "PlaceQuestProgress", perPlayer: 3 });
     expect(done.stageCleared).toBe(true);
     expect(done.cards[done.questStage ?? ""]?.code).toBe(STAGE_2);
+  });
+
+  it("07066:B:2 a bypassed stage is not defeated: a card attached to it hears no hostDefeated, where a defeated stage's attachment does", () => {
+    const t = table({ stage: STAGE_2, phase: "Quest", staging: [MUGASH], deck: ["f0", "f0"], attached: [{ code: FOREST, to: STAGE_2 }] });
+    const heard = (bypassed: boolean) => advanceToStage(t.state, STAGE_3, t.ctx, [], true, bypassed).pendingEvents?.filter((event) => event.trigger === "hostDefeated") ?? [];
+    expect(heard(false)).toHaveLength(1);
+    expect(heard(true)).toHaveLength(0);
   });
 });
 
