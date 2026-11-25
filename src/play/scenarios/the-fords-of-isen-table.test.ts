@@ -71,10 +71,10 @@ describe("Gríma in the preview", () => {
     const attached = [{ code: GRIMA, to: ISLET, encounter: true as const }];
     const staged = built({ staging: [ISLET], attached });
     expect(zoneSelector("staging", 0)(staged.state).entries.map((entry) => [entry.card.code, entry.attached.map((card) => card.code)])).toEqual([[ISLET, [GRIMA]]]);
-    expect(slotNumbers(staged.state, staged.ctx, idOf(staged.state, ISLET)).under).toMatchObject({ text: "1 held", speech: "Gríma held underneath" });
+    expect(slotNumbers(staged.state, staged.ctx, idOf(staged.state, ISLET)).under).toMatchObject({ text: "Gríma", speech: "Gríma held underneath" });
     const active = built({ active: ISLET, attached });
     expect(zoneSelector("activeLocation", 0)(active.state).entries.map((entry) => [entry.card.code, entry.attached.map((card) => card.code)])).toEqual([[ISLET, [GRIMA]]]);
-    expect(slotNumbers(active.state, active.ctx, idOf(active.state, ISLET)).under?.text).toBe("1 held");
+    expect(slotNumbers(active.state, active.ctx, idOf(active.state, ISLET)).under?.text).toBe("Gríma");
   });
 
   it("07016:A:1 free in the staging area, then in the first player's play area, solo and two-handed", () => {

@@ -10,7 +10,7 @@ const LAST: Record<string, string> = {
   "07060": "With the last gone, each player assigns damage for each card in his hand, and 2 time counters return.",
   "07061": "With the last gone, cards from the top of the encounter deck are discarded, each enemy among them joins the staging area, and 3 time counters return.",
   "07063": "With the last gone, the encounter discard pile joins the deck, 2 encounter cards are revealed for each player, and 2 time counters return.",
-  "07064": "With the last gone, Mugash returns to the staging area, 1 encounter card fewer than the players is revealed, and 3 time counters return.",
+  "07064": "With the last gone, Mugash returns to the staging area, the players reveal 1 encounter card for each player after the first, and 3 time counters return.",
 };
 
 /** The note of the stage's time dial: the counters left, the refresh phase that takes one and what the last one does. */
@@ -46,3 +46,6 @@ export function ringMakerWords(instruction: Instruction): string | null {
       return null;
   }
 }
+
+/** The pill of a captive held under a card (Mugash under his hero, Gríma under The Islet): it names the captive, as the card's own strip does, in place of a count; the reader hears "Mugash held underneath". */
+export const heldByName = (names: readonly string[]): { text: string; loses: boolean; speech: string } => ({ text: names.join(" · "), loses: false, speech: `${names.join(" and ")} held underneath` });

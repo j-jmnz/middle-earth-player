@@ -70,7 +70,7 @@ describe("Mugash held under his hero", () => {
 
   it("07024:A:2 the hero wears the held pill with Mugash's name; a free Mugash and another hero have none", () => {
     const made = built({ ...MUGASH_ON_HERO });
-    expect(slotNumbers(made.state, made.ctx, idOf(made.state, "dh1")).under).toMatchObject({ text: "1 held", speech: "Mugash held underneath" });
+    expect(slotNumbers(made.state, made.ctx, idOf(made.state, "dh1")).under).toMatchObject({ text: "Mugash", speech: "Mugash held underneath" });
     expect(slotNumbers(made.state, made.ctx, idOf(made.state, "dh2")).under).toBeNull();
     const staged = built({ staging: [MUGASH] });
     expect(detail(staged, MUGASH)).toBeNull();
@@ -81,7 +81,7 @@ describe("Mugash held under his hero", () => {
     const heroes = zoneSelector("play", 0)(made.state).entries;
     expect(heroes.find((entry) => entry.card.code === "dh1")?.attached.map((card) => card.code)).toEqual([MUGASH]);
     const exhausted = updateCard(made.state, idOf(made.state, "dh1"), { exhausted: true });
-    expect(slotNumbers(exhausted, made.ctx, idOf(exhausted, "dh1")).under?.text).toBe("1 held");
+    expect(slotNumbers(exhausted, made.ctx, idOf(exhausted, "dh1")).under?.text).toBe("Mugash");
   });
 });
 
@@ -139,7 +139,7 @@ describe("choices that can destroy the hero that holds Mugash", () => {
   const damageRow = (made: Made) => sheetsOf(made, "07055", "whenRevealed", () => "damage")[0]?.rows.find((row) => row.id === "damage");
 
   it("07055:A:2 Take Cover!'s damage row warns when the hero that holds Mugash has 1 hit point left, and not before", () => {
-    expect(damageRow(holder({}, 5))?.caution).toBe("Tap again: the damage destroys the hero that holds Mugash and the players lose the game");
+    expect(damageRow(holder({}, 5))?.caution).toBe("Tap again: the damage destroys the hero that holds Mugash and the players lose the game.");
     expect(damageRow(holder({}, 4))?.caution).toBeUndefined();
     expect(damageRow(holder({}, 5))?.label).toBe("Deal 1 damage to each exhausted character");
   });
@@ -148,7 +148,7 @@ describe("choices that can destroy the hero that holds Mugash", () => {
     const at = (damage: number) => sheetsOf(holder({}, damage), "07038", "forced", (n, ids) => (n === 0 ? "damage" : (ids[0] ?? "")));
     const rows = (damage: number) => at(damage).at(-1)?.rows ?? [];
     expect(at(3)[0]?.rows.map((row) => row.label)).toEqual(["Deal 3 damage to a character you control", "Remove 1 time counter from the current quest (2 left, 1 after)"]);
-    expect(rows(3).find((row) => row.label === "dh1")?.caution).toBe("Tap again: dh1 holds Mugash, the damage destroys it and the players lose the game");
+    expect(rows(3).find((row) => row.label === "dh1")?.caution).toBe("Tap again: dh1 holds Mugash, the damage destroys it and the players lose the game.");
     expect(rows(3).filter((row) => row.caution != null)).toHaveLength(1);
     expect(rows(2).some((row) => row.caution != null)).toBe(false);
   });
@@ -176,7 +176,7 @@ describe("the search of the out-of-play deck", () => {
 
   it("07027:A:2 the sheet says what a search of the player's own deck does, and lists the revealed cards that are no enemy", () => {
     const sheet = sheetOf(search({ piles: { outOfPlay0: ["f0", "ally", "filler", "event"] } }));
-    expect(sheet).toMatchObject({ kind: "pick", verb: "Take", note: "You revealed the top 3 cards of your out-of-play deck. Enemies join the staging area. Choose 1 other card for your hand. The rest are discarded." });
+    expect(sheet).toMatchObject({ kind: "pick", verb: "Take", note: "Methedras explored: you revealed the top 3 cards of your out-of-play deck. Enemies join the staging area. Choose 1 other card for your hand. The rest are discarded." });
     expect((sheet as { options: readonly PickOption[] }).options.map((option) => option.label)).toEqual(["ally", "filler"]);
   });
 
@@ -184,6 +184,6 @@ describe("the search of the out-of-play deck", () => {
     const found = search({ seats: 2, active: "07028", piles: { outOfPlay0: ["ally", "filler", "event", "filler", "f0", "filler"], outOfPlay1: ["ally"] } });
     const sheet = sheetOf(found);
     expect(sheet).toMatchObject({ kind: "pick", verb: "Take" });
-    expect(String((sheet as { note?: string }).note)).toMatch(/^Player 1: You revealed the top 5 cards of your out-of-play deck\./);
+    expect(String((sheet as { note?: string }).note)).toMatch(/^Player 1: Orc Cave explored: you revealed the top 5 cards of your out-of-play deck\./);
   });
 });

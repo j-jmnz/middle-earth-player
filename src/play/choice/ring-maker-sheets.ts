@@ -12,7 +12,7 @@ const LAST_COUNTER: Record<string, string> = {
   "07060": "each player assigns damage for each card in his hand, and 2 time counters return.",
   "07061": "cards from the top of the encounter deck are discarded, each enemy among them joins the staging area, and 3 time counters return.",
   "07063": "the encounter discard pile joins the deck, 2 encounter cards are revealed for each player, and 2 time counters return.",
-  "07064": "Mugash returns to the staging area, 1 encounter card fewer than the players is revealed, and 3 time counters return.",
+  "07064": "Mugash returns to the staging area, the players reveal 1 encounter card for each player after the first, and 3 time counters return.",
 };
 
 // Whether this Choose has the row that takes a time counter off the current quest.
