@@ -94,6 +94,7 @@ import * as assault from "../scenarios/assault-on-osgiliath/game.ts";
 import * as blood from "../scenarios/the-blood-of-gondor/game.ts";
 import * as vale from "../scenarios/the-morgul-vale/game.ts";
 import * as isen from "../scenarios/the-fords-of-isen/game.ts";
+// import * as orc from "../scenarios/to-catch-an-orc/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -214,4 +215,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-mines-of-moria", "The Mines of Moria", mines.MINES_GOLDENS, mines.minesWorld, mines.playGolden),
   entry("escape-from-khazad-dum", "Escape from Khazad-dûm", khazad.KHAZAD_GOLDENS, khazad.khazadWorld, khazad.playGolden),
   entry("the-hunt-for-the-dreadnaught", "The Hunt for the Dreadnaught", dreadnaught.DREADNAUGHT_GOLDENS, dreadnaught.dreadnaughtWorld, dreadnaught.playGolden),
+  // entry("to-catch-an-orc", "To Catch an Orc", orc.ORC_GOLDENS, orc.orcWorld, orc.playGolden),
 ];
