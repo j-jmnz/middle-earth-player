@@ -79,12 +79,15 @@ function watchErrors(show: (text: string) => void): void {
  * What the page did in a second beside drawing frames, by name: the milliseconds it took and how many times it ran. `raf` is the animation frame callbacks (the
  * animations and the canvases' drawing), `draw` Skia's recording of the canvases' scenes (watchDraws), `db` the page's waits on the database worker, `save` the
  * copies of the saves to storage, `audio` the audio players' blessing and making, `tap` the taps (their count; no time), `img` the pictures the browser decoded
- * (the time each took off the page), `tex` the pictures handed to the graphics chip, and `shader` the drawing programs it compiled and linked (watchGraphics).
+ * (the time each took off the page), `tex` the whole pictures handed to the graphics chip and `texpx` their size in thousands of pixels (in place of a time), `sub`
+ * the parts of a picture handed over (the letters' atlas), and `shader` the drawing programs it compiled and linked (watchGraphics). `busy` is how long the page's
+ * own thread was held, whatever held it: the sum of the waits over 12 ms between one message and the next of a channel that answers itself (watchBusy). A second
+ * with a low frame rate and no `busy` was slowed by the browser or the graphics chip, not by the page's script.
  */
 export type Work = Partial<Record<SpanName, readonly [ms: number, count: number]>>;
 
 /** The order the log prints the work in. */
-export const SPAN_ORDER: readonly SpanName[] = ["raf", "draw", "db", "save", "audio", "tap", "img", "tex", "shader"];
+export const SPAN_ORDER: readonly SpanName[] = ["busy", "raf", "draw", "db", "save", "audio", "tap", "img", "tex", "texpx", "sub", "shader"];
 
 /**
  * One second of the meter: its frame rate, its longest frame, how many of its frames took over two frames' time, how long its frames ran late in all (`late`: what
@@ -199,6 +202,35 @@ function timeMethod(owner: object | undefined, method: string, name: SpanName): 
   };
 }
 
+// The size of each whole picture handed to the graphics chip, in thousands of pixels: the call's width and height when it names them, else its source's.
+function sizeUploads(owner: object | undefined): void {
+  const original = (owner as Record<string, unknown> | undefined)?.["texImage2D"];
+  if (!owner || typeof original !== "function") return;
+  (owner as Record<string, unknown>)["texImage2D"] = function sized(this: unknown, ...args: unknown[]) {
+    const source = args[args.length - 1] as { width?: number; height?: number; videoWidth?: number } | null;
+    const named = args.length >= 9 && typeof args[3] === "number" && typeof args[4] === "number";
+    const pixels = named ? (args[3] as number) * (args[4] as number) : (source?.width ?? 0) * (source?.height ?? 0);
+    note("texpx", pixels / 1000);
+    return (original as (...rest: unknown[]) => unknown).apply(this, args);
+  };
+}
+
+// How long the page's thread was held: a message channel answers itself, and a wait over BUSY_MS between two answers is time something held the thread.
+const BUSY_MS = 12;
+
+function watchBusy(): void {
+  const channel = new MessageChannel();
+  let last = performance.now();
+  channel.port1.onmessage = () => {
+    const now = performance.now();
+    if (now - last > BUSY_MS) note("busy", now - last);
+    last = now;
+    // One answer a millisecond is enough, and leaves the thread to the page.
+    setTimeout(() => channel.port2.postMessage(0), 1);
+  };
+  channel.port2.postMessage(0);
+}
+
 // The graphics side of a slow second: each picture the browser decodes for the table (createImageBitmap, timed to its answer), each picture handed to the
 // graphics chip (texImage2D, texSubImage2D) and each drawing program compiled or linked, on either WebGL context.
 function watchGraphics(): void {
@@ -217,7 +249,8 @@ function watchGraphics(): void {
   const contexts = window as { WebGL2RenderingContext?: { prototype: object }; WebGLRenderingContext?: { prototype: object } };
   for (const context of [contexts.WebGL2RenderingContext?.prototype, contexts.WebGLRenderingContext?.prototype]) {
     timeMethod(context, "texImage2D", "tex");
-    timeMethod(context, "texSubImage2D", "tex");
+    sizeUploads(context);
+    timeMethod(context, "texSubImage2D", "sub");
     timeMethod(context, "compileShader", "shader");
     timeMethod(context, "linkProgram", "shader");
   }
@@ -250,6 +283,7 @@ function sender(): (log: readonly Second[], fault: string) => void {
 function startMeter(): void {
   watchFrames();
   watchGraphics();
+  watchBusy();
   onSpan((name, ms, bytes) => {
     note(name, ms);
     if (name === "save" && bytes !== undefined) savedBytes = bytes;
