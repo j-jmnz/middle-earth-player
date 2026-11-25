@@ -34,7 +34,6 @@ import { pickCandidates, seatsOf } from "../interpret/pick.ts";
 import { deckPool } from "../families/uncharted/pick.ts";
 import { aboutCard } from "../windows/listen.ts";
 import { placesPicked } from "../families/pelargir/progress-bar.ts";
-import { heldInHand } from "../families/ring-maker/hand.ts";
 import { leavesPlayPicked } from "../families/pelargir/vale/cannot-leave.ts";
 import { spendsLockedHost, spendsPicked } from "../families/pelargir/spending.ts";
 import { allIdle } from "./idle.ts";
@@ -112,16 +111,6 @@ function playerObjective(state: ScenarioState, sourceId: string, ctx: ReduceCont
   return source != null && source.controller != null && inPlay(source.zone) && printedOf(ctx.cards, source.code).type === "objective";
 }
 
-// A later Pick from the hand that feeds a move out of it (Gildor: swap with a card in the hand) finds only a card held there (Ill Tidings): the Action has no target (families/ring-maker/hand.ts).
-function laterHandPickEmpty(state: ScenarioState, steps: readonly Instruction[], seat: number, sourceId: string, ctx: ReduceContext): boolean {
-  if (state.modifiers.length === 0) return false;
-  return steps.some((step, index) => {
-    if (index === 0 || step.verb !== "Pick" || step.when || step.pick.from !== "hand" || !leavesPlayPicked(steps.slice(index + 1))) return false;
-    const all = pickCandidates(state, step.pick, seat, [], sourceId, ctx);
-    return all.length > 0 && all.every((id) => heldInHand(state, id));
-  });
-}
-
 /** Why a Trigger of a player card's Action or Response cannot change the game state, or null. `event` is the one a Response answers. */
 export function noChangeReason(state: ScenarioState, effect: Effect, sourceId: string, seat: number, ctx: ReduceContext, event?: GameEvent): string | null {
   if (effect.timing !== "action" && effect.timing !== "response") return null;
@@ -135,7 +124,6 @@ export function noChangeReason(state: ScenarioState, effect: Effect, sourceId: s
   const scope: AmountScope = { actor: seat, sourceId, subject: about ?? null, other: event?.other ?? null, ...(event?.participants ? { participants: event.participants } : {}) };
   // A spend from a locked host (Livery of the Tower) cannot pay: the effect is not offered (families/pelargir/spending.ts).
   if (spendsLockedHost(state, steps, hostOf(state, sourceId))) return NO_TARGET;
-  if (laterHandPickEmpty(state, steps, seat, sourceId, ctx)) return NO_TARGET;
   if (first.verb !== "Pick") return allIdle(state, steps, sourceId, seat, ctx, scope, { eventSeat: event?.seat ?? undefined }) ? IDLE : null;
   const pick = first.pick;
   // A search of a deck with no card in it finds nothing and shuffles nothing; with cards in it, it may find none and still shuffle (rr.search).

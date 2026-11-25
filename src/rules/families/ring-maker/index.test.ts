@@ -8,10 +8,11 @@ import { destroyCard } from "../../core/keywords.ts";
 import { moveCard } from "../../core/zones.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
-import { leavesPlayPicked } from "../pelargir/vale/cannot-leave.ts";
+import { leavesPlayPicked, leavesPlayPickedInEach } from "../pelargir/vale/cannot-leave.ts";
 import { discardRandom } from "../../interpret/verbs.ts";
 import { settle } from "../../engine/machine.ts";
 import { EFFECTS } from "../../../effects/index.ts";
+import { reduce } from "../../engine/reduce.ts";
 import { noChangeReason } from "../../player/potential.ts";
 import { mayGainResources } from "../misc/guards.ts";
 import { idOf, resolveRecords, revealedTop, run, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
@@ -85,7 +86,7 @@ describe("Ill Tidings in a hand (07023:A:1)", () => {
 
   // Dúnedain Pipe (17088:action:1) puts a hand card on the deck, Gildor Inglorion (02079:action:1) swaps one with the deck, Message from Elrond (08032:action:1) gives one: none offers Ill Tidings.
   it("07023:A:1 a pick that feeds a move out of the hand leaves it out, and an Action whose only target it is is not offered", () => {
-    const lone = tableFromLayout(SCENARIO, { hand: [], play: ["02079"], deck: ["07042", "07043", "07044"] }, { extra: ["02079", "17088", "08032"] });
+    const lone = tableFromLayout(SCENARIO, { hand: [], play: ["02079", "142009"], deck: ["07042", "07043", "07044"] }, { extra: ["02079", "17088", "08032", "142009"] });
     const state = revealedTop(lone, ILL_TIDINGS);
     const id = idOf(state, ILL_TIDINGS);
     expect(state.seats[0]?.hand).toEqual([id]);
@@ -97,11 +98,22 @@ describe("Ill Tidings in a hand (07023:A:1)", () => {
     expect(from(pipe.instructions.slice(1))).not.toContain(id);
     expect(from([])).toContain(id);
     const gildor = ofRecord("02079:action:1");
-    expect(noChangeReason(state, gildor, idOf(state, "02079"), 0, lone.ctx)).not.toBeNull();
+    // Gildor still looks at and arranges the top 3, so an empty swap pick does not refuse the Action; the pick filter alone keeps Ill Tidings in the hand.
+    expect(noChangeReason(state, gildor, idOf(state, "02079"), 0, lone.ctx)).toBeNull();
+    const swap = gildor.instructions[2];
+    if (swap?.verb !== "Pick") throw new Error("Gildor picks from the hand second");
+    expect(pickCandidates(state, swap.pick, 0, [], null, lone.ctx, undefined, undefined, false, { leaves: leavesPlayPicked(gildor.instructions.slice(3)) })).toEqual([]);
+    expect(state.seats[0]?.hand).toEqual([id]);
+    // Wizard Pipe (142009:action:1) exchanges a hand card with the deck top: with Ill Tidings the only hand card the Action is refused.
+    const wizard = ofRecord("142009:action:1");
+    expect(noChangeReason(state, wizard, idOf(state, "142009"), 0, lone.ctx)).not.toBeNull();
+    const fired = reduce(state, { type: "Trigger", cardId: idOf(state, "142009"), effectId: "142009:action:1" }, lone.ctx);
+    expect(fired.ok ? fired.state.seats[0]?.hand : null).toBeNull();
+    expect(state.seats[0]?.hand).toEqual([id]);
     const message = ofRecord("08032:action:1");
     const each = message.instructions[2];
     if (each?.verb !== "Each") throw new Error("Message from Elrond gives with an Each");
-    expect(pickCandidates(state, each.pick, 0, [], null, lone.ctx, undefined, undefined, false, { leaves: leavesPlayPicked(each.instructions, true) })).not.toContain(id);
+    expect(pickCandidates(state, each.pick, 0, [], null, lone.ctx, undefined, undefined, false, { leaves: leavesPlayPickedInEach(each.instructions) })).not.toContain(id);
   });
 
   it("an eliminated player's hand leaves with the player", () => {

@@ -1,6 +1,6 @@
 // Rules: rr.cannot, rr.reveal, rr.drawing-cards (data/rules/entries.json); ledger line 07023:A:1.
-// Ill Tidings: a revealed treachery that goes into the first player's hand and cannot leave it. The move is no draw, so no card hears a draw. Three places keep it there: core/zones.ts moveCard refuses a move out of the hand while `heldInHand`, and the picks that
-// discard from a hand and the random discard leave the card out (families/wilderland/pick.ts barredFromPlayerDiscard asks here).
+// Ill Tidings: a revealed treachery that goes into the first player's hand and cannot leave it. The move is no draw, so no card hears a draw. Four places keep it there: core/zones.ts moveCard refuses a move out of the hand while `heldInHand`; the picks that
+// discard from a hand and the random discard leave the card out (families/wilderland/pick.ts barredFromPlayerDiscard asks here); and a Pick that feeds a verb moving the card out of the hand (`leavesHandPicked`, read through families/pelargir/vale/cannot-leave.ts) leaves it out, so an Action with no other target is not offered.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { addModifier } from "../../core/modified-stat.ts";
@@ -15,6 +15,12 @@ export function heldInHand(state: ScenarioState, id: string): boolean {
   const card = state.cards[id];
   if (!card || card.zone !== "hand" || !flagged(state, id, "cannotLeaveHand")) return false;
   return card.controller == null || !state.seats[card.controller]?.eliminated;
+}
+
+/** Whether the instruction takes the picked card out of a hand to another place, player or deck (a card that holds `cannotLeaveHand` is no target for it). A conditional instruction is not read. */
+export function leavesHandPicked(instruction: Instruction): boolean {
+  if ("when" in instruction && instruction.when) return false;
+  return instruction.verb === "SwapPicked" || instruction.verb === "GivePicked" || instruction.verb === "MovePicked" || instruction.verb === "ExchangeWithDeckTop";
 }
 
 /** DrawSelfIntoHand: the source goes into the hand of the acting seat and holds `cannotLeaveHand` from then on. A source that is no longer in the staging area (canceled and discarded) goes nowhere. */
