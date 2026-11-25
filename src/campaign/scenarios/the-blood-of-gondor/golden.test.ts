@@ -251,10 +251,15 @@ describe("The Blood of Gondor golden", () => {
           const played = game(entry);
           const steps = stepsByIntent(played, world(entry).ctx);
           steps.forEach((list, at) => {
-            const text = list.map((step) => JSON.stringify(step)).join("\n");
-            // A card revealed or turned faceup in the intent was seen: when the deck runs out in the same staging step it is shuffled back and may be taken at once (Lying in Wait revealed, then Mordor Looms of the next seat takes it), and its own reveal steps name it.
-            const seen = new Set(list.filter((step) => step.kind === "reveal" || (step.kind === "push" && step.frame === "whenRevealed")).map((step) => (step as { cardId: string }).cardId));
-            for (const id of hiddenIds(played.trail?.[at] as ScenarioState)) if (!seen.has(id)) expect(text.includes(`"${id}"`), `${entry.name} intent ${at}`).toBe(false);
+            // A card revealed in the intent was seen until the reset that shuffles the discard pile back into the deck: when the deck runs out in the staging step, a card just revealed (Lying in Wait) is shuffled back and the next seat's Mordor Looms may take it. From that reset on, a step that names the card without a new reveal gives away a card that lies facedown.
+            const seen = new Set<string>();
+            const hidden = hiddenIds(played.trail?.[at] as ScenarioState);
+            list.forEach((step, index) => {
+              if (step.kind === "resetEncounterDeck") seen.clear();
+              if (step.kind === "reveal" || (step.kind === "push" && step.frame === "whenRevealed")) seen.add((step as { cardId: string }).cardId);
+              const text = JSON.stringify(step);
+              for (const id of hidden) if (!seen.has(id)) expect(text.includes(`"${id}"`), `${entry.name} intent ${at} step ${index}`).toBe(false);
+            });
           });
         }
       });
