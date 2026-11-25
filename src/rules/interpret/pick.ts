@@ -335,6 +335,13 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   return familyPickMatches(state, id, spec, at, ctx);
 }
 
+// A host the pick's `control` allows from the chooser's side: any, the chooser's own, or another player's. A card no player controls (a location) is no player's host.
+function hostControlFits(state: ScenarioState, id: string, control: PickSpec["control"], asking: number): boolean {
+  if (control === "any") return true;
+  const controller = state.cards[id]?.controller;
+  return controller != null && (control === "you") === (controller === asking);
+}
+
 // An attachment's host is of the type and controlled as the filter's `on` says, from the chooser's side.
 function onHost(state: ScenarioState, hostId: string | null, on: NonNullable<PickSpec["on"]>, asking: number, ctx: ReduceContext): boolean {
   const host = hostId ? state.cards[hostId] : undefined;
@@ -403,8 +410,8 @@ function candidatesOf(
   if (spec.type === "player") return seatsOf(state, spec, asking).filter((index) => !state.seats[index]?.eliminated && seatPickMatches(state, index, spec, ctx)).map((index) => `seat:${index}`);
   if (spec.hostForPicked) {
     const card = state.cards[picked.at(-1) ?? ""];
-    // An attachment already on a card moves to another one ("attach Dúnedain Warning to another hero", 02026:A:3).
-    return card ? attachmentHostIds(state, asking, card.code, ctx, { byEffect: true }).filter((id) => id !== card.host) : [];
+    // An attachment already on a card moves to another one ("attach Dúnedain Warning to another hero", 02026:A:3). The pick's own `control` says whose characters may take it (`you`, `other`, `any`), within the hosts the card's record allows (a card with none: the characters of every seat unless the pick says `you`).
+    return card ? attachmentHostIds(state, asking, card.code, ctx, { byEffect: true, anySeat: spec.control !== "you" }).filter((id) => id !== card.host && hostControlFits(state, id, spec.control, asking)) : [];
   }
   // Immunity is to player card effects: an encounter card's Pick may choose an immune card (mec109.immune-to-player-card-effects).
   // An ally with an encounter back is an encounter card and has encounter card effects (dcce.encounter-cards: the ship-objectives, the Modification attachments, Calaerion, Gavin, Send for Help). The Stormcaller Elite's objective allies have no encounter back (dcce.stormcaller-elite) and stay objectives.

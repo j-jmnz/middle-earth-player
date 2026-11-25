@@ -16,7 +16,7 @@ import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-pa
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, send, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, combat, passAll, type PlayerBase, playerTableFor, stat } from "../../../test/harness/player-table.ts";
+import { attacking, choices, combat, hosts, passAll, type PlayerBase, playerTableFor, stat } from "../../../test/harness/player-table.ts";
 
 const ANVIL = "12196";
 const AXE = "12197";
@@ -77,11 +77,14 @@ describe("Attach to a character (12196:A:1, 12197:A:1, 12198:A:1, 12200:A:1, 122
     ["12204:A:1", BOW],
   ] as const;
   for (const [line, code] of rows) {
-    lineSpec(line, "Attach to a character: any player's hero or ally, not an enemy", (effects) => {
+    lineSpec(line, "Attach to a character: any player's hero or ally, not an enemy; the hand play offers the same hosts", (effects) => {
       const { tab, run } = unguarded(effects, code, { seats: 2, heroes: [{ code: GIMLI, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: AXEHAND, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }] });
       expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, GIMLI), idsOf(tab, PAL), idsOf(tab, AXEHAND)].sort());
       const done = send(run, { type: "Choose", optionId: idsOf(tab, AXEHAND) }, tab.ctx);
       expect(done.state.cards[idsOf(tab, code)]).toMatchObject({ host: idsOf(tab, AXEHAND), controller: 0 });
+      // The hand play is what tests the line (without its record every character of the seat is offered, not every seat's): the same three hosts are offered when a player plays the treasure from the hand.
+      const held = table(effects, { seats: 2, heroes: [{ code: GIMLI, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: AXEHAND, seat: 0 }], hand: [{ code, seat: 0 }] });
+      expect(hosts(held, idsOf(held, code))).toEqual([idsOf(held, GIMLI), idsOf(held, PAL), idsOf(held, AXEHAND)].sort());
     });
   }
 });

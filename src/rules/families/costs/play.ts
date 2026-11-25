@@ -119,7 +119,7 @@ export function afterPlay(before: ScenarioState, state: ScenarioState, intent: P
   if (discount?.doomed) for (const index of livingSeats(next)) next = raiseThreat(next, index, discount.doomed, steps, ruleCause("rr.doomed-x"));
   // "Those allies cannot quest this round."
   if (discount?.cannotQuest && printed.type !== "event") next = addModifier(next, intent.cardId, discount.sourceId || intent.cardId, "cannotQuest", 1, "endOfRound");
-  if (playsOntoHost(printed) && intent.hostId) next = queueEvent(next, { trigger: "attached", seat, subject: intent.cardId, other: intent.hostId });
+  if (playsOntoHost(printed) && intent.hostId) next = queueEvent(next, { trigger: "attached", seat, subject: intent.cardId, other: intent.hostId, byPlay: true });
   // Characters exhausted for the cost not paid in resources (ExhaustToReduce).
   const rule = cardRules(before, intent.cardId, "ExhaustToReduce", ctx)[0];
   const owed = rule ? (playCost(before, intent.cardId, seat, ctx, intent.hostId ?? null) ?? 0) - paid.reduce((sum, payment) => sum + payment.amount, 0) : 0;

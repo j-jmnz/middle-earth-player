@@ -8,7 +8,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
 import { markShort } from "../../interpret/effect-verbs.ts";
-import { attachmentHostIds, enforceRestricted } from "../../player/attach.ts";
+import { attachmentHostIds, enforceRestricted, hostTakesControl } from "../../player/attach.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { askTarget, openBranch } from "../../windows/choices.ts";
 import type { EngineStep } from "../../core/intents.ts";
@@ -167,12 +167,14 @@ export function reattach(state: ScenarioState, instruction: Extract<Instruction,
   const movedId = instruction.card === "picked" ? lastPicked(state) : focus.sourceId;
   const source = movedId ? state.cards[movedId] : undefined;
   if (!source?.host) return state;
-  const options = attachmentHostIds(state, focus.seat, source.code, ctx, { byEffect: true }).filter((id) => id !== source.host);
+  // "Attach to another hero" / "move it to an eligible character" name no player, so a character of any seat may take it.
+  const options = attachmentHostIds(state, focus.seat, source.code, ctx, { byEffect: true, anySeat: true }).filter((id) => id !== source.host);
   const target = focus.chosen && options.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;
   if (!target) return options.length > 1 ? askTarget(state, { instruction, seat: focus.seat, chosen: null }, options) : state;
   const old = state.cards[source.host];
   let next = old ? updateCard(state, old.id, { attachments: old.attachments.filter((id) => id !== source.id) }) : state;
-  next = attachTo(updateCard(next, source.id, { host: null }), source.id, target);
-  next = queueEvent(next, { trigger: "attached", seat: source.controller, subject: source.id, other: target });
+  // The new host's controller controls it (rr.attachment-cards), as for an attachment AttachPicked moves.
+  next = hostTakesControl(attachTo(updateCard(next, source.id, { host: null }), source.id, target), source.id, ctx);
+  next = queueEvent(next, { trigger: "attached", seat: next.cards[source.id]?.controller ?? source.controller, subject: source.id, other: target });
   return enforceRestricted(next, target, ctx, steps);
 }
