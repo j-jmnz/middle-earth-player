@@ -57,7 +57,7 @@ import { effectsOf } from "../windows/listen.ts";
 import { engagesAgain, optionallyEngaged } from "../families/quest/engage.ts";
 import { noteOptionalEngage } from "../families/pelargir/optional-engage.ts";
 import { syncThreatSaves } from "../families/quest/threat.ts";
-import { eventWaits } from "../families/defense/listen.ts";
+import { attachedHearsHostDamage, eventWaits } from "../families/defense/listen.ts";
 import { announceShadowsDealt } from "../families/defense/shadow.ts";
 import { attackedEarly, earlyAttacks } from "../families/defense/order.ts";
 import { strikeResumes } from "../families/attack/flow.ts";
@@ -466,6 +466,6 @@ function undefendedHero(state: ScenarioState, heroId: string | undefined, ctx: R
 // Whether any card that could answer damage just dealt (a damageDealt Response or Forced effect) is in play or in a hand.
 function damageAnswerable(state: ScenarioState, ctx: ReduceContext): boolean {
   return Object.values(state.cards).some(
-    (card) => (inPlay(card.zone) || card.zone === "hand") && effectsOf(ctx, card.code).some((effect) => effect.trigger === "damageDealt"),
+    (card) => ((inPlay(card.zone) || card.zone === "hand") && effectsOf(ctx, card.code).some((effect) => effect.trigger === "damageDealt")) || attachedHearsHostDamage(state, card, ctx),
   );
 }

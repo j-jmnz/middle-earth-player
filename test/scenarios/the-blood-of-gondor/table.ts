@@ -3,10 +3,9 @@ import type { Effect } from "../../../src/catalog/boundary.ts";
 import { UNATTRIBUTED } from "../../../src/rules/core/cause.ts";
 import { placeDamage } from "../../../src/rules/core/keywords.ts";
 import type { ScenarioState } from "../../../src/rules/core/state.ts";
-import type { PlayerIntent } from "../../../src/rules/engine/reduce.ts";
 import { hiddenIds } from "../../../src/rules/families/pelargir/hidden.ts";
 
-import { engagedCodes, idOf, legalIntents, opened, PASSING, run, send, tableFromLayout, where, type Layout, type LayoutTable, type Run } from "../../harness/scene-kit.ts";
+import { drive, engagedCodes, idOf, legalIntents, opened, run, tableFromLayout, where, type Layout, type LayoutTable } from "../../harness/scene-kit.ts";
 
 export const SCENARIO = "the-blood-of-gondor";
 export const CODES = {
@@ -39,7 +38,7 @@ export const BOROMIR = "05002";
 export const table = (layout: Layout, effects?: readonly Effect[], extra?: readonly string[]): LayoutTable =>
   tableFromLayout(SCENARIO, { ...layout, stage: layout.stage ?? CODES.ambush }, { ...(effects ? { effects } : {}), ...(extra ? { extra } : {}) });
 
-export { engagedCodes, opened, run, where };
+export { drive, engagedCodes, opened, run, where };
 
 /** The seat takes `amount` hidden cards, by the family's own verb: the top cards of the encounter deck. */
 export const takes = (made: LayoutTable, state: ScenarioState, seat: number, amount = 1): ScenarioState => run(made, state, { verb: "TakeHiddenCard", amount }, { seat });
@@ -49,27 +48,6 @@ export const hiddenCodes = (state: ScenarioState, seat?: number): string[] => hi
 
 /** The id of the first card with this code, whatever its zone. */
 export const idByCode = (state: ScenarioState, code: string): string => Object.values(state.cards).find((card) => card.code === code)?.id ?? "";
-
-/** The game goes on until `stop` holds: every window is passed, a choice takes its first option (or the one `choose` names), an enemy to attack is the first offered. */
-export function drive(made: LayoutTable, from: Run, stop: (state: ScenarioState) => boolean, choose: (state: ScenarioState) => string = (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "")): Run {
-  let current = from;
-  for (let guard = 0; guard < 400 && !stop(current.state) && !current.state.lost && !current.state.stageCleared; guard += 1) {
-    const state = current.state;
-    if (state.window?.kind === "choose") {
-      current = send(current, { type: "Choose", optionId: choose(state) }, made.ctx);
-      continue;
-    }
-    if (state.window?.kind === "chooseEnemy") {
-      current = send(current, { type: "ChooseEnemy", enemyId: state.window.options[0] ?? "" }, made.ctx);
-      continue;
-    }
-    const intents = legalIntents(state, made.ctx);
-    const pass = PASSING.map((type) => intents.find((intent) => intent.type === type)).find((intent) => intent != null);
-    if (!pass) break;
-    current = send(current, pass as PlayerIntent, made.ctx);
-  }
-  return current;
-}
 
 /** The hero (or any card) of this code takes `amount` damage from the framework, as a heavy attack of an earlier round left it. */
 export const hurt = (made: LayoutTable, state: ScenarioState, code: string, amount: number): ScenarioState => ({ ...placeDamage({ ...state, window: null }, idOf(state, code), amount, made.ctx.cards, [], "framework", UNATTRIBUTED), window: state.window });

@@ -272,7 +272,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (!attachmentsPickMatches(state, id, spec, ctx, at.sourceId)) return false;
   // The uncharted family's filters: a Lost Island, progress enough (families/uncharted/pick.ts).
   if (!unchartedPickMatches(state, id, spec, ctx) || !aflamePickMatches(state, id, spec, ctx) || !sidePickMatches(state, id, spec)) return false;
-  if (spec.attachable != null && !attachmentHostIds(state, asking, spec.attachable, ctx, { byEffect: true }).includes(id)) return false;
+  if (spec.attachable != null && !attachmentHostIds(state, asking, spec.attachable, ctx, { byEffect: true, anySeat: spec.control === "any" }).includes(id)) return false;
   // The attack family's filters: printed keywords, the source's host, engaged with whom, a shared Trait, an attachment on the
   // event's card, printed hit points, the top of a discard pile (families/attack/pick.ts).
   if (!attackPickMatches(state, id, spec, at, ctx)) return false;

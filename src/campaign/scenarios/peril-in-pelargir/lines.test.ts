@@ -90,12 +90,12 @@ describe("05019 Alcaron's Scroll", () => {
     expect(state.cards[idOf(state, SCROLL)]?.host).toBe(table.hero);
   });
 
-  it("05019:A:2 as the engine runs it, lethal damage destroys the hero before the Forced: the Scroll goes to the staging area and not to the enemy (the printed order, the Scroll first, needs core/destroy.ts; reading in the scenario file, Engine notes)", () => {
+  it("05019:A:2 lethal damage: the Forced is heard while the hero is in play, so the Scroll attaches to the attacking enemy and then the hero is destroyed (scenario file, Readings, timing vs destruction)", () => {
     const hurt = (made: Layout): LayoutTable => scrollTable(made);
     const result = fightEnemy(hurt, "f0", THUG, {}, { tweak: (state, made) => updateCard(state, made.hero, { damage: 5 }) });
     const state = result.run.state;
     expect(state.cards[result.made.hero]?.zone).not.toBe("heroes");
-    expect(state.cards[idOf(state, SCROLL)]?.zone).toBe("staging");
+    expect(state.cards[idOf(state, SCROLL)]?.host).toBe(idOf(state, THUG));
   });
 });
 

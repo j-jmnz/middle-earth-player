@@ -9,7 +9,8 @@ import { dealOneShadow, type ReduceContext } from "../../interpret/interpret.ts"
 import { effectsOf } from "../../windows/listen.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { discardShadowOf } from "../../combat/shadow.ts";
-import type { GameEvent, PendingAttack, ScenarioState } from "../../core/state.ts";
+import type { CardInstance, GameEvent, PendingAttack, ScenarioState } from "../../core/state.ts";
+import { isCharacterType, printedOf } from "../../core/printed.ts";
 import { inPlay } from "../../core/state.ts";
 
 // Some card in play or in a hand has a Response, Forced or triggered effect on one of these triggers.
@@ -18,6 +19,17 @@ export function listened(state: ScenarioState, ctx: ReduceContext, triggers: rea
   return Object.values(state.cards).some(
     (card) => (inPlay(card.zone) || card.zone === "hand") && effectsOf(ctx, card.code).some((effect) => effect.trigger != null && triggers.includes(effect.trigger)),
   );
+}
+
+/**
+ * Whether this card is attached to a character in play and holds a Forced effect that hears the damage an attack dealt to its host (`timing: "forced"`, `subject: "host"`, `trigger: "damagedByAttack"`: Alcaron's Scroll, 05019:A:2, rr.forced). The host is not
+ * destroyed until that Forced effect has been heard, so the effect resolves while the host and the card are still in play (docs/scenarios/against-the-shadow/peril-in-pelargir.md, Readings, 05019:A:2 timing vs destruction). Read by damageAnswerable
+ * (engine/machine.ts), which holds a character's lethal damage.
+ */
+export function attachedHearsHostDamage(state: ScenarioState, card: CardInstance, ctx: ReduceContext): boolean {
+  const host = card.host == null ? undefined : state.cards[card.host];
+  if (!host || !inPlay(card.zone) || !inPlay(host.zone) || !isCharacterType(printedOf(ctx.cards, host.code))) return false;
+  return effectsOf(ctx, card.code).some((effect) => effect.timing === "forced" && effect.subject === "host" && effect.trigger === "damagedByAttack");
 }
 
 // Queues the event when some card could hear its trigger; otherwise the state is unchanged.
