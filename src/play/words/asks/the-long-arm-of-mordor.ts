@@ -39,7 +39,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "16034:response:1 @0 Pick": { owned: true, note: "Jubayr: choose a non-unique enemy to discard 1 facedown shadow card from.", verb: "Discard" },
 
   // 16035:A:2 (Sauron's Enforcers): at the end of the round the first player assigns X damage among all characters in play, X the stage number.
-  "16035:forced:1 @0 AssignDamage": { owned: true, note: "Sauron's Enforcers: assign {x} damage, the stage number, among the characters in play, heroes in the staging area too ({left} left).", bind: X, verb: "Assign", title: "{card}: assign {left}" },
+  "16035:forced:1 @0 AssignDamage": { owned: true, note: "Sauron's Enforcers: assign {x} damage, the stage number, among the characters in play, heroes in the staging area too ({left} left).", bind: X, verb: "Assign", title: "Assign {left}: {card}" },
 
   // 16036:A:2 (Southron Boma, Travel): each player spends 1 resource from a hero they control, an objective-hero included.
   "16036:travel:1 @0.0 SpendResources": { owned: true, note: "Southron Boma: choose a hero you control to spend 1 resource from, to travel here.", verb: "Pay" },
@@ -53,7 +53,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "16038:whenRevealed:1 @0.0.ally.0 Pick": { owned: true, note: "Savage Attack: choose one of your highest cost allies to discard.", verb: "Discard" },
 
   // 16039:A:2 (Overrun by Orcs) Shadow: the defending player assigns X damage among the characters they control, X the stage number.
-  "16039:shadow:1 @0 AssignDamage": { owned: true, note: "Overrun by Orcs, Shadow: assign {x} damage, the stage number, among the characters you control ({left} left).", bind: X, verb: "Assign", title: "{card}: assign {left}" },
+  "16039:shadow:1 @0 AssignDamage": { owned: true, note: "Overrun by Orcs, Shadow: assign {x} damage, the stage number, among the characters you control ({left} left).", bind: X, verb: "Assign", title: "Assign {left}: {card}" },
 
   // 16057:A:2 (Forest Clearing) Shadow: the defending player discards an attachment they control.
   "16057:shadow:1 @0 Pick": { owned: true, note: "Forest Clearing, Shadow: choose an attachment you control to discard.", verb: "Discard" },

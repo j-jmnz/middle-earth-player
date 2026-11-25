@@ -32,8 +32,8 @@ export function cardLabel(game: ScenarioState, names: SheetNames, id: string): s
 }
 
 /**
- * The row of a Captive of The Uruk-hai in a pick (Grishnákh's, 143024:A:1; Hands of a Healer's, 143016:A:3, which mixes Captives with the heroes the players control): "Legolas · Captive · 2 of 4 damage", with
- * " · Player 2" after it when the options hold the heroes of more than one player. Undefined for any other row.
+ * The row of a Captive in a pick: "Legolas · Captive · 2 of 4 damage" for one The Uruk-hai's enemy or To Isengard! holds (Grishnákh's, 143024:A:1; Hands of a Healer's, 143016:A:3, which mixes Captives with the heroes the players control), "Legolas · staging area · 2 of 4 damage" for a hero
+ * no card holds, "Legolas · guarded by Uruk of Mordor · 2 of 4 damage" for a hero an Orc guards (The Long Arm of Mordor), with " · Player 2" after it when the options hold the heroes of more than one player. Undefined for any other row.
  */
 export function captiveLabel(game: ScenarioState, ctx: ReduceContext, names: SheetNames, id: string, options: readonly string[]): string | undefined {
   const card = game.cards[id];
@@ -41,7 +41,9 @@ export function captiveLabel(game: ScenarioState, ctx: ReduceContext, names: She
   const hitPoints = printedOf(ctx.cards, card.code).health;
   const damage = hitPoints == null ? `${card.damage} damage` : `${card.damage} of ${hitPoints} damage`;
   const owners = new Set(options.map((other) => game.cards[other]?.owner).filter((owner) => owner != null));
-  return `${names.card(id)} · Captive · ${damage}${card.owner != null && owners.size > 1 ? ` · Player ${card.owner + 1}` : ""}`;
+  const guard = card.guardedHero === true && card.host != null ? game.cards[card.host] : undefined;
+  const where = guard ? `guarded by ${names.card(guard.id)}` : card.host == null ? "staging area" : "Captive";
+  return `${names.card(id)} · ${where} · ${damage}${card.owner != null && owners.size > 1 ? ` · Player ${card.owner + 1}` : ""}`;
 }
 
 /**
@@ -91,7 +93,9 @@ export function seatedLabel(game: ScenarioState, ctx: ReduceContext, names: Shee
     const on = isReanimatedCode(host.code) ? `${hostName}, Player ${seat + 1}'s card` : hostType === "enemy" ? `${hostName}, enemy engaged with Player ${seat + 1}` : `${hostName}, Player ${seat + 1}'s ${hostType}`;
     return `${names.card(id)} \u00b7 on ${on}`;
   }
-  const kind = type === "hero" || type === "attachment" || type === "event" || type === "treasure" ? type : type === "player-side-quest" ? "side quest" : "ally";
+  // An objective-hero (printed type objective) among a seat's heroes is a hero (The Long Arm of Mordor).
+  const amongHeroes = game.cards[id]?.zone === "heroes";
+  const kind = type === "hero" || type === "attachment" || type === "event" || type === "treasure" ? type : type === "player-side-quest" ? "side quest" : amongHeroes ? "hero" : "ally";
   return type === "enemy" ? `${names.card(id)} \u00b7 engaged with Player ${seat + 1}` : `${names.card(id)} \u00b7 Player ${seat + 1}'s ${kind}`;
 }
 
