@@ -137,10 +137,7 @@ describe("19053 Urdug and 19055 Tiny (enemy sides)", () => {
   });
 
   it("19053:A:2 an attack whose damage destroys the hero still dealt damage: Urdug and Tiny return to the staging area", () => {
-    const killed = questAttack({}, (state) => {
-      const hero = Object.values(state.cards).find((card) => card.zone === "heroes" && card.controller === 0)!;
-      return updateCard(state, hero.id, { damage: 5 });
-    });
+    const killed = questAttack({}, (state) => updateCard(state, Object.values(state.cards).find((card) => card.zone === "heroes" && card.controller === 0)!.id, { damage: 5 }));
     expect(Object.values(killed.state.cards).some((card) => card.zone === "discard" && card.damage >= 6)).toBe(true);
     expect(zoneOf(killed, CODES.urdugEnemy)).toBe("staging");
     expect(zoneOf(killed, CODES.tinyEnemy)).toBe("staging");
