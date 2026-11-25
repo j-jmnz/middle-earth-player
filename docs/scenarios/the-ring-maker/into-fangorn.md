@@ -46,13 +46,6 @@ The statuses are those of the Readings bullet of `docs/scenarios/the-ring-maker.
 - `07066:B:4` (span-settled). Stage 3 (07067) is reached only by the Time jump, so no stage follows stage 2 by progress: defeating stage 2 (with Mugash attached, `07066:B:3`) wins the game and does not advance. Basis: the printed line.
 - `07037:A:1` (recommended; a blog only, `faq.search-effects` gives the rule). The shuffle of the encounter deck follows a search only (`faq.search-effects`): when any attack was made no player searches and the deck is not shuffled.
 
-## Readings to confirm
-
-- Hinder and an attack by effect (`07034:A:2`, `07037:A:1`): the shadow card on an attack outside the combat phase.
-- `07037:A:1`: "if no attack was made" as one test over the table; the shuffle after a search only.
-- `07031:A:1`: Guarded not resolved at Setup.
-- The other `recommended` rows above.
-
 ## Table
 
 Each piece a record creates, with the line that creates it (`docs/agents/agent-brief.md`, Scenario procedure, The Table step). The engine decides each number; the table only says it.
