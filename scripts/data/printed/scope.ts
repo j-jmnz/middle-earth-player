@@ -92,7 +92,7 @@ export const PLAYER_REQUESTS = [
 
 // The packs whose deck-legal player cards the ledger holds (the pilot of reading every player card from its scan). A pack is added here when
 // `pnpm data sync scans --pack <id>` and `pnpm data ledger-seed --pack <id>` have run for it; the ledger file is data/printed/player-cards.json.
-export const PLAYER_PACKS: readonly string[] = ["OHaUH", "HoN", "TSF", "TDF", "EaAD", "AoO", "BoG", "TMV"];
+export const PLAYER_PACKS: readonly string[] = ["OHaUH", "HoN", "TSF", "TDF", "EaAD", "AoO", "BoG", "TMV", "VoI", "TDT", "TTT", "TiT", "NiE", "CS", "TAC"];
 // Single deck-legal player cards the ledger holds beside the packs (`--codes <code,...>` on the same two commands): the cards with errata, where the source text and
 // the printed card most often differ. A code is added here when `pnpm data sync scans --codes` and `pnpm data ledger-seed --codes` have run for it.
 export const PLAYER_CODES: readonly string[] = [

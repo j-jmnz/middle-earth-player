@@ -1,7 +1,7 @@
 // Rules: rr.response, rr.limits, rr.lasting-effects, rr.in-play-and-out-of-play, rr.doomed-x, rr.action, rr.cost, rr.engaged,
 // rr.search, rr.enters-play, rr.triggered-ability, rr.step-7-4 (data/rules/entries.json).
-// The Voice of Isengard heroes and allies, each printed line tested from the words on the card (data/cards/VoI.json: data/printed holds no
-// ledger for this pack, so the lines are the text of data/cards and every intent goes through sendUnledgered): Éomer 07001:A:1, Saruman
+// The Voice of Isengard heroes and allies, each printed line tested from the words on the card (data/printed/the-ring-maker.json, read against the scans, and every
+// intent goes through the ledger-checked send): Éomer 07001:A:1, Saruman
 // 07003:A:2, Orthanc Guard 07004:A:1, Isengard Messenger 07005:A:1, Westfold Outrider 07006:A:1, Westfold Horse-breeder 07007:A:1. The
 // attachments are in the-voice-of-isengard-attachments.test.ts, the events in the-voice-of-isengard-events.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -13,8 +13,8 @@ import { updateCard, withMode } from "../../rules/core/state.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { answerFirst, choices, endRound, fillers, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, type Table } from "../../../test/harness/scene.ts";
+import { answerFirst, choices, endRound, fillers, play, playerTableFor, printed, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const EOMER = "07001";
 const SARUMAN = "07003";
@@ -63,10 +63,10 @@ describe("Éomer (07001:A:1)", () => {
   lineSpec("07001:A:1", "Éomer: after a character leaves play, +2 Attack until the end of the round", (effects) => {
     const tab = table(effects, { heroes: [{ code: EOMER, seat: 0 }], allies: [{ code: OUTRIDER, seat: 0 }], staging: [WEAK], playerDeck: fillers(PLAIN, 3) });
     const [eomer, outrider] = [idsOf(tab, EOMER), idsOf(tab, OUTRIDER)];
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: outrider, effectId: "07006:action:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: outrider, effectId: "07006:action:1" }, tab.ctx);
     expect(run.state.cards[outrider]?.zone).toBe("discard");
     expect(triggers(run.state, tab)).toContain("07001:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: eomer, effectId: "07001:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: eomer, effectId: "07001:response:1" }, tab.ctx);
     expect(stat(run.state, tab, eomer, "attack")).toBe(printed(tab, EOMER, "attack") + 2);
     expect(stat(endRound(run.state, tab).state, tab, eomer, "attack")).toBe(printed(tab, EOMER, "attack"));
   });
@@ -76,9 +76,9 @@ describe("Éomer (07001:A:1)", () => {
     const tab = table(EFFECTS, { heroes: [{ code: EOMER, seat: 0 }], allies: [{ code: OUTRIDER, seat: 0 }, { code: OUTRIDER, seat: 0 }], staging: [WEAK, WEAK] });
     const eomer = idsOf(tab, EOMER);
     const [first = "", second = ""] = tab.ids[OUTRIDER] ?? [];
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: first, effectId: "07006:action:1" }, tab.ctx);
-    run = answerFirst(sendUnledgered(run, { type: "Trigger", cardId: eomer, effectId: "07001:response:1" }, tab.ctx), tab);
-    run = sendUnledgered(run, { type: "Trigger", cardId: second, effectId: "07006:action:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: first, effectId: "07006:action:1" }, tab.ctx);
+    run = answerFirst(send(run, { type: "Trigger", cardId: eomer, effectId: "07001:response:1" }, tab.ctx), tab);
+    run = send(run, { type: "Trigger", cardId: second, effectId: "07006:action:1" }, tab.ctx);
     expect(run.state.cards[second]?.zone).toBe("discard");
     expect(triggers(run.state, tab)).not.toContain("07001:response:1");
     expect(stat(run.state, tab, eomer, "attack")).toBe(printed(tab, EOMER, "attack") + 2);
@@ -105,7 +105,7 @@ describe("Orthanc Guard (07004:A:1)", () => {
     let run = doomedPlay(tab);
     expect(run.state.seats[0]?.threat).toBe(8 + 2);
     expect(triggers(run.state, tab)).toContain("07004:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: guard, effectId: "07004:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: guard, effectId: "07004:response:1" }, tab.ctx);
     expect(run.state.cards[guard]?.exhausted).toBe(false);
   });
 
@@ -121,8 +121,8 @@ describe("Orthanc Guard (07004:A:1)", () => {
   lineSpec("07004:A:1", "Orthanc Guard: also after a doomed encounter card is revealed", (effects) => {
     const tab = table(effects, { start: "quest", heroes: [{ code: DENETHOR, seat: 0 }], allies: [{ code: GUARD, seat: 0 }], deck: [DOOM, GLADE] });
     const guard = idsOf(tab, GUARD);
-    let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [guard] }, tab.ctx);
-    run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Commit", cardIds: [guard] }, tab.ctx);
+    run = send(run, { type: "Pass" }, tab.ctx);
     expect(run.state.seats[0]?.threat).toBe(8 + 1);
     expect(run.state.cards[guard]?.exhausted).toBe(true);
     expect(triggers(run.state, tab)).toContain("07004:response:1");
@@ -140,7 +140,7 @@ describe("Isengard Messenger (07005:A:1)", () => {
     for (let copy = 0; copy < 2; copy += 1) {
       run = doomedPlay(tab, run, copy);
       expect(triggers(run.state, tab)).toContain("07005:response:1");
-      run = sendUnledgered(run, { type: "Trigger", cardId: messenger, effectId: "07005:response:1" }, tab.ctx);
+      run = send(run, { type: "Trigger", cardId: messenger, effectId: "07005:response:1" }, tab.ctx);
     }
     expect(stat(run.state, tab, messenger, "willpower")).toBe(printed(tab, MESSENGER, "willpower") + 2);
     run = doomedPlay(tab, run, 2);
@@ -155,11 +155,11 @@ describe("Isengard Messenger, a revealed Doomed card (07005:A:1)", () => {
   lineSpec("07005:A:1", "Isengard Messenger: +1 Willpower after a doomed encounter card is revealed", (effects) => {
     const tab = table(effects, { start: "quest", heroes: [{ code: DENETHOR, seat: 0 }], allies: [{ code: MESSENGER, seat: 0 }], deck: [DOOM, GLADE] });
     const messenger = idsOf(tab, MESSENGER);
-    let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [messenger] }, tab.ctx);
-    run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Commit", cardIds: [messenger] }, tab.ctx);
+    run = send(run, { type: "Pass" }, tab.ctx);
     expect(run.state.seats[0]?.threat).toBe(8 + 1);
     expect(triggers(run.state, tab)).toContain("07005:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: messenger, effectId: "07005:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: messenger, effectId: "07005:response:1" }, tab.ctx);
     expect(stat(run.state, tab, messenger, "willpower")).toBe(printed(tab, MESSENGER, "willpower") + 1);
   });
 });
@@ -175,13 +175,13 @@ describe("Westfold Outrider (07006:A:1)", () => {
     const tab = scene(effects);
     const [staging = "", other = "", own = ""] = tab.ids[WEAK] ?? [];
     const outrider = idsOf(tab, OUTRIDER);
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: outrider, effectId: "07006:action:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: outrider, effectId: "07006:action:1" }, tab.ctx);
     expect(run.state.cards[outrider]?.zone).toBe("discard");
     expect(choices(run.state, tab).sort()).toEqual(["otherPlayer", "staging"]);
-    run = sendUnledgered(run, { type: "Choose", optionId: "otherPlayer" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "otherPlayer" }, tab.ctx);
     // A lone candidate may be taken without a question; the enemy engaged with you is never one.
     expect(choices(run.state, tab)).not.toContain(own);
-    run = run.state.window?.kind === "choose" ? sendUnledgered(run, { type: "Choose", optionId: other }, tab.ctx) : run;
+    run = run.state.window?.kind === "choose" ? send(run, { type: "Choose", optionId: other }, tab.ctx) : run;
     expect(run.state.cards[other]).toMatchObject({ zone: "engaged", controller: 0 });
     expect(run.state.cards[staging]?.zone).toBe("staging");
   });
@@ -190,9 +190,9 @@ describe("Westfold Outrider (07006:A:1)", () => {
   it("07006:A:1 Westfold Outrider: engages an enemy in the staging area", () => {
     const tab = scene(EFFECTS);
     const [staging = ""] = tab.ids[WEAK] ?? [];
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, OUTRIDER), effectId: "07006:action:1" }, tab.ctx);
-    run = sendUnledgered(run, { type: "Choose", optionId: "staging" }, tab.ctx);
-    run = run.state.window?.kind === "choose" ? sendUnledgered(run, { type: "Choose", optionId: staging }, tab.ctx) : run;
+    let run = send(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, OUTRIDER), effectId: "07006:action:1" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "staging" }, tab.ctx);
+    run = run.state.window?.kind === "choose" ? send(run, { type: "Choose", optionId: staging }, tab.ctx) : run;
     expect(run.state.cards[staging]).toMatchObject({ zone: "engaged", controller: 0 });
   });
 
@@ -216,7 +216,7 @@ describe("Westfold Horse-breeder (07007:A:1)", () => {
     const breeder = idsOf(tab, BREEDER);
     let run = play(begin(tab.state), tab, breeder);
     expect(triggers(run.state, tab)).toContain("07007:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: breeder, effectId: "07007:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: breeder, effectId: "07007:response:1" }, tab.ctx);
     // The Mount among the top 10 is the lone candidate, so it is taken without a question.
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[top]?.zone).toBe("hand");
