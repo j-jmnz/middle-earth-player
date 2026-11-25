@@ -50,6 +50,8 @@ export type Layout = {
   progress?: number;
   // The side the current quest stage shows (B by default; A for a stage 2 of a quest deck that has not flipped yet, 03070:A:1).
   side?: "A" | "B";
+  // The heat tracker of Desert Crossing, as its Setup left it (16068:A:1): one table modifier with this value.
+  temperature?: number;
   // A code, or a code with its tokens.
   active?: Entry;
   // The Nightmare setup card, side A faceup next to the quest deck, with its tokens (901001:A:2 counts on it).
@@ -79,6 +81,8 @@ export type Layout = {
   attached?: readonly { code: string; to: string; encounter?: true }[];
   // The codes of the cards committed to the quest (a hero stand-in, an ally of `play`).
   committed?: readonly string[];
+  // The codes of the cards that lie exhausted (every card of the code: a hero stand-in, an ally of `play`).
+  exhaustedCards?: readonly string[];
   // The pursuit value of The Uruk-hai, as its quest card's Setup set it (mec112.pursuit); absent: no tracker.
   pursuit?: number;
   // A hero stand-in lies faceup as a Captive under the card with the code `under` (The Uruk-hai, 143069:A:1).
@@ -194,6 +198,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     for (const item of layout.deckOf ?? []) if (dealtTo(item, seat)) state = spawn(state, dealtCode(item), { zone: "deck", seat }, "down").state;
   }
   if (layout.heroResources) for (const id of Object.keys(state.cards)) if (state.cards[id]?.zone === "heroes") state = updateCard(state, id, { resources: layout.heroResources });
+  if (layout.temperature != null) state = { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "table", stat: "temperature", amount: layout.temperature, until: "endOfGame" }] };
   if (layout.noteEncounterDiscards) state = { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "table", stat: "noteEncounterDiscards", amount: 1, until: "endOfGame" }] };
   if (layout.sagaHero && "hero" in (world.data.sagaStart ?? {})) {
     const saga = spawn(state, (world.data.sagaStart as { hero: string }).hero, { zone: "heroes", seat: 0 });
@@ -247,6 +252,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   }
   if (layout.captive) state = holdCaptive(state, idOf(state, layout.captive.hero), idOf(state, layout.captive.under));
   if (layout.pursuit != null) state = { ...state, pursuit: layout.pursuit };
+  for (const code of layout.exhaustedCards ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { exhausted: true });
   for (const code of layout.committed ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { committed: true });
   // A game that deals encounter side quests in its encounter deck reads the side quest rules, as its start notes (families/wilderland/night-quest.ts markSideQuests).
   state = markSideQuests(state, cards);

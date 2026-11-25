@@ -11,7 +11,7 @@ export type StatName = Parameters<typeof modifiedStat>[2];
 export type FlagName = Parameters<typeof flagged>[2];
 
 /** A scenario value an expectation reads through a named reader (card-spec-check.ts, COUNTERS). */
-export type CounterName = "pursuit" | "life";
+export type CounterName = "pursuit" | "life" | "temperature";
 
 /** One action of a row. A choice a record opens is answered by the `answer` actions that follow the action that opens it (the first option when none is left). */
 export type Act =
