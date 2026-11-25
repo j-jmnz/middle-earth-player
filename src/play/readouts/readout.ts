@@ -150,7 +150,10 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     // Stage 2B of Encounter at Amon Dîn: the attack discards villager tokens from Rescued Villagers and damages no hero.
     const tokens = hit ? undefendedVillagersReadout(game, hit, strength, shadowNext) : null;
     if (hit && tokens) return { kind: "defense", stats: [ATTACK(strength)], result: tokens };
-    if (hit) return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended: ${strength} damage on ${cardName(hit)}${undefendedRemoves(game, hit, strength)}${shadowNote}${destroyedWords(game, ctx, hit, strength, cardName, shadowNext)}${bloodDockClause(game, hit)}${undefendedLocationsReadout(game, ctx)}` };
+    if (hit) {
+      const lost = destroyedWords(game, ctx, hit, strength, cardName, shadowNext);
+      return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended: ${strength} damage on ${cardName(hit)}${undefendedRemoves(game, hit, strength)}${shadowNote}${lost}${lost ? bloodDockClause(game, hit) : ""}${undefendedLocationsReadout(game, ctx)}` };
+    }
     // The one hero the damage may go on (Gollum's attack from the riddle area, a shadow effect that names the hero) is named before it is picked.
     const only = attack.onlyHeroes?.length === 1 && !attack.undefended ? attack.onlyHeroes[0] : undefined;
     if (only && game.cards[only]) return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended, ${cardName(only)} takes ${strength}${shadowNote}` };

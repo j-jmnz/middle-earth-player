@@ -141,7 +141,7 @@ export function bloodAttackLine(game: ScenarioState): string | null {
 /** The caution on a defense that would destroy Faramir or Lord Alcaron: the players lose when either leaves play (06132:A:3, 06133:A:3), which the shared caution does not read. Empty for any other card and scenario. */
 export const bloodLossNote = (game: ScenarioState, characterId: string): string => (live(game) && (game.cards[characterId]?.code === FARAMIR || game.cards[characterId]?.code === ALCARON) ? "; the players lose the game if he is destroyed" : "");
 
-/** The clause the dock readout adds to a defense that destroys a character: "a hero destroyed turns your 1 hidden card" (Brutal Uruk, 06121:A:1). Empty for any other attacker and when the controller holds none. */
+/** The clause the dock readout adds to a defense that destroys a character: "a character destroyed turns your 1 hidden card" (Brutal Uruk, 06121:A:1). Empty for any other attacker and when the controller holds none. */
 export function bloodDockClause(game: ScenarioState, characterId?: string): string {
   const attack = game.pendingAttack;
   if (!live(game) || !attack || game.cards[attack.enemyId]?.code !== URUK) return "";

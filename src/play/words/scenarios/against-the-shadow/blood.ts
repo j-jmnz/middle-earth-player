@@ -106,7 +106,7 @@ export const urukAttackWords = (seatCount: number, seat: number, held: number): 
 };
 
 /** The short clause of the dock readout: a character destroyed turns its controller's hidden cards. Empty with none. */
-export const dockWords = (seatCount: number, seat: number, held: number): string => (held === 0 ? "" : `; a hero destroyed turns ${seatCount > 1 ? `Player ${seat + 1}'s` : "your"} ${hiddenCards(held)}`);
+export const dockWords = (seatCount: number, seat: number, held: number): string => (held === 0 ? "" : `; a character destroyed turns ${seatCount > 1 ? `Player ${seat + 1}'s` : "your"} ${hiddenCards(held)}`);
 
 const SOURCE = (count: number | undefined): string => (count === 1 || count == null ? "1 hidden card" : `${count} hidden cards`);
 const WHO: Readonly<Record<string, string>> = { actor: "the acting player", firstPlayer: "the first player", eachPlayer: "each player, the first player first," };

@@ -251,8 +251,29 @@ describe("Conflict at the Crossroads and Brutal Uruk (06131:A:1, 06121:A:1)", ()
       const names = namesOf(made, at.state);
       const sheet = defenseSheet(at.state, made.ctx, legalIntents(at.state, made.ctx), names) as PickSheet;
       const result = readoutFor(at.state, made.ctx, sheet, { key: sheet.key, ids: [idOf(at.state, ally)], shares: [] }, names.card)?.result ?? "";
-      expect(result).toContain(`destroys ${name}; the players lose the game if he is destroyed; a hero destroyed turns your 1 hidden card`);
+      expect(result).toContain(`destroys ${name}; the players lose the game if he is destroyed; a character destroyed turns your 1 hidden card`);
     }
+  });
+
+  it("an undefended Brutal Uruk attack adds the dock clause only when the damage destroys the hero", () => {
+    const made = table({ seats: 2, phase: "Encounter", stage: captured, engaged: [{ code: uruk, seat: 0 }], deck: ["f0", "f0", "f0"] });
+    let at = send(start(takes(made, made.state, 0, 1)), { type: "DeclineEngage" }, made.ctx);
+    for (let guard = 0; guard < 40 && at.state.window?.kind !== "defense"; guard += 1) {
+      const pass = legalIntents(at.state, made.ctx).find((intent) => intent.type === "Pass" || intent.type === "DeclineAttack" || intent.type === "DeclineEngage");
+      if (at.state.window?.kind === "chooseEnemy") at = send(at, { type: "ChooseEnemy", enemyId: at.state.window.options[0] ?? "" }, made.ctx);
+      else if (pass) at = send(at, pass as never, made.ctx);
+      else break;
+    }
+    const attack = at.state.pendingAttack as NonNullable<ScenarioState["pendingAttack"]>;
+    const heroId = at.state.seats[0]?.heroes[0] ?? "";
+    const health = made.ctx.cards.get(at.state.cards[heroId]?.code ?? "")?.health ?? 0;
+    const undefended = (left: number): string => {
+      const hit = { ...at.state, pendingAttack: { ...attack, undefended: true, heroId, shadowResolved: true }, cards: { ...at.state.cards, [heroId]: { ...(at.state.cards[heroId] as NonNullable<ScenarioState["cards"][string]>), damage: health - left } } };
+      return readoutFor(hit, made.ctx, null, null, namesOf(made, hit).card)?.result ?? "";
+    };
+    expect(undefended(health)).toMatch(/^Undefended: \d+ damage/);
+    expect(undefended(health)).not.toContain("hidden card");
+    expect(undefended(1)).toContain("is destroyed; a character destroyed turns Player 1's 1 hidden card");
   });
 
   it("the attack sheet and the dock readout name the controller of the defender: a defender of the other seat turns his own cards, and one card reads in the singular", () => {
@@ -270,8 +291,8 @@ describe("Conflict at the Crossroads and Brutal Uruk (06131:A:1, 06121:A:1)", ()
     const other = { ...at.state, pendingAttack: { ...(at.state.pendingAttack as NonNullable<ScenarioState["pendingAttack"]>), defenderId: sentinel } };
     expect(bloodAttackLine(at.state)).toContain("Player 1 holds 2 hidden cards");
     expect(bloodAttackLine(other)).toContain("Player 2 holds 1 hidden card:");
-    expect(bloodDockClause(other, sentinel)).toBe("; a hero destroyed turns Player 2's 1 hidden card");
-    expect(bloodDockClause(at.state, idOf(at.state, "dh1"))).toBe("; a hero destroyed turns Player 1's 2 hidden cards");
+    expect(bloodDockClause(other, sentinel)).toBe("; a character destroyed turns Player 2's 1 hidden card");
+    expect(bloodDockClause(at.state, idOf(at.state, "dh1"))).toBe("; a character destroyed turns Player 1's 2 hidden cards");
     expect(bloodDockClause(table({ phase: "Encounter" }).state, "x")).toBe("");
   });
 });
