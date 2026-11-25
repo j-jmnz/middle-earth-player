@@ -4794,23 +4794,6 @@
   ],
   "campaigns": [
     {
-      "id": "haradrim",
-      "name": "Haradrim",
-      "kind": "cycle",
-      "products": [
-        "The Sands of Harad",
-        "The Mûmakil",
-        "Race Across Harad",
-        "Beneath the Sands",
-        "The Black Serpent",
-        "The Dungeons of Cirith Gurat",
-        "The Crossings of Poros"
-      ],
-      "released": "2016-11-23",
-      "reason": "No source names a cycle. Hall of Beorn lists the scenarios of The Sands of Harad and of its six Adventure Packs under each product; RingsDB numbers the deluxe expansion and the six packs as cycles 23 and 24. The cycle has no Campaign Mode, so it is a cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 23 and 24; hallofgondor.com/release-dates (released: US release of the first product)"
-    },
-    {
       "id": "vengeance-of-mordor",
       "name": "Vengeance of Mordor",
       "kind": "cycle",

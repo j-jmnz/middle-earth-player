@@ -50,7 +50,7 @@ export const RULE_PDFS = [
     ["otd", "hobbit_on_the_doorstep_rulesheet.pdf"],
     ["hon", "heirs-of-numenor_rules.pdf"],
     ["wor", "mec65_web_the-wilds-of_rhovanion_rules.pdf"],
-    // trg is read for its Setup and special rules (Dwarrowdelf, below) and Secrecy X, which it introduced; bts for one keyword, Valour (Beneath the Sands).
+    // trg is read for its Setup and special rules (Dwarrowdelf, below) and Secrecy X, which it introduced; bts is Beneath the Sands' rulesheet (the Haradrim cycle, below), read whole.
     ["trg", "the-redhorn-gate-rulesheet.pdf"],
     ["bts", "mec58_web_beneath_the_sands-rules.pdf"],
     // Shadows of Mirkwood's Adventure Pack rulesheets: the encounter sets of the scenario and its special rules. The Hunt for Gollum's and Conflict at the Carrock's rulesheets (htg, cac, below)
@@ -95,6 +95,16 @@ export const RULE_PDFS = [
     ["nie", "mec29-the-nin-in-eilph-rulesheet.pdf"],
     ["cs", "celebrimbors-secret-rulesheet.pdf"],
     ["tac", "mec31-the-antlered-crown-rulesheet.pdf"],
+  ].map(([doc, file]) => ({ doc: doc as string, file: file as string, url: `${FFG}/${file as string}` })),
+  // The Haradrim cycle's rules insert (The Sands of Harad, three scenarios) and the Adventure Pack rulesheets (MEC56 to MEC61): the scenario's encounter sets, its setup paragraph and the keywords it introduces (FFG host, text layer).
+  // Beneath the Sands' rulesheet is `bts` (above), read for Valour and now for its whole text.
+  ...[
+    ["tsoh", "mec55_rules_webready.pdf"],
+    ["mum", "mec56_rule_set.pdf"],
+    ["rah", "mec57_web_race_across_harad-rules.pdf"],
+    ["tbs", "mec59_web_the_black_serpent-rules.pdf"],
+    ["dcg", "mec60_web_the_dungeons_of_cirith-rules.pdf"],
+    ["cop", "mec61_web_the_crossing_of_poros-rules.pdf"],
   ].map(([doc, file]) => ({ doc: doc as string, file: file as string, url: `${FFG}/${file as string}` })),
 ] as const;
 

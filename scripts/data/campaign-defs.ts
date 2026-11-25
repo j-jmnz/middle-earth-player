@@ -153,6 +153,14 @@ export const PRODUCTS: readonly ProductDef[] = [
   { name: "The Nîn-in-Eilph", packs: ["NiE"], home: "the-ring-maker", load: "dragncards", easySheet: false, twinPack: null },
   { name: "Celebrimbor's Secret", packs: ["CS"], home: "the-ring-maker", load: "dragncards", easySheet: false, twinPack: null },
   { name: "The Antlered Crown", packs: ["TAC"], home: "the-ring-maker", load: "dragncards", easySheet: false, twinPack: null },
+  // Haradrim: The Sands of Harad deluxe expansion (three scenarios) and the six Adventure Packs, whose scenario and encounter cards are Hall of Beorn's like the earlier cycles'.
+  { name: "The Sands of Harad", packs: ["TSoH"], home: "haradrim", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Mûmakil", packs: ["M"], home: "haradrim", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Race Across Harad", packs: ["RAH"], home: "haradrim", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Beneath the Sands", packs: ["BtS"], home: "haradrim", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Black Serpent", packs: ["TBS"], home: "haradrim", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Dungeons of Cirith Gurat", packs: ["DoCG"], home: "haradrim", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Crossings of Poros", packs: ["CoP"], home: "haradrim", load: "dragncards", easySheet: false, twinPack: null },
   // Standalone scenarios: each official scenario printed on its own, Hall of Beorn's cards of it alone. Hall of Beorn lists the event scenarios of 2011 to 2017 under the year (`scenarioProduct`).
   { name: "The Massing at Osgiliath", packs: ["TMaO"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2011" },
   { name: "The Battle of Lake-town", packs: ["TBoLT"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2012" },
