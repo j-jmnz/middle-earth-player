@@ -2,7 +2,7 @@
 // rr.attachment-cards, rr.restricted, rr.unique-cards, rr.doomed-x, rr.lasting-effects, rr.staging-area, rr.ownership-and-control,
 // ltp.undefended-attack, rr.triggered-ability, rr.printed (data/rules/entries.json).
 // The Nîn-in-Eilph player cards, each line tested from the words on the card: Mablung 08084:A:1, Tighten Our Belts 08086:A:1, Galadhon
-// Archer 08087:A:2, Bow of the Galadhrim 08088:A:2 and A:3, Island Amid Perils 08090:A:1, Mirkwood Pioneer 08091:A:1, Wingfoot 08092:A:1,
+// Archer 08087:A:2, Bow of the Galadhrim 08088:A:1 and A:2, Island Amid Perils 08090:A:1, Mirkwood Pioneer 08091:A:1, Wingfoot 08092:A:1,
 // Defender of the West 08093:A:1 and A:3. The lines are the text of data/cards/NiE.json (data/printed holds no entry for this pack), so every
 // intent goes through sendUnledgered.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -184,10 +184,10 @@ describe("Galadhon Archer (08087:A:2)", () => {
   });
 });
 
-describe("Bow of the Galadhrim (08088:A:2, A:3)", () => {
+describe("Bow of the Galadhrim (08088:A:1, A:2)", () => {
   // "Attach to a Silvan character with the ranged keyword.": the Galadhon Archer and Legolas (Silvan, Ranged) are offered; the Silvan ally
   // without Ranged and Hirluin (Ranged, not Silvan) are not.
-  lineSpec("08088:A:2", "Bow of the Galadhrim: Attach to a Silvan character with the ranged keyword", (effects) => {
+  lineSpec("08088:A:1", "Bow of the Galadhrim: Attach to a Silvan character with the ranged keyword", (effects) => {
     const tab = table(effects, { heroes: [{ code: LEGOLAS, seat: 0 }, { code: HIRLUIN, seat: 0 }], allies: [{ code: ARCHER, seat: 0 }, { code: SILVAN, seat: 0 }], hand: [{ code: BOW, seat: 0 }] });
     const bow = idsOf(tab, BOW);
     expect(hosts(tab, bow)).toEqual([idsOf(tab, LEGOLAS), idsOf(tab, ARCHER)].sort());
@@ -201,7 +201,7 @@ describe("Bow of the Galadhrim (08088:A:2, A:3)", () => {
 
   // "Attached character gets +1 Attack (+2 Attack instead if attacking an enemy not engaged with you.)": played on the Archer (Attack 2),
   // it gives 3; the Archer's ranged attack on the Dear, engaged with the other player, strikes with 4.
-  lineSpec("08088:A:3", "Bow of the Galadhrim: +1 Attack, +2 instead attacking an enemy not engaged with you", (effects) => {
+  lineSpec("08088:A:2", "Bow of the Galadhrim: +1 Attack, +2 instead attacking an enemy not engaged with you", (effects) => {
     const tab = bowScene(effects);
     const archer = idsOf(tab, ARCHER);
     const played = play(begin(tab.state), tab, idsOf(tab, BOW), archer);
@@ -211,7 +211,7 @@ describe("Bow of the Galadhrim (08088:A:2, A:3)", () => {
   });
 
   // The Archer attacks the Brute, engaged with its own player: +1 only.
-  it("08088:A:3 Bow of the Galadhrim: +1 only attacking an enemy engaged with you", () => {
+  it("08088:A:2 Bow of the Galadhrim: +1 only attacking an enemy engaged with you", () => {
     const tab = bowScene(EFFECTS);
     const archer = idsOf(tab, ARCHER);
     const played = play(begin(tab.state), tab, idsOf(tab, BOW), archer);

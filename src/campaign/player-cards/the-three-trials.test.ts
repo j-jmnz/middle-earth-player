@@ -1,7 +1,7 @@
 // Rules: rr.attachment-cards, rr.limits, rr.response, rr.explored, rr.ready, rr.action, rr.cost, rr.engaged, rr.ranged, rr.hit-points,
 // rr.sentinel, rr.engagement-check, rr.then, rr.event-cards, rr.triggered-ability, rr.play-and-put-into-play (data/rules/entries.json).
 // The Three Trials player cards, written from their card text (data/cards/TTT.json; data/printed holds no ledger for this pack, so every
-// intent goes through sendUnledgered): Idraen 08025:A:1, Feigned Voices 08027:A:1, Rúmil 08028:A:2, Elven Mail 08029:A:2 and A:3,
+// intent goes through sendUnledgered): Idraen 08025:A:1, Feigned Voices 08027:A:1, Rúmil 08028:A:2, Elven Mail 08029:A:1 and A:2,
 // Warden of Arnor 08031:A:1, Message from Elrond 08032:A:1, Noiseless Movement 08033:A:1, Leaf Brooch 08034:A:1.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -199,10 +199,10 @@ describe("Rúmil (08028:A:2)", () => {
   });
 });
 
-describe("Elven Mail (08029:A:2, A:3)", () => {
+describe("Elven Mail (08029:A:1, A:2)", () => {
   // "Attach to a Noldor or Silvan character.": Legolas (Silvan hero), Erestor (Noldor hero) and Rúmil (Silvan ally) are offered; Aragorn
   // and the plain ally are not. Legolas (Tactics) pays.
-  it("08029:A:2 Elven Mail: Attach to a Noldor or Silvan character", () => {
+  it("08029:A:1 Elven Mail: Attach to a Noldor or Silvan character", () => {
     const tab = table(EFFECTS, { heroes: [{ code: LEGOLAS, seat: 0 }, { code: ERESTOR, seat: 0 }, { code: ARAGORN, seat: 0 }], allies: [{ code: RUMIL, seat: 0 }, { code: ALLY, seat: 0 }], hand: [{ code: MAIL, seat: 0 }] });
     const mail = idsOf(tab, MAIL);
     expect(hosts(tab, mail)).toEqual([idsOf(tab, LEGOLAS), idsOf(tab, ERESTOR), idsOf(tab, RUMIL)].sort());
@@ -211,7 +211,7 @@ describe("Elven Mail (08029:A:2, A:3)", () => {
 
   // "Attached character gets +2 hit points and gains sentinel.": two players; the Mail is played on Legolas (no sentinel of his own), who
   // then has 2 more hit points and may defend the attack of the enemy engaged with the other player.
-  lineSpec("08029:A:3", "Elven Mail: +2 hit points and sentinel", (effects) => {
+  lineSpec("08029:A:2", "Elven Mail: +2 hit points and sentinel", (effects) => {
     const tab = table(effects, { seats: 2, heroes: [{ code: LEGOLAS, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: MAIL, seat: 0 }], engaged: [{ code: WALL, seat: 1 }] });
     const legolas = idsOf(tab, LEGOLAS);
     const health = tab.ctx.cards.get(LEGOLAS)?.health ?? 0;

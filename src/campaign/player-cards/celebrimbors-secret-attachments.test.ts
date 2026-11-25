@@ -2,7 +2,7 @@
 // (data/rules/entries.json).
 // Celebrimbor's Secret attachments, each printed line tested from the words on the card (data/cards/CS.json: data/printed holds no
 // ledger for this pack, so the lines are the text of data/cards): Heir of Mardil 08113:A:1, Mirror of Galadriel 08118:A:1 and A:2,
-// Cloak of Lórien 08120:A:1 to A:3, Nenya 08121:A:1 and A:2.
+// Cloak of Lórien 08120:A:1 and A:2, Nenya 08121:A:1 and A:2.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../effects/index.ts";
@@ -111,22 +111,21 @@ describe("Mirror of Galadriel (08118)", () => {
 describe("Cloak of Lórien (08120)", () => {
   // "Attach to a Noldor or Silvan character.": Galadriel (Noldor hero), the Handmaiden (Silvan ally) and the other player's Orophin
   // (Silvan ally) are offered; Aragorn and a plain ally are not.
-  lineSpec("08120:A:1", "Cloak of Lórien: Attach to a Noldor or Silvan character", (effects) => {
+  lineSpec("08120:A:1", "Cloak of Lórien: Attach to a Noldor or Silvan character, Limit 1 per character", (effects) => {
     const tab = table(effects, { seats: 2, heroes: [{ code: GALADRIEL, seat: 0 }, { code: ARAGORN, seat: 0 }, { code: THEODRED, seat: 1 }], allies: [{ code: HANDMAIDEN, seat: 0 }, { code: ALLY, seat: 0 }, { code: OROPHIN, seat: 1 }], hand: [{ code: CLOAK, seat: 0 }] });
     expect(hosts(tab, idsOf(tab, CLOAK))).toEqual([GALADRIEL, HANDMAIDEN, OROPHIN].map((code) => idsOf(tab, code)).sort());
-  });
-
-  // "Limit 1 per character.": the Handmaiden, who already wears a Cloak, is not offered a second.
-  lineSpec("08120:A:2", "Cloak of Lórien: Limit 1 per character", (effects) => {
-    const scene = table(effects, { heroes: [{ code: GALADRIEL, seat: 0 }], allies: [{ code: HANDMAIDEN, seat: 0 }, { code: CLOAK, seat: 0 }], hand: [{ code: CLOAK, seat: 0 }] });
-    const [worn, held] = scene.ids[CLOAK] ?? [];
-    const tab = attach(scene, [[worn ?? "", idsOf(scene, HANDMAIDEN)]]);
-    expect(hosts(tab, held ?? "")).toEqual([idsOf(tab, GALADRIEL)]);
+    // "Limit 1 per character." (the same printed paragraph): the Handmaiden, who already wears a Cloak, is not offered a second.
+    {
+      const scene = table(effects, { heroes: [{ code: GALADRIEL, seat: 0 }], allies: [{ code: HANDMAIDEN, seat: 0 }, { code: CLOAK, seat: 0 }], hand: [{ code: CLOAK, seat: 0 }] });
+      const [worn, held] = scene.ids[CLOAK] ?? [];
+      const tab = attach(scene, [[worn ?? "", idsOf(scene, HANDMAIDEN)]]);
+      expect(hosts(tab, held ?? "")).toEqual([idsOf(tab, GALADRIEL)]);
+    }
   });
 
   // "Attached character gets +1 Defense (+2 Defense instead if the active location has the Forest trait).": +1 with no active location
   // and with Bag End (Shire), +2 (not +3) with Old Forest Road (Forest).
-  lineSpec("08120:A:3", "Cloak of Lórien: +1 Defense, +2 instead while the active location is a Forest", (effects) => {
+  lineSpec("08120:A:2", "Cloak of Lórien: +1 Defense, +2 instead while the active location is a Forest", (effects) => {
     const defense = (active?: string): number => {
       const tab = table(effects, { heroes: [{ code: GALADRIEL, seat: 0 }], attached: [{ code: CLOAK, host: GALADRIEL }], ...(active ? { active } : {}) });
       return stat(tab.state, tab, idsOf(tab, GALADRIEL), "defense");

@@ -80,7 +80,7 @@ describe("The Ring-maker cycle", () => {
       const text = rules.get(SETUP_SPANS[id as keyof typeof SETUP_SPANS]) ?? "";
       expect(text, id).toContain("encounter deck");
       // The Voice of Isengard's insert and the Dunland Warriors set spell "Weary Travellers" and "Dunlending Warriors" as their rulesheets do not agree: the card data names the sets.
-      for (const set of pin.sets) expect(text.replace("Travellers", "Travelers").replace("Dunlending", "Dunland"), `${id} ${set}`).toContain(set);
+      for (const set of pin.sets) expect(text.replaceAll("Travellers", "Travelers").replaceAll("Dunlending", "Dunland"), `${id} ${set}`).toContain(set);
     }
     expect(def?.scenarios.map((scenario) => scenario.id)).toEqual(Object.keys(DECK));
   });
