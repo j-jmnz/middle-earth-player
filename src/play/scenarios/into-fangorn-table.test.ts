@@ -10,6 +10,8 @@ import { sheetFor } from "../choice/sheets.ts";
 import { slotNumbers } from "../cards/card-effects.ts";
 import { dungeonDetail } from "../cards/dungeon-preview.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
+import { readoutFor } from "../readouts/readout.ts";
+import { enemiesToFace } from "../store/foresight.ts";
 
 const ID = "into-fangorn";
 const MUGASH = "07031";
@@ -58,7 +60,7 @@ describe("the time dial of stages 1B, 2B and 3B", () => {
 
 // Every sheet a record's windows open: the rows each offers with the caution on each, and the sentence over it.
 type Row = { id: string; label: string; caution?: string };
-function sheetsOf(made: Made, code: string, timing: "whenRevealed" | "forced", pick: (n: number, ids: readonly string[]) => string, source?: string) {
+function sheetsOf(made: Made, code: string, timing: "whenRevealed" | "forced" | "action", pick: (n: number, ids: readonly string[]) => string, source?: string) {
   const sheets: { prompt: string; note: string; rows: Row[] }[] = [];
   resolveRecords(made.state, made.ctx, code, timing, source, (at: ScenarioState) => {
     const sheet = sheetFor(at, made.ctx, legalIntents(at, made.ctx), { card: (id) => made.cards.get(at.cards[id]?.code ?? "")?.name ?? id, line: () => null });
@@ -111,6 +113,36 @@ describe("Mugash on Edge of Fangorn and on a hero", () => {
   it("07031:A:2 Mugash free in the staging area says how a player claims him, and what guards him", () => {
     expect(detail(built({ staging: [MUGASH] }), MUGASH)).toBe("Mugash is free of encounters. A player can exhaust a ready hero he controls to claim him.");
     expect(detail(built({ staging: [MUGASH], attached: [{ code: "07033", to: MUGASH, encounter: true }] }), MUGASH)).toBe("Mugash is guarded: a player can claim him only when he is free of encounters.");
+  });
+});
+
+describe("the commit tray with a Hinder Huorn engaged", () => {
+  const PLAIN = "07042";
+  const tray = (engaged: readonly string[]) => {
+    const made = tableFromLayout(ID, { phase: "Quest", stage: "07066", timeCounters: 3, engaged: [...engaged], deckOf: ["filler", "filler", "filler"] }, { extra: [PLAIN] });
+    const result = readoutFor(made.state, made.ctx, null, null, (id) => made.cards.get(made.state.cards[id]?.code ?? "")?.name ?? id)?.result ?? "";
+    return { made, result };
+  };
+
+  it("07033:A:1 leaves out an enemy that makes no attack in the coming combat phase: a lone Hinder Huorn is no enemy to face", () => {
+    const { made, result } = tray(["07033"]);
+    expect(enemiesToFace(made.state, made.ctx, 0)).toEqual([]);
+    expect(result).not.toMatch(/Enemies to face/);
+  });
+
+  it("07034:A:1 counts the enemy beside it that does attack, with its attack alone", () => {
+    const { made, result } = tray(["07034", PLAIN]);
+    expect(enemiesToFace(made.state, made.ctx, 0).map((id) => made.state.cards[id]?.code)).toEqual([PLAIN]);
+    expect(result).toMatch(/Enemies to face: 1 \(\d+ attack\)$/);
+  });
+});
+
+describe("the claim of Mugash", () => {
+  it("07031:A:2 leads with a sentence short enough for one line of the tray, and leaves the damage rule to the second", () => {
+    const made = built({ staging: [MUGASH] });
+    const sheet = sheetsOf(made, MUGASH, "action", (_n, ids) => ids[0] ?? "", idOf(made.state, MUGASH))[0];
+    expect(sheet?.note).toBe("Exhaust a ready hero to claim him. If it takes damage, Mugash returns to the top of the encounter deck.");
+    expect(sheet?.note.split(". ")[0]?.length).toBeLessThanOrEqual(36);
   });
 });
 
