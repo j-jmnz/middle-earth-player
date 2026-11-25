@@ -18,6 +18,7 @@ import { captiveUnder } from "../../rules/families/south/captive.ts";
 import { battlementsTimeNearWords, battlementsTimeWords, deckLabel, deckNearWords, deckWords, thaurdirLimitWords, thaurdirWords, handUnderLabel, handUnderWords, huntWords, iarionLabel, iarionWords, protectNearWords, protectWords, savageNearWords, savageWords, rearguardLimitWords, rearguardWords, shelterTimeNearWords, shelterTimeWords, timeNearWords, timeWords } from "../words/scenarios/angmar/angmar-table.ts";
 import { executionersNearWords, executionersTimeWords } from "../words/scenarios/angmar/gram-table.ts";
 import { secretsTimeNearWords, secretsTimeWords } from "../words/scenarios/angmar/rhudaur-table.ts";
+import { FORDS_STAGES } from "./ring-maker/fords.ts";
 import { SECRETS_OF_RHUDAUR, sideQuestsInPlay } from "./rhudaur.ts";
 import { cardsOf, type TableDial } from "./dials.ts";
 import { EXECUTIONERS, executionersRaises } from "./gram.ts";
@@ -132,7 +133,8 @@ export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
   // each dial is its card's (id and test id) and says where its copy lies.
   for (const card of Object.values(game.cards)) {
     const total = inPlay(card.zone) ? timeOf(ctx, card.code) : null;
-    if (total == null) continue;
+    // The Fords of Isen's stages print Time X too: readouts/ring-maker/fords.ts words their dial.
+    if (total == null || FORDS_STAGES.includes(card.code)) continue;
     const held = captiveUnder(game, card.id);
     const heldName = held ? nameOf(game.cards[held]?.code ?? "") : null;
     // Find Shelter's last counter costs damage and returns 4 counters (09032:A:2), not the game: its dial warns near and never critical.

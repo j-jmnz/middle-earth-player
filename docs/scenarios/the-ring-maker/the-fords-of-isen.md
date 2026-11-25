@@ -52,3 +52,13 @@ The statuses are those of the Readings bullet of `docs/scenarios/the-ring-maker.
 - `07045:A:2`, `07049:A:2`: researched, a relayed official answer. The Condition leaves play with the stage; the next stage does not inherit it.
 - `07046:A:2`, `07048:A:1`, `07045:A:2`, `07049:A:2`, `07018:A:2`: researched, community only. One draw is one trigger; each player's draw in the resource phase is its own.
 - `07047:A:1`: recommended. The topmost Dunland enemy is the one discarded last.
+
+## Table
+
+Each piece a record creates, with the line that creates it (`docs/agents/agent-brief.md`, Scenario procedure, The Table step). The engine decides each number; the table only says it.
+
+- **Time dial** (`07059:B:1`, `07060:B:2`, `07061:B:1`; `rm.time-x`): the counters left on the current stage against the Time X it printed, a readout with its limit in the top bar (`src/play/readouts/ring-maker/fords.ts`, words in `src/play/words/scenarios/ring-maker/fords-table.ts`). It warms at 2 counters left. It is critical at 1 only on stage 1B, whose last counter discards Gríma (`07059:B:2`) and loses the game (`07016:A:3`); the last counter of stages 2B and 3B returns counters (`07060:B:3`, `07061:B:2`), so those dials warm near and are never critical. `angmarDials` leaves these stages out so Rescue Iârion's words are not said on them. A stage is one per game, so the dial is one for all seats: there is no held dial for each seat.
+- **Gríma held under The Islet** (`07059:A:1`, `07016:A:1`): the preview of the card says where he lies. On The Islet he is held under it in every zone it can be in (staging area or active location) and controlled by no player; free in the staging area he waits for the first player; in a play area his controller is named, solo and two-handed (`src/play/cards/ring-maker/preview.ts`, hooked in `dungeon-preview.ts`).
+- **Ill Tidings in a hand** (`07023:A:1`): the preview of the card in the hand says it is held there, cannot be played or discarded and counts as a card in hand, which is why no play or discard row is offered for it (`ring-maker/preview.ts`).
+- **Owner on a pick that spans seats**: the search and damage picks of `07022:A:1`, `07044:A:1`, `07049:A:2`, `07059:A:1`, `07060:B:1`, `07060:B:3` and `07061:A:1` are `owned` in the asks file (`src/play/words/asks/the-fords-of-isen.ts`), so two-handed each sentence leads with the player.
+- Test: `src/play/scenarios/the-fords-of-isen-table.test.ts`; screen moments: `test/scenarios/the-fords-of-isen/screens.ts`.
