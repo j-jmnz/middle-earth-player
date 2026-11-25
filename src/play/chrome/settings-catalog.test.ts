@@ -42,6 +42,13 @@ describe("the categories", () => {
     expect(ids("soundtrack", COMPUTER)).toEqual([]);
   });
 
+  it("show Stop other audio on a phone that plays something, and never on a computer", () => {
+    const rows = ["music", "stopOtherAudio"] as const;
+    expect(rowsFor(rows, PHONE)).toEqual(["music", "stopOtherAudio"]);
+    expect(rowsFor(rows, { ...PHONE, sounds: false, music: false })).toEqual([]);
+    expect(rowsFor(rows, { ...COMPUTER, sounds: true, music: true })).toEqual(["music"]);
+  });
+
   it("say what each is set to now", () => {
     expect(categorySummary("sound", DEFAULT_SETTINGS, PHONE)).toBe("Effects 80% · Music 50%");
     expect(categorySummary("sound", { ...DEFAULT_SETTINGS, music: false }, { ...PHONE, sounds: false })).toBe("Music off");

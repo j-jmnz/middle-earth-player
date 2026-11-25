@@ -42,6 +42,9 @@ export type TableSettings = {
   music: boolean;
   // How loud the music plays, 0 to 1 in steps of 5% (src/ui/sound/volume.ts).
   musicVolume: number;
+  // On a phone, the app stops the audio of other apps when it opens and when it comes back to the front; off, its sounds mix with
+  // that audio and its music waits for it (src/ui/sound/other-apps.ts; user decision, 2026-11-25).
+  stopOtherAudio: boolean;
   // Reduced motion: follow the phone's setting, or always snap whatever the phone says.
   reduceMotion: ReduceMotionOption;
   // Keep the screen from sleeping while a table is open.
@@ -98,7 +101,7 @@ export function strongOutlines(option: StrongOutlinesOption, increaseContrast: b
 // The stops the video uses: after staging ("the golden action window") and before the shadow card turns.
 export const DEFAULT_STOPS: readonly string[] = ["3.3", "shadow"];
 
-export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: "system", guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, sounds: true, soundVolume: 0.8, music: true, musicVolume: 0.5, reduceMotion: "system", keepAwake: true, theme: "dark", cardQuality: "high", fogDrift: true, tableAsList: "system", confirmTime: "standard", bannerCloses: "timer", titleFace: "carved", timingTips: false, checkUpdates: true, debugTools: false };
+export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: "system", guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, sounds: true, soundVolume: 0.8, music: true, musicVolume: 0.5, stopOtherAudio: true, reduceMotion: "system", keepAwake: true, theme: "dark", cardQuality: "high", fogDrift: true, tableAsList: "system", confirmTime: "standard", bannerCloses: "timer", titleFace: "carved", timingTips: false, checkUpdates: true, debugTools: false };
 
 /** Settings read back from storage: unknown keys dropped, missing ones defaulted, wrong types replaced. */
 export function parseSettings(raw: unknown): TableSettings {
@@ -125,6 +128,7 @@ export function parseSettings(raw: unknown): TableSettings {
     soundVolume: typeof value.soundVolume === "number" ? clampVolume(value.soundVolume) : DEFAULT_SETTINGS.soundVolume,
     music: flag(value.music, DEFAULT_SETTINGS.music),
     musicVolume: typeof value.musicVolume === "number" ? clampVolume(value.musicVolume) : DEFAULT_SETTINGS.musicVolume,
+    stopOtherAudio: flag(value.stopOtherAudio, DEFAULT_SETTINGS.stopOtherAudio),
     reduceMotion: REDUCE_MOTION_OPTIONS.find((option) => option === value.reduceMotion) ?? DEFAULT_SETTINGS.reduceMotion,
     keepAwake: flag(value.keepAwake, DEFAULT_SETTINGS.keepAwake),
     theme: THEME_OPTIONS.find((option) => option === value.theme) ?? DEFAULT_SETTINGS.theme,
