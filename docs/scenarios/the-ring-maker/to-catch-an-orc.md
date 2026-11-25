@@ -1,0 +1,34 @@
+# To Catch an Orc
+
+The Ring-maker part 2 (The Voice of Isengard, `VoI`), standalone only, on Easy and Normal (Q04.2, E04.2). Encounter sets To Catch an Orc, Misty Mountain Orcs and Broken Lands (`rm.setup-to-catch-an-orc`; Misty Mountain Orcs is shared with Trouble in Tharbad and Celebrimbor's Secret, Broken Lands with Celebrimbor's Secret). The scenario adds the out-of-play deck (`rm.out-of-play-deck`), Mugash and his Guard with player card backs (`rm.mugash-player-card-backs`) and the Searches X keyword (`rm.searches-x`).
+
+- **Setup.** Stage 1A prints "Each player removes the top 20 cards of his deck and places them aside, as an out-of-play deck. The first player takes Mugash plus 1 Mugash's Guard for each other player in the game and randomly shuffles one facedown into each player's out-of-play deck. Place any remaining copies of Mugash's Guard aside, out of play." (`07062:A:1`). The Setup reader gives it three steps: `createOutOfPlayDecks`, `shuffleIntoOutOfPlayDecks` and an aside of the remaining Guards.
+- **When.** The twenty cards are the top of each deck after the starting hand is drawn and any mulligan is taken: Setup step 5 (draw the setup hand) comes before step 7 (follow the scenario Setup instructions). Basis: `rr.setup`, `rr.mulligan`.
+- **Piles.** The `setAside` pile holds Mugash (07024) and Mugash's Guard (07025); the Setup puts them into the players' out-of-play decks, so they are never in the encounter deck. The Guard copies the Setup does not deal stay aside. No override.
+- **Errata.** None for a card of this scenario.
+
+## Data
+
+- Mugash (07024) and Mugash's Guard (07025) are encounter cards with a player card back; they cannot be put into a player's deck (`rm.mugash-player-card-backs`). Mugash prints "Cannot have attachments" and a Forced effect that attaches him to a hero after he is defeated, as a Captive attachment with the text the card gives.
+- Stage 1B has each player search the encounter deck for a Mountain location and then advances (`07062:B:1`); stage 2B and 3B print Time 2 and Time 3 (`07063:B:1`, `07064:B:1`). Methedras (07027) and Orc Cave (07028) print the Searches keyword on their leaving-play lines; Mugash's Lair (07029) reveals the top card of each out-of-play deck at the beginning of the encounter phase.
+- Searches is not in the `keywords` of `data/cards`; the records name it by the lines `07027:A:2` and `07028:A:1`.
+
+## Readings
+
+The statuses are those of the Readings bullet of `docs/scenarios/the-ring-maker.md`. Each key is the scan-read ledger line (`data/printed/the-ring-maker.json`), `<code>:<side>:<n>`. Sources read: the Voice of Isengard insert (`rm.searches-x`, `rm.out-of-play-deck`), https://ffg-forum-archive.entropicdreams.com/topic/100233-mugash-forced-effect-on-to-catch-an-orc (an official response by Caleb), https://visionofthepalantir.com/2018/05/15/to-catch-an-orc/ (a player's preview, not a rules authority; it links an official ruling on a thread at boardgamegeek.com that the fetch could not read).
+
+- Out-of-play deck (span-settled). Each player's twenty cards are one facedown deck out of play, apart from the draw deck, the hand and the discard pile; a card there is not in play and counts for no effect that names the player's deck. Basis: `rm.out-of-play-deck`, `rr.in-play-and-out-of-play`.
+- Searches X (`07027:A:2`, `07028:A:1`) (span-settled). When a location with the keyword leaves play (here as an explored location), each player the card names reveals the top X cards of his out-of-play deck, adds each revealed enemy to the staging area, chooses 1 of the other cards for his hand and discards the rest. Methedras names each player, Orc Cave the first player. Not taken: the search keeps the enemies hidden. Basis: `rm.searches-x`.
+- Searches with fewer than X cards (recommended). The player reveals all the cards the deck holds; with none nothing happens. Not taken: a loss for an empty deck (no rule makes an out-of-play deck a draw deck; `rr.running-out-of-cards` is about the player deck). Basis: `rm.searches-x`. Sources: none found.
+- `07024:A:2` (researched). Mugash's Forced effect attaches him to a hero and exhausts that hero; the exhaustion is an effect, not a cost, so he attaches to an exhausted hero. The hero stays exhausted and cannot ready while Mugash is attached. Basis: the official response by Caleb dated 2014-03-03 on https://ffg-forum-archive.entropicdreams.com/topic/100233-mugash-forced-effect-on-to-catch-an-orc ("Exhausting the hero Mugash is attached to is an effect, not a cost.").
+- `07024:A:2` (span-settled). The Captive attachment is the attachment with the text the card gives: "Attached hero cannot ready. If attached hero leaves play, the players lose the game." Basis: the printed line, `rr.attachment-cards`.
+- `07025:A:1`, `07025:A:2` (span-settled). While a player controls a hero with Mugash attached, each Guard engages that player; when a Guard destroys a character and Mugash is attached to a hero, Mugash returns to the staging area. Basis: the printed lines.
+- `07026:A:1` (recommended). "Shuffles 1 random card from his hand into his out-of-play deck": the card goes in at a random place, face down. Not taken: the card goes on top. Basis: `rm.out-of-play-deck`. Sources: none found.
+- `07029:A:1` (span-settled). The top card of each player's out-of-play deck is revealed; an enemy goes to the staging area and any other card is discarded to its owner's discard pile. Basis: `rm.out-of-play-deck`, `rr.discard-pile-and-victory-display`.
+- Time on stages and enemies (`07063:B:1`, `07064:B:1`) (span-settled). The counters are placed when the stage is revealed and one is removed at the end of each refresh phase. Basis: `rm.time-x`.
+- Setup timing (span-settled). See Setup, When.
+
+## Readings to confirm
+
+- Searches with fewer than X cards: recommended. See Readings.
+- `07026:A:1`: recommended. The card is shuffled in at random. See Readings.

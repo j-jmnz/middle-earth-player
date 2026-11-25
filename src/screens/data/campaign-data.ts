@@ -1,6 +1,7 @@
 import againstTheShadow from "../../../data/campaigns/against-the-shadow.json";
 import dwarrowdelf from "../../../data/campaigns/dwarrowdelf.json";
 import theHobbit from "../../../data/campaigns/the-hobbit.json";
+import theRingMaker from "../../../data/campaigns/the-ring-maker.json";
 import shadowsOfMirkwood from "../../../data/campaigns/shadows-of-mirkwood.json";
 import standaloneScenarios from "../../../data/campaigns/standalone-scenarios.json";
 import dreamChaser from "../../../data/campaigns/dream-chaser.json";
@@ -105,6 +106,15 @@ import amonDin from "../../../data/scenarios/encounter-at-amon-din.json";
 import assaultOnOsgiliath from "../../../data/scenarios/assault-on-osgiliath.json";
 import bloodOfGondor from "../../../data/scenarios/the-blood-of-gondor.json";
 import morgulVale from "../../../data/scenarios/the-morgul-vale.json";
+import fordsOfIsen from "../../../data/scenarios/the-fords-of-isen.json";
+import toCatchAnOrc from "../../../data/scenarios/to-catch-an-orc.json";
+import intoFangorn from "../../../data/scenarios/into-fangorn.json";
+import dunlandTrap from "../../../data/scenarios/the-dunland-trap.json";
+import threeTrials from "../../../data/scenarios/the-three-trials.json";
+import troubleInTharbad from "../../../data/scenarios/trouble-in-tharbad.json";
+import ninInEilph from "../../../data/scenarios/the-nin-in-eilph.json";
+import celebrimborsSecret from "../../../data/scenarios/celebrimbors-secret.json";
+import antleredCrown from "../../../data/scenarios/the-antlered-crown.json";
 import { printedScenarioName } from "../../campaign/printed-name";
 import { campaignDataSchema, parseAnyScenarioData, type AnyScenarioData, type CampaignData } from "../../catalog/scenario-data";
 
@@ -112,8 +122,8 @@ import { campaignDataSchema, parseAnyScenarioData, type AnyScenarioData, type Ca
 // source for them. Metro needs static JSON imports, so the map is written by hand; campaign-data.test.ts checks it against
 // data/campaigns/index.json and data/scenarios. Each file is parsed (zod) the first time it is asked for, not when the module
 // loads, and kept: the app opens without parsing every scenario, and a screen pays only for the ones it shows.
-const RAW_CAMPAIGNS: Readonly<Record<string, unknown>> = Object.fromEntries([shadowsOfMirkwood, dwarrowdelf, theHobbit, againstTheShadow, standaloneScenarios, fellowship, mirkwoodPaths, darkOfMirkwood, dreamChaser, eredMithrin, angmarAwakened, twoTowers, returnOfTheKing].map((raw) => [raw.id, raw]));
-const RAW_SCENARIOS: Readonly<Record<string, unknown>> = Object.fromEntries([weMustAway, misty, riddles, fliesAndSpiders, lonelyMountain, fiveArmies, perilInPelargir, intoIthilien, siegeOfCairAndros, stewardsFear, druadanForest, amonDin, assaultOnOsgiliath, bloodOfGondor, morgulVale, intoThePit, seventhLevel, flightFromMoria, redhornGate, roadToRivendell, watcherInTheWater, longDark, foundationsOfStone, shadowAndFlame, past, knife, flight, south, journey, breaking, passage, anduin, dolGuldur, oath, caves, voyage, fate, raid, stormcaller, depths, temple, ruins, cobas, corsairs, upTheAnduin, lostInMirkwood, kingsQuest, witheredHeath, roam, fireInTheNight, framsburg, gundabad, wilderland, urukHai, helmsDeep, isengard, marshes, crossRoads, shelob, greyCompany, siege, pelennor, cirithUngol, blackGate, mountDoom, intruders, weatherHills, deadmensDike, wastes, mountGram, ettenmoors, rhudaur, carnDum, dreadRealm, hunt, carrock, rhosgobel, emynMuil, deadMarshes, returnToMirkwood, massing, lakeTown, stoneOfErech, oldForest, fogOnTheBarrowDowns, ruinsOfBelegost, murderAtThePrancingPony, siegeOfAnnuminas, attackOnDolGuldur, wizardsQuest, woodlandRealm, minesOfMoria, escapeFromKhazadDum, huntForTheDreadnaught].map((raw) => [raw.id, raw]));
+const RAW_CAMPAIGNS: Readonly<Record<string, unknown>> = Object.fromEntries([shadowsOfMirkwood, dwarrowdelf, theHobbit, againstTheShadow, theRingMaker, standaloneScenarios, fellowship, mirkwoodPaths, darkOfMirkwood, dreamChaser, eredMithrin, angmarAwakened, twoTowers, returnOfTheKing].map((raw) => [raw.id, raw]));
+const RAW_SCENARIOS: Readonly<Record<string, unknown>> = Object.fromEntries([weMustAway, misty, riddles, fliesAndSpiders, lonelyMountain, fiveArmies, perilInPelargir, intoIthilien, siegeOfCairAndros, stewardsFear, druadanForest, amonDin, assaultOnOsgiliath, bloodOfGondor, morgulVale, fordsOfIsen, toCatchAnOrc, intoFangorn, dunlandTrap, threeTrials, troubleInTharbad, ninInEilph, celebrimborsSecret, antleredCrown, intoThePit, seventhLevel, flightFromMoria, redhornGate, roadToRivendell, watcherInTheWater, longDark, foundationsOfStone, shadowAndFlame, past, knife, flight, south, journey, breaking, passage, anduin, dolGuldur, oath, caves, voyage, fate, raid, stormcaller, depths, temple, ruins, cobas, corsairs, upTheAnduin, lostInMirkwood, kingsQuest, witheredHeath, roam, fireInTheNight, framsburg, gundabad, wilderland, urukHai, helmsDeep, isengard, marshes, crossRoads, shelob, greyCompany, siege, pelennor, cirithUngol, blackGate, mountDoom, intruders, weatherHills, deadmensDike, wastes, mountGram, ettenmoors, rhudaur, carnDum, dreadRealm, hunt, carrock, rhosgobel, emynMuil, deadMarshes, returnToMirkwood, massing, lakeTown, stoneOfErech, oldForest, fogOnTheBarrowDowns, ruinsOfBelegost, murderAtThePrancingPony, siegeOfAnnuminas, attackOnDolGuldur, wizardsQuest, woodlandRealm, minesOfMoria, escapeFromKhazadDum, huntForTheDreadnaught].map((raw) => [raw.id, raw]));
 
 const campaigns = new Map<string, CampaignData>();
 const scenarios = new Map<string, AnyScenarioData>();
@@ -142,6 +152,8 @@ export const BOXES: readonly Box[] = [
   { id: "the-hobbit", name: "The Hobbit", campaignId: "the-hobbit", scenarios: ["we-must-away-ere-break-of-day", "over-the-misty-mountains-grim", "dungeons-deep-and-caverns-dim", "flies-and-spiders", "the-lonely-mountain", "the-battle-of-five-armies"] },
   // Against the Shadow is the cycle of the Heirs of Númenor box and its six Adventure Packs: standalone only, one box in release order.
   { id: "against-the-shadow", name: "Against the Shadow", campaignId: "against-the-shadow", scenarios: ["peril-in-pelargir", "into-ithilien", "the-siege-of-cair-andros", "the-stewards-fear", "the-druadan-forest", "encounter-at-amon-din", "assault-on-osgiliath", "the-blood-of-gondor", "the-morgul-vale"] },
+  // The Ring-maker is the cycle of The Voice of Isengard box and its six Adventure Packs: standalone only, one box in release order.
+  { id: "the-ring-maker", name: "The Ring-maker", campaignId: "the-ring-maker", scenarios: ["the-fords-of-isen", "to-catch-an-orc", "into-fangorn", "the-dunland-trap", "the-three-trials", "trouble-in-tharbad", "the-nin-in-eilph", "celebrimbors-secret", "the-antlered-crown"] },
   { id: "revised-core", name: "Revised Core Set", campaignId: "mirkwood-paths", scenarios: ["passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur"] },
   { id: "the-dark-of-mirkwood", name: "The Dark of Mirkwood", campaignId: "the-dark-of-mirkwood", scenarios: ["the-oath", "the-caves-of-nibin-dum"] },
   // The Lost Realm and the six Adventure Packs are one box with the Campaign Expansion on the Scenarios tab, as the other campaign expansions' are.

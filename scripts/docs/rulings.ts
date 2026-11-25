@@ -41,7 +41,7 @@ export const STAMP = /(?<!\bnot )\buser(?:[- ](?:rulings?|decisions?|instruction
 const DATE = /\d{4}-\d{2}-\d{2}/g;
 export const LINE_ID = /(?<![\w:])(\d{2,6}):[A-Za-z]+:\d+(?![\w])/g;
 export const CODE = /(?<![\w:./-])\d{5,6}(?![\w/])/g;
-export const RULE_ID = /(?<![\w./-])(?:rr|faq|ltp|dcce|mec\d+|dwd|decklist|emce|sotm|ats|tdom|hon|easy-mode|trg|bts|wor)\.[a-z0-9][\w.-]*[a-z0-9]/g;
+export const RULE_ID = /(?<![\w./-])(?:rr|faq|ltp|dcce|mec\d+|dwd|decklist|emce|sotm|ats|rm|tdom|hon|easy-mode|trg|bts|wor)\.[a-z0-9][\w.-]*[a-z0-9]/g;
 // The brief's sections that state rules and card readings; a stamp in another section is a product decision unless it names a card or a rule.
 const RULE_SECTIONS = /^(?:Campaign|Mirkwood campaign|Standalone play|Scenario state|The engine plays|Engine steps|Core round|Player card readings|Keywords implemented|Player side quests|Window stack|Three layers|Coverage test)/;
 

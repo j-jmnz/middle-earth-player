@@ -1,0 +1,163 @@
+{
+  "id": "the-dunland-trap",
+  "name": "The Dunland Trap",
+  "number": 1,
+  "stages": [
+    "08011",
+    "08012",
+    "08013"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Dunland Trap",
+      "count": 26
+    },
+    {
+      "name": "Dunland Warriors",
+      "count": 9
+    },
+    {
+      "name": "Weary Travelers",
+      "count": 7
+    }
+  ],
+  "cards": [
+    {
+      "code": "08017",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "08018",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "08019",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "08020",
+      "normal": 4,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "08021",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "08022",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "08023",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "08024",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "07046",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "07047",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "07048",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "07049",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "07056",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "07057",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "07058",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "08011",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "08012",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "08013",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "08016",
+      "normal": 1,
+      "easy": 1,
+      "pile": "activeLocation"
+    },
+    {
+      "code": "08014",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "08015",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q04.4",
+    "dragnEasy": "E04.4",
+    "hobSlug": "The-Dunland-Trap"
+  }
+}
