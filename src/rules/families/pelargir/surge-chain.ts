@@ -5,11 +5,11 @@
 import type { ScenarioState } from "../../core/state.ts";
 import { gameReads } from "../../core/game-reads.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { inSurgeChain } from "../surge-chain.ts";
+import { inSurgeChain } from "../../quest/surge-chain.ts";
 
 const TERROR_DRIVES_THEM = "06159";
 
-/** A surge chain (families/surge-chain.ts) that the reset leaves alone. Only in a game with a record that takes a hidden card, or one with a record that removes a card by its title (The Morgul Vale: To the Tower is in the game, `gameReads` checks the records of the cards in the game, not the staging area), and with no Terror Drives Them in the chain. */
+/** A surge chain (quest/surge-chain.ts) that the reset leaves alone. Only in a game with a record that takes a hidden card, or one with a record that removes a card by its title (The Morgul Vale: To the Tower is in the game, `gameReads` checks the records of the cards in the game, not the staging area), and with no Terror Drives Them in the chain. */
 export function inOwnSurgeChain(state: ScenarioState, ctx: ReduceContext): boolean {
   if (!gameReads(state, ctx, '"TakeHiddenCard"') && !gameReads(state, ctx, '"RemoveAllNamedFromGame"')) return false;
   return inSurgeChain(state, (code) => code !== TERROR_DRIVES_THEM);

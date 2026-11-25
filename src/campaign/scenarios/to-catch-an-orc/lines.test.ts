@@ -10,6 +10,8 @@ import { idOf } from "../../../../test/harness/scene-kit.ts";
 const SCENARIO = "to-catch-an-orc";
 const STAGE_2 = "07063";
 const PARTY = "07041";
+const STAGE_3 = "07064";
+const MUGASH_ON_DH2 = { code: "07024", to: "dh2", encounter: true } as const;
 
 describe("To Catch an Orc: the lines whose records leave the table as the engine has it", () => {
   const taken: Layout = { stage: STAGE_2, timeCounters: 1, active: "07054", deck: ["f0"] };
@@ -25,6 +27,15 @@ describe("To Catch an Orc: the lines whose records leave the table as the engine
     const stage = done.run.state.cards[idOf(done.run.state, STAGE_2)];
     expect(stage?.resources).toBe(2);
     expect(stage?.progress ?? 0).toBe(0);
+  });
+
+  // The win itself is the engine's default for a defeated last stage, so this passes without the record 07064:questResolution:1 (no row can fail without it); it reads the two lines of the stage together: progress reaches the stage only with Mugash on a hero (07064:B:3), so only then is it defeated and the game won.
+  it("07064:B:4 the players win by defeating the last stage, which only a hero with Mugash attached lets them do (with B:3)", () => {
+    const free = playedLayout(SCENARIO, { stage: STAGE_3, progress: 11, staging: ["07024"] }, quest("success"));
+    expect(free.run.state.stageCleared).toBeFalsy();
+    const held = playedLayout(SCENARIO, { stage: STAGE_3, progress: 11, attached: [MUGASH_ON_DH2] }, quest("success"));
+    expect(held.run.state.stageCleared).toBe(true);
+    expect(held.run.state.lost).toBeFalsy();
   });
 
   it("07041:A:1 Orc Hunting Party that surges with nothing else to reveal ends the chain: the reset shuffles it back once and the round engine does not loop", () => {

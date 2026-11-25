@@ -5,12 +5,12 @@
 import { gameReads } from "../../core/game-reads.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { inSurgeChain } from "../surge-chain.ts";
+import { inSurgeChain } from "../../quest/surge-chain.ts";
 
 const ORC_HUNTING_PARTY = "07041";
 
-/** The discard pile holds only open reveals of Orc Hunting Party (the shared chain check, families/surge-chain.ts): the surge finds no card and the chain ends. */
+/** The discard pile holds only reveals still open (the shared chain check, quest/surge-chain.ts; Orc Hunting Party's surge is what chains them, and an Orc Territory or a location revealed in the chain is open with it): the surge finds no card and the chain ends. */
 export function inOwnSurgeChain(state: ScenarioState, ctx: ReduceContext): boolean {
   if (!gameReads(state, ctx, `"cardCode":"${ORC_HUNTING_PARTY}"`)) return false;
-  return inSurgeChain(state, (code) => code === ORC_HUNTING_PARTY);
+  return inSurgeChain(state);
 }
