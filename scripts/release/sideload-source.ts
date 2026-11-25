@@ -19,7 +19,7 @@ const { versionCodeOf } = require("../../app.config.js") as { versionCodeOf: (ve
 
 export const SOURCE_NAME = "source.json";
 export const BUNDLE_ID = "com.middleearth.player";
-// React Native's iOS minimum (react-native/scripts/cocoapods/helpers.rb); the README's Install section says the same.
+// React Native's iOS minimum (react-native/scripts/cocoapods/helpers.rb); guide/install.md (Install) says the same.
 export const MIN_IOS = "15.1";
 const DESCRIPTION = "An offline app for playing The Lord of the Rings: The Card Game solo or two-handed, with its campaigns. Fan-made, not affiliated with Fantasy Flight Games.";
 
