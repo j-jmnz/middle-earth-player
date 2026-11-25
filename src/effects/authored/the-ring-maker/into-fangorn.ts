@@ -73,7 +73,7 @@ const hinder = (code: string): Effect[] => [
 const resourcePhase = (code: string, instructions: Instruction[]): Effect => ({ id: `${code}:forced:2`, cardCode: code, lines: [`${code}:A:2`], timing: "forced", trigger: "beginningOfPhase", condition: { kind: "all", conditions: [{ kind: "phase", is: "Resource" }, ENGAGED] }, instructions });
 
 // The two stages that return Mugash: "shuffle Mugash into the encounter deck and advance to stage 3 / 3A" (07065:B:2, 07066:B:2). The advance is a jump (AdvanceToStage), which no restriction on the stage's own advance holds back.
-const timeOut = (code: string): Effect => ({ id: `${code}:forced:1`, cardCode: code, lines: [`${code}:B:2`], timing: "forced", trigger: "lastTimeCounterRemoved", subject: "self", instructions: [...SHUFFLE_MUGASH, { verb: "AdvanceToStage", code: STAGE_3, again: true }] });
+const timeOut = (code: string): Effect => ({ id: `${code}:forced:1`, cardCode: code, lines: [`${code}:B:2`], timing: "forced", trigger: "lastTimeCounterRemoved", subject: "self", instructions: [...SHUFFLE_MUGASH, { verb: "AdvanceToStage", code: STAGE_3, again: true, bypassed: true }] });
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   // 07031 Mugash (objective). Guarded: the line of every Guarded objective, resolved each time he is revealed. Action: any player exhausts a ready hero to claim him when he is free of encounters (the guard gone, Edge of Fangorn included); he attaches to the hero. He lies on Edge of Fangorn from Setup: while it
@@ -227,7 +227,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     trigger: "progressPlaced",
     subject: "self",
     condition: { kind: "all", conditions: [{ kind: "less", left: 5, right: { stat: "progress", of: "self" } }, MUGASH_ATTACHED] },
-    instructions: [{ verb: "AdvanceToStage", code: STAGE_2, again: true }],
+    instructions: [{ verb: "AdvanceToStage", code: STAGE_2, again: true, bypassed: true }],
   },
 ], { pool: STORM });
 

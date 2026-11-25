@@ -121,6 +121,19 @@ describe("Mugash and the quest stages (07031, 07065 to 07067)", () => {
     expect(barred.stageCleared).toBeFalsy();
   });
 
+  it("07066:B:2 a time-out jump off stage 2 is no defeat: the quest moves to stage 3 and the game is not won, where the stage 2 Forced effect hears a defeat", () => {
+    const { done } = timeOut({ stage: STAGE_2, staging: [MUGASH], deck: ["f0", "f0"] }, STAGE_2);
+    expect(done.cards[done.questStage ?? ""]?.code).toBe(STAGE_3);
+    expect(done.stageCleared).toBeFalsy();
+    expect(done.stageLeft?.bypassed).toBe(true);
+  });
+
+  it("07066:B:4 defeating stage 2 by progress with Mugash on a hero still wins once the jumps are bypasses", () => {
+    const t = table({ stage: STAGE_2, phase: "Quest", progress: 11, attached: [onHero] });
+    const done = run(t, t.state, { verb: "PlaceQuestProgress", perPlayer: 3 });
+    expect(done.stageCleared).toBe(true);
+  });
+
   it("07066:B:4 defeating the second stage wins the game, and does not advance to stage 3", () => {
     const t = table({ stage: STAGE_2, phase: "Quest", progress: 11, attached: [onHero] });
     const done = run(t, t.state, { verb: "PlaceQuestProgress", perPlayer: 3 });
