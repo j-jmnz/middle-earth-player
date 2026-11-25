@@ -294,6 +294,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144064:B:1 (back): The players cannot advance unless the first player controls Sméagol.
   144064:constant:1: Constant
     only if not (the actor controls the card with code 144076)
+    who acts: the acting player is the first player (a quest stage belongs to no player; while the stages are split between the players, the player whose stage it is)
     - the players cannot defeat this stage while this holds
 
 144064:B:2 (back): Forced: After a player declares any number of attackers against Gollum, discard the top card of the encounter deck. Gollum gets +X Defense for this attack, where X is the discarded card's Threat.
@@ -319,6 +320,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144065:B:2 (back): The players cannot advance unless the first player controls Sméagol and there are at least 4 locations in the victory display.
   144065:constant:2: Constant
     only if not (the actor controls the card with code 144076)
+    who acts: the acting player is the first player (a quest stage belongs to no player; while the stages are split between the players, the player whose stage it is)
     - the players cannot defeat this stage while this holds
   144065:constant:3: Constant
     only if the number of location (any player controls) in the victory display is at most 3
@@ -348,6 +350,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144066:B:2 (back): The players cannot defeat this stage unless the first player controls Sméagol. If the players defeat this stage, they win the game.
   144066:constant:2: Constant
     only if not (the actor controls the card with code 144076)
+    who acts: the acting player is the first player (a quest stage belongs to no player; while the stages are split between the players, the player whose stage it is)
     - the players cannot defeat this stage while this holds
 
 ## 144075 Gollum

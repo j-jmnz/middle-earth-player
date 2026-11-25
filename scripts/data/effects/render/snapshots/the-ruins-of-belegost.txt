@@ -200,7 +200,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
   50609:constant:3: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
     - this card counts as an attachment while it is attached
 
 50609:A:3 (front): Attached hero gets +4 Attack.
@@ -223,7 +223,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
   50610:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
     - this card counts as an attachment while it is attached
 
 50610:A:3 (front): Action: Exhaust Map of Ered Luin to choose a non-unique location. That location gets -2 Threat until the end of the phase.
@@ -244,7 +244,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
   50611:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
     - this card counts as an attachment while it is attached
 
 50611:A:3 (front): Action: Exhaust Keys of Belegost to choose a hero. Add 1 resource to that hero's pool.
@@ -265,7 +265,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
   50612:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
     - this card counts as an attachment while it is attached
 
 50612:A:3 (front): Action: Exhaust Book of Aulë's Children to choose a player. That player draws 1 card.
@@ -286,7 +286,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
   50613:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
     - this card counts as an attachment while it is attached
 
 50613:A:3 (front): Action: Exhaust Dwarven Torch to choose a non-unique enemy. That enemy gets -1 Attack and -1 Defense until the end of the phase.
@@ -308,7 +308,7 @@ Scenario piles that place cards with no record (quest: 50601 Ruins of the First 
   50614:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
     - this card counts as an attachment while it is attached
 
 50614:A:3 (front): Action: Exhaust Blue Mountain Gem to choose a player. Reduce that player's threat by 1.

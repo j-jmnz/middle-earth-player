@@ -123,6 +123,14 @@ export function bodyProps(slot: CardSlot, ctx: PieceContext): BodyProps {
   };
 }
 
+/** A hand card draws no numbers but the pill of a card that cannot leave it (Ill Tidings, 07023:A:1): its numbers hold that pill alone, and a card without one has none. */
+function handInfo(slot: CardSlot, ctx: PieceContext): SlotNumbers | null {
+  if (slot.kind !== "card" || slot.faceDown || slot.zone !== "hand") return null;
+  const under = ctx.info(ctx.game, ctx.seat, slot.id).under;
+  if (under == null) return null;
+  return { effects: { stats: [], flags: [] }, willpower: null, commitStat: "willpower", questPoints: null, stageLoses: false, engagement: null, delayed: false, under, fire: null, loss: null, place: null, side: null, determined: null, dead: null, combat: null };
+}
+
 /** Everything the drawing of one slot reads, from the canvas's context for this render. */
 export function pieceProps(slot: CardSlot, ctx: PieceContext): PieceProps {
   const card = slot.kind === "card";
@@ -136,7 +144,7 @@ export function pieceProps(slot: CardSlot, ctx: PieceContext): PieceProps {
     beat: ctx.beating.has(slot.id),
     veiledHand: card && ((ctx.peeking && slot.zone === "hand") || slot.stormcaller === "apart"),
     stageMarks: slot.stormcaller === "stage" ? ctx.stageMarks : null,
-    info: numbered ? ctx.info(ctx.game, ctx.seat, slot.id) : null,
+    info: numbered ? ctx.info(ctx.game, ctx.seat, slot.id) : handInfo(slot, ctx),
     optionMark: ctx.highlight.marks.get(slot.id),
     inactive: card && !slot.faceDown && ctx.inactive(slot.picture ?? slot.code),
     owner: slot.zone === "questStage" ? ctx.owner : null,

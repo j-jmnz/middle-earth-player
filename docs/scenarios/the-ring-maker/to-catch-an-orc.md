@@ -19,16 +19,11 @@ The statuses are those of the Readings bullet of `docs/scenarios/the-ring-maker.
 
 - Out-of-play deck (span-settled). Each player's twenty cards are one facedown deck out of play, apart from the draw deck, the hand and the discard pile; a card there is not in play and counts for no effect that names the player's deck. Basis: `rm.out-of-play-deck`, `rr.in-play-and-out-of-play`.
 - Searches X (`07027:A:2`, `07028:A:1`) (span-settled). When a location with the keyword leaves play (here as an explored location), each player the card names reveals the top X cards of his out-of-play deck, adds each revealed enemy to the staging area, chooses 1 of the other cards for his hand and discards the rest. Methedras names each player, Orc Cave the first player. Not taken: the search keeps the enemies hidden. Basis: `rm.searches-x`.
-- Searches with fewer than X cards (recommended). The player reveals all the cards the deck holds; with none nothing happens. Not taken: a loss for an empty deck (no rule makes an out-of-play deck a draw deck; `rr.running-out-of-cards` is about the player deck). Basis: `rm.searches-x`. Sources: none found.
+- Searches with fewer than X cards (recommended). The player reveals all the cards the deck holds; with none nothing happens. Not taken: a loss for an empty deck (no rule makes an out-of-play deck a draw deck; `rr.running-out-of-cards` is about the player deck). Basis: `rm.searches-x`; no rule orders more, so the effect does as much as the deck allows.
 - `07024:A:2` (researched). Mugash's Forced effect attaches him to a hero and exhausts that hero; the exhaustion is an effect, not a cost, so he attaches to an exhausted hero. The hero stays exhausted and cannot ready while Mugash is attached. Basis: the official response by Caleb dated 2014-03-03 on https://ffg-forum-archive.entropicdreams.com/topic/100233-mugash-forced-effect-on-to-catch-an-orc ("Exhausting the hero Mugash is attached to is an effect, not a cost.").
 - `07024:A:2` (span-settled). The Captive attachment is the attachment with the text the card gives: "Attached hero cannot ready. If attached hero leaves play, the players lose the game." Basis: the printed line, `rr.attachment-cards`.
 - `07025:A:1`, `07025:A:2` (span-settled). While a player controls a hero with Mugash attached, each Guard engages that player; when a Guard destroys a character and Mugash is attached to a hero, Mugash returns to the staging area. Basis: the printed lines.
-- `07026:A:1` (recommended). "Shuffles 1 random card from his hand into his out-of-play deck": the card goes in at a random place, face down. Not taken: the card goes on top. Basis: `rm.out-of-play-deck`. Sources: none found.
+- `07026:A:1` (span-settled). "Shuffles 1 random card from his hand into his out-of-play deck": the card goes in at a random place, face down. Not taken: the card goes on top. Basis: the printed verb "shuffles" (a shuffle puts the card at a random place), `rm.out-of-play-deck`.
 - `07029:A:1` (span-settled). The top card of each player's out-of-play deck is revealed; an enemy goes to the staging area and any other card is discarded to its owner's discard pile. Basis: `rm.out-of-play-deck`, `rr.discard-pile-and-victory-display`.
 - Time on stages and enemies (`07063:B:1`, `07064:B:1`) (span-settled). The counters are placed when the stage is revealed and one is removed at the end of each refresh phase. Basis: `rm.time-x`.
 - Setup timing (span-settled). See Setup, When.
-
-## Readings to confirm
-
-- Searches with fewer than X cards: recommended. See Readings.
-- `07026:A:1`: recommended. The card is shuffled in at random. See Readings.

@@ -21,6 +21,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51101:B:2 (back): This stage cannot be defeated unless the first player controls Mendor.
   51101:constant:1: Constant
     only if not (the actor controls the card with code 51111)
+    who acts: the acting player is the first player (a quest stage belongs to no player; while the stages are split between the players, the player whose stage it is)
     - the players cannot defeat this stage while this holds
 
 ## 51103 A Chosen Path

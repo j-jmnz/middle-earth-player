@@ -2,6 +2,7 @@
 // mec112.saruman-grima-smeagol, mec112.campaign-mode-aragorn, mec113.campaign-mode-ring-bearer (data/rules/entries.json). Who the first player takes control of at
 // the start of a saga scenario, and the title bans of the box. Pure.
 import type { CampaignData, ScenarioData } from "../catalog/scenario-data.ts";
+import { RING_MAKER_CAMPAIGN, ringMakerTitleBans } from "./ring-maker/bans.ts";
 
 /**
  * The saga hero the first player starts a scenario with: the Ring-bearer from their own heroes with The One Ring attached (the
@@ -48,7 +49,8 @@ export const RETURN_OF_THE_KING_CAMPAIGN = "the-return-of-the-king";
 const NO_RING_BEARER: TitleBan = { title: "Frodo Baggins", types: null, rule: "mec113.campaign-mode-ring-bearer" };
 
 /** The titles the players cannot use in this scenario of this campaign. */
-export function titleBansOf(campaign: Pick<CampaignData, "id">, scenario: Pick<ScenarioData, "sagaStart">): readonly TitleBan[] {
+export function titleBansOf(campaign: Pick<CampaignData, "id">, scenario: Pick<ScenarioData, "sagaStart" | "id">): readonly TitleBan[] {
+  if (campaign.id === RING_MAKER_CAMPAIGN) return ringMakerTitleBans(scenario.id);
   const grantsHero = scenario.sagaStart != null && "hero" in scenario.sagaStart;
   if (campaign.id === RETURN_OF_THE_KING_CAMPAIGN) return grantsHero ? [NO_RING_BEARER] : [];
   if (campaign.id !== TWO_TOWERS_CAMPAIGN) return [];

@@ -293,6 +293,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18067:B:3 (back): The players cannot defeat this stage unless the first player controls Haldan.
   18067:constant:2: Constant
     only if not (the actor controls the card with code 18070)
+    who acts: the acting player is the first player (a quest stage belongs to no player; while the stages are split between the players, the player whose stage it is)
     - the players cannot defeat this stage while this holds
 
 ## 18068 The Passage of the Ford
@@ -342,7 +343,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18070:A:1 (front): The first player gains control of Haldan while he is free of encounters.
   18070:constant:1: Constant
-    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them
+    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them, and from then on it follows the first player token: it passes to the new first player each time the token moves, while it stays free of encounters
 
 18070:A:2 (front): While there is an active location, Haldan does not exhaust to quest.
   18070:constant:2: Constant

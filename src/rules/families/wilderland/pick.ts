@@ -11,11 +11,14 @@ import { flagged, type ScenarioState } from "../../core/state.ts";
 import { cardsUnder, playerCardsUnder } from "../../core/zones.ts";
 import { guardsTitled, isGuard } from "../objectives/pick.ts";
 import { engagementBarred } from "../quest/engage.ts";
+import { heldInHand } from "../ring-maker/hand.ts";
 import { heroGuardedBy } from "./carried.ts";
 
-/** Whether a card in a hand is barred from the discards a player card makes (the constant verb Undiscardable) and `sourceId` is a player card effect: its effect, a cost it takes or a random discard. A game rule or an encounter card's effect is not barred. */
+/** Whether a card in a hand is barred from the discards a player card makes (the constant verb Undiscardable) or cannot leave the hand (`cannotLeaveHand`) and `sourceId` is a player card effect: its effect, a cost it takes or a random discard. A game rule or an encounter card's effect is not barred. */
 export function barredFromPlayerDiscard(state: ScenarioState, ctx: ReduceContext, id: string, sourceId: string | null): boolean {
   const card = state.cards[id];
+  // A card that cannot leave the hand (Ill Tidings, families/ring-maker/hand.ts) is barred from every discard, whatever the source.
+  if (heldInHand(state, id)) return true;
   return card != null && constantVerbCodes(ctx, "Undiscardable").has(card.code) && isPlayerCardEffect(state, ctx.cards, sourceId);
 }
 

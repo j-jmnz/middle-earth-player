@@ -20,12 +20,8 @@ The statuses are those of the Readings bullet of `docs/scenarios/the-ring-maker.
 - `08068:A:1` to `08068:A:3` (span-settled). The first player controls Nalir from the Setup as an ally; at the beginning of the refresh phase his controller raises threat by 1 for each player in the game; if Nalir leaves play the players lose. Basis: the printed lines, `rm.attacks-against-nalir`.
 - `08066:B:3` (span-settled). Each time progress is placed on stage 1B all of it is canceled and each player's threat is reduced by an equal amount (the amount of the canceled progress); the players cannot go below 0. Not taken: each player reduces by the total. Basis: `rr.threat-threat-dial`.
 - `08066:B:4` (span-settled). When every player has 0 threat the players advance to stage 2. Basis: the printed line.
-- `08067:B:2` (recommended). Bellach attacks Nalir as an immediate attack by an effect: Nalir is the defender and takes the damage; the players choose between that and raising each player's threat by 3. Not taken: the first player chooses for all. Basis: `rm.attacks-against-nalir`. Sources: none found.
+- `08067:B:2` (span-settled). Bellach attacks Nalir as an immediate attack by an effect: Nalir is the defender and takes the damage; the players choose between that and raising each player's threat by 3. Not taken: the first player chooses for all. Basis: `rm.attacks-against-nalir`, `rr.first-player` (the first player's final say lists the travel location, the target of a single-target effect and the order of effects, not an either-or choice).
 - `08067:B:4` (span-settled). Each time any character leaves play, its controller raises threat by 2. Basis: the printed line.
 - `08070:A:2` (span-settled). Orc and Creature enemies get -30 engagement cost and +1 Threat while Bellach is in play. Basis: the printed line.
 - `08069:A:1`, `08069:A:2` (span-settled). Players cannot reduce their threat while The Empty Mug is in play; while it is in the victory display the current quest gains a Forced effect that removes from the game a card whose effect reduced a player's threat. Basis: the printed lines.
 - `08075:A:2` (span-settled). Time counters cannot be removed from the current quest while Tharbad Hideout is the active location. Basis: the printed line, `rm.time-x`.
-
-## Readings to confirm
-
-- `08067:B:2`: recommended. Bellach's attack on Nalir and the choice. See Readings.

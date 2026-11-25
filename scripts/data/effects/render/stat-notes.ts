@@ -41,6 +41,7 @@ export const FLAG_NOTES: Readonly<Record<string, string>> = {
   archeryBonus: " (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends)",
   archeryToAllies: " (archery damage must be assigned to allies, if able)",
   // Cards that return, leave or are kept.
+  returnsToStagingArea: " (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile)",
   returnsToEncounterDeck: " (a claimed objective: when its hero leaves play it goes to the top of the encounter deck instead of the staging area)",
   returnsWithoutActive: " (while no location is the active location an engaged holder goes back to the staging area at once, whatever engaged it)",
   noPlayerAttachments: " (no player card can be attached to it)",

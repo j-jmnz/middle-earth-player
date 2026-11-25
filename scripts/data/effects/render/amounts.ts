@@ -81,6 +81,12 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   return familyAmount(expr);
 }
 
+/** The N of an amount that tops the actor's hand up to N cards ({ hand, times: -1, plus: N }: "draw until you have N cards in hand"), or null for any other amount. A hand of N or more gives 0 or less, which draws nothing. */
+export function topUpTo(amount: unknown): number | null {
+  if (!isObj(amount) || amount.hand !== true || amount.times !== -1 || typeof amount.plus !== "number" || amount.plus <= 0) return null;
+  return amount.every === undefined && amount.limit === undefined && amount.negative === undefined ? amount.plus : null;
+}
+
 export function renderAmount(amount: unknown, ctx: Ctx, pick: PickRenderer): string {
   if (typeof amount === "number") return String(amount);
   if (!isObj(amount)) return jsonOf(ctx, "amount", amount);

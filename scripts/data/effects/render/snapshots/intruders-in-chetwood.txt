@@ -150,7 +150,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     - the card with code 09016 that a player controls lies facedown under this card, still in play, controlled by no one, with what is attached to it; when this card is defeated it returns under the first player, exhausted
 
 09024:A:3 (front): Forced: After the last time counter is removed from this stage, discard Iârion.
-  09024:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card only: with no subject, an event about one card is heard by that card alone)
+  09024:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card only: with no subject, an event about one card is heard by that card alone)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card held under this card is discarded from where it lies, and leaves play
 
@@ -309,6 +309,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 09068:B:3 (back): The players cannot defeat this stage unless the first player controls Iârion. If the players defeat this stage, they win the game.
   09068:constant:2: Constant
     only if not (the actor controls the card with code 09016)
+    who acts: the acting player is the first player (a quest stage belongs to no player; while the stages are split between the players, the player whose stage it is)
     - the players cannot defeat this stage while this holds
 
 ## 10156 Intruders in Chetwood

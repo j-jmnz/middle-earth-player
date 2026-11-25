@@ -335,6 +335,8 @@ export const effectSchema = z.strictObject({
   byPlay: z.literal(true).optional(),
   // This Forced effect resolves before the other Forced effects of the same moment, whatever the age of their cards (the engine resolves the oldest card's first): "after resolving the Forced effect on each stage 3 in play" (50907:A:1; docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 5).
   early: z.literal(true).optional(),
+  // The Forced effects that hear what this effect does (a draw, the last time counter taken off the stage) resolve after the whole effect, not between its steps (families/ring-maker/events.ts, The Fords of Isen).
+  holdsEvents: z.literal(true).optional(),
   cancel: cancelSchema.optional(),
   // While this holds, nothing may cancel the effect ("If The One Ring is exhausted, this effect cannot be canceled").
   uncancelable: conditionSchema.optional(),
