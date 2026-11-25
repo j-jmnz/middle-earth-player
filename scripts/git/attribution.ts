@@ -2,7 +2,7 @@
 // page, a `Co-Authored-By` line that names Claude or Anthropic, and the "Generated with|by Claude Code" footer, in any letter case. Each is matched in the form a tool writes it (a trailer
 // or footer at the start of a line, after optional emoji, `_`, `*` and spaces), so prose that names one mid-sentence, or inside backticks, passes. This is the one list of patterns:
 // scripts/git/commit-message.ts reads it for a commit message, and the CI job that checks a pull request's title passes the description to `pnpm commit:check --description`
-// (.github/workflows/test.yml, commits).
+// (.github/workflows/commits.yml).
 
 export type AttributionKind = "session" | "co-author" | "footer";
 
