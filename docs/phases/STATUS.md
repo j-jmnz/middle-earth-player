@@ -21,8 +21,8 @@ No phase is open.
 
 Open work is tracked as GitHub issues, one per area, with one checklist line per item. Read the issue of the area your task touches, not all of them. A new open item is a line in its area's issue, or a new issue with an existing label (`docs/agents/issue-standards.md`).
 
-- Rules and engine: #189. Angmar Awakened: #184. The Two Towers and The Return of the King: #186. Dwarrowdelf: #185. Shadows of Mirkwood: #182. Standalone scenarios: #183.
-- Screens and code: #187. Desktop: #181. Cards tab views: #178. Sound and music: #179. README showcase: #180. Releases: #177.
+- Rules and engine: #189. Angmar Awakened: #184. The Two Towers and The Return of the King: #186. Dwarrowdelf: #185. Shadows of Mirkwood: #182. Standalone scenarios: #183. Against the Shadow: #245.
+- Screens and code: #187. Against the Shadow screens and data: #246. Desktop: #181. Cards tab views: #178. Sound and music: #179. README showcase: #180. Releases: #177.
 
 A reading no official source settles is not an open item: it is in the section `Readings to confirm` of its box's file in `docs/scenarios/` (or of `docs/brief.md` for the core round and the player cards), until the user confirms it.
 
