@@ -29,7 +29,7 @@ Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc
 07025:A:1 (front): While a player controls a hero with Mugash attached, Mugash's Guard engages that player.
   07025:constant:1: Constant
     only if this card is in the staging area
-    - this card: stat engagesCaptiveHolder 1, while this card is in play
+    - this card: stat engagesCaptiveHolder (while it is in the staging area it engages the player who controls a hero with Mugash attached, at once and whatever its engagement cost) 1, while this card is in play
 
 07025:A:2 (front): Forced: After Mugash's Guard destroys a character, if Mugash is attached to a hero, return Mugash to the staging area.
   07025:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
@@ -119,7 +119,8 @@ Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "damage":
-        - the acting player assigns 3 damage among the character (you control), one at a time
+        - choose character (you control)
+        - deal 3 damage to the picked card
       * option "time" (only if 0 is less than resources of the current quest stage):
         - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
 
@@ -248,7 +249,7 @@ Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc
 07063:B:3 (back): Response: After questing successfully, cancel all progress that would be placed on this stage. Then, place 1 time counter on this stage. Or, if Mugash is in play, advance to stage 3.
   07063:response:1: Response after the players quest successfully (event happened to the controller)
     - the acting player chooses one of:
-      * option "time":
+      * option "time" (only if progress was placed on the current quest card this quest phase (the quest card itself, the overflow of an explored active location included)):
         - the progress placed on the current quest card since the phase began, the overflow of an explored active location included, is taken off it and forgotten
         - place 1 resource tokens on this card
       * option "advance" (only if there is a card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose):
@@ -278,4 +279,4 @@ Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc
   07064:questResolution:1: Quest resolution
     - the players win the game
 
-(rendered pieces: 169 by template, 0 as JSON)
+(rendered pieces: 171 by template, 0 as JSON)

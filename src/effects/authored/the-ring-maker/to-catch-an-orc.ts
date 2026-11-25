@@ -104,7 +104,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
         verb: "Choose",
         who: "actor",
         options: [
-          { id: "damage", instructions: [{ verb: "AssignDamage", amount: 3, pick: { type: "character", control: "you" } }] },
+          { id: "damage", instructions: [{ verb: "Pick", pick: { type: "character", control: "you" } }, { verb: "DamageCard", amount: 3, target: "picked" }] },
           { id: "time", requires: HAS_TIME, instructions: [REMOVE_TIME] },
         ],
       },
@@ -167,7 +167,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "07062:whenRevealed:1", cardCode: "07062", lines: ["07062:B:1"], timing: "whenRevealed", instructions: [EACH_PLAYER([{ verb: "SearchMove", type: "location", trait: "Mountain", to: "staging", deckOnly: true }]), SHUFFLED, { verb: "AdvanceStage" }] },
 
   // 07063 Searching for Mugash. Time 2; after the last counter the encounter discard pile is shuffled into the deck, 2 cards are revealed for each player and 2 counters go on the stage. Response: after questing successfully the first player cancels the progress this phase and places a counter,
-  // or, with Mugash in play, advances to stage 3 (trackQuestProgress keeps the progress the cancel reads).
+  // or, with Mugash in play, advances to stage 3 (trackQuestProgress keeps the progress the cancel reads). With no progress to cancel the first option is not offered (rr.then: the counter follows a cancel that resolved).
   { id: "07063:constant:1", cardCode: "07063", lines: ["07063:B:1"], timing: "constant", instructions: [{ verb: "Time", amount: 2 }] },
   {
     id: "07063:forced:1",
@@ -190,7 +190,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
         verb: "Choose",
         who: "actor",
         options: [
-          { id: "time", instructions: [{ verb: "CancelPhaseProgress" }, { verb: "PlaceResourceTokens", amount: 1, on: "self" }] },
+          { id: "time", requires: { kind: "questProgressNoted", is: true }, instructions: [{ verb: "CancelPhaseProgress" }, { verb: "PlaceResourceTokens", amount: 1, on: "self" }] },
           { id: "advance", requires: { kind: "canPick", pick: MUGASH_IN_PLAY }, instructions: [{ verb: "AdvanceStage" }] },
         ],
       },
