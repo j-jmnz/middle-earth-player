@@ -16,13 +16,15 @@ const SHORT_HAND = { kind: "less", left: { hand: true }, right: 3 } as const;
 // A Morgul Sorcerer is in play (staging area or engaged): its Forced effect (06149:A:1) deals it a shadow card after tokens are placed.
 const SORCERER: Condition = { kind: "count", pick: { type: "enemy", control: "any", staging: true, names: ["Morgul Sorcerer"] }, min: 1 };
 const DEALT = " Each Morgul Sorcerer in play is dealt a shadow card.";
+const DEALT_AFTER = " Each Morgul Sorcerer in play is dealt a shadow card after tokens are placed.";
+const SORCERER_NOTE = "Morgul Sorcerer, shadow effect: place 1 progress token on To the Tower, or treat this attack as undefended. To the Tower holds {tokens} of the 10 that lose the game.";
 const LOSS_CAUTION = "Tap again: To the Tower reaches 10 and the players lose the game";
 const NO_HAND = { kind: "less", left: { hand: true }, right: 1 } as const;
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 06144:A:1 (The Rearguard, Setup): the piles add To the Tower, Murzag and a Morgul Vale to the staging area; the record only names To the Tower so that its own Forced effect hears it.
   "06144:setup:1 @0 Pick": { bare: true, note: "Setup: To the Tower is added to the staging area, and every Faramir the players own is removed from the game.", verb: "Add" },
   // 06149:A:2 (Morgul Sorcerer, Shadow): the defending player places 1 token on To the Tower, or the attack is treated as undefended; not asked when it already is undefended.
-  "06149:shadow:1 @0 Choose": { owned: true, note: "Morgul Sorcerer, shadow effect: place 1 progress token on To the Tower, or treat this attack as undefended. To the Tower holds {tokens} of the 10 that lose the game. Each Morgul Sorcerer in play is dealt a shadow card after tokens are placed.", bind: { tokens: TOKENS } },
+  "06149:shadow:1 @0 Choose": { owned: true, note: [{ when: SORCERER, text: `${SORCERER_NOTE}${DEALT_AFTER}` }, { text: SORCERER_NOTE }], bind: { tokens: TOKENS } },
   "06149:shadow:1 @0 place": {
     label: [
       { when: LOSES_AT_ONE, text: "Place 1 progress on To the Tower: the players lose" },
@@ -54,8 +56,8 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   },
   "06157:whenRevealed:1 @0 reveal": {
     label: [
-      { when: ONE_PLAYER, text: "Reveal {players} more encounter card: no progress placed" },
-      { text: "Reveal {players} more encounter cards: no progress placed" },
+      { when: ONE_PLAYER, text: "Reveal {players} more encounter card: no progress from this card" },
+      { text: "Reveal {players} more encounter cards: no progress from this card" },
     ],
     bind: { players: { players: true } },
   },
