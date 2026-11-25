@@ -154,6 +154,11 @@ The new verbs and flags are in the family `pelargir` (`src/catalog/families/pela
 - A set-aside Captain, Lord Alcaron and the Nazgûl, is out of play until its stage adds it; the sweep never restores a set-aside card.
 - A seat left with no hero after the removal of Faramir is eliminated by the engine's own rule.
 
+## Games
+
+- **Goldens** (`test/scenarios/the-morgul-vale/game.ts`, `golden.test.ts`, moments in `moments.ts`): a solo win, a two-handed win and an Easy solo win; losses by ten tokens on To the Tower (the policy puts every token it may on the card), by every hero destroyed and by threat 50. The stand-in heroes are strong (Attack 12, Willpower 20) and the players keep two heroes out of the quest, defend one attack a round, engage and attack the Captain of the stage first and use Morgul Road's Response. The checks name each moment by intent and card: the Captains and the stages, progress that advances no stage, a token from each kind of source, the loss at exactly ten, the Bodyguard's shield and its switch, Murzag's reveal and the enemy it engages, Lord Alcaron's additional attack, the Nazgûl's cut to 1, The Power of Mordor, The White Bridge and each choice.
+- **Fixture** (`vale-lost`, no won one): a two-handed Easy game of saved decklists that loses with the Tower at 7, a Bodyguard hurt with a Captain in play and the choices of Sleepless Malice and Morgul Road. No game of the first 400 seeds loses after a stage advanced, because the saved decklists fall before they destroy Murzag; the stage advance, the Nazgûl and Lord Alcaron are seen in the goldens only, not on a screen of a fixture.
+
 ## Table
 
 Each piece is made by a line named here and drawn only while that line makes it; none is a control. The words, the layout and the rules of each piece are in `docs/design-system-table.md`, The Morgul Vale's table pieces; every hook keys on this scenario's id and is empty in another. Code: `src/play/readouts/against-the-shadow/vale.ts`, `vale-steps.ts`, `src/play/words/scenarios/against-the-shadow/vale.ts`, `src/play/words/asks/the-morgul-vale.ts`; test `src/play/scenarios/the-morgul-vale-table.test.ts`.
