@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 import { TextButton } from "../../ui/buttons.tsx";
 import { Segmented } from "../../ui/segmented.tsx";
 import { SettingSwitch } from "../../ui/setting-switch.tsx";
-import { ALWAYS_EMPTY_LINE, BANNER_CLOSES_LINE, BANNER_CLOSES_WORDS, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, DEBUG_LINE, EFFECTS_VOLUME_LINE, fogLine, GUIDE_LINE, HAPTICS_LINE, MUSIC_LINE, MUSIC_VOLUME_LINE, SOUNDS_LINE, NONE_YET, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TITLE_FACE_LINE, TITLE_FACE_WORDS, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, type AlwaysRow } from "./settings-words.ts";
+import { ALWAYS_EMPTY_LINE, BANNER_CLOSES_LINE, BANNER_CLOSES_WORDS, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, DEBUG_LINE, EFFECTS_VOLUME_LINE, fogLine, GUIDE_LINE, HAPTICS_LINE, MUSIC_LINE, MUSIC_VOLUME_LINE, STOP_OTHER_AUDIO_LINE, SOUNDS_LINE, NONE_YET, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TITLE_FACE_LINE, TITLE_FACE_WORDS, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, type AlwaysRow } from "./settings-words.ts";
 import { SETTING_TITLES, type SettingId } from "./settings-catalog.ts";
 import { platformLine, TABLE_LIST_DETAIL } from "./settings-platform.ts";
 import { CHECK_LINE } from "../../ui/update/offer.ts";
@@ -110,6 +110,8 @@ export function SettingRow({ id, settings, onChange, always, testPrefix }: RowPr
       return <SettingSwitch roomy label={title} detail={platformLine(MUSIC_LINE)} value={settings.music} onChange={(music) => onChange({ music })} testID={tid("music")} />;
     case "musicVolume":
       return <VolumeSlider label={title} detail={MUSIC_VOLUME_LINE} value={settings.musicVolume} dim={!settings.music} onChange={(musicVolume) => onChange({ musicVolume })} testID={tid("music-volume")} />;
+    case "stopOtherAudio":
+      return <SettingSwitch roomy label={title} detail={STOP_OTHER_AUDIO_LINE} value={settings.stopOtherAudio} onChange={(stopOtherAudio) => onChange({ stopOtherAudio })} testID={tid("stop-other-audio")} />;
     case "guide":
       return <SettingSwitch roomy label={title} detail={GUIDE_LINE} value={settings.guide} onChange={(guide) => onChange({ guide, ...(guide ? { guideSeen: {} } : {}) })} testID={tid("guide")} />;
     case "stops":

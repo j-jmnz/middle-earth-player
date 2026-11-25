@@ -210,7 +210,9 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51013:A:1 (front): When Revealed: The first player chooses a card in his hand. The opposing team looks at the first player's hand and chooses a different card to place faceup under Necromancer's Pass as a guarded objective. While Necromancer's Pass is guarding a card, copies of that card cannot be played. When Necromancer's Pass is explored, return the guarded card to its owner's hand.
   51013:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
+    - the rest of the effect is carried out by the first player
     - choose card (you control) in hand, chosen by the first player
     - then, if not (the acting player (the defending player, in a Shadow effect) holds at most 1 cards in hand) (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (you control) in hand, (the opposing team chooses: only the first of those stays, the order of seats and then of play breaking a tie, and nobody is asked), with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides), chosen by the first player, other than the cards this effect already picked
     - then, if not (the acting player (the defending player, in a Shadow effect) holds at most 1 cards in hand) (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked card (an ally in play, or a card of a hand) lies faceup under this card, its owner's still and out of play (an ally in play loses its tokens and its attachments are discarded); no copy of its title can be played while it lies there; it returns to its owner's hand when this card leaves play
@@ -811,4 +813,4 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
     - choose attachment (any player controls) attached to the defending character
     - discard the picked card
 
-(rendered pieces: 488 by template, 0 as JSON)
+(rendered pieces: 489 by template, 0 as JSON)

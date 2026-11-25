@@ -267,7 +267,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 
 04023:A:1 (front): When Revealed: The first player attaches this card to a hero he controls. Counts as a Condition attachment with the text: "Attached hero gets -2 Willpower and cannot commit to a quest. If attached hero has more than 1 copy of Freezing Cold attached, discard attached hero from play."
   04023:whenRevealed:1: When revealed
-    - attach this card to a hero the first player controls, one that carries a copy of this card too (the first player chooses it; with none this card is discarded) (the attachment is announced as it attaches: a Forced effect on an attachment hears it)
+    - attach this card to a hero the first player controls, one that carries a copy of this card too (the first player chooses it; with none this card stays where it is) (the attachment is announced as it attaches: a Forced effect on an attachment hears it)
   04023:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Condition attachment while it is attached
