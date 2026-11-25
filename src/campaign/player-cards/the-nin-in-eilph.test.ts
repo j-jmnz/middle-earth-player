@@ -3,8 +3,8 @@
 // ltp.undefended-attack, rr.triggered-ability, rr.printed (data/rules/entries.json).
 // The Nîn-in-Eilph player cards, each line tested from the words on the card: Mablung 08084:A:1, Tighten Our Belts 08086:A:1, Galadhon
 // Archer 08087:A:2, Bow of the Galadhrim 08088:A:1 and A:2, Island Amid Perils 08090:A:1, Mirkwood Pioneer 08091:A:1, Wingfoot 08092:A:1,
-// Defender of the West 08093:A:1 and A:3. The lines are the text of data/cards/NiE.json (data/printed holds no entry for this pack), so every
-// intent goes through sendUnledgered.
+// Defender of the West 08093:A:1 and A:3. The lines are read from data/printed/the-ring-maker.json (scan-read ledger), and every
+// intent goes through the ledger-checked send.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
@@ -14,8 +14,8 @@ import { stagingThreat } from "../../rules/quest/quest.ts";
 import { DEAR, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, IntentRefused, type Table } from "../../../test/harness/scene.ts";
-import { atDefense, attacking, canPlay, choices, combat, endRound, enter, hosts, passAll, play, playCode, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, IntentRefused, type Table } from "../../../test/harness/scene.ts";
+import { atDefense, attacking, canPlay, choices, combat, endRound, enter, hosts, passAll, play, playCode, playerTableFor, printed, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const MABLUNG = "08084";
 const BELTS = "08086";
@@ -74,9 +74,9 @@ describe("Mablung (08084:A:1)", () => {
   lineSpec("08084:A:1", "Mablung: after you engage an enemy, 1 resource, once per phase", (effects) => {
     const tab = table(effects, { start: "encounter", heroes: [{ code: MABLUNG, seat: 0 }], staging: [DEAR, NEAR] });
     const mablung = idsOf(tab, MABLUNG);
-    let run = sendUnledgered(begin(tab.state), { type: "Engage", enemyId: idsOf(tab, DEAR) }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Engage", enemyId: idsOf(tab, DEAR) }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("08084:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: mablung, effectId: "08084:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: mablung, effectId: "08084:response:1" }, tab.ctx);
     expect(run.state.cards[mablung]?.resources).toBe(6 + 1);
     run = passAll(run, tab.ctx);
     expect(run.state.cards[idsOf(tab, NEAR)]?.zone).toBe("engaged");
@@ -86,7 +86,7 @@ describe("Mablung (08084:A:1)", () => {
   // An enemy that the engagement check engages is an enemy you engage (rr.engaged): with the Response not yet used, it is offered.
   it("08084:A:1 Mablung: offered when the engagement check engages an enemy", () => {
     const tab = table(EFFECTS, { start: "encounter", heroes: [{ code: MABLUNG, seat: 0 }], staging: [NEAR] });
-    const run = sendUnledgered(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
+    const run = send(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, NEAR)]?.zone).toBe("engaged");
     expect(triggers(run.state, tab)).toContain("08084:response:1");
   });
@@ -94,9 +94,9 @@ describe("Mablung (08084:A:1)", () => {
   // "you": the other player engages an enemy, and Mablung has no Response.
   it("08084:A:1 Mablung: not offered when another player engages an enemy", () => {
     const tab = table(EFFECTS, { seats: 2, start: "encounter", heroes: [{ code: MABLUNG, seat: 0 }, { code: PAL, seat: 1 }], staging: [DEAR] });
-    let run = sendUnledgered(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
     expect(run.state.activeSeat).toBe(1);
-    run = sendUnledgered(run, { type: "Engage", enemyId: idsOf(tab, DEAR) }, tab.ctx);
+    run = send(run, { type: "Engage", enemyId: idsOf(tab, DEAR) }, tab.ctx);
     expect(run.state.cards[idsOf(tab, DEAR)]?.controller).toBe(1);
     expect(triggers(run.state, tab)).not.toContain("08084:response:1");
   });
@@ -109,7 +109,7 @@ describe("Tighten Our Belts (08086:A:1)", () => {
     const tab = table(effects, { seats: 2, heroes: [{ code: ARAGORN, seat: 0 }, { code: BERAVOR, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: GUARD, seat: 0 }, ...Array.from({ length: belts }, () => ({ code: BELTS, seat: 0 }))] });
     const spent = playCode(tab, GUARD);
     expect(spent.state.cards[idsOf(tab, ARAGORN)]?.resources).toBe(6 - 2);
-    const run = sendUnledgered(enter(spent.state, tab, "refresh"), { type: "Pass" }, tab.ctx);
+    const run = send(enter(spent.state, tab, "refresh"), { type: "Pass" }, tab.ctx);
     expect([run.state.window?.kind, run.state.activeSeat]).toEqual(["frameAction", 0]);
     return { tab, run };
   }
@@ -122,7 +122,7 @@ describe("Tighten Our Belts (08086:A:1)", () => {
     const before = [start.state.cards[aragorn]?.resources, start.state.cards[beravor]?.resources, start.state.cards[pal]?.resources];
     let run = play(start, tab, idsOf(tab, BELTS));
     expect(choices(run.state, tab).sort()).toEqual(["seat:0", "seat:1"]);
-    run = sendUnledgered(run, { type: "Choose", optionId: "seat:0" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "seat:0" }, tab.ctx);
     const after = [run.state.cards[aragorn]?.resources, run.state.cards[beravor]?.resources, run.state.cards[pal]?.resources];
     expect(after).toEqual([before[0], (before[1] ?? 0) + 1, before[2]]);
   });
@@ -155,7 +155,7 @@ describe("Tighten Our Belts (08086:A:1)", () => {
 });
 
 // Answers one question with its first option.
-const chooseFirst = (run: ReturnType<typeof begin>, tab: Table) => sendUnledgered(run, { type: "Choose", optionId: choices(run.state, tab)[0] ?? "" }, tab.ctx);
+const chooseFirst = (run: ReturnType<typeof begin>, tab: Table) => send(run, { type: "Choose", optionId: choices(run.state, tab)[0] ?? "" }, tab.ctx);
 
 describe("Galadhon Archer (08087:A:2)", () => {
   // Legolas pays for the Archer. The Far is in the staging area, the Brute engaged with the player, the Dear engaged with the other player.
@@ -169,9 +169,9 @@ describe("Galadhon Archer (08087:A:2)", () => {
     const [archer, far, brute, dear] = [idsOf(tab, ARCHER), idsOf(tab, FAR), idsOf(tab, BRUTE), idsOf(tab, DEAR)];
     let run = play(begin(tab.state), tab, archer);
     expect(triggers(run.state, tab)).toContain("08087:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: archer, effectId: "08087:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: archer, effectId: "08087:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual(["engagedOther", "staging"]);
-    run = sendUnledgered(run, { type: "Choose", optionId: "engagedOther" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "engagedOther" }, tab.ctx);
     expect(run.state.cards[dear]?.damage).toBe(1);
     expect(run.state.cards[far]?.damage).toBe(0);
     expect(run.state.cards[brute]?.damage).toBe(0);
@@ -206,7 +206,7 @@ describe("Bow of the Galadhrim (08088:A:1, A:2)", () => {
     const archer = idsOf(tab, ARCHER);
     const played = play(begin(tab.state), tab, idsOf(tab, BOW), archer);
     expect(stat(played.state, tab, archer, "attack")).toBe(printed(tab, ARCHER, "attack") + 1);
-    const run = sendUnledgered(begin(attacking(played.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, DEAR), attackerIds: [archer] }, tab.ctx);
+    const run = send(begin(attacking(played.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, DEAR), attackerIds: [archer] }, tab.ctx);
     expect(strikes(run)).toEqual([[idsOf(tab, DEAR), printed(tab, ARCHER, "attack") + 2]]);
   });
 
@@ -215,7 +215,7 @@ describe("Bow of the Galadhrim (08088:A:1, A:2)", () => {
     const tab = bowScene(EFFECTS);
     const archer = idsOf(tab, ARCHER);
     const played = play(begin(tab.state), tab, idsOf(tab, BOW), archer);
-    const run = sendUnledgered(begin(attacking(played.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, BRUTE), attackerIds: [archer] }, tab.ctx);
+    const run = send(begin(attacking(played.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, BRUTE), attackerIds: [archer] }, tab.ctx);
     expect(strikes(run)).toEqual([[idsOf(tab, BRUTE), printed(tab, ARCHER, "attack") + 1]]);
   });
 });
@@ -229,7 +229,7 @@ describe("Island Amid Perils (08090:A:1)", () => {
     const silvan = idsOf(tab, SILVAN);
     let run = play(begin(tab.state), tab, idsOf(tab, ISLAND));
     expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, ARCHER), silvan].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: silvan }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: silvan }, tab.ctx);
     expect(run.state.cards[silvan]?.zone).toBe("hand");
     expect(run.state.seats[0]?.threat).toBe(8 - 3);
     expect(run.state.seats[1]?.threat).toBe(6);
@@ -257,9 +257,9 @@ describe("Mirkwood Pioneer (08091:A:1)", () => {
     expect(stagingThreat(tab.state, tab.ctx.cards)).toBe(2 + 1);
     let run = play(begin(tab.state), tab, pioneer);
     expect(triggers(run.state, tab)).toContain("08091:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: pioneer, effectId: "08091:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: pioneer, effectId: "08091:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([far, idsOf(tab, SPOT)].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: far }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: far }, tab.ctx);
     expect([run.state.seats[0]?.threat, run.state.seats[1]?.threat]).toEqual([8 + 1, 6 + 1]);
     expect(stagingThreat(run.state, tab.ctx.cards)).toBe(1);
     expect(stagingThreat(endRound(run.state, tab).state, tab.ctx.cards)).toBe(2 + 1);
@@ -268,7 +268,7 @@ describe("Mirkwood Pioneer (08091:A:1)", () => {
   // "You may": played without the Response, no threat is raised.
   it("08091:A:1 Mirkwood Pioneer: no doomed when the player does not use it", () => {
     const tab = scene(EFFECTS);
-    const run = sendUnledgered(play(begin(tab.state), tab, idsOf(tab, PIONEER)), { type: "Pass" }, tab.ctx);
+    const run = send(play(begin(tab.state), tab, idsOf(tab, PIONEER)), { type: "Pass" }, tab.ctx);
     expect([run.state.seats[0]?.threat, run.state.seats[1]?.threat]).toEqual([8, 6]);
     expect(stagingThreat(run.state, tab.ctx.cards)).toBe(2 + 1);
   });
@@ -319,7 +319,7 @@ describe("Defender of the West (08093:A:1, A:3)", () => {
     const beechbone = idsOf(tab, BEECHBONE);
     const played = play(begin(tab.state), tab, idsOf(tab, DEFENDER), beechbone);
     let run = atDefense(tab, played.state);
-    run = passAll(sendUnledgered(run, { type: "Undefended", heroId: beechbone }, tab.ctx), tab.ctx, { responses: true });
+    run = passAll(send(run, { type: "Undefended", heroId: beechbone }, tab.ctx), tab.ctx, { responses: true });
     expect(run.state.cards[beechbone]?.damage).toBe(2);
     expect(run.state.cards[idsOf(tab, EOWYN)]?.damage).toBe(0);
   });
@@ -331,6 +331,6 @@ describe("Defender of the West (08093:A:1, A:3)", () => {
     const played = play(begin(tab.state), tab, idsOf(tab, DEFENDER), beechbone);
     const run = passAll(combat(played.state, tab), tab.ctx);
     expect([run.state.window?.kind, run.state.activeSeat]).toEqual(["defense", 1]);
-    expect(() => sendUnledgered(run, { type: "Undefended", heroId: beechbone }, tab.ctx)).toThrow(IntentRefused);
+    expect(() => send(run, { type: "Undefended", heroId: beechbone }, tab.ctx)).toThrow(IntentRefused);
   });
 });
