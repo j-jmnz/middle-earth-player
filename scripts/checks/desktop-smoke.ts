@@ -32,19 +32,19 @@ const FIXTURE = "duo";
 const SAVE = `save-e2e-${FIXTURE}`;
 const TIMEOUT = 90_000;
 
-type Session = Opened & { requests: string[]; csp: string[]; errors: string[]; kit: string[] };
+type Session = Opened & { requests: string[]; csp: string[]; errors: string[]; canvasKitLines: string[] };
 type Options = { packed: string | null; userData: string };
 
 
 async function launch(log: Log, { packed, userData }: Options): Promise<Session> {
   const opened = packed ? await openPacked(packed, userData) : await openChecked(userData);
-  const session: Session = { ...opened, requests: [], csp: [], errors: [], kit: [] };
+  const session: Session = { ...opened, requests: [], csp: [], errors: [], canvasKitLines: [] };
   const { page } = session;
   session.context.on("request", (request) => session.requests.push(request.url()));
   page.on("console", (message) => {
     const text = message.text();
     log.debug(`console.${message.type()} ${text.slice(0, 300)}`);
-    if (/canvaskit/i.test(text)) session.kit.push(text.slice(0, 300));
+    if (/canvaskit/i.test(text)) session.canvasKitLines.push(text.slice(0, 300));
     if (/content security policy/i.test(text)) session.csp.push(text.slice(0, 300));
   });
   page.on("pageerror", (error) => session.errors.push(error.message.slice(0, 300)));
@@ -105,7 +105,7 @@ async function isolation(session: Session): Promise<string> {
   return `${APP_ORIGIN}, preload: ${api.length} members`;
 }
 
-/** What the page shows, for a failure message: its path, its canvases, whether the machine gives a WebGL 2 context (the canvas table needs one), whether CanvasKit loaded, the desktop screen-reader flag (it turns the table into a list), what CanvasKit logged and the start of its text. */
+/** What the page shows, for a failure message: its path, its canvases, whether the machine gives a WebGL 2 context (the canvas table needs one), whether CanvasKit loaded, the desktop screen-reader flag alone (the Table as a list setting also gives the list), what CanvasKit logged and the start of its text. */
 async function pageState(session: Session): Promise<string> {
   const state = await session.page.evaluate(() => {
     const canvases = [...document.querySelectorAll("canvas")].map((canvas) => `${canvas.clientWidth}x${canvas.clientHeight}`);
@@ -115,11 +115,11 @@ async function pageState(session: Session): Promise<string> {
     const reader = desktop?.accessibilitySupportEnabled?.() === true;
     const kit = (globalThis as { CanvasKit?: unknown }).CanvasKit !== undefined;
     const text = (document.body.innerText || "").replace(/\s+/g, " ").slice(0, 300);
-    return `path ${location.pathname}; canvases [${canvases.join(", ")}]; WebGL 2 ${webgl2 ? "available" : "NOT available"}; CanvasKit ${kit ? "loaded" : "NOT loaded"}; screen reader flag ${reader ? "ON" : "off"}; test ids [${ids.join(", ")}]; text "${text}"`;
+    return `path ${location.pathname}; canvases [${canvases.join(", ")}]; WebGL 2 ${webgl2 ? "available" : "NOT available"}; CanvasKit ${kit ? "loaded" : "NOT loaded"}; desktop screen reader flag ${reader ? "ON" : "off"} (the Table as a list setting is not shown); test ids [${ids.join(", ")}]; text "${text}"`;
   });
   const last = session.requests.slice(-8).map((url) => url.replace(APP_ORIGIN, "").slice(0, 70));
   const wasm = session.requests.filter((url) => url.endsWith("/canvaskit.wasm")).length;
-  return `${state}; canvaskit.wasm requests ${wasm}; ${session.requests.length} requests, the last ${last.length}: [${last.join(", ")}]; CanvasKit console [${session.kit.join(" | ")}]`;
+  return `${state}; canvaskit.wasm requests ${wasm}; ${session.requests.length} requests, the last ${last.length}: [${last.join(", ")}]; CanvasKit console [${session.canvasKitLines.join(" | ")}]`;
 }
 
 async function table(session: Session): Promise<string> {

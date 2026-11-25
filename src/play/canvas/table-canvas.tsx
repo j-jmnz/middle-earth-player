@@ -1,7 +1,7 @@
 // The web build's table (the phone's file is table-canvas.native.tsx, which draws with Skia). Skia on the web needs CanvasKit loaded first
-// (ui/skia/skia-web.ts), so this entry point is a gate (it also starts the load, if nothing has): until it is ready (and if it never loads) the table is the reader table, the same list a
-// screen reader or Table as a list gets on the phone, and then it imports the Skia file by its explicit path. No Skia module is evaluated
-// during the static render or before CanvasKit.
+// (ui/skia/skia-web.ts), so this entry point is a gate. It also starts the load on mount, if nothing has: until CanvasKit is ready (and if it
+// never loads) the table is the reader table, the same list a screen reader or Table as a list gets on the phone, and then it imports the Skia
+// file by its explicit path. No Skia module is evaluated during the static render or before CanvasKit.
 import { lazy, memo, Suspense, useEffect } from "react";
 
 import { startCanvasKit, useCanvasKit } from "../../ui/skia/skia-web.ts";
