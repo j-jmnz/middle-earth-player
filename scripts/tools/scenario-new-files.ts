@@ -1,3 +1,4 @@
+import { POLICY_KIT_RULES } from "../../test/harness/policy-kit.ts";
 import { authoredRel } from "../data/effects/authored-paths.ts";
 import { finderImport } from "../data/effects/seed-finder-paths.ts";
 import { loadAnyScenario } from "../data/load-scenarios.ts";
@@ -49,24 +50,7 @@ export const upper = (short: string): string => short.toUpperCase().replace(/-/g
 const dataImport = (depth: string): string => `import { loadCampaign, loadScenario } from "${depth}scripts/data/load-scenarios.ts";`;
 const dataConsts = (facts: Facts, c: string): string => `const campaign = loadCampaign("${facts.campaignId}");\nconst ${c} = loadScenario("${facts.id}");`;
 
-/** The rules of the play policy kit (test/harness/policy-kit.ts), as the comment a new game.ts carries; a test keeps it in step with the kit's exports. */
-export const POLICY_KIT_RULES: readonly (readonly [name: string, says: string])[] = [
-  ["chooseFirstOrLast(which)", "a Choose window takes the first or the last option"],
-  ["chooseOption(wanted, otherwise)", "a Choose window takes the option `wanted` names for the options offered, else the first or last"],
-  ["commitAllBut(reserve, keepHome)", "the quest commit: every character but the last `reserve` heroes (and those `keepHome` names)"],
-  ["travelFewestQuestPoints(allow)", "a travel window: the location with the fewest quest points (one `allow` permits), else decline"],
-  ["declineTravel()", "a travel window: decline"],
-  ["defendFirst(perRound)", "a defense window: the first character who may defends, else the first hero is undefended"],
-  ["undefendedLeastDamaged(except)", "a defense window: nobody defends, the least damaged hero takes the attack"],
-  ["archeryLeastDamaged(skip)", "an archery window: all the damage to the least damaged character"],
-  ["attackAllTogether(rank, may)", "the player attack window: every ready character attacks the enemy of the lowest `rank` together"],
-  ["attackEach(options)", "the player attack window: the first ready character attacks alone"],
-  ["engageUpTo(most, options)", "the optional engagement step: engage the enemy of the lowest `rank` while engaged with fewer than `most`"],
-  ["triggerActions(effectIds, oncePerRound)", "an Action or Response of the records named, each time the engine offers it"],
-  ["passCommitWhile(when)", "the quest commit: pass while `when` holds"],
-];
-
-/** The comment over the rules list of a new game.ts: what a policy is and the kit's rules. */
+/** The comment over the rules list of a new game.ts: what a policy is and the kit's rules (`POLICY_KIT_RULES`, test/harness/policy-kit.ts). */
 export const policyKitComment = (policyName: string): string =>
   `// The policy (test/harness/policy-kit.ts): a list of rules tried in order, then the auto-player's answer with ${policyName}. A rule answers its own window and returns null for any other. The kit's rules:\n${POLICY_KIT_RULES.map(([name, says]) => `//   ${name}  ${says}`).join("\n")}\n`;
 

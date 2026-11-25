@@ -8,21 +8,26 @@ import { attackTogether, engageOneEach } from "./game-kit.ts";
 // Test helper. The play policy kit of a scenario's `game.ts` (docs/agents/agent-brief.md, Scenario procedure, Games). A policy is a list of rules tried in order: the first that answers
 // a window wins, and a window no rule answers falls to the auto-player (test/harness/auto-player.ts, `nextIntent`) with the scenario's PolicyOptions. A rule is a small function of the window
 // it owns: it returns an intent the reducer lists, or null for any other window, so rules compose by order alone. The rules are the ones that three or more of the Against the Shadow and
-// Hobbit scenarios' policies wrote out by hand; a scenario-specific answer (a card's option, a stage's target) is a `chooseOption` or a `rank` the scenario passes in.
-//
-//   chooseFirstOrLast(which)               a Choose window takes the first or the last option
-//   chooseOption(wanted, otherwise)        a Choose window takes the option `wanted` names for the options offered, else the first or last
-//   commitAllBut(reserve, keepHome)        the quest commit: every character but the last `reserve` heroes (and those `keepHome` names)
-//   travelFewestQuestPoints(allow)         a travel window: the location with the fewest quest points (one `allow` permits), else decline
-//   declineTravel()                        a travel window: decline
-//   defendFirst(perRound)                  a defense window: the first character who may defends (the first `perRound` attacks of a seat's round), else the first hero is undefended
-//   undefendedLeastDamaged(except)         a defense window: nobody defends, the least damaged hero takes the attack (the others stay ready to attack)
-//   archeryLeastDamaged(skip)              an archery window: all the damage to the least damaged character
-//   attackAllTogether(rank, may)           the player attack window: every ready character attacks the enemy of the lowest `rank` (else the first) together
-//   attackEach(options)                    the player attack window: the first ready character attacks alone, so each takes a different enemy when `once`
-//   engageUpTo(most, options)              the optional engagement step: engage the enemy of the lowest `rank` (`allow` permits) while engaged with fewer than `most`
-//   triggerActions(effectIds, oncePerRound)    an Action or Response of the records named, each time (or once a round) the engine offers it and the seat can pay
-//   passCommitWhile(when)                  the quest commit: pass without committing while `when` holds
+// Hobbit scenarios' policies wrote out by hand; a scenario-specific answer (a card's option, a stage's target) is a `chooseOption` or a `rank` the scenario passes in. POLICY_KIT_RULES lists
+// every rule with its one-line description (the comment of a new game.ts is built from it).
+
+/** The kit's rules, each with what it does in one line. A test keeps the list in step with the exports below. */
+export const POLICY_KIT_RULES: readonly (readonly [name: string, says: string])[] = [
+  ["chooseFirstOrLast(which)", "a Choose window takes the first or the last option"],
+  ["chooseOption(wanted, otherwise)", "a Choose window takes the option `wanted` names for the options offered, else the first or last"],
+  ["commitAllBut(reserve, keepHome)", "the quest commit: every character but the last `reserve` heroes (and those `keepHome` names)"],
+  ["travelFewestQuestPoints(allow)", "a travel window: the location with the fewest quest points (one `allow` permits), else decline"],
+  ["declineTravel()", "a travel window: decline"],
+  ["defendFirst(perRound)", "a defense window: the first character who may defends (the first `perRound` attacks of a seat's round), else the first hero is undefended"],
+  ["undefendedLeastDamaged(except)", "a defense window: nobody defends, the least damaged hero takes the attack (the others stay ready to attack)"],
+  ["archeryLeastDamaged(skip)", "an archery window: all the damage to the least damaged character"],
+  ["attackAllTogether(rank, may)", "the player attack window: every ready character attacks the enemy of the lowest `rank` (else the first) together"],
+  ["attackEach(options)", "the player attack window: the first ready character attacks alone, so each takes a different enemy when `once`"],
+  ["declineAttack()", "the player attack window: decline to attack"],
+  ["engageUpTo(most, options)", "the optional engagement step: engage the enemy of the lowest `rank` (`allow` permits) while engaged with fewer than `most`"],
+  ["triggerActions(effectIds, oncePerRound)", "an Action or Response of the records named, each time (or once a round) the engine offers it and the seat can pay"],
+  ["passCommitWhile(when)", "the quest commit: pass without committing while `when` holds"],
+];
 
 export type Rule = (state: ScenarioState, ctx: ReduceContext, memory: Set<string>) => PlayerIntent | null;
 export type Policy = readonly Rule[];
@@ -57,7 +62,7 @@ export function commitAllBut(reserve: number, keepHome: (state: ScenarioState, i
   return (state, ctx) => {
     if (state.mode !== "questCommit" || state.window?.kind !== "pass") return null;
     if (Object.values(state.cards).some((card) => card.committed && card.controller === state.activeSeat)) return null;
-    const home = new Set((state.seats[state.activeSeat]?.heroes ?? []).slice(-reserve));
+    const home = new Set(reserve > 0 ? (state.seats[state.activeSeat]?.heroes ?? []).slice(-reserve) : []);
     const ids = legalTargets(state, { type: "Commit" }, ctx).filter((id) => !home.has(id) && !keepHome(state, id));
     return ids.length > 0 ? { type: "Commit", cardIds: ids } : null;
   };
@@ -91,12 +96,11 @@ export function defendFirst(perRound = Number.POSITIVE_INFINITY): Rule {
   };
 }
 
-/** A defense window where nobody defends: the damage of the attack goes to the seat's least damaged hero (the ones `except` names never), so the others stay ready to attack. */
+/** A defense window where nobody defends: the damage of the attack goes to the seat's least damaged hero the engine offers (the ones `except` names never), so the others stay ready to attack. Null when the engine offers none. */
 export function undefendedLeastDamaged(except: (state: ScenarioState, id: string) => boolean = () => false): Rule {
-  return (state) => {
+  return (state, ctx) => {
     if (state.window?.kind !== "defense") return null;
-    const heroes = (state.seats[state.window.seat]?.heroes ?? []).filter((id) => state.cards[id]?.zone === "heroes" && !except(state, id));
-    const least = leastDamaged(state, heroes);
+    const least = leastDamaged(state, legalTargets(state, { type: "Undefended" }, ctx).filter((id) => !except(state, id)));
     return least ? { type: "Undefended", heroId: least } : null;
   };
 }
@@ -128,18 +132,13 @@ export function attackEach(options: { may?: (state: ScenarioState, id: string) =
   };
 }
 
+/** The player attack window: decline to attack (the rule to put after the attack rules, so a window they leave open ends). */
+export const declineAttack = (): Rule => (state) => (state.window?.kind === "playerAttack" ? { type: "DeclineAttack" } : null);
+
 /** The optional engagement step: the enemy of the lowest `rank` (that `allow` permits; else the first) while the seat is engaged with fewer than `most` (by default its hero count). */
 export function engageUpTo(most?: number, options: { allow?: (state: ScenarioState, id: string) => boolean; rank?: (state: ScenarioState, id: string) => number } = {}): Rule {
-  return (state, ctx) => {
-    if (!options.allow && !options.rank) return engageOneEach(state, ctx, most);
-    if (state.window?.kind !== "optionalEngage") return null;
-    const seat = state.seats[state.activeSeat];
-    if (!seat || seat.engaged.length >= (most ?? seat.heroes.length)) return null;
-    const targets = legalTargets(state, { type: "Engage" }, ctx).filter((id) => options.allow?.(state, id) ?? true);
-    const rank = options.rank;
-    const enemy = rank ? [...targets].sort((left, right) => rank(state, left) - rank(state, right))[0] : targets[0];
-    return enemy ? { type: "Engage", enemyId: enemy } : null;
-  };
+  const { allow, rank } = options;
+  return (state, ctx) => engageOneEach(state, ctx, most, allow ? (id) => allow(state, id) : undefined, rank ? (id) => rank(state, id) : undefined);
 }
 
 /** An Action or Response of the records named, each time the engine offers it (once a round with `oncePerRound`) and its cost can be paid; never while a choice of the frame is open. */
