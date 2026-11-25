@@ -4956,6 +4956,12 @@
   ],
   "dragnPackAliases": [
     {
+      "dragncards": "The Nin-in-Eilph",
+      "pack": "NiE",
+      "reason": "DragnCards spells the pack's name without the circumflex (\"The Nin-in-Eilph\"), so the row's pack does not name the product. Its collector numbers (94 to 101) and names are Hall of Beorn's own, so the row's number and name find the cards of NiE (the stage 2 and 3 cards have no OCTGN guid in Hall of Beorn).",
+      "source": "DragnCards preBuiltDecks.json (Q04.7) and cardDb.tsv (packName The Nin-in-Eilph, numberInPack); hallofbeorn.com/Export/QuestCards (CardSet The Nîn-in-Eilph, Number)"
+    },
+    {
       "dragncards": "The Siege of Annuminas",
       "pack": "TSoA",
       "reason": "DragnCards spells the pack's name without the accent (\"The Siege of Annuminas\"); its rows' collector numbers (12 to 32) and names find the cards of TSoA, whose Hall of Beorn numbers they equal.",

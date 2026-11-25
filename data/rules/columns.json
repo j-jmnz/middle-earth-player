@@ -50,5 +50,12 @@
   "fos": {"default": [{"x": 80, "y": 215, "w": 255, "h": 500}, {"x": 338, "y": 95, "w": 245, "h": 603}]},
   "saf": {"default": [{"x": 80, "y": 215, "w": 255, "h": 500}, {"x": 338, "y": 95, "w": 245, "h": 603}]},
   "htg": {"default": [], "handRead": "by eye from the rendered page of MEC02: the text is outlines"},
-  "cac": {"default": [], "handRead": "by eye from the rendered page of MEC03: the text is outlines"}
+  "cac": {"default": [], "handRead": "by eye from the rendered page of MEC03: the text is outlines"},
+  "voi": {"only": [2, 3, 5, 6, 8, 9, 10], "default": [{"x": 40, "y": 40, "w": 270, "h": 600}, {"x": 310, "y": 40, "w": 270, "h": 600}]},
+  "tdt": {"default": [{"x": 40, "y": 30, "w": 270, "h": 740}, {"x": 310, "y": 30, "w": 270, "h": 740}]},
+  "ttt": {"default": [{"x": 40, "y": 30, "w": 270, "h": 740}, {"x": 310, "y": 30, "w": 270, "h": 740}]},
+  "tit": {"default": [{"x": 40, "y": 30, "w": 270, "h": 740}, {"x": 310, "y": 30, "w": 270, "h": 740}]},
+  "nie": {"default": [{"x": 40, "y": 30, "w": 270, "h": 740}, {"x": 310, "y": 30, "w": 270, "h": 740}]},
+  "cs": {"default": [{"x": 40, "y": 30, "w": 270, "h": 740}, {"x": 310, "y": 30, "w": 270, "h": 740}]},
+  "tac": {"default": [{"x": 40, "y": 30, "w": 270, "h": 740}, {"x": 310, "y": 30, "w": 270, "h": 740}]}
 }

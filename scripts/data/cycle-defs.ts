@@ -16,6 +16,7 @@ const TROLL_TREASURE = ["131020", "131021", "131022"];
 const WEB_TREASURE = ["132019"];
 const DRAGON_TREASURE = ["132020", "132021", "132022", "132023", "132024"];
 const againstTheShadow = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("03", n, id, product, extra);
+const ringMaker = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("04", n, id, product, extra);
 const hobbit = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("0A", n, id, product, extra);
 
 export const CYCLE_DEFS: readonly CampaignDef[] = [
@@ -101,6 +102,26 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
     ],
     saga: false,
     ledger: "against-the-shadow",
+  },
+  {
+    id: "the-ring-maker",
+    name: "The Ring-maker",
+    kind: "cycle",
+    released: "2014-02-21",
+    products: ["The Voice of Isengard", "The Dunland Trap", "The Three Trials", "Trouble in Tharbad", "The Nîn-in-Eilph", "Celebrimbor's Secret", "The Antlered Crown"],
+    scenarios: [
+      ringMaker(1, "the-fords-of-isen", "The Voice of Isengard", { deck: { normal: "Q04.1", easy: "E04.1", label: "Fords of Isen" } }),
+      ringMaker(2, "to-catch-an-orc", "The Voice of Isengard"),
+      ringMaker(3, "into-fangorn", "The Voice of Isengard"),
+      ringMaker(4, "the-dunland-trap", "The Dunland Trap"),
+      ringMaker(5, "the-three-trials", "The Three Trials"),
+      ringMaker(6, "trouble-in-tharbad", "Trouble in Tharbad"),
+      ringMaker(7, "the-nin-in-eilph", "The Nîn-in-Eilph"),
+      ringMaker(8, "celebrimbors-secret", "Celebrimbor's Secret"),
+      ringMaker(9, "the-antlered-crown", "The Antlered Crown"),
+    ],
+    saga: false,
+    ledger: "the-ring-maker",
   },
   {
     // The scenarios printed on their own (RingsDB's cycle 50 packs that are not A Long-extended Party's): one product line each as it is built. The index counts the built ones.
