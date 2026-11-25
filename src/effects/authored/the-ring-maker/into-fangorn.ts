@@ -23,7 +23,9 @@ const THREE_PLAYERS: Condition = { kind: "count", pick: { type: "player", contro
 const READY_HERO: PickSpec = { type: "hero", control: "you", state: "ready" };
 const READY_CHARACTER: PickSpec = { type: "character", control: "you", state: "ready" };
 const OWN_CHARACTER: PickSpec = { type: "character", control: "you" };
-const COMMITTED_HERO: PickSpec = { type: "hero", control: "any", committed: true };
+// "Limit 1 per hero" and "Limit 1 per location" (07058, 07057): only a card with no copy of the attachment is a host, so a card with none to take is discarded.
+const COMMITTED_HERO: PickSpec = { type: "hero", control: "any", committed: true, hasAttachment: { names: ["In Need of Rest"], none: true } };
+const OFF_TRACK_HOST: PickSpec = { type: "location", control: "any", hasAttachment: { names: ["Off Track"], none: true } };
 const ACTIVE_LOCATION: PickSpec = { type: "location", control: "any", active: true };
 // The Forest locations in the staging area (Ancient Forest) and in play (Tangled Woods): Edge of Fangorn is one, and takes both, which come from encounter cards.
 const STAGED_FOREST: PickSpec = { type: "location", control: "any", stagingOnly: true, trait: "Forest" };
@@ -46,7 +48,7 @@ const RETURN_ACTIVE: Instruction = { verb: "MoveEncounterCard", card: "activeLoc
 const time = (code: string, amount: number, line: string): Effect => ({ id: `${code}:constant:1`, cardCode: code, lines: [line], timing: "constant", instructions: [{ verb: "Time", amount }] });
 
 // Hinder (rm.hinder), the same on the three Huorns: while engaged, in the combat phase only, the enemy makes no attack and is dealt no shadow card (the flags are rebuilt from the phase, so an attack by a card effect or in another phase is made and dealt one); at the beginning of the combat phase it removes 1 progress from
-// the current quest, else from the active location, else nothing. "Cannot have attachments" holds always.
+// the current quest, else from the active location, else nothing (the location step is written first: each step's condition is read when it runs, so the quest step cannot empty the quest and send the second one on). "Cannot have attachments" holds always.
 const hinder = (code: string): Effect[] => [
   { id: `${code}:constant:1`, cardCode: code, lines: [`${code}:A:1`], timing: "constant", condition: { kind: "all", conditions: [ENGAGED, COMBAT] }, instructions: [{ verb: "ModifyStat", stat: "cannotAttack", amount: 1, until: "whileSourceInPlay", target: "self" }, { verb: "ModifyStat", stat: "noShadowDealt", amount: 1, until: "whileSourceInPlay", target: "self" }] },
   { id: `${code}:constant:2`, cardCode: code, lines: [`${code}:A:1`], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotHaveAttachments", amount: 1, until: "whileSourceInPlay", target: "self" }] },
@@ -58,8 +60,8 @@ const hinder = (code: string): Effect[] => [
     trigger: "beginningOfPhase",
     condition: { kind: "all", conditions: [COMBAT, ENGAGED] },
     instructions: [
-      { verb: "RemoveProgressFromQuest", amount: 1, when: { kind: "questProgress" } },
       { verb: "RemoveProgressFrom", amount: 1, target: "activeLocation", when: { kind: "not", condition: { kind: "questProgress" } } },
+      { verb: "RemoveProgressFromQuest", amount: 1, when: { kind: "questProgress" } },
     ],
   },
 ];
@@ -160,7 +162,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
 
   // 07057 Off Track. Surge is its keyword. When Revealed: the first player attaches it to a location in play that holds no Off Track (none: it is discarded); it counts as a Condition attachment. The location gets +2 quest points; Forced at the end of each refresh phase, wherever the location is in play:
   // an additional time counter comes off the current quest.
-  { id: "07057:whenRevealed:1", cardCode: "07057", lines: ["07057:A:2"], timing: "whenRevealed", instructions: [{ verb: "Pick", pick: { type: "location", control: "any", who: "firstPlayer" } }, { verb: "AttachSelfToPicked" }] },
+  { id: "07057:whenRevealed:1", cardCode: "07057", lines: ["07057:A:2"], timing: "whenRevealed", instructions: [{ verb: "Pick", pick: { ...OFF_TRACK_HOST, who: "firstPlayer" } }, { verb: "AttachSelfToPicked", when: { kind: "canPick", pick: OFF_TRACK_HOST } }] },
   {
     id: "07057:constant:1",
     cardCode: "07057",
@@ -172,7 +174,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   { id: "07057:forced:1", cardCode: "07057", lines: ["07057:A:2"], timing: "forced", trigger: "endOfPhase", condition: { kind: "all", conditions: [{ kind: "phase", is: "Refresh" }, ATTACHED] }, instructions: [{ verb: "RemoveTimeFromQuest", amount: 1 }] },
 
   // 07058 In Need of Rest. When Revealed: the player removes a hero committed to the quest from it and attaches this to that hero (none committed: discarded); a Condition attachment. Forced: after a time counter comes off the current quest, the attached hero takes 1 damage.
-  { id: "07058:whenRevealed:1", cardCode: "07058", lines: ["07058:A:1"], timing: "whenRevealed", instructions: [{ verb: "Pick", pick: COMMITTED_HERO }, { verb: "RemoveFromQuest" }, { verb: "AttachSelfToPicked" }] },
+  { id: "07058:whenRevealed:1", cardCode: "07058", lines: ["07058:A:1"], timing: "whenRevealed", instructions: [{ verb: "Pick", pick: COMMITTED_HERO }, { verb: "RemoveFromQuest", when: { kind: "canPick", pick: COMMITTED_HERO } }, { verb: "AttachSelfToPicked", when: { kind: "matches", card: "picked", pick: { type: "hero", control: "any" } } }] },
   { id: "07058:constant:1", cardCode: "07058", lines: ["07058:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }, { verb: "AttachesTo", host: { kind: "hero" }, limitPerHost: true }] },
   { id: "07058:forced:1", cardCode: "07058", lines: ["07058:A:1"], timing: "forced", trigger: "timeCounterRemoved", condition: ATTACHED, instructions: [{ verb: "DamageCard", amount: 1, target: "host" }] },
 
