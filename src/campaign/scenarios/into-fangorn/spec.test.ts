@@ -1,18 +1,15 @@
-// Rules: rm.hinder, rm.does-not-stack, rm.time-x, rr.forced, rr.the-word-choose, rr.effects, rr.attachment-cards, rr.setup, rr.search, rr.shadow-cards (data/rules/entries.json).
+// Rules: rm.hinder, rm.does-not-stack, rm.time-x, rr.forced, rr.the-word-choose, rr.effects, rr.attachment-cards, rr.setup, rr.search, rr.step-6-2 (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, cardSpecs, committed, count, damageOn, defend, endRound, exhausted, flag, handCount, progressOn, quest, resourcesOn, reveal, resolve, side, stat, threat, travel, notWon, won, window, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, committed, count, damageOn, defend, endRound, exhausted, quest, resourcesOn, reveal, resolve, stat, travel, notWon, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Into Fangorn (the-ring-maker part 3): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
-// What a row cannot show is in lines.test.ts (Hinder through the combat phase, Mugash leaving play, the two-player search, the stacking pick, the stage jumps, the refresh cap). The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and
+// What a row cannot show is in lines.test.ts (Hinder through the combat phase, the two-player search, the stacking pick, the refresh cap) and mugash.test.ts (Mugash leaving play, the stage shuffles and jumps). The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and
 // 6 hit points; dh1 and dh2 are the first seat's, dh3 the second's.
 const EDGE = "07032";
 const DARK = "07033";
 const ANGRY = "07034";
-const DEADLY = "07035";
-const FOREST = "07050";
-const WOODS = "07051";
 const TURNED = "07052";
 const PROVISIONS = "07056";
 const OFF_TRACK = "07057";

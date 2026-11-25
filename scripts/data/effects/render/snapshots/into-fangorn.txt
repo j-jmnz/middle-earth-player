@@ -20,10 +20,10 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
 
 07031:A:3 (front): Forced: After attached hero takes damage, return Mugash to the top of the encounter deck.
   07031:forced:1: Forced after a card takes damage (heard about the host)
+    only if its host is a hero (any player controls)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card goes on top of the encounter deck
   07031:forced:2: Forced on the event hostDefeated
-    only if the event's other card is a damaged hero (any player controls)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card goes on top of the encounter deck
 
@@ -140,7 +140,7 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
     - each enemy engaged with a player (not one in the staging area) with the trait Huorn makes an immediate attack, each dealt a shadow card of its own
     - for each player, first player first:
       - if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card): the acting player finds one Huorn enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
-    - shuffle the encounter deck
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter deck
 
 ## 07050 Ancient Forest
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -165,7 +165,7 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
 07051:A:1 (front): While Tangled Woods is in the staging area, each Forest location in play gains: 'Travel: Exhaust a hero to travel here.' This ability does not stack with other copies of Tangled Woods.
   07051:constant:1: Constant
     only if this card is in the staging area
-    - each Forest location (any player controls): stat travelExhaust 1, while this card is in play (does not stack: only the oldest copy of this card in play gives it)
+    - each Forest location (any player controls) or in the staging area: stat travelExhaust 1, while this card is in play (does not stack: only the oldest copy of this card in play gives it)
 
 ## 07052 Turned Around
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -207,8 +207,8 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
 07057:A:2 (front): When Revealed: Attach to a location in play. (Counts as a Condition attachment with the text: 'Limit 1 per location. Attached location gets +2 quest points and Gain: 'Forced: Remove an additional time counter from the current quest at the end of each refresh phase, if able.'')
   07057:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose location (any player controls) chosen by the first player, with no attachment named "Off Track"
-    - then, if there is a location (any player controls) with no attachment named "Off Track" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this card attaches to the picked card (nowhere if that card carries one of its title already)
+    - choose location (any player controls) or in the staging area, chosen by the first player, with no attachment named "Off Track"
+    - then, if there is a location (any player controls) or in the staging area, with no attachment named "Off Track" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this card attaches to the picked card (nowhere if that card carries one of its title already)
   07057:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Condition attachment while it is attached
@@ -258,7 +258,8 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
   07065:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if there is a card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose: choose card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not
+    - shuffle the encounter deck
+    - then, if there is a card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not
     - then, if there is a card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is shuffled into the encounter deck
     - then, if a copy of the card with code 07031 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game) (checked when this step runs, after the steps above; not tied to whether they did anything): one out-of-play copy of the card with code 07031 (set aside, in the encounter discard pile, in the victory display or under a card) joins the encounter deck, which is shuffled (when copies are out of play in more than one zone the first player chooses which; nothing with no copy left)
     - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 07067 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there)
@@ -286,7 +287,8 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
   07066:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if there is a card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose: choose card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not
+    - shuffle the encounter deck
+    - then, if there is a card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not
     - then, if there is a card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is shuffled into the encounter deck
     - then, if a copy of the card with code 07031 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game) (checked when this step runs, after the steps above; not tied to whether they did anything): one out-of-play copy of the card with code 07031 (set aside, in the encounter discard pile, in the victory display or under a card) joins the encounter deck, which is shuffled (when copies are out of play in more than one zone the first player chooses which; nothing with no copy left)
     - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 07067 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there)
@@ -297,7 +299,10 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
     - the players cannot defeat this stage while this holds
 
 07066:B:4 (back): If the players defeat this stage, they win the game.
-  07066:questResolution:1: Quest resolution
+  07066:constant:3: Constant
+    - this card: stat holdsWin (defeating this final stage does not win the game: it stays the current quest card, defeated, and its own Forced effects win the game or reset the quest) 1, while this card is in play
+  07066:forced:2: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
 ## 07067 The Angry Forest
@@ -322,4 +327,4 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 07066 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there)
 
-(rendered pieces: 246 by template, 0 as JSON)
+(rendered pieces: 251 by template, 0 as JSON)

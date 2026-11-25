@@ -38,9 +38,9 @@ const MUGASH_ATTACHED: Condition = { kind: "canPick", pick: HERO_WITH_MUGASH };
 const NO_MUGASH: Condition = { kind: "not", condition: MUGASH_ATTACHED };
 const SHUFFLED: Instruction = { verb: "ShuffleEncounterDeck" };
 // "Shuffle Mugash into the encounter deck" (07065:B:2, 07066:B:2) from wherever he is: in play (attached to Edge of Fangorn or to a hero, or lying in the staging area) or out of play (the encounter discard pile). His old guard stays where it is.
-// Already in the encounter deck (in neither place), he stays and the deck is shuffled: that step is first, because each later step's condition is read when it runs, and a deck he has just joined would pass it.
+// The deck is shuffled whichever way Mugash joins it, so a Mugash already in the encounter deck gets a random place too: that step is first, before the others move him.
 const SHUFFLE_MUGASH: Instruction[] = [
-  { ...SHUFFLED, when: { kind: "all", conditions: [{ kind: "not", condition: { kind: "canPick", pick: MUGASH_IN_PLAY } }, { kind: "not", condition: MUGASH_OUT_OF_PLAY }] } },
+  SHUFFLED,
   { verb: "Pick", pick: MUGASH_IN_PLAY, when: { kind: "canPick", pick: MUGASH_IN_PLAY } },
   { verb: "MoveEncounterCard", card: "picked", to: "shuffle", when: { kind: "canPick", pick: MUGASH_IN_PLAY } },
   { verb: "ShuffleOutOfPlayIntoEncounterDeck", code: MUGASH, when: MUGASH_OUT_OF_PLAY },
