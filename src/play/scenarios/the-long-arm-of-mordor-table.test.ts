@@ -52,7 +52,7 @@ describe("the heroes in the staging area", () => {
     const text = preview(t, "dh2");
     expect(text).toContain("Player 1's hero, in play in the staging area under no player's control.");
     expect(text).toContain("Its text box is blank. It is immune to player card effects.");
-    expect(text).toContain("A quest stage gives it back to Player 1's, exhausted, with its tokens and attachments.");
+    expect(text).toContain("A quest stage gives it back to Player 1, exhausted, with its tokens and attachments.");
   });
 
   it("16071:A:1 says in the dial of its seat that it is in the staging area, not that it is a Captive", () => {

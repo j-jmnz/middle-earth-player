@@ -40,7 +40,7 @@ export function stagedDetail(game: ScenarioState, cardId: string, name: (id: str
   if (!card) return null;
   const owner = card.owner != null ? capital(ownerWords(game.seatCount, card.owner)) : "A";
   if (card.captive === true && card.zone === "captive" && card.host == null) {
-    return `${stagedWords(owner, flagged(game, cardId, "blankText"), flagged(game, cardId, "immuneToPlayerCards"))} ${stagedReturnWords(card.owner != null ? ownerWords(game.seatCount, card.owner, true) : "its owner")}`;
+    return `${stagedWords(owner, flagged(game, cardId, "blankText"), flagged(game, cardId, "immuneToPlayerCards"))} ${stagedReturnWords(card.owner != null && game.seatCount > 1 ? `Player ${card.owner + 1}` : "its owner")}`;
   }
   if (isGuarded(card)) return guardedWords(owner, name(card.host ?? ""));
   const first = guardedUnder(game, cardId).map((id) => game.cards[id])[0];
