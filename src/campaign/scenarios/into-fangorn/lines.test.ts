@@ -2,14 +2,14 @@
 // The engine Into Fangorn needs: Hinder (flags that exist only in the combat phase and a Forced effect at its start), "does not stack" on the Forest locations, the card a player chooses from the discard pile, the refresh cap and the removal of a time counter heard by the quest's attachments.
 import { describe, expect, it } from "vitest";
 
-import type { EngineStep } from "../../core/intents.ts";
-import { settle } from "../../engine/machine.ts";
-import { ruleCause } from "../../core/cause.ts";
-import { placeDamage } from "../../core/damage.ts";
-import { destroyCard } from "../../core/keywords.ts";
-import { flagged, updateCard, type ScenarioState } from "../../core/state.ts";
-import { moveEncounter } from "../encounter/moves.ts";
-import { runInstruction } from "../../interpret/interpret.ts";
+import type { EngineStep } from "../../../rules/core/intents.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import { ruleCause } from "../../../rules/core/cause.ts";
+import { placeDamage } from "../../../rules/core/damage.ts";
+import { destroyCard } from "../../../rules/core/keywords.ts";
+import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { moveEncounter } from "../../../rules/families/encounter/moves.ts";
+import { runInstruction } from "../../../rules/interpret/interpret.ts";
 import { drive, fight, idOf, idsOf, opened, resolveRecords, revealedTop, run, statOf, tableFromLayout, zoneOf, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "into-fangorn";
