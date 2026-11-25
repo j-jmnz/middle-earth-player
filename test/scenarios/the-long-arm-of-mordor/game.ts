@@ -4,16 +4,16 @@ import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/ru
 import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenarios.ts";
 import type { PolicyOptions } from "../../harness/auto-player.ts";
 import { fillerLoadout, HERO_STATS, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
-import { chooseFirstOrLast, policyIntent, type Policy } from "../../harness/policy-kit.ts";
+import { archeryLeastDamaged, attackAllTogether, chooseOption, commitAllBut, engageUpTo, policyIntent, undefendedLeastDamaged, type Policy } from "../../harness/policy-kit.ts";
 
 const cycle = loadCampaign("haradrim");
 const mordor = loadAnyScenario("the-long-arm-of-mordor");
 
 // Test helper. A whole standalone game of The Long Arm of Mordor played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. TODO: say how the players travel, engage and answer the choices this scenario asks.
+// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. Each player takes the objective-hero with the most Willpower (Firyal, then Yazan, Jubayr, Kahliel), so the quest can place progress on stage 1 at once; the Enforcers' damage and every undefended attack go to a hero that is not an objective-hero (a staged hero at stages 1 and 2, the strongest hero after); every character quests but, from stage 3, the last hero a player controls that is no objective-hero (it attacks the guards and the Orcs together); nobody defends, and every other choice takes its first option.
 export const MORDOR_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
-// "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
-export type MordorDecks = "strong" | "weak" | "brittle";
+// "strong": big-number heroes that win; "tense": strong heroes that start at a threat of 14 each, so the threat reaches 50; "brittle": strong questers that die to an attack.
+export type MordorDecks = "strong" | "tense" | "brittle";
 
 export const mordorLoadout = fillerLoadout;
 
@@ -42,8 +42,24 @@ export const DEFAULT_POLICY: MordorPolicy = { choose: "first" };
 //   engageUpTo(most, options)  the optional engagement step: engage the enemy of the lowest `rank` (`allow` permits) while engaged with fewer than `most`
 //   triggerActions(effectIds, oncePerRound)  an Action or Response of the records named, each time (or once a round) the engine offers it and the seat can pay
 //   passCommitWhile(when)  the quest commit: pass without committing while `when` holds
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go in the list, before the auto-player's.
-const rules = (policy: MordorPolicy): Policy => [chooseFirstOrLast(policy.choose)];
+// A Choose window takes a card that is not an objective-hero when it offers one (the Enforcers' damage goes to a staged hero, never to the objective-hero whose loss eliminates its player).
+// When only objective-heroes are offered (the Setup's pick) the one with the most Willpower is first: Firyal (3), then Yazan, Jubayr and Kahliel.
+const OBJECTIVE_HEROES: readonly string[] = ["16032", "16033", "16034", "16031"];
+const sparingObjective = (state: ScenarioState, options: readonly string[]): string | undefined =>
+  options.find((id) => state.cards[id] && !OBJECTIVE_HEROES.includes(state.cards[id].code)) ?? [...options].sort((left, right) => OBJECTIVE_HEROES.indexOf(state.cards[left]?.code ?? "") - OBJECTIVE_HEROES.indexOf(state.cards[right]?.code ?? ""))[0];
+
+const isObjective = (state: ScenarioState, id: string) => OBJECTIVE_HEROES.includes(state.cards[id]?.code ?? "");
+
+// From stage 3 (the guards) the last hero a player controls that is no objective-hero stays home to attack (the others, the objective-hero too, quest).
+const stayHome = (state: ScenarioState, id: string): boolean => {
+  // Stages 1 and 2 need no attacker: every character quests, so the staged heroes taken back are not left home.
+  if ((state.cards[state.questStage ?? ""]?.code ?? "") < "16073") return false;
+  const seat = state.seats[state.activeSeat];
+  const mine = (seat?.heroes ?? []).filter((hero) => state.cards[hero]?.controller === state.activeSeat && !isObjective(state, hero));
+  return mine.length > 0 && mine[mine.length - 1] === id;
+};
+
+const rules = (policy: MordorPolicy): Policy => [chooseOption(sparingObjective, policy.choose), commitAllBut(0, stayHome), archeryLeastDamaged(isObjective), undefendedLeastDamaged(isObjective), engageUpTo(), attackAllTogether()];
 
 // Every intent is one the reducer listed.
 export function mordorIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: MordorPolicy = DEFAULT_POLICY): PlayerIntent {
@@ -55,14 +71,21 @@ export type MordorGame = PlayedGame;
 // The goldens (src/campaign/scenarios/the-long-arm-of-mordor/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type MordorGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: MordorDecks; outcome: "won" | "lost"; policy?: Partial<MordorPolicy>; lossReason?: string };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Nightmare) and a few losses (each way the scenario can be lost), each on a fixed seed.
-export const MORDOR_GOLDENS: readonly MordorGolden[] = [];
+// The games to pin (.claude/rules/code-standards.md, Test cost): wins true solo and two-handed (the players free the staged heroes, kill the guards and defeat the Uruk Chieftain; Easy does not change a standalone game, and the scenario has no Nightmare deck, so
+// neither has a golden of its own) and each way to lose: every player's threat at 50 (heroes that start at a threat of 14) and every player eliminated by heroes destroyed (heroes too brittle for the attacks, the objective-heroes among them).
+export const MORDOR_GOLDENS: readonly MordorGolden[] = [
+  { name: "true solo, won, Normal", seatCount: 1, seed: 7, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed, won, Normal", seatCount: 2, seed: 7, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 2, difficulty: "Normal", decks: "tense", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed, lost, threat reaches 50", seatCount: 2, seed: 2, difficulty: "Normal", decks: "tense", outcome: "lost", lossReason: "No seats remain" },
+  { name: "true solo, lost, every hero destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed, lost, every hero destroyed", seatCount: 2, seed: 7, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+];
 
 const game = standaloneGame<MordorDecks, MordorPolicy>({
   campaign: cycle,
   scenario: mordor,
   stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles and its Nightmare deck.
   codes: [...mordor.cards.map((card) => card.code)],
   intent: mordorIntent,
   policy: DEFAULT_POLICY,
