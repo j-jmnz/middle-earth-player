@@ -1,10 +1,10 @@
-// Rules: rr.forced, rr.action, rr.shadow-effects, rr.travel, rr.active-location, rr.reveal, rr.keywords, rr.first-player, rr.blank, rr.surge, faq.lasting-effects, faq.additional-attacks (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Stone of Erech).
+// Rules: rr.forced, rr.action, rr.shadow-effects, rr.travel, rr.active-location, rr.reveal, rr.keywords, rr.first-player, rr.blank, rr.surge, faq.lasting-effects, faq.additional-attacks (data/rules/entries.json); docs/scenarios/standalone-scenarios/the-stone-of-erech.md (The Stone of Erech).
 import { describe, it } from "vitest";
 
 import { announce, answer, attack, cardSpecs, damageOn, deckCount, defend, exhausted, flag, handCount, lost, progressOn, quest, resolve, respond, reveal, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Stone of Erech (standalone-scenarios part 3): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The Night objective in play is the layout's `night`
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The Night objective in play is the layout's `night`
 // (its progress with it); a Dusk or Midnight line is read with that card in play. The lines a row cannot express (the passive check at the limit, Derufin's journey, Spectral, a cancel offer) are tests in lines.test.ts.
 const EVENTIDE = "50308";
 const DUSK = "50309";

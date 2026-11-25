@@ -1,4 +1,4 @@
-// Rules: rr.keywords, rr.blank, rr.sentinel, rr.ranged, rr.surge, dwd.ambush, mec109.indestructible, mec109.toughness, mec109.archery, mec113.phantom (data/rules/entries.json).
+// Rules: ats.prowl, ats.villagers, rr.keywords, rr.blank, rr.sentinel, rr.ranged, rr.surge, dwd.ambush, mec109.indestructible, mec109.toughness, mec109.archery, mec113.phantom (data/rules/entries.json).
 //
 // A card's keywords as they stand now, for the table's card preview: the printed ones, the ones a card effect gives (Sentinel, Ranged, Surge,
 // Toughness, Archery, Immune, Phantom), and the printed ones an effect or a blank text box takes away. Every reading goes through the engine's own
@@ -6,12 +6,16 @@
 import { cardArchery } from "../../rules/combat/combat.ts";
 import { isLostIsland } from "../../rules/families/uncharted/pick.ts";
 import { hasSpectral } from "../../rules/families/attack/spectral.ts";
+import { losesKeyword } from "../../rules/families/pelargir/stage-keyword.ts";
 import { hasPhantom } from "../../rules/families/grey-company/phantom.ts";
 import { hasKeyword, indestructible, playerCardEffectCanChoose, printedKeywordsBlank, toughnessOf } from "../../rules/core/keywords.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { flagged, heldAmount } from "../../rules/core/state.ts";
 
+import { printsArcheryX, prowlValue } from "../readouts/against-the-shadow/druadan.ts";
+import { villagersValue } from "../readouts/against-the-shadow/amon-din.ts";
+import { underworldValue } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { KEYWORD_RULES, type KeywordKey } from "./keyword-rules.ts";
 
 /** One keyword chip: its key in KEYWORD_RULES, the word with its value now ("Archery 2"), and whether an effect has taken it away (drawn struck through). */
@@ -40,6 +44,10 @@ export function cardKeywords(game: ScenarioState, ctx: ReduceContext, cardId: st
   };
 
   for (const key of PRINTED_FLAGS) shown(key, kw[key] === true);
+  // The Last Battle's own text takes its printed Siege away once the players hold 4 victory points (05076:B:3): the chip stays, struck through, beside the Battle it gains. The Cross-roads takes Captured!'s printed Battle away (06123:A:1).
+  for (const key of ["siege", "battle"] as const) if (found.has(key) && losesKeyword(game, cardId, key)) add(key, true);
+  // Battle or Siege a card effect gives the card (the last stage of Into Ithilien gains Siege, 05071:B:1): drawn like a printed one.
+  for (const key of ["battle", "siege"] as const) if (!found.has(key) && flagged(game, cardId, key)) add(key, false);
   for (const key of PRINTED_VALUES) shown(key, (kw[key] ?? 0) > 0, kw[key] ?? undefined);
   // Uncharted is on the Lost Island side only (dcce.uncharted); the charted side of a double-sided location has none.
   shown("uncharted", isLostIsland(instance, ctx));
@@ -76,6 +84,18 @@ export function cardKeywords(game: ScenarioState, ctx: ReduceContext, cardId: st
   else shown("pillage", (kw.pillage ?? 0) > 0, kw.pillage ?? undefined);
   // Massive: an enemy that stays in the staging area, engaged with every player, which every player may attack (the Dreadnaught).
   if (flagged(game, cardId, "attackableEngagedWithAll")) add("massive", false);
+
+  // Underworld X: the value its own record takes (06018:A:1 and the other four Underworld locations); none in any other scenario.
+  const underworld = underworldValue(game, ctx, cardId);
+  if (underworld > 0 && usable) add("underworld", lostAll, underworld);
+
+  // Prowl X: the value its own record takes (06047, 06048, 06049, 06054); none in any other scenario. The Hunter's Archery X shows its number at 0 too, as it is printed (06048:A:1).
+  const prowl = prowlValue(game, ctx, cardId);
+  if (prowl > 0 && usable) add("prowl", lostAll, prowl);
+  // Villagers X: the value its own record takes (the three locations that print it and stage 1B); none in any other scenario.
+  const villagers = villagersValue(game, ctx, cardId);
+  if (villagers > 0 && usable) add("villagers", lostAll, villagers);
+  if (usable && printsArcheryX(game, ctx, instance.code) && archery <= 0) found.set("archery", { key: "archery", word: "Archery 0", lost: lostAll });
 
   if (indestructible(game, cardId, printed)) add("indestructible", false);
   else shown("indestructible", kw.indestructible);

@@ -55,6 +55,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (expr.siegeTally === true) return { text: "the Siege values added up this round: each enemy destroyed and each location explored adds its printed Siege value", read: ["siegeTally"] };
   if (expr.pursuit === true) return { text: "the pursuit value", read: ["pursuit"] };
   if (expr.questCards === true) return { text: "the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1)", read: ["questCards"] };
+  if (expr.stagesNoProgress === true) return { text: "the number of quest stages in play with no progress on them (stages 2 to 4 in play together, the only stage before them, stage 5 after)", read: ["stagesNoProgress"] };
   if (expr.shadowCardsInPlay === true) return { text: "the number of shadow cards dealt to the enemies in play (in the staging area and engaged)", read: ["shadowCardsInPlay"] };
   if (expr.discardPileMaxCost === true) return { text: "the highest printed cost among the cards in the acting player's discard pile (0 for none, a hero or an X cost)", read: ["discardPileMaxCost"] };
   if (expr.discarded === "cost") return { text: "the combined printed cost of the cards this effect has discarded from decks (a card with no printed cost counts 0)", read: ["discarded"] };
@@ -74,6 +75,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (expr.hand === true) return { text: "the cards in your hand", read: ["hand"] };
   if (expr.attackDamage === true) return { text: "the damage the player attack this effect answers would deal this enemy: the attackers' total Attack less this enemy's Defense (0 at the least)", read: ["attackDamage"] };
   if (expr.dealt === true) return { text: "the damage just dealt", read: ["dealt"] };
+  if (isObj(expr.archeryOf)) return { text: `the total archery value (printed, gained and what the card gives itself) of the card with the most among ${pick(expr.archeryOf, ctx)}, 0 when none`, read: ["archeryOf", "max"] };
   if (isObj(expr.resourcesOn)) return { text: `the resource tokens on ${pick(expr.resourcesOn, ctx)}${expr.max === true ? " (the most on any one)" : ""}`, read: ["resourcesOn", "max"] };
   if (isObj(expr.damageOn)) return { text: `the damage tokens on ${pick(expr.damageOn, ctx)}`, read: ["damageOn"] };
   return familyAmount(expr);

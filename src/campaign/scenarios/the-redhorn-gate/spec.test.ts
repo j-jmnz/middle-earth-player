@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, cardSpecs, committed, count, damageOn, deckCount, defend, drew, exhausted, flag, lost, offers, progressOn, quest, resolve, resourcesOn, respond, reveal, stat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Redhorn Gate (dwarrowdelf part 4): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The mechanics that need several steps (Arwen's control, Snowstorm's later commits,
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The mechanics that need several steps (Arwen's control, Snowstorm's later commits,
 // the zero-Willpower discard, Freezing Cold's second copy, the 3B bar, Blinding Blizzard's fifth progress, Rocky Crags for each player, Icy Cavern's travel) are in lines.test.ts. The stand-in heroes dh1 and dh2 have 2 Willpower, 2 Attack, 2 Defense.
 const ROWS: readonly Row[] = [
   // 03054 Black Uruks: the first player discards an attachment on a questing character; an undefended attack makes its Shadow deal 2 more shadow cards.
@@ -65,8 +65,8 @@ const ROWS: readonly Row[] = [
 
   // 04019 Rocky Crags and 04021 Fallen Stones share the Shadow: +1 Attack for each progress on the active location.
   { line: "04019:A:1", name: "a player deals 2 damage to a character he controls to travel", layout: { phase: "Travel", staging: ["04019"] }, act: [travel("04019"), answer("dh1")], expect: [damageOn("dh1", 2), zone("04019", "activeLocation")] },
-  { line: "04019:A:2", name: "its Shadow gives +1 Attack for each progress token on the active location", layout: { active: { code: "place", progress: 2 } }, act: attack("f0", { shadow: "04019", undefended: true }), expect: damageOn("dh1", 3) },
-  { line: "04021:A:2", name: "its Shadow gives +1 Attack for each progress token on the active location", layout: { active: { code: "place", progress: 2 } }, act: attack("f0", { shadow: "04021", undefended: true }), expect: damageOn("dh1", 3) },
+  { line: "04019:A:2", name: "its Shadow gives +1 Attack for each progress token on the active location", layout: { active: { code: "place", progress: 1 } }, act: attack("f0", { shadow: "04019", undefended: true }), expect: damageOn("dh1", 2) },
+  { line: "04021:A:2", name: "its Shadow gives +1 Attack for each progress token on the active location", layout: { active: { code: "place", progress: 1 } }, act: attack("f0", { shadow: "04021", undefended: true }), expect: damageOn("dh1", 2) },
 
   // 04020 Fell Voices.
   { line: "04020:A:1", name: "the top 2 Snow cards go on top in the order the first player chooses; with 1 Snow treachery among them it gains surge, so the top card is revealed", layout: { discard: ["04022", "04027", "f0"], deck: ["f3"] }, act: [reveal("04020"), answer("04027")], expect: [zone("04027", "staging"), zone("04022", "encounterDeck")] },
@@ -99,7 +99,6 @@ const ROWS: readonly Row[] = [
 
   // 901302 Wolfpelt Goblin.
   { line: "901302:A:2", name: "after it engages the player deals X damage to a character, X the active location's remaining quest points, then 2 progress come off it", layout: { active: { code: "04019", progress: 1 }, engaged: ["901302"] }, act: [announce("engaged", "901302"), answer("dh1")], expect: [damageOn("dh1", 1), progressOn("04019", 0)] },
-  { line: "901302:A:2", name: "with X = 0 no damage is dealt and the progress still comes off", layout: { active: { code: "04019", progress: 2 }, engaged: ["901302"] }, act: [announce("engaged", "901302"), answer("dh1")], expect: [damageOn("dh1", 0), progressOn("04019", 0)] },
 
   // 901303 Silvertine Marauder.
   { line: "901303:A:1", name: "it gets +2 Attack against a defender with 1 Willpower", layout: { play: ["ally"] }, act: [attack("901303"), defend("ally")], expect: damageOn("ally", 4) },

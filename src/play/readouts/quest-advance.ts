@@ -7,6 +7,7 @@
 // advanced already: the screen holds the moment so the stage is read before the round goes on, and the table answers nothing for
 // the player meanwhile (use-table-choice.ts). The table also opens on it (user request, 2026-10-29): the stage in play when the game is
 // loaded, so a new game shows its first quest card, usually the one whose Setup the game just ran, before the table. Pure, so a test reads it.
+import { ARMIES_STAGE_FRAME } from "../../rules/families/armies/stages.ts";
 import { isSeparate, parkedStage, stageOf, stageSeat, viewOf } from "../../rules/families/breaking/areas.ts";
 import { stagePlace } from "../../rules/families/quest/branch.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
@@ -14,11 +15,14 @@ import type { CardFace } from "../../rules/core/state.ts";
 import { isOver } from "../../rules/engine/undo.ts";
 import { topFrame } from "../../rules/windows/windows.ts";
 
+import { amonDinWin } from "./against-the-shadow/amon-din.ts";
+import { valeWin } from "./against-the-shadow/vale.ts";
 import { stageDetail } from "./fortress.ts";
 import { advanceHold, questObjective, stagePoints } from "./objective.ts";
 import { isTrapStage, trapAdvance } from "./standalone-scenarios/barrow-downs.ts";
 import { questSeat } from "../store/selectors.ts";
 import { STAGE_LOSS } from "../words/scenarios/stormcaller.ts";
+import { stageAdvanceWords } from "./hobbit/roast-mutton.ts";
 import type { TableMoment } from "../store/store.ts";
 
 /**
@@ -55,7 +59,10 @@ export function callerLastStage(game: Pick<ScenarioState, "sea">): string | null
 
 /** The stage whose own effect (its When Revealed) is resolving and waits on the player, or null. */
 export function askingStage(game: ScenarioState): string | null {
-  return game.window != null && ASKING.has(game.window.kind) ? (topFrame(game)?.cardId ?? null) : null;
+  const frame = topFrame(game);
+  // The first player's choice of the current stage at the start of a round is the table's choice tray, not a stage's own effect (its frame names a stage only as its source).
+  const roundChoice = frame?.data.kind === "effect" && frame.data.effectId === ARMIES_STAGE_FRAME;
+  return game.window != null && ASKING.has(game.window.kind) && !roundChoice ? (frame?.cardId ?? null) : null;
 }
 
 /**
@@ -127,7 +134,7 @@ export function advanceWords(
   const points = stage ? stagePoints(view, stage, ctx) : null;
   const hold = advanceHold(view, ctx, line);
   const objective = points == null ? questObjective(view, ctx, line) : null;
-  const won = points != null ? `${points} quest point${points === 1 ? "" : "s"} to complete it` : objective ? `To win: ${objective}` : null;
+  const won = points != null ? `${points} quest point${points === 1 ? "" : "s"} to complete it` : (amonDinWin(view) ?? valeWin(view, ctx) ?? (objective ? `To win: ${objective}` : stage ? stageAdvanceWords(view, stage) : null));
   // A stage with Defense says where questing's progress goes, one whose filling loses the game says so (mec112.defense, 143075:B:3).
   const detail = (stage ? stageDetail(view, ctx, stage.code, points, hold, won) : [hold ?? won].filter((text) => text != null)).join(". ") || null;
   const who = seat != null && game.seatCount > 1 ? `Player ${seat + 1}` : null;

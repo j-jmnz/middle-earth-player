@@ -2,11 +2,11 @@
 // the four every table shows, the second slot's, and the victory display. Which of the second slot's piles a game has is decided here from the state, once. Pure.
 import type { ScenarioState } from "../../rules/core/state.ts";
 
-// The four piles every table shows, and the second slot's: the Corsair deck and its discard pile while the scenario has a Corsair deck (dcce.corsair-deck), the Smaug deck and its discard pile in The Battle of Lake-town (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town), the Evil Creatures deck and its
+// The four piles every table shows, and the second slot's: the Corsair deck and its discard pile while the scenario has a Corsair deck (dcce.corsair-deck), the Smaug deck and its discard pile in The Battle of Lake-town (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town), the Evil Creatures deck and its
 // discard pile while it deals that (emce.evil-creatures-deck), or one deck alone: the Uncharted deck (dcce.uncharted-deck), the Grotto deck (dcce.grotto-deck) or the Caves deck
 // (emce.caves-deck), the Balrog deck and its discard pile in Shadow and Flame Nightmare (the setup card's lines 901801:A:2 to A:4), or the Harad deck lying under The Cross-roads (mec112.setup-journey-to-the-cross-roads). The victory display is a pile too, at staging's right end, only while a card is in it (ltp.victory-display). Only the discard piles and the victory display open a list.
 export type BasePileId = "deck" | "discard" | "encounterDeck" | "encounterDiscard";
-export type SecondPileId = "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "grottoDeck" | "evilCreaturesDeck" | "evilCreaturesDiscard" | "balrogDeck" | "balrogDiscard" | "cavesDeck" | "haradDeck" | "angmarOrcDeck" | "investigationDeck" | "smaugDeck" | "smaugDiscard";
+export type SecondPileId = "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "grottoDeck" | "evilCreaturesDeck" | "evilCreaturesDiscard" | "balrogDeck" | "balrogDiscard" | "cavesDeck" | "haradDeck" | "angmarOrcDeck" | "investigationDeck" | "smaugDeck" | "smaugDiscard" | "sackDeck";
 export type VictoryPileId = "victory";
 export type PileId = BasePileId | SecondPileId | VictoryPileId;
 
@@ -21,6 +21,7 @@ const HARAD_PILES: readonly SecondPileId[] = ["haradDeck"];
 const ANGMAR_PILES: readonly SecondPileId[] = ["angmarOrcDeck"];
 const INVESTIGATION_PILES: readonly SecondPileId[] = ["investigationDeck"];
 const SMAUG_PILES: readonly SecondPileId[] = ["smaugDeck", "smaugDiscard"];
+const SACK_PILES: readonly SecondPileId[] = ["sackDeck"];
 const NONE_PILES: readonly SecondPileId[] = [];
 
 export const PILE_WORDS: Readonly<Record<PileId, string>> = {
@@ -42,6 +43,7 @@ export const PILE_WORDS: Readonly<Record<PileId, string>> = {
   investigationDeck: "Investigation deck",
   smaugDeck: "Smaug deck",
   smaugDiscard: "Smaug discard pile",
+  sackDeck: "Sack deck",
   victory: "Victory display",
 };
 
@@ -66,6 +68,8 @@ export function secondPilesOf(game: Pick<ScenarioState, "corsairDeck" | "unchart
   if (game.piles?.angmarOrcDeck !== undefined) return ANGMAR_PILES;
   if (game.piles?.investigationDeck !== undefined) return INVESTIGATION_PILES;
   if (game.piles?.smaugDeck !== undefined) return SMAUG_PILES;
+  // We Must Away, Ere Break of Day: the Sack deck the Setup builds (hob.sack-deck, 131023:A:1).
+  if (game.piles?.sackDeck !== undefined) return SACK_PILES;
   return game.piles?.cavesDeck !== undefined ? CAVES_PILES : NONE_PILES;
 }
 
@@ -109,6 +113,7 @@ export function pileIds(game: ScenarioState, pile: PileId, seat: number): readon
     case "investigationDeck":
     case "smaugDeck":
     case "smaugDiscard":
+    case "sackDeck":
       return game.piles?.[pile] ?? NONE;
     case "victory":
       return game.victory;

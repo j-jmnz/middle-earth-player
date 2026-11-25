@@ -12,7 +12,7 @@ import { moveOtherLooked } from "../encounter/items.ts";
 import { leavePlay } from "../encounter/moves.ts";
 
 // The verbs src/catalog/families/caves.ts adds. The progress rules of the quest card (families/caves/progress.ts), the engagement cost 0 and the
-// damage flags are read where they apply (rules/core/keywords.ts, rules/quest/quest.ts); only the verbs run here. Null when the verb is not one of them.
+// damage flags are read where they apply (rules/core/damage.ts, rules/quest/quest.ts); only the verbs run here. Null when the verb is not one of them.
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
     case "BottomOtherLooked":
@@ -31,7 +31,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 export function setAsideInPlay(state: ScenarioState, instruction: Extract<Instruction, { verb: "SetAsideInPlay" }>, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const card = Object.values(state.cards).find((entry) => entry.code === instruction.code && inPlay(entry.zone));
   if (!card) return state;
-  const away = updateCard(moveCard(leavePlay(state, card.id, ctx, steps), card.id, { zone: "setAside" }), card.id, { face: "down", controller: null });
+  const away = updateCard(moveCard(leavePlay(state, card.id, ctx, steps), card.id, { zone: "setAside" }, instruction.byQuest === true ? { supersedes: true } : {}), card.id, { face: "down", controller: null });
   return instruction.keepDamage === true ? updateCard(away, card.id, { damage: card.damage, keepsDamage: true }) : away;
 }
 

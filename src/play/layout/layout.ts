@@ -36,6 +36,8 @@ export type CardSlot = Rect & {
   zone: SlotZone;
   kind: SlotKind;
   exhausted: boolean;
+  // An unconscious character (hob.unconscious-characters): turned 180 degrees, upright in its footprint, and no sideways exhausted card.
+  unconscious?: true;
   faceDown: boolean;
   // Quest cards are printed sideways.
   landscape: boolean;
@@ -50,6 +52,8 @@ export type CardSlot = Rect & {
   committed: boolean;
   // The facedown prisoner of Escape from Dol Guldur (01123:B:1): its back wears a small hero mark and a tap still opens its preview.
   held?: true;
+  // A facedown card of The Steward's Fear's underworld stack: the location it lies under, which a tap or a hold on the card opens in its place (the card has no code here, so nothing names it).
+  opens?: string;
   // A facedown Reanimated Dead (The Dread Realm): a player card back with a small mark, and a tap or a hold opens a preview that says what it is.
   dead?: true;
   // A deck with an encounter card attached to it (Iron Shackles, 01105:A:1): a chain on its count strip.
@@ -80,7 +84,7 @@ export type CardSlot = Rect & {
 export type CombatMark = { x: number; y: number; kind: FightKind; enemyId: string; preview: boolean };
 
 // The second slot's decks, which stand in its left place, and its discard piles, in its right one.
-const SECOND_DECKS = ["corsairDeck", "unchartedDeck", "grottoDeck", "evilCreaturesDeck", "balrogDeck", "cavesDeck", "haradDeck", "angmarOrcDeck", "smaugDeck", "investigationDeck"] as const;
+const SECOND_DECKS = ["corsairDeck", "unchartedDeck", "grottoDeck", "evilCreaturesDeck", "balrogDeck", "cavesDeck", "haradDeck", "angmarOrcDeck", "smaugDeck", "investigationDeck", "sackDeck"] as const;
 const SECOND_DISCARDS = ["corsairDiscard", "evilCreaturesDiscard", "balrogDiscard", "smaugDiscard"] as const;
 // The four piles every table has, the second slot's when the game has one (the Corsair pair: dcce.corsair-deck; the Evil Creatures pair or the Caves deck: emce.evil-creatures-deck, emce.caves-deck), and the victory display while a card is in it.
 export type TablePiles<T> = Readonly<Record<BasePileId, T>> & Partial<Readonly<Record<SecondPileId | VictoryPileId, T>>>;

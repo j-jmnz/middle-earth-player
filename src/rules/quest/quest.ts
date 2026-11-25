@@ -21,11 +21,14 @@ import { queueEvent } from "../windows/queue.ts";
 import { moveCard } from "../core/zones.ts";
 import { placeQuestingProgress, type QuestDamageCause } from "../families/defense/damage.ts";
 import { travelsOverActive } from "../families/grapple/travel.ts";
-import { freeSlot, makeActiveIn, placeOnActive } from "../families/south/locations.ts";
+import { exploreIfFull, freeSlot, makeActiveIn, placeOnActive } from "../families/south/locations.ts";
 import { noteQuestPlaced, questRoom } from "../families/caves/progress.ts";
 import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts";
 import { attachedStageFrom, branchFrom, holdStage, reached as reachedStage } from "../families/quest/branch.ts";
 import { leaveStage, randomStageFrom } from "../families/wilderland/random-stage.ts";
+import { stagedCommitted } from "../families/pelargir/committed.ts";
+import { skippedStage } from "../families/pelargir/stage-skip.ts";
+import { skipAreaStage } from "../families/riddles/area.ts";
 import { headOf, sharing, viewOf, withView } from "../families/breaking/areas.ts";
 import { threatFromOtherAreas } from "../families/breaking/threat.ts";
 import { engagedContributors } from "./engaged-threat.ts";
@@ -35,6 +38,7 @@ import { islandTravelTo } from "../families/island/travel.ts";
 import { reduceQuestProgress } from "../families/angmar/progress.ts";
 import { currentSideQuest, mainQuestBarred, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
 import { replaceStageProgress } from "./progress-replaced.ts";
+import { jointAdvance } from "../families/armies/advance.ts";
 import { familyOptionalEngageBarred, familyQuestResult } from "../interpret/family-hooks.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
@@ -113,6 +117,11 @@ export function committedWillpower(state: ScenarioState, cards: Cards, only?: nu
       // "Using its Attack instead of its Willpower" (11005:A:2).
       total += modifiedStat(view, instance, questStatOf(view, id, cards), cards);
     }
+  }
+  // An ally objective in the staging area committed by its own text counts too (05025:A:1, families/pelargir/committed.ts).
+  for (const id of stagedCommitted(view, only)) {
+    const instance = view.cards[id];
+    if (instance && !willpowerIgnored(view, id)) total += modifiedStat(view, instance, questStatOf(view, id, cards), cards);
   }
   return total;
 }
@@ -275,6 +284,9 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     if (next.stageChoice === "due" || next.stageHeld === currentId) return next;
     // Defeating a stage when the Stormcaller is at its stage means the players have caught up to it and win (families/stormcaller/values.ts, 12013:B:3).
     if (caughtUp(next, current.code)) return clearStage(next);
+    // Stages 2 to 4 of The Battle of Five Armies advance together to the stage after them (families/armies/advance.ts).
+    const joint = jointAdvance(next, currentId, cards);
+    if (joint) next = joint.state;
     const index = next.stages.findIndex((stage) => stage.code === current.code);
     // A quest that is ordered by its quest deck (ShuffleStages, LookAtStages, families/quest/order.ts) goes to the top stage of the deck, or asks.
     const ordered = orderedNext(next, current.code);
@@ -289,8 +301,8 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     // A stage that names AdvanceIfAttached (50601:B:3) proceeds to the stage its Loot condition names.
     const attached = ordered || branched || rolled ? null : attachedStageFrom(next, current.code, cards);
     if (attached) next = attached.state;
-    const nextId = ordered ? ordered.id : rolled ? rolled.id : attached ? attached.id : (() => {
-      const nextCode = branched ? branched.code : index < 0 || flagged(next, currentId, "holdsWin") ? undefined : next.stages[index + 1]?.code;
+    const nextId = joint ? joint.id : ordered ? ordered.id : rolled ? rolled.id : attached ? attached.id : (() => {
+      const nextCode = branched ? branched.code : index < 0 || flagged(next, currentId, "holdsWin") ? undefined : skippedStage(next, currentId, index) ?? skipAreaStage(next, index);
       return nextCode ? next.questDeck.find((id) => next.cards[id]?.code === nextCode) : undefined;
     })();
     if (!nextId) return flagged(next, currentId, "holdsWin") ? holdStage(next, currentId) : clearStage(next);
@@ -335,7 +347,9 @@ export function travelTo(state: ScenarioState, locationId: string, cards: Cards,
   const instance = state.cards[locationId];
   if (!instance || instance.zone !== "staging") return null;
   if (!isLocationCard(printedOf(cards, instance.code))) return null;
-  return slot ? moveCard(state, locationId, { zone: slot }) : makeActiveIn(state, locationId);
+  const traveled = slot ? moveCard(state, locationId, { zone: slot }) : makeActiveIn(state, locationId);
+  // Progress placed in the staging area may already fill the location's quest points once they drop to the printed value: it is explored on arrival (rr.explored).
+  return exploreIfFull(traveled, locationId, cards, steps);
 }
 
 // The locations in the staging area; with `seat`, once stages are separate, in that seat's staging area (families/breaking/areas.ts).

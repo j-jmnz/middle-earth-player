@@ -8,7 +8,7 @@ import sharp from "sharp";
 import { SCENE_PICTURE } from "../../src/screens/art/crop.ts";
 import { sniffImage } from "../../src/screens/images/policy.ts";
 import { DATA_DIR, PDF_CACHE_DIR, PICTURE_CACHE_DIR, SCAN_CACHE_DIR } from "../data/paths.ts";
-import { fetchBytesRetrying, sha256, type SourceFile, type SourceRecord } from "../data/sources/fetch.ts";
+import { fetchAtPin, fetchBytesRetrying, sha256, type SourceFile, type SourceRecord } from "../data/sources/fetch.ts";
 import { mirrorFromEnv, mirrorReader } from "../data/mirror/client.ts";
 import { renderPdfPage } from "../data/sources/pictures.ts";
 import { bytes, duration, isDirectRun, runPack, type Log } from "../log.ts";
@@ -49,6 +49,8 @@ export type PackScansOptions = {
   scene?: (body: Uint8Array, typeCode: string, code: string) => Promise<Uint8Array>;
   // How many pictures are loaded at once (PACK_CONCURRENCY when not given).
   concurrency?: number;
+  // The waits before a download whose bytes are not at the pin is tried again (RETRY_WAITS_MS when not given).
+  retryWaitsMs?: readonly number[];
 };
 
 type Pin = SourceFile & { cacheDir: string };
@@ -59,7 +61,7 @@ type Pin = SourceFile & { cacheDir: string };
  * `<code>.B` and keyed so in the map (src/play/canvas/picture-key.ts). The file is the
  * card's `pictures` file of data/sources.json when it has one, else its `scans` file: the cached copy is used when its
  * hash matches the pin; otherwise the asset mirror's copy, then the pinned URL (a release machine has no cache), and a PDF
- * page the mirror does not hold is rendered from the pinned PDF. Bytes that do not match the pin fail the build: run `pnpm data sync scans pictures` to move the pins.
+ * page the mirror does not hold is rendered from the pinned PDF. Bytes that do not match the pin are fetched again (fetchAtPin), then fail the build: run `pnpm data sync scans pictures` to move the pins.
  * A picture larger than MAX_SIDE is scaled down to it. A card with neither is drawn as its text.
  */
 export async function packScans(options: PackScansOptions, log: Log): Promise<PackedScan[]> {
@@ -248,8 +250,9 @@ async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body
     if (!pdfPin) throw new Error(`${pin.path} is a page of ${page.pdf}, which data/sources.json does not pin. Run pnpm data sync pictures.`);
     const pdfFile = path.join(context.pdfCacheDir, path.basename(pdfPin.path));
     if (!existsSync(pdfFile) || sha256(readFileSync(pdfFile)) !== pdfPin.sha256) {
-      const body = (await context.mirror?.(pdfPin.sha256)) ?? (await context.fetchScan(pdfPin.url));
-      if (sha256(body) !== pdfPin.sha256) throw new Error(`${pdfPin.url} has sha256 ${sha256(body)}, pinned ${pdfPin.sha256}. Run pnpm data sync pictures and check the change.`);
+      const mirroredPdf = await context.mirror?.(pdfPin.sha256);
+      const { body, hash } = mirroredPdf ? { body: mirroredPdf, hash: sha256(mirroredPdf) } : await fetchAtPin(pdfPin.url, pdfPin.sha256, context.fetchScan, log, context.retryWaitsMs);
+      if (hash !== pdfPin.sha256) throw new Error(`${pdfPin.url} has sha256 ${hash}, pinned ${pdfPin.sha256}. Run pnpm data sync pictures and check the change.`);
       mkdirSync(context.pdfCacheDir, { recursive: true });
       writeFileSync(pdfFile, body);
     }
@@ -267,8 +270,7 @@ async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body
     return { body, from: "render" };
   }
   log.debug(`${pin.path} not in the cache at its pin, fetching ${pin.url}`);
-  const body = await context.fetchScan(pin.url);
-  const hash = sha256(body);
+  const { body, hash } = await fetchAtPin(pin.url, pin.sha256, context.fetchScan, log, context.retryWaitsMs);
   if (hash !== pin.sha256) throw new Error(`${pin.url} has sha256 ${hash}, pinned ${pin.sha256}. Run pnpm data sync scans pictures and check the change.`);
   mkdirSync(pin.cacheDir, { recursive: true });
   writeFileSync(cached, body);

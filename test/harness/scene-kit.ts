@@ -1,4 +1,4 @@
-import type { Effect } from "../../src/catalog/boundary.ts";
+import type { Effect, Instruction } from "../../src/catalog/boundary.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import type { EngineStep } from "../../src/rules/core/intents.ts";
 import { definePrinted, type PrintedCard } from "../../src/rules/core/printed.ts";
@@ -10,6 +10,7 @@ import { settle } from "../../src/rules/engine/machine.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 import { syncConstants } from "../../src/rules/interpret/constants.ts";
 import { pushCardEffects } from "../../src/rules/interpret/effect-frames.ts";
+import { runInstruction } from "../../src/rules/interpret/interpret.ts";
 
 import { causeProblems } from "./cause-check.ts";
 import { begin, send, type Run } from "./scene.ts";
@@ -52,6 +53,71 @@ export function statOf(state: ScenarioState, cards: ReduceContext["cards"], code
 /** The codes of the cards in a zone, sorted. */
 export function codesIn(state: ScenarioState, zone: string): string[] {
   return Object.values(state.cards).filter((card) => card.zone === zone).map((card) => card.code).sort();
+}
+
+/** The zone of the first card with this code (a card the table does not have has none). */
+export const where = (state: ScenarioState, code: string): string | undefined => state.cards[idOf(state, code)]?.zone;
+
+/** The codes of the cards engaged with a seat (the first seat by default), in engagement order. */
+export const engagedCodes = (state: ScenarioState, seat = 0): string[] => (state.seats[seat]?.engaged ?? []).map((id) => state.cards[id]?.code ?? "");
+
+/** The run of a table's state, constants synced. */
+export const opened = (made: { state: ScenarioState; ctx: ReduceContext }, state: ScenarioState = made.state): Run => begin(syncConstants(state, made.ctx));
+
+/** The state after one instruction ran for a seat (the window cleared first) and the table settled. The round is stopped while the instruction runs, so only what it does is read; the table is given back as it was unless the instruction opened a window of its own. */
+export function run(made: { ctx: ReduceContext }, state: ScenarioState, instruction: Instruction, options: { seat?: number; sourceId?: string | null; steps?: EngineStep[] } = {}): ScenarioState {
+  const steps = options.steps ?? [];
+  const done = settle(runInstruction({ ...state, window: null, mode: "stopped" }, instruction, { seat: options.seat ?? 0, sourceId: options.sourceId ?? null }, made.ctx, steps), made.ctx, steps);
+  return done.window != null || done.stack.length > 0 ? done : { ...done, mode: state.mode, window: state.window, activeSeat: state.activeSeat };
+}
+
+/** The intents that let a window go by without a decision: pass, decline to travel, engage nobody, attack nobody. */
+export const PASSING: readonly PlayerIntent["type"][] = ["Pass", "DeclineTravel", "DeclineEngage", "DeclineAttack"];
+
+/** The game goes on until `stop` holds: every window is passed, a choice takes its first option (or the one `choose` names), an enemy to attack is the first offered. */
+export function drive(made: { ctx: ReduceContext }, from: Run, stop: (state: ScenarioState) => boolean, choose: (state: ScenarioState) => string = (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "")): Run {
+  let current = from;
+  for (let guard = 0; guard < 400 && !stop(current.state) && !current.state.lost && !current.state.stageCleared; guard += 1) {
+    const state = current.state;
+    if (state.window?.kind === "choose") {
+      current = send(current, { type: "Choose", optionId: choose(state) }, made.ctx);
+      continue;
+    }
+    if (state.window?.kind === "chooseEnemy") {
+      current = send(current, { type: "ChooseEnemy", enemyId: state.window.options[0] ?? "" }, made.ctx);
+      continue;
+    }
+    const intents = legalIntents(state, made.ctx);
+    const pass = PASSING.map((type) => intents.find((intent) => intent.type === type)).find((intent) => intent != null);
+    if (!pass) break;
+    current = send(current, pass as PlayerIntent, made.ctx);
+  }
+  return current;
+}
+
+/**
+ * An attack is fought out: a defense window names the hero `heroCode` (the first hero of the player attacked by default) as the one that takes an undefended attack, or declares `defender` when given; a choice takes the option `choose` names (the first by default); every
+ * other window is passed. Stops once `stop` holds.
+ */
+export function fight(made: { ctx: ReduceContext }, from: Run, stop: (state: ScenarioState) => boolean, options: { defender?: string; heroCode?: string; choose?: (state: ScenarioState) => string } = {}): Run {
+  let current = from;
+  const answer = (intent: PlayerIntent): void => {
+    current = send(current, intent, made.ctx);
+  };
+  for (let guard = 0; guard < 120 && !stop(current.state) && !current.state.lost && !current.state.stageCleared; guard += 1) {
+    const state = current.state;
+    const intents = legalIntents(state, made.ctx);
+    if (state.window?.kind === "choose") answer({ type: "Choose", optionId: options.choose ? options.choose(state) : (state.window.options[0] ?? "") });
+    else if (state.window?.kind === "chooseEnemy") answer({ type: "ChooseEnemy", enemyId: state.window.options[0] ?? "" });
+    else if (options.defender && intents.some((intent) => intent.type === "DeclareDefender")) answer({ type: "DeclareDefender", defenderId: idOf(state, options.defender) });
+    else if (intents.some((intent) => intent.type === "Undefended")) answer({ type: "Undefended", heroId: options.heroCode ? idOf(state, options.heroCode) : (state.seats[state.window?.kind === "defense" ? state.window.seat : 0]?.heroes[0] ?? "") });
+    else {
+      const pass = PASSING.map((type) => intents.find((intent) => intent.type === type)).find((intent) => intent != null);
+      if (!pass) break;
+      answer(pass as PlayerIntent);
+    }
+  }
+  return current;
 }
 
 /** A card of the staging area or another zone: a code, or a code with its tokens. */
@@ -191,11 +257,13 @@ export function secondSeatHero(state: ScenarioState): string | null {
   return seat === 0 ? null : (state.seats[seat]?.heroes[0] ?? null);
 }
 
-// The card an undefended attack lands on: the one `lands` names for the attacking enemy's code, else the hero asked for.
+// The card an undefended attack lands on: the one `lands` names for the attacking enemy's code while it is in the game, else the hero asked for.
 function undefendedOn(state: ScenarioState, lands: Readonly<Record<string, string>> | undefined, hero: string): string {
   const attacker = state.pendingAttack ? state.cards[state.pendingAttack.enemyId]?.code : undefined;
   const code = attacker == null ? undefined : lands?.[attacker];
-  return code == null ? hero : idOf(state, code);
+  // A card that left the game since (a Battleground location a shadow removed) cannot be named again: the hero is.
+  const target = code == null ? undefined : idOf(state, code);
+  return target == null || state.cards[target]?.zone === "removed" ? hero : target;
 }
 
 export type FightTable = { state: ScenarioState; ctx: ReduceContext; hero: string; hero2: string };

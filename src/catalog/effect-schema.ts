@@ -96,7 +96,8 @@ export const costSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("exhaustCode"), code: z.string().min(1) }),
   // A card in play that the player controls with this title exhausts, whichever printing the game deals ("exhaust The One Ring", 141001:A:1).
   z.strictObject({ kind: z.literal("exhaustNamed"), name: z.string().min(1) }),
-  z.strictObject({ kind: z.literal("raiseThreat"), amount: z.number().int().positive() }),
+  // `each`: every player's threat is raised, not only the payer's ("raise each player's threat by 2", 131079:A:3).
+  z.strictObject({ kind: z.literal("raiseThreat"), amount: z.number().int().positive(), each: z.literal(true).optional() }),
   // Damage on the source itself ("Deal 1 damage to ~ to ...").
   z.strictObject({ kind: z.literal("damageSelf"), amount: z.number().int().positive() }),
   z.strictObject({ kind: z.literal("returnSelfToHand") }),
@@ -179,9 +180,13 @@ const delaySchema = z.strictObject({
   // put the Nazgûl of Dol Guldur into play", 900307:A:1; rr.step-3-4).
   until: z.enum(["endOfPhase", "endOfRound", "questSucceeded", "questFailed", "endOfAttack", "startOfGame", "beginningOfTravel"]),
   uncancelable: conditionSchema.optional(),
+  // With `endOfPhase`: the named phase, not the one running now ("At the end of the quest phase", 131073:A:1; revealed in another phase it waits for the next quest phase).
+  phase: z.literal("Quest").optional(),
   // The delayed instructions act on the card the last Pick chose (Sneak Attack's ally).
   subject: z.literal("picked").optional(),
   instructions: z.array(simpleInstructionSchema),
+  // The Delay is scheduled only when this holds ("The first player chooses a Stone-giant ... it engages ... at the end of the quest phase", 131073:A:1).
+  ...when,
 });
 
 // Runs the instructions once for each card that matches the filter now, each time with that card as the picked card ("Ready
@@ -326,7 +331,7 @@ export const effectSchema = z.strictObject({
   byEncounterDeck: z.literal(true).optional(),
   // A "revealed" event is not heard when the card was found in the encounter discard pile by a search ("revealed from the encounter deck" counts a search of the deck, 09016:A:3).
   notFromDiscard: z.literal(true).optional(),
-  // This Forced effect resolves before the other Forced effects of the same moment, whatever the age of their cards (the engine resolves the oldest card's first): "after resolving the Forced effect on each stage 3 in play" (50907:A:1; docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 5).
+  // This Forced effect resolves before the other Forced effects of the same moment, whatever the age of their cards (the engine resolves the oldest card's first): "after resolving the Forced effect on each stage 3 in play" (50907:A:1; docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 5).
   early: z.literal(true).optional(),
   cancel: cancelSchema.optional(),
   // While this holds, nothing may cancel the effect ("If The One Ring is exhausted, this effect cannot be canceled").

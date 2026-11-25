@@ -14,6 +14,10 @@ export type SourceRecord = {
   pin: { kind: "sha256" | "git"; value: string };
   fetchedAt: string;
   files: SourceFile[];
+  // Absent on an official source. A fan-made source names its publisher and its licence (scripts/data/sources/origins.ts).
+  origin?: "official" | "fan-made";
+  publisher?: string;
+  licence?: string;
 };
 
 export function sha256(body: string | Uint8Array): string {
@@ -70,6 +74,29 @@ export async function fetchBytesRetrying(url: string, timeoutMs = 120_000, log: 
       log.warn(`${error instanceof Error ? error.message : String(error)}; trying again in ${duration(wait)}`);
       await new Promise((resolve) => setTimeout(resolve, wait));
     }
+  }
+}
+
+/**
+ * A pinned file from its URL: `fetchOne`, tried again after each wait while the bytes do not hash to the pin. Google Drive
+ * now and then answers 200 with a quota or sign-in page, or with a cut-off body, in place of the file, and the next request
+ * gets the file. Returns the last body with its hash; the caller fails on a hash that is still not the pin (the file
+ * changed upstream).
+ */
+export async function fetchAtPin(
+  url: string,
+  pin: string,
+  fetchOne: (url: string) => Promise<Uint8Array>,
+  log: Log = fetchLog,
+  waits: readonly number[] = RETRY_WAITS_MS,
+): Promise<{ body: Uint8Array; hash: string }> {
+  for (let attempt = 0; ; attempt += 1) {
+    const body = await fetchOne(url);
+    const hash = sha256(body);
+    const wait = waits[attempt];
+    if (hash === pin || wait === undefined) return { body, hash };
+    log.warn(`GET ${url} gave ${bytes(body.byteLength)} with sha256 ${hash}, pinned ${pin}; trying again in ${duration(wait)}`);
+    await new Promise((resolve) => setTimeout(resolve, wait));
   }
 }
 

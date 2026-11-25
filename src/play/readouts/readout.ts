@@ -25,17 +25,25 @@ import { companyProgressWords } from "./company.ts";
 import { erechQuestWords } from "./standalone-scenarios/erech.ts";
 import { downsHoldWords, downsQuestWords, downsRaise } from "./standalone-scenarios/barrow-downs.ts";
 import { forestHoldWords } from "./standalone-scenarios/old-forest.ts";
+import { stagingThreatNow } from "./the-hobbit/riddles.ts";
 import { lairProgressWords } from "./lair.ts";
 import { blackGateQuestEnd } from "./black-gate.ts";
 import { fortitudeNumbers } from "./fortitude.ts";
 import { mountDoomQuestNote } from "./mount-doom.ts";
 import { seatLevel } from "./threat-level.ts";
 import { pelennorQuestWords } from "./pelennor.ts";
+import { undefendedLocationsReadout } from "./against-the-shadow/osgiliath.ts";
+import { bloodDockClause, bloodLossNote, bloodTravel } from "./against-the-shadow/blood.ts";
+import { valeShieldReadout, valeTravel } from "./against-the-shadow/vale.ts";
+import { questMovesWords, undefendedVillagersReadout } from "./against-the-shadow/amon-din.ts";
+import { undefendedRemoves } from "./against-the-shadow/cair-andros.ts";
 import { siegeProgressWords } from "./siege.ts";
 import { sailingReadout } from "./sea-readout.ts";
 import type { Sheet, SheetStat } from "../choice/sheet-types.ts";
 import { escapeNumbers } from "../choice/escape-notes.ts";
 import { choiceFor, type Choice } from "../choice/table-choice.ts";
+import { progressReadout } from "./against-the-shadow/druadan.ts";
+import { questStatNow, questStatWord, type QuestStat } from "../phases/quest-stat.ts";
 
 // `join` is the word between two numbers: "against" (willpower against threat), or "then" for the staging threat before and
 // after a travel.
@@ -45,6 +53,8 @@ const WILL = (value: number): SheetStat => ({ icon: "willpower", value, word: "W
 const THREAT = (value: number): SheetStat => ({ icon: "threat", value, word: "Threat" });
 const ATTACK = (value: number): SheetStat => ({ icon: "attack", value, word: "Attack" });
 const DEFENSE = (value: number): SheetStat => ({ icon: "defense", value, word: "Defense" });
+// The quest total's number: the stat the current quest counts (hon.battle, hon.siege), Willpower unless the quest has Battle or Siege.
+const QUEST = (stat: QuestStat, value: number): SheetStat => ({ icon: stat, value, word: questStatWord(stat) });
 
 /**
  * The readout the dock draws. While the quest meter shows the numbers (the command column's head is drawn, in the Quest phase), the meter
@@ -119,7 +129,9 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const enemy = game.cards[attack.enemyId];
     if (!enemy) return null;
     const strength = modifiedStat(game, enemy, "attack", ctx.cards);
-    const shadowNote = attack.shadowResolved ? "" : ", shadow card next";
+    // A shadow card comes next only when the enemy holds one: Gollum's attack from the riddle area deals none (131074:A:1), nor does an enemy dealt none for want of a card.
+    const shadowNext = !attack.shadowResolved && enemy.shadowId != null;
+    const shadowNote = shadowNext ? ", shadow card next" : "";
     const picked = pickedInAttack(game, sheet, choice);
     // Several defenders (Stand Together, rr.multiple-defenders): their defense is pooled against the attack, and all the
     // damage goes on the one the defending player chooses.
@@ -132,12 +144,21 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const defenderId = attack.undefended ? undefined : (attack.defenderId ?? (picked?.role === "defender" ? picked.id : undefined));
     if (defenderId && game.cards[defenderId]) {
       const defense = defenseAsDefender(game, defenderId, ctx.cards);
-      const destroyed = destroyedWords(game, ctx, defenderId, Math.max(0, strength - defense), cardName, !attack.shadowResolved);
-      return { kind: "defense", stats: [ATTACK(strength), DEFENSE(defense)], result: `${damageWords(strength, defense)}${shadowNote}${destroyed}` };
+      const destroyed = destroyedWords(game, ctx, defenderId, Math.max(0, strength - defense), cardName, shadowNext);
+      return { kind: "defense", stats: [ATTACK(strength), DEFENSE(defense)], result: `${damageWords(strength, defense)}${shadowNote}${destroyed}${destroyed ? `${bloodLossNote(game, defenderId)}${bloodDockClause(game, defenderId)}` : ""}` };
     }
     const hit = attack.heroId ?? (picked?.role === "hit" ? picked.id : undefined);
-    if (hit) return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended: ${strength} damage on ${cardName(hit)}${shadowNote}${destroyedWords(game, ctx, hit, strength, cardName, !attack.shadowResolved)}` };
-    return { kind: "defense", stats: [ATTACK(strength)], result: attack.undefended ? `Undefended: ${strength} damage${shadowNote}` : `Undefended, a hero takes ${strength}` };
+    // Stage 2B of Encounter at Amon Dîn: the attack discards villager tokens from Rescued Villagers and damages no hero.
+    const tokens = hit ? undefendedVillagersReadout(game, hit, strength, shadowNext) : null;
+    if (hit && tokens) return { kind: "defense", stats: [ATTACK(strength)], result: tokens };
+    if (hit) {
+      const lost = destroyedWords(game, ctx, hit, strength, cardName, shadowNext);
+      return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended: ${strength} damage on ${cardName(hit)}${undefendedRemoves(game, hit, strength)}${shadowNote}${lost}${lost ? bloodDockClause(game, hit) : ""}${undefendedLocationsReadout(game, ctx)}` };
+    }
+    // The one hero the damage may go on (Gollum's attack from the riddle area, a shadow effect that names the hero) is named before it is picked.
+    const only = attack.onlyHeroes?.length === 1 && !attack.undefended ? attack.onlyHeroes[0] : undefined;
+    if (only && game.cards[only]) return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended, ${cardName(only)} takes ${strength}${shadowNote}` };
+    return { kind: "defense", stats: [ATTACK(strength)], result: attack.undefended ? `Undefended: ${strength} damage${shadowNote}${undefendedLocationsReadout(game, ctx)}` : `Undefended, a hero takes ${strength}${undefendedLocationsReadout(game, ctx)}` };
   }
   // The players attack: the attackers picked (or declared) against the enemy's defense.
   const strike = game.pendingStrike;
@@ -156,6 +177,12 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     // Against a Spectral enemy the attackers' Willpower is the strength (50312:A:1).
     const spectral = hasSpectral(game, enemyId, ctx.cards);
     const spectralNote = spectral ? "Willpower against a Spectral enemy. " : "";
+    // Stage 3 of The Drúadan Forest: the characters attack with Willpower and the damage is progress on the enemy, against its hit points (06044:B:2), never damage and never "destroyed".
+    const progress = progressReadout(game, ctx, enemyId, total, defense, cardName(enemyId), strike?.awaiting === "end");
+    if (progress != null) return { kind: "attack", stats: [WILL(total), DEFENSE(defense)], result: progress };
+    // The Morgul Vale: a Morgul Bodyguard takes the damage meant for a Captain (06148:A:1).
+    const shield = valeShieldReadout(game, ctx, enemyId, Math.max(0, total - defense));
+    if (shield) return { kind: "attack", stats: [ATTACK(total), DEFENSE(defense)], result: shield };
     return { kind: "attack", stats: [spectral ? WILL(total) : ATTACK(total), DEFENSE(defense)], result: `${spectralNote}${damageWords(total, defense, placed)}${after}` };
   }
   // Travel: the staging threat now and after the picked location leaves staging, and the progress it takes first (rr.travel).
@@ -167,8 +194,11 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const location = pickedId ? game.cards[pickedId] : undefined;
     if (!location) return now > 0 ? { kind: "travel", stats: [THREAT(now)], result: "Staging threat now" } : null;
     const after = stagingThreat({ ...area, staging: area.staging.filter((id) => id !== location.id) }, ctx.cards);
-    const points = questPointsOf(game, location, ctx.cards);
-    return { kind: "travel", stats: [THREAT(now), THREAT(after)], join: "then", result: points != null ? `It takes the next ${points} progress before the quest` : null };
+    // The Blood of Gondor: the points the location has once it is active, and the hidden cards the travel takes (blood.ts).
+    const blood = bloodTravel(game, ctx, location.id);
+    const points = blood ? blood.points : questPointsOf(game, location, ctx.cards);
+    const said = valeTravel(game, location.id) ?? (points != null ? `It takes the next ${points} progress before the quest` : null);
+    return { kind: "travel", stats: [THREAT(now), THREAT(after)], join: "then", result: blood?.cost ? (said ? `${said}; ${blood.cost}` : blood.cost) : said };
   }
   // The quest, when no attack is going on: committed willpower (and the characters picked to join it) against staging.
   if (game.phase === "Quest" && !game.questResolved && (game.mode === "questCommit" || game.mode === "staging" || game.mode === "resolution")) {
@@ -186,21 +216,24 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     // The acting seat quests against its own staging area once stages are separate.
     const seat = questSeat(game);
     const willpower = committedWillpower(game, ctx.cards, seat) + added;
-    const threat = stagingThreat(game, ctx.cards, seat);
-    if (game.mode === "questCommit") return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${commitWords(game, ctx, picked)}${blackGateQuestEnd(game)}${mountDoomQuestNote(game, ctx)}` };
+    const threat = stagingThreatNow(game, ctx, seat);
+    const stat = questStatNow(game, ctx);
+    if (game.mode === "questCommit") return { kind: "quest", stats: [QUEST(stat, willpower), THREAT(threat)], result: `${commitWords(game, ctx, picked)}${blackGateQuestEnd(game)}${mountDoomQuestNote(game, ctx)}` };
     // A stage with Defense (mec112.defense): the Threat that beats the Willpower is progress the encounter deck places, so no player's threat rises and no elimination is warned of.
-    if (stageHasDefense(game)) return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: defenseQuestResult(willpower, threat, defenseOutcome(game, ctx)) };
+    if (stageHasDefense(game)) return { kind: "quest", stats: [QUEST(stat, willpower), THREAT(threat)], result: defenseQuestResult(willpower, threat, defenseOutcome(game, ctx)) };
     // Stage 3B of The Battle of the Pelennor Fields (Assault) places no progress on the stage and damages Minas Tirith instead of raising threat, and stage 4B deals the progress as damage: neither warns of an elimination.
     const pelennor = pelennorQuestWords(game, ctx, willpower - threat);
-    if (pelennor) return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: pelennor };
+    if (pelennor) return { kind: "quest", stats: [QUEST(stat, willpower), THREAT(threat)], result: pelennor };
     // Shelob's Lair holds some progress back (stage 2B's cap, an Underground location on stage 1): the split the engine would place; stage 3B of The Passing of the Grey Company says the progress pays the Stone's travel; stage 1B of The Siege of Gondor says Great Corsair Ship holds it.
     const held = lairProgressWords(game, ctx, willpower - threat) ?? companyProgressWords(game, ctx, willpower - threat) ?? erechQuestWords(game, ctx, willpower - threat) ?? downsQuestWords(game, ctx, willpower - threat);
     // The Siege's words carry their own "if nothing changes" ("4 progress if nothing changes: held while Great Corsair Ship is in play").
-    const siege = siegeProgressWords(game, ctx, willpower - threat);
+    // Stage 1B of Encounter at Amon Dîn moves villager tokens in place of progress.
+    const villagers = questMovesWords(game, ctx, willpower - threat, cardName);
+    const siege = siegeProgressWords(game, ctx, willpower - threat) ?? (villagers ? `${villagers} if nothing changes` : null);
     // The Old Forest's stage 3B: progress that would fill it, and the card that holds the win.
     // Fog on the Barrow-downs' stage 3B: the progress it takes none of while a Great Barrow is in play, and the defeat it holds until every player is at it with Standing Stones in the victory display.
     const holds = forestHoldWords(game, ctx, willpower - threat) ?? downsHoldWords(game, ctx, willpower - threat);
-    return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${siege ?? (held ? `${held} if nothing changes` : questResult(willpower, threat))}${holds ? `; ${holds}` : ""}${eliminationWords(game, ctx, threat - willpower, seat)}${blackGateQuestEnd(game)}${mountDoomQuestNote(game, ctx)}` };
+    return { kind: "quest", stats: [QUEST(stat, willpower), THREAT(threat)], result: `${siege ?? (held ? `${held} if nothing changes` : questResult(willpower, threat))}${holds ? `; ${holds}` : ""}${eliminationWords(game, ctx, threat - willpower, seat)}${blackGateQuestEnd(game)}${mountDoomQuestNote(game, ctx)}` };
   }
   return null;
 }

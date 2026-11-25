@@ -7,6 +7,7 @@ import type { ReduceContext } from "../interpret/interpret.ts";
 import { matchesPick } from "../interpret/pick.ts";
 import type { CardInstance, GameEvent, ScenarioState } from "../core/state.ts";
 import { flagged } from "../core/state.ts";
+import { engagedAs } from "../core/engaged.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { areaHeadOf, firstOfArea, isolatedAreas } from "../families/breaking/areas.ts";
 
@@ -68,8 +69,8 @@ export function subjectMatches(state: ScenarioState, id: string, spec: PickSpec,
   if (!card) return false;
   const seat = answeringSeat(state, listener, ctx);
   if (spec.type === "enemy") {
-    if (spec.engaged === "you" && !(card.zone === "engaged" && card.controller === seat)) return false;
-    if (spec.engaged === "other" && !(card.zone === "engaged" && card.controller !== seat)) return false;
+    // An enemy in the staging area that is considered engaged with the player is engaged with him (rr.engaged).
+    if (spec.engaged != null && !engagedAs(state, id, spec.engaged, seat)) return false;
     if (spec.stagingOnly && card.zone !== "staging") return false;
   } else if (spec.control === "you" && card.controller !== seat) return false;
   else if (spec.control === "other" && (card.controller == null || card.controller === seat)) return false;
@@ -84,6 +85,8 @@ export function hears(state: ScenarioState, effect: Effect, listener: CardInstan
   if (textBlank(state, listener.id, ctx.cards)) return false;
   // A character that cannot trigger its effect cannot use its own Responses (Sacked!, 02048:A:1).
   if (effect.timing === "response" && (flagged(state, listener.id, "cannotTriggerEffects") || (listener.controller != null && flagged(state, `seat:${listener.controller}`, "cannotTriggerEffects")))) return false;
+  // Unconscious characters cannot trigger abilities, Forced ones included (hob.unconscious-characters).
+  if (effect.timing === "forced" && state.modifiers.length > 0 && flagged(state, listener.id, "cannotTriggerForced")) return false;
   if (effect.byEncounterDeck && !event.fromDeck) return false;
   // Damage that cannot be canceled (DamageCard `uncancelable`) is not offered to an ability that cancels it.
   if (event.uncancelable && effect.instructions.some((instruction) => instruction.verb === "CancelDamage")) return false;

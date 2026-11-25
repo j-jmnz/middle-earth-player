@@ -43,3 +43,46 @@ export function threatSourceWords(kind: string | null, threat: number, from: key
 export function threatSourceSaid(kind: string | null, threat: number, from: keyof typeof FROM_WORDS, area?: number): string {
   return [kind, whereWords(from, area)?.toLowerCase(), `${threat} threat`].filter(Boolean).join(", ");
 }
+
+/** The Set aside list (docs/design-system-table.md, Reading panels): its title, the menu row's words, and the lines that are not a card. */
+export const SET_ASIDE_TITLE = "Set aside";
+
+/** The menu row: "Set aside (5)". */
+export function setAsideLabel(count: number): string {
+  return `${SET_ASIDE_TITLE} (${count})`;
+}
+
+/** What a screen reader hears of the menu row: "Set aside cards, 5". */
+export function setAsideSaid(count: number): string {
+  return `Set aside cards, ${count}`;
+}
+
+/** The cards the scenario hides: "1 card is facedown", "2 cards are facedown". Shown and heard the same; it names nothing. */
+export function facedownWords(count: number): string {
+  return count === 1 ? "1 card is facedown" : `${count} cards are facedown`;
+}
+
+/** The count over the list's title, with where the cards are (rr.in-play-and-out-of-play: cards set aside are out of play): "21 cards · out of play". */
+export function setAsideHead(count: number): string {
+  return `${plural(count, "card")} · out of play`;
+}
+
+/** A row that stands for several copies of one card: "Deep Deep Dark ×4"; the name alone for one. */
+export function copiesLabel(name: string, count: number): string {
+  return count > 1 ? `${name} ×${count}` : name;
+}
+
+/** What a screen reader hears of that name: "Deep Deep Dark, 4 copies". */
+export function copiesSaid(name: string, count: number): string {
+  return count > 1 ? `${name}, ${count} copies` : name;
+}
+
+/** The damage a set-aside card keeps (19024:A:1), short enough for a row at any text size; its preview says the whole rule. Null for none. */
+export function keptWords(damage: number): string | null {
+  return damage > 0 ? `Keeps ${damage} damage` : null;
+}
+
+/** A set-aside card's line: its type, then the damage it keeps ("Enemy · Keeps 15 damage"). */
+export function setAsideWords(kind: string | null, kept: string | null): string | null {
+  return [kind, kept].filter(Boolean).join(" · ") || null;
+}

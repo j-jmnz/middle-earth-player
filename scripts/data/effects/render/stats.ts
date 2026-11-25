@@ -1,12 +1,16 @@
 // The stat templates: ModifyStat (who holds the stat, what a flag means, how long it lasts) and Restrict (a prohibition read from the record's own fields), with the glosses they share. Beside the other verb modules (verbs.ts).
 import { cardRef, renderAmount } from "./amounts.ts";
 import { ERECH_STAT_NOTES } from "./families/erech.ts";
+import { RIDDLES_STAT_NOTES } from "./families/riddles.ts";
 import { ESCAPE_STAT_NOTES } from "./families/escape.ts";
+import { BURGLE_STAT_NOTES } from "./families/burgle.ts";
 import { FOG_STAT_NOTES } from "./families/fog.ts";
+import { POISON_STAT_NOTES } from "./families/poison.ts";
 import { FLAG_NOTES } from "./stat-notes.ts";
 import { RUINS_STAT_NOTES } from "./families/ruins.ts";
 import { INVESTIGATION_STAT_NOTES } from "./families/investigation.ts";
 import { guardianRestrict } from "./families/guardian.ts";
+import { PELARGIR_STAT_NOTES } from "./families/pelargir.ts";
 import { isObj, str, type Ctx, type Obj } from "./kit.ts";
 import { longDarkRestrict } from "./families/long-dark.ts";
 import { renderPick } from "./picks.ts";
@@ -46,11 +50,15 @@ const targetStat = (value: string): string => TARGET_STAT[value] ?? cardRef(valu
 // What a stat flag means where the bare name would not say it.
 const STAT_NOTE: Readonly<Record<string, string>> = {
   ...ESCAPE_STAT_NOTES,
+  ...BURGLE_STAT_NOTES,
   ...SMAUG_STAT_NOTES,
   ...ERECH_STAT_NOTES,
+  ...RIDDLES_STAT_NOTES,
   ...FOG_STAT_NOTES,
+  ...POISON_STAT_NOTES,
   ...RUINS_STAT_NOTES,
   ...INVESTIGATION_STAT_NOTES,
+  ...PELARGIR_STAT_NOTES,
   ...FLAG_NOTES,
   cannotLeaveStaging: " (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect)",
   cannotBeEngaged: " (no player engages it: not optionally, not by an engagement check, not by an effect)",
@@ -115,6 +123,7 @@ export const STAT_TEMPLATES: Readonly<Record<string, Template>> = {
     if (engaged) return engaged;
     if (i.what === "draw") return { text: `a player who does not control a ${pick(i.unlessControls, ctx)} cannot draw cards through card effects (the framework's draws are not card effects)`, read: ["what", "unlessControls"] };
     if (i.what === "travel" && i.withResources === true) return { text: "the players cannot travel to a location that holds resource tokens while this holds", read: ["what", "withResources"] };
+    if (i.what === "travel" && typeof i.exceptTitle === "string") return { text: `the players cannot travel to a location whose title is not ${i.exceptTitle} while this holds (the Trait is no title; another copy of the title may be traveled to)`, read: ["what", "exceptTitle"] };
     if (i.what === "travel" && i.exceptSelf === true) return { text: "the players cannot travel to any location but this one while this card is in play (a Travel Action is not traveling)", read: ["what", "exceptSelf"] };
     if (i.what === "travel") return { text: `the players cannot travel to ${typeof i.location === "string" ? `the location with code ${i.location}${typeof i.guarding === "string" ? ` that guards ${i.guarding}` : ""}` : typeof i.trait === "string" ? `locations with the trait ${i.trait}` : "this location"} while this holds`, read: ["what", "location", "guarding", "trait"] };
     return null;

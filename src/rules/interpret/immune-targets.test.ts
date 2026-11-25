@@ -1,4 +1,4 @@
-// Rules: rr.immune, mec109.immune-to-player-card-effects, faq.legolas-immune-location (data/rules/entries.json).
+// Rules: rr.immune, mec109.immune-to-player-card-effects, hob.immune-to-player-card-effects, faq.legolas-immune-location (data/rules/entries.json).
 // A player card effect that names its card without a pick (the active location, each location in the staging area, the attacking enemy, progress on the
 // current quest) leaves a card immune to player card effects as it is.
 import { beforeAll, describe, expect, it } from "vitest";

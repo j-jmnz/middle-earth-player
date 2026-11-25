@@ -10,6 +10,13 @@ function cycleScenario(cycle: string, n: number, id: string, product: string, ex
 }
 const shadowsOfMirkwood = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("01", n + 3, id, product, extra);
 const dwarrowdelf = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("02", n, id, product, extra);
+// The treasure cards of the scenarios that discover them (hob.treasure-ohauh, hob.treasure-otd): We Must Away's three (the troll icon: Sting, Orcrist, Glamdring), Flies and Spiders' Bilbo's Magic Ring (the spider web) and The Lonely
+// Mountain's five Erebor treasures (the dragon; The Arkenstone, Mithril Shirt, Thrór's Battle Axe, Thrór's Hunting Bow, Thrór's Golden Cup). A scenario's Setup lists the icons of the earlier scenarios that discover treasure.
+const TROLL_TREASURE = ["131020", "131021", "131022"];
+const WEB_TREASURE = ["132019"];
+const DRAGON_TREASURE = ["132020", "132021", "132022", "132023", "132024"];
+const againstTheShadow = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("03", n, id, product, extra);
+const hobbit = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("0A", n, id, product, extra);
 
 export const CYCLE_DEFS: readonly CampaignDef[] = [
   {
@@ -51,6 +58,49 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
     ],
     saga: false,
     ledger: "dwarrowdelf",
+  },
+  {
+    id: "the-hobbit",
+    name: "The Hobbit",
+    kind: "cycle",
+    released: "2012-08-17",
+    products: ["The Hobbit: Over Hill and Under Hill", "The Hobbit: On the Doorstep"],
+    scenarios: [
+      // DragnCards loads Bilbo Baggins in player 1's play area (the first player takes control of him at the start of every game, hob.bilbo-baggins-ohauh) and the seven Sack cards in its second shared deck.
+      hobbit(1, "we-must-away-ere-break-of-day", "The Hobbit: Over Hill and Under Hill", { groups: { sharedEncounterDeck2: "setAside" } }),
+      // The second shared deck is the inactive second encounter deck (the Misty Mountain Goblins and The Great Goblin sets, hob.active-and-inactive-encounter-decks); Hall of Beorn lists the sets of the first deck only.
+      hobbit(2, "over-the-misty-mountains-grim", "The Hobbit: Over Hill and Under Hill", { groups: { sharedEncounterDeck2: "encounterDeck2" }, encounterSets: ["Over the Misty Mountains Grim", "Western Lands", "Misty Mountain Goblins", "The Great Goblin"], treasures: TROLL_TREASURE }),
+      hobbit(3, "dungeons-deep-and-caverns-dim", "The Hobbit: Over Hill and Under Hill", { treasures: TROLL_TREASURE }),
+      hobbit(4, "flies-and-spiders", "The Hobbit: On the Doorstep", { treasures: TROLL_TREASURE }),
+      // The second shared deck is the five Erebor treasure cards, which the Setup stacks facedown under The Lonely Mountain.
+      hobbit(5, "the-lonely-mountain", "The Hobbit: On the Doorstep", { groups: { sharedEncounterDeck2: "setAside" }, treasures: [...TROLL_TREASURE, ...WEB_TREASURE] }),
+      hobbit(6, "the-battle-of-five-armies", "The Hobbit: On the Doorstep", { treasures: [...TROLL_TREASURE, ...WEB_TREASURE, ...DRAGON_TREASURE] }),
+    ],
+    saga: false,
+    ledger: "the-hobbit",
+  },
+  {
+    id: "against-the-shadow",
+    name: "Against the Shadow",
+    kind: "cycle",
+    released: "2012-11-26",
+    products: ["Heirs of Númenor", "The Steward's Fear", "The Drúadan Forest", "Encounter at Amon Dîn", "Assault on Osgiliath", "The Blood of Gondor", "The Morgul Vale"],
+    scenarios: [
+      againstTheShadow(1, "peril-in-pelargir", "Heirs of Númenor", { setupSpan: "ats.setup-peril-in-pelargir", deck: { normal: "Q03.1", easy: "E03.1", label: "Peril In Pelargir" } }),
+      againstTheShadow(2, "into-ithilien", "Heirs of Númenor", { setupSpan: "ats.setup-into-ithilien" }),
+      againstTheShadow(3, "the-siege-of-cair-andros", "Heirs of Númenor", { setupSpan: "ats.setup-the-siege-of-cair-andros" }),
+      // DragnCards loads the underworld deck (the Streets of Gondor and Brigands enemies and the three Clue objectives) as the second shared deck; the Setup builds it from the encounter deck's sets (ats.setup-the-stewards-fear-underworld-deck).
+      againstTheShadow(4, "the-stewards-fear", "The Steward's Fear", { setupSpan: "ats.setup-the-stewards-fear", groups: { sharedEncounterDeck2: "setAside" } }),
+      againstTheShadow(5, "the-druadan-forest", "The Drúadan Forest", { setupSpan: "ats.setup-the-druadan-forest" }),
+      // DragnCards loads the objective ally Lord Alcaron in player 1's play area; the printed Setup puts him into play.
+      againstTheShadow(6, "encounter-at-amon-din", "Encounter at Amon Dîn", { setupSpan: "ats.setup-encounter-at-amon-din", groups: { player1Play1: "setAside" } }),
+      againstTheShadow(7, "assault-on-osgiliath", "Assault on Osgiliath", { setupSpan: "ats.setup-assault-on-osgiliath" }),
+      // DragnCards loads the objective allies Faramir and Lord Alcaron in player 1's play area; the printed Setup puts them into play.
+      againstTheShadow(8, "the-blood-of-gondor", "The Blood of Gondor", { setupSpan: "ats.setup-the-blood-of-gondor", groups: { player1Play1: "setAside" } }),
+      againstTheShadow(9, "the-morgul-vale", "The Morgul Vale", { setupSpan: "ats.setup-the-morgul-vale" }),
+    ],
+    saga: false,
+    ledger: "against-the-shadow",
   },
   {
     // The scenarios printed on their own (RingsDB's cycle 50 packs that are not A Long-extended Party's): one product line each as it is built. The index counts the built ones.

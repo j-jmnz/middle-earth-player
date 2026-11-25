@@ -41,6 +41,7 @@ export type FrameName =
   | "hide"
   | "fortitude"
   | "escape"
+  | "burgle"
   | "whenRevealed"
   | "forced"
   | "shadow"
@@ -114,7 +115,7 @@ export type EffectData = {
   // names (the enemy a character defends against).
   subject?: string;
   other?: string;
-  // The active location when a Travel effect began (absent: none): a Travel to itself that finds another location active was pre-empted by the effect itself (Dark-wood Grove reveals Giant Web, 51146:A:2; docs/scenarios/standalone-scenarios.md, The Woodland Realm, reading 20).
+  // The active location when a Travel effect began (absent: none): a Travel to itself that finds another location active was pre-empted by the effect itself (Dark-wood Grove reveals Giant Web, 51146:A:2; docs/scenarios/standalone-scenarios/the-woodland-realm.md, The Woodland Realm, reading 20).
   activeAtStart?: string;
   // The card the source was attached to when its own cost took it out of play ("Discard Cram to ready attached hero", 131011:A:2): "attached hero" still names it.
   host?: string;
@@ -145,6 +146,8 @@ export type EffectData = {
   escape?: "failed" | "passed";
   // The last locate test this effect made (LocateTest; the `lastLocateFailed` and `lastLocatePassed` conditions, families/long-dark/conditions.ts).
   locate?: "failed" | "passed";
+  // The last burgle attempt this effect made (BurgleAttempt; the `burgleSucceeded` and `burgleFailed` conditions, families/burgle/results.ts).
+  burgle?: "failed" | "succeeded";
   // A Draw this effect ran drew a card (the `drew` condition: the text after "then" resolves only when the draw did, rr.then).
   drew?: boolean;
   // A Draw, a DiscardTopOfDeck or a DiscardResources this effect ran found too few cards or tokens (the `thenResolves` condition: the text after "then" is not attempted, rr.then).
@@ -192,6 +195,19 @@ export type EscapeData = {
   result: EscapeResult | null;
 };
 
+// A burgle attempt under way (families/burgle/attempt.ts, hob.burgle). `seat`: the first player who makes it. `effectCardId`: the encounter card step 1 stopped at, whose burgle effect step 3 reads. `revealedId`: the card of the seat's deck step 2 revealed, which stays on the deck (null with
+// no card to reveal). `matching`: the cards of the hand step 3 offered, and `need` how many it asks, read when the effect frame is pushed. `result`: whether the attempt succeeded, once step 3 is read.
+export type BurgleData = {
+  kind: "burgle";
+  seat: number;
+  effectCardId: string | null;
+  dealtIds: readonly string[];
+  revealedId: string | null;
+  matching: readonly string[];
+  need: number;
+  result: boolean | null;
+};
+
 // An event the engine announces. `seat` is the player it happened to. `phase` is the phase that just ended.
 // `cardId` limits the event to one card: only that card's effects hear it.
 // `subject` is the card the event is about; every card in play hears it. `participants` are the characters in an attack.
@@ -200,8 +216,8 @@ export type EscapeData = {
 // `leftPlayWithAttachments` event is about (families/play/zones.ts).
 // `occurrence`: events one game occurrence created share it (each character of one commit), and are announced together in
 // a single response window (rr.triggering-condition). `fromDeck`: a "revealed" card the encounter deck itself revealed. `fromStaging`: an
-// "engaged" enemy that came from the staging area, kept only in a game with ships (Boarding, families/sea/boarding.ts).
-export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean; byPlayerCard?: true; amount?: number; attachments?: readonly string[]; occurrence?: string; fromDeck?: boolean; fromDiscard?: true; fromStaging?: boolean; shadowBlank?: true; uncancelable?: true; at?: number };
+// "engaged" enemy that came from the staging area, kept only in a game with ships (Boarding, families/sea/boarding.ts). `exhaustedToDefend`: a "declaredDefender" character the declaration exhausted (not one that stayed ready or was exhausted already).
+export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean; byPlayerCard?: true; amount?: number; attachments?: readonly string[]; occurrence?: string; fromDeck?: boolean; fromDiscard?: true; fromStaging?: boolean; exhaustedToDefend?: true; shadowBlank?: true; uncancelable?: true; at?: number };
 
 // A Response a player may use after an event. It is offered once and may be passed. `event` is the one it answers, when a
 // window answers several events of one occurrence.
@@ -219,6 +235,7 @@ export type FrameData =
   | HideData
   | FortitudeData
   | EscapeData
+  | BurgleData
   | EffectData;
 
 export type Frame = {
@@ -264,10 +281,12 @@ export type PendingAttack = {
   immediate?: boolean;
   // The attack is a shadow card's own (Wolf Rider, 01081:A:2), made once the attack it was dealt to ended.
   shadowAttack?: boolean;
+  // The defending player must declare the character with the most damage, an exhausted one too, and cannot leave the attack undefended while one can defend (Ravenous Warg, 132059:A:1; families/armies/defender.ts).
+  mustDefend?: true;
   defenderId?: string;
   // The hero an undefended attack lands on.
   heroId?: string;
-  // A shadow effect made the attack count as undefended.
+  // The attack is undefended with no hero named for its damage yet (left undefended, rr.step-6-4-1), or a shadow effect made it count as undefended.
   undefended?: boolean;
   // The Attack the enemy dealt with, noted at the damage step only in a game with a card that resolves the attack against each player (AttackOthersUndefended).
   struck?: number;

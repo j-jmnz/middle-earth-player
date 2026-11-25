@@ -1,4 +1,4 @@
-// The layers over the table that read or answer (phase 21): the one reading panel (a discard pile, the log, the threat panel, the staging threat's cards, the
+// The layers over the table that read or answer (phase 21): the one reading panel (a discard pile, the set-aside cards, the log, the threat panel, the staging threat's cards, the
 // table settings; reading-panels.tsx) and the phase carousel, with the hit layers that close them on a tap outside, and the hit
 // layers that fold the choice's rows (choice/tray.tsx), which stand in the dock. The table view hands them the numbers; they send no intent. One reading layer at a time (reading.ts):
 // a new one replaces the last.
@@ -24,17 +24,19 @@ import { carouselHeight } from "../phases/carousel-size.ts";
 import { PhaseCarousel } from "../phases/phase-carousel.tsx";
 import { PhaseSweep } from "../phases/phase-sweep.tsx";
 import type { Reading } from "./reading.ts";
-import { kindWords, threatSourceSaid, threatSourceWords, victorySaid, victoryWords } from "../words/list.ts";
+import { copiesLabel, copiesSaid, facedownWords, keptWords, kindWords, SET_ASIDE_TITLE, setAsideHead, setAsideWords, threatSourceSaid, threatSourceWords, victorySaid, victoryWords } from "../words/list.ts";
+import { setAsideFromKey, setAsideKey } from "../store/set-aside.ts";
 import { adjustWords, threatSourcesOf } from "../readouts/threat-sources.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
 import { seatDialLimit } from "../readouts/threat-level.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
-import { DialPanel, LogPanel, PileList, RowList, SettingsPanel, ThreatPanel, ThreatSourceList, type ListCard } from "./reading-panels.tsx";
+import { DialPanel, LogPanel, PileList, RowList, SetAsideList, SettingsPanel, ThreatPanel, ThreatSourceList, type ListCard } from "./reading-panels.tsx";
 import { IslandPanel } from "../dream-chaser/island-panel.tsx";
 import { WAITING, islandFit, islandPanelWidth, islandReadout, standingWords } from "../dream-chaser/island-table.ts";
 import { foldTitle } from "../layout/row-fold.ts";
 import { areaRoleOf } from "../store/stormcaller-table.ts";
 import { AREA_LIST_TITLE } from "../words/scenarios/stormcaller.ts";
+import { facedownSplitWords } from "../words/scenarios/against-the-shadow/stewards-fear.ts";
 import { alwaysRows } from "./settings-words.ts";
 import { useReaderMode, useScreenReader } from "../../ui/screen-reader.ts";
 import { hidesFace, PILE_WORDS, pileIds, type PileId } from "../store/selectors.ts";
@@ -116,6 +118,18 @@ function RowReading({ store, ctx, row, names, picture, onRead, onClose }: { stor
   return <RowList title={areaOnly ? AREA_LIST_TITLE : foldTitle(row)} cards={cards} onRead={onRead} onClose={onClose} />;
 }
 
+// The set-aside cards the players may read, the copies of one card as one row, and the count of the facedown ones (store/set-aside.ts). The panel subscribes to the list as one string,
+// so a state that changes nothing it draws does not render it. Nothing of a facedown card but the count reaches this component.
+function SetAsideReading({ store, ctx, names, picture, onRead, onClose }: { store: TableStore; ctx: ReduceContext; names: SheetNames; picture: Pictures; onRead: (cardId: string) => void; onClose: () => void }) {
+  const key = useStore(store, (state) => setAsideKey(state.game, ctx));
+  const list = setAsideFromKey(key);
+  const cards = list.rows.map((row) => {
+    const made = listCard(row.id, row.code, row.picture, names, picture, ctx.cards, setAsideWords(kindWords(ctx.cards.get(row.code)), keptWords(row.kept)));
+    return { ...made, label: copiesLabel(made.label, row.count), spoken: copiesSaid(made.label, row.count) };
+  });
+  return <SetAsideList title={SET_ASIDE_TITLE} head={setAsideHead(list.total)} cards={cards} facedown={list.facedown === 0 ? null : list.deck ? facedownSplitWords(list.facedown, list.deck) : facedownWords(list.facedown)} onRead={onRead} onClose={onClose} />;
+}
+
 // The cards that make up the staging threat the quest meter draws (threat-sources.ts), each with the Threat it adds. A card the table hides
 // the face of is not named.
 function ThreatSourceReading({ store, ctx, names, picture, onRead, onClose }: { store: TableStore; ctx: ReduceContext; names: SheetNames; picture: Pictures; onRead: (cardId: string) => void; onClose: () => void }) {
@@ -131,10 +145,10 @@ function ThreatSourceReading({ store, ctx, names, picture, onRead, onClose }: { 
 }
 
 function LogReading({ store, logNames, onClose }: { store: TableStore; logNames: LogNames; onClose: () => void }) {
+  // Only the round and its steps: the log does not rebuild on an intent that changes neither. The quest line names the stat the quest counted, which the table kept with the step (store/counted.ts).
   const round = useStore(store, (state) => state.game.round);
   const roundSteps = useStore(store, (state) => state.roundSteps);
-  const lines = useMemo(() => logLines(roundSteps, logNames), [roundSteps, logNames]);
-  return <LogPanel round={round} lines={lines} onClose={onClose} />;
+  return <LogPanel round={round} lines={logLines(roundSteps, logNames)} onClose={onClose} />;
 }
 
 // The Island Map: the map as the game lays it out, fitted to the room the panel has (island-table.ts); a tile shows its card large.
@@ -240,10 +254,10 @@ export function TableLayers({
   const panel = reading && reading.kind !== "carousel" ? reading : null;
   const held = useHeld(panel);
   const settingsOpen = held?.kind === "settings";
-  // A pile's list (a discard pile, the victory display) stands on the banner's plain fill (user request, 2026-11-08); the settings panel and the
+  // A pile's list (a discard pile, the victory display) and the set-aside cards' list stand on the banner's plain fill (user request, 2026-11-08); the settings panel and the
   // other card lists (a row's, the staging threat's) on night; the log, the threat panel and the Island Map on paper.
   const night = settingsOpen || held?.kind === "row" || held?.kind === "stagingThreat";
-  const surface = held?.kind === "pile" ? "notice" : night ? "night" : "paper";
+  const surface = held?.kind === "pile" || held?.kind === "setAside" ? "notice" : night ? "night" : "paper";
   // The settings panel is wider than the other panels, so its three-word switches fit (settings-panel-width.ts).
   const width = settingsOpen ? settingsPanelWidth(canvas, s, screen.width - insets.left - insets.right - 2 * EDGE * s) : Math.max(READING_MIN * s, box.width);
   const foot = Math.max(insets.bottom, EDGE * s);
@@ -286,6 +300,7 @@ export function TableLayers({
           />
         ) : null}
         {held?.kind === "row" ? <RowReading store={store} ctx={ctx} row={held.row} names={names} picture={picture} onRead={onPreview} onClose={close} /> : null}
+        {held?.kind === "setAside" ? <SetAsideReading store={store} ctx={ctx} names={names} picture={picture} onRead={onPreview} onClose={close} /> : null}
         {held?.kind === "stagingThreat" ? <ThreatSourceReading store={store} ctx={ctx} names={names} picture={picture} onRead={onPreview} onClose={close} /> : null}
         {held?.kind === "log" ? <LogReading store={store} logNames={logNames} onClose={close} /> : null}
         {held?.kind === "threat" ? <ThreatReading store={store} ctx={ctx} names={names} seat={held.seat} onClose={close} /> : null}

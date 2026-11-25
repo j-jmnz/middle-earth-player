@@ -5,22 +5,24 @@ import type { Card } from "../../../../src/catalog/card-facts.ts";
 import { stripKeywords } from "../../normalize/keywords.ts";
 import type { Segment } from "../generate.ts";
 import { newCtx, type Obj, type Tally } from "./kit.ts";
+import { checkLines } from "./checks.ts";
 import { renderRecord } from "./record.ts";
 
 export type CardRender = { text: string; tally: Tally };
 
 // `rawLines`: every printed ledger line of the card in order (the ones generate.ts drops as keyword-only included). `pile`: where the scenario deals the card (encounter, quest, staging...), which places it with no record.
-export type CardExtras = { rawLines?: readonly { lineId: string; line: string }[]; pile?: string; finalStage?: boolean };
+export type CardExtras = { rawLines?: readonly { lineId: string; line: string }[]; pile?: string; finalStage?: boolean; checks?: boolean };
 
+// `checks`: print under each line the checks that apply to it (checks.ts), which the reading judge answers.
 // `inert`: the ledger line ids marked inert (a reminder or keyword the engine applies by rule), which need no record.
 export function renderCard(card: Card, segments: readonly Segment[], effects: readonly Effect[], inert: ReadonlySet<string>, extras: CardExtras = {}): CardRender {
   const own = effects.filter((effect) => effect.cardCode === card.code);
-  const ctx = newCtx({ effects: effects as unknown as readonly Obj[], cardName: card.name, cardType: card.type, ...(extras.finalStage ? { finalStage: true } : {}) });
+  const rows = extras.rawLines ?? segments.map((segment) => ({ lineId: segment.lineId, line: segment.line }));
+  const ctx = newCtx({ effects: effects as unknown as readonly Obj[], cardName: card.name, cardType: card.type, lineTexts: new Map(rows.map((row) => [row.lineId, row.line])), ...(extras.finalStage ? { finalStage: true } : {}) });
   const known = new Set(segments.map((segment) => segment.lineId));
   const bySegment = new Map(segments.map((segment) => [segment.lineId, segment]));
   const out: string[] = [`## ${card.code} ${card.name}`];
   if (extras.pile) out.push(`(the scenario deals it into the ${extras.pile} pile; the piles place it, no record does)`);
-  const rows = extras.rawLines ?? segments.map((segment) => ({ lineId: segment.lineId, line: segment.line }));
   for (const row of rows) {
     const segment = bySegment.get(row.lineId);
     out.push("", `${row.lineId}${segment ? ` (${segment.side})` : ""}: ${row.line}`);
@@ -35,6 +37,7 @@ export function renderCard(card: Card, segments: readonly Segment[], effects: re
       const shared = effect.lines.length > 1 ? ` (record also names ${effect.lines.filter((id) => id !== row.lineId).join(", ")})` : "";
       out.push(...renderRecord(effect as unknown as Obj, ctx).map((line, at) => `  ${line}${at === 0 ? shared : ""}`));
     }
+    if (extras.checks) out.push(...checkLines(row.line, owners));
   }
   const stray = own.filter((effect) => !effect.lines.some((id) => known.has(id)));
   for (const effect of stray) out.push("", `RECORD NAMING NO LINE OF THIS CARD (${effect.lines.join(", ")})`, ...renderRecord(effect as unknown as Obj, ctx).map((line) => `  ${line}`));

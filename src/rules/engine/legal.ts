@@ -78,7 +78,7 @@ export function legalIntents(state: ScenarioState, ctx: ReduceContext): LegalInt
     case "chooseEnemy":
       return [{ type: "ChooseEnemy" }];
     case "defense":
-      return state.pendingAttack?.undefended ? [{ type: "Undefended" }] : [{ type: "DeclareDefender" }, { type: "Undefended" }];
+      return state.pendingAttack?.undefended ? [{ type: "Undefended" }] : mustDefend(state, ctx) ? [{ type: "DeclareDefender" }] : [{ type: "DeclareDefender" }, { type: "Undefended" }];
     case "archery":
       return [{ type: "Distribute", total: window.total }];
     case "playerAttack":
@@ -107,9 +107,8 @@ export function legalTargets(state: ScenarioState, selection: Selection, ctx: Re
     case "ChooseEnemy":
       return state.window?.kind === "chooseEnemy" ? state.window.options : [];
     case "DeclareDefender": {
-      const seat = state.pendingAttack?.seat ?? state.activeSeat;
       if (state.pendingAttack?.undefended) return [];
-      return defenderIds(state, seat, ctx.cards).filter((id) => !defenseBlocked(state, ctx, id));
+      return declarableDefenders(state, ctx);
     }
     case "Undefended":
       return undefendedTargets(state, state.pendingAttack?.seat ?? state.activeSeat, ctx.cards);
@@ -348,8 +347,21 @@ function defenderReason(
   return null;
 }
 
+// The characters DeclareDefender may name now: the one list the offer, the targets and mustDefend all read.
+function declarableDefenders(state: ScenarioState, ctx: ReduceContext): string[] {
+  const seat = state.pendingAttack?.seat ?? state.activeSeat;
+  return defenderIds(state, seat, ctx.cards).filter((id) => !defenseBlocked(state, ctx, id));
+}
+
+// The attack must be defended while a character can defend it (Ravenous Warg, 132059:A:1). An attack already considered undefended (its defender left play, rr.step-6-4-3) has no defender to force. The offer and the refusal both read this.
+function mustDefend(state: ScenarioState, ctx: ReduceContext): boolean {
+  const attack = state.pendingAttack;
+  return attack?.mustDefend === true && attack.undefended !== true && declarableDefenders(state, ctx).length > 0;
+}
+
 function undefendedReason(state: ScenarioState, intent: Extract<PlayerIntent, { type: "Undefended" }>, ctx: ReduceContext): string | null {
   if (state.window?.kind !== "defense" || !state.pendingAttack) return "That intent is not legal in this window";
+  if (mustDefend(state, ctx)) return "The defending player must declare the character with the most damage";
   const heroes = undefendedTargets(state, state.pendingAttack.seat, ctx.cards);
   // A seat whose only heroes are held by an enemy (Carried Away, 18074) has no hero to take the attack: it is undefended and deals no damage (shadow.ts, resolveAttack).
   if (heroes.length === 0) return null;
@@ -358,8 +370,9 @@ function undefendedReason(state: ScenarioState, intent: Extract<PlayerIntent, { 
     if (intent.heroId != null && intent.heroId !== only) return "Choose a hero";
     return null;
   }
-  if (intent.heroId == null || !heroes.includes(intent.heroId)) return "Choose a hero";
-  return null;
+  // Left undefended with no hero named (rr.step-6-4-1): the damage is assigned at the damage step, after the shadow effect (rr.step-6-4-3).
+  if (intent.heroId == null) return state.pendingAttack.shadowResolved ? "Choose a hero" : null;
+  return heroes.includes(intent.heroId) ? null : "Choose a hero";
 }
 
 function attackReason(

@@ -1,0 +1,205 @@
+{
+  "id": "over-the-misty-mountains-grim",
+  "name": "Over the Misty Mountains Grim",
+  "number": 2,
+  "stages": [
+    "131026",
+    "131027",
+    "131028"
+  ],
+  "encounterSets": [
+    {
+      "name": "Over the Misty Mountains Grim",
+      "count": 12
+    },
+    {
+      "name": "Western Lands",
+      "count": 14
+    },
+    {
+      "name": "Misty Mountain Goblins",
+      "count": 18
+    },
+    {
+      "name": "The Great Goblin",
+      "count": 12
+    }
+  ],
+  "cards": [
+    {
+      "code": "131064",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131068",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "131069",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131072",
+      "normal": 4,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131073",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "131035",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "131039",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131040",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "131041",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "131055",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "131056",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131057",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "131026",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "131027",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "131028",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "131058",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "131059",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "131060",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "131061",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "131065",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "131070",
+      "normal": 3,
+      "easy": 0,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "131062",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "131063",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "131066",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "131067",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "131071",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounterDeck2"
+    }
+  ],
+  "campaignPlaced": [],
+  "sagaStart": {
+    "hero": "131001"
+  },
+  "treasures": [
+    "131020",
+    "131021",
+    "131022"
+  ],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q0A.2",
+    "dragnEasy": "E0A.2",
+    "hobSlug": "Over-the-Misty-Mountains-Grim"
+  }
+}

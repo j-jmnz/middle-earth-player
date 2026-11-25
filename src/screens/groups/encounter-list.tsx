@@ -12,7 +12,8 @@ import { useDatabases } from "../data/databases";
 import { BodyText, ListRow, ScreenScroll, Section } from "../kit/chrome";
 import { FoldSection, type useFolds } from "../kit/fold-section";
 import { groupDataOf } from "./cache";
-import { encounterList, searchEncounter, searchWords, type EncounterRow } from "./encounter-tree";
+import { searchWords } from "../kit/fold";
+import { encounterList, searchEncounter, type EncounterRow } from "./encounter-tree";
 import { FoldAllBar } from "./fold-all-bar";
 
 /** A product's fold id; every product starts closed. */
@@ -59,7 +60,7 @@ export function EncounterList({
           const id = productFoldId(product.id);
           const folded = searching ? false : folds.folded(id, true);
           return (
-            <FoldSection key={product.id} id={id} title={product.title} summary={product.summary} folded={folded} onFold={(next) => (searching ? undefined : folds.setFolded(id, next, true))}>
+            <FoldSection key={product.id} id={id} title={product.title} summary={product.summary} folded={folded} onFold={searching ? undefined : (next) => folds.setFolded(id, next, true)}>
               {folded
                 ? null
                 : product.items.map((item) =>

@@ -6,6 +6,8 @@
 // phases beside it (carousel.ts lays the whole round out for the strip a tap on the pill opens).
 import { endedInDefeat } from "../../rules/core/eliminate.ts";
 import { extraPhaseMode, phaseOf, type ModeName, type ScenarioState } from "../../rules/core/state.ts";
+import { progressAttack } from "../readouts/against-the-shadow/druadan.ts";
+import { beforeCombatNote } from "../readouts/against-the-shadow/blood.ts";
 
 // `phase` is the word the pill shows over the step ("" when there is none: Setup, Mulligan); `previousPhase` and `nextPhase` are
 // the phases beside it in the round ("" before the first). `previous` and `next` are the steps beside the step. `additional`: the phase running is an additional instance (Send for Help (Spirit), 11213:A:2);
@@ -122,12 +124,27 @@ const POINTS: Readonly<Record<string, Omit<WindowPoint, "id">>> = {
   "7.4": { title: "Before the next round", note: "The first player token has passed." },
 };
 
-export function windowPoint(game: ScenarioState): WindowPoint | null {
+// The points of a player's attack while its damage is progress (06044:B:2).
+const PROGRESS_POINTS: Readonly<Record<string, Omit<WindowPoint, "id">>> = {
+  strike: { title: "Before progress", note: "The attackers are declared. Progress is placed next." },
+  end: { title: "Before the attack ends", note: "Progress is placed." },
+};
+
+// The note of a point that names the quest stat says the stat the stage counts instead of Willpower: Attack under Battle, Defense under Siege (hon.battle, hon.siege), as the reference's quest steps do (reference.ts).
+const STAT_NOTES: Readonly<Record<string, (stat: string) => string>> = {
+  "3.3": (stat) => `Staging is done. ${stat[0]?.toUpperCase()}${stat.slice(1)} raised now counts against its threat.`,
+};
+
+const noteOf = (id: string, point: Omit<WindowPoint, "id">, stat: string | undefined): string => (stat && stat !== "willpower" ? STAT_NOTES[id]?.(stat) : undefined) ?? point.note;
+
+export function windowPoint(game: ScenarioState, stat?: string): WindowPoint | null {
   const awaiting = game.pendingAttack?.awaiting ?? game.pendingStrike?.awaiting;
   const last = [...game.stepWindows].reverse().find((key) => key.startsWith(`${game.round}:`))?.slice(`${game.round}:`.length);
   const id = game.window?.kind === "frameAction" ? (awaiting ?? last ?? null) : game.mode === "resourceActions" ? "resourceActions" : null;
-  const point = id ? POINTS[id] : undefined;
-  return id && point ? { id, ...point } : null;
+  // A player's attack on stage 3 of The Drúadan Forest places progress, not damage (06044:B:2); an enemy's attack on a hero still deals damage.
+  const progress = id != null && game.pendingAttack?.awaiting == null && game.pendingStrike?.awaiting != null && progressAttack(game) ? PROGRESS_POINTS[id] : undefined;
+  const point = progress ?? (id ? POINTS[id] : undefined);
+  return id && point ? { id, ...point, note: progress ? point.note : (beforeCombatNote(game, id) ?? noteOf(id, point, stat)) } : null;
 }
 
 /** The title of a window point by its id ("Before the quest resolves"), or null for an unknown id. */
@@ -136,6 +153,7 @@ export function pointTitle(id: string): string | null {
 }
 
 /** The note of a window point by its id, or null. */
-export function pointNote(id: string): string | null {
-  return POINTS[id]?.note ?? null;
+export function pointNote(id: string, stat?: string): string | null {
+  const point = POINTS[id];
+  return point ? noteOf(id, point, stat) : null;
 }

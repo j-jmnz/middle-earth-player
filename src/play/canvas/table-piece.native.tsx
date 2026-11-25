@@ -68,16 +68,16 @@ function drawOverlay(p: PieceProps) {
   return (
     <Group>
       <Group opacity={veiled ? 0.55 : 1}>
-        {info ? <Badges slot={slot} rect={rect} effects={info.effects} willpower={info.willpower} questPoints={info.questPoints} stageLoses={info.stageLoses} owner={p.owner} fonts={fonts} images={tokens} t={t} s={s} contrast={contrast} /> : null}
+        {info ? <Badges slot={slot} rect={rect} effects={info.effects} willpower={info.willpower} commitStat={info.commitStat} questPoints={info.questPoints} stageLoses={info.stageLoses} owner={p.owner} fonts={fonts} images={tokens} t={t} s={s} contrast={contrast} /> : null}
         {info?.combat ? <CombatPill rect={rect} combat={info.combat} fonts={fonts} t={t} s={s} /> : null}
         {info?.engagement ? <EngagementMark rect={rect} cost={info.engagement.cost} engages={info.engagement.engages} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.fire ? <FireMarkView rect={rect} mark={info.fire} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.side?.loses ? <FireMarkView rect={rect} mark={info.side.loses} fonts={fonts} images={tokens} t={t} s={s} /> : null}
-        {info?.side?.current ? <CurrentQuestMark rect={rect} clear={badgeReach(info.effects, fonts, s)} fonts={fonts} t={t} s={s} /> : null}
-        {info?.determined ? <DeterminedMarkView rect={rect} word={info.determined.word} clear={badgeReach(info.effects, fonts, s)} fonts={fonts} t={t} s={s} /> : null}
+        {info?.side?.current ? <CurrentQuestMark rect={rect} clear={badgeReach(info.effects, fonts, s, rect.h)} fonts={fonts} t={t} s={s} /> : null}
+        {info?.determined ? <DeterminedMarkView rect={rect} word={info.determined.word} clear={badgeReach(info.effects, fonts, s, rect.h)} fonts={fonts} t={t} s={s} /> : null}
         {info?.loss ? <ShipLossView rect={rect} mark={info.loss} fonts={fonts} t={t} s={s} /> : null}
         {info?.place ? <PlaceMarkView rect={rect} mark={info.place} t={t} s={s} /> : null}
-        {info?.under ? <UnderMarkView rect={rect} mark={info.under} fonts={fonts} t={t} s={s} /> : null}
+        {info?.under ? <UnderMarkView rect={rect} mark={info.under} sideways={slot.exhausted} fonts={fonts} t={t} s={s} /> : null}
         {info?.delayed ? <DelayedMark rect={rect} t={t} s={s} /> : null}
         {p.stageMarks ? <StageMarks rect={rect} pill={p.stageMarks.pill} apart={p.stageMarks.apart} fonts={fonts} t={t} s={s} /> : null}
         <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} t={t} s={s} ring={slot.resources > 0 ? sphereRing(p.sphere, t) : null} contrast={contrast} />

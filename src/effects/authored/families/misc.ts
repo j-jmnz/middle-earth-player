@@ -181,7 +181,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"145001:triggered:1","cardCode":"145001","lines":["145001:A:1"],"timing":"triggered","trigger":"leftPlay","subject":"self","instructions":[{"verb":"LoseGame"}]},
   {"id":"146002:constant:1","cardCode":"146002","lines":["146002:A:1"],"timing":"constant","instructions":[{"verb":"ControlledBy","who":"firstPlayer","card":"self"}]},
   // 142001 Frodo Baggins: exhaust The One Ring (142091) and spend a Fellowship resource when he defends; the attack deals no damage.
-  {"id":"142001:response:1","cardCode":"142001","lines":["142001:A:1"],"timing":"response","trigger":"declaredDefender","subject":"self","cost":{"kind":"resources","amount":1,"sphere":"fellowship"},"condition":{"kind":"exhausted","code":"142091","is":false},"instructions":[
+  {"id":"142001:response:1","cardCode":"142001","lines":["142001:A:1"],"timing":"response","trigger":"declaredDefender","subject":"self","cost":{"kind":"resources","amount":1,"sphere":"fellowship"},"condition":{"kind":"all","conditions":[{"kind":"exhaustedToDefend"},{"kind":"exhausted","code":"142091","is":false}]},"instructions":[
     {"verb":"Exhaust","target":{"kind":"byCode","code":"142091"}},{"verb":"ModifyStat","stat":"dealsNoDamage","amount":1,"until":"endOfPhase","target":"other"},{"verb":"RaiseThreat","amount":2,"who":"eachSeat"}]},
   // 144013 Speak Your Promise!: the Ring-bearer readies; the enemy's Attack and Defense drop by the Ring-bearer's Willpower above its Threat.
   {"id":"144013:action:1","cardCode":"144013","lines":["144013:A:1"],"timing":"action","condition":{"kind":"all","conditions":[{"kind":"canPick","pick":{"type":"hero","control":"any","trait":"Ring-bearer"}},{"kind":"canPick","pick":{"type":"enemy","control":"any","engaged":"you"}}]},"instructions":[
@@ -195,9 +195,9 @@ export const RECORDS: readonly Effect[] = [
   // 22146 Thorongil: another version of the host is attached to it; the host has its game text and resource icon while Thorongil is in play.
   {"id":"22146:response:1","cardCode":"22146","lines":["22146:A:2"],"timing":"response","trigger":"attached","subject":"self","eventSeat":"you","instructions":[{"verb":"AttachCollectionHero"}]},
 
-  // 19033 Wild Stallion: a Planning Action attaches it to another ally, where it counts as a Restricted Mount attachment.
-  {"id":"19033:action:1","cardCode":"19033","lines":["19033:A:2"],"timing":"action","condition":{"kind":"all","conditions":[{"kind":"phase","is":"Planning"},{"kind":"canPick","pick":{"type":"ally","control":"you","other":true}}]},"instructions":[
-    {"verb":"Pick","pick":{"type":"ally","control":"you","other":true}},{"verb":"AttachAsMount"}]},
+  // 19033 Wild Stallion: a Planning Action attaches it to another ally that has no Wild Stallion on it (Limit 1 per ally) and can have attachments, where it counts as a Restricted Mount attachment.
+  {"id":"19033:action:1","cardCode":"19033","lines":["19033:A:2"],"timing":"action","condition":{"kind":"all","conditions":[{"kind":"phase","is":"Planning"},{"kind":"canPick","pick":{"type":"ally","control":"you","other":true,"hasAttachment":{"names":["Wild Stallion"],"none":true},"takesSource":true}}]},"instructions":[
+    {"verb":"Pick","pick":{"type":"ally","control":"you","other":true,"hasAttachment":{"names":["Wild Stallion"],"none":true},"takesSource":true}},{"verb":"AttachAsMount"}]},
   {"id":"19033:constant:2","cardCode":"19033","lines":["19033:A:2"],"timing":"constant","instructions":[
     {"verb":"ModifyStat","stat":"traitMount","amount":1,"until":"whileSourceInPlay","when":{"kind":"matches","card":"host","pick":{"type":"ally","control":"any"}}},
     {"verb":"ModifyStat","stat":"countsAsRestricted","amount":1,"until":"whileSourceInPlay","when":{"kind":"matches","card":"host","pick":{"type":"ally","control":"any"}}},

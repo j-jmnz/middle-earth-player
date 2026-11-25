@@ -138,6 +138,21 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "the-mines-of-moria": UNDERGROUND,
   "escape-from-khazad-dum": UNDERGROUND,
   "the-hunt-for-the-dreadnaught": SEA,
+  "peril-in-pelargir": { calm: "gondor", combat: "siege" },
+  "into-ithilien": { calm: "crossroads", combat: "pelennor" },
+  "the-siege-of-cair-andros": { calm: "gondor", combat: "siege" },
+  "the-stewards-fear": { calm: "gondor", combat: "shadow" },
+  "the-druadan-forest": { calm: "crossroads", combat: "uruk" },
+  "encounter-at-amon-din": { calm: "gondor", combat: "uruk" },
+  "assault-on-osgiliath": { calm: "gondor", combat: "siege" },
+  "the-blood-of-gondor": { calm: "crossroads", combat: "uruk" },
+  "the-morgul-vale": { calm: "morgul", combat: "uruk" },
+  "we-must-away-ere-break-of-day": { calm: "shire", combat: "chase" },
+  "over-the-misty-mountains-grim": UNDERGROUND,
+  "dungeons-deep-and-caverns-dim": UNDERGROUND,
+  "flies-and-spiders": FOREST,
+  "the-lonely-mountain": DRAGONS,
+  "the-battle-of-five-armies": { calm: "rohan", combat: "pelennor" },
 };
 
 /** The loop a table plays: its scenario's combat loop during the Combat phase, its calm loop otherwise, and the menu's for a scenario with no pair. */

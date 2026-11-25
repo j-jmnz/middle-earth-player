@@ -19,6 +19,8 @@ function attachHost(to: unknown): string {
   if (!isObj(to)) return str(to);
   if (to.kind === "ship") return to.defender === true ? "the Ship objective defending the attack in progress (nothing happens if the defender is not a Ship)" : "a Ship objective the players control, chosen by the first player";
   if (to.kind === "attackingEnemy") return "the enemy making the attack in progress";
+  if (to.kind === "subject") return "the character the event is about (nobody is asked)";
+  if (to.kind === "defender") return "the defending character of the attack in progress (nothing happens when the attack is undefended)";
   if (to.kind === "enemy") return `${to.challenge === true ? "the enemy with the most hit points left, by the opposing team, nobody being asked," : "an enemy"} with the trait ${str(to.trait)}`;
   if (to.kind === "character") return `a character (hero or ally, an objective ally included) of any player, chosen by the first player${typeof to.trait === "string" ? `, one that has the trait ${to.trait} now` : ""}${typeof to.name === "string" ? `, the character titled "${to.name}"` : ""}${to.control === "mostAttachments" ? ", among those holding the most attachments (the first player chooses among those tied)" : ""}${to.unlimited === true ? "; a character that carries a copy is offered too" : "; a character that carries a copy is not offered"} (the card is discarded when none can host it)`;
   const hero: Readonly<Record<string, string>> = { you: "a hero the revealing player controls", any: "any player's hero, chosen by the first player", highestThreat: "a hero of the player with the highest threat, who chooses it (the first player chooses among the players tied)", highestThreatCost: "the hero with the highest printed threat cost among every hero in play (the first player chooses among those tied)", picked: "a hero of the player the effect picked, who chooses it", mostAttachments: "the hero with the most attachments among those the card is not on yet (the first player chooses among those tied)", firstPlayer: "a hero the first player controls, chosen by the first player" };
@@ -58,10 +60,10 @@ export const CORE_TEMPLATES: Templates = {
     text: `Resolution: ${typeof i.amount === "number" && i.amount < 0 ? `lose ${-i.amount}` : `gain ${str(i.amount)}`} XP${isObj(i.each) ? ` for ${(XP_EACH[str(i.each.kind)] ?? (() => str(i.each)))(i.each)}` : ""}${typeof i.max === "number" ? `, at most ${i.max} XP from the line` : ""} (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)`,
     read: ["amount", "each", "max"],
   }),
-  SpendResources: (i) => ({
+  SpendResources: (i, ctx) => ({
     text: i.target === undefined
-      ? `${i.group === true ? "the players as a group" : "the acting player"} spend ${str(i.amount)} resource(s) from heroes with ${typeof i.sphere === "string" ? `the ${SPHERE(i.sphere)} icon` : "this card's sphere icon"}, choosing a hero for each resource${i.group === true ? " (any player's)" : " (their own)"} (with fewer resources than that, nothing is spent)`
-      : `${str(i.amount)} resource(s) are spent from the pool of ${cardRef(i.target)} (nobody chooses; a pool with fewer spends nothing)`,
+      ? `${i.group === true ? "the players as a group" : "the acting player"} spend ${amt(i.amount, ctx)} resource(s) from heroes with ${typeof i.sphere === "string" ? `the ${SPHERE(i.sphere)} icon` : "this card's sphere icon"}, choosing a hero for each resource${i.group === true ? " (any player's)" : " (their own)"} (with fewer resources than that, nothing is spent)`
+      : `${amt(i.amount, ctx)} resource(s) are spent from the pool of ${cardRef(i.target)} (nobody chooses; a pool with fewer spends nothing)`,
     read: ["amount", "target", "sphere", "group", "paid"],
   }),
   Earn: (i) => ({ text: `Resolution: the cards with codes ${codes(i.codes)} are earned, with no choice${i.eachPlayer === true ? " (one copy for each living player)" : ""}${i.afterHand === true ? "; the copy goes into its player's deck, shuffled in once the starting hand is drawn" : ""}${i.forFirstPlayer === true ? "; the card is the first player's, a pool entry for that seat" : ""}`, read: ["codes", "eachPlayer", "afterHand", "forFirstPlayer"] }),
@@ -69,6 +71,10 @@ export const CORE_TEMPLATES: Templates = {
   GrantIcon: (i) => ({ text: `(constant on an attachment) the attached hero also pays for ${SPHERE(i.sphere)} cards and counts as ${SPHERE(i.sphere)} hero for a filter that reads the sphere`, read: ["sphere"] }),
   HideTest: (i) => ({ text: `the revealing player makes a Hide test with Hide ${str(i.x)}: they may exhaust any number of ready characters they control to commit them, then discard the top ${str(i.x)} card(s) of the encounter deck (a treachery adds 0 Threat); the test passes when the committed characters' total Willpower is at least the total Threat of the discarded cards; a failure is recorded and the Forced effects that hear it resolve`, read: ["x"] }),
   AttachSelf: (i) => ({ text: `this card attaches itself to ${attachHost(i.to)}${i.announces === true ? " (announced as it attaches)" : ""}`, read: ["to", "announces"] }),
+  ReduceNextCost: (i, ctx) => ({
+    text: `the next ${pck(i.pick, ctx)} ${i.who === "any" ? "any player plays" : i.who === "picked" ? "the picked player plays" : "the acting player plays"}${i.hostSphere === true ? ", of the sphere of this card's host (read now)," : ""} costs ${amt(i.amount, ctx)} less until ${i.until === "used" ? "a card spends it" : (UNTIL[str(i.until) as keyof typeof UNTIL] ?? str(i.until))}${typeof i.min === "number" ? `, not below ${i.min}` : ""}${typeof i.doomed === "number" ? `; that card gains Doomed ${i.doomed}` : ""}${i.noMatch === true ? "; it needs no resource match" : ""}${i.cannotQuest === true ? "; it cannot quest this round" : ""}`,
+    read: ["pick", "amount", "until", "min", "who", "hostSphere", "doomed", "noMatch", "cannotQuest"],
+  }),
   ReduceCostOf: (i, ctx) => ({ text: `(constant) a ${pck(i.pick, ctx)} costs ${amt(i.amount, ctx)} less${typeof i.min === "number" ? `, not below ${i.min}` : ""}${i.firstEachRound === true ? `, only the first such card each round${i.anyPlayer === true ? ", counting the cards all the players play together" : ""}` : ""}${i.onHost === "self" ? ", only an attachment played on this card" : i.onHost === "host" ? ", only an attachment played on this card's host" : ""}${i.anyPlayer === true ? "; the discount is every player's, whoever controls this card" : ""}`, read: ["pick", "amount", "min", "firstEachRound", "onHost", "anyPlayer"] }),
   ReturnUnderToStaging: (i) => ({ text: `each card under ${typeof i.from === "string" ? `the card in play with code ${i.from}` : "this location"} ${i.to === "engaged" ? "is put into play engaged with the first player instead of the staging area, and counts as engaging them" : "returns to the staging area faceup"}`, read: ["to", "from"] }),
   RemoveQuestProgress: (i) => ({ text: `remove ${str(i.perPlayer)} progress from the current quest card for each player ${i.startedPlayers === true ? "who started the game" : "in the game"} (it stops at 0)`, read: ["perPlayer", "startedPlayers"] }),
@@ -131,8 +137,11 @@ export const CORE_SAMPLES: Samples = {
     { verb: "AttachSelf", to: { kind: "hero", control: "highestThreat", exceptSphere: "fellowship", trait: "Warrior", minWillpower: 1, unlimited: true } },
     { verb: "AttachSelf", to: { kind: "enemy", trait: "Orc", challenge: true } },
     { verb: "AttachSelf", to: { kind: "attackingEnemy" } },
+    { verb: "AttachSelf", to: { kind: "subject" } },
+    { verb: "AttachSelf", to: { kind: "defender" } },
     { verb: "AttachSelf", to: { kind: "character", trait: "Eagle", name: "Wilyador", unlimited: true, control: "mostAttachments" } },
   ],
+  ReduceNextCost: [{ verb: "ReduceNextCost", pick: { type: "card", control: "you", cardType: "ally" }, amount: { x: true }, until: "endOfPhase", hostSphere: true }, { verb: "ReduceNextCost", pick: { type: "card", control: "you", cardType: "ally" }, amount: 1, until: "used", min: 1, who: "any", doomed: 1, noMatch: true, cannotQuest: true }],
   ReduceCostOf: [{ verb: "ReduceCostOf", pick: { type: "card", control: "you", cardType: "ally" }, amount: 1, firstEachRound: true, anyPlayer: true, min: 1, onHost: "host" }, { verb: "ReduceCostOf", pick: { type: "card", control: "you" }, amount: 1, onHost: "self" }],
   ReturnUnderToStaging: [{ verb: "ReturnUnderToStaging", to: "engaged", from: "50621" }],
   RemoveQuestProgress: [{ verb: "RemoveQuestProgress", perPlayer: 5, startedPlayers: true }],

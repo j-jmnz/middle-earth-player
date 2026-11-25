@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { applyResolution, emptyLog, type CampaignLog } from "../../src/campaign/log.ts";
@@ -21,6 +23,8 @@ import { causeProblems, NUMBER_STEPS } from "./cause-check.ts";
 import { ownCodes, unreachedRecords, whileRecording, writeUnreached } from "./reached.ts";
 import type { CampaignGoldenBase, PlayedGame } from "./game-kit.ts";
 import { goldensMovedHint } from "./golden-moved.ts";
+import { GOLDEN_PINS } from "./golden-pins.ts";
+import { endOf, goldenText } from "../../scripts/game/golden-file.ts";
 import { nextPartId, nextPartStatus, nextStepKind } from "./next-part.ts";
 import { NO_COPY_LIMITS } from "../../src/campaign/wilderland.ts";
 
@@ -111,6 +115,50 @@ function standaloneRun(spec: { campaign: CampaignData }, state: ScenarioState, c
   return runOf({ id: "run-1", kind: "standalone", refId: "game-1", campaignId: null, box: spec.campaign.id, state, cards, heroes: [["q1", "q2", "q3"]], reward: null, startedAt: 100, endedAt: 200, activeMs: null, engineVersion: ENGINE_VERSION });
 }
 
+/**
+ * The rows of a scenario's golden.json, one for each golden: what the spec says, its `intents`, `checks` (the digest of the table after each intent,
+ * src/campaign/digest.ts: they move only when a change reaches this scenario's games) and `end` (the result and a hash of the whole final state); the
+ * state itself only for the goldens in golden-pins.ts. Every golden test builds its rows here. It fails on a pin that names no golden of the scenario,
+ * and on a write that stores a pinned state while a game of the file moves in the same write: pinning a golden must not accept an engine move nobody
+ * looked at (`pnpm game moved`, `pnpm game diff`). `GOLDEN_ACCEPT_MOVE=1` allows the one write once the move is accepted.
+ */
+export function goldenRows<G extends { name: string }>(spec: { scenarioId: string; file: string; goldens: readonly G[]; played: (golden: G) => (Pick<PlayedGame, "kept" | "intents" | "checks" | "state">) | undefined; ctx: (golden: G) => ReduceContext }): Record<string, unknown>[] {
+  const pins = GOLDEN_PINS[spec.scenarioId] ?? [];
+  expect(pins.filter((name) => !spec.goldens.some((golden) => golden.name === name)), "names in test/harness/golden-pins.ts that are no golden of this scenario").toEqual([]);
+  const rows = spec.goldens.map((golden) => {
+    const played = spec.played(golden);
+    return {
+      ...golden,
+      intents: played?.intents,
+      checks: played ? checksOf(played, spec.ctx(golden)) : undefined,
+      end: played ? endOf(played.state) : undefined,
+      state: played && pins.includes(golden.name) ? played.state : undefined,
+    } as Record<string, unknown>;
+  });
+  refuseMovedPin(spec.scenarioId, spec.file, rows);
+  return rows;
+}
+
+// A pinned state written beside a moved game: the stored rows are read back and the two are compared on what a move changes.
+function refuseMovedPin(scenarioId: string, file: string, rows: readonly Record<string, unknown>[]): void {
+  if (process.env.GOLDEN_ACCEPT_MOVE) return;
+  let stored: Record<string, unknown>[];
+  try {
+    stored = JSON.parse(readFileSync(file, "utf8")) as Record<string, unknown>[];
+  } catch {
+    return;
+  }
+  const same = (a: unknown, b: unknown): boolean => JSON.stringify(a) === JSON.stringify(b);
+  const key = (row: Record<string, unknown>, at: number): string => String(row.name ?? `seed ${String(row.seed)} row ${at + 1}`);
+  const before = new Map(stored.map((row, at) => [key(row, at), row] as const));
+  const moved = rows.filter((row, at) => {
+    const was = before.get(key(row, at));
+    return was !== undefined && (!same(was.intents, row.intents) || !same(was.checks, row.checks) || !same(was.end, row.end));
+  });
+  const stateChanged = rows.some((row, at) => row.state !== undefined && !same(before.get(key(row, at))?.state, row.state));
+  if (moved.length > 0 && stateChanged) throw new Error(`${scenarioId}/golden.json: this write stores a pinned state while ${moved.length} golden(s) move (${moved.map((row) => String(row.name ?? row.seed)).slice(0, 3).join("; ")}). Settle the move first (\`pnpm game moved\`, \`pnpm game diff <scenario-id>/<n> --base <ref>\`), or set GOLDEN_ACCEPT_MOVE=1 for this one write.`);
+}
+
 export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extends PlayedGame = PlayedGame>(spec: GoldenSuiteSpec<G, D, P>): void {
   const worlds = new Map<D, SuiteWorld>();
   const games = new Map<string, P>();
@@ -167,13 +215,9 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extend
     }
 
     it("plays the same intents to the same state on fixed seeds", async () => {
-      const out = spec.goldens.map((golden) => {
-        const played = games.get(golden.name);
-        // The checks are the digest of the table after each intent (src/campaign/digest.ts): they move only when a change reaches this scenario's games.
-        return { ...golden, intents: played?.intents, state: played?.state, checks: played ? checksOf(played, worlds.get(golden.decks)!.ctx) : undefined };
-      });
-      await expect(JSON.stringify(out)).toMatchFileSnapshot(spec.file, goldensMovedHint(spec.file, spec.scenario.id, out));
-      // A later part reads these states back from golden.json in place of playing the games again (test/harness/golden-state.ts).
+      const out = goldenRows({ scenarioId: spec.scenario.id, file: spec.file, goldens: spec.goldens, played: (golden) => games.get(golden.name), ctx: (golden) => worlds.get(golden.decks)!.ctx });
+      await expect(goldenText(out)).toMatchFileSnapshot(spec.file, goldensMovedHint(spec.file, spec.scenario.id, out));
+      // A later part reads the pinned states back from golden.json in place of playing the games again (test/harness/golden-state.ts).
       for (const golden of spec.goldens) expect(JSON.parse(JSON.stringify(game(golden).state)), golden.name).toEqual(game(golden).state);
     });
 

@@ -12,7 +12,7 @@ import { loadCards } from "../data/load-cards.ts";
 import { generateEffects } from "../data/effects/generate.ts";
 import { lineTimings } from "../data/normalize/timings.ts";
 import { isKeywordLine } from "../data/normalize/keywords.ts";
-import { keyOf, lineId, loadLedger } from "../data/printed/ledger.ts";
+import { keyOf, lineId, loadLedger, printedLine } from "../data/printed/ledger.ts";
 import { isPoolCard, withPool } from "../data/printed/pool.ts";
 import { PLAYER_REQUESTS } from "../data/printed/scope.ts";
 import { authoredFileNames, authoredOrder, renderAuthoredBarrel } from "../data/effects/barrel.ts";
@@ -123,25 +123,29 @@ describe("effect coverage", () => {
   // the card came into play, so a constant record owns it: a Forced trigger on one way in (added to the staging area, engaged) would miss the others. Named one by one, with the reason.
   const REPLACEMENT_RECORDS: ReadonlySet<string> = new Set(["11181:constant:2"]);
 
-  const lineOf = (id: string): string => {
-    const [code, side, n] = id.split(":");
-    return lines.byKey.get(keyOf(code ?? "", side ?? ""))?.lines[Number(n) - 1] ?? "";
-  };
+  // A constant record that is no replacement effect: it raises the table flag that makes the engine announce an event, so the card's own Forced record can hear it. 05023:constant:1 is the other half of Harbor Storehouse's Forced line (05023:A:1):
+  // the flag `noteDeckDiscards` makes the engine announce a card that leaves the top of the encounter deck (families/stormcaller/zone.ts, discardedFromDeck), held while the card is in play.
+  const ANNOUNCEMENT_FLAG_RECORDS: ReadonlySet<string> = new Set(["05023:constant:1"]);
+
+  // A constant record that is the other half of a When Revealed line whose lasting effect is recalculated as the game changes (faq.lasting-effects): 05049:whenRevealed:1 sets the flag `attackForUncommitted` until the end of the round and 05049:constant:1 counts
+  // "+1 Attack for each character not currently committed" while the flag holds, because a modifier made by the When Revealed effect fixes its amount when it resolves.
+  const LASTING_CONSTANT_RECORDS: ReadonlySet<string> = new Set(["05049:constant:1"]);
+
+  const lineOf = (id: string): string => printedLine(lines, id) ?? "";
 
   it("has a record that names a line of its own card, for every shipped record", () => {
     for (const effect of EFFECTS) {
       expect(effect.lines.length, `${effect.id} names a line`).toBeGreaterThan(0);
       for (const id of effect.lines) {
-        const [code, side, n] = id.split(":");
-        const entry = lines.byKey.get(keyOf(code ?? "", side ?? ""));
+        const code = id.split(":")[0];
         expect(code, `${effect.id} claims ${id}, a line of another card`).toBe(effect.cardCode);
-        const line = entry?.lines[Number(n) - 1];
+        const line = printedLine(lines, id);
         expect(line, `${effect.id} claims ${id}, which is not a printed line`).toBeDefined();
         // A ledger edit that shifts line numbers moves a record onto a line with another label. A record may also own an
         // unlabeled line it carries out with its labeled one (Close Call's "Doomed X." raised by its Response, 08005).
         const timings = lineTimings(line ?? "");
         const alongside = timings.has("constant") && effect.lines.some((other) => other !== id && lineTimings(lineOf(other)).has(effect.timing));
-        if (!alongside && !REPLACEMENT_RECORDS.has(effect.id) && !isCampaignMarker(effect, line ?? "")) expect(timings, `${effect.id} (${effect.timing}) claims ${id}: ${line}`).toContain(effect.timing);
+        if (!alongside && !REPLACEMENT_RECORDS.has(effect.id) && !ANNOUNCEMENT_FLAG_RECORDS.has(effect.id) && !LASTING_CONSTANT_RECORDS.has(effect.id) && !isCampaignMarker(effect, line ?? "")) expect(timings, `${effect.id} (${effect.timing}) claims ${id}: ${line}`).toContain(effect.timing);
       }
     }
   });

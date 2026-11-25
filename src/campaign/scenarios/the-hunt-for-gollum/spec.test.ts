@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, cardSpecs, damageOn, defend, endPhase, exhausted, flag, handCount, progressOn, quest, resolve, resourcesOn, respond, reveal, revealedBy, stagingThreat, stat, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Hunt for Gollum (shadows-of-mirkwood part 1): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot express (a host, a cost, a legal intent, a card field)
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). What a row cannot express (a host, a cost, a legal intent, a card field)
 // is a test titled with its line id in lines.test.ts. The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; every seat starts at threat 28; a layout's current stage is on its B side. A Clue "attached" in a layout is a claimed one.
 const CLUE = "02014";
 const OLD_FORD = "02015";

@@ -81,7 +81,7 @@ export function combatDamage(
   const captured = captureInstead(state, enemyId, assigned, raw, ctx);
   if (captured) return captured;
   const logged = steps.length;
-  const targetId = damageGoesTo(state, assigned);
+  const targetId = damageGoesTo(state, assigned, "combat");
   const damaged = placeDamage(state, assigned, raw, ctx.cards, steps, "combat", cause);
   const landed = steps.slice(logged).reduce((sum, step) => (step.kind === "damage" && step.targetId === targetId && step.amount > 0 ? sum + step.amount : sum), 0);
   const placed = noteHurt(noteLanded(noteWillpower(damaged, state, targetId, ctx), landed), targetId, state.cards[targetId]?.damage ?? 0, landed, ctx);
@@ -130,7 +130,7 @@ export function combatDamage(
 
 // Cave-troll (03020:A:1, flag `excessToDamage`): "For each excess point of combat damage dealt by Cave-troll you must damage another character you control." Once the attack ends, each
 // point is its own choice of the defending player: 1 damage on a character he controls other than the one the attack damaged, and a point that kills a character does not stop the next
-// (FFG's answer, docs/scenarios/dwarrowdelf.md, The Seventh Level). With no other character the point is lost. The instructions run in the frame the attack's `after` effects use.
+// (FFG's answer, docs/scenarios/dwarrowdelf/the-seventh-level.md, The Seventh Level). With no other character the point is lost. The instructions run in the frame the attack's `after` effects use.
 export function excessDamageAfter(state: ScenarioState, attack: NonNullable<ScenarioState["pendingAttack"]>, ctx: ReduceContext): { instructions: readonly Instruction[]; cause: Cause | undefined } | null {
   const excess = attack.defense?.excess ?? 0;
   const enemy = state.cards[attack.enemyId];

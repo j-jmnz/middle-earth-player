@@ -88,6 +88,21 @@ export const FIXTURE_REGISTRY = [
   { scenarioId: "the-mines-of-moria", kind: "standalone", names: ["mines-lost"] },
   { scenarioId: "escape-from-khazad-dum", kind: "standalone", names: ["khazad-lost"] },
   { scenarioId: "the-hunt-for-the-dreadnaught", kind: "standalone", names: ["dreadnaught-lost"] },
+  { scenarioId: "peril-in-pelargir", kind: "standalone", names: ["pelargir-lost"] },
+  { scenarioId: "into-ithilien", kind: "standalone", names: ["ithilien-lost"] },
+  { scenarioId: "the-siege-of-cair-andros", kind: "standalone", names: ["andros-lost"] },
+  { scenarioId: "the-stewards-fear", kind: "standalone", names: ["fear-lost"] },
+  { scenarioId: "the-druadan-forest", kind: "standalone", names: ["druadan-lost"] },
+  { scenarioId: "encounter-at-amon-din", kind: "standalone", names: ["din-lost"] },
+  { scenarioId: "assault-on-osgiliath", kind: "standalone", names: ["assault-lost"] },
+  { scenarioId: "the-blood-of-gondor", kind: "standalone", names: ["blood-lost"] },
+  { scenarioId: "the-morgul-vale", kind: "standalone", names: ["vale-lost"] },
+  { scenarioId: "we-must-away-ere-break-of-day", kind: "standalone", names: ["day-lost"] },
+  { scenarioId: "over-the-misty-mountains-grim", kind: "standalone", names: ["grim-lost"] },
+  { scenarioId: "dungeons-deep-and-caverns-dim", kind: "standalone", names: ["dim-lost"] },
+  { scenarioId: "flies-and-spiders", kind: "standalone", names: ["spiders-lost"] },
+  { scenarioId: "the-lonely-mountain", kind: "standalone", names: ["mountain-lost"] },
+  { scenarioId: "the-battle-of-five-armies", kind: "standalone", names: ["armies-lost"] },
 ] as const satisfies readonly { scenarioId: string; file?: string; kind?: "standalone"; names: readonly string[] }[];
 
 // The entries as plain data, for code that reads `kind` and `file` whichever entries carry them.

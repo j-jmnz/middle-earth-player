@@ -25,6 +25,8 @@ export type EngineStep =
   | { kind: "escapeTest"; seat: number | null; dealtIds: readonly string[]; committed: number; escape: number; success: boolean; stat?: "attack" | "defense" }
   // The locate test (dwd.locate-test): `handIds` the cards the tester discarded from his hand, `dealtIds` the encounter cards each discarded, in order; the last one passed it when `success`.
   | { kind: "locateTest"; seat: number; handIds: readonly string[]; dealtIds: readonly string[]; success: boolean }
+  // A burgle attempt (hob.burgle): `dealtIds` the encounter cards step 1 discarded, the last one the card with the burgle effect; `revealedId` the card step 2 revealed (null with an empty deck); `discardedIds` the hand cards step 3 discarded; the attempt succeeded when `success`.
+  | { kind: "burgle"; seat: number; dealtIds: readonly string[]; revealedId: string | null; discardedIds: readonly string[]; success: boolean }
   | { kind: "fortitudeTest"; seat: number; discardedIds: readonly string[]; willpower: number; eyes: number; success: boolean }
   | { kind: "hideTest"; cardId: string; discardedIds: readonly string[]; willpower: number; threat: number; success: boolean }
   // `stormcaller`: the Stormcaller's quest stage advanced (dcce.stormcallers-area-stages), not the players' quest.
@@ -55,7 +57,11 @@ export type EngineStep =
   // Discover X resolved for the active location: the cards looked at (top of the encounter deck first), the Loot objective attached to it as a guarded objective and the Hazard card revealed, if any (emce.discover). The rest went to the encounter discard pile.
   | { kind: "discover"; locationId: string; looked: readonly string[]; loot?: string; hazard?: string; cause: Cause }
   // A card from the encounter discard pile was set aside for the Resolution to add a copy of to the campaign pool (A Growing Threat, 12167:A:2; emce.campaign-pool-encounter): the card that did it and the card set aside.
-  | { kind: "setAsideForPool"; sourceId: string; cardId: string; cause: Cause };
+  | { kind: "setAsideForPool"; sourceId: string; cardId: string; cause: Cause }
+  // A character was given poison (hob.venom-poison): `count` is the poison it has now, `of` its printed hit points; one more at `of` makes it unconscious.
+  | { kind: "poison"; targetId: string; count: number; of: number; cause: Cause }
+  // A character was made unconscious (hob.unconscious-characters), or, with `ready`, readied from it.
+  | { kind: "unconscious"; targetId: string; ready?: true; cause: Cause };
 
 export type Payment = { heroId: string; amount: number };
 

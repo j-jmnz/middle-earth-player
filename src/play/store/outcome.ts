@@ -22,7 +22,18 @@ import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape
 import { locateResultTitle } from "../words/scenarios/locate.ts";
 import { BACK_TITLE, TRAPPED_TITLE } from "../readouts/standalone-scenarios/barrow-downs-words.ts";
 import { discoverLines, discoverTitle, POOL_COPY } from "../words/scenarios/wilderland.ts";
+import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poison.ts";
 import { hostName, playWords, type PlayInto } from "../cards/host-words.ts";
+import { STAT_WORD } from "../cards/card-effects.ts";
+import { progressAttack, willpowerAttack } from "../readouts/against-the-shadow/druadan.ts";
+import { controlChanges, changeWords } from "../readouts/against-the-shadow/osgiliath.ts";
+import { deadVillagers, heldBeat, onVillagers, villagerLines } from "../readouts/against-the-shadow/amon-din.ts";
+import { stackTakes, underHost } from "../readouts/against-the-shadow/stewards-fear.ts";
+import { hiddenChanges, hiddenLines } from "../readouts/against-the-shadow/blood-steps.ts";
+import { valeFrom, valeOf, valeQuiet, valeStepWords } from "../readouts/against-the-shadow/vale-steps.ts";
+import { HIDDEN_TITLE } from "../words/scenarios/against-the-shadow/blood.ts";
+import { NO_HERO_DAMAGE, VILLAGERS_TITLE } from "../words/scenarios/against-the-shadow/amon-din.ts";
+import { releasedWords, UNDERWORLD_TITLE } from "../words/scenarios/against-the-shadow/stewards-fear.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
 // is at that line (resolve in beats).
@@ -40,7 +51,7 @@ export const BEAT_MS = 650;
 // `revealed` gives the printed When Revealed lines of a card (the Stormcaller's stage the C side of which was just revealed), or null.
 const SIDE_QUEST_TITLE = "End of the planning phase";
 
-type Names = { card: (cardId: string) => string; passes?: (cardId: string) => boolean; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null; stageName?: (cardId: string) => string | null; mustBypass?: (cardId: string) => string | null; atStaging?: (cardId: string) => boolean; fate?: FateNames; forestAdvance?: (before: ScenarioState, after: ScenarioState, stageId: string) => string | null };
+type Names = { card: (cardId: string) => string; typeOf?: (cardId: string) => string | null; questStat?: (before: ScenarioState) => "willpower" | "attack" | "defense"; passes?: (cardId: string) => boolean; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null; stageName?: (cardId: string) => string | null; mustBypass?: (cardId: string) => string | null; atStaging?: (cardId: string) => boolean; fate?: FateNames; forestAdvance?: (before: ScenarioState, after: ScenarioState, stageId: string) => string | null };
 
 // "stage 3 of 4" for the Stormcaller's stage `cardId` (the area's current stage once it has advanced), or "its next stage" for a state that moved on.
 function stormcallerStageWords(state: ScenarioState, cardId: string): string {
@@ -52,8 +63,9 @@ function seatWord(state: ScenarioState, seat: number): string {
   return state.seatCount > 1 ? `Player ${seat + 1} threat` : "Threat";
 }
 
-// `whole`: the group's lines are kept together, uncut, and come last (Discover's, whose last line lays the look strip).
-type Group = { rank: number; title: string; tone: MomentTone; lines: MomentLine[]; whole?: boolean };
+// `whole`: the group's lines are kept together, uncut, and come last (Discover's, whose last line lays the look strip). `firm`: the group's lines are never cut, the cut falls on the other lines (a location taken or lost in Assault on Osgiliath).
+// `early`: the group is told right after the lead, ahead of the other groups (the villager tokens of Encounter at Amon Dîn, which the quest result moved).
+type Group = { rank: number; title: string; tone: MomentTone; lines: MomentLine[]; whole?: boolean; early?: true; firm?: true };
 
 /**
  * The banner for one accepted intent, or null when it changed nothing worth one (a draw, a resource, a pass that only moved
@@ -90,12 +102,18 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
     boarded.set(shipAt, (boarded.get(shipAt) ?? 0) + 1);
   });
 
+  // The cards of The Blood of Gondor turned faceup in this intent: an enemy among them engages under its turn line (hiddenLines), not in a beat of its own.
+  const hidden = hiddenChanges(before, after, steps, after.questStage != null && after.cards[after.questStage]?.code === "06118", names.typeOf);
+  const turnedEngaged = new Set(hidden?.seats.flatMap((entry) => entry.turned.filter((turned) => turned.fate.kind === "engaged").map((turned) => turned.id)) ?? []);
+
   steps.forEach((step, index) => {
     switch (step.kind) {
       case "quest": {
         const [title, tone]: [string, MomentTone] = step.willpower > step.threat ? ["Quest succeeded", "good"] : step.willpower < step.threat ? ["Quest failed", "bad"] : ["Quest held even", "plain"];
         const group = open(0, title, tone);
-        group.lines.push({ text: `Willpower ${step.willpower} against threat ${step.threat}`, mark: "willpower" });
+        // The stat the stage counted, read on the state before the intent: Attack under Battle, Defense under Siege (hon.battle, hon.siege). The step holds the total as `willpower` whatever the stat was.
+        const stat = names.questStat?.(before) ?? "willpower";
+        group.lines.push({ text: `${STAT_WORD[stat]} ${step.willpower} against threat ${step.threat}`, mark: stat });
         if (tone === "plain") group.lines.push({ text: "No progress, no threat", mark: null });
         return;
       }
@@ -115,7 +133,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         return;
       }
       case "progress":
-        line(step.amount < 0 ? `${-step.amount} progress removed from ${stageNamed(step.targetId)}` : `${step.amount} progress on ${stageNamed(step.targetId)}`, "progress");
+        line(valeStepWords(step, names.card, valeFrom(after, step.cause, names.card)) ?? (step.amount < 0 ? `${-step.amount} progress removed from ${stageNamed(step.targetId)}` : `${step.amount} progress on ${stageNamed(step.targetId)}`), "progress");
         return;
       case "advance": {
         // The Stormcaller's stage advance (dcce.stormcallers-area-stages): its C side's When Revealed is the beat's second line.
@@ -178,21 +196,27 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
           if (discarded) line(discarded, null, [step.enemyId]);
         } else {
           open(2, `Attack on ${enemy}`, "plain");
-          line(`Attack ${step.attack} against defense ${step.defense}`, "attack", [step.enemyId]);
+          // Stage 3 of The Drúadan Forest: the characters attack with Willpower (06044:B:2).
+          const withWillpower = willpowerAttack(before);
+          line(`${withWillpower ? "Willpower" : "Attack"} ${step.attack} against defense ${step.defense}`, withWillpower ? "willpower" : "attack", [step.enemyId]);
         }
         // The damage the strike placed comes before the next attack: say so when there is none.
         const rest = steps.slice(index + 1);
         const end = rest.findIndex((later) => later.kind === "strike" || later.kind === "attack");
-        const placed = (end < 0 ? rest : rest.slice(0, end)).some((later) => later.kind === "damage" && later.amount > 0 && later.targetId === step.targetId);
-        if (!placed) line("No damage");
+        // Progress the attack placed on the enemy (stage 3 of The Drúadan Forest) is what it dealt: no "No damage" line after it.
+        const placed = (end < 0 ? rest : rest.slice(0, end)).some((later) => (later.kind === "damage" || (later.kind === "progress" && progressAttack(before))) && later.amount > 0 && (later.targetId === step.targetId || valeOf(later)?.for === step.targetId));
+        // An undefended attack on Rescued Villagers (06067:B:1) damages no hero: the villager tokens it discards come in their own beat below.
+        if (!placed) line(onVillagers(before, step.targetId) ? NO_HERO_DAMAGE : "No damage");
         // The enemy that takes no damage until he has attacked says why (The Fate of Wilderland).
         const shielded = !placed && step.side === "player" ? names.fate?.shielded(before, step.enemyId) : null;
         if (shielded) line(shielded, null, [step.enemyId]);
         return;
       }
       case "damage":
+        // The damage tokens put on Dead Villagers (06069:A:1) are told once, with the villager tokens that caused them (villagerLines).
+        if (deadVillagers(after, step.targetId) || valeQuiet(step)) return;
         // A heal is a damage step with a negative amount (rr.damage).
-        line(step.amount < 0 ? `${-step.amount} damage healed on ${names.card(step.targetId)}` : `${step.amount} damage on ${names.card(step.targetId)}`, "damage", [step.targetId]);
+        line(valeStepWords(step, names.card) ?? (step.amount < 0 ? `${-step.amount} damage healed on ${names.card(step.targetId)}` : `${step.amount} damage on ${names.card(step.targetId)}`), "damage", [step.targetId]);
         return;
       case "destroy": {
         // A location placed facedown underneath The Havens Burn is hidden from now on: the line does not name it and rings no card (dcce.aflame).
@@ -208,7 +232,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
       }
       case "reveal":
         // The Hazard a Discover revealed is told in Discover's own lines.
-        if (steps.slice(0, index).some((earlier) => earlier.kind === "discover" && earlier.hazard === step.cardId)) return;
+        if (steps.slice(0, index).some((earlier) => earlier.kind === "discover" && earlier.hazard === step.cardId) || valeQuiet(step)) return;
         // A card of the side quest deck (emce.side-quests) is revealed at the end of the planning phase, not by the staging step: it joins the staging area, and nothing cancels its When Revealed effect.
         if (before.cards[step.cardId]?.zone === "sideQuestDeck") {
           if (!current || current.title !== SIDE_QUEST_TITLE) open(3, SIDE_QUEST_TITLE, "plain");
@@ -216,8 +240,15 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
           line(`Revealed ${names.card(step.cardId)} from the side quest deck: it is added to the staging area.${cancel}`, null, [step.cardId]);
           return;
         }
+        // A card of The Steward's Fear's underworld stack, revealed because the location it lay under left play: the line says where it came from.
+        const stackedUnder = underHost(before, step.cardId);
+        if (stackedUnder) {
+          if (!current || current.title !== UNDERWORLD_TITLE) open(2, UNDERWORLD_TITLE, "plain");
+          line(releasedWords(names.card(step.cardId), names.card(stackedUnder)), null, [step.cardId]);
+          return;
+        }
         if (!current || current.rank !== 3 || current.whole) open(3, "Staging", "plain");
-        line(`Revealed ${names.card(step.cardId)}`);
+        line(valeStepWords(step, names.card) ?? `Revealed ${names.card(step.cardId)}`);
         // The first treachery of a round, while a stage bars canceling its When Revealed effect (19137:B:1).
         const first = firstTreacheryNote(after, step.cardId, names.card(step.cardId));
         if (first) line(first, null, [step.cardId]);
@@ -239,9 +270,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         line(detachLine(names.card(step.enemyId), names.card(step.locationId)), null, [step.enemyId]);
         return;
       case "engage": {
-        if (joined.has(index)) return;
-        open(4, `${names.card(step.enemyId)} engages`, "bad");
-        line(after.seatCount > 1 ? `${names.card(step.enemyId)} engages Player ${step.seat + 1}` : `${names.card(step.enemyId)} engages you`);
+        if (joined.has(index) || turnedEngaged.has(step.enemyId)) return;
+        open(4, valeOf(step)?.by != null ? "" : `${names.card(step.enemyId)} engages`, "bad");
+        line(valeStepWords(step, names.card, null, { count: after.seatCount }) ?? (after.seatCount > 1 ? `${names.card(step.enemyId)} engages Player ${step.seat + 1}` : `${names.card(step.enemyId)} engages you`));
         const count = boarded.get(index);
         // The ship's ring follows this beat.
         if (count) line(boardingWords({ ship: names.card(step.enemyId), count, seat: step.seat, seats: after.seatCount }), null, [step.enemyId]);
@@ -294,6 +325,13 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         line(`${names.card(step.sourceId)} sets ${names.card(step.cardId)} aside`, null, [step.cardId]);
         line(POOL_COPY);
         return;
+      // Poison and unconscious (hob.venom-poison, hob.unconscious-characters): the character's table pill and its turn follow each line.
+      case "poison":
+        line(poisonLine(names.card(step.targetId), step.count, step.of), null, [step.targetId]);
+        return;
+      case "unconscious":
+        line(unconsciousLine(names.card(step.targetId), step.ready === true), null, [step.targetId]);
+        return;
       case "resetEncounterDeck":
         line("The encounter discard pile is shuffled into the encounter deck");
         return;
@@ -304,6 +342,22 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         return;
     }
   });
+
+  // The cards an Underworld location took from the underworld deck in this intent (The Steward's Fear): no step of their own.
+  const takes = stackTakes(before, after, names.card);
+  if (takes.length > 0) groups.push({ rank: 9, title: UNDERWORLD_TITLE, tone: "plain", lines: takes.map((text) => ({ text, mark: null })) });
+
+  // The villager tokens of Encounter at Amon Dîn that moved or were discarded in this intent, and the defeat of stage 2B that Ghulat holds: no step of their own.
+  const villagers = villagerLines(before, after, names.card);
+  if (villagers.length > 0) groups.push({ rank: 8, title: VILLAGERS_TITLE, tone: "plain", lines: villagers.map((text) => ({ text, mark: null })), early: true });
+  // The locations a player took control of or lost in this intent (Assault on Osgiliath): the location is moved by the engine without a step.
+  const control = controlChanges(before, after).map((change) => changeWords(change, after.seatCount, names.card(change.id)));
+  if (control.length > 0) groups.push({ rank: 8, title: "", tone: "plain", lines: control.map((text) => ({ text, mark: null })), firm: true });
+  // The hidden cards of The Blood of Gondor taken or turned in this intent: a count and a name only once a card is faceup, never a facedown card.
+  // It leads the banner (rank 3, before the engage and damage lines), and tells each enemy it turned under its own turn line.
+  if (hidden) groups.push({ rank: 3, title: HIDDEN_TITLE, tone: "plain", lines: hiddenLines(hidden, names.card).map((text) => ({ text, mark: null })) });
+  const held = heldBeat(before, after);
+  if (held) groups.push({ rank: 8, title: held.title, tone: "plain", lines: held.lines.map((text) => ({ text, mark: null })) });
 
   // A stage of Mount Gundabad's quest deck flipped to side B at the beginning of the quest phase, or bypassed (emce.bypassing): no step of its own.
   const stage = stageBeats(before, after, { card: stageNamed, ...(names.mustBypass ? { mustBypass: names.mustBypass } : {}), ...(names.atStaging ? { atStaging: names.atStaging } : {}) });
@@ -343,9 +397,15 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   const lead = [...(flow.length > 0 ? flow : shown)].sort((a, b) => a.rank - b.rank)[0] ?? shown[0];
   if (!lead) return null;
   const told = (group: Group): MomentLine[] => (group === lead || !group.title ? group.lines : [{ text: group.title, mark: null }, ...group.lines]);
-  const lines = (flow.includes(lead) ? [lead, ...flow.filter((group) => group !== lead)] : []).flatMap(told);
-  const kept = lines.slice(0, MOST);
-  if (lines.length > MOST) kept.push({ text: `And ${lines.length - MOST} more in the log`, mark: null });
+  const rest = flow.filter((group) => group !== lead);
+  const ordered = flow.includes(lead) ? [lead, ...rest.filter((group) => group.early), ...rest.filter((group) => !group.early)] : [];
+  // A firm group's lines stay whole, so the cut takes the others' (the line that says who took control of the location a quest just explored is never behind "more in the log").
+  const firm = ordered.filter((group) => group.firm).flatMap(told);
+  const loose = ordered.filter((group) => !group.firm).flatMap(told);
+  const kept = loose.slice(0, Math.max(MOST - firm.length, 1));
+  kept.push(...firm);
+  const cut = loose.length - (kept.length - firm.length);
+  if (cut > 0) kept.push({ text: `And ${cut} more in the log`, mark: null });
   return { title: lead.title || "This turn", tone: lead.tone, lines: [...kept, ...shown.filter((group) => group.whole).flatMap(told)] };
 }
 

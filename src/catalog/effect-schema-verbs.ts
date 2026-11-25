@@ -30,7 +30,7 @@ const searchSelector = {
   // A card with the Safe keyword (Across the Ettenmoors, mec108.safe): "search the encounter deck and discard pile for a location with the safe keyword" (10077:A:2). With `type: "objective"` the pool's other objectives stay out.
   safe: z.literal(true).optional(),
   // The Wizard's Quest (51001:A:1, 51003:B:1): a printed cost at most `maxCost` (`maxCostMulti` with two or more players), any of the printed `types`, only the top `top` cards of the encounter deck. `byChallenge`: "the opposing team" finds it, so nobody is asked:
-  // the card that gives the players the greatest challenge (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, reading 3): of enemies and locations the highest Threat (enemies: then the highest Attack), then the one nearest the top; of any other card the one nearest the top.
+  // the card that gives the players the greatest challenge (docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, reading 3): of enemies and locations the highest Threat (enemies: then the highest Attack), then the one nearest the top; of any other card the one nearest the top.
   maxCost: z.number().int().min(0).optional(), maxCostMulti: z.number().int().min(0).optional(), types: z.array(z.enum(["enemy", "location", "treachery"])).min(2).optional(), top: z.number().int().positive().optional(), byChallenge: z.literal(true).optional(),
 };
 
@@ -76,7 +76,7 @@ export const simpleVerbs = [
   // `eventSeat` is the player the answered event happened to.
   z.strictObject({ verb: z.literal("LowerThreat"), amount: positiveAmountSchema, who: z.enum(["actor", "picked", "eachSeat", "eventSeat"]), ...when }),
   // Places damage on the picked card (or `target`) as a player card effect (toughness and immunity apply).
-  // `uncancelable`: the damage cannot be canceled by an ability that cancels damage, though one that moves it to another card still can ("This effect cannot be canceled", 03028:A:1; docs/scenarios/dwarrowdelf.md, Flight from Moria).
+  // `uncancelable`: the damage cannot be canceled by an ability that cancels damage, though one that moves it to another card still can ("This effect cannot be canceled", 03028:A:1; docs/scenarios/dwarrowdelf/flight-from-moria.md, Flight from Moria).
   z.strictObject({ verb: z.literal("DamageCard"), amount: positiveAmountSchema, target: cardRefSchema.optional(), uncancelable: z.literal(true).optional(), ...when }),
   // Places progress tokens on the picked location, on every location in the staging area, on the source or the active
   // location. A full location is explored. `host`: the location the source is attached to.
@@ -249,6 +249,9 @@ export const simpleVerbs = [
       z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1), challenge: z.literal(true).optional() }),
       // The enemy making the attack in progress ("Shadow: Attach this card to attacking enemy", 18018:A:2).
       z.strictObject({ kind: z.literal("attackingEnemy") }),
+      // The character the answered event is about ("Forced: After Dark Bats damages a character, attach it to that character", 132036:A:1), or (`defender`) the defending character of the attack in progress ("Shadow: Attach this card to the defending character", 132036:A:2). Nobody chooses; an undefended attack has no defender and the card is not attached.
+      z.strictObject({ kind: z.literal("subject") }),
+      z.strictObject({ kind: z.literal("defender") }),
       // A Ship objective the players control, chosen by the first player ("Attach to a Ship objective.", 12132:A:1), or (`defender`) the Ship objective defending the attack in progress
       // ("If defending character is a Ship, attach ~ to it.", 12132:A:2).
       z.strictObject({ kind: z.literal("ship"), defender: z.literal(true).optional() }),
@@ -305,6 +308,7 @@ export const simpleVerbs = [
     belowSourceHitPoints: z.boolean().optional(), anyDefender: z.literal(true).optional(), // `anyDefender`: no character can defend against the source ("Players cannot declare defenders against Rock Adder", 51324:A:1).
     // With "travel" on a card that is not the location: the players cannot travel to any location but the source ("players cannot travel to other locations", 50217:A:2).
     exceptSelf: z.boolean().optional(),
+    exceptTitle: z.string().min(1).optional(), // With "travel" on a card that is not the location: no travel to a location whose title is not this one (05038:A:2).
     // With "commit" (a player who does not control a card that matches this cannot commit characters to the quest, 02013:B:1) and "draw" (such a player cannot draw cards through card effects, 900404:A:1: the resource phase's and the round's draws are framework
     // draws, not card effects). The pick is read from each player's side.
     unlessControls: pickSchema.optional(),

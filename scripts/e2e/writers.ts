@@ -74,6 +74,21 @@ import { woodlandFixtures } from "./standalone-scenarios/the-woodland-realm.ts";
 import { minesFixtures } from "./standalone-scenarios/the-mines-of-moria.ts";
 import { khazadFixtures } from "./standalone-scenarios/escape-from-khazad-dum.ts";
 import { dreadnaughtFixtures } from "./standalone-scenarios/the-hunt-for-the-dreadnaught.ts";
+import { pelargirFixtures } from "./against-the-shadow/peril-in-pelargir.ts";
+import { grimFixtures } from "./the-hobbit/over-the-misty-mountains-grim.ts";
+import { spidersFixtures } from "./the-hobbit/flies-and-spiders.ts";
+import { dayFixtures } from "./the-hobbit/we-must-away-ere-break-of-day.ts";
+import { dimFixtures } from "./the-hobbit/dungeons-deep-and-caverns-dim.ts";
+import { mountainFixtures } from "./the-hobbit/the-lonely-mountain.ts";
+import { ithilienFixtures } from "./against-the-shadow/into-ithilien.ts";
+import { armiesFixtures } from "./the-hobbit/the-battle-of-five-armies.ts";
+import { androsFixtures } from "./against-the-shadow/the-siege-of-cair-andros.ts";
+import { fearFixtures } from "./against-the-shadow/the-stewards-fear.ts";
+import { druadanFixtures } from "./against-the-shadow/the-druadan-forest.ts";
+import { dinFixtures } from "./against-the-shadow/encounter-at-amon-din.ts";
+import { assaultFixtures } from "./against-the-shadow/assault-on-osgiliath.ts";
+import { bloodFixtures } from "./against-the-shadow/the-blood-of-gondor.ts";
+import { valeFixtures } from "./against-the-shadow/the-morgul-vale.ts";
 
 // The scenarios scenario 1's block writes by hand (`won` is the one fixture not committed that the registry names, `knife-lost` starts from its log).
 export const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
@@ -159,4 +174,19 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "the-mines-of-moria": () => minesFixtures(),
   "escape-from-khazad-dum": () => khazadFixtures(),
   "the-hunt-for-the-dreadnaught": () => dreadnaughtFixtures(),
+  "peril-in-pelargir": () => pelargirFixtures(),
+  "into-ithilien": () => ithilienFixtures(),
+  "the-siege-of-cair-andros": () => androsFixtures(),
+  "the-stewards-fear": () => fearFixtures(),
+  "the-druadan-forest": () => druadanFixtures(),
+  "encounter-at-amon-din": () => dinFixtures(),
+  "assault-on-osgiliath": () => assaultFixtures(),
+  "the-blood-of-gondor": () => bloodFixtures(),
+  "the-morgul-vale": () => valeFixtures(),
+  "we-must-away-ere-break-of-day": () => dayFixtures(),
+  "over-the-misty-mountains-grim": () => grimFixtures(),
+  "dungeons-deep-and-caverns-dim": () => dimFixtures(),
+  "flies-and-spiders": () => spidersFixtures(),
+  "the-lonely-mountain": () => mountainFixtures(),
+  "the-battle-of-five-armies": () => armiesFixtures(),
 };

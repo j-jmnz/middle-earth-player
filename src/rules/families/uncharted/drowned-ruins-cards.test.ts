@@ -237,6 +237,32 @@ describe("Drowned Cave (12104:A:1, 12104:A:2)", () => {
   });
 });
 
+describe("Then after a discard that came up short (12104:A:2, 12103:A:2, rr.then)", () => {
+  const pick = (option: string) => (state: ScenarioState) => (state.window?.kind === "choose" ? option : "");
+
+  it("12104:A:2 Drowned Cave is not returned to the staging area when a deck held fewer than 10 cards to discard", () => {
+    const run = (cards: number) => {
+      const made = make({ active: CODES.drownedCave, deckOf: Array.from({ length: cards }, (_, at) => `c${at % 4}`) });
+      return resolveRecords(made.state, made.ctx, CODES.drownedCave, "forced", idOf(made.state, CODES.drownedCave), pick("return"));
+    };
+    expect(run(10).state.cards[run(10).id]?.zone, "10 cards: discarded in full").toBe("staging");
+    const short = run(9);
+    expect(short.state.seats[0]?.discard).toHaveLength(9);
+    expect(short.state.cards[short.id]?.zone, "9 cards: the discard stopped short").toBe("activeLocation");
+  });
+
+  it("12103:A:2 Sunken Temple is not flipped when a hero had no resource to discard", () => {
+    const run = (resources: number) => {
+      const made = make({ sided: [{ code: "12103", back: "12100", zone: "activeLocation" }] });
+      const state = Object.keys(made.state.cards).filter((id) => made.state.cards[id]?.zone === "heroes").reduce((current, hero) => updateCard(current, hero, { resources }), made.state);
+      const done = resolveRecords(state, made.ctx, "12103", "forced", idOf(state, "12103"), pick("flip"));
+      return done.state.cards[done.id]?.code;
+    };
+    expect(run(1), "each hero had a resource: discarded in full, flipped").toBe("12100");
+    expect(run(0), "a hero had none: not in full, not flipped").toBe("12103");
+  });
+});
+
 describe("Tangling and Grasping (12107:A:1)", () => {
   const reveal = (sided: RuinsLayout["sided"]) => {
     const made = make({ seats: 2, ...(sided ? { sided } : {}) });

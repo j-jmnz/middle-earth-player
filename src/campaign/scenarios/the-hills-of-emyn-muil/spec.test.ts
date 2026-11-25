@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, cardSpecs, damageOn, deckCount, flag, progressOn, resolve, resourcesOn, reveal, revealedBy, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Hills of Emyn Muil (shadows-of-mirkwood part 4): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). What a row cannot say (a play that is not offered, a card that is not reached,
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). What a row cannot say (a play that is not offered, a card that is not reached,
 // a game over several steps) is a test in lines.test.ts titled with the line id.
 const ROWS: readonly Row[] = [
   { line: "02083:A:1", name: "Amon Hen's Threat is twice the number of players", layout: { seats: 2, staging: ["02083"] }, act: announce("enteredPlay", "02083"), expect: [stat("02083", "threat", 4)] },
@@ -32,7 +32,7 @@ const ROWS: readonly Row[] = [
   { line: "900706:A:2", name: "Shadow: +X Attack, X the Threat of the active location", layout: { active: "place" }, act: attack("f3", { shadow: "900706", undefended: true }), expect: [damageOn("dh1", 3)] },
 
   // 900707:A:3 "Shadow: Remove all progress from each Emyn Muil location in play." The active location and one in the staging area (both Emyn Muil) lose all their progress; Enchanted Stream (a Forest) keeps its own.
-  { line: "900707:A:3", name: "Shadow: each Emyn Muil location in play, active or in the staging area, loses all its progress", layout: { active: { code: "02085", progress: 2 }, staging: [{ code: "02086", progress: 3 }, { code: "01095", progress: 1 }] }, act: attack("f0", { shadow: "900707" }), expect: [progressOn("02085", 0), progressOn("02086", 0), progressOn("01095", 1)] },
+  { line: "900707:A:3", name: "Shadow: each Emyn Muil location in play, active or in the staging area, loses all its progress", layout: { active: { code: "02085", progress: 1 }, staging: [{ code: "02086", progress: 2 }, { code: "01095", progress: 1 }] }, act: attack("f0", { shadow: "900707" }), expect: [progressOn("02085", 0), progressOn("02086", 0), progressOn("01095", 1)] },
 ];
 
 if (ROWS.length > 0) cardSpecs("the-hills-of-emyn-muil", ROWS);

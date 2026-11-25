@@ -23,6 +23,7 @@ import { announceHurt } from "../families/angmar/damage.ts";
 import { discardableShadow } from "../families/angmar/shadows.ts";
 import { combatDamage, excessDamageAfter } from "../families/defense/excess.ts";
 import { attackCanceled, defendersDeclared, holdAttackEnd, specialStrike } from "../families/defense/defenders.ts";
+import { attackSwitched } from "../families/pelargir/vale/switch.ts";
 import { holdAttack } from "../families/defense/listen.ts";
 import { startShadowAttack } from "../families/defense/shadow-attack.ts";
 import { announceShadowRaise, noteShadowStart } from "../families/defense/shadow.ts";
@@ -33,6 +34,8 @@ import { announceDestroyed, charactersDestroyed, destroyedByAttack } from "../fa
 import { printedOf } from "../core/printed.ts";
 import { attackHere, attackKey, countsEachAttack, locationDamage } from "../families/south/watcher.ts";
 import { pillageAfter } from "../families/sea/pillage.ts";
+import { aimAgain } from "../families/pelargir/siege.ts";
+import { undefendedTargets } from "./combat.ts";
 
 // Turns the attacker's shadow card up and runs its shadow effects in their own frame. The attack in
 // progress is on state.pendingAttack, so an effect can read whether it is defended and change it.
@@ -45,7 +48,7 @@ function resolveShadow(state: ScenarioState, enemyId: string, seat: number, ctx:
 // instruction ("Deal X shadow cards to this attacker", 01112:A:2) or resolves another card's When Revealed effects ("Resolve the
 // \"When Revealed\" effect of Iron Shackles", 01105:A:2), assigns damage a point at a time ("Assign X damage among characters you control", 142057:A:2),
 // runs on each card that matches ("exhaust all characters you control", 900103:A:2), or
-// reveals an encounter card ("Reveal an encounter card", 11176:A:4), or discards the bottom card of a deck and reads its printed cost (11032:A:2), or grapples (the first player chooses among tied locations, 12053:A:3, 12054:A:3), or searches for an enemy and adds it to the staging area (the first player chooses among the kinds found, 12106:A:2), runs in a frame: only a frame expands a Repeat or an Each or waits for the effects it pushes. A verb says so in its schema entry (`runsInFrame`, src/catalog/verb-flags.ts); this lists none.
+// reveals an encounter card ("Reveal an encounter card", 11176:A:4), or discards the bottom card of a deck and reads its printed cost (11032:A:2), or grapples (the first player chooses among tied locations, 12053:A:3, 12054:A:3), or searches for an enemy and adds it to the staging area (the first player chooses among the kinds found, 12106:A:2), or searches the encounter deck for a card and then shuffles it (the "Then" step reads the frame, 131053:A:2), runs in a frame: only a frame expands a Repeat or an Each or waits for the effects it pushes. A verb says so in its schema entry (`runsInFrame`, src/catalog/verb-flags.ts); this lists none.
 export function runsInFrame(effects: readonly Effect[]): boolean {
   const framed = verbsRunningInFrame();
   return effects.some((effect) => effect.instructions.some((instruction) => framed.has(instruction.verb)));
@@ -57,7 +60,9 @@ function resolveShadowCard(state: ScenarioState, shadowId: string, seat: number,
   const turned = updateCard(state, shadowId, { face: "up" });
   const effects = ctx.effects.filter((effect) => effect.cardCode === shadow.code && effect.timing === "shadow");
   // An effect that waits for a player runs in a frame settle advances; the attack goes on when it pops (afterShadowFrame).
-  if (runsInFrame(effects) && turned.pendingAttack) {
+  // A Shadow effect the first player may cancel by paying (`cancel`, "The first player may spend 1 Baggins resource to cancel this effect", 131051:A:2) runs in a frame too: the frame offers the cancel as it begins (rr.cancel).
+  const payable = effects.find((effect) => effect.cancel != null)?.cancel;
+  if ((runsInFrame(effects) || payable != null) && turned.pendingAttack) {
     const framed = pushEffectFrame(
       // The defense window is over: the defender is declared.
       { ...turned, window: null, pendingAttack: { ...turned.pendingAttack, shadowFrame: shadowId } },
@@ -69,7 +74,7 @@ function resolveShadowCard(state: ScenarioState, shadowId: string, seat: number,
         effectId: effects[0]?.id ?? `${shadowId}:shadow`,
         instructions: effects.flatMap((effect) => effect.instructions),
         causes: effects.flatMap((effect) => effect.instructions.map(() => effectCause(effect))),
-        cancel: null,
+        cancel: payable ? { amount: payable.cost, sphere: payable.sphere ?? null, unless: payable.unless ?? null } : null,
         blockCancel: null,
       },
       steps,
@@ -209,6 +214,8 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
     const { shadowFrame: _frame, ...rest } = next.pendingAttack;
     next = { ...next, pendingAttack: rest };
   }
+  // A shadow effect ended this attack ("engages the next player and makes an immediate attack", 06148:A:2): nothing of it is left to resolve (families/pelargir/vale/switch.ts).
+  if (attackSwitched(next)) return finishAttack(next, ctx, steps);
   if (nextExtraShadow(next, begun.enemyId) != null) {
     const extra = resolveExtraShadows(next, ctx, steps);
     if (extra.waits) return extra.state;
@@ -237,19 +244,24 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
     if (defender) steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: attack.defenderId, attack: strength, defense, undefended: false, cause: ruleCause("rr.step-6-4-3") });
     // "This attack deals no damage" (a flag the enemy holds, families/misc.ts).
     const raw = defender && !flagged(next, enemy.id, "dealsNoDamage") ? Math.max(0, strength - defense) : 0;
-    const damaged = noteAttackDamage(next, defender ? combatDamage(noteStruck(next, strength, ctx), attack.enemyId, attack.defenderId, raw, ctx, steps) : next, ctx);
+    const damaged = noteAttackDamage(next, defender ? combatDamage(noteStruck(next, strength, ctx), attack.enemyId, attack.defenderId, raw, ctx, steps) : next, ctx, steps);
     return damaged.lost ? damaged : afterDamage(damaged, ctx, steps);
   }
   // A shadow effect sent the damage to an active location (families/south/watcher.ts).
   const located = attack.toLocation || undefendedToCity(next, attack.enemyId) ? locationDamage(next, attack, ctx, steps) : null;
-  if (located) return located.lost || located.window ? located : afterDamage(noteAttackDamage(next, located, ctx), ctx, steps);
-  // A shadow effect made a defended attack undefended: the player still names the hero who takes it.
-  if (attack.heroId == null) return { ...next, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
+  if (located) return located.lost || located.window ? located : afterDamage(noteAttackDamage(next, located, ctx, steps), ctx, steps);
+  // The card the damage was aimed at left the game during the shadow (a Battleground location, families/pelargir/siege.ts): the damage is set after the shadow, so it is aimed again.
+  const aimed = next.modifiers.length > 0 ? aimAgain(next, ctx.cards, (state) => undefendedTargets(state, attack.seat, ctx.cards)) : null;
+  if (aimed) return aimed.window ? aimed : resolveAttack(aimed, ctx, steps);
+  // No hero is named yet (the attack was left undefended with several heroes to take it, or a shadow effect made a defended attack undefended): the
+  // defending player names the hero now, with the shadow effect resolved (rr.step-6-4-3).
+  // The action windows between the attack's steps may have left another seat active: the defending player answers.
+  if (attack.heroId == null) return { ...next, activeSeat: attack.seat, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };
   // No hero is left to take the attack (every hero of the seat is held, 18074): it deals no damage.
   if (!next.cards[attack.heroId]) return afterDamage(next, ctx, steps);
   const strength = modifiedStat(next, enemy, "attack", ctx.cards);
   steps.push({ kind: "strike", side: "enemy", enemyId: attack.enemyId, targetId: attack.heroId, attack: strength, defense: 0, undefended: true, cause: ruleCause("rr.step-6-4-3") });
-  const hit = noteAttackDamage(next, combatDamage(noteStruck(next, strength, ctx), attack.enemyId, attack.heroId, flagged(next, enemy.id, "dealsNoDamage") ? 0 : strength, ctx, steps), ctx);
+  const hit = noteAttackDamage(next, combatDamage(noteStruck(next, strength, ctx), attack.enemyId, attack.heroId, flagged(next, enemy.id, "dealsNoDamage") ? 0 : strength, ctx, steps), ctx, steps);
   return hit.lost ? hit : afterDamage(hit, ctx, steps);
 }
 
@@ -338,8 +350,8 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   if (!attackHere(state, attack.enemyId)) return waiting.length > 0 ? (startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended) : ended;
   // Only the effect that searches the deck for another copy of a destroyed ally (DiscardCopiesFromDeck of "other", 10137:A:2) reads the ally the attack destroyed.
   const destroyedAlly = after.some((one) => one.verb === "DiscardCopiesFromDeck" && one.of === "other") ? destroyedAllyOf(state, attack, ctx) : undefined;
-  // Only an effect that reanimates the character the attack destroyed (Unholy Crypt, 101161:A:2) reads it.
-  const destroyedCharacter = after.some((one) => one.verb === "Reanimate" && one.from === "destroyed") ? destroyedByAttack(state, attack, ctx)[0] : undefined;
+  // Only an effect that reanimates the character the attack destroyed (Unholy Crypt, 101161:A:2), or one that acts for its controller (Assault on Osgiliath, 06100:A:2), reads it.
+  const destroyedCharacter = after.some((one) => (one.verb === "Reanimate" && one.from === "destroyed") || one.verb === "ActForDestroyedController") ? destroyedByAttack(state, attack, ctx)[0] : undefined;
   return pushEffectFrame(
     ended,
     {

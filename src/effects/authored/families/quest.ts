@@ -85,7 +85,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"12036:action:1","cardCode":"12036","lines":["12036:A:2"],"timing":"action","condition":{"kind":"all","conditions":[{"kind":"phase","is":"Quest"},{"kind":"canPick","pick":QUESTING_HOBBIT}]},"instructions":[
     {"verb":"ChooseX","max":[{"count":QUESTING_HOBBIT}]},
     {"verb":"Repeat","times":{"x":true},"instructions":[{"verb":"Pick","pick":QUESTING_HOBBIT},{"verb":"Ready","target":"picked"},{"verb":"RemoveFromQuest"}]},
-    {"verb":"LowerThreat","amount":{"x":true},"who":"actor"}]},
+    {"verb":"LowerThreat","amount":{"x":true},"who":"actor","when":{"kind":"thenResolves"}}]},
   // 12037 Mirkwood Explorer (line 1 is 12037:response:1).
   {"id":"12037:action:1","cardCode":"12037","lines":["12037:A:2"],"timing":"action","cost":{"kind":"exhaustSelf"},"condition":{"kind":"canPick","pick":{"type":"location","control":"any"}},"instructions":[{"verb":"Pick","pick":{"type":"location","control":"any"}},{"verb":"MoveProgress","from":"self","all":true}]},
   // 12065 Arrows from the Trees.

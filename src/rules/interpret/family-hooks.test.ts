@@ -9,7 +9,7 @@ import { legalTargets } from "../engine/legal.ts";
 import { playBlocked } from "../families/sidequests/contract.ts";
 import { forcedTravel, travelCostUnpayable } from "./restrictions.ts";
 import type { RulesFamily } from "./family-manifest.ts";
-import { familyAmount, familyAttached, familyAttackReason, familyDefenseReason, familyForcedTravel, familyPlayBarred, familyPlayRefusal, familyUndefendedTargets, familyCondition, familyMayTravel, familyPickMatches, familyTravelCost, familyTravelReach, familyTravelUnpayable, runSettle, settleHooks, withFamilies } from "./family-hooks.ts";
+import { familyAttackDamaged, familyAmount, familyAttached, familyAttackReason, familyDefenseReason, familyForcedTravel, familyPlayBarred, familyPlayRefusal, familyUndefendedTargets, familyCondition, familyMayTravel, familyPickMatches, familyTravelCost, familyTravelReach, familyTravelUnpayable, familyWholeStateVerb, runSettle, settleHooks, withFamilies } from "./family-hooks.ts";
 import { resolveAmount } from "./amounts.ts";
 import { holds } from "./conditions.ts";
 import { matchesPick } from "./pick.ts";
@@ -48,7 +48,7 @@ describe("settle hooks", () => {
       expect([...names(phase)].sort()).toEqual([...SETTLE_ORDER[phase]].sort());
       expect(settleHooks(phase)).toHaveLength(SETTLE_ORDER[phase].length);
     }
-    expect(SETTLE_ORDER.before).toEqual(["burden", "island", "south", "quest"]);
+    expect(SETTLE_ORDER.before).toEqual(["burden", "island", "south", "quest", "sack"]);
     expect(SETTLE_ORDER.after).toEqual(["sea", "stormcaller", "island", "wilderland", "captives"]);
   });
 });
@@ -123,6 +123,25 @@ describe("pick hooks", () => {
     expect(familyPickMatches(state, "c1", spec, at, ctx, [family("a")])).toBe(true);
     expect(familyPickMatches(state, "c1", spec, at, ctx, [family("a", { pick: () => true }), family("b", { pick: (_state, id) => id !== "c1" })])).toBe(false);
     expect(familyPickMatches(state, "c2", spec, at, ctx, [family("b", { pick: (_state, id) => id !== "c1" })])).toBe(true);
+  });
+});
+
+describe("combat damage hooks", () => {
+  it("run in list order, each on the state the one before left", () => {
+    const seen: string[] = [];
+    const list = [family("a", { combat: { damaged: (_before, after) => { seen.push("a"); return { ...after, round: after.round + 1 }; } } }), family("b"), family("c", { combat: { damaged: (_before, after) => { seen.push("c"); return { ...after, round: after.round * 10 }; } } })];
+    expect(familyAttackDamaged(state, state, ctx, [], list).round).toBe((state.round + 1) * 10);
+    expect(seen).toEqual(["a", "c"]);
+    expect(familyAttackDamaged(state, state, ctx, [], [family("b")])).toBe(state);
+  });
+});
+
+describe("whole-state verbs", () => {
+  it("are the verbs a family declares in wholeState, and no other", () => {
+    const list = [family("a", { wholeState: ["JoinAtStage"] }), family("b")];
+    expect(familyWholeStateVerb("JoinAtStage", list)).toBe(true);
+    expect(familyWholeStateVerb("Draw", list)).toBe(false);
+    expect(familyWholeStateVerb("JoinAtStage", [family("b")])).toBe(false);
   });
 });
 

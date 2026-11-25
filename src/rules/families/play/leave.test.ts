@@ -158,6 +158,15 @@ describe("abilities that answer a card leaving play", () => {
     expect(discarded.cards[twin.id]?.zone).toBe("encounterDiscard");
     expect(discarded.cards[ford.id]?.zone).toBe("staging");
   });
+
+  it("does not offer Eryn Galen Settler's Response with no staging location of the explored title, so the discard is not paid for nothing (17035:A:1)", () => {
+    const table = seat();
+    const settler = put(table.state, "17035", "play");
+    const active = put(settler.state, "marsh", "activeLocation");
+    const ford = put(active.state, "ford", "staging");
+    const explored = run({ ...ford.state, window: null, activeLocation: active.id, pendingEvents: [{ trigger: "activeExplored", seat: null, subject: active.id }] }, ctx);
+    expect(triggers(explored, ctx, "17035:response:1")).toEqual([]);
+  });
 });
 
 describe("cards that leave play by their own rule", () => {

@@ -1,9 +1,11 @@
 // Where an instruction stands in an effect record, the one path scheme the words allowlist (src/play/words/scenario-words.test.ts) and the asks files (src/play/words/asks.ts) key on.
 import type { Instruction } from "../../catalog/boundary.ts";
 
+import { groupSteps } from "./group-steps.ts";
+
 /**
  * One walker over a record's instructions: every instruction, nested ones too (`instructions` of Each, If, ...) and every branch of a Choose, each with the instruction that follows it in its list and the ones after that.
- * `path` is where the instruction stands in the record: its index, with the index of each parent in front ("2.0" is the first instruction nested in the third), and the option id for a branch of a Choose ("1.trade.0").
+ * `path` is where the instruction stands in the record: its index, with the index of each parent in front ("2.0" is the first instruction nested in the third), and the option id for a branch of a Choose ("1.trade.0"). The steps a group verb queues (group-steps.ts) stand below it.
  */
 export function walk(instructions: readonly Instruction[], visit: (instruction: Instruction, next: Instruction | undefined, after: readonly Instruction[], path: string) => void, prefix = ""): void {
   instructions.forEach((instruction, index) => {
@@ -11,6 +13,9 @@ export function walk(instructions: readonly Instruction[], visit: (instruction: 
     visit(instruction, instructions[index + 1], instructions.slice(index + 2), path);
     if ("instructions" in instruction && Array.isArray(instruction.instructions)) walk(instruction.instructions, visit, `${path}.`);
     if (instruction.verb === "Choose") for (const option of instruction.options) walk(option.instructions, visit, `${path}.${option.id}.`);
+    // A group verb queues steps of its own (a Prowl's discard Choose, a Garden's spend for each player): they stand below the verb.
+    const queued = groupSteps(instruction);
+    if (queued) walk(queued, visit, `${path}.`);
   });
 }
 
@@ -48,4 +53,13 @@ export function matchOf(instructions: readonly Instruction[], wanted: Instructio
 /** The path of `wanted` in the record's instructions (matchOf), null when the record holds none. */
 export function pathOf(instructions: readonly Instruction[], wanted: Instruction): string | null {
   return matchOf(instructions, wanted)?.path ?? null;
+}
+
+/** The fixed number of times a Repeat of the record runs the instruction `wanted` (Forest Stream's 4 discards), null when no Repeat around it has a plain number. */
+export function repeatTimesOf(instructions: readonly Instruction[], wanted: Instruction): number | null {
+  let times: number | null = null;
+  walk(instructions, (instruction) => {
+    if (times === null && instruction.verb === "Repeat" && typeof instruction.times === "number" && matchOf(instruction.instructions, wanted) !== null) times = instruction.times;
+  });
+  return times;
 }

@@ -18,16 +18,19 @@ import { engagementCostOf } from "../quest/quest.ts";
 import { enemyAttackWindow, playerAttackWindow } from "../engine/step-window.ts";
 import { inPlay } from "../core/zones.ts";
 import { titleBarred } from "../families/nightmare/guards.ts";
+import { stagedCommitted } from "../families/pelargir/committed.ts";
 import { ruleCause } from "../core/cause.ts";
 import { fireForced } from "../windows/triggers.ts";
-import { undefendedExtras } from "../families/defense/damage.ts";
-import { markDefender, moreDefenders, staysReadyToDefend } from "../families/defense/defenders.ts";
+import { damageBarred, undefendedExtras } from "../families/defense/damage.ts";
+import { exhaustedToDefend, markDefender, moreDefenders, staysReadyToDefend } from "../families/defense/defenders.ts";
 import { holdAttack, queueHeard } from "../families/defense/listen.ts";
 import { awaitStrike, backAfter, declareStrike, endStrike } from "../families/attack/flow.ts";
 import { flightAttackBarred } from "../families/attack/flight.ts";
 import { countsDefense, rangedAttack, struck } from "../families/attack/strike.ts";
-import { attackStatAgainst } from "../families/attack/spectral.ts";
-import { attackHere, dealForAttack, engagedWithAll, engagedWithThreatening, noteBelowThreat, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
+import { attackStatOf, placeAttackDamage } from "../families/pelargir/stage-attack.ts";
+import { mustBeDeclared } from "../families/armies/defender.ts";
+import { attackHere, dealForAttack, engagedWithAll, noteBelowThreat, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
+import { engagedWithThreatening } from "../core/engaged.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "../families/attack/targets.ts";
 import { barredFromDreadnaught } from "../families/sea/dreadnaught.ts";
 
@@ -72,6 +75,8 @@ export function archeryRecipients(state: ScenarioState, cards: Cards, seat?: num
     if (!owner || owner.eliminated || (seat != null && state.separate && index !== seat)) continue;
     ids.push(...characters(state, index, cards));
   }
+  // An ally objective committed from the staging area is a character in play too (05052:A:1, families/pelargir/committed.ts).
+  ids.push(...stagedCommitted(state, seat));
   // "Archery damage must be assigned to allies, if able" (143058:A:2).
   if (state.modifiers.length > 0 && flagged(state, "table", "archeryToAllies")) {
     const allies = ids.filter((id) => {
@@ -138,7 +143,7 @@ export function beginEnemyAttack(
   // `fromStaging`: an effect made an enemy in the staging area attack (families/south/watcher.ts). `shadow: false`: no shadow card is dealt for the attack, though the enemy is considered engaged with each player ("Do not deal a shadow card for this attack", 19083:B:1).
   const { fromStaging = false, shadow = true } = options;
   const attacker = state.cards[enemyId];
-  const here = attacker != null && (attacker.zone === "engaged" || engagedWithAll(state, enemyId) || viaRelay(state, enemyId) || (fromStaging && attacker.zone === "staging"));
+  const here = attacker != null && (attacker.zone === "engaged" || engagedWithAll(state, enemyId) || viaRelay(state, enemyId) || (fromStaging && (attacker.zone === "staging" || attacker.zone === "riddleArea")));
   if (!attacker || !here || attackBarred(state, enemyId, seat)) return state;
   steps.push({ kind: "attack", side: "enemy", seat, enemyId });
   // An attack an effect makes from the staging area was dealt its shadow card by the effect (attackNowFromStaging, immediateAttack): one deal per attack.
@@ -183,7 +188,7 @@ export function defenderIds(state: ScenarioState, attackedSeat: number, cards: C
 
 export function canDefend(state: ScenarioState, attackedSeat: number, defenderId: string, cards: Cards): boolean {
   const instance = state.cards[defenderId];
-  if (!instance || instance.exhausted) return false;
+  if (!instance || (instance.exhausted && !mustBeDeclared(state, defenderId, cards))) return false;
   if (instance.zone !== "heroes" && instance.zone !== "play") return false;
   const printed = printedOf(cards, instance.code);
   if (!isCharacterType(printed) || instance.host != null) return false;
@@ -211,7 +216,7 @@ export function applyDefense(
   const declaredState = ready ? state : exhaustAnnounced(state, defenderId, ctx);
   const exhausted: ScenarioState = markDefender(
     {
-      ...queueEvent(declaredState, { trigger: "declaredDefender", seat: attack.seat, cardId: defenderId, other: attack.enemyId }),
+      ...queueEvent(declaredState, { trigger: "declaredDefender", seat: attack.seat, cardId: defenderId, other: attack.enemyId, ...exhaustedToDefend(state, declaredState, defenderId, ctx) }),
       pendingAttack: { ...attack, defenderId },
       window: null,
     },
@@ -228,17 +233,19 @@ export function applyDefense(
 
 export function applyUndefended(
   state: ScenarioState,
-  heroId: string,
+  heroId: string | undefined,
   ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
   const attack = state.pendingAttack;
   if (!attack || !state.cards[attack.enemyId]) return state;
-  const named: ScenarioState = { ...state, pendingAttack: { ...attack, heroId }, window: null };
-  // The attack is undefended (6.4.1); an action window comes before the shadow card is turned up. A shadow effect that
-  // made a defended attack undefended has already resolved, so the attack goes straight on.
-  if (attack.shadowResolved) return resolveAttack(named, ctx, steps);
-  return enemyAttackWindow(named, ctx, "shadow") ?? resolveAttack(named, ctx, steps);
+  // No hero is named yet: the attack is left undefended, and the damage is assigned to a hero at the damage step, after the shadow
+  // effect (rr.step-6-4-3; resolveAttack asks). A hero named with the declaration stands.
+  const left: ScenarioState = { ...state, pendingAttack: heroId == null ? { ...attack, undefended: true } : { ...attack, heroId }, window: null };
+  // The attack is undefended (6.4.1); an action window comes before the shadow card is turned up. Once the shadow effects have
+  // resolved (the hero is named at the damage step, or a shadow effect made a defended attack undefended), the attack goes straight on.
+  if (attack.shadowResolved) return resolveAttack(left, ctx, steps);
+  return enemyAttackWindow(left, ctx, "shadow") ?? resolveAttack(left, ctx, steps);
 }
 
 export function canAttack(
@@ -396,7 +403,7 @@ export function strikeEnemy(
   const enemyNow = next.cards[enemyId];
   if (!enemyNow) return next;
   steps.push({ kind: "strike", side: "player", enemyId, targetId: enemyId, attack, defense, undefended: false, cause: ruleCause("rr.step-6-8-3") });
-  const damaged = placeDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, "combat", ruleCause("rr.step-6-8-3"));
+  const damaged = placeAttackDamage(next, enemyId, Math.max(0, attack - defense), ctx.cards, steps, ruleCause("rr.step-6-8-3"));
   // Each attacker hears that the attack damaged or destroyed the enemy ("After Merry participates in an attack that destroys
   // an enemy"), and excess damage goes where a card sends it (families/attack/strike.ts).
   return struck(next, damaged, seat, enemyId, attacking, Math.max(0, attack - defense), ctx, steps);
@@ -407,8 +414,8 @@ export function attackStrength(state: ScenarioState, attackerIds: readonly strin
   let attack = 0;
   // "Immune to ranged damage" (Great Cave-troll, 03042:A:1; dwd.immune-to-ranged-damage): a character that takes part through the ranged keyword deals it no damage, a ranged character that attacks it another way does.
   const strike = flagged(state, enemyId, "immuneToRangedDamage") && state.pendingStrike?.enemyId === enemyId ? state.pendingStrike : undefined;
-  // Against a Spectral enemy a character's Willpower is its attack strength (families/attack/spectral.ts).
-  const stat = attackStatAgainst(state, enemyId, cards);
+  // Against a Spectral enemy, and while the table holds `attackWithWillpower`, a character's Willpower is its attack strength (families/attack/spectral.ts, families/pelargir/stage-attack.ts).
+  const stat = attackStatOf(state, enemyId, cards);
   for (const attackerId of attackerIds) {
     const attacker = state.cards[attackerId];
     if (attacker && strike && rangedAttack(strike, attacker)) continue;
@@ -448,7 +455,9 @@ export function undefendedTargets(state: ScenarioState, seat: number, cards: Car
   const heroes = heroIds(state, seat);
   const own = [...heroes, ...characters(state, seat, cards).filter((id) => !heroes.includes(id) && flagged(state, id, "takesUndefendedDamage"))];
   // A character another card lets take it for this player (08093), whoever controls that character.
-  const all = [...own, ...undefendedExtras(state, seat, cards).filter((id) => !own.includes(id))];
+  const withExtras = [...own, ...undefendedExtras(state, seat, cards).filter((id) => !own.includes(id))];
+  // A hero that cannot take this attack's damage is not offered for it (Bilbo Baggins in the riddle area against an attacker other than Gollum, hob.riddle-area; rr.cannot).
+  const all = withExtras.filter((id) => !damageBarred(state, id, "combat", null));
   // A shadow effect says the damage must go on one of these heroes (families/south/watcher.ts, 900408:A:3).
   // A character of another player named by the shadow effect (Wilyador, 02070:A:2) is among them though the seat does not control it.
   const only = state.pendingAttack?.onlyHeroes;

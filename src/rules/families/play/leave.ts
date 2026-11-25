@@ -12,6 +12,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { inPlay, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { noteSpent } from "../costs/pay.ts";
+import { anyLocked, resourcesLocked, stopLockedSpend } from "../pelargir/spending.ts";
 import type { Focus } from "../index.ts";
 import { namedCard } from "./refs.ts";
 
@@ -56,19 +57,26 @@ export function attachFacedown(state: ScenarioState, instruction: Extract<Instru
   return updateCard(moveCard(state, id, { zone: "under", locationId: host.id }), id, { owner });
 }
 
+/** The card in the staging area, other than `subject`, with the printed title of `subject` (DiscardSameTitle), or null. */
+export function sameTitleInStaging(state: ScenarioState, subject: string | null, ctx: ReduceContext): string | null {
+  const name = subject ? printedOf(ctx.cards, state.cards[subject]?.code ?? "").name : null;
+  return name ? (state.staging.find((id) => id !== subject && printedOf(ctx.cards, state.cards[id]?.code ?? "").name === name) ?? null) : null;
+}
+
 // DiscardSameTitle: a card in the staging area with the title of the answered event's card goes to the encounter discard
 // pile (a discard, not an exploration: no victory display).
 export function discardSameTitle(state: ScenarioState, focus: Focus, ctx: ReduceContext): ScenarioState {
-  const subject = namedCard(state, "subject", focus);
-  const name = subject ? printedOf(ctx.cards, state.cards[subject]?.code ?? "").name : null;
-  const match = state.staging.find((id) => id !== subject && printedOf(ctx.cards, state.cards[id]?.code ?? "").name === name);
-  return name && match ? moveCard(state, match, { zone: "encounterDiscard" }) : state;
+  const match = sameTitleInStaging(state, namedCard(state, "subject", focus), ctx);
+  return match ? moveCard(state, match, { zone: "encounterDiscard" }) : state;
 }
 
 // SpendFrom: resources spent from one pool (the last picked card's by default), all of them or none.
 export function spendFrom(state: ScenarioState, instruction: Extract<Instruction, { verb: "SpendFrom" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
   const id = namedCard(state, instruction.card ?? "picked", focus);
   const card = id ? state.cards[id] : undefined;
-  if (!id || !card || card.resources < instruction.amount) return state;
+  // The pick that feeds the spend found no pool that can pay while a hero is locked: the effect does not go on (the pick leaves a locked pool out).
+  if (!id || !card) return anyLocked(state) ? stopLockedSpend(state) : state;
+  if (card.resources < instruction.amount) return state;
+  if (resourcesLocked(state, id)) return stopLockedSpend(state);
   return noteSpent(updateCard(state, id, { resources: card.resources - instruction.amount }), [{ heroId: id, amount: instruction.amount }], ctx);
 }

@@ -177,11 +177,11 @@ describe("events that go back to the hand", () => {
     state = send(state, { type: "Choose", optionId: table.heroes[0] ?? "" }, ctx);
     expect(state.cards[table.heroes[0] ?? ""]?.exhausted).toBe(false);
     expect(state.cards[event.id]?.zone).toBe("hand");
-    // The second time this round it is discarded.
-    state = send(play(state, event.id, ctx), { type: "Choose", optionId: table.heroes[0] ?? "" }, ctx);
+    // The second time this round it is discarded (the hero is exhausted again: with every hero ready the event changes nothing and is not offered, rr.triggered-ability).
+    state = send(play(updateCard(state, table.heroes[0] ?? "", { exhausted: true }), event.id, ctx), { type: "Choose", optionId: table.heroes[0] ?? "" }, ctx);
     expect(state.cards[event.id]?.zone).toBe("discard");
     // Above 20 threat it is discarded the first time too.
-    const high = put(withThreat(table.state, 0, 25), "08003", "hand");
+    const high = put(updateCard(withThreat(table.state, 0, 25), table.heroes[0] ?? "", { exhausted: true }), "08003", "hand");
     const spent = send(play(high.state, high.id, ctx), { type: "Choose", optionId: table.heroes[0] ?? "" }, ctx);
     expect(spent.cards[high.id]?.zone).toBe("discard");
   });

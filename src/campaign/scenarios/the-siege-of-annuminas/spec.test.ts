@@ -1,8 +1,8 @@
-// Rules: rr.forced, rr.response, rr.then, rr.travel, rr.first-player, rr.player-elimination, rr.victory, rr.immune, rr.engaged, rr.in-play-and-out-of-play, rr.shadow-effects, faq.additional-attacks (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Siege of Annúminas).
+// Rules: rr.forced, rr.response, rr.then, rr.travel, rr.first-player, rr.player-elimination, rr.victory, rr.immune, rr.engaged, rr.in-play-and-out-of-play, rr.shadow-effects, faq.additional-attacks (data/rules/entries.json); docs/scenarios/standalone-scenarios/the-siege-of-annuminas.md (The Siege of Annúminas).
 import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, defend, endRound, exhausted, flag, lost, progressOn, quest, resolve, resourcesOn, reveal, stat, threat, travel, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Siege of Annúminas (standalone-scenarios part 8): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The lines a row cannot express (Lead the Sortie's Response, which no
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The lines a row cannot express (Lead the Sortie's Response, which no
 // Standard game can offer, the Epic cards Enemy Camp and Siege Tunnel, the immunity of Battering Ram) are tests in lines.test.ts, each titled with its line id.
 // A deck of locations: a card revealed in the staging step adds no enemy for Annúminas to count.
 const PLACES = ["place", "place", "place", "place", "place", "place"];

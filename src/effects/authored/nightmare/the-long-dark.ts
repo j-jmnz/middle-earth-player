@@ -1,7 +1,7 @@
 import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
 // The Long Dark Nightmare (deck 9016, data/printed/nightmare.json). The setup card's A:1 and its side B are the deck-building text (inert). A:2: Durin's Greaves gains surge each time it is revealed. A:3: its Lost effect (the setup card is in play, so it is heard) has the first player choose and discard an
-// ally in play, any player's. The new cards use the locate test and the Lost timing of the box's records (../dwarrowdelf/the-long-dark.ts, src/rules/families/long-dark/). The readings are in docs/scenarios/dwarrowdelf.md (The Long Dark).
+// ally in play, any player's. The new cards use the locate test and the Lost timing of the box's records (../dwarrowdelf/the-long-dark.ts, src/rules/families/long-dark/). The readings are in docs/scenarios/dwarrowdelf/the-long-dark.md (The Long Dark).
 // Rules: dwd.lost-effects, dwd.locate-test, dwd.last-player, dwd.cave-torch-the-long-dark, rr.in-play-and-out-of-play, rr.shadow-effects, rr.defending-player, rr.first-player, rr.effects, rr.attachment-cards, rr.travel, rr.step-4-2, rr.damage, rr.destroy (data/rules/entries.json).
 const FAILED: Condition = { kind: "lastLocateFailed" };
 const ATTACHED: Condition = { kind: "sourceIn", zone: "attached" };

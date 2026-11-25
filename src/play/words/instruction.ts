@@ -30,6 +30,11 @@ import { fortressWords } from "./scenarios/fortress.ts";
 import { companyWords } from "./scenarios/company.ts";
 import { angmarWords } from "./scenarios/angmar/angmar.ts";
 import { investigationWords } from "./scenarios/standalone-scenarios/investigation.ts";
+import { riddlesWords } from "./scenarios/the-hobbit/riddles.ts";
+import { villagerWords } from "./scenarios/against-the-shadow/amon-din.ts";
+import { osgiliathWords } from "./scenarios/against-the-shadow/osgiliath.ts";
+import { hiddenWords } from "./scenarios/against-the-shadow/blood.ts";
+import { valeWords } from "./scenarios/against-the-shadow/vale.ts";
 import type { ChoiceNames } from "./choice.ts";
 
 export const PICK_NOUNS: Readonly<Record<string, string>> = { hero: "hero", ally: "ally", attachment: "attachment", enemy: "enemy", character: "character", location: "location", player: "player", objective: "objective" };
@@ -93,7 +98,15 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
     // Shelob's Lair: Shelob's resources (144040:A:3, 144061:A:2; the asks file words the choice again for the sheet).
     case "PlaceResourceTokens": {
       const amount = amountWords(instruction.amount);
-      return `place ${amount} resource${amount === "1" ? "" : "s"} on ${instruction.on === "self" ? "this card" : "the card you chose"}`;
+      // Encounter at Amon Dîn: the tokens a card places are villager tokens (ats.villagers), never resources.
+      const unit = game.scenarioId === "encounter-at-amon-din" ? "villager token" : "resource";
+      return `place ${amount} ${unit}${amount === "1" ? "" : "s"} on ${instruction.on === "self" ? "this card" : instruction.on === "activeLocation" ? "the active location" : "the card you chose"}`;
+    }
+    // The Steward's Fear (06014:A:2, 06025:A:2; the asks file words the choice again for the sheet): tokens taken off the current quest.
+    case "RemoveQuestTokens": {
+      const amount = instruction.amount ?? "all";
+      const kind = instruction.kind === "any" ? "" : `${instruction.kind} `;
+      return amount === "all" ? `remove all ${kind}tokens from the current quest` : `remove ${amount} ${kind}token${amount === 1 ? "" : "s"} from the current quest`;
     }
     // The Stone of Erech's Tarlang's Neck (the asks file words the choice again for the sheet).
     case "EndPhase":
@@ -133,6 +146,17 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
     }
     case "DamageCard":
       return `deal ${amountWords(instruction.amount)} damage to ${refWords(instruction.target)}`;
+    // The pelargir family (The Drúadan Forest): the damage of Men in the Dark, and Prowl's group discard.
+    case "DamageCardThenSetX":
+      return `deal ${amountWords(instruction.amount)} damage to it`;
+    case "GroupDiscardResources": {
+      const amount = amountWords(instruction.amount);
+      return `the players as a group discard ${amount} resource${amount === "1" ? "" : "s"} from their heroes' pools`;
+    }
+    case "EachPlayerSpends": {
+      const amount = amountWords(instruction.amount);
+      return `each player spends ${amount} resource${amount === "1" ? "" : "s"} from their heroes' pools`;
+    }
     case "AddResources": {
       const amount = amountWords(instruction.amount);
       return `add ${amount} resource${amount === "1" ? "" : "s"} to ${instruction.to === "host" || instruction.to == null ? "the attached hero's" : instruction.to === "self" ? "this card's" : "its"} pool`;
@@ -185,7 +209,8 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
     // The costs family's verbs (src/catalog/families/costs.ts).
     case "SpendResources": {
       const sphere = instruction.sphere ? `${capital(instruction.sphere)} ` : "";
-      return `${instruction.group ? "the players as a group spend" : "spend"} ${instruction.amount} ${sphere}resource${instruction.amount === 1 ? "" : "s"}`;
+      const amount = amountWords(instruction.amount);
+      return `${instruction.group ? "the players as a group spend" : "spend"} ${amount} ${sphere}resource${amount === "1" ? "" : "s"}`;
     }
     case "SetX":
       return `X is ${instruction.value}`;
@@ -330,7 +355,7 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? islandWords(instruction) ?? aflameWords(instruction) ?? stormcallerWords(instruction) ?? fortressWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction, names.code) ?? encounterWords(instruction) ?? attachmentWords(instruction, names.code) ?? companyWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction) ?? assaultWords(instruction) ?? pursuitWords(instruction, game) ?? pelennorWords(instruction) ?? blackGateWords(instruction) ?? angmarWords(instruction) ?? investigationWords(instruction);
+      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? islandWords(instruction) ?? aflameWords(instruction) ?? stormcallerWords(instruction) ?? fortressWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction, names.code) ?? encounterWords(instruction) ?? attachmentWords(instruction, names.code) ?? companyWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction) ?? assaultWords(instruction) ?? pursuitWords(instruction, game) ?? pelennorWords(instruction) ?? blackGateWords(instruction) ?? angmarWords(instruction) ?? investigationWords(instruction) ?? riddlesWords(instruction) ?? villagerWords(instruction) ?? osgiliathWords(instruction) ?? hiddenWords(instruction) ?? valeWords(instruction);
   }
 }
 

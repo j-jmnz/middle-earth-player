@@ -1,14 +1,19 @@
 // Rules: rr.guarded, rr.attachment-cards, rr.in-play-and-out-of-play, rr.ownership-and-control (data/rules/entries.json); ledger lines 01108:A:1-2, 01107:A:1, 01123:B:1, 01105:A:1.
 // The one line a card of Escape from Dol Guldur says about itself in the card preview (table-preview.ts) when it has more to say than its text:
 // an objective's guard, the prisoner, an Orc Guard's card, Iron Shackles on a deck; and of A Storm on Cobas Haven, a tower the players control and the Ship enemy a location holds out of play. The engine decided each; nothing here changes one.
+import { poisonDetail } from "./poison-preview.ts";
 import { freeOfEncounters } from "../../rules/families/objectives/index.ts";
 import { captivesUnder } from "../../rules/families/captives/values.ts";
 import { heroGuardedBy } from "../../rules/families/wilderland/carried.ts";
 import { cardsUnder } from "../../rules/core/zones.ts";
 import { flagged, heldAmount } from "../../rules/core/state.ts";
+import { modifiedStat } from "../../rules/core/keywords.ts";
+import { committedInStaging } from "../../rules/families/pelargir/committed.ts";
+import { questStatOf } from "../../rules/quest/quest.ts";
 import { FALLEN_SUFFIX, ORC_GUARD_CODE, fallenBase, isShipObjectiveCode, printedOf, type PrintedCard } from "../../rules/core/printed.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
+import { STAT_WORD } from "./card-effects.ts";
 import { ownerWords } from "../words/owner.ts";
 import { prisonerWords } from "../readouts/widgets.ts";
 import { pelennorDetail } from "./pelennor-preview.ts";
@@ -19,6 +24,13 @@ import { ungolDetail } from "./ungol-preview.ts";
 import { stoneDetail } from "./stone-preview.ts";
 import { flameDetail } from "./flame-preview.ts";
 import { rhovanionDetail } from "./rhovanion-preview.ts";
+import { plotLine, underworldLine } from "../readouts/against-the-shadow/stewards-fear.ts";
+import { cairAndrosDetail } from "./against-the-shadow/cair-andros-preview.ts";
+import { amonDinDetail } from "../readouts/against-the-shadow/amon-din.ts";
+import { druadanDetail } from "./against-the-shadow/druadan-preview.ts";
+import { osgiliathControlSpeech, osgiliathDetail } from "../readouts/against-the-shadow/osgiliath.ts";
+import { bloodDetail } from "../readouts/against-the-shadow/blood.ts";
+import { valeDetail } from "../readouts/against-the-shadow/vale.ts";
 
 /**
  * The text of the engine's Orc Guard stand-in, and of a hero Fallen Into Evil made an enemy (`<code>~enemy`; its card shows the hero's art and its game text
@@ -38,6 +50,15 @@ export function standInText(cards: ReadonlyMap<string, PrintedCard>, code: strin
   const printed = printedOf(cards, code);
   const threat = printed.threat ? `Threat ${printed.threat}` : "no Threat";
   return `${fallen ? "Fallen into evil: an enemy now" : "Enemy"}. Attack ${printed.attack ?? 0}, Defense ${printed.defense ?? 0}, ${printed.health ?? 0} hit point${printed.health === 1 ? "" : "s"}, ${threat}.`;
+}
+
+// Celador or an Ithilien Guardian in the staging area (05025:A:1, 05026:A:1; ats.ally-objectives, hon.battle, hon.siege): committed to the quest by its own text, with the stat the stage counts (Attack under Battle, Defense under Siege) and its value now.
+function ithilienDetail(game: ScenarioState, ctx: ReduceContext, cardId: string): string | null {
+  const card = game.cards[cardId];
+  if (!card || !committedInStaging(game, cardId)) return null;
+  const stat = questStatOf(game, cardId, ctx.cards);
+  const value = modifiedStat(game, card, stat, ctx.cards);
+  return `Committed to the quest from the staging area, adding ${value} ${STAT_WORD[stat]} to the quest total. No player controls the card: it cannot attack, defend or pay a cost.`;
 }
 
 /** The muted line under a card's name in its preview, or null: what only the table knows about it. */
@@ -60,7 +81,21 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   if (kept) return kept;
   const captive = captiveDetail(game, ctx, card, name);
   if (captive) return captive;
-  const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card) ?? pelennorDetail(game, ctx, card) ?? barrowDetail(game, ctx, cardId, name);
+  // Poison under a character is a facedown player card too: told before the hands of Lost in Mirkwood, which would call it a hand under a location.
+  const poisoned = poisonDetail(game, ctx, cardId);
+  if (poisoned) return poisoned;
+  const ithilien = ithilienDetail(game, ctx, cardId);
+  if (ithilien) return ithilien;
+  // Assault on Osgiliath: a location a player controls, a unique location's undefended Forced line, Ruined Tower, Pinned Down and Southron Commander (keyed on the scenario).
+  const osgiliath = osgiliathDetail(game, ctx, cardId);
+  if (osgiliath) return osgiliath;
+  // The Blood of Gondor: a Travel cost of hidden cards, The Cross-roads, the two allies, Black Númenorean (keyed on the scenario).
+  const blood = bloodDetail(game, ctx, cardId);
+  if (blood) return blood;
+  // The Morgul Vale: a Captain, the Morgul Bodyguard, To the Tower and The White Bridge (keyed on the scenario).
+  const vale = valeDetail(game, ctx, cardId);
+  if (vale) return vale;
+  const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card) ?? pelennorDetail(game, ctx, card) ?? barrowDetail(game, ctx, cardId, name) ?? cairAndrosDetail(game, ctx, cardId) ?? druadanDetail(game, ctx, cardId, name) ?? underworldLine(game, ctx, cardId) ?? plotLine(game, cardId) ?? amonDinDetail(game, cardId);
   if (lost) return lost;
   const everyone = engagedWithAllWords(game, card);
   if (everyone) return everyone;
@@ -217,5 +252,5 @@ function playersControl(card: ScenarioState["cards"][string]): boolean {
 /** What a screen reader hears of a card the table shows by its picture alone: "controlled by the players" for a tower the players control, whether or not a Ship enemy guards it again. Null for any other card. */
 export function controlSpeech(game: ScenarioState, cardId: string): string | null {
   const card = game.cards[cardId];
-  return card && playersControl(card) ? "controlled by the players" : null;
+  return card && playersControl(card) ? "controlled by the players" : osgiliathControlSpeech(game, cardId);
 }

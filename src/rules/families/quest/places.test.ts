@@ -294,3 +294,29 @@ describe("a card a player card puts out of play under itself (rr.in-play-and-out
     expect(left.cards[enemy.id]).toMatchObject({ zone: "staging", face: "up" });
   });
 });
+
+describe("moving progress where a player card may not place it (06091:B:1)", () => {
+  // The Pick is followed by another step, so the pick filter does not apply: only the verb's own guard can stop the move.
+  const move = record("scout:action:1", "scout", "action", [PICK_STAGING_LOCATION, { verb: "LowerCardThreat", amount: 1, until: "endOfPhase" }, { verb: "MoveProgress", from: "self", all: true }]);
+
+  function carried(barred: boolean): { done: ScenarioState; scoutId: string; fordId: string } {
+    const { state: base } = table();
+    const location = add(base, "ford", "staging");
+    const source = add(location.state, "scout", "play");
+    const holding = updateCard(source.state, source.id, { progress: 2 });
+    const state = barred ? { ...holding, modifiers: [{ instanceId: "table", sourceId: holding.questStage ?? "", stat: "noProgressInStagingByPlayer" as const, amount: 1, until: "whileSourceInPlay" as const }] } : holding;
+    return { done: run(state, move, source.id, [move]), scoutId: source.id, fordId: location.id };
+  }
+
+  it("keeps the progress on its source when the bar holds on the destination", () => {
+    const { done, scoutId, fordId } = carried(true);
+    expect(done.cards[scoutId]?.progress).toBe(2);
+    expect(done.cards[fordId]?.progress).toBe(0);
+  });
+
+  it("moves it when the stage has no bar", () => {
+    const { done, scoutId, fordId } = carried(false);
+    expect(done.cards[scoutId]?.progress).toBe(0);
+    expect(done.cards[fordId]?.progress).toBe(2);
+  });
+});

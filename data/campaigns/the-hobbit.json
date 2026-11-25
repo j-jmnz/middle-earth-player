@@ -1,0 +1,15 @@
+{
+  "id": "the-hobbit",
+  "name": "The Hobbit",
+  "scenarios": [
+    "we-must-away-ere-break-of-day",
+    "over-the-misty-mountains-grim",
+    "dungeons-deep-and-caverns-dim",
+    "flies-and-spiders",
+    "the-lonely-mountain",
+    "the-battle-of-five-armies"
+  ],
+  "kind": "cycle",
+  "starterDecks": [],
+  "saga": false
+}

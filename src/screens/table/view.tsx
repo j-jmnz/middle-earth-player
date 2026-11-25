@@ -27,7 +27,7 @@ import { MomentBanner } from "../../play/readouts/moment-banner";
 import { TableDock } from "../../play/choice/dock/table-dock";
 import { TableLayers } from "../../play/chrome/table-layers";
 import { openReading, type Reading } from "../../play/chrome/reading";
-import { phaseCarousel, stopAheadOf } from "../../play/phases/carousel";
+import { carouselOf, stopAheadOf } from "../../play/phases/carousel";
 import { useLook } from "../../ui/display-prefs";
 import { tableSettings } from "../../ui/table-settings";
 import { useKeepAwake } from "../../play/chrome/use-keep-awake";
@@ -152,7 +152,7 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
   const rail = useMemo(() => railFor(game), [game]);
   // The strip is laid out only while it is open; the rail's S (a stop of the player's lies ahead) is read without laying it out.
   const carouselOpen = reading?.kind === "carousel";
-  const carousel = useMemo(() => (carouselOpen ? phaseCarousel(game, { stopsOn, stops }, ruleTitle) : null), [carouselOpen, game, stopsOn, stops]);
+  const carousel = useMemo(() => (carouselOpen ? carouselOf(game, ctx, { stopsOn, stops }, ruleTitle) : null), [carouselOpen, game, ctx, stopsOn, stops]);
   const stopAhead = useMemo(() => stopAheadOf(game, { stopsOn, stops }), [game, stopsOn, stops]);
   const logNames: LogNames = useMemo(
     () => ({
@@ -178,7 +178,10 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
           goBack(router, nav.back);
           return;
         case "log":
-          setReading({ kind: "log" });
+        case "setAside":
+        case "settings":
+          // The reading panel of the row's own name (src/play/chrome/reading.ts).
+          setReading({ kind: id });
           return;
         case "rules":
           router.push("/glossary");
@@ -189,9 +192,6 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
         case "setup":
           setPreview(null);
           setSetupShown(true);
-          return;
-        case "settings":
-          setReading({ kind: "settings" });
           return;
         case "resign":
           // Asked first: a resigned scenario is lost and its outcome opens.
@@ -398,7 +398,7 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
               extras={pills.pills}
               more={pills.more} aidsFolded={aidsFolded} onMore={more.show} onLines={more.showLines}
               resetKey={choice.resetKey} momentKey={choice.sheet.key} stay={choice.stayFocus}
-              guide={choice.guide}
+              guide={choice.guide} hidden={advance.shown != null && advance.asks}
               trayOpen={choice.panelOpen}
               count={trayCount(choice.sheet, choice.choice)}
               tray={<ChoiceTray open={choice.panelOpen} sheet={choice.sheet} choice={choice.choice} refusedRows={choice.refusedRows} picture={pictureOf} dense={isDense(screen.height, s)} onTile={choice.onTile} onRead={onPreview} onStep={choice.onStep} />}
@@ -492,7 +492,7 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
         />
       ) : null}
       {/* Last, so the layer Back closes first is the one on top. */}
-      <UpdateTableMenu open={menuOpen} nav={nav} without={menuWithout} state={{ store, nameOf, intents }} top={barBottom} right={insets.right + 8 * s} bottom={insets.bottom + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
+      <UpdateTableMenu open={menuOpen} nav={nav} without={menuWithout} ctx={ctx} state={{ store, nameOf, intents }} top={barBottom} right={insets.right + 8 * s} bottom={insets.bottom + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
       <MorePopoverView more={more} items={pills.more} words={{ title: choice.header.lead + choice.header.title, guide: choice.guide, note: choice.header.note, unavailable: choice.unavailable, result: choice.readout?.result, refusal }} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
     </Screen>
   );

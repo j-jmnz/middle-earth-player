@@ -9,7 +9,8 @@ import { currentCause, effectCause, UNATTRIBUTED, type Cause } from "../../core/
 import { effectsOf } from "../../windows/listen.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { modifiedStat, placeDamage } from "../../core/keywords.ts";
+import { familyAttackDamaged } from "../../interpret/family-hooks.ts";
+import { modifiedStat, placeDamage, type DamageSource } from "../../core/keywords.ts";
 import { isCharacterType, printedOf, type PrintedCard } from "../../core/printed.ts";
 import { placeQuestProgress, questPointsOf } from "../../quest/quest.ts";
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
@@ -17,7 +18,10 @@ import { flagged, inPlay, modifierActive, updateCard } from "../../core/state.ts
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { defendingAgainst } from "../angmar/combat.ts";
+import { scrollDamageTarget } from "../pelargir/scroll.ts";
+import { bodyguardTarget } from "../pelargir/vale/bodyguard.ts";
 import { listened, queueHeard, trimFollowUps } from "./listen.ts";
+import { bilboDamageBarred } from "../riddles/gollum.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -61,13 +65,20 @@ export function redirectDamage(state: ScenarioState, instruction: Extract<Instru
 
 // "Attached hero takes all damage assigned to the chosen hero": damage assigned to a card that holds damageToSourceHost goes to
 // the host of that modifier's source while the host is in play.
-export function damageGoesTo(state: ScenarioState, id: string): string {
+export function damageGoesTo(state: ScenarioState, id: string, source?: DamageSource): string {
   for (const modifier of state.modifiers) {
     if (modifier.stat !== "damageToSourceHost" || modifier.instanceId !== id || modifier.amount <= 0 || !modifierActive(state, modifier)) continue;
     const host = state.cards[modifier.sourceId]?.host;
     if (host && host !== id && inPlay(state.cards[host]?.zone ?? "removed")) return host;
   }
-  return id;
+  // "Any damage dealt by this attack is dealt to the hero with Alcaron's Scroll attached, if able" (05020:A:2): the pelargir family names the hero, or none.
+  // "Any damage that would be dealt to a Captain enemy is dealt to 1 Morgul Bodyguard instead" (06148:A:1): the Captain holds the flag while a Bodyguard is in play.
+  return scrollDamageTarget(state, id, source) ?? bodyguardTarget(state, id) ?? id;
+}
+
+// Damage a card does not take from this source: Bilbo Baggins in the riddle area takes it only from Gollum (families/riddles/gollum.ts).
+export function damageBarred(state: ScenarioState, id: string, source: string, sourceId: string | null | undefined): boolean {
+  return bilboDamageBarred(state, id, source, sourceId);
 }
 
 // Characters of any player that may take the damage of an undefended attack against `seat` because a card that player controls
@@ -125,7 +136,9 @@ export function questDamageCause(state: ScenarioState, ctx: ReduceContext): Ques
 
 // Each character that took damage from the enemy attack in progress and is still in play hears it ("After attached hero takes
 // damage from an enemy attack"): the characters whose damage went up between the two states; the enemy making the attack is the event's other card.
-export function noteAttackDamage(before: ScenarioState, after: ScenarioState, ctx: ReduceContext): ScenarioState {
+export function noteAttackDamage(before: ScenarioState, damaged: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  // A family may act on the damage (an enemy with Venom gives each character it damaged 1 poison: hob.venom-poison, families/poison/venom.ts).
+  const after = familyAttackDamaged(before, damaged, ctx, steps);
   if (!listened(after, ctx, ["damagedByAttack"])) return after;
   let next = after;
   for (const now of Object.values(after.cards)) {

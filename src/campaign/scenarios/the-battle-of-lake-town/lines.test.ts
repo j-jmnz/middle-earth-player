@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town), rr.attachment-cards, rr.objective-cards, rr.travel, rr.action, rr.winning-the-game, rr.cancel, faq.enemy-attacks-outside-combat (data/rules/entries.json).
+// Rules: docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md (The Battle of Lake-town), rr.attachment-cards, rr.objective-cards, rr.travel, rr.action, rr.winning-the-game, rr.cancel, faq.enemy-attacks-outside-combat (data/rules/entries.json).
 import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
@@ -380,6 +380,26 @@ describe("50208:A:2 The Old Thrush's Response after the attached hero is declare
 
   it("50208:A:2 it is not offered against an enemy that is not Smaug", () => {
     const { done, run } = declared("f3");
+    expect(response(run.state, done.table)).toBeUndefined();
+  });
+
+  // FAULT: "After attached hero exhausts to attack Smaug": under Hour of Wrath (10144:A:1) the hero does not exhaust to attack, so the Response is not offered. The record reads a declared attacker
+  // (50208:response:1), not an attack that exhausted the hero.
+  const attackBarredFromExhausting = () => {
+    const done = played({ layout: { phase: "PlayerAttacks", attached: [{ code: "50208", to: "dh1" }], engaged: [{ code: "50204", seat: 0 }], hand: ["filler", "filler", "filler"] }, act: [], expect: [] });
+    const target = first(done.run.state, "50204");
+    const barred = { ...done.run, state: { ...done.run.state, modifiers: [...done.run.state.modifiers, { instanceId: done.table.hero, sourceId: "x", stat: "noExhaustAttack" as const, amount: 1, until: "endOfPhase" as const }] } };
+    const run = send(barred, { type: "DeclareAttackers", enemyId: target, attackerIds: [done.table.hero] }, done.table.ctx);
+    return { done, run };
+  };
+
+  it("50208:A:2 under Hour of Wrath the hero attacks without exhausting", () => {
+    const { done, run } = attackBarredFromExhausting();
+    expect(run.state.cards[done.table.hero]?.exhausted).toBe(false);
+  });
+
+  it.fails("50208:A:2 it is not offered when the hero did not exhaust to attack (Hour of Wrath)", () => {
+    const { done, run } = attackBarredFromExhausting();
     expect(response(run.state, done.table)).toBeUndefined();
   });
 });

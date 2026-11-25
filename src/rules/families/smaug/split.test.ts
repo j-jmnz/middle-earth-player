@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town, Fisherman's Dock), rr.active-location, rr.step-3-4; ledger line 50223:A:2.
+// Rules: docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md (The Battle of Lake-town, Fisherman's Dock), rr.active-location, rr.step-3-4; ledger line 50223:A:2.
 // With two active locations, one of them Fisherman's Dock, the progress from questing is split as the first player chooses; a split that fills both is not asked, and two active locations without the Dock fill in order (The Ring Goes South).
 import { describe, expect, it } from "vitest";
 
@@ -9,6 +9,9 @@ import { placeQuestProgress } from "../../quest/quest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { DOCK, lakeTable, run } from "./fixture.ts";
 import { splitShares } from "./split.ts";
+import { TOWER } from "../pelargir/ruined-tower.ts";
+import type { Effect } from "../../../catalog/boundary.ts";
+import { definePrinted } from "../../core/printed.ts";
 
 function twoActive(withDock: boolean) {
   const made = lakeTable({ staging: [{ code: "plain", key: "a" }, { code: withDock ? DOCK : "plain", key: "dock" }] });
@@ -51,5 +54,27 @@ describe("progress on two active locations with Fisherman's Dock (50223:A:2)", (
     const plain = twoActive(false);
     const placed = placeQuestProgress(plain.state, 3, plain.made.ctx.cards, [], () => true, true);
     expect(placed.cards[plain.a]?.progress).toBe(3);
+  });
+});
+
+// A card in play that answers a location leaving play (Idraen's Response, 08025): it hears an explored location only when the split announces it.
+const HEARS: Effect = { id: "a1:response:1", cardCode: "a1", lines: ["a1:A:1"], timing: "response", trigger: "leftPlay", subject: { type: "location", control: "any" }, instructions: [{ verb: "RaiseThreat", amount: 1 }] };
+
+function explore(second: string) {
+  const made = lakeTable({ cards: [definePrinted({ code: TOWER, name: "Ruined Tower", type: "location", threat: 2, questPoints: 2 })], effects: [HEARS], allies: [{ code: "a1" }], staging: [{ code: "plain", key: "a" }, { code: second, key: "second" }] });
+  const a = made.ids.a ?? "";
+  const other = made.ids.second ?? "";
+  const base = { ...moveCard(moveCard(made.state, a, { zone: "activeLocation" }), other, { zone: "secondActiveLocation" }), activeLocation: a, secondActiveLocation: other } as ScenarioState;
+  const asked = run(made, base, { verb: "SplitProgress", amount: 2 });
+  return send(asked, { type: "Choose", optionId: "split:0" }, made.ctx);
+}
+
+describe("a location a split explores (rr.explored)", () => {
+  it("opens no Response window for a Fisherman's Dock split, as on main (The Battle of Lake-town plays as before)", () => {
+    expect(explore(DOCK).window?.kind).not.toBe("response");
+  });
+
+  it("opens the Response window of a card that hears it for a Ruined Tower split (06103:A:1; 06091:B:2 takes the explored location)", () => {
+    expect(explore(TOWER).window?.kind).toBe("response");
   });
 });

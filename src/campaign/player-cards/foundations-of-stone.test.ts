@@ -16,6 +16,8 @@ import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
 import { attacking, choices, exhausted, fillers, passAll, playCode, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const GLORFINDEL = "04101";
+const WINDFOLA = "12116";
+const ONWARD = "onward";
 const SCOUT = "04104";
 const STARGAZER = "04106";
 const VALINOR = "04107";
@@ -41,7 +43,8 @@ const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
-  const cards = new Map([...starter.cards, ...(await loadPrinted([GLORFINDEL, SCOUT, STARGAZER, VALINOR, RUNES, LEGOLAS, EOWYN, BERAVOR]))]);
+  const cards = new Map([...starter.cards, ...(await loadPrinted([GLORFINDEL, WINDFOLA, SCOUT, STARGAZER, VALINOR, RUNES, LEGOLAS, EOWYN, BERAVOR]))]);
+  cards.set(ONWARD, definePrinted({ code: ONWARD, name: "Onward", type: "event", sphere: "neutral", cost: 0 }));
   cards.set(WEAK, definePrinted({ code: WEAK, name: "Weak", type: "enemy", threat: 1, engagementCost: 40, attack: 1, defense: 0, health: 9 }));
   for (const code of [ONE, TWO, THREE, FOUR, FIVE, SIX]) cards.set(code, definePrinted({ code, name: code, type: "event", sphere: "leadership", cost: 0 }));
   base = { ...starter, cards };
@@ -156,6 +159,32 @@ describe("Imladris Stargazer (04106:A:1)", () => {
     expect(run.state.seats[1]?.deck).toEqual([FIVE, FOUR, THREE, TWO, ONE, SIX].map((code) => idsOf(tab, code)));
     expect(run.state.seats[0]?.deck).toEqual(own);
   });
+});
+
+// A test event that removes the committed hero from the quest, so that Windfola's Response (12116:A:3) can commit him again.
+const REMOVE: Effect = { id: "onward:action:1", cardCode: ONWARD, lines: ["onward:A:1"], timing: "action", instructions: [{ verb: "Pick", pick: { type: "hero", control: "you", committed: true } }, { verb: "RemoveFromQuest" }] };
+
+// FAULT: "After Glorfindel exhausts to commit to a quest": Windfola commits him a second time while he is still exhausted from the first commit. He does not exhaust to be committed again,
+// so his threat must not rise again; the Forced effect reads the exhausted state (04101:forced:1), not the exhaust that committed him.
+// The table after Windfola commits Glorfindel a second time; the first commit raised his threat to 9.
+function windfolaCommitsAgain() {
+  const tab = table([...EFFECTS, REMOVE], { start: "quest", heroes: [{ code: GLORFINDEL, seat: 0 }], attached: [{ code: WINDFOLA, host: GLORFINDEL }], hand: [{ code: ONWARD, seat: 0 }], deck: ["f0", "f0"] });
+  const glorfindel = idsOf(tab, GLORFINDEL);
+  let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [glorfindel] }, tab.ctx);
+  const first = run.state.seats[0]?.threat;
+  run = playCode(tab, ONWARD, run);
+  run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, WINDFOLA), effectId: "12116:response:1", payments: [] }, tab.ctx);
+  return { run, glorfindel, first };
+}
+
+it("04101:A:1 Glorfindel: the first commit raises his threat to 9 and Windfola commits him again, still exhausted", () => {
+  const { run, glorfindel, first } = windfolaCommitsAgain();
+  expect(first).toBe(9);
+  expect(run.state.cards[glorfindel]).toMatchObject({ committed: true, exhausted: true });
+});
+
+it.fails("04101:A:1 Glorfindel: no second rise of threat when Windfola commits him again without an exhaust", () => {
+  expect(windfolaCommitsAgain().run.state.seats[0]?.threat).toBe(9);
 });
 
 describe("Daeron's Runes (04108:A:1)", () => {

@@ -83,6 +83,7 @@ export function TableDock({
   stay = false,
   guide = null,
   trayOpen = false,
+  hidden = false,
   count = "",
   tray = null,
   onTop,
@@ -130,6 +131,8 @@ export function TableDock({
   tray?: ReactNode;
   // The screen y of the top of the dock's content: the choice tray's outside-tap layer over the column stops there.
   onTop?: (top: number) => void;
+  // The quest advance screen holds a question over the table (quest-advance-view.tsx): it asks the same choice, so the dock stays laid out but is not drawn, heard or touched.
+  hidden?: boolean;
   // The dock's own height (the content stack, padding included): the column's head fills the room above it.
   // `hasNumbers`: whether the readout's numbers row is in it.
   onHeight?: (height: number, hasNumbers: boolean) => void;
@@ -185,7 +188,7 @@ export function TableDock({
   // A title that opens its card is underlined faintly, so the name reads as a link to the card.
   const titleStyle = onTitle ? { flexShrink: 0, textDecorationLine: "underline" as const, textDecorationColor: withAlphaHex(t.bone, 0.35) } : { flexShrink: 0 };
   return (
-    <View pointerEvents="box-none" style={{ flex: 1, minHeight: 0, justifyContent: "flex-end" }} onLayout={(event) => setRoom((now) => ({ ...now, column: Math.round(event.nativeEvent.layout.height) }))}>
+    <View pointerEvents={hidden ? "none" : "box-none"} importantForAccessibility={hidden ? "no-hide-descendants" : "auto"} accessibilityElementsHidden={hidden === true} style={{ flex: 1, minHeight: 0, justifyContent: "flex-end", opacity: hidden ? 0 : 1 }} onLayout={(event) => setRoom((now) => ({ ...now, column: Math.round(event.nativeEvent.layout.height) }))}>
       {/* No panel: the dock stands on the command column's fade (table/view.tsx). The words, the choice's rows (when it is open) and the
           numbers and buttons are stacked from the foot of the column up. The column's empty top above them passes taps to the canvas. */}
       <View

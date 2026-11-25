@@ -1,6 +1,6 @@
 // Rules: rr.keywords, rr.action, rr.response, rr.forced, rr.triggered-ability, rr.shadow-effects, rr.travel, rr.setup, rr.surge, rr.sentinel, rr.ranged, rr.restricted,
 // rr.immune, rr.permanent, rr.doomed-x, rr.guarded, mec109.archery, mec109.peril, mec109.indestructible, mec109.toughness, mec109.hide-x, mec113.dire, mec113.phantom,
-// dwd.ambush, dwd.regenerate, dwd.locate-test, dcce.sailing, dcce.boarding, dcce.uncharted, dcce.aflame, dcce.grapple, hon.battle, hon.siege, trg.secrecy, bts.valour (data/rules/entries.json).
+// ats.underworld, ats.prowl, dwd.ambush, dwd.regenerate, dwd.locate-test, dcce.sailing, dcce.boarding, dcce.uncharted, dcce.aflame, dcce.grapple, hon.battle, hon.siege, trg.secrecy, bts.valour (data/rules/entries.json).
 //
 // Which rule span explains a keyword or a timing word in the table's card preview. Candidates are rule ids; the book of the open scenario's
 // own wording wins, then the Rules Reference, then Learn to Play (`pickRule`). Pure: the screen turns the id into text (screens/rules/glossary.ts).
@@ -8,7 +8,7 @@ import { ruleDoc } from "./ledger.ts";
 
 export type KeywordKey =
   | "surge" | "peril" | "indestructible" | "permanent" | "sentinel" | "ranged" | "restricted" | "battle" | "siege" | "immune" | "sailing" | "uncharted"
-  | "phantom" | "dire" | "spectral" | "pass" | "ambush" | "hide" | "doomed" | "regenerate" | "archery" | "toughness" | "secrecy" | "boarding" | "aflame" | "grapple" | "burn" | "pillage" | "massive";
+  | "phantom" | "dire" | "spectral" | "pass" | "ambush" | "hide" | "doomed" | "regenerate" | "archery" | "toughness" | "secrecy" | "boarding" | "aflame" | "grapple" | "burn" | "pillage" | "massive" | "underworld" | "prowl" | "villagers";
 
 /** `word` is the keyword as printed, without its value; `rules` are the span ids that define it, most specific book first. `text`: a keyword no rules span defines (Burn X) says its definition itself, with the source it comes from. */
 export type RuleWord = { word: string; rules: readonly string[]; text?: { paragraphs: readonly string[]; source: string } };
@@ -39,7 +39,13 @@ export const KEYWORD_RULES: Readonly<Record<KeywordKey, RuleWord>> = {
   uncharted: { word: "Uncharted", rules: ["dcce.uncharted"] },
   aflame: { word: "Aflame", rules: ["dcce.aflame"] },
   grapple: { word: "Grapple", rules: ["dcce.grapple"] },
-  // Burn X (The Battle of Lake-town): printed on no rules span; the Quest Companion defines it (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town, Burn X).
+  // Underworld X (The Steward's Fear): a keyword the scenario's rules span defines (ats.underworld); the card's records carry it, so the chip reads its value from them (cards/card-keywords.ts).
+  underworld: { word: "Underworld", rules: ["ats.underworld"] },
+  // Prowl X (The Drúadan Forest): a keyword the scenario's rules span defines (ats.prowl); the card's own record carries it, so the chip reads its value from the record (cards/card-keywords.ts).
+  prowl: { word: "Prowl", rules: ["ats.prowl"] },
+  // Villagers X (Encounter at Amon Dîn): a keyword the scenario's rules span defines (ats.villagers); the card's own record carries it, so the chip reads its value from the record (cards/card-keywords.ts).
+  villagers: { word: "Villagers", rules: ["ats.villagers"] },
+  // Burn X (The Battle of Lake-town): printed on no rules span; the Quest Companion defines it (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town, Burn X).
   burn: {
     word: "Burn",
     rules: [],
@@ -50,7 +56,7 @@ export const KEYWORD_RULES: Readonly<Record<KeywordKey, RuleWord>> = {
       source: "Quest Companion (community source)",
     },
   },
-  // Pillage X and Massive (The Hunt for the Dreadnaught): the Dream-chaser rules span none of them; the box rulebook defines them (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, readings 17 and 21).
+  // Pillage X and Massive (The Hunt for the Dreadnaught): the Dream-chaser rules span none of them; the box rulebook defines them (docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, readings 17 and 21).
   pillage: {
     word: "Pillage",
     rules: [],
@@ -67,7 +73,7 @@ export const KEYWORD_RULES: Readonly<Record<KeywordKey, RuleWord>> = {
       source: "RulesPal transcription of the box rulebook (community source)",
     },
   },
-  // Spectral (The Stone of Erech): from RulesPal's transcription of the scenario's rulesheet, which data/rules does not hold (docs/scenarios/standalone-scenarios.md, The Stone of Erech, Spectral).
+  // Spectral (The Stone of Erech): from RulesPal's transcription of the scenario's rulesheet, which data/rules does not hold (docs/scenarios/standalone-scenarios/the-stone-of-erech.md, The Stone of Erech, Spectral).
   spectral: {
     word: "Spectral",
     rules: [],

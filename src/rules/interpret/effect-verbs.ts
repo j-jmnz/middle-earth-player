@@ -4,9 +4,9 @@ import { redirectProgress } from "../families/quest/blizzard.ts";
 import { progressToQuest, sendsProgressToQuest } from "../families/quest/doors.ts";
 import { holdPlacement, holdsProgress } from "../families/long-dark/hold.ts";
 import { effectProgressBarredOn } from "../families/quest/effect-progress.ts";
+import { noteBarred, playerProgressBarredOn } from "../families/pelargir/progress-bar.ts";
 import { frameScope, resolveAmount } from "./amounts.ts";
 import { hasTrait } from "./conditions.ts";
-import { runQuestResolution } from "../quest/explore.ts";
 import type { EngineStep } from "../core/intents.ts";
 import { drawMany, type ReduceContext } from "./interpret.ts";
 import { destroyCard, playerCardEffectCanChoose } from "../core/keywords.ts";
@@ -15,7 +15,7 @@ import { cancelAttack } from "../families/defense/defenders.ts";
 import { printedOf } from "../core/printed.ts";
 import { questPointsOf } from "../quest/quest.ts";
 import { notePlaced, progressRoom, reducedProgress } from "../families/south/locations.ts";
-import { announceLeftPlay } from "../quest/stage-reveal.ts";
+import { announceExplored } from "../quest/stage-reveal.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { livingSeats, updateCard } from "../core/state.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
@@ -60,7 +60,15 @@ export function drawVerb(
   const gained = (state.seats[target]?.deck.length ?? 0) - (drawn.seats[target]?.deck.length ?? 0);
   if (data?.kind !== "effect" || !readsThen(ctx)) return drawn;
   // A draw that found fewer cards than it named is not resolved in full, so what follows "then" is not attempted (the `thenResolves` condition).
-  return gained > 0 || count > gained ? patchTop(drawn, { data: { ...data, ...(gained > 0 ? { drew: true } : {}), ...(count > gained ? { short: true } : {}) } }) : drawn;
+  const noted = gained > 0 ? patchTop(drawn, { data: { ...data, drew: true } }) : drawn;
+  return count > gained ? markShort(noted, ctx) : noted;
+}
+
+// The running effect did not resolve in full (a draw, a discard or a ready that fell short), so what follows "then" is not attempted (the `thenResolves` condition, rr.then). Only a game whose records
+// read it keeps the mark.
+export function markShort(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+  const data = topFrame(state)?.data;
+  return data?.kind === "effect" && readsThen(ctx) ? patchTop(state, { data: { ...data, short: true } }) : state;
 }
 
 const READS_THEN = new WeakMap<readonly Effect[], boolean>();
@@ -124,7 +132,7 @@ export function applyTargetVerb(
       return attack?.enemyId === id && attack.seat === barred && !attack.damaged ? cancelAttack(next) : next;
     }
     case "PlaceProgressOnLocation":
-      return placeProgress(state, id, instruction.perPlayer * livingSeats(state).length, ctx, steps);
+      return placeProgress(state, id, instruction.perPlayer * livingSeats(state).length, ctx, steps, undefined, false, playerSource(state, sourceId, ctx));
   }
 }
 
@@ -133,10 +141,14 @@ export function progressPlacer(state: ScenarioState, ctx: ReduceContext, seat: n
   return playerSource(state, sourceId, ctx) && gameReadsOnTrigger(state, ctx, "progressPlaced", '"eventSeat"') ? seat : undefined;
 }
 
-// Progress on a location in play. A location that is full is explored and leaves play. `placedBy` is the player whose card effect placed it (progressPlacer).
-export function placeProgress(state: ScenarioState, id: string, amount: number, ctx: ReduceContext, steps: EngineStep[], placedBy?: number, held = false): ScenarioState {
+// Progress on a location in play. A location that is full is explored and leaves play. `placedBy` is the player whose card effect placed it (progressPlacer); `byPlayerCard`: a player card's effect places it (the bar of 06091:B:1, families/pelargir/progress-bar.ts).
+export function placeProgress(state: ScenarioState, id: string, amount: number, ctx: ReduceContext, steps: EngineStep[], placedBy?: number, held = false, byPlayerCard = false): ScenarioState {
   const location = state.cards[id];
   if (!location || effectProgressBarredOn(state, id)) return state;
+  if (playerProgressBarredOn(state, id, byPlayerCard)) {
+    noteBarred(steps, id);
+    return state;
+  }
   // "Progress that would be placed on Doors of Durin is instead placed on the current quest card" (04065:A:1, families/quest/doors.ts).
   if (sendsProgressToQuest(state, id)) return progressToQuest(state, amount, ctx, steps);
   // "Before placing progress tokens on Twisting Passage" (04092:A:1, families/long-dark/hold.ts): the placement waits for the location's Forced effect, which places what is let through with `held`.
@@ -154,5 +166,5 @@ export function placeProgress(state: ScenarioState, id: string, amount: number, 
   // Under Exploration a location with progress equal to its quest points is not explored; it remains in play (dcce.exploration).
   if (points == null || location.progress + placed < points || exploring(next)) return next;
   const explored = destroyCard(next, id, ctx.cards, steps, true);
-  return announceLeftPlay(runQuestResolution(explored, id, ctx, steps), id, ctx, steps, true);
+  return announceExplored(explored, id, ctx, steps);
 }

@@ -27,6 +27,7 @@ import { distinctChoices, inPlay, livingSeats, updateCard } from "../../core/sta
 import { patchTop } from "../../windows/windows.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import { effectData, pushPicked } from "./moves.ts";
+import { resourcesLocked } from "../pelargir/spending.ts";
 
 type PickEncounter = Extract<Instruction, { verb: "PickEncounter" }>;
 
@@ -124,7 +125,7 @@ function payResources(state: ScenarioState, item: QueueItem, ctx: ReduceContext)
   const instruction = item.instruction;
   if (instruction.verb !== "PayResources") return state;
   const paid = item.offset ?? 0;
-  const heroes = (state.seats[item.seat]?.heroes ?? []).filter((id) => (state.cards[id]?.resources ?? 0) > 0 && heroPays(state, id, instruction.sphere, ctx));
+  const heroes = (state.seats[item.seat]?.heroes ?? []).filter((id) => (state.cards[id]?.resources ?? 0) > 0 && heroPays(state, id, instruction.sphere, ctx) && !resourcesLocked(state, id));
   const total = heroes.reduce((sum, id) => sum + (state.cards[id]?.resources ?? 0), 0);
   if (paid === 0 && total < instruction.amount) return pushPicked(state, "");
   if (!item.chosen && heroes.length > 1 && effectData(state)) return askTarget(state, { ...item, offset: paid }, heroes);

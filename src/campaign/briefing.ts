@@ -96,7 +96,7 @@ export function loadoutOf(input: LoadoutInput): LoadoutSeat[] {
 // What the scenario's saga start adds to the loadout rules: the granted ☺ hero, and the titles the box refuses in standalone play too.
 function sagaRulesOf(world: World): SagaRules {
   const role = sagaRole(world);
-  return { hero: role.kind === "hero" ? role.hero : undefined, titleBans: titleBansOf(world.campaign, world.scenario) };
+  return { hero: role.kind === "hero" ? role.hero : undefined, titleBans: titleBansOf(world.campaign, world.scenario), treasures: world.scenario.treasures };
 }
 
 const RULE_OF: Readonly<Record<string, string>> = {
@@ -113,6 +113,8 @@ const RULE_OF: Readonly<Record<string, string>> = {
   sameHero: "No two players use the same hero",
   bannedHero: "A hero the campaign refuses in this scenario",
   undiscoveredTreasure: "A treasure must be discovered first",
+  treasureSet: "A treasure of a set the scenario lists",
+  bagginsOutsideHobbit: "Bilbo Baggins only in The Hobbit's scenarios",
   treasureCopies: "One copy of a treasure",
 };
 
@@ -138,10 +140,10 @@ export function loadoutProblems(input: LoadoutInput, fallen: readonly string[], 
       problems.push({ rule: limit === 3 ? "One to three heroes" : `One to ${limit} heroes`, message: `${label} has ${seat.heroes.length} heroes. A saved deck has one to ${limit === 3 ? "three" : limit}.` });
     } else if (world.deckFacts) {
       // A deck saves before it is ready to play (rr.deckbuilding); it is not dealt until it is. A contract's deckbuilding rules apply.
-      // A treasure the log records is no deck card for this check: it is outside the 50 card minimum (emce.treasure); validateLoadout admits or refuses it.
+      // A treasure is no deck card for this check: it is outside the 50 card minimum (emce.treasure, hob.treasure-ohauh, hob.treasure-otd); validateLoadout admits or refuses it.
       // A contract that builds a loot deck needs it in the side deck (src/catalog/loot.ts).
       const side = seat.side ? deckCounts(seat.side) : undefined;
-      const refusal = deckReadyRefusal(seat.heroes, deckCounts(seat.deck.filter((code) => world.cards.get(code)?.campaignKind !== "treasure")), world.deckFacts, world.effects, side);
+      const refusal = deckReadyRefusal(seat.heroes, deckCounts(seat.deck.filter((code) => world.cards.get(code)?.type !== "treasure")), world.deckFacts, world.effects, side);
       if (refusal) problems.push({ rule: "The deck is ready to play", message: `${label} is not ready to play: ${formatDeckRefusal(refusal)}` });
     }
     for (const code of seat.heroes) {

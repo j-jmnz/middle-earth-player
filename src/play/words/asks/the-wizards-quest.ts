@@ -2,7 +2,7 @@ import type { Ask } from "../asks.ts";
 
 // The choice words of The Wizard's Quest (standalone-scenarios part 10), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario the-wizards-quest --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=the-wizards-quest` prints each sentence.
-// The opposing team's choices (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, readings 1 and 3) are the engine's, never a prompt: they carry no entry. The entries below are the choices a player makes, and the few the engine words for a sheet that may still open.
+// The opposing team's choices (docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, readings 1 and 3) are the engine's, never a prompt: they carry no entry. The entries below are the choices a player makes, and the few the engine words for a sheet that may still open.
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 51004:B:1 (Carried Away): each player's ally of highest cost lies under the stage.
   "51004:whenRevealed:2 @0.0 Pick": { owned: true, note: "Carried Away: the ally you control with the highest cost lies under the stage. No copy of it can be played.", verb: "Choose" },

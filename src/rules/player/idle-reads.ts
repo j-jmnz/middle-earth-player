@@ -43,6 +43,7 @@ export function readsTable(condition: Condition): boolean {
   switch (condition.kind) {
     case "threat":
     case "phase":
+    case "resources":
       return true;
     // A pick that reads the running effect is not settled before the effect runs.
     case "count":
@@ -72,6 +73,17 @@ export function amountIdle(state: ScenarioState, amount: Amount | undefined, fra
     const read = resolveAmount(state, amount, id == null ? frame.scope : { ...frame.scope, picked: [id] }, ctx);
     return options.signed === true ? read === 0 : read <= 0;
   });
+}
+
+/**
+ * Whether X cannot be chosen (the engine takes no X then, `chooseX`):
+ * 1. every number of `max` must be settled, or X is not read;
+ * 2. for each card the earlier Pick may have chosen (or none), the lowest number of `max` is read;
+ * 3. X cannot be chosen when that lowest number is below `min` for every one of those cards.
+ */
+export function xUnchoosable(state: ScenarioState, max: readonly Amount[], min: number, frame: IdleFrame, ctx: ReduceContext): boolean {
+  if (!max.every(settledAmount)) return false;
+  return (frame.picked ?? [null]).every((id) => Math.min(...max.map((amount) => resolveAmount(state, amount, id == null ? frame.scope : { ...frame.scope, picked: [id] }, ctx))) < min);
 }
 
 /** The scope a condition is read in: the actor, the source and the card the answered event is about. */
@@ -107,11 +119,15 @@ export function seatsOfWho(state: ScenarioState, who: string | undefined, frame:
   return null;
 }
 
-/** The card a Ready or a Heal names when it is the host, the source itself or the picked card; undefined for any other target (not read here). */
+/** The card a Ready, a Heal or an AddResources names when it is the host, the source itself, the picked card or the subject of the event; undefined for any other target (not read here). */
 export function namedCards(state: ScenarioState, target: string | undefined, source: CardInstance, bare: "self" | "picked", frame: IdleFrame, mark: IdleMark): readonly (CardInstance | null)[] | undefined {
   const named = target ?? bare;
   if (named === "picked") return frame.picked?.map((id) => state.cards[id] ?? null);
+  // The card the answered event is about (the hero whose attack destroyed an enemy): not read when the frame holds none.
+  if (named === "subject") return frame.scope.subject == null ? undefined : [state.cards[frame.scope.subject] ?? null];
   if (mark.event) return undefined;
   if (named === "host") return [source.host ? (state.cards[source.host] ?? null) : null];
+  // The other card of the event the Response answers (the defending character of an attack that resolved): an undefended attack has none, and the step reads no card.
+  if (named === "other") return frame.scope.other == null ? [] : [state.cards[frame.scope.other] ?? null];
   return named === "self" ? [source] : undefined;
 }

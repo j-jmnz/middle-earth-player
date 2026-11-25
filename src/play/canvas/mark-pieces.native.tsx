@@ -4,7 +4,7 @@
 import { Circle, Group, Image, Line, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
 
 import { cardCorner } from "../../ui/card-corner.ts";
-import { MUST_COMMIT_WORD, type CardEffects, type CombatNumber } from "../cards/card-effects.ts";
+import { chipText, moreText, MUST_COMMIT_WORD, type CardEffects, type CombatNumber } from "../cards/card-effects.ts";
 import { DETERMINED_WORD } from "../words/scenarios/angmar/wastes-table.ts";
 import { type IconName } from "../../ui/icon-map.ts";
 import { glyphCells, type PlaceMark } from "../store/island-place.ts";
@@ -13,6 +13,7 @@ import type { CombatMark, Rect } from "../layout/layout.ts";
 import { STAGE_APART_WORD } from "../words/scenarios/stormcaller.ts";
 import type { OptionMark } from "../choice/sheet-types.ts";
 import { currentMark } from "./current-mark.ts";
+import { hiddenBadges } from "./badge-room.ts";
 import { TOKEN } from "./token-spots.ts";
 import { underMarkBox } from "./under-mark.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
@@ -77,11 +78,11 @@ export function OptionMarkView({ rect, mark, fonts, images, t, s }: { rect: Rect
  * The cards underneath The Havens Burn against the number that loses the game: a night pill at the card's foot with the short count ("2/5"), threat red when the next card placed under it loses (11038:A:2).
  * The count is short on purpose: it stays inside the card at every size (the full sentence is in the preview and the screen reader's line). Only the count is shown, never which cards are underneath.
  */
-export function UnderMarkView({ rect, mark, fonts, t, s }: { rect: Rect; mark: { text: string; loses: boolean; count?: number }; fonts: Fonts; t: TableTokens; s: number }) {
+export function UnderMarkView({ rect, mark, sideways, fonts, t, s }: { rect: Rect; mark: { text: string; loses: boolean; count?: number; clearName?: true }; sideways: boolean; fonts: Fonts; t: TableTokens; s: number }) {
   // Captured cards (a `count`) stand a row above the foot, clear of the engagement cost, the combat number and the quest strip; where "3 captured" does not fit, a facedown-card glyph and the bare count stand in.
   const counted = mark.count != null;
   const count = String(mark.count ?? "");
-  const box = underMarkBox(rect, fonts.badge.getTextWidth(mark.text), fonts.badge.getTextWidth(count), s, counted);
+  const box = underMarkBox(rect, fonts.badge.getTextWidth(mark.text), fonts.badge.getTextWidth(count), s, counted, sideways && mark.clearName === true);
   const text = box.kind === "words" ? mark.text : count;
   const words = fonts.badge.getTextWidth(text);
   const token = box.height;
@@ -149,13 +150,16 @@ export function DeterminedMarkView({ rect, word, clear, fonts, t, s }: { rect: R
   return <WordPill rect={rect} text={word} short={word === DETERMINED_WORD ? "D" : undefined} clear={clear} fonts={fonts} t={t} s={s} />;
 }
 
-/** How far the widest effect badge reaches from the card's left edge, so a word pill keeps clear of the badge column (the rows are drawn by `Badges`: a stat is the icon, the number and 5 pt, a flag the pill and 4 pt (the must-commit pill is a stat's width), the "more" pill 24 pt). */
-export function badgeReach(effects: CardEffects, fonts: Fonts, s: number): number {
+/** How far the widest effect badge reaches from the card's left edge, so a word pill keeps clear of the badge column (the rows are drawn by `Badges`: a stat is the icon, the number and 5 pt, a flag the pill and 4 pt (the must-commit pill is a stat's width), the "more" pill its words and 12 pt, at least 24 pt). */
+export function badgeReach(effects: CardEffects, fonts: Fonts, s: number, height: number): number {
   const widths = [
-    ...effects.stats.map((badge) => 15 * s + fonts.badge.getTextWidth(`${badge.delta > 0 ? "+" : "-"}${Math.abs(badge.delta)}`) + 5 * s),
+    ...effects.stats.map((badge) => 15 * s + fonts.badge.getTextWidth(chipText(badge)) + 5 * s),
     ...effects.flags.map((flag) => (flag.flag === "mustCommit" ? 15 * s + fonts.badge.getTextWidth(MUST_COMMIT_WORD) + 5 * s : BADGE_H * s + 4 * s)),
   ];
-  return widths.length === 0 ? 0 : 2 * s + Math.max(24 * s, ...widths);
+  // The pill for the effects left out ("2 more") is as wide as its words and 12 pt, and is drawn when any are left out: the count is the one `Badges` draws, which depends on the room the card's height leaves.
+  const left = hiddenBadges(effects.stats.length + effects.flags.length, height, s, BADGE_H * s);
+  const more = left > 0 ? fonts.badge.getTextWidth(moreText(left)) + 12 * s : 0;
+  return widths.length === 0 ? 0 : 2 * s + Math.max(24 * s, more, ...widths);
 }
 
 // An accent pill with a word inside the card's top edge, upright, clear of the effect badges' column; where the word does not fit, a short accent dot in its place (a round pill with `short` in it when the word has one).

@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Stone of Erech); ledger lines 50301:A:1, 50302:A:1, 50304:A:1, 50308:A:1, 50308:A:2, 50309:A:2, 50310:A:1, 50317:A:2, 50321:A:1, 50324:A:1, 50303:B:2, 50312:A:2, 50302:B:1, 50311:A:1. The erech family's verbs, flags and conditions on the scenario's own opening: the Night objectives and
+// Rules: docs/scenarios/standalone-scenarios/the-stone-of-erech.md (The Stone of Erech); ledger lines 50301:A:1, 50302:A:1, 50304:A:1, 50308:A:1, 50308:A:2, 50309:A:2, 50310:A:1, 50317:A:2, 50321:A:1, 50324:A:1, 50303:B:2, 50312:A:2, 50302:B:1, 50311:A:1. The erech family's verbs, flags and conditions on the scenario's own opening: the Night objectives and
 // their passive check, Derufin attached to the Stone and freed to the first player, the hand passed to the left, and the table flags (no quest progress, no planning phase, no collection, no events, lost icons).
 import { beforeAll, describe, expect, it } from "vitest";
 

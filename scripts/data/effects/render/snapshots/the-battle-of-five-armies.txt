@@ -1,0 +1,326 @@
+Scenario piles that place cards with no record (quest: 132075 The Gathering of the Clouds; quest: 132076 The Eastern Spur; quest: 132077 Battle in the Dale; quest: 132078 The Defense of Ravenhill; quest: 132079 The Clouds Burst; staging: 132053 Bolg)
+
+## 132052 Misty Mountain Eagle
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132052:A:1 (front): Action: The first player may spend 2 Baggins resources to (choose one): take control of Misty Mountain Eagle, or discard this ally to discard a non-unique enemy in the staging area.
+  132052:action:1: Action (cost: pay 2 baggins resource(s))
+    only if all of: (this card is in the staging area) and (the actor holds the first player token)
+    who acts: any player may trigger it; the acting player is the one who does
+    - the acting player chooses one of:
+      * option "control":
+        - the acting player takes control of this card (it enters play under that player, ready; a shadow card stops being its enemy's shadow card)
+      * option "discard" (only if there is a non-unique enemy (any player controls) in the staging area only to choose):
+        - choose non-unique enemy (any player controls) in the staging area only
+        - discard this card
+        - discard the picked card
+
+132052:A:2 (shadow): Shadow: Deal 3 damage to attacking enemy.
+  132052:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - deal 3 damage to the attacking enemy
+
+## 132053 Bolg
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+132053:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+132053:A:2 (front): X is the number of players in the game.
+  132053:constant:1: Constant
+    - this card: stat threat the number of players, while this card is in play
+
+132053:A:3 (front): Cannot leave the staging area.
+  132053:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - this card: stat leavesStagingWhenDefeated (it cannot leave the staging area, except that damage that destroys it discards it) 1, while this card is in play
+
+132053:A:4 (front): The first Goblin revealed each round gains surge.
+  132053:constant:3: Constant
+    - while this card is in play, the first Goblin enemy revealed each round (the Setup's reveals count for round 1) gains Surge as it is revealed
+
+## 132054 Bodyguard of Bolg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132054:A:1 (front): Bolg cannot take damage.
+  132054:constant:1: Constant
+    - each enemy (any player controls) or in the staging area, named "Bolg": stat cannotTakeDamage 1, while this card is in play
+
+132054:A:2 (front): Forced: When this enemy attacks, deal it an additional shadow card for each quest stage in play with no progress tokens on it.
+  132054:forced:1: Forced when this enemy attacks, before the defender is declared
+    who acts: the acting player is the defending player (the player the attack is against)
+    - repeat the number of quest stages in play with no progress on them (stages 2 to 4 in play together, the only stage before them, stage 5 after) times:
+      - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+
+## 132055 Gundabad Wolf Rider
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132055:A:1 (front): Forced: When this enemy attacks, remove 1 progress from the current quest.
+  132055:forced:1: Forced when this enemy attacks, before the defender is declared
+    who acts: the acting player is the defending player (the player the attack is against)
+    - remove 1 progress from the current quest card (all of it when it holds less)
+
+132055:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each quest stage in play with no progress on it.
+  132055:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack the number of quest stages in play with no progress on them (stages 2 to 4 in play together, the only stage before them, stage 5 after), until the end of the attack
+
+## 132056 Gundabad Climber
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132056:A:1 (front): When Revealed: Remove 1 progress from every quest stage in play. (2 progress instead if 3 or more players in the game.)
+  132056:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the number of player (any player controls) is at least 3): each quest stage in play loses up to 1 progress
+    - then, if the number of player (any player controls) is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): each quest stage in play loses up to 2 progress
+
+## 132057 Vanguard of Bolg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132057:A:1 (front): This enemy gets +1 Threat, +1 Attack, and +1 Defense for each quest stage in play with no progress on it.
+  132057:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat the number of quest stages in play with no progress on them (stages 2 to 4 in play together, the only stage before them, stage 5 after), while this card is in play
+    - this card: stat attack the number of quest stages in play with no progress on them (stages 2 to 4 in play together, the only stage before them, stage 5 after), while this card is in play
+    - this card: stat defense the number of quest stages in play with no progress on them (stages 2 to 4 in play together, the only stage before them, stage 5 after), while this card is in play
+
+132057:A:2 (shadow): Shadow: If this attack destroys a character, remove all progress from the current quest.
+  132057:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): all progress on the current quest is removed (the encounter side quest that is the current quest while there is one, else the main quest card)
+
+## 132058 Gundabad Archer
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132058:A:1 (front): When Revealed: Each player must deal 2 damage to a character he controls.
+  132058:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - choose character (you control)
+      - deal 2 damage to the picked card
+
+132058:A:2 (shadow): Shadow: Deal 1 damage to defending character for each quest stage in play with no progress on it.
+  132058:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - deal the number of quest stages in play with no progress on them (stages 2 to 4 in play together, the only stage before them, stage 5 after) damage to the defender
+
+## 132059 Ravenous Warg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132059:A:1 (front): Forced: When Ravenous Warg attacks, the defending player must declare the character he controls with the most damage as the defender. (Even if exhausted.)
+  132059:forced:1: Forced when this enemy attacks, before the defender is declared
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attack in progress must be defended by the character the defending player controls with the most damage (one of those tied), exhausted or not, and cannot be left undefended while a character can defend
+
+132059:A:2 (shadow): Shadow: Defending character gets -1 Defense for each quest stage in play with no progress on it.
+  132059:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the defender: stat defense minus (the number of quest stages in play with no progress on them (stages 2 to 4 in play together, the only stage before them, stage 5 after)), until the end of the attack
+
+## 132060 Northern Slopes
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132060:A:1 (front): While Northern Slopes is in the staging area, each Goblin enemy gets +1 Attack and +1 Defense.
+  132060:constant:1: Constant
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Goblin enemy (any player controls) or in the staging area: stat attack 1, while this card is in play
+    - each Goblin enemy (any player controls) or in the staging area: stat defense 1, while this card is in play
+
+132060:A:2 (front): While Northern Slopes is the active location, it gains: "Forced: When a character leaves play, remove 1 progress from the current quest, if able."
+  132060:forced:1: Forced after a card leaves play (heard about character (any player controls))
+    only if this card is the active location
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - remove 1 progress from the current quest card (all of it when it holds less)
+
+## 132061 Ruins of Dale
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132061:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+132061:A:2 (front): Forced: Remove 2 progress from stage 3B at the end of each round, if able.
+  132061:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the quest stage 132077 in play loses up to 2 progress
+
+132061:A:3 (front): Travel: Spend 3 Baggins resources to travel here. (1 Baggins instead if stage 3B is the current quest.)
+  132061:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the heroes hold fewer resources than the cost (owed only while the quest stage 132077 is the current quest stage); or when the heroes hold fewer resources than the cost (owed only while not (the quest stage 132077 is the current quest stage))
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the quest stage 132077 is the current quest stage: the players as a group spend 1 resource(s) from heroes with the baggins icon, choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
+    - then, if not (the quest stage 132077 is the current quest stage) (checked when this step runs, after the steps above; not tied to whether they did anything): the players as a group spend 3 resource(s) from heroes with the baggins icon, choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
+
+## 132062 Ravenhill
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132062:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+132062:A:2 (front): Forced: Remove 2 progress from stage 4B at the end of each round, if able.
+  132062:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the quest stage 132078 in play loses up to 2 progress
+
+132062:A:3 (front): Travel: Spend 3 Baggins resources to travel here. (1 Baggins instead if stage 4B is the current quest.)
+  132062:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the heroes hold fewer resources than the cost (owed only while the quest stage 132078 is the current quest stage); or when the heroes hold fewer resources than the cost (owed only while not (the quest stage 132078 is the current quest stage))
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the quest stage 132078 is the current quest stage: the players as a group spend 1 resource(s) from heroes with the baggins icon, choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
+    - then, if not (the quest stage 132078 is the current quest stage) (checked when this step runs, after the steps above; not tied to whether they did anything): the players as a group spend 3 resource(s) from heroes with the baggins icon, choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
+
+## 132063 The Front Gate
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132063:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+132063:A:2 (front): Forced: Remove 2 progress from stage 2B at the end of each round, if able.
+  132063:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the quest stage 132076 in play loses up to 2 progress
+
+132063:A:3 (front): Travel: Spend 3 Baggins resources to travel here. (1 Baggins instead if stage 2B is the current quest.)
+  132063:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the heroes hold fewer resources than the cost (owed only while the quest stage 132076 is the current quest stage); or when the heroes hold fewer resources than the cost (owed only while not (the quest stage 132076 is the current quest stage))
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the quest stage 132076 is the current quest stage: the players as a group spend 1 resource(s) from heroes with the baggins icon, choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
+    - then, if not (the quest stage 132076 is the current quest stage) (checked when this step runs, after the steps above; not tied to whether they did anything): the players as a group spend 3 resource(s) from heroes with the baggins icon, choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
+
+## 132064 Hatred Rekindled
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132064:A:1 (front): When Revealed: Each enemy engaged with a player makes an immediate attack. Do not deal shadow cards for attacks made by this effect. If no attacks were made by this effect, this card gains surge.
+  132064:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy engaged with a player makes an immediate attack, dealt no shadow card
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+132064:A:2 (shadow): Shadow: Attacking enemy makes an additional attack immediately after this one.
+  132064:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
+
+## 132065 Goblins are Upon You!
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132065:A:1 (front): When Revealed: Each player must search the encounter deck and discard pile for a Goblin enemy and put it into play, engaged with him. Then, shuffle the encounter deck. (This effect cannot be canceled.)
+  132065:whenRevealed:1: When revealed (cannot be canceled while this card is in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one Goblin enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
+    - shuffle the encounter deck
+
+132065:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each Goblin enemy engaged with you.
+  132065:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack the number of Goblin enemy (any player controls) engaged with you, until the end of the attack
+
+## 132066 Heedless of Order
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132066:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+132066:A:2 (front): When Revealed: Choose a different quest to be the current quest until the end of the round, if able. If the current quest did not change as a result of this effect, this card gains Doomed 3.
+  132066:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (there is a quest card besides the current quest that could be chosen to be the current quest (the main quest card, or an encounter side quest in the staging area)): each player raises their threat by 3 from the doomed keyword this card gains (doomedRaised is announced for each)
+    - then, if there is a quest card besides the current quest that could be chosen to be the current quest (the main quest card, or an encounter side quest in the staging area) (checked when this step runs, after the steps above; not tied to whether they did anything): the first player chooses a quest card other than the current quest (the main quest card, a quest stage in play together, or a side quest in the staging area) to be the current quest until the end of the round
+
+## 132075 The Gathering of the Clouds
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+132075:A:1 (front): Setup: Search the encounter deck for Bolg and add it to the staging area. Then, shuffle the encounter deck and reveal 1 encounter card per player.
+  132075:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+132075:B:1 (back): When Revealed: Put stage 2, stage 3, and stage 4 into play at the same time. Then, remove this stage from play.
+  132075:whenRevealed:1: When revealed
+    - the quest stages with the codes 132076, 132077, 132078 leave the quest deck and lie in play together with side B up, no progress on them (the first is the current quest stage until the first player chooses); the stage this is on leaves play
+
+## 132076 The Eastern Spur
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+132076:B:1 (back): Players cannot advance from this stage unless stage 3 and stage 4 are complete.
+  132076:constant:1: Constant
+    only if not every quest stage in play with the code 132077 and 132078 holds at least its quest points in progress
+    - the players cannot defeat this stage while this holds
+
+132076:B:2 (back): Forced: If there is no progress on this stage at the end of the round, each player must discard 1 random card from his hand.
+  132076:forced:1: Forced at the end of the round
+    only if the quest stage 132076 is in play with no progress on it
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - each player discards 1 random card(s) from hand
+
+## 132077 Battle in the Dale
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+132077:B:1 (back): Players cannot advance from this stage unless stage 2 and stage 4 are complete.
+  132077:constant:1: Constant
+    only if not every quest stage in play with the code 132076 and 132078 holds at least its quest points in progress
+    - the players cannot defeat this stage while this holds
+
+132077:B:2 (back): Battle. (Characters use Attack instead of Willpower when questing here.)
+  (the keyword part is owned by the card's keywords; the records cover: (Characters use Attack instead of Willpower when questing here.))
+  132077:constant:2: Constant
+    only if the quest stage 132077 is the current quest stage
+    - this card: stat battle 1, while this card is in play
+
+132077:B:3 (back): Forced: If there is no progress on this stage at the end of the round, the first player adds the topmost enemy in the discard pile to the staging area, if able.
+  132077:forced:1: Forced at the end of the round
+    only if the quest stage 132077 is in play with no progress on it
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the last enemy of the encounter discard pile is added to the staging area (put there, not revealed; nothing with none)
+
+## 132078 The Defense of Ravenhill
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+132078:B:1 (back): Players cannot advance from this stage unless stage 2 and stage 3 are complete.
+  132078:constant:1: Constant
+    only if not every quest stage in play with the code 132076 and 132077 holds at least its quest points in progress
+    - the players cannot defeat this stage while this holds
+
+132078:B:2 (back): Siege. (Characters use Defense instead of Willpower when questing here.)
+  (the keyword part is owned by the card's keywords; the records cover: (Characters use Defense instead of Willpower when questing here.))
+  132078:constant:2: Constant
+    only if the quest stage 132078 is the current quest stage
+    - this card: stat siege 1, while this card is in play
+
+132078:B:3 (back): Forced: If there is no progress on this stage at the end of the round, each player must discard all resources from each hero's resource pool.
+  132078:forced:1: Forced at the end of the round
+    only if the quest stage 132078 is in play with no progress on it
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - for each hero (any player controls):
+      - all the resources come off the resource pool of the picked card (discarded, not spent)
+
+## 132079 The Clouds Burst
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+132079:B:1 (back): When Revealed: Each player must search the encounter deck and discard pile for a copy of Bodyguard of Bolg and add it to the staging area, if able. Shuffle the encounter deck.
+  132079:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one card with code 132054 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+132079:B:2 (back): Progress cannot be placed on this stage. While Bolg is in the staging area, it is considered to be engaged with the first player.
+  132079:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat noProgressPlaced 1, while this card is in play
+    - each enemy (any player controls) in the staging area only, named "Bolg": stat engagedWithFirst 1, while this card is in play
+    - each enemy (any player controls) in the staging area only, named "Bolg": stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - each enemy (any player controls) in the staging area only, named "Bolg": stat noThreatContribution 1, while this card is in play
+
+132079:B:3 (back): If Bolg is destroyed, the players win the game.
+  132079:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) named "Bolg")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players win the game
+
+(rendered pieces: 182 by template, 0 as JSON)

@@ -11,6 +11,7 @@ import { tickSent } from "../../ui/haptics.ts";
 import { refusedFeedback } from "../../ui/sound/feedback.ts";
 import { playSound, playUndo } from "../../ui/sound/sound.ts";
 import { pointTitle } from "../phases/rail.ts";
+import { questStatNow } from "../phases/quest-stat.ts";
 import { isFreeResponse, nextStopTitle, passableWindow } from "../phases/stops.ts";
 import { useAutoAnswer, useBanner, useGuide, useSettle } from "./table-hooks.ts";
 import { tableSettings, toggleAlways } from "../../ui/table-settings.ts";
@@ -18,6 +19,7 @@ import type { Moment } from "../store/outcome.ts";
 import { readoutFor, type Readout } from "../readouts/readout.ts";
 import { useReaderMode, useScreenReader } from "../../ui/screen-reader.ts";
 import { hidesFace, actingSeat, isDead, isLooked, onTableFor } from "../store/selectors.ts";
+import { stackHost } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { dropOutcome, targetFromKey } from "../store/selection.ts";
 import { cannotPay } from "./why.ts";
 import { announce } from "../../ui/announce.ts";
@@ -193,7 +195,7 @@ export function useTableChoice({
   const baseHeader = limit ? { ...noted, note: [noted.note, limit.note].filter(Boolean).join(" ") } : noted;
   // While stops are on, the eyebrow says so first (a long eyebrow is cut at its end): the table passes some windows.
   const header = settings.stopsOn ? { ...baseHeader, step: `Stops on, ${baseHeader.step}` } : baseHeader;
-  const guide = useGuide(settings, game, sheet, legal, live != null, header.note);
+  const guide = useGuide(settings, game, sheet, legal, live != null, header.note, questStatNow(game, ctx));
   const reset = useCallback(() => {
     setOverlay(null);
     setHeld(null);
@@ -339,10 +341,12 @@ export function useTableChoice({
       // tray), and a tap on it picks it through the same pick as its tray row, so the tray's selection and the board stay in step; a tap
       // on any other card folds the tray.
       const answers = (responses || panelOpen) && tappable(sheet).has(cardId);
-      const action = tapAction({ panelOpen, reader, cardId, peeking, faceDown: hidesFace(game.cards[cardId]) && !isDead(game.cards[cardId]) && !isLooked(game, cardId), answers }, pick);
+      // A facedown card of The Steward's Fear's underworld stack opens the location it lies under; no other facedown card opens anything.
+      const host = stackHost(game, cardId);
+      const action = tapAction({ panelOpen, reader, cardId, peeking, faceDown: hidesFace(game.cards[cardId]) && !isDead(game.cards[cardId]) && !isLooked(game, cardId) && host == null, answers }, pick);
       if (action === "fold") setFolded(sheet.key);
       else if (action === "pile") onPile(cardId.slice(5));
-      else if (action === "preview") onPreview(cardId);
+      else if (action === "preview") onPreview(host ?? cardId);
     },
     [panelOpen, reader, touchReader, peeking, sheet, responses, pick, onPile, onPreview, game],
   );

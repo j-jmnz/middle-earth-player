@@ -1,4 +1,4 @@
-// Rules: rr.cannot, rr.immune (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (Murder at the Prancing Pony). Lines a spec row cannot express.
+// Rules: rr.cannot, rr.immune (data/rules/entries.json); docs/scenarios/standalone-scenarios/murder-at-the-prancing-pony.md (Murder at the Prancing Pony). Lines a spec row cannot express.
 import { describe, expect, it } from "vitest";
 
 import { heldAmount } from "../../../rules/core/state.ts";

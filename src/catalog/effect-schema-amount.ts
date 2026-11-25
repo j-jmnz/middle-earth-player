@@ -57,6 +57,8 @@ export const amountExprSchema = z.strictObject({
   // The cards attached facedown to the source (Eagles of the Misty Mountains), and the resource tokens other copies of the
   // source card hold above the number on this one (Keeping Count; the most any copy holds), read by src/rules/families/misc/amounts.ts.
   facedown: z.literal(true).optional(),
+  // The poison under the card the reference names ("equal to the number of poison it has", 132034:A:1; hob.venom-poison). Read by the poison family (src/rules/families/poison/amounts.ts).
+  poison: cardRefSchema.optional(),
   resourcesAboveCopies: z.literal(true).optional(),
   // The Victory points of the cards in the victory display added up, read live ("X is the number of victory points in the victory display", 03025:A:3; dwd.the-nameless-fear). Read by src/rules/families/misc/amounts.ts.
   victoryPoints: z.literal(true).optional(),
@@ -92,25 +94,31 @@ export const amountExprSchema = z.strictObject({
   discardedMatching: pickSchema.optional(),
   // The printed cost of the card the source guards: the player cards under it, and the card it is attached to as a guard ("X is that card's cost", 18050:A:1). Read by the wilderland family.
   guardedCost: z.literal(true).optional(),
-  // The Siege values added up for this round (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 4): each destroyed enemy and each explored location adds its printed Siege value (TallySiege), "X is the total siege value of each location explored and each enemy destroyed this round" (50907:A:1). 0 once the round is over. Read by the wilderland family.
+  // The Siege values added up for this round (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 4): each destroyed enemy and each explored location adds its printed Siege value (TallySiege), "X is the total siege value of each location explored and each enemy destroyed this round" (50907:A:1). 0 once the round is over. Read by the wilderland family.
   siegeTally: z.literal(true).optional(),
   // The damage on the card the answered event is about beyond its printed hit points: "for each excess point of damage dealt" (18049:A:2). Read by the wilderland family.
   excessOf: z.literal("subject").optional(),
   // The resource tokens on the cards that match, added up ("+1 quest point for each resource token on a Raider enemy in play", 12042:A:2).
   resourcesOn: pickSchema.optional(),
-  // With `resourcesOn`: the most resource tokens on any one of those cards, not the sum ("X is the highest number of resources on a Raider enemy in play", 12161:A:1). 0 when none matches.
+  // With `resourcesOn` or `archeryOf`: the most on any one of those cards, not the sum, as for resource tokens ("X is the highest number of resources on a Raider enemy in play", 12161:A:1). 0 when none matches.
   max: z.literal(true).optional(),
+  // With `max`: the total archery value (printed, gained, and what the card gives itself) of the card among those that match with the most, 0 when none matches ("X is equal to the total archery value of the highest archery Wose enemy in play", 06052:A:2). Read by the pelargir family.
+  archeryOf: pickSchema.optional(),
   // The number of cards left in this deck beside the encounter deck ("gets -1 Threat for each facedown card under it", 144030:A:2: the Harad deck lies under The Cross-roads). 0 in a game that did not deal it. Read by the wilderland family.
   pile: pileNameSchema.optional(),
   // What the running effect discarded from the top of decks so far, over every player it acted for: `cost` the combined printed cost of the cards (a card with no printed cost counts 0: "X is the combined printed cost of the discarded cards", 09034:A:1), `types`
   // the number of different card types among them ("for each different card type discarded this way", 09064:A:1). Read by the deck family.
   discarded: z.enum(["cost", "types"]).optional(),
+  // The hidden cards (The Blood of Gondor, ats.hidden-cards): `own` those in the acting player's play area, `all` those in every play area ("X is the total number of hidden cards in the game", 06119:A:1). 0 in a game with none. Read by the pelargir family.
+  hidden: z.enum(["own", "all"]).optional(),
   // The total printed Threat of the cards the running effect discarded from the top of the encounter deck (DiscardEncounterTop), looked at by it: an enemy's or a location's Threat, 0 for any other card ("X is the total Threat of the discarded cards", 10107:A:1). Read by the angmar family.
   discardedThreat: z.literal(true).optional(),
   // The Willpower the character the attack destroyed had in play, kept when the attack damaged it ("raise your threat by the destroyed character's Willpower", 10107:A:2); 0 when none was kept. Read by the angmar family.
   destroyedWillpower: z.literal(true).optional(),
   // The number of quest cards in play: the main quest card, the side quests in the staging area, encounter and player, at least 1 ("X is the number of quest cards in play", 09016:A:1; mec108.side-quests-in-play). Read by the angmar family.
   questCards: z.literal(true).optional(),
+  // The quest stages in play with no progress token on them: stages 2 to 4 in play together, the only stage before them and stage 5 after them ("for each quest stage in play with no progress on it", 132054:A:2; 132057:A:1). Read by the armies family.
+  stagesNoProgress: z.literal(true).optional(),
   // Every shadow card dealt to an enemy in play, the staging area's and the engaged ones, added up ("where X is the number of shadow cards in play", 10126:A:1). Read by the angmar family.
   shadowCardsInPlay: z.literal(true).optional(),
   // The highest printed cost among the cards in the actor's discard pile, 0 for an empty pile, a card with a printed X cost or no cost (a hero) counting 0 ("the printed cost of the highest cost card in that player's discard pile", 10137:A:1). Read by the angmar family.
@@ -139,7 +147,7 @@ export const amountExprSchema = z.strictObject({
   minasTirithLeft: z.literal(true).optional(),
   // A count the earlier Resolution recorded in the Campaign Log's notes ("X is the number recorded in the campaign log", 145078:A:1), 0 when none is recorded or the game has no log. Read by the campaign family.
   recorded: z.enum(RECORDED_COUNTS).optional(),
-  // The Battle of Lake-town (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town), read by the smaug family: the damage on Lake-town ("X is the amount of damage on Lake-town", 50222:A:2), and the Victory points in the victory display (50203:B:3).
+  // The Battle of Lake-town (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town), read by the smaug family: the damage on Lake-town ("X is the amount of damage on Lake-town", 50222:A:2), and the Victory points in the victory display (50203:B:3).
   lakeTownDamage: z.literal(true).optional(),
   victoryDisplay: z.literal(true).optional(),
 });

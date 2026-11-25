@@ -4,6 +4,7 @@ import { legalIntents, legalTargets, reduce, type LegalIntent, type PlayerIntent
 import type { StartScenario } from "../../src/rules/setup/setup.ts";
 
 import { nextIntent } from "../../test/harness/auto-player.ts";
+import { idleWatcher, type IdleHit } from "./idle.ts";
 import { dice, playIntent, seedOf, triggerIntent, type Dice } from "./policy.ts";
 import { encounterStart, kept, type EncounterWorld, type Profile } from "./encounter-world.ts";
 import { POLICY } from "./world.ts";
@@ -38,7 +39,7 @@ const HASH = 1;
 const PROFILES: readonly Profile[] = ["strong", "weak", "brittle", "tense", "steady"];
 
 export type GameProblem = { game: number; seed: number; profile: Profile; seats: 1 | 2; step: number; round: number; window: string | null; intent: PlayerIntent | null; message: string };
-export type GameSummary = { game: number; seed: number; profile: Profile; seats: 1 | 2; steps: number; rounds: number; ended: "lost" | "won" | "problem"; problem: GameProblem | null };
+export type GameSummary = { game: number; seed: number; profile: Profile; seats: 1 | 2; steps: number; rounds: number; ended: "lost" | "won" | "problem"; lossReason: string | null; problem: GameProblem | null; idle: readonly IdleHit[] };
 
 type Offered<T extends LegalIntent["type"]> = Extract<LegalIntent, { type: T }>;
 
@@ -175,7 +176,7 @@ export type GameRecord = { summary: GameSummary; start: StartScenario | null; ct
 export function recordGame(world: EncounterWorld, number: number): GameRecord {
   const { profile, seats, seed } = gameOf(number);
   const ctx = world.contexts[profile];
-  const record: GameRecord = { summary: { game: number, seed, profile, seats, steps: 0, rounds: 0, ended: "problem", problem: null }, start: null, ctx, intents: [], failing: null };
+  const record: GameRecord = { summary: { game: number, seed, profile, seats, steps: 0, rounds: 0, ended: "problem", lossReason: null, problem: null, idle: [] }, start: null, ctx, intents: [], failing: null };
   record.summary = runGame(world, number, record);
   return record;
 }
@@ -187,6 +188,8 @@ function runGame(world: EncounterWorld, number: number, record: GameRecord): Gam
   // The probe's own dice, so the game is the same game with or without it.
   const probe = dice(seedOf(world.scenario.id, seed * 104729 + number));
   const memory = new Set<string>();
+  const watcher = idleWatcher(ctx);
+  summary.idle = watcher.hits;
   let start: StartScenario | null = null;
   let state: ScenarioState | null = null;
   let intent: PlayerIntent | null = null;
@@ -211,6 +214,7 @@ function runGame(world: EncounterWorld, number: number, record: GameRecord): Gam
       const result = reduce(state, intent, ctx);
       if (!result.ok) return problem(`The reducer refused an offered intent: ${result.reason}`);
       if (result.state.failure) return problem(`state.failure: ${result.state.failure}`);
+      watcher.observe(state, intent, result.state, result.steps);
       state = result.state;
       intents.push(intent);
       const fault = tableFaults(state, ctx)[0];
@@ -220,6 +224,7 @@ function runGame(world: EncounterWorld, number: number, record: GameRecord): Gam
     summary.steps = intents.length;
     summary.rounds = state.round;
     summary.ended = state.lost ? "lost" : "won";
+    summary.lossReason = state.lost ? (state.lossReason ?? "no reason recorded") : null;
     let active = beginActive(start, HASH);
     for (const sent of intents) active = recordIntent(active, sent);
     const replayed = replay(JSON.parse(JSON.stringify(active)), start, HASH, ctx);

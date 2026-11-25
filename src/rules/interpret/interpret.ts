@@ -11,7 +11,7 @@ import { namedTargetImmune } from "./immune-targets.ts";
 import { collectAllyResources } from "../families/costs/pay.ts";
 import { runFamilyVerb } from "../families/index.ts";
 import { commitCard } from "../families/attack/index.ts";
-import { exhaustCard, placePlayerDamage, readyCard, runPlayerVerb } from "./player-verbs.ts";
+import { exhaustCard, placePlayerDamage, readyWithThen, runPlayerVerb } from "./player-verbs.ts";
 import { drawVerb } from "./effect-verbs.ts";
 import { revealNow } from "../windows/frames.ts";
 import { runSetupVerb } from "../setup/verbs.ts";
@@ -28,7 +28,7 @@ import { DECKS } from "../core/piles.ts";
 import { shadowFace } from "../families/defense/shadow.ts";
 import { drawCards } from "../families/dungeon/deck.ts";
 import { withView } from "../families/breaking/areas.ts";
-import { isBreakingVerb } from "../families/breaking/index.ts";
+import { familyWholeStateVerb } from "./family-hooks.ts";
 import { announceDraw } from "../families/dreamchaser/index.ts";
 import { heroDrawn } from "../families/deck/hero.ts";
 import { announceEnteredHand } from "../families/island/hand.ts";
@@ -100,9 +100,8 @@ export function runInstruction(
   if (state.failure) return state;
   const twin = withTwin(state, instruction, ctx.cards);
   // Once stages are separate "the staging area", "this stage" and "the quest" of an instruction are the acting seat's (mec109.multiple-staging-areas): the
-  // instruction runs on the state as that seat sees it, with its own staging area and stage in the shared fields (families/breaking/areas.ts). The verbs of the
-  // breaking family are about the areas themselves and run on the whole state.
-  if (state.separate && !isBreakingVerb(twin.verb)) return withView(state, focus.seat, (view) => runTwinned(view, twin, focus, ctx, steps));
+  // instruction runs on the state as that seat sees it, with its own staging area and stage in the shared fields (families/breaking/areas.ts). A verb a family declares in `wholeState` is about the areas themselves and runs on the whole state.
+  if (state.separate && !familyWholeStateVerb(twin.verb)) return withView(state, focus.seat, (view) => runTwinned(view, twin, focus, ctx, steps));
   return runTwinned(state, twin, focus, ctx, steps);
 }
 
@@ -135,7 +134,7 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
       const traveled = travelNow(state, locationId, ctx, steps);
       // A player the cost of the travel eliminated (a threat raise to 50 earlier in the effect) travels nowhere: this instruction changes nothing, later instructions of the effect still run and the game goes on (rr.player-elimination).
       if (traveled) return traveled;
-      // The Travel effect itself made another location the active location (Dark-wood Grove reveals Giant Web, 51146:A:2, 51131:A:1), or took the location out of the staging area: the travel does not take place and the opportunity is over (docs/scenarios/standalone-scenarios.md, The Woodland Realm, reading 20).
+      // The Travel effect itself made another location the active location (Dark-wood Grove reveals Giant Web, 51146:A:2, 51131:A:1), or took the location out of the staging area: the travel does not take place and the opportunity is over (docs/scenarios/standalone-scenarios/the-woodland-realm.md, The Woodland Realm, reading 20).
       if (instruction.to === "self" && (effectMadeActive(state) || state.cards[locationId]?.zone !== "staging")) return state.mode === "travel" ? travelTaken(state) : state;
       return state.seats[focus.seat]?.eliminated ? state : { ...state, failure: "Travel was refused" };
     }
@@ -156,11 +155,11 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
       return modifyStat(state, instruction, focus, ctx);
     case "Exhaust": {
       const target = instruction.target;
-      const id = target?.kind === "byCode" || target?.kind === "byName" ? readyNamedCard(state, ctx, target, instruction.who === "firstPlayer" ? state.firstPlayer : null)?.id : focus.sourceId;
+      const id = target?.kind === "byCode" || target?.kind === "byName" ? readyNamedCard(state, ctx, target, instruction.who === "firstPlayer" ? state.firstPlayer : null, focus.seat)?.id : focus.sourceId;
       return id ? exhaustCard(state, id) : state;
     }
     case "Ready":
-      return focus.sourceId ? readyCard(state, focus.sourceId, playerSource(state, focus.sourceId, ctx), ctx.cards) : state;
+      return focus.sourceId ? readyWithThen(state, focus.sourceId, ctx, playerSource(state, focus.sourceId, ctx)) : state;
     case "Commit":
       // A card the effect names commits as it is, and is announced (families/attack.ts).
       if (instruction.target) return commitCard(state, instruction.target, focus);

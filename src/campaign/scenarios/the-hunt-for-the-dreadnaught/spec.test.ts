@@ -1,8 +1,8 @@
-// Rules: rr.setup, rr.forced, rr.response, rr.action, rr.player-elimination, rr.quest-advancement, rr.cancel, rr.cost, rr.engaged, rr.damage, rr.immune, rr.first-player, rr.effects, dcce.ship-objectives, dcce.ship-enemies, dcce.prepare-your-fleet, dcce.corsair-deck, dcce.boarding, faq.additional-attacks, faq.lasting-effects (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Hunt for the Dreadnaught).
+// Rules: rr.setup, rr.forced, rr.response, rr.action, rr.player-elimination, rr.quest-advancement, rr.cancel, rr.cost, rr.engaged, rr.damage, rr.immune, rr.first-player, rr.effects, dcce.ship-objectives, dcce.ship-enemies, dcce.prepare-your-fleet, dcce.corsair-deck, dcce.boarding, faq.additional-attacks, faq.lasting-effects (data/rules/entries.json); docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md (The Hunt for the Dreadnaught).
 import { announce, answer, attack, window, cardSpecs, count, damageOn, deckCount, defend, flag, handCount, progressOn, quest, resolve, resourcesOn, reveal, side, stagingThreat, stat, threat, won, zone, lost, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Hunt for the Dreadnaught (standalone-scenarios part 14): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The quest deck is the real one (`stages`); the lines a row cannot
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The quest deck is the real one (`stages`); the lines a row cannot
 // express (a whole Setup, a choice among the ships, a seeded game) are tests in lines.test.ts, each titled with its line id.
 const STAGES = ["40004", "40005"] as const;
 const FLEET = ["40006", "40007", "40008", "40009", "40010", "40011"];

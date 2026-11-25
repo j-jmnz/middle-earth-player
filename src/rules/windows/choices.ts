@@ -1,6 +1,8 @@
 import type { LegalIntent, PlayerIntent } from "../core/intents.ts";
+import { firstPlayerFor } from "../families/breaking/areas.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { holds } from "../interpret/conditions.ts";
+import { unpayableUnderLock } from "../families/costs/verbs.ts";
 import { guardianSeat } from "../families/guardian/seats.ts";
 import { DONE, limitReached, noteOption, untakenOptions } from "../families/deck/choose.ts";
 import type { EffectData, QueueItem, ScenarioState } from "../core/state.ts";
@@ -26,12 +28,12 @@ export function openBranch(state: ScenarioState, item: QueueItem, returned: numb
   const instruction = item.instruction;
   if (instruction.verb !== "Choose") return state;
   // `guardian`: the player guarding Gollum chooses (02134:A:1, 900904:A:1); the actor when nobody does.
-  const seat = instruction.who === "firstPlayer" ? state.firstPlayer : instruction.who === "guardian" ? (guardianSeat(state) ?? item.seat) : item.seat;
+  const seat = instruction.who === "firstPlayer" ? firstPlayerFor(state, item.seat) : instruction.who === "guardian" ? (guardianSeat(state) ?? item.seat) : item.seat;
   const data = effectData(state);
   // An option may require something of the cards the effect picked or the event it answers ("If it is an enemy, you may
   // discard it").
   const scope = { actor: seat, sourceId: topFrame(state)?.cardId ?? null, returned, ...(data?.picked ? { picked: data.picked } : {}), ...(data?.subject ? { subject: data.subject } : {}), ...(data?.other ? { other: data.other } : {}), ...(data?.participants ? { participants: data.participants } : {}), ...(data?.x != null ? { x: data.x } : {}) };
-  const legal = limitReached(state, instruction, seat, scope.sourceId, ctx) ? [] : untakenOptions(state, instruction, instruction.options.filter((option) => !option.requires || holds(state, option.requires, scope, ctx)));
+  const legal = limitReached(state, instruction, seat, scope.sourceId, ctx) ? [] : untakenOptions(state, instruction, instruction.options.filter((option) => (!option.requires || holds(state, option.requires, scope, ctx)) && !unpayableUnderLock(state, option.instructions, seat, ctx)));
   if (legal.length === 0) return state;
   // A Choose with `upTo` is always asked while an option is left: the actor may stop.
   if (instruction.upTo != null) return ask(state, { kind: "branch", item: { ...item, seat } }, seat, [...legal.map((option) => option.id), DONE]);

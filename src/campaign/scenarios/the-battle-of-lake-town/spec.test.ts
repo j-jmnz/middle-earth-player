@@ -1,10 +1,10 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town), rr.forced, rr.shadow-effects, rr.travel, rr.keywords, rr.cancel, faq.enemy-attacks-outside-combat, faq.additional-attacks (data/rules/entries.json).
+// Rules: docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md (The Battle of Lake-town), rr.forced, rr.shadow-effects, rr.travel, rr.keywords, rr.cancel, faq.enemy-attacks-outside-combat, faq.additional-attacks (data/rules/entries.json).
 import { describe, it } from "vitest";
 
 import { announce, answer, attack, cardSpecs, damageOn, defend, flag, exhausted, lost, progressOn, quest, resolve, reveal, stat, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Battle of Lake-town (standalone-scenarios part 2): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
 // The lines a row cannot express (a choice among many, a count of damage the engine places in a loop, a stage defeated) are tests in lines.test.ts; the Smaug deck, Burn and the attacks on Lake-town are tested with their family in src/rules/families/smaug/.
 const LAKE = "50207";
 

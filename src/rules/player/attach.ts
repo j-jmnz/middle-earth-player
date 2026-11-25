@@ -19,7 +19,7 @@ import { playerCardEffectCanChoose } from "../core/keywords.ts";
 import { isCharacterType, printedOf, scenarioOwned } from "../core/printed.ts";
 import { attachBlocked, restrictedLoad } from "../interpret/restrictions.ts";
 import type { ScenarioState } from "../core/state.ts";
-import { heldAmount, livingSeats, updateCard } from "../core/state.ts";
+import { flagged, heldAmount, livingSeats, updateCard } from "../core/state.ts";
 import { attachTo, moveCard } from "../core/zones.ts";
 import { matchesPick, pickCandidates } from "../interpret/pick.ts";
 import { spheresOf } from "../families/costs/pay.ts";
@@ -36,8 +36,9 @@ export function attachRule(ctx: ReduceContext, code: string): AttachRule | undef
 }
 
 // The cards an attachment with this code may be attached to. A card with an "Attach to" record may go on a card of any
-// seat; one without goes on a character of the seat that plays it.
-export function attachmentHostIds(state: ScenarioState, seat: number, code: string, ctx: ReduceContext): string[] {
+// seat; one without goes on a character of the seat that plays it. `options.byEffect`: an effect attaches a card already in play or set aside
+// (Reattach, an "attach to" pick), which a bar on playing attachment cards does not reach.
+export function attachmentHostIds(state: ScenarioState, seat: number, code: string, ctx: ReduceContext, options: { byEffect?: boolean; anySeat?: boolean } = {}): string[] {
   // A card played unattached or onto a threat dial goes on no card (families/attachments/play.ts).
   if (playIntoRule(ctx, code)) return [];
   const rule = attachRule(ctx, code);
@@ -47,7 +48,8 @@ export function attachmentHostIds(state: ScenarioState, seat: number, code: stri
     // Any of the filters, from the playing seat's side; a filter that says `control: "you"` keeps the seat's own cards.
     for (const filter of rule.hosts) candidates.push(...pickCandidates(state, filter, seat, [], null, ctx).filter((id) => !candidates.includes(id)));
   } else if (!rule) {
-    candidates.push(...characters(state, seat, ctx.cards));
+    // `options.anySeat`: the pick that asks names no seat (`control: "any"`), so a character of any seat may take the card (rr.attachment-cards, the option to attach to another player's character).
+    for (const index of options.anySeat === true ? livingSeats(state) : [seat]) candidates.push(...characters(state, index, ctx.cards));
   } else if (named.kind === "activeLocation") {
     // The playing seat's own active location once stages are separate (families/breaking/areas.ts).
     const active = activeOf(state, seat);
@@ -60,8 +62,11 @@ export function attachmentHostIds(state: ScenarioState, seat: number, code: stri
       else candidates.push(...characters(state, index, ctx.cards));
     }
   }
+  // "Players cannot play attachment cards on Troll enemies" (131033:A:1): the play of an attachment card, not an effect that attaches one.
+  const barredPlay = options.byEffect !== true && printedOf(ctx.cards, code).type === "attachment";
   return candidates.filter((id) => {
     const host = state.cards[id];
+    if (barredPlay && flagged(state, id, "noAttachmentPlays")) return false;
     if (!host || !playerCardEffectCanChoose(printedOf(ctx.cards, host.code), state, id, printedOf(ctx.cards, code))) return false;
     if (attachBlocked(state, ctx, id, code)) return false;
     if (!rule) return true;

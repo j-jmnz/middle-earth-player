@@ -69,6 +69,8 @@ export function worldCodes(campaign: CampaignData, scenario: AnyScenarioData, ef
   if (scenario.campaignCard !== undefined) codes.add(scenario.campaignCard);
   // The saga hero a scenario grants and what it attaches to the Ring-bearer (ScenarioData.sagaStart).
   if (scenario.sagaStart) for (const code of "hero" in scenario.sagaStart ? [scenario.sagaStart.hero] : scenario.sagaStart.attached) codes.add(code);
+  // The treasures a deck may add at the Setup (ScenarioData.treasures, The Hobbit).
+  for (const code of scenario.treasures ?? []) codes.add(code);
   // A card with two catalog codes (the Stormcaller Elite) is dealt as its first side; the other side is in the world for the flip.
   for (const card of scenarioCards(scenario)) {
     codes.add(card.code);

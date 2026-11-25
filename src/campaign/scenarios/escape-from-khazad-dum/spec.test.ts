@@ -1,10 +1,10 @@
-// Rules: rr.search, rr.reveal, rr.forced, rr.travel, rr.explored, rr.shadow-effects, rr.staging, rr.damage, rr.surge, rr.engaged, rr.lasting-effects, rr.blank, docs/scenarios/standalone-scenarios.md (Escape from Khazad-dûm) (data/rules/entries.json).
+// Rules: rr.search, rr.reveal, rr.forced, rr.travel, rr.explored, rr.shadow-effects, rr.staging, rr.damage, rr.surge, rr.engaged, rr.lasting-effects, rr.blank, docs/scenarios/standalone-scenarios/escape-from-khazad-dum.md (Escape from Khazad-dûm) (data/rules/entries.json).
 import { describe, it } from "vitest";
 
 import { announce, answer, attack, cardSpecs, committed, count, damageOn, deckCount, defend, defender, exhausted, flag, handCount, progressOn, quest, resolve, resourcesOn, respond, reveal, stagingThreat, stat, threat, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Escape from Khazad-dûm (standalone-scenarios part 13): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
 // Each layout holds the quest cards a Quick-build game keeps (1A, one stage 2, one stage 3), so a stage number is the printed one. What a row cannot express (an attack whose damage lands on the stage, a lost game, a card that waits out of play) is in lines.test.ts.
 const F0 = ["f0", "f0", "f0", "f0", "f0", "f0"];
 const ADVANCING = { phase: "Quest", deck: ["f0"] } as const;

@@ -5,6 +5,7 @@ import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { CardRef, Effect, Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard } from "../../interpret/amounts.ts";
+import { markShort } from "../../interpret/effect-verbs.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { beginEnemyAttack, characters } from "../../combat/combat.ts";
@@ -49,7 +50,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "DamageOncePerRound":
       return damageOncePerRound(state, instruction, focus, ctx, steps);
     case "SearchToStaging":
-      return searchToStaging(state, instruction.code, ctx);
+      return searchToStaging(state, instruction.code, ctx, instruction.deckOnly === true);
     case "AttackActor":
       return attackActor(state, focus, ctx, steps);
     case "AttachToDamagedDefender":
@@ -118,13 +119,14 @@ function attachToQuest(state: ScenarioState, focus: Focus, main: boolean): Scena
 
 // The first copy of the card's title found in the encounter deck, its discard pile or the victory display, in that order (rr.search),
 // joins the staging area faceup, not revealed.
-function searchToStaging(state: ScenarioState, code: string, ctx: ReduceContext): ScenarioState {
+function searchToStaging(state: ScenarioState, code: string, ctx: ReduceContext, deckOnly: boolean): ScenarioState {
   const title = printedOf(ctx.cards, code).name;
-  const found = [...state.encounterDeck, ...state.encounterDiscard, ...state.victory].find((id) => {
+  const found = (deckOnly ? state.encounterDeck : [...state.encounterDeck, ...state.encounterDiscard, ...state.victory]).find((id) => {
     const instance = state.cards[id];
     return instance != null && printedOf(ctx.cards, instance.code).name === title;
   });
-  if (!found) return state;
+  // Nothing found: the search did not resolve, so a "Then" step after it is not attempted (rr.then).
+  if (!found) return markShort(state, ctx);
   return updateCard(moveCard(state, found, { zone: "staging" }), found, { face: "up", controller: null, damage: 0, progress: 0, resources: 0 });
 }
 

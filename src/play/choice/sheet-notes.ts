@@ -9,6 +9,7 @@ import { switchNote } from "../words/scenarios/uncharted.ts";
 import { nightResponseNote } from "../words/scenarios/night.ts";
 import { framsburgEngageNote, framsburgResponseNote } from "../words/scenarios/framsburg.ts";
 import { fateEngageNote, fateResponseNote } from "../words/scenarios/fate.ts";
+import { villagerResponseNote } from "../readouts/against-the-shadow/amon-din.ts";
 import { gundabadResponseNote } from "../words/scenarios/gundabad.ts";
 import type { HideNumbers, SheetNames, TriggerOption } from "./sheet-types.ts";
 
@@ -39,7 +40,7 @@ export function responseNote(game: ScenarioState, names: SheetNames, offers: rea
   const waiting = offers.filter((offer) => offer.seat === seat && !listed.some((item) => item.cardId === offer.cardId && item.effectId === offer.effectId));
   // At the end of the round, a card that counts tokens says what the count leads to (41050:B:1).
   const leads = event?.trigger === "endOfRound" ? offers.flatMap((offer) => tokenOutcome(ctx, game.cards[offer.cardId]?.code ?? "")).slice(0, 1) : [];
-  const night = nightResponseNote(game, names, event, listed.map((item) => item.cardId)) ?? framsburgResponseNote(game, ctx, names, event, listed.map((item) => item.cardId)) ?? gundabadResponseNote(game, ctx, names, event, listed.map((item) => item.cardId)) ?? fateResponseNote(game, ctx, names, event, listed.map((item) => item.cardId));
+  const night = nightResponseNote(game, names, event, listed.map((item) => item.cardId)) ?? framsburgResponseNote(game, ctx, names, event, listed.map((item) => item.cardId)) ?? gundabadResponseNote(game, ctx, names, event, listed.map((item) => item.cardId)) ?? fateResponseNote(game, ctx, names, event, listed.map((item) => item.cardId)) ?? villagerResponseNote(game, names.card, event);
   const base = night ?? ["A Response may be used now, or passed.", ...leads].join(" ");
   if (waiting.length === 0) return base;
   // The side quest's sentence already says that passing gives it up.

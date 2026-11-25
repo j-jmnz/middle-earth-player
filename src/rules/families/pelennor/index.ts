@@ -1,5 +1,5 @@
 // Rules: mec113.minas-tirith, mec113.assault, rr.damage (data/rules/entries.json); ledger lines of the cards of The Battle of the Pelennor Fields (145043 to 145080). The verbs src/catalog/families/pelennor.ts adds and the hooks the core calls
-// (interpret/family-hooks.ts): the damage the City Wall takes first lives in wall.ts, called by placeDamage (core/keywords.ts).
+// (interpret/family-hooks.ts): the damage the City Wall takes first lives in wall.ts, called by placeDamage (core/damage.ts).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";

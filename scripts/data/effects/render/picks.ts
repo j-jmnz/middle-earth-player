@@ -43,6 +43,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["top"], typeof pick.top === "number" ? (pick.from === "discard" ? `among the top ${pick.top} cards of each player's own discard pile` : `among the top ${pick.top}`) : null);
   note(["bottom"], typeof pick.bottom === "number" ? `among the bottom ${pick.bottom}` : null);
   note(["staging"], pick.staging === true ? "or in the staging area" : null);
+  note(["riddleArea"], pick.riddleArea === true ? "in the riddle area: stage 2, Gollum, Bilbo Baggins and the Ring on him (while stage 2 is there)" : null);
   note(["stagingArea"], pick.stagingArea === "shared" ? "in the shared staging area (the one stage 2B deals out)" : pick.stagingArea === "any" ? "in any player's staging area" : pick.stagingArea === "own" ? "in the chooser's own staging area (the only one while the stages are not separate)" : null);
   note(["otherArea"], pick.otherArea === true ? "whose staging area is a different one from the chooser's (every other player while the areas are not separate)" : null);
   note(["atOtherStage"], pick.atOtherStage === true ? "at another stage than the chooser's (none while the game has one stage)" : null);
@@ -51,6 +52,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["atStage"], pick.atStage === true ? "at the acting player's staging area (every area before they are separate)" : null);
   note(["playerCard"], pick.playerCard === true ? "that is a player card" : pick.playerCard === false ? "that is an encounter card" : null);
   note(["stagingOnly"], pick.stagingOnly === true ? "in the staging area only" : null);
+  note(["onCharacter"], pick.onCharacter === true ? "including the ones an encounter card attached to a character" : null);
   note(["highestThreatPlusRemaining"], pick.highestThreatPlusRemaining === true ? "with the highest sum of its current Threat and its remaining quest points (the quest points less the progress on it; a tie is the chooser's)" : null);
   note(["attachable"], typeof pick.attachable === "string" ? `that the card with code ${pick.attachable} can be attached to` : null);
   note(["engaged"], typeof pick.engaged === "string" ? (ENGAGED[pick.engaged] ?? pick.engaged) : null);
@@ -68,7 +70,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["attacking"], pick.attacking === true ? "attacking" : null);
   note(["defending"], pick.defending === true ? "defending" : null);
   note(["canExhaust"], pick.canExhaust === true ? "that can exhaust (not held by a rule that stops it exhausting)" : null);
-  note(["hasResources"], pick.hasResources === true ? "with resources on it" : null);
+  note(["hasResources"], pick.hasResources === true ? "with resources on it" : pick.hasResources === false ? "with no resources on it" : null);
   note(["affectable"], pick.affectable === true ? "that a card effect can affect (not one immune to card effects)" : null);
   note(["progress"], pick.progress === true ? "with progress on it" : pick.progress === false ? "with no progress on it" : null);
   note(["captive"], typeof pick.captive === "string" ? (pick.captive === "only" ? "that is a Captive (held by an enemy or lying free)" : pick.captive === "free" ? "that is a Captive that no enemy holds" : "(Captives included)") : null);
@@ -110,7 +112,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["guardedByTrait"], typeof pick.guardedByTrait === "string" ? `guarded by (attached to) a ${pick.guardedByTrait} enemy` : null);
   note(["notGuardedByTrait"], typeof pick.notGuardedByTrait === "string" ? `not guarded by (attached to) a ${pick.notGuardedByTrait} enemy` : null);
   note(["guardsTrait"], typeof pick.guardsTrait === "string" ? `attached as the guard of a ${pick.guardsTrait} objective` : null);
-  note(["controlled"], pick.controlled === true ? (pick.type === "ally" ? "that a player controls (not one a guard holds in the staging area)" : pick.type === "attachment" ? "that a player controls (not an encounter attachment)" : "that is claimed (attached to a character a player controls)") : null);
+  note(["controlled"], pick.controlled === true ? (pick.type === "ally" ? "that a player controls (not one a guard holds in the staging area)" : pick.type === "attachment" ? "that a player controls (not an encounter attachment)" : pick.type === "location" ? "that lies in a player's play area (a location the first player took control of, not one in the staging area or active)" : "that is claimed (attached to a character a player controls)") : null);
   note(["questCardType"], pick.questCardType === true ? "a quest card of any kind (a quest stage, an encounter side quest or a player side quest)" : null);
   note(["questCard"], pick.questCard === true ? "that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)" : null);
   note(["maxHitPointsLeft"], typeof pick.maxHitPointsLeft === "number" ? `with ${pick.maxHitPointsLeft} or fewer hit points remaining` : null);
@@ -125,6 +127,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["aboveThreat"], pick.aboveThreat === true ? "with an engagement cost higher than the chooser's threat" : null);
   note(["on"], onWords(pick.on));
   note(["other"], pick.other === true ? "other than this card" : null);
+  note(["takesSource"], pick.takesSource === true ? "that this card can be attached to (one that cannot have attachments is left out)" : null);
   note(["different"], pick.different === true ? "other than the cards this effect already picked" : null);
   note(["guardsObjectiveLocation"], pick.guardsObjectiveLocation === true ? "attached to an objective-location as its guard" : null);
   note(["copyInDiscard"], pick.copyInDiscard === true ? "with a copy of it (the same title) in its controller's discard pile" : pick.copyInDiscard === "owner" ? "with a card of its title in its owner's discard pile" : null);

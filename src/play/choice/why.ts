@@ -10,6 +10,8 @@ import { payingSlack } from "../../rules/families/deck/play.ts";
 import { playsOntoHost, printedOf } from "../../rules/core/printed.ts";
 import { reduce, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 
+import { valeRefusal } from "../readouts/against-the-shadow/vale.ts";
+
 import { playRequest } from "./pay.ts";
 import type { Sheet } from "./sheet-types.ts";
 
@@ -52,12 +54,12 @@ export function whyNotPlayable(game: ScenarioState, ctx: ReduceContext, cardId: 
       case "That card cannot be played now":
         return "Its condition does not hold now.";
       case "That card has no legal target":
-        return "It has no legal target now.";
+        return `It has no legal target now.${valeRefusal(game, ctx, cardId, printed.type === "attachment")}`;
       default:
         return `${refused}.`;
     }
   }
-  if (playsOntoHost(printed) && attachmentTargets(game, cardId, ctx).length === 0) return "No card can take it now.";
+  if (playsOntoHost(printed) && attachmentTargets(game, cardId, ctx).length === 0) return `No card can take it now.${valeRefusal(game, ctx, cardId, true)}`;
   const request = playRequest(game, ctx, cardId);
   return request ? shortWords(request.total, request.pools.reduce((sum, pool) => sum + pool.max, 0), playSlack(game, ctx, cardId), printed.sphere) : null;
 }

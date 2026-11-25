@@ -133,7 +133,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     for (const code of codes) state = spawn(state, code, { zone }).state;
     // The Evil Creatures deck has a discard pile of its own, which exists from the start (emce.evil-creatures-deck).
     if (zone === "evilCreaturesDeck") state = { ...state, piles: { ...state.piles, evilCreaturesDiscard: state.piles?.evilCreaturesDiscard ?? [] } };
-    // So does the Smaug deck (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town).
+    // So does the Smaug deck (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town).
     if (zone === "smaugDeck") state = { ...state, piles: { ...state.piles, smaugDiscard: state.piles?.smaugDiscard ?? [] } };
   }
   if (input.unchartedDeck && input.unchartedDeck.length > 0) state = dealUnchartedDeck(state, input.unchartedDeck, ctx);

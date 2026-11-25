@@ -1,10 +1,10 @@
-// Rules: rr.forced, rr.reveal, rr.shadow-effects, rr.travel, rr.engaged, rr.victory, rr.quest-advancement, rr.immune, rr.lasting-effects, rr.surge, mec109.peril (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (Fog on the Barrow-downs).
+// Rules: rr.forced, rr.reveal, rr.shadow-effects, rr.travel, rr.engaged, rr.victory, rr.quest-advancement, rr.immune, rr.lasting-effects, rr.surge, mec109.peril (data/rules/entries.json); docs/scenarios/standalone-scenarios/fog-on-the-barrow-downs.md (Fog on the Barrow-downs).
 import { describe, it } from "vitest";
 
 import { announce, attack, cardSpecs, damageOn, deckCount, defend, endPhase, endRound, flag, handCount, notWon, progressOn, quest, resolve, resourcesOn, reveal, stagingThreat, stat, threat, travel, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Fog on the Barrow-downs (standalone-scenarios part 5): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The lines a row cannot express (the Setup shuffle,
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The lines a row cannot express (the Setup shuffle,
 // the split into separate staging areas, the return, an elimination while apart, the flags a seat holds) are tests in split.test.ts and lines.test.ts, each titled with its line id.
 const FILLERS = ["f0", "f0", "f0", "f0", "f0"];
 const END_OF_ROUND = { seat: null } as const;

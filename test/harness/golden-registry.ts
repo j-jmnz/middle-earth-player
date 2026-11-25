@@ -64,6 +64,8 @@ import * as water from "../scenarios/the-watcher-in-the-water/game.ts";
 import * as dark from "../scenarios/the-long-dark/game.ts";
 import * as stone from "../scenarios/foundations-of-stone/game.ts";
 import * as flame from "../scenarios/shadow-and-flame/game.ts";
+import * as pelargir from "../scenarios/peril-in-pelargir/game.ts";
+import * as spiders from "../scenarios/flies-and-spiders/game.ts";
 import * as osgiliath from "../scenarios/the-massing-at-osgiliath/game.ts";
 import * as town from "../scenarios/the-battle-of-lake-town/game.ts";
 import * as erech from "../scenarios/the-stone-of-erech/game.ts";
@@ -78,6 +80,19 @@ import * as woodland from "../scenarios/the-woodland-realm/game.ts";
 import * as mines from "../scenarios/the-mines-of-moria/game.ts";
 import * as khazad from "../scenarios/escape-from-khazad-dum/game.ts";
 import * as dreadnaught from "../scenarios/the-hunt-for-the-dreadnaught/game.ts";
+import * as armies from "../scenarios/the-battle-of-five-armies/game.ts";
+import * as grim from "../scenarios/over-the-misty-mountains-grim/game.ts";
+import * as day from "../scenarios/we-must-away-ere-break-of-day/game.ts";
+import * as dim from "../scenarios/dungeons-deep-and-caverns-dim/game.ts";
+import * as mountain from "../scenarios/the-lonely-mountain/game.ts";
+import * as ithilien from "../scenarios/into-ithilien/game.ts";
+import * as andros from "../scenarios/the-siege-of-cair-andros/game.ts";
+import * as fear from "../scenarios/the-stewards-fear/game.ts";
+import * as druadan from "../scenarios/the-druadan-forest/game.ts";
+import * as din from "../scenarios/encounter-at-amon-din/game.ts";
+import * as assault from "../scenarios/assault-on-osgiliath/game.ts";
+import * as blood from "../scenarios/the-blood-of-gondor/game.ts";
+import * as vale from "../scenarios/the-morgul-vale/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -168,6 +183,21 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-long-dark", "The Long Dark", dark.DARK_GOLDENS, dark.darkWorld, dark.playGolden),
   entry("foundations-of-stone", "Foundations of Stone", stone.STONE_GOLDENS, stone.stoneWorld, stone.playGolden),
   entry("shadow-and-flame", "Shadow and Flame", flame.FLAME_GOLDENS, flame.flameWorld, flame.playGolden),
+  entry("we-must-away-ere-break-of-day", "We Must Away, Ere Break of Day", day.DAY_GOLDENS, day.dayWorld, day.playGolden),
+  entry("over-the-misty-mountains-grim", "Over the Misty Mountains Grim", grim.GRIM_GOLDENS, grim.grimWorld, grim.playGolden),
+  entry("dungeons-deep-and-caverns-dim", "Dungeons Deep and Caverns Dim", dim.DIM_GOLDENS, dim.dimWorld, dim.playGolden),
+  entry("flies-and-spiders", "Flies and Spiders", spiders.SPIDERS_GOLDENS, spiders.spidersWorld, spiders.playGolden),
+  entry("the-lonely-mountain", "The Lonely Mountain", mountain.MOUNTAIN_GOLDENS, mountain.mountainWorld, mountain.playGolden),
+  entry("the-battle-of-five-armies", "The Battle of Five Armies", armies.ARMIES_GOLDENS, armies.armiesWorld, armies.playGolden),
+  entry("peril-in-pelargir", "Peril in Pelargir", pelargir.PELARGIR_GOLDENS, pelargir.pelargirWorld, pelargir.playGolden),
+  entry("into-ithilien", "Into Ithilien", ithilien.ITHILIEN_GOLDENS, ithilien.ithilienWorld, ithilien.playGolden),
+  entry("the-siege-of-cair-andros", "The Siege of Cair Andros", andros.ANDROS_GOLDENS, andros.androsWorld, andros.playGolden),
+  entry("the-stewards-fear", "The Steward's Fear", fear.FEAR_GOLDENS, fear.fearWorld, fear.playGolden),
+  entry("the-druadan-forest", "The Drúadan Forest", druadan.DRUADAN_GOLDENS, druadan.druadanWorld, druadan.playGolden),
+  entry("encounter-at-amon-din", "Encounter at Amon Dîn", din.DIN_GOLDENS, din.dinWorld, din.playGolden),
+  entry("assault-on-osgiliath", "Assault on Osgiliath", assault.ASSAULT_GOLDENS, assault.assaultWorld, assault.playGolden),
+  entry("the-blood-of-gondor", "The Blood of Gondor", blood.BLOOD_GOLDENS, blood.bloodWorld, blood.playGolden),
+  entry("the-morgul-vale", "The Morgul Vale", vale.VALE_GOLDENS, vale.valeWorld, vale.playGolden),
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
   entry("the-battle-of-lake-town", "The Battle of Lake-town", town.TOWN_GOLDENS, town.townWorld, town.playGolden),
   entry("the-stone-of-erech", "The Stone of Erech", erech.ERECH_GOLDENS, erech.erechWorld, erech.playGolden),

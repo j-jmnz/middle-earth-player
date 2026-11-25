@@ -30,16 +30,18 @@ function park(state: ScenarioState, seat: number): ScenarioState {
 
 // The acting seat leaves the stage the players share. Not separate yet: the other living seat (if any) takes the shared stage, staging area and active location as its own, and the areas are isolated from now on; separate already: the seat holds the
 // shared stage and parks it. A card of the shared staging area stays with the stage, not with the seat.
-function leaveShared(state: ScenarioState, seat: number): ScenarioState {
+function leaveShared(state: ScenarioState, seat: number, keepActive = false): ScenarioState {
   if (state.separate) return park(state, seat);
   const other = livingSeats(state).find((index) => index !== seat);
   const separate: ScenarioState = { ...state, separate: true, isolated: true };
   const shared = state.questStage;
   const active = [state.activeLocation, state.secondActiveLocation].filter((id): id is string => id != null);
   if (other == null) {
-    // Alone: the stage is parked as it is, the active location back in the staging area.
-    let next = separate;
-    for (const id of active) next = moveCard(next, id, { zone: "staging" });
+    // Alone: the stage is parked as it is, the active location back in the staging area (`keepActive`: the seat keeps it as its own).
+    const own = state.seats[seat];
+    const kept = keepActive ? active[0] : undefined;
+    let next = kept && own ? withSeat(separate, seat, { ...own, active: kept }) : separate;
+    for (const id of active) if (id !== kept) next = moveCard(next, id, { zone: "staging" });
     return mirrorActive(next);
   }
   const holder = state.seats[other];
@@ -51,7 +53,7 @@ function leaveShared(state: ScenarioState, seat: number): ScenarioState {
 }
 
 // SplitToOwnStage (148007:A:2): the stage 4A copy is the acting seat's own stage, side B up; the caller resolves its When Revealed effects for the seat (breaking/index.ts). Null when the seat is not at the shared stage, is eliminated, or no copy is left in the quest deck.
-export function splitOff(state: ScenarioState, code: string, seat: number): { state: ScenarioState; stageId: string } | null {
+export function splitOff(state: ScenarioState, code: string, seat: number, keepActive = false): { state: ScenarioState; stageId: string } | null {
   const id = inDeck(state, code);
   const owner = state.seats[seat];
   if (!id || !owner || owner.eliminated) return null;
@@ -60,7 +62,7 @@ export function splitOff(state: ScenarioState, code: string, seat: number): { st
     if (!stage || stage.code === code) return null;
   }
   const shared = state.separate ? owner.stage : state.questStage;
-  const left = leaveShared(state, seat);
+  const left = leaveShared(state, seat, keepActive);
   const placed = mirrorActive(updateCard(moveCard(left, id, { zone: "questStage", seat }), id, { face: "B", controller: seat, progress: 0 }));
   // The stage it left is not defeated: it stays in play for the others, so no "when this stage is defeated" effect hears the advance (emce.bypassing).
   return { state: shared ? { ...placed, stageLeft: { to: id, from: shared, bypassed: true } } : placed, stageId: id };

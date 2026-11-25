@@ -16,15 +16,13 @@ import { dealtCodes, loadCampaigns, loadAnyScenario } from "../../../scripts/dat
 import { ROOT } from "../../../scripts/data/paths.ts";
 import { asksFileNames, checkAsksNames, renderAsksBarrel } from "../../../scripts/data/effects/asks-barrel.ts";
 import { walk } from "../../../test/harness/record-walk.ts";
-import { judgeBranch, judgePick } from "../../../test/harness/words-judge.ts";
+import { entryProblems, judgeBranch, judgePick, renderedEntry, tailsOf } from "../../../test/harness/words-judge.ts";
 
 import { askWords } from "./ask.ts";
-import { dealtNow } from "./scenarios/aflame.ts";
 import { askAt, askKey, askValues, asksChoose, asksOption, asksPick, fill, placeholdersOf, templatesOf, textsOf, unknownPlaceholders, type Ask, type AsksTable } from "./asks.ts";
 import { ASKS_BY_SCENARIO } from "./asks/index.ts";
 import { pickWords, type ChoiceNames } from "./choice.ts";
 import { pathOf } from "./record-path.ts";
-import { askedSeat } from "./seat.ts";
 import { idOf, tableFromLayout } from "../../../test/harness/scene-kit.ts";
 
 const cards = new Map(loadCards().map((card) => [card.code, card]));
@@ -202,10 +200,6 @@ describe("the barrel of asks files", () => {
 
 // A scenario with an asks file has its words as data, and these checks stand in for the words code it has none of.
 const dump = process.env.WORDS_DUMP;
-const LIMIT = 25;
-const wordsIn = (text: string): number => text.trim().split(/\s+/).filter(Boolean).length;
-// A card id the game makes (i12) or a card code: a row of a Pick that names a card is that card's, and a label may not rename it.
-const CARD_LIKE = /^(i\d+|\d{5,6})$/;
 describe.each(Object.keys(ASKS_BY_SCENARIO))("the asks of %s", (id) => {
   const asks = ASKS_BY_SCENARIO[id]!;
   const scenario = loadAnyScenario(id);
@@ -251,52 +245,19 @@ describe.each(Object.keys(ASKS_BY_SCENARIO))("the asks of %s", (id) => {
     expect(problems).toEqual([]);
   });
 
-  it("keeps each entry in the form docs/design-system-table.md (Choice tray) gives: a short verb, labels on options that are no card, cautions that start \"Tap again:\"", () => {
-    const problems: string[] = [];
-    for (const [key, entry] of Object.entries(asks)) {
-      if (entry.verb !== undefined && (wordsIn(entry.verb) < 1 || wordsIn(entry.verb) > 2)) problems.push(`${key}: the verb "${entry.verb}" is not one or two words`);
-      for (const label of Object.keys(entry.labels ?? {})) if (CARD_LIKE.test(label)) problems.push(`${key}: labels["${label}"] names a card, and a card's row keeps its own name`);
-      for (const text of textsOf(entry.caution?.text)) if (!text.startsWith("Tap again:")) problems.push(`${key}: the caution "${text}" does not start "Tap again:"`);
-    }
-    expect(problems).toEqual([]);
+  it("keeps each entry in the form docs/design-system-table.md (Choice tray) gives: a short verb, labels on options that are no card, cautions that start \"Tap again:\", and no todo stub left", () => {
+    expect(Object.entries(asks).flatMap(([key, entry]) => entryProblems(key, entry))).toEqual([]);
   });
 
   it("fills every template as the sheet would: no placeholder without a value, and none left in a sentence", () => {
     const problems: string[] = [];
     for (const effect of records) {
       walk(effect.instructions, (instruction, next, _after, at) => {
-        const tails = [instruction.verb, ...(instruction.verb === "Choose" ? instruction.options.map((option) => option.id) : [])];
-        for (const tail of tails) {
-          const key = askKey(effect.id, at, tail);
-          const entry = asks[key];
-          if (!entry) continue;
-          // A Pick's {n} is what the instruction after it deals, read now; a Choose and its branches have none.
-          const asksCard = instruction.verb !== "Choose";
-          const now = asksCard ? dealtNow(game, ctx, next, askedSeat(game), effect.cardCode) : undefined;
-          const asked = { game, ctx, names, instruction, source: effect.cardCode, effectId: effect.id, options: [], ...(now !== undefined ? { amountNow: now } : {}) };
-          const unknown = unknownPlaceholders(entry, asksCard);
-          if (unknown.length > 0) problems.push(`${key}: no value for ${unknown.map((name) => `{${name}}`).join(", ")}`);
-          // Every template, each variant and each caution, whether its condition holds on this table or not.
-          const { values } = askValues(asked, entry);
-          const texts: string[] = [];
-          for (const template of templatesOf(entry)) {
-            const text = fill(template, values);
-            if (text === null) problems.push(`${key}: "${template}" does not render (a placeholder has no value here)`);
-            else texts.push(text);
-          }
-          // The sentence the sheet opens with, led as the sheet leads it.
-          const said = tail === "Choose" ? asksChoose(asked, asks)?.note : tail === instruction.verb ? asksPick(asked, asks)?.prompt : undefined;
-          if (typeof entry.note === "string" && said === undefined && tail === instruction.verb) problems.push(`${key}: the note does not render`);
-          // The sheet says the entry's own sentence: a record that holds the same object at two paths (Brace of Coneys' two Chooses) would match the first and say the other's.
-          const own = typeof entry.note === "string" ? fill(entry.note, values) : null;
-          if (own !== null && said !== undefined && !said.toLowerCase().includes(own.toLowerCase())) problems.push(`${key}: the sheet says "${said}", not the entry's "${own}" (another instruction of the record was matched)`);
-          if (said !== undefined) texts.push(said);
-          lines.push(`${key}: ${[...new Set(texts)].join(" / ")}`);
-          for (const text of texts) {
-            if (/\{\w+\}/.test(text)) problems.push(`${key}: "${text}" has a placeholder left`);
-            // The sentence-length rule of src/play/words/sentence-length.test.ts: split after . ! ? and count words.
-            for (const part of text.split(/(?<=[.!?])\s+/)) if (wordsIn(part) > LIMIT) problems.push(`${key}: (${wordsIn(part)} words) ${part}`);
-          }
+        for (const tail of tailsOf(instruction)) {
+          const rendered = renderedEntry(judged, effect, instruction, next, at, tail, asks);
+          if (!rendered) continue;
+          problems.push(...rendered.problems);
+          lines.push(rendered.line);
         }
       });
     }

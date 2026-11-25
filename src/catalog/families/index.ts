@@ -1,4 +1,4 @@
-import { collect } from "../family-manifest.ts";
+import { collect, type AsideSecret, type AsideUnused, type CatalogFamily } from "../family-manifest.ts";
 import { manifest as attack } from "./attack.ts";
 import { manifest as defense } from "./defense.ts";
 import { manifest as encounter } from "./encounter.ts";
@@ -48,15 +48,26 @@ import { manifest as nameless } from "./nameless.ts";
 import { manifest as flame } from "./flame.ts";
 import { manifest as smaug } from "./smaug.ts";
 import { manifest as erech } from "./erech.ts";
+import { manifest as westernLands } from "./western-lands.ts";
+import { manifest as sack } from "./sack.ts";
 import { manifest as investigation } from "./investigation.ts";
 import { manifest as wizardsQuest } from "./wizards-quest.ts";
+import { manifest as burgle } from "./burgle.ts";
+import { manifest as pelargir } from "./pelargir.ts";
+import { manifest as poison } from "./poison.ts";
+import { manifest as riddles } from "./riddles.ts";
+import { manifest as armies } from "./armies.ts";
 
 // The mechanic families, in the order their verbs, triggers and flags join the shared enums (docs/architecture.md, Mechanic families). A new family is
 // one file here and one in src/rules/families, and one line in this list and one in the rules list.
 export const CATALOG_FAMILIES = [
-  attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island, wilderland, pursuit, captives, fortress, wizardry, mire, gollum, harad, greyCompany, pelennor, cirithUngol, blackGate, mountDoom, angmar, captured, escape, guardian, longDark, nameless, flame, smaug, erech, investigation, wizardsQuest,
+  attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island, wilderland, pursuit, captives, fortress, wizardry, mire, gollum, harad, greyCompany, pelennor, cirithUngol, blackGate, mountDoom, angmar, captured, escape, guardian, longDark, nameless, flame, smaug, erech, investigation, wizardsQuest, poison, westernLands, sack, riddles, burgle, pelargir, armies,
 ] as const;
 
 export const FAMILY_VERBS = collect(CATALOG_FAMILIES, "verbs");
+/** Every family's verbs that hide a set-aside card (family-manifest.ts, AsideSecret), with the family that declares each. */
+export const ASIDE_SECRETS: readonly (AsideSecret & { readonly family: string })[] = CATALOG_FAMILIES.flatMap((family: CatalogFamily) => (family.asideSecrets ?? []).map((secret) => ({ ...secret, family: family.name })));
+/** Every family's verbs that park unused cards in the set-aside zone (family-manifest.ts, AsideUnused). */
+export const ASIDE_UNUSED: readonly (AsideUnused & { readonly family: string })[] = CATALOG_FAMILIES.flatMap((family: CatalogFamily) => (family.asideUnused ?? []).map((unused) => ({ ...unused, family: family.name })));
 export const FAMILY_TRIGGERS = collect(CATALOG_FAMILIES, "triggers");
 export const FAMILY_FLAGS = collect(CATALOG_FAMILIES, "flags");

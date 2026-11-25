@@ -16,7 +16,8 @@ const VERBS = [
   // The card in play with this code (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its tokens and
   // attachments, and a later AddSetAsideToStaging can bring it back ("Set Goblin Chieftain aside, out of play", 41006:A:1). Nothing happens when
   // no card with the code is in play. `keepDamage` leaves the damage tokens on it ("Set Cold-Drake aside, out of play. (Do not remove damage tokens from it.)", 19024:A:1).
-  z.strictObject({ verb: z.literal("SetAsideInPlay"), code: z.string().min(1), keepDamage: z.boolean().optional(), ...when }),
+  // `byQuest`: a quest card's effect sets it aside, which a card that cannot leave the staging area allows ("Cannot leave the staging area (except by quest effect)", 132041:A:2).
+  z.strictObject({ verb: z.literal("SetAsideInPlay"), code: z.string().min(1), keepDamage: z.boolean().optional(), byQuest: z.literal(true).optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;
@@ -29,7 +30,7 @@ const FLAGS = [
   // 41037:A:1). Read by progressRoom (families/south/locations.ts).
   "noProgressPlaced",
   // On an enemy: it loses the text "Cannot take damage." ("While there are at least 8 progress tokens on this stage, Goblin Chieftain loses
-  // the text", 41007:B:1): the cannotTakeDamage it holds is not read (rules/core/keywords.ts).
+  // the text", 41007:B:1): the cannotTakeDamage it holds is not read (rules/core/damage.ts).
   "losesNoDamage",
   // On an enemy: the excess of its combat damage (damage beyond the remaining hit points of the character it damages) removes that much progress
   // from the current quest ("remove 1 progress from the current quest", 41030:A:2; families/defense/excess.ts).
@@ -44,7 +45,7 @@ const FLAGS = [
   "trackQuestPlaced",
   "noQuestProgress",
   // On an enemy, until the end of the attack: the combat damage dealt to it is canceled ("Cancel all combat damage dealt to attacking enemy",
-  // 41033:A:2; rules/core/keywords.ts placeDamage).
+  // 41033:A:2; rules/core/damage.ts placeDamage).
   "combatDamageCanceled",
   // On a location in the staging area: the first player may declare an attack against it during the combat phase as if it were an enemy engaged
   // with him (41028:A:1). Its Defense for the attack comes from a ModifyStat record (rules/combat/combat.ts canAttack).

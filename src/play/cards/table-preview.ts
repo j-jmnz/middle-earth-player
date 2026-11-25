@@ -4,7 +4,7 @@ import { stageSeat, viewOf } from "../../rules/families/breaking/areas.ts";
 import { isLostIsland } from "../../rules/families/uncharted/pick.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import type { CardInstance } from "../../rules/core/state.ts";
-import { flagged } from "../../rules/core/state.ts";
+import { flagged, isExhausted } from "../../rules/core/state.ts";
 import { BLIZZARD_LIMIT } from "../../rules/families/quest/blizzard.ts";
 
 
@@ -16,6 +16,12 @@ import { oathDetail } from "./oath-preview.ts";
 import { delayedLines, effectLines } from "./card-effects.ts";
 import type { PreviewCard } from "./card-preview.tsx";
 import { stageDetail } from "../readouts/fortress.ts";
+import { removalLimit } from "../readouts/against-the-shadow/cair-andros.ts";
+import { enemyProgress } from "../readouts/against-the-shadow/druadan.ts";
+import { amonDinStageLines, amonDinWin, damageUnit, villagerUnit } from "../readouts/against-the-shadow/amon-din.ts";
+import { osgiliathStageLines, osgiliathWin } from "../readouts/against-the-shadow/osgiliath.ts";
+import { stewardsFearStageLines } from "../readouts/against-the-shadow/stewards-fear.ts";
+import { valeStageLines, valeWin } from "../readouts/against-the-shadow/vale.ts";
 import { advanceHold, questObjective, stagePoints } from "../readouts/objective.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
 import { forestScore, forestStageWords } from "../readouts/standalone-scenarios/old-forest-words.ts";
@@ -24,6 +30,7 @@ import { inspectTargets } from "../store/selectors.ts";
 import { whyNotPlayable } from "../choice/why.ts";
 import { previewKeywords } from "./preview-keywords.ts";
 import { contractSides } from "./contract-sides.ts";
+import { LOOT_ROLE } from "../words/loot.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 
 // A card code as the preview draws it: its name, its picture (or null) by picture key (picture-key.ts: side B of a revealed quest
@@ -50,19 +57,21 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
   const objective = questObjective(game, ctx, line);
   // A stage 2 of The Old Forest has no quest points: it says what its Victory points test sends the quest to.
   const forest = forestScore(game, ctx);
-  return { title: name, detail: objective ? `To win: ${objective}` : forest ? forestStageWords(forest) : "No quest points" };
+  // Stages 1 and 2 of The Steward's Fear have no quest points either: their tokens against the 4 that advance them follow (06011:B:3, 06012:B:3).
+  const own = amonDinWin(game) ?? osgiliathWin(game, ctx, stage.code) ?? valeWin(game, ctx) ?? (objective ? `To win: ${objective}` : forest ? forestStageWords(forest) : "No quest points");
+  return { title: name, detail: [own, ...stewardsFearStageLines(game, ctx, stage.code), ...amonDinStageLines(game, stage.code), ...osgiliathStageLines(game, stage.code), ...valeStageLines(game, ctx, stage.code)].join(". ") };
 }
 
 /**
  * What lies on the card now, one phrase a counter: its damage, progress and resource tokens, and whether it is exhausted or committed to the
- * quest. Empty for a card with none (a card in the hand, a fresh enemy). `progressLimit`: the progress is counted against a limit ("3 / 5 progress", Blinding Blizzard, 901307:A:2).
+ * quest. Empty for a card with none (a card in the hand, a fresh enemy). `progressLimit`: the progress is counted against a limit ("3 / 5 progress", Blinding Blizzard, 901307:A:2). `unit`: the word for a resource token ("villager token" on a card of Encounter at Amon Dîn that holds them). `damageWord`: the word for a damage token ("damage token" on its Dead Villagers).
  */
-export function tokenLines(card: Pick<CardInstance, "damage" | "progress" | "resources" | "exhausted" | "committed">, progressLimit?: number): string[] {
+export function tokenLines(card: Pick<CardInstance, "damage" | "progress" | "resources" | "exhausted" | "unconscious" | "committed">, progressLimit?: number, unit = "resource", damageWord?: string): string[] {
   return [
-    ...(card.damage > 0 ? [`${card.damage} damage`] : []),
+    ...(card.damage > 0 ? [damageWord ? `${card.damage} ${damageWord}${card.damage === 1 ? "" : "s"}` : `${card.damage} damage`] : []),
     ...(card.progress > 0 ? [`${card.progress}${progressLimit == null ? "" : ` / ${progressLimit}`} progress`] : []),
-    ...(card.resources > 0 ? [`${card.resources} resource${card.resources === 1 ? "" : "s"}`] : []),
-    ...(card.exhausted ? ["Exhausted"] : []),
+    ...(card.resources > 0 ? [`${card.resources} ${unit}${card.resources === 1 ? "" : "s"}`] : []),
+    ...(isExhausted(card) ? ["Exhausted"] : []),
     ...(card.committed ? ["Committed"] : []),
   ];
 }
@@ -103,7 +112,9 @@ export function previewCards(
     const card = game.cards[id];
     if (!card) return [];
     if (earlier.includes(id)) return [earlierStage(game, ctx, card.code, describe)];
-    const role = index === 0 ? null : card.zone === "shadow" ? "Shadow card" : card.host ? "Attachment" : null;
+    // The loot a location guards is under it, out of play, and still its player's (22024:B:2).
+    const loot = game.lootDecks != null && card.zone === "under" && card.controller != null;
+    const role = index === 0 ? null : card.zone === "shadow" ? "Shadow card" : loot ? LOOT_ROLE : card.host ? "Attachment" : null;
     // The effects on it, then what a delayed effect will do to it (Sneak Attack's return); for the pressed hand card, why it
     // does not glow.
     const effects = [...effectLines(game, ctx, id, cardName), ...delayedLines(game, id, cardName)];
@@ -121,7 +132,8 @@ export function previewCards(
     const heading = game.sea?.headingCard === id ? headingStepOf(game.sea?.heading) : null;
     const turned = heading ? { title: headingPreviewTitle(heading), turn: headingLook(heading).turn } : {};
     const steps = heading ? { steps: headingPreviewSteps(heading).map((row) => ({ text: row.line, current: row.current })) } : {};
-    const tokens = tokenLines(card, flagged(game, id, "progressRedirect") ? BLIZZARD_LIMIT : undefined);
+    // A Battleground location's preview line says its damage against its limit, and an enemy of stage 3 its progress against its hit points, so the token line does not say them a second time.
+    const tokens = tokenLines(removalLimit(game, id) > 0 ? { ...card, damage: 0 } : enemyProgress(game, ctx, id) ? { ...card, progress: 0 } : card, flagged(game, id, "progressRedirect") ? BLIZZARD_LIMIT : undefined, villagerUnit(game, card) ?? "resource", damageUnit(game, card) ?? undefined);
     const keywords = previewKeywords(game, ctx, id, described.text, options.ruleDoc ?? null);
     const sides = contractSides(printedOf(ctx.cards, card.code).type, described.text);
     if (sides) {

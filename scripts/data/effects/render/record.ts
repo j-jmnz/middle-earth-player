@@ -7,6 +7,9 @@ import { actorNote } from "./actor.ts";
 import { barNote } from "./bars.ts";
 import { renderInstruction } from "./verbs.ts";
 
+// A printed line that is a keyword and its reminder in brackets: "Battle. (Characters quest using Attack instead of Willpower.)", "Doomed 3. (...)".
+const KEYWORD_REMINDER = /^[A-Z][A-Za-z' -]*?(?: [0-9X]+)?\.\s*\(.*\)\.?$/;
+
 const TIMING: Readonly<Record<string, string>> = {
   setup: "Setup",
   forced: "Forced",
@@ -62,7 +65,10 @@ const TRIGGER: Readonly<Record<string, string>> = {
   progressPlacedOnSelf: "after progress is placed on this card, the placement that explores it included (X is the amount placed; the card may have left play)",
   questProgressPlacedOnStage: "once, after a quest that succeeded has placed progress on the stage itself",
   escapeFailed: "after an escape test that this card's own effect made is failed (no other card hears it; the event happened to the player who made the test)",
+  burgleFailed: "after the first player's burgle attempt fails (every card in play hears it)",
   escapePassed: "after an escape test that this card's own effect made is passed (no other card hears it; the event happened to the player who made the test)",
+  attackUndefended: "after an enemy attack on a player has dealt its damage with no defender declared (any enemy attack, whatever its damage; the event happened to the defending player)",
+  controlLost: "after a player loses control of a location (it left his play area for any reason; the event happened to that player, about that location)",
   questProgressPlaced: "once, after a quest that succeeded has placed progress (on the active location, on a location that takes it first or on the stage)",
 };
 
@@ -81,7 +87,7 @@ const COSTS: Readonly<Record<string, (c: Obj) => string | null>> = {
   exhaustSelf: () => "exhaust this card",
   discardSelf: () => "discard this card",
   exhaustHost: () => "exhaust the attached card",
-  raiseThreat: (c) => `raise your threat by ${str(c.amount)}`,
+  raiseThreat: (c) => (c.each === true ? `raise each player's threat by ${str(c.amount)}` : `raise your threat by ${str(c.amount)}`),
   damageSelf: (c) => `deal ${str(c.amount)} damage to this card`,
   returnSelfToHand: () => "return this card to hand",
   resources: (c) => `pay ${str(c.amount)} ${typeof c.sphere === "string" ? `${c.sphere} ` : ""}resource(s)${c.from === "self" ? " from this card's pool" : c.from === "host" ? " from the host's pool" : ""}`,
@@ -96,7 +102,7 @@ export function renderCost(value: unknown, ctx: Ctx): string {
   if (Array.isArray(value)) return value.map((one) => renderCost(one, ctx)).join(" and ");
   if (!isObj(value) || typeof value.kind !== "string") return jsonOf(ctx, "cost", value);
   const said = COSTS[value.kind]?.(value);
-  return said ? done(ctx, said, value, ["kind", "amount", "sphere", "from", "code", "name"]) : jsonOf(ctx, "cost", value);
+  return said ? done(ctx, said, value, ["kind", "amount", "sphere", "from", "code", "name", "each"]) : jsonOf(ctx, "cost", value);
 }
 
 function renderSubject(value: unknown, ctx: Ctx): string {
@@ -136,7 +142,10 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   if (travel) lines.push(`  note: ${travel}`);
   // The last stage's win is the engine's own rule, not a record's: a constant on its side B that runs nothing only names the printed line.
   const winsOnDefeat = ctx.finalStage === true && effect.timing === "constant" && Array.isArray(effect.lines) && effect.lines.every((id) => typeof id === "string" && id.includes(":B:"));
-  if (instructions.length === 0) lines.push(winsOnDefeat ? "  (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)" : "  (no instructions: the record only names the printed line, and the engine runs no step for it)");
+  // On the last stage, a constant that runs nothing and names only printed keyword lines with their reminder text ("Siege. (Characters quest using Defense instead of Willpower.)") is the keyword's reminder, not the stage's defeat.
+  const keywordReminder = ctx.finalStage === true && effect.timing === "constant" && Array.isArray(effect.lines) && effect.lines.length > 0 && effect.lines.every((id) => typeof id === "string" && KEYWORD_REMINDER.test(ctx.lineTexts?.get(id) ?? ""));
+  if (instructions.length === 0 && keywordReminder) lines.push("  (no instructions: the record only names the printed keyword reminder; the keyword is the card's own and the engine reads it from the card)");
+  else if (instructions.length === 0) lines.push(winsOnDefeat ? "  (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)" : "  (no instructions: the record only names the printed line, and the engine runs no step for it)");
   if (instructions.length > 1) lines.push("  (steps run in order; a step depends on an earlier one only through its own condition)");
   const inner = effect.trigger === "engaged" ? { ...ctx, engagedSeat: true } : ctx;
   instructions.forEach((instruction, at) => lines.push(...renderInstruction(instruction, inner, 1, at > 0)));

@@ -6,6 +6,7 @@
 import type { Instruction, ModifierStat, ModifierUntil } from "../../catalog/boundary.ts";
 import { memoOf, type StateMemo } from "../../rules/interpret/constant-records.ts";
 import { captivesUnder } from "../../rules/families/captives/values.ts";
+import { alliesUnder } from "../readouts/against-the-shadow/blood.ts";
 import { aflameTally, burnTally } from "../../rules/families/aflame/values.ts";
 import { cellOf, islandOf } from "../../rules/families/island/map.ts";
 
@@ -17,6 +18,7 @@ import { shipLoss, type ShipLoss } from "../words/scenarios/grapple.ts";
 import { heldWords } from "../words/scenarios/sea.ts";
 import { lootDeckWords, lootGuardWords } from "../words/loot.ts";
 import { lootUnder } from "../../rules/families/sidequests/loot.ts";
+import { stackMark } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { capturedPill } from "../words/scenarios/angmar/gram-table.ts";
 import { capturedOwners } from "../readouts/gram.ts";
 import { hiddenMark, isHeldFaceup, keptMark } from "../readouts/standalone-scenarios/wizards-quest.ts";
@@ -25,7 +27,9 @@ import { placedLimit } from "../../rules/families/uncharted/limit.ts";
 import { modifiedStat, printedStat } from "../../rules/core/keywords.ts";
 import { heldBy } from "../../rules/core/holder-classes.ts";
 import { isLocationCard, printedOf, type PrintedCard } from "../../rules/core/printed.ts";
-import { engagementCostOf, questPointsOf } from "../../rules/quest/quest.ts";
+import { effectById } from "../../rules/windows/listen.ts";
+import { engagementCostOf, questPointsOf, questStatOf } from "../../rules/quest/quest.ts";
+import { committedInStaging } from "../../rules/families/pelargir/committed.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
 import { flagged, inPlay, modifierActive, type ScenarioState } from "../../rules/core/state.ts";
 
@@ -34,6 +38,7 @@ import type { IconName } from "../../ui/icon-map.ts";
 import { stagePoints } from "../readouts/objective.ts";
 import { stageDefeatLoses } from "../readouts/fortress.ts";
 import { determinedMark, type DeterminedMark } from "./determined-mark.ts";
+import { poisonMark } from "./poison-mark.ts";
 import { deadSpeech } from "./realm-preview.ts";
 import { sideQuestMark, stagedSideQuest, type SideQuestMark } from "./side-quest-mark.ts";
 
@@ -42,9 +47,21 @@ export type BadgeStat = "willpower" | "attack" | "defense" | "hitPoints" | "thre
 // A printed number an effect changed: its icon, the engine's value now and how far it is from the printed one. `lasting`
 // when every effect behind it ends with the phase, the round or the attack (the forest spider's +1 until the end of the
 // round), so the pill shows it will go (rr.lasting-effects).
-export type StatBadge = { stat: BadgeStat; icon: IconName; word: string; value: number; delta: number; lasting: boolean };
+// `floored`: the effects take the number past its floor of 0 (Ithilien Road's "engagement cost is 0": -99 on a 34), so the chip shows the 0 and not the difference.
+export type StatBadge = { stat: BadgeStat; icon: IconName; word: string; value: number; delta: number; lasting: boolean; floored: boolean };
 
-export type FlagStat = "cannotAttack" | "cannotTakeDamage" | "cannotTakeNonCombatDamage" | "cannotBeEngaged" | "cannotBeOptionallyEngaged" | "damageLimit" | "cancelsDamage" | "mustCommit";
+/** The chip's text: "+1" or "-2", or "0" for a number the effects took past its floor of 0. */
+export function chipText(badge: StatBadge): string {
+  return badge.floored ? "0" : `${badge.delta > 0 ? "+" : "-"}${Math.abs(badge.delta)}`;
+}
+
+// Whether the active modifiers lower a stat below 0 (the floor): the number a "-99" modifier prints would be a lie, so it is worded as 0.
+function overshoots(modifiers: readonly ScenarioState["modifiers"][number][], base: number): boolean {
+  const lowered = modifiers.reduce((total, modifier) => (!modifier.set && modifier.amount < 0 ? total + modifier.amount : total), 0);
+  return base + lowered < 0;
+}
+
+export type FlagStat = "cannotAttack" | "cannotTakeDamage" | "cannotTakeNonCombatDamage" | "cannotBeEngaged" | "cannotBeOptionallyEngaged" | "damageLimit" | "cancelsDamage" | "mustCommit" | "cannotQuest" | "noPlayerAttachments" | "bilboLimitedToGollum";
 
 // The short word on the pill of a card that must commit to the quest (A Fell Dread, 101163:A:1): a "must", not a "cannot", so it is drawn as the Willpower icon and this word on an accent pill, never struck through.
 export const MUST_COMMIT_WORD = "Quest";
@@ -64,7 +81,8 @@ const STAT_ICON: Readonly<Record<BadgeStat, IconName>> = {
   engagementCost: "engagementCost",
 };
 
-const STAT_WORD: Readonly<Record<BadgeStat, string>> = {
+/** The word for each stat, as the table says it (the quest total says the one the stage counts, phases/quest-stat.ts). */
+export const STAT_WORD: Readonly<Record<BadgeStat, string>> = {
   willpower: "Willpower",
   attack: "Attack",
   defense: "Defense",
@@ -76,6 +94,10 @@ const STAT_WORD: Readonly<Record<BadgeStat, string>> = {
 
 const FLAGS: readonly { flag: FlagStat; icon: IconName; word: string }[] = [
   { flag: "cannotAttack", icon: "attack", word: "Cannot attack" },
+  // Bilbo Baggins in the riddle area (131030:B:3, hob.riddle-area): the stage's other limits on him, as the preview lists them.
+  { flag: "cannotQuest", icon: "willpower", word: "Cannot quest" },
+  { flag: "noPlayerAttachments", icon: "attachment", word: "Takes no attachments from players" },
+  { flag: "bilboLimitedToGollum", icon: "defense", word: "Defends against and takes damage from Gollum only" },
   { flag: "cannotTakeDamage", icon: "hitPoints", word: "Takes no damage" },
   { flag: "cannotTakeNonCombatDamage", icon: "hitPoints", word: "Takes only combat damage" },
   { flag: "cannotBeEngaged", icon: "engagementCost", word: "Cannot be engaged" },
@@ -113,6 +135,9 @@ function printedValue(printed: PrintedCard, stat: BadgeStat): number | null {
 // A card's edge shows this many effect pills, then "+n" for the rest (the preview lists all of them).
 export const BADGE_CAP = 2;
 
+/** The words on the night pill that stands for the effect pills left out ("2 more"): a count with no sign, so it cannot be read as a change to a number the way "+2" is. */
+export const moreText = (hidden: number): string => `${hidden} more`;
+
 /** How many of `total` effect pills are drawn and how many hide behind "+n", given the rows that fit on the card's edge. */
 export function badgeSplit(total: number, room: number): { shown: number; hidden: number } {
   const fit = Math.max(1, room);
@@ -134,6 +159,12 @@ function cached<T>(memo: StateMemo<Map<string, T>>, game: ScenarioState, ctx: Re
   return built;
 }
 
+// A constant record's modifier lasts while its source is in play, but the record says what the card prints: "while it is the active location" (05028:A:1). The engine reads the record's stat only; this is the wording.
+function untilOf(ctx: ReduceContext, modifier: ScenarioState["modifiers"][number]): ModifierUntil {
+  const written = modifier.origin ? effectById(ctx, modifier.origin)?.instructions.find((entry) => entry.verb === "ModifyStat" && entry.stat === modifier.stat) : undefined;
+  return written?.verb === "ModifyStat" && written.until === "whileSourceActive" ? "whileSourceActive" : modifier.until;
+}
+
 /** The effects on one card in play now: changed numbers and "cannot"s. Empty for a card out of play or face down. */
 export function cardEffects(game: ScenarioState, ctx: ReduceContext, cardId: string): CardEffects {
   return cached(EFFECTS, game, ctx, cardId, () => effectsOnCard(game, ctx, cardId));
@@ -152,7 +183,7 @@ function effectsOnCard(game: ScenarioState, ctx: ReduceContext, cardId: string):
     if (value === base) continue;
     const behind = game.modifiers.filter((modifier) => modifier.stat === stat && heldBy(modifier, card, printed) && modifierActive(game, modifier));
     const lasting = behind.length > 0 && behind.every((modifier) => TEMPORARY.has(modifier.until));
-    stats.push({ stat, icon: STAT_ICON[stat], word: STAT_WORD[stat], value, delta: value - base, lasting });
+    stats.push({ stat, icon: STAT_ICON[stat], word: STAT_WORD[stat], value, delta: value - base, lasting, floored: value === 0 && overshoots(behind, base) });
   }
   // A card engaged with each player is engaged, so "Cannot be engaged" would contradict it: its words say it (engagedWithAllWords).
   const engagedWithAll = flagged(game, cardId, "engagedWithAll");
@@ -205,12 +236,14 @@ export function effectLines(game: ScenarioState, ctx: ReduceContext, cardId: str
     if (word) {
       // A conditional modifier counts only when its number shows.
       if (modifier.when && !shown.stats.some((badge) => badge.stat === modifier.stat)) continue;
-      const amount = modifier.set ? `${word} is ${modifier.amount}` : `${modifier.amount >= 0 ? "+" : ""}${modifier.amount} ${word}`;
-      lines.push(`${amount} from ${source}, ${UNTIL[modifier.until]}`);
+      // A modifier that takes the number past its floor of 0 says "is 0" ("Engagement cost is 0 from Ithilien Road"), not the -99 it is written as.
+      const floored = !modifier.set && modifier.amount < 0 && shown.stats.some((badge) => badge.stat === modifier.stat && badge.floored);
+      const amount = modifier.set ? `${word} is ${modifier.amount}` : floored ? `${word} is 0` : `${modifier.amount >= 0 ? "+" : ""}${modifier.amount} ${word}`;
+      lines.push(`${amount} from ${source}, ${UNTIL[untilOf(ctx, modifier)]}`);
       continue;
     }
     const flag = FLAGS.find((entry) => entry.flag === modifier.stat);
-    if (flag && modifier.amount > 0) lines.push(`${flagWord(flag.word, modifier.amount)}: ${source}, ${UNTIL[modifier.until]}`);
+    if (flag && modifier.amount > 0) lines.push(`${flagWord(flag.word, modifier.amount)}: ${source}, ${UNTIL[untilOf(ctx, modifier)]}`);
   }
   return lines;
 }
@@ -270,16 +303,22 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
   const questing = card != null && (stagedSideQuest(game, ctx, cardId) || card.zone === "questStage" || card.zone === "activeLocation" || card.zone === "secondActiveLocation" || areaRoleOf(game, cardId) === "stage");
   const enemy = card != null && card.zone === "staging" && card.face !== "down" && printedOf(ctx.cards, card.code).type === "enemy";
   const cost = enemy ? engagementCostOf(game, card, ctx.cards) : null;
+  // A character committed to the quest, or an ally objective committed by its own text in the staging area (05025:A:1), shows the stat the quest counts (hon.battle, hon.siege).
+  const committed = card != null && (card.committed || committedInStaging(game, cardId));
+  const commitStat = committed ? questStatOf(game, cardId, ctx.cards) : "willpower";
+  // A staged enemy's foot chip shows the engagement cost it has now, so a cost the effects took to 0 is not told a second time by a bare "0" among the +n and -n chips (the preview line still says "Engagement cost is 0").
+  const shown = cost == null ? effects : { ...effects, stats: effects.stats.filter((badge) => !(badge.stat === "engagementCost" && badge.floored)) };
   return {
-    effects,
-    willpower: card?.committed ? modifiedStat(game, card, "willpower", ctx.cards) : null,
+    effects: shown,
+    willpower: card != null && committed ? modifiedStat(game, card, commitStat, ctx.cards) : null,
+    commitStat,
     // A stage that progress never defeats has no strip (objective.ts): "25 / 0" would read as a stage that should be won.
     questPoints: questing ? (card.zone === "questStage" ? stagePoints(game, card, ctx) : questPointsOf(game, card, ctx.cards)) : null,
     stageLoses: card != null && card.zone === "questStage" && stageDefeatLoses(ctx, card.code),
     engagement: cost != null ? { cost, engages: engagesAt(game, ctx).get(cardId) === seat } : null,
     delayed: game.delayed.some((entry) => actsOn(entry, cardId)),
     // The cards underneath The Havens Burn against the number that loses (11038:A:2); `loses` when one more card does.
-    under: card != null && inPlay(card.zone) ? (underMark(burnTally(game, cardId, ctx)) ?? heldMark(game, ctx, cardId) ?? lootMark(game, ctx, cardId)) : null,
+    under: card != null && inPlay(card.zone) ? (underMark(burnTally(game, cardId, ctx)) ?? heldMark(game, ctx, cardId) ?? lootMark(game, ctx, cardId) ?? poisonMark(game, ctx, cardId)) : null,
     // An Aflame location in play: its damage against the value that destroys it.
     fire: card != null && inPlay(card.zone) ? fireMark(aflameTally(game, cardId, ctx)) : null,
     // A Ship location while the stage that loses at a total Threat of 9 is in play: its Threat against that total (12041:B:2).
@@ -317,8 +356,8 @@ function stagingPlace(game: ScenarioState, cardId: string): PlaceMark | null {
   return at ? { row: at.row, col: at.col, from: marker } : null;
 }
 
-/** The pill on The Havens Burn: "2/5" (cards under it against the number that loses), threat red when the next card placed under it loses the game; `speech` is "2 under, lose at 5". */
-export type UnderMark = { text: string; loses: boolean; speech: string; count?: number };
+/** The pill on The Havens Burn: "2/5" (cards under it against the number that loses), threat red when the next card placed under it loses the game; `speech` is "2 under, lose at 5". `clearName`: on a card turned sideways the pill stands at its far end, clear of the name (a character with poison). */
+export type UnderMark = { text: string; loses: boolean; speech: string; count?: number; clearName?: true };
 
 function underMark(tally: { count: number; limit: number } | null): UnderMark | null {
   return tally ? burnMark(tally) : null;
@@ -327,6 +366,9 @@ function underMark(tally: { count: number; limit: number } | null): UnderMark | 
 // The Ship enemy Belfalas Islet holds out of play while it is the active location (12129:A:2) is the same night pill as the cards under The Havens Burn: "1 held", and the reader hears the enemy's name.
 // The Captives of The Uruk-hai lying under To Isengard! or held by Grishnákh are counted the same way (families/captives): "2 held", and the reader hears each hero's name.
 function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): UnderMark | null {
+  // The facedown underworld cards under a location of The Steward's Fear: "2 underworld", never which cards (06018:A:1).
+  const stack = stackMark(game, cardId);
+  if (stack) return stack;
   // The cards captured underneath a card in Escape from Mount Gram: "3 captured", with their owners spoken (readouts/gram.ts).
   const owners = game.capture != null ? capturedOwners(game, cardId) : [];
   if (owners.length > 0) return capturedPill(owners);
@@ -335,6 +377,10 @@ function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): Unde
   const hidden = hiddenMark(game, cardId);
   if (kept && hidden) return { text: `${kept.text} · ${hidden.text}`, loses: false, speech: `${kept.speech}. ${hidden.speech}`, count: kept.count + hidden.count };
   if (kept ?? hidden) return kept ?? hidden;
+  // The objective allies of The Blood of Gondor lie under Captured!, in play and controlled by nobody: "2 held".
+  const allies = alliesUnder(game, cardId);
+  // The count lifts the pill clear of the quest points ("0 / 15") like the other held marks (underMarkBox).
+  if (allies.length > 0) return { ...heldWords(allies.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name)), count: allies.length };
   const captives = captivesUnder(game, cardId);
   if (captives.length > 0) return heldWords(captives.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
   const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);
@@ -365,7 +411,9 @@ function fireMark(tally: { value: number; damage: number } | null): FireMark | n
 
 export type SlotNumbers = {
   effects: CardEffects;
+  // The committed number, and the stat it is (Willpower unless the quest has Battle or Siege): its pill's icon.
   willpower: number | null;
+  commitStat: "willpower" | "attack" | "defense";
   questPoints: number | null;
   // The current stage's defeat loses the game (The Wall is Breached!, 143075:B:3): its strip says so in threat red.
   stageLoses: boolean;

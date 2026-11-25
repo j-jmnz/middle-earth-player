@@ -7,7 +7,7 @@
 import type { PrintedCard } from "../../rules/core/printed.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
-import { type CardInstance, type ScenarioState } from "../../rules/core/state.ts";
+import { isExhausted, type CardInstance, type ScenarioState } from "../../rules/core/state.ts";
 import { shadowCards } from "../../rules/core/zones.ts";
 import { stagingThreat } from "../../rules/quest/quest.ts";
 
@@ -18,6 +18,7 @@ import { shareHint, shareValue, wordOf } from "../choice/tray-logic.ts";
 import type { OptionMark, Sheet } from "../choice/sheet-types.ts";
 import { actingSeat, hidesFace, isDead, isLooked, isPrisoner, type ZoneFacts, type ZoneId } from "../store/selectors.ts";
 import { areaRoleOf, areaSpeech } from "../store/stormcaller-table.ts";
+import { villagerUnit } from "../readouts/against-the-shadow/amon-din.ts";
 import { plural } from "./list.ts";
 import { seatTag } from "./scenarios/area.ts";
 import { REANIMATED_DEAD } from "./scenarios/angmar/dread-realm-table.ts";
@@ -85,7 +86,9 @@ function statWords(game: ScenarioState, card: CardInstance, printed: PrintedCard
     if (stat === "willpower" && info.willpower != null) continue;
     if (printed[stat] == null) continue;
     const value = modifiedStat(game, card, stat, deps.cards);
-    const delta = info.effects.stats.find((badge) => badge.stat === stat)?.delta ?? 0;
+    const badge = info.effects.stats.find((entry) => entry.stat === stat);
+    // A number taken past its floor says only the 0 ("0 engagementCost"), not the -99 behind it.
+    const delta = badge?.floored ? 0 : (badge?.delta ?? 0);
     words.push(`${value} ${stat}${delta !== 0 ? ` (${delta > 0 ? "+" : ""}${delta})` : ""}`);
   }
   return words;
@@ -148,12 +151,12 @@ function labelOf(game: ScenarioState, seat: number, card: CardInstance, deps: Ca
     parts.push(`controlled by player ${card.controller + 1}`);
   }
   if (card.zone === "attached" && card.host && game.cards[card.host]) parts.push(`attached to ${nameOfCard(game.cards, card.host, deps.nameOf)}`);
-  if (card.exhausted) parts.push("exhausted");
+  if (isExhausted(card)) parts.push("exhausted");
   if (card.committed) parts.push(info.willpower != null ? `committed to the quest, ${info.willpower} willpower` : "committed to the quest");
 
   const damage = damageWords(game, card, printed, deps, info);
   if (damage) parts.push(damage);
-  if (card.resources > 0) parts.push(plural(card.resources, "resource", "resources"));
+  if (card.resources > 0) parts.push(villagerUnit(game, card) ? plural(card.resources, "villager token") : plural(card.resources, "resource", "resources"));
   const island = islandTell(game, card);
   if (!stage) {
     if (info.questPoints != null) parts.push(`${card.progress} of ${info.questPoints} progress`);

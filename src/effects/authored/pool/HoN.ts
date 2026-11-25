@@ -13,8 +13,9 @@ export const RECORDS: readonly Effect[] = [
   {"id":"05006:action:1","cardCode":"05006","lines":["05006:A:1"],"timing":"action","instructions":[{"verb":"Pick","pick":{"type":"hero","control":"any","trait":"Gondor"}},{"verb":"AddResources","amount":1,"to":"picked"}]},
   // 05008 Behind Strong Walls
   {"id":"05008:action:1","cardCode":"05008","lines":["05008:A:1"],"timing":"action","instructions":[{"verb":"Pick","pick":{"type":"character","control":"any","trait":"Gondor","defending":true}},{"verb":"Ready","target":"picked"},{"verb":"ModifyStat","stat":"defense","amount":1,"until":"endOfPhase","target":"picked"}]},
-  // 05009 Spear of the Citadel (lines 1 and 2 are Restricted and the generated 05009:constant:1). The attacking enemy is the
-  // event's other card.
+  // 05009 Spear of the Citadel. Lines 1 and 2 (the card prints "Limit 1 per character." as its own paragraph) are the one
+  // attachment rule the generated 05009:constant:1 wrote for them as a single line. The attacking enemy is the event's other card.
+  {"id":"05009:constant:1","cardCode":"05009","lines":["05009:A:1","05009:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character","sphere":"tactics"},"limitPerHost":true}]},
   {"id":"05009:response:1","cardCode":"05009","lines":["05009:A:3"],"timing":"response","trigger":"declaredDefender","subject":"host","instructions":[{"verb":"DamageCard","amount":1,"target":"other"}]},
   // 05010 Damrod. Lowering threat by 0 would change nothing (rr.triggered-ability).
   {"id":"05010:action:1","cardCode":"05010","lines":["05010:A:1"],"timing":"action","cost":{"kind":"discardSelf"},"condition":{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true},"min":1},"instructions":[{"verb":"LowerThreat","amount":{"count":{"type":"enemy","control":"any","stagingOnly":true}},"who":"actor"}]},
@@ -31,4 +32,4 @@ export const RECORDS: readonly Effect[] = [
   {"id":"05018:response:1","cardCode":"05018","lines":["05018:A:1"],"timing":"response","trigger":"enteredPlay","subject":"self","condition":{"kind":"canPick","pick":{"type":"hero","control":"any","traits":["Gondor","Noble"]}},"instructions":[{"verb":"Pick","pick":{"type":"hero","control":"any","traits":["Gondor","Noble"]}},{"verb":"AddResources","amount":1,"to":"picked"}]},
 ];
 
-export const REPLACES: readonly string[] = [];
+export const REPLACES: readonly string[] = ["05009:constant:1"];

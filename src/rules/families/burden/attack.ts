@@ -20,25 +20,46 @@ import { damageGoesTo } from "../defense/damage.ts";
 import { gameReads } from "../../core/game-reads.ts";
 import { attackWith } from "../attack/immediate.ts";
 import { effectData } from "../encounter/moves.ts";
+import { consideredEngagedSeats } from "../../core/engaged.ts";
 
 type Each = Extract<Instruction, { verb: "ImmediateAttackEach" }>;
 
-// The enemies engaged with a player now, in player order and the order they engaged in; while the areas are isolated, only those engaged with the players sharing the acting seat's area ("each Wight enemy engaged with a player", 148014:A:1: at the revealer's stage).
-function engagedEnemies(state: ScenarioState, seat: number): string[] {
-  return (isolatedAreas(state) ? sharing(state, seat) : livingSeats(state)).flatMap((index) => state.seats[index]?.engaged ?? []);
+// One enemy to attack and the seat it attacks: the player an engaged enemy is engaged with, or a player a staging enemy is considered engaged with (the Watcher in the Water, the Balrog, Bolg at stage 5: rr.engaged).
+type Attacker = { enemy: string; against: number | undefined };
+
+// The enemies engaged with one of `seats` now, in seat order and the order they engaged in, then (unless `engagedOnly`) those in the staging area that are considered engaged with one of them.
+function attackersAmong(state: ScenarioState, seats: number[], engagedOnly: boolean): Attacker[] {
+  const engaged = seats.flatMap((index) => (state.seats[index]?.engaged ?? []).map((enemy): Attacker => ({ enemy, against: undefined })));
+  if (engagedOnly) return engaged;
+  const considered = state.staging.flatMap((enemy) => consideredEngagedSeats(state, enemy, seats).map((against): Attacker => ({ enemy, against })));
+  return [...engaged, ...considered];
+}
+
+// The attackers of "each engaged enemy": while the areas are isolated, only those engaged with the players sharing the acting seat's area ("each Wight enemy engaged with a player", 148014:A:1: at the revealer's stage). `engagedOnly` leaves out the staging area ("engaged with a player, and not in the staging area", 142086:A:2).
+function engagedEnemies(state: ScenarioState, seat: number, engagedOnly: boolean): Attacker[] {
+  return attackersAmong(state, isolatedAreas(state) ? sharing(state, seat) : livingSeats(state), engagedOnly);
+}
+
+// One queued attack: an enemy from the staging area attacks the seat it was queued for (`focus.seat`) and is counted as one that attacked.
+function attackOne(state: ScenarioState, enemy: string, instruction: Each, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const shadow = instruction.shadow !== false;
+  if (state.cards[enemy]?.zone === "staging") return attackWith(state, enemy, ctx, steps, focus.seat, 0, true, shadow);
+  return attackWith(state, enemy, ctx, steps, undefined, 0, false, shadow);
 }
 
 // ImmediateAttackEach. The first time it runs it queues an attack for each engaged enemy ahead of the rest of the effect; each
 // queued attack runs when the one before it is resolved. Outside an effect nobody can wait for the attacks, so none is made.
 export function immediateAttackEach(state: ScenarioState, instruction: Each, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  if (instruction.enemy != null) return attackWith(state, instruction.enemy, ctx, steps);
+  if (instruction.enemy != null) return attackOne(state, instruction.enemy, instruction, focus, ctx, steps);
   const data = effectData(state);
   if (!data) return state;
   // `trait`: only the engaged enemies with it ("All engaged Troll enemies attack", 900208:A:1).
   const trait = instruction.trait;
-  const queued = (instruction.own ? (state.seats[focus.seat]?.engaged ?? []) : engagedEnemies(state, focus.seat))
-    .filter((enemy) => (trait == null || hasTrait(state, enemy, trait, ctx)) && (instruction.notTrait == null || !hasTrait(state, enemy, instruction.notTrait, ctx)))
-    .map((enemy): QueueItem => ({ instruction: { ...instruction, enemy }, seat: focus.seat, chosen: null }));
+  const engagedOnly = instruction.notStaging === true;
+  const attackers = instruction.own ? attackersAmong(state, [focus.seat], engagedOnly) : engagedEnemies(state, focus.seat, engagedOnly);
+  const queued = attackers
+    .filter(({ enemy }) => (trait == null || hasTrait(state, enemy, trait, ctx)) && (instruction.notTrait == null || !hasTrait(state, enemy, instruction.notTrait, ctx)))
+    .map(({ enemy, against }): QueueItem => ({ instruction: { ...instruction, enemy }, seat: against ?? focus.seat, chosen: null }));
   return patchTop(state, { data: { ...data, queue: [...queued, ...data.queue] } });
 }
 
@@ -46,7 +67,7 @@ export function immediateAttackEach(state: ScenarioState, instruction: Each, foc
 // damage was redirected to) that are in the discard pile with as much damage as they have hit points ("If this attack destroys a
 // character", 141065:A:2, 141066:A:2; "After a character is destroyed by a Hill Troll", 01130:A:4).
 export function destroyedByAttack(state: ScenarioState, attack: PendingAttack, ctx: ReduceContext): string[] {
-  const hit = new Set([...declaredDefenders(attack), ...(attack.heroId ? [attack.heroId] : [])].flatMap((id) => [id, damageGoesTo(state, id)]));
+  const hit = new Set([...declaredDefenders(attack), ...(attack.heroId ? [attack.heroId] : [])].flatMap((id) => [id, damageGoesTo(state, id, "combat")]));
   return [...hit].filter((id) => {
     const card = state.cards[id];
     if (!card || card.zone !== "discard") return false;

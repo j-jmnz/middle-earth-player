@@ -4,7 +4,9 @@
 // turn reference (reference.ts: the rule titles from data/rules and what the player decides), the step the engine is in, and the
 // action windows the player can stop at. Pure and read-only: every word comes from `turnReference`, `STEP_WORDS` and the
 // window points through it, none is written here, and nothing here sends an intent.
+import { questStatNow, type QuestStat } from "./quest-stat.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
+import type { ReduceContext } from "../../rules/engine/reduce.ts";
 
 import { phaseIndex, ROUND_PHASES, windowPoint } from "./rail.ts";
 import { turnReference, type ReferencePhase } from "./reference.ts";
@@ -52,10 +54,10 @@ function stateOf(index: number, here: number, ran: number): CarouselPhase["state
  * The round laid out for the panel. `stops` is the player's standing setting (table-settings.ts); `title` reads a rule span's
  * title (as turnReference does). Before the Resource phase every phase is next, and after Refresh every phase is past.
  */
-export function phaseCarousel(game: ScenarioState, stops: Pick<TableSettings, "stopsOn" | "stops">, title: (id: string) => string | null): Carousel {
+export function phaseCarousel(game: ScenarioState, stops: Pick<TableSettings, "stopsOn" | "stops">, title: (id: string) => string | null, stat?: QuestStat): Carousel {
   const here = phaseIndex(game);
   const ran = game.extraResume != null && game.extraFollowed ? ROUND_PHASES.indexOf(game.extraFollowed) : here;
-  const reference = turnReference(game, title);
+  const reference = turnReference(game, title, stat);
   const phases = ROUND_PHASES.map((name, index): CarouselPhase => {
     const steps = carouselSteps(reference.find((phase) => phase.phase === name)?.steps ?? [], stops.stops);
     return { id: name.toLowerCase(), name, state: stateOf(index, here, ran), steps };
@@ -65,6 +67,11 @@ export function phaseCarousel(game: ScenarioState, stops: Pick<TableSettings, "s
     phases,
     stopAhead: stops.stopsOn && stopAhead(game, phases[here]?.steps, stops.stops),
   };
+}
+
+/** The carousel with the quest steps worded by the stat the stage counts (quest-stat.ts): Attack under Battle, Defense under Siege. */
+export function carouselOf(game: ScenarioState, ctx: ReduceContext, stops: Pick<TableSettings, "stopsOn" | "stops">, title: (id: string) => string | null): Carousel {
+  return phaseCarousel(game, stops, title, questStatNow(game, ctx));
 }
 
 // A phase's steps for the panel, each window marked a stop where the player's stops say so.

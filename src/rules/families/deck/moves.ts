@@ -16,6 +16,7 @@ import { queueEvent } from "../../windows/queue.ts";
 import { announceAllyLeft } from "../../core/ally-left.ts";
 import { discardLockedFor } from "../angmar/lock.ts";
 import { announceTopDiscard } from "./pressure.ts";
+import { markShort } from "../../interpret/effect-verbs.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import type { CardInstance, EffectData, ScenarioState } from "../../core/state.ts";
 import { inPlay, updateCard, withSeat } from "../../core/state.ts";
@@ -41,7 +42,7 @@ function ownerOf(card: CardInstance): number | null {
 }
 
 // The zone group MoveCard's `from` names.
-function zoneGroup(card: CardInstance): "hand" | "play" | "discard" | "deck" | null {
+export function zoneGroup(card: CardInstance): "hand" | "play" | "discard" | "deck" | null {
   if (inPlay(card.zone)) return "play";
   return card.zone === "hand" || card.zone === "discard" || card.zone === "deck" ? card.zone : null;
 }
@@ -135,6 +136,12 @@ export function shuffleDiscardIn(state: ScenarioState, instruction: Verb<"Shuffl
   return shuffleSeatDeck(next, seat);
 }
 
+// ShuffleSetAsideIntoDeck: a set-aside card with the printed code goes into the acting player's deck, shuffled in. Nothing happens when none is set aside.
+export function shuffleSetAsideIn(state: ScenarioState, code: string, seat: number): ScenarioState {
+  const id = state.setAside.find((other) => state.cards[other]?.code === code);
+  return id && state.seats[seat] ? shuffleSeatDeck(moveCard(state, id, { zone: "deck", seat }), seat) : state;
+}
+
 // RemoveDiscardFromGame: every card in the actor's discard pile is removed from the game (900908:A:1), in discard order.
 export function removeDiscardFromGame(state: ScenarioState, focus: Focus): ScenarioState {
   let next = state;
@@ -161,6 +168,8 @@ export function discardFromDeck(state: ScenarioState, instruction: Verb<"Discard
   const top = (next.seats[focus.seat]?.deck ?? []).slice(0, Math.max(0, amount));
   for (const id of top) next = queueEvent(moveCard(next, id, { zone: "discard", seat: focus.seat }), { trigger: "discardedFromDeck", seat: focus.seat, cardId: id });
   next = announceTopDiscard(patchData(next, { looked: top, discardedFromDecks: [...(effectData(next)?.discardedFromDecks ?? []), ...top] }), focus.seat, top.length, ctx);
+  // A deck of fewer cards than the discard names stops it short, so the text after "then" is not attempted (the `thenResolves` condition, rr.then).
+  if (top.length < amount) next = markShort(next, ctx);
   const count = instruction.count;
   if (!count) return next;
   const at = { seat: focus.seat, sourceId: focus.sourceId, counting: true, ...(scope.x != null ? { x: scope.x } : {}) };

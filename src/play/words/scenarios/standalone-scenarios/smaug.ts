@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (The Battle of Lake-town: the Smaug deck and Burn X, from the Quest Companion), rr.first-player, rr.damage (data/rules/entries.json); ledger lines 50201:A:1, 50202:B:2, 50205:A:2, 50209:A:2, 50210:A:1, 50210:A:2, 50221:A:2, 50223:A:2, 50214:A:2.
+// Rules: docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md (The Battle of Lake-town: the Smaug deck and Burn X, from the Quest Companion), rr.first-player, rr.damage (data/rules/entries.json); ledger lines 50201:A:1, 50202:B:2, 50205:A:2, 50209:A:2, 50210:A:1, 50210:A:2, 50221:A:2, 50223:A:2, 50214:A:2.
 // The choices the Lake-town engine asks that no record holds (src/rules/families/smaug/): where the first player reveals the next Smaug, each player's turn to take Burn damage on a character (exhaust one, how much of the pool it takes, or done), how many progress tokens stage 2B
 // discards to heal Lake-town, and how Fisherman's Dock's two active locations divide the progress. The keep row of the Shadow cancel offers (50209, 50210) is worded here too, since it says whether another player is asked next. Each sentence says the number, the side of the table and the
 // player; the Burn rows name the player (two-handed), and a row that loses the game, or destroys the character, is armed. Pure.
@@ -37,7 +37,7 @@ function kindOf(choose: Choose): Kind | null {
   return steps.some((step) => step.verb === "ResolveBurn" && step.assign != null) ? "share" : "burn";
 }
 
-/** The damage Lake-town holds and the limit it loses at (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town). */
+/** The damage Lake-town holds and the limit it loses at (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town). */
 const lakeNow = (game: ScenarioState): { damage: number; limit: number } => ({ damage: lakeTownDamage(game), limit: lakeTownLimit(game) });
 
 // The first of `seats` the engine asks next: the one with a ready character that can still take damage (families/smaug/burn.ts skips the others), or null.
@@ -101,12 +101,16 @@ export function smaugBranchWords(choose: Choose, optionId: string, game: Scenari
     if (step?.verb !== "SplitProgress") return null;
     const onFirst = step.onFirst ?? 0;
     const rest = (step.amount ?? 0) - onFirst;
-    const place = (id: string | null, count: number): string => {
+    // Assault on Osgiliath only: two Ruined Towers share a name, so each row says which active location it is, and a location the share fills is explored and goes to the first player (06091:B:2).
+    const osgiliath = game.scenarioId === "assault-on-osgiliath";
+    const twins = osgiliath && game.activeLocation != null && game.secondActiveLocation != null && game.cards[game.activeLocation]?.code === game.cards[game.secondActiveLocation]?.code;
+    const place = (id: string | null, count: number, which: string): string => {
       const card = id == null ? undefined : game.cards[id];
       const points = card == null ? null : questPointsOf(game, card, ctx.cards);
-      return `${count} on ${id == null ? "the location" : names.card(id)}${card != null && points != null ? ` (${card.progress + count} of ${points})` : ""}`;
+      const explored = osgiliath && card != null && points != null && card.progress + count >= points;
+      return `${count} on ${id == null ? "the location" : names.card(id)}${twins ? ` (${which} active location)` : ""}${card != null && points != null ? ` (${card.progress + count} of ${points})` : ""}${explored ? ", explored: the first player takes control" : ""}`;
     };
-    return `${place(game.activeLocation, onFirst)}, ${place(game.secondActiveLocation, rest)}`;
+    return `${place(game.activeLocation, onFirst, "first")}, ${place(game.secondActiveLocation, rest, "second")}`;
   }
   if (kind === "offer") {
     if (optionId !== "keep") return null;

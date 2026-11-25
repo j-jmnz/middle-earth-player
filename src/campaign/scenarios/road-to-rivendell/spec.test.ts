@@ -4,7 +4,7 @@ import { describe, it } from "vitest";
 import { announce, answer, attack, cardSpecs, damageOn, deckCount, defend, endPhase, exhausted, flag, lost, progressOn, resolve, resourcesOn, respond, reveal, stagingThreat, stat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Road to Rivendell (dwarrowdelf part 5): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). Build wrote the rows for the mechanics it added (Ambush's checks, Goblin Gate's gained ambush, Barren Hills,
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). Build wrote the rows for the mechanics it added (Ambush's checks, Goblin Gate's gained ambush, Barren Hills,
 // Orc Ambush, Goblin Gate's live quest points); Finish writes the rest. The stand-in heroes dh1 and dh2 have 2 Willpower, 2 Attack, 2 Defense; the first player's threat is the layout's first number.
 const ROWS: readonly Row[] = [
   // 04043 Goblin Gate: while it is the active location the round's first enemy revealed from the deck gains ambush, so Crebain (cost 35, no ambush of its own) engages a first player with threat 40.
@@ -52,7 +52,7 @@ const ROWS: readonly Row[] = [
 
   // 901402 Ambush in the Night: Goblin Gate's quest points grow by 1 for each enemy engaged with a player.
   { line: "901402:B:2", name: "Goblin Gate gets 1 more quest point for each enemy engaged with a player", layout: { stage: "901402", side: "B", active: "04043", engaged: ["04049", "04050"] }, act: announce("engaged", "04049"), expect: stat("04043", "questPoints", 6) },
-  { line: "901402:B:2", name: "a Goblin Gate whose progress equals its quest points once an engaged enemy leaves is explored at once", layout: { stage: "901402", side: "B", active: { code: "04043", progress: 4 }, engaged: ["04049"], deck: ["f0"], threat: [0, 0] }, act: reveal("901409"), expect: zone("04043", "encounterDiscard") },
+  { line: "901402:B:2", name: "a Goblin Gate that holds its printed quest points in progress is not explored while an enemy is engaged with a player", layout: { stage: "901402", side: "B", active: { code: "04043", progress: 4 }, engaged: ["04049"] }, act: announce("engaged", "04049"), expect: zone("04043", "activeLocation") },
   // 04038 Along the Misty Mountains: Setup puts Arwen into play under the first player's control and each player reveals a card.
   { line: "04038:A:1", name: "Setup puts Arwen into play and each player reveals a card", layout: { stage: "04038", side: "A", setAside: ["04041"], deck: ["f0", "f0"] }, act: resolve("04038", "setup"), expect: [zone("04041", "play"), zone("f0", "staging")] },
 

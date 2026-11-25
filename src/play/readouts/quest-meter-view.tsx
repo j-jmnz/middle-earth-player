@@ -12,7 +12,7 @@ import Animated, { cancelAnimation, useAnimatedStyle, useSharedValue, withTiming
 import { GameIcon } from "../../ui/game-icon.tsx";
 import { MOTION } from "../../ui/motion-tokens.ts";
 import { timing, useMotionScale } from "../../ui/motion-run.ts";
-import { meterFractions, scaleLabel, scaleMarker, stagingWord, type QuestScale } from "./quest-scale.ts";
+import { meterFractions, scaleLabel, scaleMarker, scaleStatWord, stagingWord, type QuestScale } from "./quest-scale.ts";
 import { Text } from "../../ui/text.tsx";
 import { withAlphaHex } from "../../ui/tokens.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
@@ -78,7 +78,7 @@ function FullMeter({ scale, height }: { scale: QuestScale; height: number }) {
           {marker.caption ?? ""}
         </Text>
       </View>
-      <View testID="quest-meter-willpower" className="items-center" style={{ width: 64 * s }}>
+      <View testID="quest-meter-stat" className="items-center" style={{ width: 64 * s }}>
         <Text className="font-display" style={{ height: NUMBER * s, fontSize: 20 * s, lineHeight: NUMBER * s, color: t.bone }}>
           {String(scale.willpower)}
         </Text>
@@ -90,7 +90,7 @@ function FullMeter({ scale, height }: { scale: QuestScale; height: number }) {
           <Animated.View style={[{ position: "absolute", left: -6 * s, right: -6 * s, height: 2 * s, borderRadius: s, backgroundColor: t.bone }, lineStyle]} />
         </View>
         <Text className="text-micro" numberOfLines={1} style={{ height: CAPTION * s, color: t.muted }}>
-          willpower
+          {scaleStatWord(scale)}
         </Text>
       </View>
     </View>
@@ -134,7 +134,7 @@ function CompactMeter({ scale, height }: { scale: QuestScale; height: number }) 
   return (
     <View style={{ height }}>
       <CompactRow fill={threatFill} color={t.threat} edge={t.threatEdge} word={stagingWord(scale)} value={String(scale.threat)} trailing={null} trailingColor={t.muted} />
-      <CompactRow fill={willFill} color={t.accent} edge={t.accentDeep} word="willpower" value={String(scale.willpower)} trailing={even ? "Even" : marker.value} trailingColor={markerColor(marker.tone, t)} glyph={marker.word === "Encounter"} />
+      <CompactRow fill={willFill} color={t.accent} edge={t.accentDeep} word={scaleStatWord(scale)} value={String(scale.willpower)} trailing={even ? "Even" : marker.value} trailingColor={markerColor(marker.tone, t)} glyph={marker.word === "Encounter"} />
     </View>
   );
 }

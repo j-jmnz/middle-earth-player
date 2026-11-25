@@ -101,18 +101,18 @@ const VERBS = [
   z.strictObject({ verb: z.literal("PutObjectiveLocationAfterDiscard") }),
   // Carried Away (18074:A:1): "Each player chooses a hero he controls, discards each token and attachment from that hero, and places it in the staging area ... attaches that enemy to the hero he owns in the staging area, guarding it." After a Pick of the hero, a DiscardUntil enemy and a
   // MoveEncounterCard of that enemy to the staging area, the hero (the card picked before the last) loses its tokens and attachments and lies facedown under the enemy (the captive zone: in play, controlled by no one), flagged as guarded; the enemy guards it (guardsHero). Nothing happens when no enemy was found.
-  // `keepAttachments` (51008:B:1, "discard all tokens from the chosen hero"): only the hero's tokens are discarded; its attachments stay on it under the enemy (docs/scenarios/standalone-scenarios.md, The Wizard's Quest, reading 10).
+  // `keepAttachments` (51008:B:1, "discard all tokens from the chosen hero"): only the hero's tokens are discarded; its attachments stay on it under the enemy (docs/scenarios/standalone-scenarios/the-wizards-quest.md, The Wizard's Quest, reading 10).
   z.strictObject({ verb: z.literal("CarryAwayHero"), keepAttachments: z.literal(true).optional(), ...when }),
   // Carried Away (18074:B:2): "When an enemy guarding a hero is defeated, return that hero to its owner's control, exhausted." (user ruling, 2026-11-05: when it leaves play in any way) The hero the event's subject (the enemy) guarded comes back among its owner's heroes, faceup and exhausted.
   z.strictObject({ verb: z.literal("ReleaseGuardedHero"), ...when }),
   // Carried Away (18074:B:3): "When the players advance from this stage, discard each guarded hero." Each hero an enemy guards goes to its owner's discard pile; a player left with no hero is eliminated (rr.player-elimination).
   z.strictObject({ verb: z.literal("DiscardGuardedHeroes"), ...when }),
   // Enemy Camp (50815:A:2, "discard 1 random facedown hero from under each stage 3"): of the heroes lying facedown under the current quest stage when it is stage number `stage`, one chosen with the game's seed goes to its owner's discard pile (a player left with no hero is eliminated).
-  // Nothing happens at another stage or with no hero under it (docs/scenarios/standalone-scenarios.md, The Siege of Annúminas, reading 18: Standard Game Mode puts no hero there).
+  // Nothing happens at another stage or with no hero under it (docs/scenarios/standalone-scenarios/the-siege-of-annuminas.md, The Siege of Annúminas, reading 18: Standard Game Mode puts no hero there).
   z.strictObject({ verb: z.literal("DiscardHeldHero"), stage: z.number().int().positive(), ...when }),
   // Enemy Camp (50815:A:2, "return each hero under each stage 3 to its owner's control"): each hero lying facedown under the current quest stage, when it is stage number `stage`, returns among its owner's heroes, faceup and exhausted.
   z.strictObject({ verb: z.literal("ReturnHeldHeroes"), stage: z.number().int().positive(), ...when }),
-  // Attack on Dol Guldur (standalone-scenarios part 9; ledger lines 50907:A:1, 50931:B:2; docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, readings 4 and 6).
+  // Attack on Dol Guldur (standalone-scenarios part 9; ledger lines 50907:A:1, 50931:B:2; docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, readings 4 and 6).
   // On the event of an enemy destroyed or a location explored: the Siege value printed on that card (`siegeValue`, 0 when it prints none) joins the round's tally, which the amount `siegeTally` reads. Dol Guldur's Forced effect empties it by reading it at the end of the round.
   z.strictObject({ verb: z.literal("TallySiege"), ...when }),
   // "randomly select a stage 3 that was not in play this round" (50931:B:2): of the stages in `codes`, those but the current one, the game's seed picks one and the running effect notes its code as an option taken (the condition `optionTaken`), for the penalty records that follow.
@@ -299,8 +299,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("SearchBoonOrTreasureToHand") }),
   // "Search the encounter deck, discard pile, and victory display for a Goblin Troop and add it to the staging area" (19161:A:3): the card with this code in any of the three is added to the staging area, entering play there. Nothing happens when none is left.
   z.strictObject({ verb: z.literal("SearchStageCard"), code, ...when }),
-  // "Add each enemy discarded by this effect to the staging area" (19162:A:2): every card of `type` that the effect's DiscardEncounterTop discarded and that is still in the encounter discard pile enters the staging area, in the order they were discarded.
-  z.strictObject({ verb: z.literal("StageDiscarded"), type: z.literal("enemy"), ...when }),
+  // "Add each enemy discarded by this effect to the staging area" (19162:A:2): every card of `type` that the effect's DiscardEncounterTop discarded and that is still in the encounter discard pile enters the staging area, in the order they were discarded. With `trait`, only an enemy with that Trait goes ("Add each Goblin enemy discarded by this effect to the staging area", 131063:A:1); the others stay in the discard pile.
+  z.strictObject({ verb: z.literal("StageDiscarded"), type: z.literal("enemy"), trait: z.string().min(1).optional(), ...when }),
   // "Remove 1 progress from The Goblins' Assault" (19163:A:2): progress comes off the card in play with this title, at most as much as it holds. `target` names the card itself instead ("remove 1 progress from River Ninglor", 02017:A:1:
   // a card's own title is the card, though another copy is in play).
   z.strictObject({ verb: z.literal("RemoveProgressFrom"), amount: positiveAmountSchema, named: z.string().min(1).optional(), target: cardRefSchema.optional(), ...when }),
@@ -323,9 +323,9 @@ const FLAGS = [
   "damageShield",
   // On an enemy: the damage it would be dealt is canceled and the card that granted the flag (Dragon Scales, 18059:A:2) is discarded. Set by a constant ModifyStat of the attachment; src/rules/families/wilderland/shield.ts cancelAllDamage takes it as damage is placed.
   "cancelsDamage",
-  // On an enemy: it has at most this many damage tokens ("it cannot have more than 18 damage", 19023:B:3); damage past the amount is not placed. Read where damage is placed (rules/core/keywords.ts placeDamage).
+  // On an enemy: it has at most this many damage tokens ("it cannot have more than 18 damage", 19023:B:3); damage past the amount is not placed. Read where damage is placed (rules/core/damage.ts placeDamage).
   "damageCeiling",
-  // On a card that holds damageCap: the damage a quest card or a side quest deals is not counted against the cap or held to it ("takes at most X damage each round from effects other than a quest card's", 19074:A:2). Read where damage is placed (rules/core/keywords.ts placeDamage).
+  // On a card that holds damageCap: the damage a quest card or a side quest deals is not counted against the cap or held to it ("takes at most X damage each round from effects other than a quest card's", 19074:A:2). Read where damage is placed (rules/core/damage.ts placeDamage).
   "damageCapSparesQuest",
   // On a character, or on every character ModifyStat target "characters" holds now and later: player card effects cannot ready it ("characters cannot be readied by player card effects", 19020:A:2). Read by readyBarred (rules/core/holder-classes.ts).
   "cannotReadyByPlayerCard",
@@ -335,7 +335,7 @@ const FLAGS = [
   "progressPlacedShared",
   // On a side quest in the staging area: it is the current quest until the end of the phase (emce.side-quests-in-play). Set by MakeCurrentQuest; a record reads it with the `flag` condition ("While Defend the Town is the current quest", 19071:A:1).
   "currentQuest",
-  // On an enemy: the characters defending against it do not count their Defense ("Characters do not count their Defense when defending against Dagnir", 19067:A:1). Read by defenseAsDefender (rules/core/keywords.ts).
+  // On an enemy: the characters defending against it do not count their Defense ("Characters do not count their Defense when defending against Dagnir", 19067:A:1). Read by defenseAsDefender (rules/core/modified-stat.ts).
   "defenseIgnored",
   // On an enemy: allies cannot be declared as attackers against it ("Allies cannot be declared as attackers against Dagnir", 19068:A:1). Read by canAttack (rules/combat/combat.ts).
   "alliesCannotAttack",
@@ -350,11 +350,11 @@ const FLAGS = [
   "optionalEngageUnique",
   // On a seat (target eachSeat): the most its threat can be reduced by player card effects each round ("each player's threat cannot be reduced by more than 1 via player card effects each round", 19104:A:2). Read by lowerThreatByEffect (families/quest/threat.ts).
   "playerThreatReductionCap",
-  // On a card: damage that comes from an effect other than a quest card's is not placed on it ("Dagnir cannot take damage from non-quest effects", 19127:A:1). Combat damage is not an effect of a card and still counts. Read where damage is placed (rules/core/keywords.ts placeDamage).
+  // On a card: damage that comes from an effect other than a quest card's is not placed on it ("Dagnir cannot take damage from non-quest effects", 19127:A:1). Combat damage is not an effect of a card and still counts. Read where damage is placed (rules/core/damage.ts placeDamage).
   "cannotTakeNonQuestDamage",
   // On a card in play: an encounter card's effect cannot discard it ("Unique locations cannot be discarded from play by encounter card effects", 12193:B:1). Read by the Discard verb (rules/interpret/verbs.ts).
   "cannotBeDiscardedByEncounter",
-  // On a hero (set by a constant ModifyStat of an attachment on its host): the players lose the game when it leaves play ("If attached hero leaves play, the players lose the game", 19143:A:3). Read where a card is destroyed (rules/core/keywords.ts destroyCard).
+  // On a hero (set by a constant ModifyStat of an attachment on its host): the players lose the game when it leaves play ("If attached hero leaves play, the players lose the game", 19143:A:3). Read where a card is destroyed (rules/core/destroy.ts destroyCard).
   "lossOnLeavingPlay",
   // Engine use, on a card or the table: the first treachery revealed this round, noted as it is revealed in a game that reads firstRevealedEachRound (families/wilderland/reveals.ts), and that a treachery was revealed this round.
   "firstTreachery",
@@ -377,7 +377,7 @@ const FLAGS = [
   // On the table: the Refresh Action of Abandoned Tools can be used once each round while Escape from Darkness is the current quest (901201:A:3), and the use made this round (engine use).
   "refreshOnce",
   "refreshUsed",
-  // On an enemy: it has no Indestructible, whatever it prints ("While Dol Guldur's city strength is 0, each Lieutenant enemy loses indestructible", 50931:B:1; docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 18). Its other keywords stay. Read by indestructible (rules/core/keywords.ts).
+  // On an enemy: it has no Indestructible, whatever it prints ("While Dol Guldur's city strength is 0, each Lieutenant enemy loses indestructible", 50931:B:1; docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 18). Its other keywords stay. Read by indestructible (rules/core/keyword-flags.ts).
   "losesIndestructible",
   // On an enemy: no Response cancels a Shadow effect the enemy attacks with ("its shadow cards cannot be canceled", 50916:A:1). Read by cancelBarred (rules/families/encounter/cancel.ts).
   "shadowsUncancelable",

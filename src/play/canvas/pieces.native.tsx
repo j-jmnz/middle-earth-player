@@ -6,13 +6,14 @@ import { Circle, DashPathEffect, FilterMode, Group, Image, Line, MipmapMode, Pat
 import type { ReactElement } from "react";
 
 import { cardCorner } from "../../ui/card-corner.ts";
-import { badgeSplit, MUST_COMMIT_WORD, type CardEffects } from "../cards/card-effects.ts";
+import { badgeSplit, chipText, moreText, MUST_COMMIT_WORD, type CardEffects } from "../cards/card-effects.ts";
 import { SPHERE_TINT, type IconName } from "../../ui/icon-map.ts";
 import { ICONS } from "../../ui/icons/generated.ts";
 import type { CardSlot, Rect } from "../layout/layout.ts";
 import { medallionAt } from "../layout/look-strip.ts";
 import { medallionCount } from "../words/scenarios/sea.ts";
 import { stripText } from "./table-canvas-views.ts";
+import { badgeRoom } from "./badge-room.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 import { wrapName } from "./wrap.ts";
@@ -259,6 +260,7 @@ export function Badges({
   rect,
   effects,
   willpower,
+  commitStat,
   questPoints,
   owner,
   stageLoses,
@@ -272,6 +274,7 @@ export function Badges({
   rect: Rect;
   effects: CardEffects;
   willpower: number | null;
+  commitStat: "willpower" | "attack" | "defense";
   questPoints: number | null;
   // Whose stage this is ("P2") once stages are separate between players: told on the progress strip.
   owner?: string | null;
@@ -288,7 +291,7 @@ export function Badges({
   const pill = BADGE_H * s;
   const strip = 15 * s;
   // Rows that fit between the top edge and the resource token at the bottom left.
-  const room = Math.max(1, Math.floor((h - TOKEN * s - 6 * s) / (pill + 2 * s)));
+  const room = badgeRoom(h, s, pill);
   const items = [...effects.stats.map((badge) => ({ kind: "stat" as const, badge })), ...effects.flags.map((flag) => ({ kind: "flag" as const, flag }))];
   const { shown: count, hidden } = badgeSplit(items.length, room);
   const shown = items.slice(0, count);
@@ -316,7 +319,7 @@ export function Badges({
     }
     const { badge } = item;
     const up = badge.delta > 0;
-    const text = `${up ? "+" : "-"}${Math.abs(badge.delta)}`;
+    const text = chipText(badge);
     const width = 15 * s + fonts.badge.getTextWidth(text) + 5 * s;
     return (
       <Group key={`s${badge.stat}`}>
@@ -336,20 +339,22 @@ export function Badges({
   });
   if (hidden > 0) {
     const top = y + 3 * s + shown.length * (pill + 2 * s);
+    const more = moreText(hidden);
+    const width = fonts.badge.getTextWidth(more) + 12 * s;
     rows.push(
       <Group key="more">
-        <RoundedRect x={x + 2 * s} y={top} width={24 * s} height={pill} r={pill / 2} color={t.night} />
-        <Text x={x + 6 * s} y={top + 11.5 * s} text={`+${hidden}`} font={fonts.badge} color={t.bone} />
+        <RoundedRect x={x + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={t.night} />
+        <Text x={x + 8 * s} y={top + 11.5 * s} text={more} font={fonts.badge} color={t.bone} />
       </Group>,
     );
   }
   return (
     <Group>
       {rows}
-      {slot.committed && willpower != null ? (
+      {willpower != null ? (
         <Group>
           <RoundedRect x={x + w / 2 - 16 * s} y={y + h - pill - 3 * s} width={32 * s} height={pill} r={pill / 2} color={t.accent} />
-          <CanvasIcon name="willpower" x={x + w / 2 - 13 * s} y={y + h - pill - 1 * s} size={11 * s} color={t.onAccent} />
+          <CanvasIcon name={commitStat} x={x + w / 2 - 13 * s} y={y + h - pill - 1 * s} size={11 * s} color={t.onAccent} />
           <Text x={x + w / 2 + 1 * s} y={y + h - 6.5 * s} text={String(willpower)} font={fonts.badge} color={t.onAccent} />
         </Group>
       ) : null}

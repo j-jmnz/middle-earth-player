@@ -89,6 +89,7 @@
     "desktop": "node scripts/cli.ts desktop",
     "webapp": "node scripts/cli.ts webapp",
     "release": "node scripts/cli.ts release",
+    "worktree": "node scripts/cli.ts worktree",
     "move": "node scripts/tools/move.ts",
     "commit:check": "node scripts/git/commit-message.ts",
     "eas-build-post-install": "pnpm assets",

@@ -1163,6 +1163,18 @@
     },
     {
       "match": {
+        "code": "06131"
+      },
+      "set": {
+        "keywords": {
+          "surge": false
+        }
+      },
+      "reason": "Conflict at the Crossroads prints no Surge keyword: its When Revealed text says \"Conflict at the Crossroads gains surge\" only when no Orc enemies are engaged with players. Hall of Beorn lists Surge as a keyword, so the card would surge every time; the record gains it conditionally.",
+      "source": "scan 06131.A (data/printed/against-the-shadow.json, no keyword line)"
+    },
+    {
+      "match": {
         "code": "144075"
       },
       "set": {
@@ -1184,6 +1196,44 @@
       },
       "reason": "The Stone of Erech prints \"Immune to player card effects.\" as its first line; Hall of Beorn lists no keyword for it, so the engine would read no immunity.",
       "source": "scan 145017.A (data/printed/the-return-of-the-king.json)"
+    },
+    {
+      "match": {
+        "code": "05025"
+      },
+      "set": {
+        "willpower": 2,
+        "attack": 2,
+        "defense": 2,
+        "health": 3
+      },
+      "reason": "Hall of Beorn has no stat fields for an ally objective, so Celador has none. The scan prints Willpower 2, Attack 2, Defense 2 and 3 hit points; an ally objective fights while committed (ats.ally-objectives), so the engine needs them.",
+      "source": "scan 05025.A (data/printed/against-the-shadow.json)"
+    },
+    {
+      "match": {
+        "code": "05026"
+      },
+      "set": {
+        "willpower": 2,
+        "attack": 2,
+        "defense": 1,
+        "health": 2
+      },
+      "reason": "Hall of Beorn has no stat fields for an ally objective, so Ithilien Guardian has none. The scan prints Willpower 2, Attack 2, Defense 1 and 2 hit points; an ally objective fights while committed (ats.ally-objectives), so the engine needs them.",
+      "source": "scan 05026.A (data/printed/against-the-shadow.json)"
+    },
+    {
+      "match": {
+        "code": "05047"
+      },
+      "set": {
+        "keywords": {
+          "immune": true
+        }
+      },
+      "reason": "Secluded Glade prints \"Immune to player card effects.\" as its first line; Hall of Beorn lists it as text only, so the engine would read no immunity.",
+      "source": "scan 05047.A (data/printed/against-the-shadow.json)"
     },
     {
       "match": {
@@ -1423,7 +1473,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1435,7 +1485,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1447,7 +1497,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1459,7 +1509,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1471,7 +1521,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1483,7 +1533,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1495,7 +1545,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1507,7 +1557,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1519,7 +1569,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -1531,7 +1581,7 @@
         }
       },
       "reason": "The Siege value is a printed box at the bottom right of the card in the Attack on Dol Guldur box (read from the scan), on no text line and in no source.",
-      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios.md, Attack on Dol Guldur, reading 2)"
+      "source": "Attack on Dol Guldur box, card scan (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 2)"
     },
     {
       "match": {
@@ -3688,7 +3738,7 @@
           "pillage": 8
         }
       },
-      "reason": "Captain of the Haven's line 1 prints \"Pillage 8.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, Mechanics for Build).",
+      "reason": "Captain of the Haven's line 1 prints \"Pillage 8.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, Mechanics for Build).",
       "source": "scan 40014.A, data/printed/standalone-scenarios.json"
     },
     {
@@ -3700,7 +3750,7 @@
           "pillage": 2
         }
       },
-      "reason": "Corsair Plunderer's line 1 prints \"Pillage 2.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, Mechanics for Build).",
+      "reason": "Corsair Plunderer's line 1 prints \"Pillage 2.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, Mechanics for Build).",
       "source": "scan 40021.A, data/printed/standalone-scenarios.json"
     },
     {
@@ -3712,7 +3762,7 @@
           "pillage": 3
         }
       },
-      "reason": "Daring Buccaneer's line 1 prints \"Pillage 3.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, Mechanics for Build).",
+      "reason": "Daring Buccaneer's line 1 prints \"Pillage 3.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, Mechanics for Build).",
       "source": "scan 40022.A, data/printed/standalone-scenarios.json"
     },
     {
@@ -3724,7 +3774,7 @@
           "pillage": 3
         }
       },
-      "reason": "Fierce Marauder's line 1 prints \"Pillage 3.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/scenarios/standalone-scenarios.md, The Hunt for the Dreadnaught, Mechanics for Build).",
+      "reason": "Fierce Marauder's line 1 prints \"Pillage 3.\". The keyword is on no source's keyword list for this box (the build lists it as an unknown token), so the keyword field is read from the scan (docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md, The Hunt for the Dreadnaught, Mechanics for Build).",
       "source": "scan 40023.A, data/printed/standalone-scenarios.json"
     },
     {
@@ -3738,6 +3788,20 @@
       },
       "reason": "Masterwork Bow prints \"Attach to a character. Restricted.\" (line 1 of its ledger entry, read from the scan), but Hall of Beorn lists no Restricted keyword for it, as it does for the other Ered Mithrin treasures that print it. Without the keyword the Bow is never a third Restricted attachment (rr.restricted).",
       "source": "scan 12204.A, data/printed/ered-mithrin.json"
+    },
+    {
+      "match": {
+        "code": "132075"
+      },
+      "set": {
+        "name": "The Gathering of the Clouds",
+        "imageUrls": [
+          "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Gathering-of-the-Clouds-1A.jpg",
+          "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Gathering-of-the-Clouds-1B.jpg"
+        ]
+      },
+      "reason": "Hall of Beorn spells the stage 1 quest card 'The Gathering of Clouds' in its title and slug and in the scan addresses, which answer 403. The card prints 'The Gathering of the Clouds' (the scan, DragnCards' deck Q0A.6), and the spelled-right addresses serve both sides.",
+      "source": "scan 132075.A (hallofbeorn.com/Export/QuestCards, Slug The-Gathering-of-Clouds-THOtD); s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Gathering-of-the-Clouds-1A.jpg; dragncards Q0A.6"
     }
   ],
   "scenarioPiles": [
@@ -4032,7 +4096,7 @@
       "code": "50204",
       "from": "setAside",
       "pile": "smaugDeck",
-      "reason": "DragnCards loads the nine Smaug cards set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: Shuffle all copies of Smaug into a separate Smaug deck.\", so Smaug the Mighty is dealt into the Smaug deck, a deck of its own with a discard pile of its own (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town).",
+      "reason": "DragnCards loads the nine Smaug cards set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: Shuffle all copies of Smaug into a separate Smaug deck.\", so Smaug the Mighty is dealt into the Smaug deck, a deck of its own with a discard pile of its own (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town).",
       "source": "dragncards preBuiltDecks.json (Q99.02); Terror from the Mountain 50201 printed Setup; Quest Companion Rulings: The Smaug Deck"
     },
     {
@@ -4040,7 +4104,7 @@
       "code": "50205",
       "from": "setAside",
       "pile": "smaugDeck",
-      "reason": "DragnCards loads the nine Smaug cards set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: Shuffle all copies of Smaug into a separate Smaug deck.\", so Smaug the Terrible is dealt into the Smaug deck, a deck of its own with a discard pile of its own (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town).",
+      "reason": "DragnCards loads the nine Smaug cards set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: Shuffle all copies of Smaug into a separate Smaug deck.\", so Smaug the Terrible is dealt into the Smaug deck, a deck of its own with a discard pile of its own (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town).",
       "source": "dragncards preBuiltDecks.json (Q99.02); Terror from the Mountain 50201 printed Setup; Quest Companion Rulings: The Smaug Deck"
     },
     {
@@ -4048,7 +4112,7 @@
       "code": "50206",
       "from": "setAside",
       "pile": "smaugDeck",
-      "reason": "DragnCards loads the nine Smaug cards set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: Shuffle all copies of Smaug into a separate Smaug deck.\", so Smaug the Magnificent is dealt into the Smaug deck, a deck of its own with a discard pile of its own (docs/scenarios/standalone-scenarios.md, The Battle of Lake-town).",
+      "reason": "DragnCards loads the nine Smaug cards set aside (Q99.02). The quest card Terror from the Mountain (50201) prints \"Setup: Shuffle all copies of Smaug into a separate Smaug deck.\", so Smaug the Magnificent is dealt into the Smaug deck, a deck of its own with a discard pile of its own (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town).",
       "source": "dragncards preBuiltDecks.json (Q99.02); Terror from the Mountain 50201 printed Setup; Quest Companion Rulings: The Smaug Deck"
     },
     {
@@ -4315,6 +4379,51 @@
       "reason": "DragnCards loads Dark Pit set aside (Q99.14) and omits its back, Durin's Bane (the scans number them 1/2 and 2/2, as The Mines of Moria's Watcher and Chamber of Mazarbul; Hall of Beorn files them as two cards, #10 and #11). The quest card Out of the Depths (51301) prints \"Setup: Add Dark Pit to the staging area.\", so it starts in the staging area, and stage 1B flips it over to Durin's Bane. `back` names that side.",
       "source": "scan 51301.A; dragncards preBuiltDecks.json (Q99.14)",
       "back": "51311"
+    },
+    {
+      "scenario": "over-the-misty-mountains-grim",
+      "code": "131064",
+      "from": "staging",
+      "pile": "encounter",
+      "reason": "DragnCards loads one Stone-Giant in the staging area (Q0A.2). The quest card A Short Rest (131026) prints no such Setup line: stage 1B advances at once to stage 2A, whose When Revealed (The Mountain Pass, 131027) searches the encounter deck for 1 copy of Stone-giant and adds it to the staging area. All 3 copies are in the encounter deck at Setup, as Hall of Beorn's count of 3 says (Easy 1).",
+      "source": "cards 131026 and 131027 (data/printed/the-hobbit.json); dragncards preBuiltDecks.json (Q0A.2); hallofbeorn.com/Export/Scenarios/Over-the-Misty-Mountains-Grim"
+    },
+    {
+      "scenario": "dungeons-deep-and-caverns-dim",
+      "code": "131074",
+      "from": "staging",
+      "pile": "encounter",
+      "reason": "DragnCards loads Gollum in the staging area (Q0A.3). Stage 1A (131029) prints \"Create a riddle area with stage 2A and follow the setup instructions on that card\", and stage 2A's Setup (Riddles in the Dark, 131030) searches the encounter deck for Gollum and Bilbo's Magic Ring and places Gollum in the riddle area, which is no part of the staging area. Gollum starts in the encounter deck, as Hall of Beorn's count of 1 says.",
+      "source": "cards 131029 and 131030 (data/printed/the-hobbit.json); hob.riddle-area; dragncards preBuiltDecks.json (Q0A.3)"
+    },
+    {
+      "scenario": "dungeons-deep-and-caverns-dim",
+      "code": "131079",
+      "from": "staging",
+      "pile": "encounter",
+      "reason": "DragnCards loads Bilbo's Magic Ring in the staging area (Q0A.3). Stage 2A's Setup (131030) searches the encounter deck for it and attaches it to Bilbo Baggins in the riddle area, so it starts in the encounter deck, as Hall of Beorn's count of 1 says.",
+      "source": "cards 131029 and 131030 (data/printed/the-hobbit.json); hob.riddle-area; dragncards preBuiltDecks.json (Q0A.3)"
+    },
+    {
+      "scenario": "peril-in-pelargir",
+      "code": "05019",
+      "pile": "attachedChosen",
+      "reason": "DragnCards loads Alcaron's Scroll in the staging area (Q03.1, E03.1). The quest card The Leaping Fish (05065) prints \"Setup: ... Make The Leaping Fish the active location and attach Alcaron's Scroll to a hero.\", so it is attached to a hero at Setup, not staged.",
+      "source": "scan 05065.A (hallofbeorn-resources Images/Cards/Heirs-of-Numenor/The-Leaping-Fish-Quest-1A.jpg); dragncards preBuiltDecks.json (Q03.1, E03.1); Heirs of Númenor rules insert p3 (ats.setup-peril-in-pelargir)"
+    },
+    {
+      "scenario": "peril-in-pelargir",
+      "code": "05020",
+      "pile": "encounter",
+      "reason": "DragnCards loads 4 of the 5 Harbor Thug in the staging area (Q03.1; its Easy deck E03.1 stages none). The quest card The Leaping Fish (05065) prints no Setup line that adds an enemy to the staging area, so all 5 copies are in the encounter deck at the start. The When Revealed of stage 1B (scan 05065.B: \"Each player must search the encounter deck for a copy of Harbor Thug and add it to the staging area.\") is what puts the Harbor Thugs in staging.",
+      "source": "scans 05065.A and 05065.B (hallofbeorn-resources Images/Cards/Heirs-of-Numenor/The-Leaping-Fish-Quest-1A.jpg and -1B.jpg); dragncards preBuiltDecks.json (Q03.1, E03.1); hallofbeorn.com/Export/Scenarios/Peril-in-Pelargir (5 Normal, 5 Easy)"
+    },
+    {
+      "scenario": "the-stewards-fear",
+      "code": "06022",
+      "pile": "encounter",
+      "reason": "DragnCards loads The Fourth Star set aside (Q03.4). The quest card Conspiracy (06011) sets aside only Roots of Mindolluin, the Villain cards and the Plot cards, and the Steward's Fear rulesheet's Setup paragraph names no other card, so The Fourth Star is in the encounter deck at the start.",
+      "source": "scan 06011.B (\"When Revealed: Search the encounter deck for The Fourth Star and make it the active location. Shuffle the encounter deck.\"); Steward's Fear rulesheet MEC18 (ats.setup-the-stewards-fear-underworld-deck); dragncards preBuiltDecks.json (Q03.4)"
     }
   ],
   "scenarioRemovals": [
@@ -4462,9 +4571,39 @@
       "easy": 2,
       "reason": "DragnCards' Easy deck E05.7 holds 1 Ruins of Arnor; Hall of Beorn gives the card's Easy count as 2 of its 3 copies, as in The Weather Hills' Easy deck, which agrees with it (the golden-bordered set icon marks the copy Easy Mode removes). Settled as researched: the printed icon is the rule, DragnCards' deck removes one copy too many.",
       "source": "Hall of Beorn (data/raw/hallofbeorn/Scenarios/The-Treachery-of-Rhudaur.json, EasyQuantity); data/raw/dragncards (E05.7, E05.2); https://www.fantasyflightgames.com/en/news/2016/8/12/travel-the-darkest-lands-of-the-north/"
+    },
+    {
+      "scenario": "the-lonely-mountain",
+      "code": "132037",
+      "easy": 0,
+      "reason": "DragnCards' Easy deck E0A.5 holds both copies of Fighting Among Friends. The Easy Mode sheet removes 2x Fighting Among Friends from the Wilderland set, Hall of Beorn's Easy count is 0, and DragnCards' Easy decks of the other two scenarios that deal the set (E0A.4, E0A.6) agree with both. The printed sheet wins; E0A.5 keeps the Normal count by mistake.",
+      "source": "data/rules/easy-mode.md (easy-mode.the-hobbit, the Easy Mode sheet, page 3); hallofbeorn.com/Export/Scenarios/The-Lonely-Mountain; dragncards E0A.4, E0A.5, E0A.6"
+    },
+    {
+      "scenario": "the-lonely-mountain",
+      "code": "132038",
+      "easy": 1,
+      "reason": "DragnCards' Easy deck E0A.5 holds both copies of Weighed Down. The Easy Mode sheet removes 1x Weighed Down from the Wilderland set, Hall of Beorn's Easy count is 1, and E0A.4 and E0A.6 agree with both. The printed sheet wins.",
+      "source": "data/rules/easy-mode.md (easy-mode.the-hobbit, the Easy Mode sheet, page 3); hallofbeorn.com/Export/Scenarios/The-Lonely-Mountain; dragncards E0A.4, E0A.5, E0A.6"
+    },
+    {
+      "scenario": "dungeons-deep-and-caverns-dim",
+      "code": "131065",
+      "easy": 2,
+      "reason": "DragnCards' Easy deck E0A.3 holds 1 The Goblins' Caves. The Easy Mode sheet removes 1x The Goblins' Caves of the 3 in the Misty Mountain Goblins set (Easy 2), and Hall of Beorn gives Easy 2. The printed sheet wins.",
+      "source": "data/rules/easy-mode.md (easy-mode.the-hobbit, the Easy Mode sheet, page 3); hallofbeorn.com/Export/Scenarios/Dungeons-Deep-and-Caverns-Dim; dragncards E0A.3"
     }
   ],
   "scenarioCounts": [
+    {
+      "scenario": "flies-and-spiders",
+      "code": "132019",
+      "pile": "setAside",
+      "normal": 4,
+      "easy": 4,
+      "reason": "The Setup (132067:A:1) lets each player shuffle 1 copy of Bilbo's Magic Ring into his deck, and the cycle plays one to four players (hob.staging-area-creating). A copy goes to each deck, since Bilbo and his token pass from player to player, so the table of four needs four. The load list sets aside 3 and the box holds 1; no source gives a count (agent recommendation, docs/scenarios/the-hobbit.md, Flies and Spiders).",
+      "source": "scan 132067.A (Setup line); docs/scenarios/the-hobbit.md, Flies and Spiders, Readings to confirm; agent recommendation"
+    },
     {
       "scenario": "the-treachery-of-rhudaur",
       "code": "09057",
@@ -4612,38 +4751,18 @@
       "easy": 3,
       "reason": "DragnCards has no Easy deck for Fog on the Barrow-downs, so Easy loads Q99.05 unchanged. Hall of Beorn's Easy counts (its scenario list; 42 Normal and 33 Easy encounter cards) remove 2 of Great Barrow's 5 copies (Easy 3); all copies are set aside by stage 1A's Setup, so the setAside pile loses them; the gold Easy mark is printed on individual copies, so a scan cannot show which. Normal mode is unaffected.",
       "source": "hallofbeorn.com/Export/Scenarios/Fog-on-the-Barrow-downs; hallofbeorn.com/LotR/Scenarios/Fog-on-the-Barrow-downs (42 Normal, 33 Easy encounter cards); dragncards Q99.05"
+    },
+    {
+      "scenario": "into-ithilien",
+      "code": "05027",
+      "pile": "staging",
+      "normal": 4,
+      "easy": 4,
+      "reason": "The Setup (05068:A) has each player search the encounter deck for a copy of Southron Company and add it to the staging area. The set holds 4 copies; DragnCards' Q03.2 stages all 4 and E03.2 stages 1 and leaves 3 in the encounter deck, though the Easy Mode sheet changes no Setup. The staging pile holds the 4 copies (one for each of up to 4 players), so the encounter pile's copies are dropped.",
+      "source": "scan 05068.A (hallofbeorn-resources Images/Cards/Heirs-of-Numenor/Ambush-in-Ithilien-1A.jpg); dragncards preBuiltDecks.json (Q03.2, E03.2); hallofbeorn.com/Export/Scenarios/Into-Ithilien (Southron Company 4 Normal, 4 Easy)"
     }
   ],
   "campaigns": [
-    {
-      "id": "the-hobbit",
-      "name": "The Hobbit",
-      "kind": "cycle",
-      "products": [
-        "The Hobbit: Over Hill and Under Hill",
-        "The Hobbit: On the Doorstep"
-      ],
-      "released": "2012-08-17",
-      "reason": "No source names the saga. Hall of Beorn lists the three scenarios of each of the two Hobbit saga boxes, which RingsDB numbers as cycle 40. The boxes have no Campaign Mode, so they are one cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 40; hallofgondor.com/release-dates (released: US release of the first product)"
-    },
-    {
-      "id": "against-the-shadow",
-      "name": "Against the Shadow",
-      "kind": "cycle",
-      "products": [
-        "Heirs of Númenor",
-        "The Steward's Fear",
-        "The Drúadan Forest",
-        "Encounter at Amon Dîn",
-        "Assault on Osgiliath",
-        "The Blood of Gondor",
-        "The Morgul Vale"
-      ],
-      "released": "2012-11-26",
-      "reason": "No source names a cycle. Hall of Beorn lists the scenarios of Heirs of Númenor and of its six Adventure Packs under each product; RingsDB numbers the deluxe expansion and the six packs as cycles 13 and 14. The cycle has no Campaign Mode, so it is a cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 13 and 14; hallofgondor.com/release-dates (released: US release of the first product)"
-    },
     {
       "id": "the-ring-maker",
       "name": "The Ring-maker",
@@ -4865,6 +4984,30 @@
       "pack": "EfKD",
       "reason": "DragnCards spells the pack's name without the accent (\"Escape from Khazad-dum\"); its rows' collector numbers (1 to 53) and names find the cards of EfKD, whose Hall of Beorn numbers they equal.",
       "source": "data/raw/dragncards/cardDb.tsv (packName, numberInPack); data/raw/ringsdb/packs.json"
+    },
+    {
+      "dragncards": "The Hobbit - Over Hill and Under Hill",
+      "pack": "OHaUH",
+      "reason": "DragnCards names the pack \"The Hobbit - Over Hill and Under Hill\" (a hyphen) where Hall of Beorn's product is \"The Hobbit: Over Hill and Under Hill\", so the row's pack does not name the product. Its collector numbers and names are Hall of Beorn's own, so the row's number and name find the card in OHaUH (the rows Hall of Beorn gives no OCTGN guid: Come Down Little Bird, Not Fair! Not Fair!, Grip, grab! Pinch, nab!, The Great Goblin).",
+      "source": "data/raw/dragncards/cardDb.tsv (packName, numberInPack); DragnCards preBuiltDecks.json (Q0A.1 to Q0A.3)"
+    },
+    {
+      "dragncards": "The Hobbit - On the Doorstep",
+      "pack": "OtD",
+      "reason": "DragnCards names the pack \"The Hobbit - On the Doorstep\" (a hyphen) where Hall of Beorn's product is \"The Hobbit: On the Doorstep\". Its collector numbers and names are Hall of Beorn's own, so the row's number and name find the card in OtD (the rows Hall of Beorn gives no OCTGN guid: The Spider's Glade, The Lonely Mountain).",
+      "source": "data/raw/dragncards/cardDb.tsv (packName, numberInPack); DragnCards preBuiltDecks.json (Q0A.4 to Q0A.6)"
+    },
+    {
+      "dragncards": "Heirs of Numenor",
+      "pack": "HoN",
+      "reason": "DragnCards spells the pack's name without the accent (\"Heirs of Numenor\") where Hall of Beorn's product is \"Heirs of Númenor\", so the row's pack does not name the product. Its collector numbers and names are Hall of Beorn's own, so the row's number and name find the card in HoN (the rows Hall of Beorn gives no OCTGN guid: both The Leaping Fish cards).",
+      "source": "data/raw/dragncards/cardDb.tsv (packName, numberInPack); DragnCards preBuiltDecks.json (Q03.1 to Q03.3)"
+    },
+    {
+      "dragncards": "The Druadan Forest",
+      "pack": "TDF",
+      "reason": "DragnCards spells the pack's name without the accent (\"The Druadan Forest\") where Hall of Beorn's product is \"The Drúadan Forest\", so the row's pack does not name the product. Its collector numbers (45 to 49) and names are Hall of Beorn's own, so the row's number and name find the card in TDF (the rows Hall of Beorn gives no OCTGN guid: Drû-buri-Drû, Drúadan Drummer, Elite, Hunter and Thief).",
+      "source": "data/raw/dragncards/cardDb.tsv (packName, numberInPack); DragnCards preBuiltDecks.json (Q03.5)"
     }
   ],
   "dragnCardCodes": [
@@ -5272,6 +5415,12 @@
       "code": "147006",
       "reason": "Hall of Beorn's scenario file lists the quest cards of stages 1 and 2 only. The Wicked Willow (stage 3A, 3B, card 6 of 24 in the box; the stage 2B text advances to stage 3A) is a quest card of the encounter set, and DragnCards' deck Q99.04 deals it as the last quest stage.",
       "source": "hallofbeorn.com/Export/Scenarios/The-Old-Forest; hallofbeorn.com/LotR/Scenarios/The-Old-Forest (41 Normal, 34 Easy encounter cards); dragncards Q99.04"
+    },
+    {
+      "scenario": "the-battle-of-five-armies",
+      "code": "132075",
+      "reason": "Hall of Beorn's scenario file lists the quest cards of stages 2 to 5 only. The Gathering of Clouds (stage 1A, card 75 of the box, DragnCards' \"The Gathering of the Clouds\") prints the Setup and is dealt as the first quest stage in DragnCards' deck Q0A.6.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Battle-of-Five-Armies; dragncards Q0A.6"
     }
   ]
 }

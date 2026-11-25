@@ -26,7 +26,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("PlaceHandUnderSelf"), ...when }),
   // The first player chooses a quest card other than the current quest to be the current quest until the end of the phase: the main quest card or a side quest in the staging area, encounter or player ("choose a different quest card in play to be the current quest", 09049:A:2;
   // mec108.side-quests-in-play). Nothing is chosen when there is only the current one.
-  z.strictObject({ verb: z.literal("ChooseCurrentQuest"), ...when }),
+  // `until: "endOfRound"` (132066:A:2): a side quest chosen keeps the current-quest mark to the end of the round, not the phase; the stages of The Battle of Five Armies stay current until the next round's choice (hob.current-quest-stage).
+  z.strictObject({ verb: z.literal("ChooseCurrentQuest"), until: z.literal("endOfRound").optional(), ...when }),
   // Campaign Setup: a copy of the card from the supply is put into play attached to the card in play with this title ("Attach Iârion's Pendant to Iârion", 10156:A:2). It resolves after the quest card's Setup, which puts the host into play; with no such host nothing is attached.
   verbFlags(z.strictObject({ verb: z.literal("AttachNewTo"), code, to: z.string().min(1) }), { setupRole: "afterSetup" }),
   // Campaign Setup: starting with the first player, each player may place `damage` damage on the card with this code to add `resources` resource to each of their heroes' pools ("each player may place 4 damage on Protect the Innocent to add 1 resource to each of their heroes'

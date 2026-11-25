@@ -1,10 +1,10 @@
-// Rules: rr.forced, rr.travel, rr.search, rr.immune, rr.cannot, rr.engaged, rr.in-play-and-out-of-play, rr.victory, rr.quest-advancement, rr.keywords, faq.additional-attacks (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (Murder at the Prancing Pony).
+// Rules: rr.forced, rr.travel, rr.search, rr.immune, rr.cannot, rr.engaged, rr.in-play-and-out-of-play, rr.victory, rr.quest-advancement, rr.keywords, faq.additional-attacks (data/rules/entries.json); docs/scenarios/standalone-scenarios/murder-at-the-prancing-pony.md (Murder at the Prancing Pony).
 import { describe, it } from "vitest";
 
 import { announce, answer, attack, cardSpecs, count, damageOn, defend, flag, handCount, quest, resolve, respond, reveal, offers, stat, stagingThreat, threat, travel, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Murder at the Prancing Pony (standalone-scenarios part 7): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The lines a row cannot express (the seeded hiding of the Suspect and
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The lines a row cannot express (the seeded hiding of the Suspect and
 // Hideout, the table-wide stats) are tests in lines.test.ts, each titled with its line id.
 const F0 = ["f0", "f0", "f0", "f0", "f0", "f0"];
 const TAKEN_ONLY = { investigationDeck: ["50714"] } as const;
@@ -52,6 +52,7 @@ const ROWS: readonly Row[] = [
   { line: "50710:A:3", name: "with another Brigand in play Susie the Spider cannot take damage", layout: { staging: ["50710", "50723"] }, act: [], expect: [flag("50710", "cannotTakeDamage")] },
   { line: "50712:A:2", name: "Forced: when Johnny Goblin-fingers attacks the defending player discards a random card and raises their threat by its cost", layout: { engaged: ["50712"], hand: ["filler"], deck: ["f0", "f0"] }, act: announce("attacks", "50712", { seat: 0 }), expect: [handCount(0)] },
   { line: "50714:A:1", name: "Forced: looked at in the Investigation deck, Taken by Surprise puts the first enemy discarded engaged with the first player and is removed from the game", layout: { piles: { investigationDeck: ["50714"] }, deck: ["f0"], discard: ["f3"] }, act: announce("lookedAtInvestigationDeck", "50714"), expect: [zone("50714", "removed"), count("f3", "engaged", 1)] },
+  { line: "50714:A:1", name: "Then: with no enemy to discard from the encounter deck or its discard pile, nothing is put into play and Taken by Surprise stays in the game (rr.then)", layout: { piles: { investigationDeck: ["50714"] }, deck: ["50716"], discard: [] }, act: announce("lookedAtInvestigationDeck", "50714"), expect: [count("50716", "encounterDiscard", 1), zone("50714", "investigationDeck")] },
 
   // 50715 to 50720 the locations.
   { line: "50715:A:1", name: "Forced: when explored the first player either draws 2 cards each", layout: { stage: "50701", active: "50715", seats: 2, deckOf: ["filler", "filler", "filler", "filler"] }, act: [announce("locationExplored", "50715"), answer("draw")], expect: [handCount(2), handCount(2, 1)] },

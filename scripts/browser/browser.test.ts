@@ -67,6 +67,23 @@ describe("parseShotArgs", () => {
     expect(parseShotArgs(["--fixture", "duo", "--at", "5"], "/repo")).toMatchObject({ fixture: "duo", at: 5, routes: [] });
   });
 
+  it("reads a scene with its layout inline or in a file, and a moment, and takes one way to open a table", () => {
+    const inline = parseShotArgs(["--scene", "the-morgul-vale", '{"phase":"Combat"}', "--landscape"], "/repo");
+    expect(inline).toMatchObject({ scene: { scenarioId: "the-morgul-vale", layout: '{"phase":"Combat"}', file: null }, routes: [], size: LANDSCAPE });
+    expect(parseShotArgs(["--scene", "the-morgul-vale", "--scene-file", "layout.json"], "/repo").scene).toEqual({ scenarioId: "the-morgul-vale", layout: null, file: "layout.json" });
+    expect(parseShotArgs(["--moment", "the-morgul-vale/captain-bodyguard"], "/repo")).toMatchObject({ moment: "the-morgul-vale/captain-bodyguard", scene: null });
+    expect(() => parseShotArgs(["--scene-file", "layout.json"], "/repo")).toThrow("--scene <scenario-id>");
+    expect(() => parseShotArgs(["--scene", "a", "{}", "--scene-file", "b.json"], "/repo")).toThrow("inline or as --scene-file");
+    expect(() => parseShotArgs(["--scene", "a", "--moment", "b"], "/repo")).toThrow("give one");
+    expect(() => parseShotArgs(["--fixture", "duo", "--moment", "b"], "/repo")).toThrow("give one");
+    expect(() => parseShotArgs(["--scene", "a", "--landscape", "{}"], "/repo")).toThrow("directly after the scenario id");
+    expect(() => parseShotArgs(["/table", "--moment", "a/b"], "/repo")).toThrow("opens its own table");
+    expect(() => parseShotArgs(["--scene", "a", "{}", "/table"], "/repo")).toThrow("opens its own table");
+    expect(() => parseShotArgs(["--moment", "a/b", "--at", "3"], "/repo")).toThrow("does not go with --moment");
+    expect(() => parseShotArgs(["--scene", "a", "{}", "--at", "3"], "/repo")).toThrow("does not go with --scene");
+    expect(() => parseShotArgs(["--moment", "a/b/c"], "/repo")).toThrow("not a/b/c");
+  });
+
   it("puts the fixture's save id in {save}, and opens where the fixture landed when no route is named", () => {
     expect(routesOf({ routes: ["/table/{save}"] }, "/path/save-e2e-duo")).toEqual(["/table/save-e2e-duo"]);
     expect(routesOf({ routes: [] }, "/path/save-e2e-duo")).toEqual(["/path/save-e2e-duo"]);

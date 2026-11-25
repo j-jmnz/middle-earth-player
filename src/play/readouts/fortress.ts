@@ -11,6 +11,13 @@ import { resolveQuest } from "../../rules/quest/quest.ts";
 import { DEFENSE_STAGE, defenseFillsWords, type DefenseOutcome } from "../words/scenarios/fortress.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
+import { cairAndrosStageLines } from "./against-the-shadow/cair-andros.ts";
+import { druadanStageLines } from "./against-the-shadow/druadan.ts";
+import { amonDinHeld, amonDinStageLines } from "./against-the-shadow/amon-din.ts";
+import { bloodStageLines } from "./against-the-shadow/blood.ts";
+import { valeStageLines } from "./against-the-shadow/vale.ts";
+import { stewardsFearStageLines } from "./against-the-shadow/stewards-fear.ts";
+
 /** The tokens on The Defense of Helm's Deep, the number that ends it, the quest stage the players advance to and its name, for the top bar's Defense dial. */
 export type DefenseTokens = { name: string; value: number; limit: number; stage: number };
 
@@ -50,7 +57,11 @@ export function stageDetail(game: ScenarioState, ctx: ReduceContext, code: strin
   const defense = stageHasDefense(game) && game.questStage != null && game.cards[game.questStage]?.code === code;
   const loses = stageDefeatLoses(ctx, code);
   const fills = points != null && (defense || loses) ? defenseFillsWords(points, loses) : null;
-  return [fills, hold ?? (fills ? null : plain), defense ? DEFENSE_STAGE : null].filter((text) => text != null);
+  // Stage 3 of The Drúadan Forest says its own win bar: the printed win line that holds it back and the quest-point line would only repeat it (06044:B:3, 06045:A:3).
+  const druadan = druadanStageLines(game, ctx, code, (id) => ctx.cards.get(id)?.name ?? id);
+  // A stage of Encounter at Amon Dîn that is defeated with the end held says its held line first: the quest-point line would only say it is done.
+  const own = druadan.length > 0 || amonDinHeld(game, code) ? [] : [hold ?? (fills ? null : plain)];
+  return [fills, ...own, defense ? DEFENSE_STAGE : null, ...cairAndrosStageLines(game, ctx, code), ...druadan, ...stewardsFearStageLines(game, ctx, code), ...amonDinStageLines(game, code), ...bloodStageLines(game, code), ...valeStageLines(game, ctx, code)].filter((text) => text != null);
 }
 
 /**

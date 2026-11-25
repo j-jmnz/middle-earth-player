@@ -8,14 +8,15 @@ import { seedFinderRel } from "../data/effects/seed-finder-paths.ts";
 import { ROOT } from "../data/paths.ts";
 import { runScript, type Log } from "../log.ts";
 import { cycleGameFile, cycleGoldenTestFile, cycleSeedFinderFile, standaloneTestFile } from "./scenario-new-cycle.ts";
-import { asksFile, authoredFile, authoredPath, campaignTestFile, camel, gameFile, goldenTestFile, seedFinderFile, specTestFile, type Facts, type PreviousPart } from "./scenario-new-files.ts";
+import { asksFile, authoredFile, authoredPath, campaignTestFile, camel, gameFile, goldenTestFile, screensFile, seedFinderFile, specTestFile, type Facts, type PreviousPart } from "./scenario-new-files.ts";
+import { parseArgs } from "../cli-args.ts";
 
 // Writes the skeleton of a scenario that data/scenarios already has, and the lines that register it, so the work left is the scenario's own
 // (docs/agents/agent-brief.md, Scenario procedure):
 //
 //   pnpm scenario new <scenario-id> [--short <name>] [--dry-run]
 //
-// Files (never overwritten: if any exists the command refuses, listing them): the game (test/scenarios/<id>/), the golden test, the campaign test and the
+// Files (never overwritten: if any exists the command refuses, listing them): the game (test/scenarios/<id>/, with its screens.ts), the golden test, the campaign test and the
 // spec rows (src/campaign/scenarios/<id>/), the choice words as an asks file (src/play/words/asks/<id>.ts, listed in its barrel by pnpm data build), the seed finder
 // (scripts/e2e/<id>.ts, or in the campaign's folder: scripts/data/effects/seed-finder-paths.ts), the authored effects file (src/effects/authored/<id>.ts, or in the campaign's folder: scripts/data/effects/authored-paths.ts) and the empty fixture file
 // (src/campaign/fixtures/<id>.json). There is no scene file: the game, the golden test and the campaign test read the scenario from data/, and the card tests are spec rows
@@ -60,7 +61,15 @@ function keyFor(name: string, code: string, used: Set<string>): string {
 }
 
 // A scenario whose last word another scenario already uses (The Dread Realm owns "realm", Flight from Moria "moria", The Caves of Nibin-Dûm and The Battle of Carn Dûm "dum") starts from another word.
-const SHORT_OF: Readonly<Record<string, string>> = { "the-woodland-realm": "woodland", "the-mines-of-moria": "mines", "escape-from-khazad-dum": "khazad" };
+const SHORT_OF: Readonly<Record<string, string>> = { "the-woodland-realm": "woodland", "the-mines-of-moria": "mines", "escape-from-khazad-dum": "khazad", "the-druadan-forest": "druadan", "assault-on-osgiliath": "assault", "the-blood-of-gondor": "blood" };
+
+// The box file of docs/scenarios/ a campaign's scenarios belong to, where the campaign's id is not the box file's name.
+const DOC_BOX: Readonly<Record<string, string>> = { "the-dark-of-mirkwood": "mirkwood-paths" };
+
+/** The scenario's own rulings file (docs/scenarios/<box>/<scenario-id>.md): what the box file keeps is what its scenarios share. */
+export function scenarioDocFile(campaignId: string, id: string): string {
+  return `docs/scenarios/${DOC_BOX[campaignId] ?? campaignId}/${id}.md`;
+}
 
 function defaultShort(id: string): string {
   return SHORT_OF[id] ?? id.split("-").at(-1) ?? id;
@@ -183,6 +192,7 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
 
   const files = [
     { file: `test/scenarios/${id}/game.ts`, text: facts.cycle ? cycleGameFile(facts) : gameFile(facts) },
+    { file: `test/scenarios/${id}/screens.ts`, text: screensFile(facts) },
     { file: `src/campaign/scenarios/${id}/golden.test.ts`, text: facts.cycle ? cycleGoldenTestFile(facts) : goldenTestFile(facts) },
     facts.cycle ? { file: `src/campaign/scenarios/${id}/standalone.test.ts`, text: standaloneTestFile(facts) } : { file: `src/campaign/scenarios/${id}/campaign.test.ts`, text: campaignTestFile(facts) },
     { file: `src/campaign/scenarios/${id}/spec.test.ts`, text: specTestFile(facts) },
@@ -193,6 +203,9 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
   ];
   const present = files.filter((item) => exists(item.file)).map((item) => item.file);
   if (present.length > 0) return { plan: null, problems: [`${id} already has: ${present.join(", ")}`] };
+  // The scenario's rulings file is a title only; a file already written for it stays as it is and does not stop the scaffold.
+  const docFile = scenarioDocFile(facts.campaignId, id);
+  if (!exists(docFile)) files.push({ file: docFile, text: `# ${facts.name.replace(/ \(Campaign\)$/, "")}\n` });
 
   // The registries, each read as it is and edited in memory.
   const c = camel(short);
@@ -278,19 +291,28 @@ function addedLines(before: readonly string[], after: readonly string[]): string
 function nextSteps(facts: Facts, log: Log): void {
   log.info("next (docs/agents/agent-brief.md, Scenario procedure):");
   log.info("  pnpm data build                   rewrites the barrels of authored effect files (src/effects/generated/authored.ts) and of asks files (src/play/words/asks/index.ts)");
+  log.info(`  ${scenarioDocFile(facts.campaignId, facts.id)}   the scenario's own rulings file (title only): its mechanics, readings and table pieces go here, not in the box file`);
   log.info(`  pnpm scenario pack ${facts.id}   runs effects draft and writes .agent/pack/${facts.id}.md: the vocabulary, the families' manifests the drafts need, the cookbook sections and the drafts`);
+  log.info(`  pnpm scenario tests ${facts.id}      after Build: a failing row stub in spec.test.ts for each record no test names`);
   log.info("  pnpm effects open                 after the records, then add the scenario to src/campaign/playable.ts when none of its lines is open");
   log.info(`  fill the skeletons: spec rows (src/campaign/scenarios/${facts.id}/spec.test.ts)${facts.cycle ? ", the standalone test" : ""}, asks (src/play/words/asks/${facts.id}.ts), test/scenarios/${facts.id}/game.ts, the golden test (a skipped suite), the seed finder; then list the goldens in test/harness/golden-registry.ts`);
 }
 
+export const SCENARIO_NEW_USAGE = "usage: pnpm scenario new <scenario-id> [--short <name>] [--dry-run]";
+
+/** The arguments of a run: a misspelt flag (`--dryrun`) throws instead of writing the skeleton files, and `--help` asks for the usage. */
+export function scenarioNewArguments(args: readonly string[]): { id: string | undefined; short: string | undefined; dry: boolean; help: boolean } {
+  const parsed = parseArgs(args, SCENARIO_NEW_USAGE, { flags: ["dry-run"], spaced: ["short"] });
+  return { id: parsed.positional[0], short: parsed.flags.get("short") ?? undefined, dry: parsed.flags.has("dry-run"), help: parsed.help };
+}
+
 function main(log: Log): void {
-  const args = process.argv.slice(2);
-  const flags = new Set(args.filter((arg) => arg.startsWith("--")));
-  const shortAt = args.indexOf("--short");
-  const short = shortAt >= 0 ? args[shortAt + 1] : undefined;
-  const taken = (index: number): boolean => shortAt >= 0 && index === shortAt + 1;
-  const id = args.find((arg, index) => !arg.startsWith("--") && !taken(index));
-  if (!id) throw new Error("usage: pnpm scenario new <scenario-id> [--short <name>] [--dry-run]");
+  const { id, short, dry, help } = scenarioNewArguments(process.argv.slice(2));
+  if (help) {
+    log.info(SCENARIO_NEW_USAGE);
+    return;
+  }
+  if (!id) throw new Error(SCENARIO_NEW_USAGE);
   const repo: Repo = {
     read: (file) => {
       try {
@@ -306,7 +328,6 @@ function main(log: Log): void {
     process.exitCode = 1;
     return;
   }
-  const dry = flags.has("--dry-run");
   describePlan(plan, log, dry);
   if (!dry) {
     for (const item of plan.files) {

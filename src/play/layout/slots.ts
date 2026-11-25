@@ -1,7 +1,7 @@
 // The pieces the table's layout places cards with (layout.ts, play-area.ts): a card's slot, its footprint in a row, a row's left
 // edges, and the cards peeking out under a host. Pure.
 import { isReanimatedCode } from "../../rules/core/printed.ts";
-import type { CardInstance } from "../../rules/core/state.ts";
+import { isExhausted, type CardInstance } from "../../rules/core/state.ts";
 
 import type { CardSlot, Rect, SlotKind, SlotZone } from "./layout.ts";
 import type { ZoneEntry, ZoneId } from "../store/selectors.ts";
@@ -27,7 +27,8 @@ export function slotOf(card: CardInstance, zone: SlotZone, kind: SlotKind, rect:
     ...(card.face === "B" ? { picture: pictureKey(card) } : {}),
     zone,
     kind,
-    exhausted: card.exhausted,
+    exhausted: isExhausted(card),
+    ...(card.unconscious === true ? { unconscious: true as const } : {}),
     faceDown: card.face === "down",
     landscape,
     resources: card.resources,
@@ -43,7 +44,7 @@ export function slotOf(card: CardInstance, zone: SlotZone, kind: SlotKind, rect:
 
 // The width a card takes in a row: an exhausted card is turned sideways.
 export function footprint(card: CardInstance, size: { w: number; h: number }): number {
-  return card.exhausted ? size.h : size.w;
+  return isExhausted(card) ? size.h : size.w;
 }
 
 // Left edges for items of these widths across a row from `x` to `x + width`: spaced by one gap, squeezed (overlapping) when
@@ -63,8 +64,14 @@ export function rowXs(widths: readonly number[], x: number, width: number, gap: 
 
 // A card at the left edge `x` of its footprint: an exhausted card is drawn centered in its sideways footprint.
 export function cardRect(card: CardInstance, x: number, y: number, size: { w: number; h: number }): Rect {
-  const offset = card.exhausted ? (size.h - size.w) / 2 : 0;
+  const offset = isExhausted(card) ? (size.h - size.w) / 2 : 0;
   return { x: x + offset, y, w: size.w, h: size.h };
+}
+
+// A card peeking out under its host: the slot of the card, but a facedown card of The Steward's Fear's underworld stack (`entry.stacked`) carries no code, as a grappled enemy does, and opens its host.
+export function slotUnder(entry: ZoneEntry, card: CardInstance, zone: SlotZone, kind: SlotKind, rect: Rect, landscape = false): CardSlot {
+  const slot = slotOf(card, zone, kind, rect, landscape);
+  return entry.stacked?.includes(card.id) ? { ...slot, code: "", opens: entry.card.id } : slot;
 }
 
 // Attachments and face-down shadow cards peek out from under the host, the most recent lowest.
@@ -72,7 +79,7 @@ export function placeUnder(entry: ZoneEntry, zone: ZoneId, rect: Rect, out: Card
   const under = entry.attached.filter((attached) => !(attached.zone === "shadow" && attached.face !== "down"));
   under.forEach((attached, at) => {
     const kind: SlotKind = attached.zone === "shadow" ? "shadow" : "attachment";
-    out.push(slotOf(attached, zone, kind, { x: rect.x, y: rect.y + (under.length - at) * peek, w: rect.w, h: rect.h }));
+    out.push(slotUnder(entry, attached, zone, kind, { x: rect.x, y: rect.y + (under.length - at) * peek, w: rect.w, h: rect.h }));
   });
   faceUpShadows.push(...entry.attached.filter((attached) => attached.zone === "shadow" && attached.face !== "down"));
 }
@@ -87,7 +94,7 @@ export function placeCounted(entry: ZoneEntry, zone: ZoneId, rect: Rect, out: Ca
   const under = entry.attached.filter((card) => !(card.zone === "shadow" && card.face !== "down"));
   const last = under[under.length - 1];
   if (!last) return;
-  const slot = slotOf(last, zone, last.zone === "shadow" ? "shadow" : "attachment", { x: rect.x, y: rect.y + peek, w: rect.w, h: rect.h }, landscape);
+  const slot = slotUnder(entry, last, zone, last.zone === "shadow" ? "shadow" : "attachment", { x: rect.x, y: rect.y + peek, w: rect.w, h: rect.h }, landscape);
   out.push(under.length > 1 ? { ...slot, stack: under.length } : slot);
 }
 
@@ -99,5 +106,5 @@ export function placeStaging(entry: ZoneEntry, rect: Rect, out: CardSlot[], m: M
     return;
   }
   const last = under[under.length - 1] as CardInstance;
-  out.push({ ...slotOf(last, "staging", last.zone === "shadow" ? "shadow" : "attachment", { x: rect.x, y: rect.y + m.peek, w: rect.w, h: rect.h }), stack: under.length });
+  out.push({ ...slotUnder(entry, last, "staging", last.zone === "shadow" ? "shadow" : "attachment", { x: rect.x, y: rect.y + m.peek, w: rect.w, h: rect.h }), stack: under.length });
 }

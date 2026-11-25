@@ -61,6 +61,7 @@ type Hooked = {
   readonly attached: readonly RulesFamily[];
   readonly combat: readonly RulesFamily[];
   readonly optionalEngage: readonly RulesFamily[];
+  readonly deckReset: readonly RulesFamily[];
   readonly questResult: readonly RulesFamily[];
   readonly idle: readonly RulesFamily[];
   readonly idleCards: readonly RulesFamily[];
@@ -87,6 +88,7 @@ function hooked(families: readonly RulesFamily[]): Hooked {
       attached: families.filter((family) => family.attached != null),
       combat: families.filter((family) => family.combat != null),
       optionalEngage: families.filter((family) => family.optionalEngage != null),
+      deckReset: families.filter((family) => family.deckReset?.hold != null),
       questResult: families.filter((family) => family.questResult != null),
       idle: families.filter((family) => family.idle != null),
       idleCards: families.filter((family) => family.idleCards != null),
@@ -177,6 +179,12 @@ export function familyTravelUnpayable(state: ScenarioState, instruction: Instruc
   return false;
 }
 
+/** Whether some family holds the encounter discard pile back from an empty deck (families/pelargir/surge-chain.ts): the reset then does not run. */
+export function familyHoldsDeckReset(state: ScenarioState, ctx: ReduceContext, families: readonly RulesFamily[] = active()): boolean {
+  for (const family of hooked(families).deckReset) if (family.deckReset?.hold?.(state, ctx) === true) return true;
+  return false;
+}
+
 /** Whether some family bars the card from being played or put into play. */
 export function familyPlayBarred(state: ScenarioState, cardId: string, ctx: ReduceContext, families: readonly RulesFamily[] = active(), how: PlayHow = {}): boolean {
   for (const family of hooked(families).play) if (family.play?.(state, cardId, ctx, how) === true) return true;
@@ -203,6 +211,18 @@ export function familyRevealed(state: ScenarioState, cardId: string, ctx: Reduce
 export function familyOptionalEngageBarred(state: ScenarioState, enemyId: string, seat: number, cards: ReadonlyMap<string, PrintedCard>, families: readonly RulesFamily[] = active()): boolean {
   for (const family of hooked(families).optionalEngage) if (family.optionalEngage?.(state, enemyId, seat, cards) === true) return true;
   return false;
+}
+
+const wholeStateBy = new WeakMap<readonly RulesFamily[], ReadonlySet<string>>();
+
+/** Whether a family declares the verb works on the whole state, not on one seat's view of it (`RulesFamily.wholeState`). */
+export function familyWholeStateVerb(verb: string, families: readonly RulesFamily[] = active()): boolean {
+  let verbs = wholeStateBy.get(families);
+  if (!verbs) {
+    verbs = new Set(families.flatMap((family) => family.wholeState ?? []));
+    wholeStateBy.set(families, verbs);
+  }
+  return verbs.has(verb);
 }
 
 /** False when a family's pick predicate rejects the card. */
@@ -252,6 +272,13 @@ export function familyDefenseReason(state: ScenarioState, defender: PrintedCard,
     if (reason) return reason;
   }
   return null;
+}
+
+/** The state the families leave once the damage of the enemy attack in progress is dealt: each family's `combat.damaged` reads what changed between `before` and `after` (Venom, `poison`). */
+export function familyAttackDamaged(before: ScenarioState, after: ScenarioState, ctx: ReduceContext, steps: EngineStep[], families: readonly RulesFamily[] = active()): ScenarioState {
+  let next = after;
+  for (const family of hooked(families).combat) next = family.combat?.damaged?.(before, next, ctx, steps) ?? next;
+  return next;
 }
 
 /** Why a family bars the attacker from being declared against the enemy, or null (the first family's reason). */

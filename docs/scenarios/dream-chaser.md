@@ -67,3 +67,14 @@ The Dream-chaser campaign is nine scenarios played in order: The Grey Havens (Vo
 
 - **Eye of the Beast** (12050:A:3). Each Eye engaged with a player is a separate instance of its constant ability, so The Thing in the Depths attacks that player once for each such Eye in the combat phase, and each attack is dealt a new shadow card (`rr.constant-ability`, `faq.additional-attacks`). `researched`: the FAQ's answer on Caught in a Web (ALeP 2.15) applies the same principle (https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/lotr_faq_19.pdf, https://alongextendedparty.com/semi-official-errata-faq-1-10/).
 - **Serpent's Tail** (12157:A:1). A Ship enemy in the staging area is in play (`rr.in-play-and-out-of-play`), so it is dealt a shadow card like an engaged one (`DealShadowTo` with `inPlay`; user decision, 2026-11-23). The -10 follows only when the first part found a Ship enemy in play: with none, nothing is dealt and no Ship enemy that enters play later that round gets the -10 (`rr.then`; Caleb Grace, ALeP 3.119, https://alongextendedparty.com/semi-official-errata-faq-1-10/). `researched`.
+
+## The Drowned Ruins Then readings
+
+- **Drowned Cave** (12104:A:2). "Each player must discard the top 10 cards of his deck. Then, you may return Drowned Cave to the staging area": a deck of fewer than 10 cards cannot discard in full, so the card stays the active location (`rr.then`; the `thenResolves` condition). Recommended: no ruling covers a short discard before "Then"; `rr.effects` reads "as much as they are able" for the discard itself, which still happens.
+- **Sunken Temple** (12103:A:2). "Discard 1 resource from each objective-ally and each hero's resource pool. Then, you may flip Sunken Temple": a pool with no resource cannot discard 1, so the discard is not in full and Sunken Temple is not offered for flipping (`rr.then`). Recommended on the same ground.
+
+## Readings to confirm
+
+Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open points). Delete a line when the user confirms it.
+
+- Drowned Cave (12104:A:2) and Sunken Temple (12103:A:2): a discard that finds fewer cards or tokens than it names does not resolve in full, so the "Then, you may ..." part is not offered (agent recommendation; no ruling found; https://ffg-forum-archive.entropicdreams.com/topic/137865-ready-and-exhaust read).

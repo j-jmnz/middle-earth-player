@@ -3,7 +3,7 @@ import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/
 import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for Shadow and Flame (dwarrowdelf cycle part 9, no campaign card). Every line is read from the scan ledger (data/printed/dwarrowdelf.json). Surge and the keywords of Durin's Bane (Regenerate 3, Indestructible) are keywords; Setup's piles (Dark Pit set aside, Durin's Bane in the
-// staging area) are the scenario's data. The Goblins of the Deep and Deeps of Moria cards have their records elsewhere. The Nightmare deck's records are in ../nightmare/shadow-and-flame.ts. Readings: docs/scenarios/dwarrowdelf.md (Shadow and Flame).
+// staging area) are the scenario's data. The Goblins of the Deep and Deeps of Moria cards have their records elsewhere. The Nightmare deck's records are in ../nightmare/shadow-and-flame.ts. Readings: docs/scenarios/dwarrowdelf/shadow-and-flame.md (Shadow and Flame).
 // Rules: dwd.durins-bane, dwd.regenerate, rr.engaged, rr.combat-phase, rr.hit-points, rr.damage, rr.cancel, rr.forced, rr.first-player, rr.shadow-effects, rr.attachment-cards, rr.quest-phase, rr.active-location, rr.refresh-phase, rr.winning-the-game, faq.additional-attacks, faq.enemy-attacks-outside-combat (data/rules/entries.json).
 const BANE_CODE = "04150";
 const BANE = "Durin's Bane";

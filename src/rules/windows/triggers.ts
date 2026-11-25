@@ -20,14 +20,17 @@ import type { ReduceContext } from "../interpret/interpret.ts";
 import type { CardInstance, Frame, GameEvent, ScenarioState } from "../core/state.ts";
 import { inPlay } from "../core/state.ts";
 import { patchTop, popFrame, pushFrame } from "./windows.ts";
+import { sideOf } from "../families/breaking/areas.ts";
 
 type Found = { effect: Effect; instance: CardInstance };
 
 // Whose a Forced effect is: a player card's, its controller's ("Forced: After ~ attacks, discard ~ or discard a card from your
-// hand"); an encounter card's, the player the event happened to.
+// hand"); an encounter card's, the player the event happened to, or, when the event is no player's and the areas are isolated by a stage (Fog on the Barrow-downs, Flies and Spiders, not the captured areas of Escape from Mount Gram), the first player of the area the card lies in
+// ("the resolution of each phase occurs as if only the player or players that share any given staging area are currently present in the game", hob.staging-area-creating).
 function forcedActor(state: ScenarioState, instance: CardInstance, event: GameEvent, ctx: ReduceContext): number {
   const player = instance.controller != null && isPlayerType(printedOf(ctx.cards, instance.code));
-  return player ? (instance.controller ?? state.firstPlayer) : (event.seat ?? state.firstPlayer);
+  if (player) return instance.controller ?? state.firstPlayer;
+  return event.seat ?? (state.isolated === true && state.capture == null ? (sideOf(state, instance) ?? state.firstPlayer) : state.firstPlayer);
 }
 
 // A card set aside faceup next to the quest deck hears that the prisoner was rescued: its ability says it works from out of play
@@ -47,7 +50,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, tim
       // A Forced effect an encounter card gains in a player's hand works from there (`fromHand`, 18026:A:1).
       if (!inPlay(instance.zone) && !leftItself && !hearsFromAnywhere(effect, instance, event) && !hearsFromSetAside(instance, event) && !(effect.fromHand === true && instance.zone === "hand") && !(effect.fromVictory === true && instance.zone === "victory")) continue;
       const owner = forcedActor(state, instance, event, ctx);
-      const scope = { actor: owner, sourceId: instance.id, returned: 0, phase: event.phase, eventSeat: event.seat, ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.other ? { other: event.other } : {}), ...(event.trigger === "damaged" && event.amount != null ? { dealt: event.amount } : {}), ...(event.explored ? { explored: true } : {}), ...(event.byPlayerCard ? { byPlayerCard: true } : {}), ...(event.fromStaging ? { fromStaging: true } : {}), ...(event.shadowBlank ? { shadowBlank: true } : {}) };
+      const scope = { actor: owner, sourceId: instance.id, returned: 0, phase: event.phase, eventSeat: event.seat, ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.other ? { other: event.other } : {}), ...(event.trigger === "damaged" && event.amount != null ? { dealt: event.amount } : {}), ...(event.explored ? { explored: true } : {}), ...(event.byPlayerCard ? { byPlayerCard: true } : {}), ...(event.fromStaging ? { fromStaging: true } : {}), ...(event.exhaustedToDefend ? { exhaustedToDefend: true } : {}), ...(event.shadowBlank ? { shadowBlank: true } : {}) };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       // A Forced effect with a limit ("Limit once per game", 01130:A:4) does not fire once its uses are spent.
       if (effect.limit && limitSpent(state, effect, instance.id, owner)) continue;

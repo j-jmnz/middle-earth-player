@@ -19,6 +19,7 @@ import type { GameEvent, ScenarioState } from "../../core/state.ts";
 import { heldAmount, inPlay, updateCard } from "../../core/state.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { openPool } from "../misc/guards.ts";
+import { resourcesLocked } from "../pelargir/spending.ts";
 
 const ICON_FLAGS = [
   ["leadershipIcon", "leadership"],
@@ -124,9 +125,9 @@ export function allyPools(state: ScenarioState, seat: number, cardId: string | u
 // A pool that may hold resources to pay with: a hero of the seat, or an ally pool for this card.
 export function payerOk(state: ScenarioState, payerId: string, seat: number, cardId: string | undefined, ctx: ReduceContext): boolean {
   const payer = state.cards[payerId];
-  if (payer && cardId != null && openPool(state, payerId, cardId, ctx)) return true;
+  if (payer && cardId != null && openPool(state, payerId, cardId, ctx)) return !resourcesLocked(state, payerId);
   if (!payer || payer.controller !== seat) return false;
-  return payer.zone === "heroes" || (cardId != null && isAllyPool(state, payerId, cardId, ctx));
+  return (payer.zone === "heroes" || (cardId != null && isAllyPool(state, payerId, cardId, ctx))) && !resourcesLocked(state, payerId);
 }
 
 // The cards that spent resources this round (Tighten Our Belts), and the seats that did, announced as `resourcesSpent` with the number spent in a game whose cards hear it ("After the engaged player spends any number of
@@ -137,7 +138,7 @@ export function noteSpent(state: ScenarioState, payments: readonly Payment[], ct
   if (ids.length === 0) return state;
   const seatsHeard = gameReads(state, ctx, '"trigger":"resourcesSpent"') ? announceSpent(state, spent) : state;
   // Forage for Food (10082:A:1) hears each hero whose pool paid, once for the payment.
-  const announced = gameReads(seatsHeard, ctx, '"trigger":"heroResourcesSpent"') ? announceHeroesSpent(seatsHeard, ids) : seatsHeard;
+  const announced = gameReads(seatsHeard, ctx, '"trigger":"heroResourcesSpent"') ? announceHeroesSpent(seatsHeard, spent) : seatsHeard;
   if (!gameReads(announced, ctx, '"unspent":true')) return announced;
   const before = announced.spent?.round === announced.round ? announced.spent.ids : [];
   return { ...announced, spent: { round: announced.round, ids: [...new Set([...before, ...ids])] } };
@@ -155,10 +156,12 @@ function announceSpent(state: ScenarioState, spent: readonly Payment[]): Scenari
   return next;
 }
 
-// One `heroResourcesSpent` event for each hero whose pool paid (families/angmar).
-function announceHeroesSpent(state: ScenarioState, heroIds: readonly string[]): ScenarioState {
+// One `heroResourcesSpent` event for each hero whose pool paid, with the number it spent (families/angmar; "takes X damage. X is equal to the number of resources spent", 132051:A:1).
+function announceHeroesSpent(state: ScenarioState, spent: readonly Payment[]): ScenarioState {
+  const byHero = new Map<string, number>();
+  for (const payment of spent) byHero.set(payment.heroId, (byHero.get(payment.heroId) ?? 0) + payment.amount);
   let next = state;
-  for (const heroId of new Set(heroIds)) next = queueEvent(next, { trigger: "heroResourcesSpent", seat: state.cards[heroId]?.controller ?? null, cardId: heroId });
+  for (const [heroId, amount] of byHero) next = queueEvent(next, { trigger: "heroResourcesSpent", seat: state.cards[heroId]?.controller ?? null, cardId: heroId, amount });
   return next;
 }
 

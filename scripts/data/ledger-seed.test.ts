@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { loadCards } from "./load-cards.ts";
 import { loadLedger, keyOf } from "./printed/ledger.ts";
 import { PLAYER_CODES, playerPackCodes, playerScopeCodes, scanTargets, SCAN_PRINTINGS } from "./printed/scope.ts";
-import { indentOf, nightmareDeckCodes, pinnedScans, seedEntries, seedEntry, withSeeded } from "./ledger-seed.ts";
+import { indentOf, LEDGER_SEED_USAGE, ledgerSeedArguments, originArgs, nightmareDeckCodes, pinnedScans, seedEntries, seedEntry, withSeeded } from "./ledger-seed.ts";
 
 // `pnpm data ledger-seed`: the entries a scenario's cards are missing, from the source text, readBy empty.
 const cards = loadCards();
@@ -38,6 +38,19 @@ describe("ledger seed", () => {
     const target = { code: "02014", side: "A" as const, printing: "HfG", urls: [] };
     const entry = seedEntry({ ...(card as NonNullable<typeof card>), text: "Guarded.\nResponse: it’s “here”.", shadowText: "Shadow: x." }, target, { url: "https://x.test/a.jpg", sha256: "0".repeat(64) });
     expect(entry.lines).toEqual(["Guarded.", `Response: it's "here".`, "Shadow: x."]);
+  });
+
+  it("seeds a fan-made entry with its publisher and the version of the set, an official one with neither", () => {
+    const card = cards.find((one) => one.code === "02014") as NonNullable<(typeof cards)[number]>;
+    const target = { code: "02014", side: "A" as const, printing: "HfG", urls: [] };
+    const scan = { url: "https://x.test/a.jpg", sha256: "0".repeat(64) };
+    expect(seedEntry(card, target, scan)).not.toHaveProperty("publisher");
+    expect(seedEntry(card, target, scan, { publisher: "alep", version: "2.0" })).toMatchObject({ publisher: "alep", version: "2.0" });
+    expect(originArgs(["x", "--publisher", "alep", "--version", "2.0"])).toEqual({ publisher: "alep", version: "2.0" });
+    expect(originArgs(["x"])).toBeUndefined();
+    expect(() => originArgs(["--publisher", "alep"])).toThrow("go together");
+    expect(() => originArgs(["--publisher", "nobody", "--version", "1"])).toThrow("not declared");
+    expect(ledgerSeedArguments(["x", "--publisher", "alep", "--version", "2.0"]).id).toBe("x");
   });
 
   it("writes a player card's tags and icons as plain words", () => {
@@ -106,5 +119,17 @@ describe("ledger seed", () => {
     expect(indentOf('{\n "campaign": "x"\n}\n')).toBe(1);
     expect(indentOf('{\n  "campaign": "x"\n}\n')).toBe(2);
     expect(indentOf(null)).toBe(2);
+  });
+});
+
+describe("ledger seed arguments", () => {
+  it("reads the scenario id and --nightmare, and leaves the values of --pack and --codes out of the id", () => {
+    expect(ledgerSeedArguments(["the-long-dark", "--nightmare"])).toEqual({ id: "the-long-dark", nightmare: true, help: false });
+    expect(ledgerSeedArguments(["--pack", "OHaUH", "--codes", "01001"])).toEqual({ id: undefined, nightmare: false, help: false });
+  });
+
+  it("refuses a misspelt flag, so --nightmar does not seed the campaign's ledger, and answers --help with help", () => {
+    expect(() => ledgerSeedArguments(["the-long-dark", "--nightmar"])).toThrow(LEDGER_SEED_USAGE);
+    expect(ledgerSeedArguments(["--help"]).help).toBe(true);
   });
 });

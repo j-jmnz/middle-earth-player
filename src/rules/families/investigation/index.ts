@@ -1,4 +1,4 @@
-// Rules: docs/scenarios/standalone-scenarios.md (Murder at the Prancing Pony), rr.in-play-and-out-of-play, rr.forced (data/rules/entries.json); ledger lines 50701:A:1, 50715:A:1 to 50720:A:2, 50702:B:1, 50702:B:2, 50714:A:1, 50728:A:1.
+// Rules: docs/scenarios/standalone-scenarios/murder-at-the-prancing-pony.md (Murder at the Prancing Pony), rr.in-play-and-out-of-play, rr.forced (data/rules/entries.json); ledger lines 50701:A:1, 50715:A:1 to 50720:A:2, 50702:B:1, 50702:B:2, 50714:A:1, 50728:A:1.
 // The verbs and hooks src/catalog/families/investigation.ts adds: the Investigation deck built by the Setup (deck.ts), the looks at it (look.ts: Investigate X and the other looks) and the accusation (accuse.ts). Hidden information: nothing here pushes a step that names a card of the deck or the pair set aside facedown.
 import type { Amount, Condition, Instruction } from "../../../catalog/boundary.ts";
 
@@ -6,7 +6,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import type { AmountScope } from "../../interpret/amounts.ts";
+import { frameScope, resolveAmount, type AmountScope } from "../../interpret/amounts.ts";
 import type { Focus } from "../index.ts";
 import { spendablePools } from "../costs/verbs.ts";
 import { livingSeats } from "../../core/state.ts";
@@ -53,7 +53,7 @@ function amount(state: ScenarioState, found: Exclude<Amount, number>, scope: Amo
 function unpayable(state: ScenarioState, instruction: Instruction, ctx: ReduceContext): boolean {
   if (instruction.verb !== "ForEachPlayer") return false;
   const spend = instruction.instructions.find((inner) => inner.verb === "SpendResources");
-  return spend?.verb === "SpendResources" && livingSeats(state).some((seat) => spendablePools(state, seat, {}, ctx).total < spend.amount);
+  return spend?.verb === "SpendResources" && livingSeats(state).some((seat) => spendablePools(state, seat, {}, ctx).total < resolveAmount(state, spend.amount, frameScope(state, seat, null), ctx));
 }
 
 export const manifest: RulesFamily = {

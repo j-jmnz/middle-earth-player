@@ -249,6 +249,12 @@ family owns files that are composed by the `index.ts` next to them, so families 
   `FAMILY_VERBS`, `FAMILY_TRIGGERS` and `FAMILY_FLAGS` from it; they join the verb union, the trigger enum and the stat enum.
   `families.test.ts` fails if two families add the same trigger or flag; a duplicate verb or condition kind fails when the schema loads. A
   new pick filter, condition kind or amount field goes in the shared `effect-schema-*.ts` file, with a comment naming the family file that reads it.
+- A verb that leaves a set-aside card the players must not see (a random pick left facedown, a facedown deck) is declared in its catalog manifest's
+  `asideSecrets` (`AsideSecret`, `src/catalog/family-manifest.ts`: the instruction's fields that name the cards), so the table's Set aside list counts
+  the card and never names it; `asideUnused` names the sets a verb parks there that are no part of the game. `scripts/checks/set-aside-sites.test.ts`
+  fails while a function of `src/rules` that writes a set-aside destination, or draws with the seed in a file that reads the set-aside cards, is not
+  listed in `scripts/checks/set-aside-sites.ts`. It reads source text: it does not see a destination in a variable, a call to a listed function from
+  another file, a change inside a listed function, or a verb that hides a card where it lies with no draw. Check those by hand for a new verb.
 - `src/rules/families/<family>/index.ts` exports one `manifest` (`src/rules/interpret/family-manifest.ts`): its `name`, the `verbs` its `run`
   answers and `run`, which resolves them and returns `null` for any other. `src/rules/families/index.ts` lists the manifests in
   `rulesFamilies()`, in play order (where two runners could answer, the first does); `interpret.ts` asks the families before the player verbs and
@@ -273,7 +279,7 @@ A new verb extends an existing one where it can. Before adding one, read the dra
 
 ## Readings the review catches
 
-Read each new record against these before the review. Each one is a card bug a review has found.
+Read each new record against these before the review. Each one is a card bug a review has found. A reading added here gets its tag in `scripts/data/effects/render/checks.ts`, so `pnpm effects render --checks` asks the judge about it.
 
 - **"Side quest".** The words mean either kind, a player side quest or an encounter side quest (`mec108.side-quests`): a record counts or picks them with the pick filter `sideQuest: true`, not `cardType`.
 - **"Then".** The part after "then" resolves only if the part before it did (`rr.then`). Give the later instructions the same condition, or put them on a `then` branch. A first part that can come up short (a discard of tokens, a draw, a discard from the deck) holds the rest with the condition `thenResolves`: test the case where it finds nothing.
@@ -281,6 +287,7 @@ Read each new record against these before the review. Each one is a card bug a r
 - **"After a 'When Revealed' effect is canceled".** It hears only a cancel of a card that has a When Revealed effect: a revealed enemy with none, canceled by a Response, announces nothing (`announceCanceled`, nightmare family).
 - **"Attached character", "attached hero".** These hold only while the host is that card type. A host can change type, as an objective ally does when it flips to its enemy side, so put the host's type in the record's condition.
 - **"For any reason" and "cannot enter …".** The route must cover every way a card can arrive: discards made by player cards, searches, reshuffles, and both sides of a two-sided card.
+- **"After X exhausts to …".** The event must exhaust the card: `exhaustedToDefend` for a defender, not the state `exhausted`. A card already exhausted that an effect makes defend, attack or quest did not exhaust to do it.
 - **The trigger's scope.** "After a location is explored" hears a location explored in the staging area too (`locationExplored`), not only the active one (`activeExplored`). Check which zones the trigger's event is queued from.
 - **The card's own name in a filter.** A count "for each copy of ~" or "~ chosen" counts cards with that printed title, not every chosen card.
 - **An optional ability whose whole effect is barred.** A Response or Action must not be offered while another card's flag stops everything it does (`noResourcesPlaced` on "place 1 resource here"): give it a `condition` on that flag. `pnpm effects render` prints a `note:` on such a record, saying whether it is offered while barred.

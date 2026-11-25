@@ -1,10 +1,10 @@
-// Rules: rr.forced, rr.reveal, rr.shadow-effects, rr.travel, rr.active-location, rr.engaged, rr.victory, rr.quest-advancement, mec113.saga-staging-rules (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Old Forest).
+// Rules: rr.forced, rr.reveal, rr.shadow-effects, rr.travel, rr.active-location, rr.engaged, rr.victory, rr.quest-advancement, mec113.saga-staging-rules (data/rules/entries.json); docs/scenarios/standalone-scenarios/the-old-forest.md (The Old Forest).
 import { describe, it } from "vitest";
 
 import { announce, attack, cardSpecs, damageOn, deckCount, endPhase, endRound, flag, handCount, progressOn, quest, resolve, stat, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Old Forest (standalone-scenarios part 4): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The lines a row cannot express (the random stage and its
+// `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The lines a row cannot express (the random stage and its
 // timing, the play limit, the seeded choices) are tests in stages.test.ts, each titled with its line id.
 const FILLERS = ["f0", "f0", "f0", "f0", "f0"];
 const END_OF_PLANNING = { seat: null, phase: "Planning" } as const;
@@ -52,7 +52,7 @@ const ROWS: readonly Row[] = [
   { line: "147018:A:1", name: "3 damage when the character is an ally", layout: { play: ["ally"], committed: ["ally"] }, act: resolve("147018", "whenRevealed"), expect: [damageOn("ally", 3)] },
   { line: "147018:A:2", name: "Shadow: the attacking enemy gets +1 Attack", layout: { engaged: ["f3"] }, act: attack("f3", { shadow: "147018", undefended: true }), expect: [damageOn("dh1", 2)] },
   { line: "147019:A:2", name: "When Revealed: a questing hero is removed from the quest and Song of Sleep is attached to it", layout: { committed: ["dh1"] }, act: resolve("147019", "whenRevealed"), expect: [zone("147019", "attached"), flag("dh1", "cannotReady")] },
-  { line: "147020:A:2", name: "When Revealed: progress on the staging area's locations is discarded", layout: { staging: [{ code: "147012", progress: 2 }] }, act: resolve("147020", "whenRevealed"), expect: [progressOn("147012", 0)] },
+  { line: "147020:A:2", name: "When Revealed: progress on the staging area's locations is discarded", layout: { staging: [{ code: "147012", progress: 1 }] }, act: resolve("147020", "whenRevealed"), expect: [progressOn("147012", 0)] },
   { line: "147020:A:2", name: "a non-unique active location is switched with a location of the staging area", layout: { active: "place", staging: ["147012"] }, act: resolve("147020", "whenRevealed"), expect: [zone("147012", "activeLocation"), zone("place", "staging")] },
   { line: "147021:A:2", name: "When Revealed: at the end of the phase each player raises his threat by the enemies in the staging area", layout: { staging: ["f3", "f0"], phase: "Travel", deck: FILLERS }, act: [resolve("147021", "whenRevealed"), endPhase], expect: [threat(30)] },
   { line: "147022:A:1", name: "When Revealed: the chosen player gains control of Tom Bombadil, ready and committed to the quest", layout: { deck: FILLERS }, act: resolve("147022", "whenRevealed"), expect: [zone("147022", "play")] },

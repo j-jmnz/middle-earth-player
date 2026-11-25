@@ -1,10 +1,19 @@
 // The table's log: this round's engine steps in words, each with its cause from phase 8d (the rule title, or the card and
 // its printed line), so a player can check a number against its source. It is text, not a control.
 import { plural } from "../words/list.ts";
+import { countedOf } from "./counted.ts";
+import { villagersOf } from "./villager-steps.ts";
+import { controlOf } from "../readouts/against-the-shadow/osgiliath-steps.ts";
+import { hiddenLines, hiddenOf } from "../readouts/against-the-shadow/blood-steps.ts";
+import { valeQuiet, valeStepWords } from "../readouts/against-the-shadow/vale-steps.ts";
+import { changeWords } from "../readouts/against-the-shadow/osgiliath.ts";
+import { changedWords } from "../words/scenarios/against-the-shadow/amon-din.ts";
+import { barredWords } from "../words/scenarios/against-the-shadow/osgiliath.ts";
 import { reshuffleWords } from "./pile-ids.ts";
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
 import { discoverLogLine, setAsideLine } from "../words/scenarios/wilderland.ts";
+import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poison.ts";
 import type { Cause } from "../../rules/core/cause.ts";
 import type { EngineStep } from "../../rules/core/intents.ts";
 
@@ -30,14 +39,16 @@ export function logLineSpeech(line: Pick<LogLine, "text" | "cause">): string {
   return line.cause ? `${line.text}. ${line.cause}` : line.text;
 }
 
-function markOf(step: EngineStep): LogMark {
+function markOf(step: EngineStep, stat: LogMark = null): LogMark {
   switch (step.kind) {
     case "threat":
       return "threat";
     case "hideTest":
     case "fortitudeTest":
-    case "quest":
       return "willpower";
+    // The quest's mark is the stat the stage counted (Attack under Battle, Defense under Siege); none for a step kept without it.
+    case "quest":
+      return stat;
     case "escapeTest":
       return step.stat ?? "willpower";
     case "strike":
@@ -78,7 +89,7 @@ export function causeText(cause: Cause, names: LogNames): string {
   return line ? `${card}: ${line}` : card;
 }
 
-function words(step: EngineStep, names: LogNames): string | null {
+function words(step: EngineStep, names: LogNames, questStat: string | null): string | null {
   switch (step.kind) {
     case "push":
     case "pop":
@@ -89,23 +100,23 @@ function words(step: EngineStep, names: LogNames): string | null {
       return `${names.card(step.heroId)} gains 1 resource`;
     case "damage":
       // A heal is a damage step with a negative amount (rr.damage).
-      return step.amount < 0 ? `${-step.amount} damage healed on ${names.card(step.targetId)}` : `${step.amount} damage on ${names.card(step.targetId)}`;
+      return valeQuiet(step) ? null : valeStepWords(step, names.card) ?? (step.amount < 0 ? `${-step.amount} damage healed on ${names.card(step.targetId)}` : `${step.amount} damage on ${names.card(step.targetId)}`);
     case "threat":
       return `${player(step.seat)} threat ${signed(step.amount)}`;
     case "life":
       return `The Ring-bearer's life ${signed(step.amount)}`;
     case "progress":
       // A removal (141026:B:2) is a step with a negative amount: say what left the card, never a minus sign.
-      return step.amount < 0 ? `${-step.amount} progress removed from ${names.card(step.targetId)}` : `${step.amount} progress on ${names.card(step.targetId)}`;
+      return valeStepWords(step, names.card) ?? (step.amount < 0 ? `${-step.amount} progress removed from ${names.card(step.targetId)}` : step.amount === 0 ? barredWords(names.card(step.targetId)) : `${step.amount} progress on ${names.card(step.targetId)}`);
     case "destroy":
       // A location placed facedown underneath The Havens Burn is out of play and hidden: the line never names it (dcce.aflame).
       return step.under ? "A location burns and is placed facedown underneath The Havens Burn" : `${names.card(step.targetId)} is destroyed`;
     case "eliminate":
       return `${player(step.seat)} is eliminated`;
     case "reveal":
-      return `${player(step.seat)} reveals ${names.card(step.cardId)}`;
+      return valeQuiet(step) ? null : valeStepWords(step, names.card) ?? `${player(step.seat)} reveals ${names.card(step.cardId)}`;
     case "engage":
-      return `${names.card(step.enemyId)} engages ${player(step.seat)}`;
+      return valeStepWords(step, names.card, null, { count: 2 }) ?? `${names.card(step.enemyId)} engages ${player(step.seat)}`;
     case "commit":
       return `${names.card(step.cardId)} commits to the quest`;
     case "hideCommit":
@@ -118,12 +129,14 @@ function words(step: EngineStep, names: LogNames): string | null {
       return `${escapeResultTitle(step.success, step.seat, true)}: ${escapeCountedWords(step.stat ?? "willpower", step.committed, step.escape)}`;
     case "locateTest":
       return `${step.success ? "Locate test passed" : "Locate test failed"}: ${plural(step.handIds.length, "card")} discarded from the hand, ${plural(step.dealtIds.length, "encounter card")} discarded`;
+    case "burgle":
+      return `${step.success ? "Burgle attempt succeeded" : "Burgle attempt failed"}: ${plural(step.dealtIds.length, "encounter card")} discarded, ${plural(step.discardedIds.length, "card")} discarded from the hand`;
     case "fortitudeTest":
       return `Fortitude test ${step.success ? "passed" : "failed"}: willpower ${step.willpower} against ${plural(step.eyes, "Sauron's Eye icon")}`;
     case "hideTest":
       return `Hide test ${step.success ? "passed" : "failed"}: willpower ${step.willpower} against threat ${step.threat}`;
     case "quest":
-      return `Quest: willpower ${step.willpower} against threat ${step.threat}`;
+      return `Quest: ${questStat ? `${questStat} ` : ""}${step.willpower} against threat ${step.threat}`;
     case "strike":
       return step.undefended ? `Attack ${step.attack}, undefended, on ${names.card(step.targetId)}` : `Attack ${step.attack} against defense ${step.defense} on ${names.card(step.targetId)}`;
     case "advance":
@@ -145,6 +158,10 @@ function words(step: EngineStep, names: LogNames): string | null {
       return step.count === 0 ? null : `${step.count} ${step.count === 1 ? "card" : "cards"} of ${step.set} ${step.count === 1 ? "is" : "are"} shuffled into the encounter deck`;
     case "setAsideForPool":
       return setAsideLine(names.card(step.sourceId), names.card(step.cardId));
+    case "poison":
+      return poisonLine(names.card(step.targetId), step.count, step.of);
+    case "unconscious":
+      return unconsciousLine(names.card(step.targetId), step.ready === true);
     case "resetEncounterDeck":
       return `The encounter discard pile (${step.count}) is shuffled into the encounter deck`;
     case "reshuffleDeck":
@@ -154,13 +171,22 @@ function words(step: EngineStep, names: LogNames): string | null {
   }
 }
 
-/** The round's steps as log lines, oldest first. Frame pushes and pops are bookkeeping and are left out. */
+/** The round's steps as log lines, oldest first. Frame pushes and pops are bookkeeping and are left out. A quest step names the stat it counted when the table kept it (counted.ts), else it names none. */
 export function logLines(steps: readonly EngineStep[], names: LogNames): LogLine[] {
   const lines: LogLine[] = [];
   steps.forEach((step, index) => {
-    const text = words(step, names);
-    if (!text) return;
-    lines.push({ key: `${index}`, text, cause: "cause" in step ? causeText(step.cause, names) : null, mark: markOf(step) });
+    const stat = countedOf(step);
+    // A location a player took control of is explored, not destroyed: the intent's last step says who took it (osgiliath-steps.ts).
+    const explored = step.kind === "destroy" && steps.some((other) => controlOf(other)?.changes.some((change) => change.kind === "took" && change.id === step.targetId));
+    const text = explored && step.kind === "destroy" ? `${names.card(step.targetId)} is explored` : words(step, names, stat);
+    if (text) lines.push({ key: `${index}`, text, cause: "cause" in step ? causeText(step.cause, names) : null, mark: markOf(step, stat) });
+    // The villager tokens of Encounter at Amon Dîn that moved in the intent this step ended: no engine step tells them (villager-steps.ts).
+    villagersOf(step).forEach((change, at) => lines.push({ key: `${index}-v${at}`, text: changedWords(names.card(change.id), change.was, change.now), cause: null, mark: "resource" }));
+    // The control of Osgiliath locations taken or lost in the intent this step ended (Assault on Osgiliath): no engine step tells it (readouts/against-the-shadow/osgiliath-steps.ts).
+    controlOf(step)?.changes.forEach((change, at) => lines.push({ key: `${index}-c${at}`, text: changeWords(change, controlOf(step)?.seatCount ?? 1, names.card(change.id)), cause: null, mark: null }));
+    // The hidden cards of The Blood of Gondor taken, turned or discarded and the allies placed under Captured! in the intent this step ended (readouts/against-the-shadow/blood-steps.ts).
+    const hidden = hiddenOf(step);
+    if (hidden) hiddenLines(hidden, names.card, true).forEach((text, at) => lines.push({ key: `${index}-h${at}`, text, cause: null, mark: null }));
   });
   return lines;
 }

@@ -18,7 +18,8 @@ const VERBS = [
   // first copy found is added to the staging area ("searches the encounter deck, discard pile, and victory display for Khamûl the Easterling and
   // adds it to the staging area", 906101:A:2; rr.search). It is not revealed. Nothing happens when no copy is in those places. The deck is
   // shuffled by a ShuffleEncounterDeck after it (the line says so). In a quest card's Setup it runs at the top level ("Search the encounter deck for Gollum, and add it to the staging area", 02105:A:1).
-  verbFlags(z.strictObject({ verb: z.literal("SearchToStaging"), code: z.string().min(1), ...when }), { setupRuns: "top" }),
+  // `deckOnly`: only the encounter deck is searched ("Search the encounter deck for Troll Camp", 131053:A:2).
+  verbFlags(z.strictObject({ verb: z.literal("SearchToStaging"), code: z.string().min(1), deckOnly: z.literal(true).optional(), ...when }), { setupRuns: "top", runsInFrame: true }),
   // The source enemy attacks the actor now, as an attack outside the combat phase: from the staging area though it is not engaged, or while
   // it is engaged with the actor ("Southern Spy makes an immediate attack against you", 906203:A:1). It is dealt a shadow card of its own.
   // Nothing happens when it is engaged with another player or out of play.
@@ -123,7 +124,7 @@ const FLAGS = [
   // test", 906106:A:1). The smallest amount held applies. Read by hideCommitReason (rules/quest/hide.ts) through families/nightmare.ts.
   "hideCommitLimit",
   // On a card: it is immune to player card effects while the flag holds ("While Bill Ferny is in the staging area, he gains: Immune to player
-  // card effects", 906201:A:2; mec109.immune-to-player-card-effects). Read with the printed keyword (rules/core/keywords.ts playerCardEffectCanChoose).
+  // card effects", 906201:A:2; mec109.immune-to-player-card-effects). Read with the printed keyword (rules/core/keyword-flags.ts playerCardEffectCanChoose).
   "immuneToPlayerCards",
   // On a card: it cannot ready, by a card effect or in the refresh phase, while the flag holds ("your cards cannot ready for the remainder
   // of the round", 900103:A:1). Read wherever a card readies (player-verbs.ts readyCard, refresh.ts, effect-verbs.ts ReadyHero).

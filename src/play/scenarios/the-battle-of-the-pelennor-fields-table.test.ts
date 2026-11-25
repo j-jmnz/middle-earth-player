@@ -11,7 +11,7 @@ import { tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts
 
 import { dialProps } from "../readouts/dials.ts";
 import { pelennorDetail } from "../cards/pelennor-preview.ts";
-import { stagedAllyLabel } from "../choice/sheet-parts.ts";
+import { seatedLabel, stagedAllyLabel } from "../choice/sheet-parts.ts";
 import { pelennorDials, pelennorHands, pelennorQuestWords } from "../readouts/pelennor.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
 import { ASKS } from "../words/asks/the-battle-of-the-pelennor-fields.ts";
@@ -271,5 +271,17 @@ describe("the words", () => {
     expect(wallWords(4)).toContain("City Wall");
     expect(wallWords(4)).toContain("raises their threat by 3");
     expect(cityWords(40)).toContain("40 hit points");
+  });
+});
+
+describe("145073:A:1 the Esquires' pick of a hero", () => {
+  it("145073:A:1 names the owner on each hero of the pick when two players play, and on none with one player", () => {
+    const two = table({ seats: 2, setAside: ["145014", "145015"], stage: "145073", side: "A" });
+    const state = two.state;
+    const heroes = [...(state.seats[0]?.heroes ?? []), ...(state.seats[1]?.heroes ?? [])];
+    const labels = heroes.map((id) => seatedLabel(state, two.ctx, { card: (card: string) => two.ctx.cards.get(state.cards[card]?.code ?? "")?.name ?? card, line: () => null }, id, heroes));
+    expect(labels.every((label) => label != null && /Player [12]'s hero$/.test(label))).toBe(true);
+    expect(labels[0]).toContain("Player 1's hero");
+    expect(labels.at(-1)).toContain("Player 2's hero");
   });
 });

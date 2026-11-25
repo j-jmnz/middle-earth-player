@@ -68,8 +68,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("CountEncounterTop"), top: z.number().int().positive(), type: encounterType, not: z.boolean().optional(), ...when }),
   // Reveals the top card of the encounter deck for the actor, or for the player the answered event happened to
   // (`eventSeat`), in a staging of its own (rr.reveal, rr.staging): the effect goes on once that card is resolved.
+  // `lessX` (with `times`): the effect's X, which an earlier ChooseX fixed, fewer cards, at least 1 ("Reveal 3 encounter cards per player, Bilbo Baggins may spend X resources to reduce the total number of encounter cards revealed by X. (To a minimum of 1.)", 131028:B:2).
   // `times`: that many cards, one after the other, each in a staging of its own ("reveals 1 encounter card for each resource here", 143078:B:2; read once, when the first is revealed).
-  verbFlags(z.strictObject({ verb: z.literal("RevealEncounter"), who: z.enum(["actor", "eventSeat", "firstPlayer"]).optional(), times: positiveAmountSchema.optional(), ...when }), { runsInFrame: true, setupRuns: "inForEachPlayer" }),
+  verbFlags(z.strictObject({ verb: z.literal("RevealEncounter"), who: z.enum(["actor", "eventSeat", "firstPlayer"]).optional(), times: positiveAmountSchema.optional(), lessX: z.literal(true).optional(), ...when }), { runsInFrame: true, setupRuns: "inForEachPlayer" }),
   // Searches the encounter deck, then its discard pile, then the player's collection (in that order, "search the encounter deck, discard pile, and
   // your collection for a Goblin Sniper", 41041:A:1) for a card with the printed title of `code`, and adds it to the staging area. The app tracks
   // no collection (docs/brief.md): the collection holds every card the game knows, so a copy of `code` is made when neither the deck nor the pile
@@ -107,8 +108,8 @@ const VERBS = [
   // ("That player reveals 1 fewer encounter card this phase (to a minimum of 0)", 143020:A:2): the reveals the players make in turn skip that player's, and nothing else is shortened. A player's own reveal is one card, so `min: 1` leaves it as it is.
   z.strictObject({ verb: z.literal("RevealFewer"), amount: z.number().int().positive(), min: z.union([z.literal(0), z.literal(1)]), who: z.literal("picked").optional(), ...when }),
   // The staging step of this phase reveals `amount` more cards (rr.step-3-3): "reveal an additional encounter card this phase"
-  // (141080:A:2). The extra cards are revealed by the players in turn, from the first player on.
-  z.strictObject({ verb: z.literal("RevealMore"), amount: z.number().int().positive(), ...when }),
+  // (141080:A:2). The extra cards are revealed by the players in turn, from the first player on. `perPlayer`: `amount` more for each player in the game ("reveal 1 additional encounter card per player", 131029:B:2).
+  z.strictObject({ verb: z.literal("RevealMore"), amount: z.number().int().positive(), perPlayer: z.literal(true).optional(), ...when }),
   // A lasting effect on the encounter cards revealed from now until `until`, for those of `type` (any type without it):
   // `threatZero`, the next such card added to the staging area has Threat 0 until the end of the phase; `damage`, the first
   // such card revealed takes `amount` damage from the source; `discard`, the next card revealed is discarded without
@@ -219,8 +220,6 @@ const FLAGS = [
   // Held by the table until the end of the round: a first enemy was noted for a FirstEnemyGains marker, with any keyword (`enemyRevealed`) or with the ambush keyword (`ambushEnemyRevealed`).
   "enemyRevealed",
   "ambushEnemyRevealed",
-  // On a location in play, while its source is in play: it is explored as soon as its progress equals its quest points as they stand now, whatever changed them ("Goblin Gate gets +1 quest point for each enemy engaged with a player", 901402:B:2; rr.explored; src/rules/families/encounter/explore.ts).
-  "exploredWhenFull",
 ] as const;
 
 export const manifest = { name: "encounter", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

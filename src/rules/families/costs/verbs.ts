@@ -1,4 +1,4 @@
-// Rules: rr.resources, rr.resource-match, rr.cost, rr.attachment-cards, rr.lasting-effects (data/rules/entries.json).
+// Rules: rr.resources, rr.resource-match, rr.cost, rr.attachment-cards, rr.lasting-effects, mec108.create-staging-area, hob.staging-area-creating (data/rules/entries.json).
 //
 // The costs family's verbs that change a pool, the effect's X or a discount: ReduceNextCost ("reduce the cost of the next
 // Silvan ally you play this phase by 1"), ChooseX ("discard X cards from your hand"), DiscardResources, SpendResources ("the
@@ -7,22 +7,24 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
-import { readsThen } from "../../interpret/effect-verbs.ts";
+import { markShort } from "../../interpret/effect-verbs.ts";
 import { attachmentHostIds, enforceRestricted } from "../../player/attach.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { askTarget, openBranch } from "../../windows/choices.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { heroPays } from "../../player/payments.ts";
+import { anyLocked, resourcesLocked, stopLockedSpend } from "../pelargir/spending.ts";
 import { mayGainResources } from "../misc/guards.ts";
 import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
 import { printedOf, type Sphere } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { Discount, ScenarioState } from "../../core/state.ts";
-import { livingSeats, updateCard } from "../../core/state.ts";
+import { updateCard } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { attachTo } from "../../core/zones.ts";
-import { noteSpent, spentThisRound } from "./pay.ts";
+import { sharing } from "../breaking/areas.ts";
+import { noteSpent, spentThisRound, spheresOf } from "./pay.ts";
 
 type Focus = { seat: number; sourceId: string | null; chosen?: string };
 
@@ -34,12 +36,11 @@ export function reduceNextCost(state: ScenarioState, instruction: Extract<Instru
   const amount = resolveAmount(state, instruction.amount, scope, ctx);
   const rider = instruction.doomed != null || instruction.noMatch === true || instruction.cannotQuest === true;
   if (seat == null || (amount <= 0 && !rider)) return state;
-  // "that matches attached hero's sphere": the host's printed sphere, read now.
+  // "that matches attached hero's sphere": the host's spheres, read now (`hostSpheres`).
   const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
-  const read = instruction.hostSphere ? printedOf(ctx.cards, state.cards[source?.host ?? ""]?.code ?? "").sphere : null;
-  const hostSphere = read === "fellowship" || read === "baggins" ? null : read;
-  if (instruction.hostSphere && hostSphere == null) return state;
-  const pick = hostSphere ? { ...instruction.pick, sphere: hostSphere } : instruction.pick;
+  const spheres = instruction.hostSphere ? hostSpheres(state, source?.host ?? "", ctx) : null;
+  if (spheres != null && spheres.length === 0) return state;
+  const pick = spheres ? { ...instruction.pick, spheres } : instruction.pick;
   const discount: Discount = {
     seat,
     sourceId: focus.sourceId ?? "",
@@ -53,6 +54,14 @@ export function reduceNextCost(state: ScenarioState, instruction: Extract<Instru
     ...(instruction.cannotQuest ? { cannotQuest: true as const } : {}),
   };
   return { ...state, discounts: [...(state.discounts ?? []), discount] };
+}
+
+// The spheres of influence of the hero a card is attached to: its printed sphere and every resource icon it gained (docs/brief.md, Three layers). A Baggins or Fellowship hero is of that
+// sphere, so a Baggins or Fellowship card matches him; only a neutral hero has none, since a neutral card has no sphere (rr.neutral-cards).
+export function hostSpheres(state: ScenarioState, hostId: string, ctx: ReduceContext): Sphere[] {
+  const host = state.cards[hostId];
+  if (!host) return [];
+  return spheresOf(state, hostId, printedOf(ctx.cards, host.code).sphere, ctx).filter((sphere) => sphere !== "neutral");
 }
 
 // ChooseX: the actor picks X among the numbers that can be chosen (a branch per number); one number is taken without asking.
@@ -81,33 +90,45 @@ export function discardResources(state: ScenarioState, instruction: Extract<Inst
   const amount = Math.min(card.resources, named);
   const next = amount > 0 ? updateCard(state, id, { resources: card.resources - amount }) : state;
   // A discard that found fewer tokens than it names is not resolved in full, so the text after "then" is not attempted (the `thenResolves` condition, rr.then).
-  const data = topFrame(next)?.data;
-  return amount < named && data?.kind === "effect" && readsThen(ctx) ? patchTop(next, { data: { ...data, short: true } }) : next;
+  return amount < named ? markShort(next, ctx) : next;
 }
 
 // The heroes whose resources can pay `sphere` for the actor, or for any player with `group`, and what they hold in all.
 export function spendablePools(state: ScenarioState, actor: number, spec: { sphere?: Sphere | undefined; group?: boolean | undefined }, ctx: ReduceContext): { pools: string[]; total: number } {
-  const seats = spec.group ? livingSeats(state) : [actor];
-  const pools = seats.flatMap((seat) => state.seats[seat]?.heroes ?? []).filter((id) => (state.cards[id]?.resources ?? 0) > 0 && heroPays(state, id, spec.sphere ?? null, ctx));
+  // `group`: the players who share the actor's staging area, all of them while the area is shared (mec108.create-staging-area, hob.staging-area-creating: only players that share a staging area can interact).
+  const seats = spec.group ? sharing(state, actor) : [actor];
+  const pools = seats.flatMap((seat) => state.seats[seat]?.heroes ?? []).filter((id) => (state.cards[id]?.resources ?? 0) > 0 && heroPays(state, id, spec.sphere ?? null, ctx) && !resourcesLocked(state, id));
   return { pools, total: pools.reduce((sum, id) => sum + (state.cards[id]?.resources ?? 0), 0) };
+}
+
+/** Whether a PayResources in the instructions cannot be paid while a hero is locked: the pools that can pay do not hold what it names (Rumour from the Earth's return). False in a game with no lock. */
+export function unpayableUnderLock(state: ScenarioState, instructions: readonly Instruction[], actor: number, ctx: ReduceContext): boolean {
+  if (!anyLocked(state)) return false;
+  return instructions.some((instruction) => instruction.verb === "PayResources" && spendablePools(state, actor, { sphere: instruction.sphere }, ctx).total < instruction.amount);
 }
 
 // SpendResources: a hero for each resource, chosen by the actor unless every resource left must pay.
 export function spendResources(state: ScenarioState, instruction: Extract<Instruction, { verb: "SpendResources" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
+  // The amount is a number or an expression ("spend X resources", 131028:B:2), read once here.
+  const scope = frameScope(state, focus.seat, focus.sourceId);
+  const amount = resolveAmount(state, instruction.amount, scope, ctx);
+  if (amount <= 0) return state;
   if (instruction.target) {
     // From one card's own pool: nobody chooses, and a pool that cannot pay spends nothing.
-    const id = refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId)) ?? "";
-    if ((state.cards[id]?.resources ?? 0) < instruction.amount) return state;
-    return noteSpent(updateCard(state, id, { resources: (state.cards[id]?.resources ?? 0) - instruction.amount }), [{ heroId: id, amount: instruction.amount }], ctx);
+    const id = refCard(state, instruction.target, scope) ?? "";
+    if ((state.cards[id]?.resources ?? 0) < amount) return state;
+    // A locked pool pays nothing and the effect it paid for does not go on, as for every spender (families/pelargir/spending.ts).
+    if (resourcesLocked(state, id)) return stopLockedSpend(state);
+    return noteSpent(updateCard(state, id, { resources: (state.cards[id]?.resources ?? 0) - amount }), [{ heroId: id, amount }], ctx);
   }
   let paid = [...(instruction.paid ?? []), ...(focus.chosen ? [focus.chosen] : [])];
   const left = (id: string): number => (state.cards[id]?.resources ?? 0) - paid.filter((entry) => entry === id).length;
   const { pools } = spendablePools(state, focus.seat, instruction, ctx);
-  if (paid.length === 0 && pools.reduce((sum, id) => sum + left(id), 0) < instruction.amount) return state;
-  while (paid.length < instruction.amount) {
+  if (paid.length === 0 && pools.reduce((sum, id) => sum + left(id), 0) < amount) return state;
+  while (paid.length < amount) {
     const open = pools.filter((id) => left(id) > 0);
     if (open.length === 0) return state;
-    if (open.length === 1 || open.reduce((sum, id) => sum + left(id), 0) <= instruction.amount - paid.length) {
+    if (open.length === 1 || open.reduce((sum, id) => sum + left(id), 0) <= amount - paid.length) {
       paid = [...paid, open[0] ?? ""];
       continue;
     }
@@ -146,7 +167,7 @@ export function reattach(state: ScenarioState, instruction: Extract<Instruction,
   const movedId = instruction.card === "picked" ? lastPicked(state) : focus.sourceId;
   const source = movedId ? state.cards[movedId] : undefined;
   if (!source?.host) return state;
-  const options = attachmentHostIds(state, focus.seat, source.code, ctx).filter((id) => id !== source.host);
+  const options = attachmentHostIds(state, focus.seat, source.code, ctx, { byEffect: true }).filter((id) => id !== source.host);
   const target = focus.chosen && options.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;
   if (!target) return options.length > 1 ? askTarget(state, { instruction, seat: focus.seat, chosen: null }, options) : state;
   const old = state.cards[source.host];

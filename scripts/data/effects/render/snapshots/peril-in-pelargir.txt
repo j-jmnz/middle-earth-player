@@ -1,0 +1,298 @@
+Scenario piles that place cards with no record (quest: 05065 The Leaping Fish; quest: 05066 Fighting in the Streets; quest: 05067 Escape to the Quays; activeLocation: 05021 The Leaping Fish; attachedChosen: 05019 Alcaron's Scroll)
+
+## 05019 Alcaron's Scroll
+(the scenario deals it into the attachedChosen pile; the piles place it, no record does)
+
+05019:A:1 (front): If unattached, return Alcaron's Scroll to the staging area and it gains: 'Action: Exhaust a hero to attach Alcaron's Scroll to that hero.'
+  05019:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat takesAttackDamage (the hero it is attached to takes the damage of an attack whose enemy holds damageToScroll) 1, while this card is in play
+    - this card counts as an attachment while it is attached
+  05019:action:1: Action
+    only if all of: (this card is in the staging area) and (there is a ready hero (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready hero (you control)
+    - exhaust the picked card
+    - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
+
+05019:A:2 (front): Forced: When the hero with Alcaron's Scroll attached is damaged by an enemy attack, attach Alcaron's Scroll to that enemy.
+  05019:forced:1: Forced on the event damagedByAttack (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this objective leaves the hero, the enemy or the staging area it is on and attaches to the event's other card, an enemy in play that may have attachments; it stays a claimed objective that no player controls, so it returns to the staging area when it is detached; with no such enemy nothing happens
+
+## 05020 Harbor Thug
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05020:A:1 (front): Forced: When the player whose hero has Alcaron's Scroll attached raises his threat, Harbor Thug engages that player.
+  05020:forced:1: Forced after a player's threat is raised
+    only if there is a hero (you control) with an attachment named "Alcaron's Scroll" to choose
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - engage this card
+
+05020:A:2 (shadow): Shadow: Any damage dealt by this attack is dealt to the hero with Alcaron's Scroll attached, if able.
+  05020:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat damageToScroll (the damage its attack deals to the defending player's characters goes to the hero the card holding takesAttackDamage is attached to instead, if a hero holds it; with none the damage stays where it was assigned) 1, until the end of the attack
+
+## 05021 The Leaping Fish
+(the scenario deals it into the activeLocation pile; the piles place it, no record does)
+
+05021:A:1 (front): If Alcaron's Scroll is attached to a hero, The Leaping Fish gains: 'Forced: At the beginning of the quest phase discard X cards from the top of the encounter deck where X is the number of players in the game. Add each enemy discarded by this effect to the staging area.'
+  05021:forced:1: Forced when a phase begins
+    only if all of: (it is the Quest phase) and (the card with code 05019 is attached to a hero, any player's)
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard the number of players card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)
+    - add the discarded enemies to the staging area
+
+## 05022 Pelargir Docks
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05022:A:1 (front): While Pelargir Docks is the active location, enemies get +1 Attack and +1 Defense.
+  05022:constant:1: Constant
+    only if this card is the active location
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) or in the staging area: stat attack 1, while this card is in play
+    - each enemy (any player controls) or in the staging area: stat defense 1, while this card is in play
+
+## 05023 Harbor Storehouse
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05023:A:1 (front): Forced: Each time a location is discarded from the top of the encounter deck, raise each player's threat by 1.
+  05023:constant:1: Constant
+    - the table: stat noteDeckDiscards (held by the table: a card that goes from the top of the encounter deck to its discard pile is announced, so a card that hears "discarded from the encounter deck" answers it) 1, while this card is in play
+  05023:forced:1: Forced on the event discardedFromEncounterDeck (heard about location (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - raise threat by 1 (each player)
+
+05023:A:2 (shadow): Shadow: Deal attacking enemy an additional shadow card for each Thug enemy in play.
+  05023:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - repeat the number of Thug enemy (any player controls) or in the staging area times:
+      - the attacking enemy is dealt a shadow card [also {"inPlay":true}]
+
+## 05024 Collateral Damage
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05024:A:1 (front): When Revealed: Discard 2 cards from the top of the encounter deck. Discard an additional 2 cards for each copy of Collateral Damage in the discard pile. Then, raise each player's threat by 2 for each location discarded by this effect.
+  05024:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard 2 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)
+    - discard the number of treachery (any player controls) encounterDiscard, named "Collateral Damage" x 2 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on); they join the cards this effect discarded before, so a later amount "discarded by this effect" counts them all
+    - raise each player's threat by 2 for each location card this effect discarded from the top of the encounter deck, in any of its discard steps, even one a reset of the deck put back in it
+
+05024:A:2 (shadow): Shadow: Any damage dealt by this attack is dealt to the hero with Alcaron's Scroll attached, if able.
+  05024:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat damageToScroll (the damage its attack deals to the defending player's characters goes to the hero the card holding takesAttackDamage is attached to instead, if a hero holds it; with none the damage stays where it was assigned) 1, until the end of the attack
+
+## 05037 Pickpocket
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05037:A:1 (front): Forced: When Pickpocket attacks, the defending player discards 1 resource from one of his heroes' resource pools and 1 card at random from his hand.
+  05037:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control) with resources on it
+    - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
+    - the acting player discards 1 random card(s) from hand
+
+05037:A:2 (shadow): Shadow: Defending player discards 1 of his attachments. (Discard all of his attachments instead if undefended.)
+  05037:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): choose attachment (you control) that a player controls (not an encounter attachment)
+    - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): for each attachment (you control) that a player controls (not an encounter attachment):
+      - discard the picked card
+
+## 05038 City Street
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05038:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+05038:A:2 (front): While City Street is in the staging area, players cannot travel to a location that does not have the title City Street.
+  05038:constant:1: Constant
+    only if this card is in the staging area
+    - the players cannot travel to a location whose title is not City Street while this holds (the Trait is no title; another copy of the title may be traveled to)
+
+05038:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack.
+  05038:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack 2, until the end of the attack
+
+## 05039 Market Square
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05039:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+05039:A:2 (front): Travel: Each player must spend 1 resource from one of his heroes' resource pools to travel here.
+  05039:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player's heroes hold fewer resources than they must spend (read by the investigation family)
+    - for each player, first player first:
+      - the acting player spend 1 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
+
+05039:A:3 (shadow): Shadow: Defending player discards all resources in his heroes' resource pools.
+  05039:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - for each hero (you control):
+      - all the resources come off the resource pool of the picked card (discarded, not spent)
+
+## 05040 Lost in the City
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05040:A:1 (front): When Revealed: Each player must search the encounter deck and discard pile for 1 City location and add it to the staging area, if able. Shuffle the encounter deck. This effect cannot be canceled.
+  05040:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one City location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+05040:A:2 (shadow): Shadow: Defending player discards his hand.
+  05040:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player discards all the cards in their hand
+
+## 05041 Local Trouble
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05041:A:1 (front): When Revealed: Attach this card to the hero with the highest threat cost without a copy of Local Trouble attached. (Counts as a Condition attachment with the text: 'When attached hero exhausts, readies, or triggers an ability, raise its controller's threat by 1.')
+  05041:whenRevealed:1: When revealed
+    - this card attaches to the hero with the highest printed threat cost among the heroes (any player's) that carry no copy of it and may have it, the first player choosing among heroes tied; with no such hero it is not attached
+  05041:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  05041:triggered:1: Triggered (mandatory, not printed as Forced) on the event exhausted (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - raise threat by 1 (hostController)
+  05041:triggered:2: Triggered (mandatory, not printed as Forced) on the event readied (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - raise threat by 1 (hostController)
+  05041:triggered:3: Triggered (mandatory, not printed as Forced) on the event abilityTriggered (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - raise threat by 1 (hostController)
+
+## 05042 Zealous Traitor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05042:A:1 (front): Forced: When Zealous Traitor engages a player, that player must deal 1 damage to each ally he controls. (2 damage instead if Zealous Traitor was not optionally engaged.)
+  05042:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if this card holds the flag engagedOptionally: for each ally (you control):
+      - deal 1 damage to the picked card
+    - then, if not (this card holds the flag engagedOptionally) (checked when this step runs, after the steps above; not tied to whether they did anything): for each ally (you control):
+      - deal 2 damage to the picked card
+
+## 05043 Lossarnach Bandit
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05043:A:1 (front): Forced: When Lossarnach Bandit engages a player, that player discards 1 resource from each of his heroes' resource pools. (2 resources instead if Lossarnach Bandit was not optionally engaged.)
+  05043:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if this card holds the flag engagedOptionally: for each hero (you control) with resources on it:
+      - 1 resource(s) come off the resource pool of the picked card (discarded, not spent)
+    - then, if not (this card holds the flag engagedOptionally) (checked when this step runs, after the steps above; not tied to whether they did anything): for each hero (you control) with resources on it:
+      - 2 resource(s) come off the resource pool of the picked card (discarded, not spent)
+
+## 05044 Umbar Assassin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05044:A:1: Archery 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+05044:A:2 (front): Forced: When Umbar Assassin engages a player, that player must deal 3 damage to a hero he controls. (Discard that hero instead if Umbar Assassin was not optionally engaged.)
+  05044:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control)
+    - then, if this card holds the flag engagedOptionally (checked when this step runs, after the steps above; not tied to whether they did anything): deal 3 damage to the picked card
+    - then, if not (this card holds the flag engagedOptionally) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+## 05045 Lurking in Shadows
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+05045:A:1 (front): When Revealed: Return all Brigand enemies engaged with players to the staging area. If this effect returned no Brigand enemies to the staging area, Lurking in Shadows gains surge.
+  05045:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - return every enemy with the trait Brigand engaged with a player to the staging area
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+05045:A:2 (shadow): Shadow: Return attacking enemy to the staging area after it attacks.
+  05045:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 05065 The Leaping Fish
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+05065:A:1 (front): Setup: Search the encounter deck for The Leaping Fish and Alcaron's Scroll. Make The Leaping Fish the active location and attach Alcaron's Scroll to a hero.
+  05065:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - a copy of the card with code 05019 is set aside, out of play
+    - choose hero (any player controls) that the card with code 05019 can be attached to, chosen by the first player
+    - the set-aside copy of the card with code 05019 is attached to the last picked hero; an objective card is claimed by it (it returns to the staging area when it is detached)
+    - shuffle the encounter deck
+
+05065:B:1 (back): Battle. (Characters use their Attack instead of Willpower when questing.)
+  (the keyword part is owned by the card's keywords; the records cover: (Characters use their Attack instead of Willpower when questing.))
+  05065:constant:1: Constant
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
+
+05065:B:2 (back): When Revealed: Each player must search the encounter deck for a copy of Harbor Thug and add it to the staging area. Shuffle the encounter deck.
+  05065:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one card with code 05020 in the encounter deck and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+## 05066 Fighting in the Streets
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+05066:B:1 (back): Battle. (Characters use their Attack instead of Willpower when questing.)
+  (the keyword part is owned by the card's keywords; the records cover: (Characters use their Attack instead of Willpower when questing.))
+  05066:constant:1: Constant
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
+
+05066:B:2 (back): The players cannot advance to the next stage unless Alcaron's Scroll is attached to a hero.
+  05066:constant:2: Constant
+    only if the card with code 05019 is not attached to a hero (it is in the staging area, on an enemy or out of play)
+    - the players cannot defeat this stage while this holds
+
+05066:B:3 (back): When Revealed: Attach Alcaron's Scroll to the highest engagement cost enemy in play, if able. Otherwise, add Alcaron's Scroll to the staging area.
+  05066:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, with the highest current engagement cost of those (ties: the chooser decides), chosen by the first player
+    - the objective in play with code 05019 leaves the hero, the enemy or the staging area it is on and attaches to the picked card, an enemy in play that may have attachments; it stays a claimed objective that no player controls, so it returns to the staging area when it is detached; with no enemy to attach to it is added to the staging area instead
+
+## 05067 Escape to the Quays
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+05067:A:1 (front): When Revealed: Each player searches the encounter deck and discard pile for 1 enemy and adds it to the staging area.
+  05067:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+05067:B:1 (back): Enemies cannot be optionally engaged.
+  05067:constant:1: Constant
+    - the table: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+05067:B:2 (back): Forced: The first enemy revealed from the encounter deck each round makes an immediate attack against the player who controls Alcaron's Scroll from the staging area.
+  05067:forced:1: Forced after a card is revealed (heard about enemy (any player controls); only when the encounter deck revealed it)
+    only if the card the event is about is the first enemy the encounter deck revealed this round (not one a search, a shadow card or a discard added)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the enemy the event is about, in the staging area, makes an immediate attack against the player whose hero has the card with code 05019 attached, from the staging area: it is dealt a shadow card and the defender may be declared; with no such hero (the card is in the staging area or on an enemy) there is no attack
+
+05067:B:3 (back): The players cannot defeat this stage unless Alcaron's Scroll is attached to a hero. If the players defeat this stage, they have won the game.
+  05067:constant:2: Constant
+    only if the card with code 05019 is not attached to a hero (it is in the staging area, on an enemy or out of play)
+    - the players cannot defeat this stage while this holds
+
+(rendered pieces: 165 by template, 1 as JSON)

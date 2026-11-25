@@ -1,6 +1,6 @@
 import { FAMILY_SAMPLES } from "./families.ts";
 import type { Obj } from "./kit.ts";
-import { DREADNAUGHT_SAMPLES, ERECH_SAMPLES, ESCAPE_SAMPLES, FOG_SAMPLES, GULDUR_SAMPLES, GUARDIAN_SAMPLES, INVESTIGATION_SAMPLES, LONG_DARK_SAMPLES, RUINS_SAMPLES, SIEGE_SAMPLES, SMAUG_SAMPLES, STONE_SAMPLES, WIZARDS_QUEST_SAMPLES } from "./verbs.ts";
+import { BURGLE_SAMPLES, DREADNAUGHT_SAMPLES, ERECH_SAMPLES, ESCAPE_SAMPLES, FOG_SAMPLES, GULDUR_SAMPLES, GUARDIAN_SAMPLES, INVESTIGATION_SAMPLES, LONG_DARK_SAMPLES, POISON_SAMPLES, RUINS_SAMPLES, SIEGE_SAMPLES, SMAUG_SAMPLES, SACK_SAMPLES, STONE_SAMPLES, WESTERN_LANDS_SAMPLES, WIZARDS_QUEST_SAMPLES } from "./verbs.ts";
 
 // A field is never hidden (kit.ts): a template that names a key in `read` must say it in its text, or the key would be dropped from the reader's view with no `[also ...]` to show it. For each verb, samples that set
 // every field the template reads; removing a field must change the text. A new template needs a sample here.
@@ -8,6 +8,7 @@ export const HERO = { type: "hero", control: "you" };
 export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ...FAMILY_SAMPLES,
   ...ESCAPE_SAMPLES,
+  ...BURGLE_SAMPLES,
   ...LONG_DARK_SAMPLES,
   ...STONE_SAMPLES,
   ...GUARDIAN_SAMPLES,
@@ -18,8 +19,11 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ...SIEGE_SAMPLES,
   ...GULDUR_SAMPLES,
   ...DREADNAUGHT_SAMPLES,
+  ...POISON_SAMPLES,
   ...INVESTIGATION_SAMPLES,
   ...WIZARDS_QUEST_SAMPLES,
+  ...WESTERN_LANDS_SAMPLES,
+  ...SACK_SAMPLES,
   ModifyStat: [
     { verb: "ModifyStat", stat: "attack", amount: 1, until: "whileSourceInPlay", holders: HERO, eachResource: true, doesNotStack: true },
     { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfPhase", holders: HERO, per: "hero", trait: "Dwarf", subtract: true },
@@ -73,8 +77,9 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   EngageSeatWith: [{ verb: "EngageSeatWith", pick: HERO, controls: true }, { verb: "EngageSeatWith", pick: HERO }],
   GrantSurgeToSubject: [{ verb: "GrantSurgeToSubject" }],
   PlaceDamageOn: [{ verb: "PlaceDamageOn", code: "02064", amount: 2 }],
-  SearchToStaging: [{ verb: "SearchToStaging", code: "900602" }],
+  SearchToStaging: [{ verb: "SearchToStaging", code: "900602" }, { verb: "SearchToStaging", code: "131036", deckOnly: true }],
   PlaceDamage: [{ verb: "PlaceDamage", amount: 2, card: "picked" }, { verb: "PlaceDamage", amount: { players: true } }],
+  LookAtEncounterTop: [{ verb: "LookAtEncounterTop" }],
   LookAtTop: [{ verb: "LookAtTop", count: 3, deck: "own" }],
   DiscardOtherLooked: [{ verb: "DiscardOtherLooked" }],
   SetX: [{ verb: "SetX", value: 2 }],
@@ -113,7 +118,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   HoldUnder: [{ verb: "HoldUnder", code: "09016" }],
   DiscardHeld: [{ verb: "DiscardHeld" }],
   PlaceHandUnderSelf: [{ verb: "PlaceHandUnderSelf" }],
-  ChooseCurrentQuest: [{ verb: "ChooseCurrentQuest" }],
+  ChooseCurrentQuest: [{ verb: "ChooseCurrentQuest" }, { verb: "ChooseCurrentQuest", until: "endOfRound" }],
   AttachNewTo: [{ verb: "AttachNewTo", code: "10157", to: "Iârion" }],
   TradeDamageForResources: [{ verb: "TradeDamageForResources", code: "10158", damage: 4, resources: 1 }],
   FirstTraitSurge: [{ verb: "FirstTraitSurge", trait: "Weather", type: "enemy", doomed: 2 }, { verb: "FirstTraitSurge", trait: "Hazard", type: "any" }],
@@ -181,7 +186,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ShufflePileIntoEncounterDeck: [{ verb: "ShufflePileIntoEncounterDeck", pile: "angmarOrcs" }],
   StageSetAside: [{ verb: "StageSetAside", code: "09046", remember: true }, { verb: "StageSetAside", name: "Orc Ambush" }, { verb: "StageSetAside", code: "09046", reveal: true }],
   ResolveWhenRevealed: [{ verb: "ResolveWhenRevealed", card: "self" }, { verb: "ResolveWhenRevealed", card: "self", reveal: true }],
-  RevealMore: [{ verb: "RevealMore", amount: 1 }],
+  RevealMore: [{ verb: "RevealMore", amount: 1 }, { verb: "RevealMore", amount: 1, perPlayer: true }],
   FlipInPlace: [{ verb: "FlipInPlace", code: "09071", into: "09072", attachTo: "picked", entersPlay: true }],
   AddToPool: [{ verb: "AddToPool", code: "10160", eachPlayer: true }],
   ShuffleIntoEncounterDeck: [{ verb: "ShuffleIntoEncounterDeck", code: "10160" }],
@@ -191,6 +196,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   RemoveFromCampaignPool: [{ verb: "RemoveFromCampaignPool" }],
   CancelDamage: [{ verb: "CancelDamage", amount: 2, target: "host" }, { verb: "CancelDamage", all: true }],
   ChooseX: [{ verb: "ChooseX", min: 2, max: [{ stat: "damage", of: "picked" }] }, { verb: "ChooseX", max: [3, { stat: "resources", of: "picked" }] }],
+  PayFromHero: [{ verb: "PayFromHero", name: "Bilbo Baggins" }],
   MoveDamage: [{ verb: "MoveDamage", amount: 2 }, { verb: "MoveDamage", all: true }],
   TakeLoggedCaptives: [{ verb: "TakeLoggedCaptives", under: "143022" }],
   FreeRingBearer: [{ verb: "FreeRingBearer" }],
@@ -258,6 +264,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   LimitPlaysPerRound: [{ verb: "LimitPlaysPerRound", max: 1 }],
   QuestProgress: [{ verb: "QuestProgress", amount: 10 }],
   ShuffleDiscardIntoDeck: [{ verb: "ShuffleDiscardIntoDeck" }],
+  ShuffleSetAsideIntoDeck: [{ verb: "ShuffleSetAsideIntoDeck", code: "132019" }],
   RemoveSourceFromGame: [{ verb: "RemoveSourceFromGame" }],
   DamageEach: [{ verb: "DamageEach", amount: 1, pick: HERO }],
   Restrict: [
@@ -268,6 +275,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
     { verb: "Restrict", what: "travel", location: "18068", guarding: "Tiny" },
     { verb: "Restrict", what: "travel", trait: "West Bank" },
     { verb: "Restrict", what: "travel", exceptSelf: true },
+    { verb: "Restrict", what: "travel", exceptTitle: "City Street" },
     { verb: "Restrict", what: "travel", withResources: true },
     { verb: "Restrict", what: "travel" },
     { verb: "Restrict", what: "defend", anyDefender: true },
@@ -291,17 +299,17 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   GuardReturnedBy: [{ verb: "GuardReturnedBy", code: "04041", returns: "firstPlayer" }],
   MakeEngagementChecks: [{ verb: "MakeEngagementChecks", lower: { name: "Raider Flagship", amount: 50 } }],
   ImmediateAttackBy: [{ verb: "ImmediateAttackBy", target: "subject" }],
-  ImmediateAttackEach: [{ verb: "ImmediateAttackEach", trait: "Troll", notTrait: "Orc", enemy: "Dagnir", own: true }],
+  ImmediateAttackEach: [{ verb: "ImmediateAttackEach", trait: "Troll", notTrait: "Orc", enemy: "Dagnir", own: true }, { verb: "ImmediateAttackEach", shadow: false, notStaging: true }],
   DiscardTopEncounter: [{ verb: "DiscardTopEncounter", ambushCheck: true }],
   FirstEnemyGains: [{ verb: "FirstEnemyGains", keyword: "surge", withKeyword: "ambush" }],
   RevealEnemies: [{ verb: "RevealEnemies", ids: ["a"] }],
   DiscardEncounterTop: [{ verb: "DiscardEncounterTop", count: 2 }],
   DiscardUntilEnemies: [{ verb: "DiscardUntilEnemies", perPlayer: 2, to: "staging", trait: "Warg", less: 1, atLeast: 1 }, { verb: "DiscardUntilEnemies", perPlayer: 1, to: "reveal" }, { verb: "DiscardUntilEnemies", perPlayer: 1, cardType: "location", less: 1, atLeast: 1, returnOthers: true }],
-  RevealEncounter: [{ verb: "RevealEncounter", who: "firstPlayer" }, { verb: "RevealEncounter", times: 2 }],
+  RevealEncounter: [{ verb: "RevealEncounter", who: "firstPlayer" }, { verb: "RevealEncounter", times: 2 }, { verb: "RevealEncounter", times: 3, lessX: true }],
   AdvanceStage: [{ verb: "AdvanceStage" }],
   WinGame: [{ verb: "WinGame" }],
   LoseGame: [{ verb: "LoseGame", reason: "the ring is lost" }],
-  StageDiscarded: [{ verb: "StageDiscarded", type: "enemy" }],
+  StageDiscarded: [{ verb: "StageDiscarded", type: "enemy" }, { verb: "StageDiscarded", type: "enemy", trait: "Goblin" }],
   SearchStageCard: [{ verb: "SearchStageCard", code: "12345" }],
   SearchBoonOrTreasureToHand: [{ verb: "SearchBoonOrTreasureToHand" }],
   RemoveFromEncounterDeckIfLogged: [{ verb: "RemoveFromEncounterDeckIfLogged", line: "A line", count: 2, cardType: "enemy", nonUnique: true, except: ["Urdug"] }],

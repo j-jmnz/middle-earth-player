@@ -1,5 +1,8 @@
+import { POLICY_KIT_RULES } from "../../test/harness/policy-kit.ts";
 import { authoredRel } from "../data/effects/authored-paths.ts";
 import { finderImport } from "../data/effects/seed-finder-paths.ts";
+import { loadAnyScenario } from "../data/load-scenarios.ts";
+import { HOBBIT_ASK_TABLES } from "../../src/play/words/hobbit-asks.ts";
 
 // The skeleton files `pnpm scenario new` writes (scripts/tools/scenario-new.ts). Each function returns one file's text from the plan's facts.
 // A skeleton compiles, passes lint and leaves the suite green: its golden test is a skipped suite and its campaign test one real check and some
@@ -47,6 +50,10 @@ export const upper = (short: string): string => short.toUpperCase().replace(/-/g
 const dataImport = (depth: string): string => `import { loadCampaign, loadScenario } from "${depth}scripts/data/load-scenarios.ts";`;
 const dataConsts = (facts: Facts, c: string): string => `const campaign = loadCampaign("${facts.campaignId}");\nconst ${c} = loadScenario("${facts.id}");`;
 
+/** The comment over the rules list of a new game.ts: what a policy is and the kit's rules (`POLICY_KIT_RULES`, test/harness/policy-kit.ts). */
+export const policyKitComment = (policyName: string): string =>
+  `// The policy (test/harness/policy-kit.ts): a list of rules tried in order, then the auto-player's answer with ${policyName}. A rule answers its own window and returns null for any other. The kit's rules:\n${POLICY_KIT_RULES.map(([name, says]) => `//   ${name}  ${says}`).join("\n")}\n`;
+
 /** test/scenarios/<id>/game.ts */
 export function gameFile(facts: Facts): string {
   const P = pascal(facts.short);
@@ -58,11 +65,12 @@ export function gameFile(facts: Facts): string {
   return `import { emptyLog, type CampaignLog } from "../../../src/campaign/log.ts";
 import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-state.ts";
-import { legalIntents, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
+import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
 ${dataImport("../../../")}
-import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
+import type { PolicyOptions } from "../../harness/auto-player.ts";
 import { campaignGame, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
+import { chooseFirstOrLast, policyIntent, type Policy } from "../../harness/policy-kit.ts";
 
 ${dataConsts(facts, c)}
 
@@ -85,11 +93,12 @@ export type ${P}Policy = {
 };
 export const DEFAULT_POLICY: ${P}Policy = { choose: "first" };
 
-// The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option, or the last as the policy says. Every intent is one the reducer listed.
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go before the auto-player's.
+${policyKitComment(`${U}_POLICY`)}// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go in the list, before the auto-player's.
+const rules = (policy: ${P}Policy): Policy => [chooseFirstOrLast(policy.choose)];
+
+// Every intent is one the reducer listed.
 export function ${c}Intent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: ${P}Policy = DEFAULT_POLICY): PlayerIntent {
-  if (state.window?.kind === "choose") return { type: "Choose", optionId: (policy.choose === "last" ? state.window.options.at(-1) : state.window.options[0]) ?? "" };
-  return nextIntent(state, ctx, ${U}_POLICY, memory, legalIntents(state, ctx));
+  return policyIntent(rules(policy), ${U}_POLICY, state, ctx, memory);
 }
 
 export type ${P}Game = PlayedGame;
@@ -289,13 +298,31 @@ export const AUTHORED_REPLACES: readonly string[] = [];
 `;
 }
 
-/** src/play/words/asks/<id>.ts the scenario's choice words as data (src/play/words/asks.ts). pnpm data build adds it to the barrel. */
-export function asksFile(facts: Facts): string {
-  return `import type { Ask } from "../asks.ts";
+/** test/scenarios/<id>/screens.ts */
+export function screensFile(facts: Facts): string {
+  return `import type { ScreenMoment } from "../../harness/screens.ts";
 
+// The table moments the screen review shoots (\`pnpm browser shot --moment ${facts.id} --landscape\`; test/harness/screens.ts): one for each new widget of ${facts.name}'s table, a layout (the same JSON \`pnpm game scene\` takes) and a note that says
+// which printed line or widget it shows. TODO: write them while the scenario is built, and name them in the \`ux\` brief. \`scripts/browser/scene.test.ts\` builds each one in Node and fails when a layout no longer builds.
+export const screens: ScreenMoment[] = [];
+`;
+}
+
+/**
+ * src/play/words/asks/<id>.ts the scenario's choice words as data (src/play/words/asks.ts). pnpm data build adds it to the barrel. A scenario of The Hobbit spreads the shared words of the cards it deals that ask
+ * (src/play/words/hobbit-asks.ts): the On the Doorstep Bilbo Baggins, and the dragon treasure set where its Setup lists it (`ScenarioData.sagaStart`, `ScenarioData.treasures`).
+ */
+export function asksFile(facts: Facts): string {
+  const data = facts.campaignId === "the-hobbit" ? loadAnyScenario(facts.id) : null;
+  const saga = data?.sagaStart && "hero" in data.sagaStart ? data.sagaStart.hero : null;
+  const shared = HOBBIT_ASK_TABLES.filter((table) => (table.hero != null && table.hero === saga) || (table.treasure != null && data?.treasures?.includes(table.treasure))).map((table) => table.name);
+  const imported = shared.length > 0 ? `import { ${shared.join(", ")} } from "../hobbit-asks.ts";\n` : "";
+  const spread = shared.length > 0 ? `{ ${shared.map((name) => `...${name}`).join(", ")} }` : "{}";
+  return `import type { Ask } from "../asks.ts";
+${imported}
 // The choice words of ${facts.name} (${facts.campaignId} part ${facts.part}), one entry for each Pick and Choose of its records: \`<record id> @<instruction path> <verb | option id>\` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // \`pnpm test scenario ${facts.id} --words\` fails on a Pick or Choose with neither an entry nor words of its own, and \`WORDS_DUMP=${facts.id}\` prints each sentence.
-export const ASKS: Readonly<Record<string, Ask>> = {};
+export const ASKS: Readonly<Record<string, Ask>> = ${spread};
 `;
 }
 
@@ -307,7 +334,7 @@ import { describe, it } from "vitest";
 import { cardSpecs, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for ${facts.name} (${facts.campaignId} part ${facts.part}): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
-// \`cardSpecs\` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish).
+// \`cardSpecs\` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
 // TODO: the rows; the todo below stands in until there is one.
 const ROWS: readonly Row[] = [];
 

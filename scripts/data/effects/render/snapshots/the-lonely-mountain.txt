@@ -1,0 +1,316 @@
+Scenario piles that place cards with no record (quest: 132071 A Warm Welcome; quest: 132072 The Burglar's Turn; quest: 132073 Inside Information; quest: 132074 Thieves! Fire! Murder!; staging: 132040 Smaug the Golden; staging: 132043 The Lonely Mountain; setAside: 132039 A Bare Patch; setAside: 132041 Smaug the Magnificent; setAside: 132020 The Arkenstone; setAside: 132021 Mithril Shirt; setAside: 132022 Thrór's Battle Axe; setAside: 132023 Thrór's Hunting Bow; setAside: 132024 Thrór's Golden Cup)
+
+## 132039 A Bare Patch
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+132039:A:1 (front): While attached, Smaug the Magnificent gets -3 Defense.
+  132039:constant:1: Constant
+    - its host: stat defense -3, while this card is in play
+
+132039:A:2 (front): Response: After the players quest successfully, the first player makes a burgle attempt. If successful, attach A Bare Patch to Smaug the Magnificent.
+  132039:response:1: Response after the players quest successfully
+    only if all of: (the actor holds the first player token) and (this card is in the staging area) and (the card with code 132041 is in play)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player makes a burgle attempt: he discards encounter cards from the top (none is revealed) until one with a burgle effect is discarded; he shuffles his deck and reveals its top card (it stays on the deck), the players take actions once; then he discards the cards that card's burgle effect asks from his hand, or the attempt fails (a failed attempt is announced as burgleFailed)
+    - then, if the last burgle attempt the running effect made succeeded (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): this card is attached to the card in play titled "Smaug the Magnificent"; with none it is removed from the game
+
+## 132040 Smaug the Golden
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+132040:A:1 (front): Indestructible. Immune to player card effects. Cannot be engaged.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot be engaged.)
+  132040:constant:1: Constant
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+
+132040:A:2 (front): X is the number of non-Burglar characters committed to the quest.
+  132040:constant:2: Constant
+    - this card: stat threat the number of character (any player controls) without Burglar, committed to the quest, while this card is in play
+
+132040:A:3 (front): Forced: After the 6th progress token is placed here, the players advance to stage 4A.
+  132040:forced:1: Forced on the event progressPlaced (heard about this card)
+    only if this card is a enemy (any player controls) or in the staging area, with at least 6 progress on it
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 132074 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
+
+## 132041 Smaug the Magnificent
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+132041:A:1: Indestructible. Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+132041:A:2 (front): Cannot leave the staging area (except by quest effect) but is considered to be engaged with the first player.
+  132041:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - this card: stat engagedWithFirst 1, while this card is in play
+
+132041:A:3 (front): Forced: If Smaug the Magnificent is dealt a shadow card with a burgle effect, he makes an additional attack immediately after this one.
+  132041:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    only if a shadow card this enemy holds for the attack has a burgle effect
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
+
+## 132042 Croaking Crows
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132042:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+132042:A:2 (front): Forced: When a location is revealed from the encounter deck, put 1 progress on Smaug the Golden.
+  132042:forced:1: Forced after a card is revealed (heard about location (any player controls); only when the encounter deck revealed it)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Smaug the Golden"
+    - place 1 progress on the picked card
+
+132042:A:3 (front): Burgle: The first player shuffles his deck and reveals the top card. He may discard 1 card from his hand that matches the revealed card's sphere and type.
+  132042:constant:1: Constant
+    - (burgle effect, read only when a burgle attempt stops at this card) the first player may discard exactly 1 card from his hand that match the revealed card's sphere and card type (an X cost matches nothing; both must match when two are named)
+
+## 132043 The Lonely Mountain
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+132043:A:1 (front): While at least 1 card is stacked underneath, The Lonely Mountain is immune to player card effects, cannot leave the staging area, and gets -2 Threat for each card stacked under it.
+  132043:constant:1: Constant
+    only if the number of cards facedown under the card with code 132043 in play is at least 1
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat immuneToPlayerCards 1, while this card is in play
+    - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+    - this card: stat threat minus (the number of cards attached facedown to this card x 2), while this card is in play
+
+132043:A:2 (front): Action: While making a burgle attempt, the first player may spend 2 Baggins resources to take the revealed card into hand and reveal the next card of his deck.
+  132043:action:1: Action (cost: pay 2 baggins resource(s))
+    only if a burgle attempt is in its action window (after its second step, before its third) and the actor is the first player
+    who acts: any player may trigger it; the acting player is the one who does
+    - while a burgle attempt is in its action window, the revealed card goes into the first player's hand and the next card of his deck is revealed (with none left the attempt fails)
+
+## 132044 Great Hall
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132044:A:1 (front): While Great Hall is the active location, it gains: "Forced: Put 1 progress on Smaug the Golden at the end of each round."
+  132044:forced:1: Forced at the end of the round
+    only if this card is the active location
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Smaug the Golden"
+    - place 1 progress on the picked card
+
+132044:A:2 (front): Burgle: The first player shuffles his deck and reveals the top card. He may discard 3 cards from his hand that match the revealed card's type.
+  132044:constant:1: Constant
+    - (burgle effect, read only when a burgle attempt stops at this card) the first player may discard exactly 3 cards from his hand that match the revealed card's card type (an X cost matches nothing; both must match when two are named)
+
+## 132045 Secret Entrance
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132045:A:1 (front): While Secret Entrance is the active location, The Lonely Mountain's Threat is reduced by half (round up).
+  132045:constant:1: Constant
+    only if this card is the active location
+    - each location (any player controls) named "The Lonely Mountain": stat threatHalved (its Threat is halved, rounded up, after the additive modifiers) 1, while this card is in play
+
+132045:A:2 (front): Travel: The first player must exhaust a hero and name a card type to travel here. Then, look at the top card of the encounter deck. If the looked at card is not the named type, return Secret Entrance to the staging area. (The players cannot travel again this round.)
+  132045:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the line's choose step finds fewer cards than it must exhaust; or when no option can be taken
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready hero (you control) chosen by the first player
+    - exhaust the picked card
+    - the first player chooses one of:
+      * option "enemy":
+        - travel to this location
+        - the acting player looks at the top card of the encounter deck in a look window (it is not revealed and stays on the deck)
+        - then, if not (the top card of the encounter deck is an enemy (false with an empty deck)) (checked when this step runs, after the steps above; not tied to whether they did anything): return this card to the staging area
+      * option "location":
+        - travel to this location
+        - the acting player looks at the top card of the encounter deck in a look window (it is not revealed and stays on the deck)
+        - then, if not (the top card of the encounter deck is a location (false with an empty deck)) (checked when this step runs, after the steps above; not tied to whether they did anything): return this card to the staging area
+      * option "treachery":
+        - travel to this location
+        - the acting player looks at the top card of the encounter deck in a look window (it is not revealed and stays on the deck)
+        - then, if not (the top card of the encounter deck is a treachery (false with an empty deck)) (checked when this step runs, after the steps above; not tied to whether they did anything): return this card to the staging area
+      * option "objective":
+        - travel to this location
+        - the acting player looks at the top card of the encounter deck in a look window (it is not revealed and stays on the deck)
+        - then, if not (the top card of the encounter deck is a objective (false with an empty deck)) (checked when this step runs, after the steps above; not tied to whether they did anything): return this card to the staging area
+
+## 132046 Desolation of Smaug
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132046:A:1 (front): While Desolation of Smaug is the active location, the first treachery card revealed each round gains surge.
+  132046:constant:1: Constant
+    only if this card is the active location
+    - (marker, read while this card's record holds) the first treachery card revealed each round gains surge as it is revealed
+
+132046:A:2 (front): Burgle: The first player shuffles his deck and reveals the top card. He may discard 2 cards from his hand that match the revealed card's cost.
+  132046:constant:2: Constant
+    - (burgle effect, read only when a burgle attempt stops at this card) the first player may discard exactly 2 cards from his hand that match the revealed card's printed cost (an X cost matches nothing; both must match when two are named)
+
+## 132047 Western Slopes
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132047:A:1 (front): Response: When Western Slopes leaves play as an explored location (choose one): the first player draws 2 cards, or remove 1 progress token from Smaug the Golden.
+  132047:response:1: Response after a card leaves play (heard about this card only: with no subject, an event about one card is heard by that card alone)
+    only if the card the event is about had enough progress to be explored
+    - the first player chooses one of:
+      * option "draw":
+        - the first player draws 2 card(s)
+      * option "remove" (only if there is a enemy (any player controls) or in the staging area, named "Smaug the Golden", with at least 1 progress on it to choose):
+        - choose enemy (any player controls) or in the staging area, named "Smaug the Golden"
+        - remove 1 progress from the picked card
+
+132047:A:2 (front): Burgle: The first player shuffles his deck and reveals the top card. He may discard 2 cards from his hand that match the revealed card's sphere.
+  132047:constant:1: Constant
+    - (burgle effect, read only when a burgle attempt stops at this card) the first player may discard exactly 2 cards from his hand that match the revealed card's sphere (an X cost matches nothing; both must match when two are named)
+
+## 132048 Pretending to Sleep
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132048:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+132048:A:2 (front): When Revealed: Put 1 progress token on Smaug the Golden. Then, spend X Baggins resources or advance to stage 4A. X is the number of progress tokens on Smaug the Golden.
+  132048:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Smaug the Golden"
+    - place 1 progress on the picked card
+    - the first player chooses one of:
+      * option "spend" (only if all of: (there is a enemy (any player controls) or in the staging area, named "Smaug the Golden" to choose) and (the acting player's heroes with a Baggins icon hold at least progress of the picked card resources in all)):
+        - the acting player spends progress of the picked card resources from the pools of his heroes with a Baggins icon (nothing is spent when they hold fewer)
+      * option "advance" (only if there is a enemy (any player controls) or in the staging area, named "Smaug the Golden" to choose):
+        - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 132074 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
+
+132048:A:3 (front): Burgle: The first player shuffles his deck and reveals the top card. He may discard 2 cards from his hand that match the revealed card's type.
+  132048:constant:1: Constant
+    - (burgle effect, read only when a burgle attempt stops at this card) the first player may discard exactly 2 cards from his hand that match the revealed card's card type (an X cost matches nothing; both must match when two are named)
+
+## 132049 Known to an Ounce
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132049:A:1 (front): When Revealed: Each player discards 2 random cards from hand. Until the end of the phase, each Dragon enemy in play gets +1 Threat for each event discarded by this effect.
+  132049:whenRevealed:1: When revealed
+    - each player, the first player first, discards 2 cards at random from his hand; until the end of the phase each Dragon enemy in play (in the staging area or engaged) gets +1 Threat for each event so discarded, by all the players together
+
+132049:A:2 (front): Burgle: The first player shuffles his deck and reveals the top card. He may discard 1 card from his hand that matches the revealed card's sphere and cost.
+  132049:constant:1: Constant
+    - (burgle effect, read only when a burgle attempt stops at this card) the first player may discard exactly 1 card from his hand that match the revealed card's sphere and printed cost (an X cost matches nothing; both must match when two are named)
+
+## 132050 Belching Fire
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132050:A:1 (front): When Revealed: Each Dragon enemy in the staging area makes an immediate attack against the player with the highest total Willpower committed to the quest. (Do not deal a shadow card for this attack.)
+  132050:whenRevealed:1: When revealed
+    - for each Dragon enemy (any player controls) in the staging area only:
+      - the picked enemy in the staging area makes an immediate attack against the player with the highest total Willpower committed to the quest (a tie: the first player chooses), with no shadow card dealt
+
+132050:A:2 (front): Burgle: The first player shuffles his deck and reveals the top card. He may discard 1 card from his hand that matches the revealed card's type and cost.
+  132050:constant:1: Constant
+    - (burgle effect, read only when a burgle attempt stops at this card) the first player may discard exactly 1 card from his hand that match the revealed card's card type and printed cost (an X cost matches nothing; both must match when two are named)
+
+## 132051 Dragon-Spell
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+132051:A:1 (front): When Revealed: Attach to the hero with the most resources without Dragon-Spell attached. (Counts as a Condition attachment with the text: "Attached hero gets -1 Willpower for each resource in its resource pool. Forced: When attached hero spends resources, attached hero takes X damage. X is equal to the number of resources spent.")
+  132051:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (any player controls) chosen by the first player, with no attachment named "Dragon-Spell" [also {"mostResources":true}]
+    - this card attaches to the picked card (any number of copies may be attached to one card)
+  132051:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  132051:constant:2: Constant
+    - its host: stat willpower minus (resources of its host), while this card is in play
+  132051:forced:1: Forced on the event heroResourcesSpent (heard about the host)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - deal X damage to its host
+
+## 132071 A Warm Welcome
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+132071:A:1 (front): Setup: Search the encounter deck for Smaug the Golden, Smaug the Magnificent, The Lonely Mountain, and A Bare Patch. Set Smaug the Magnificent and A Bare Patch aside, out of play. Add Smaug the Golden and The Lonely Mountain to the staging area. Shuffle the five Erebor treasure cards and stack them facedown under The Lonely Mountain.
+  132071:setup:1: Setup
+    - the set-aside cards with codes 132020, 132021, 132022, 132023, 132024 are shuffled and stacked facedown, out of play, under the card in play with code 132043
+
+132071:B:1 (back): Skip the Quest phase.
+  132071:constant:1: Constant
+    - the table: stat skipQuestPhase 1, while this card is in play
+
+132071:B:2 (back): Forced: At the end of the round, advance to stage 2.
+  132071:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - advance to the next quest stage
+
+## 132072 The Burglar's Turn
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+132072:B:1 (back): Forced: After questing successfully, place 1 progress on Smaug the Golden. Then, the first player makes a burgle attempt. If successful, the first player takes the top treasure card from under The Lonely Mountain into his hand. Then, the players may advance to stage 3.
+  132072:forced:1: Forced after the players quest successfully
+    only if the actor holds the first player token
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Smaug the Golden"
+    - place 1 progress on the picked card
+    - then, if the players are on stage 2 (checked when this step runs, after the steps above; not tied to whether they did anything): the first player makes a burgle attempt: he discards encounter cards from the top (none is revealed) until one with a burgle effect is discarded; he shuffles his deck and reveals its top card (it stays on the deck), the players take actions once; then he discards the cards that card's burgle effect asks from his hand, or the attempt fails (a failed attempt is announced as burgleFailed)
+    - then, if the last burgle attempt the running effect made succeeded (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the first player takes the top card stacked under the card in play with code 132043 into his hand (nothing when none is stacked)
+    - the first player chooses one of:
+      * option "advance" (only if the players are on stage 2):
+        - advance to the next quest stage
+      * option "stay":
+
+132072:B:2 (back): Forced: After the first player makes an unsuccessful burgle attempt, Smaug the Golden attacks the first player.
+  132072:forced:2: Forced after the first player's burgle attempt fails (every card in play hears it)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Smaug the Golden"
+    - the picked enemy attacks the first player now, from the staging area, dealt a shadow card
+
+## 132073 Inside Information
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+132073:A:1 (front): When Revealed: Set Smaug the Golden aside, out of play. Add Smaug the Magnificent and A Bare Patch to the staging area.
+  132073:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the card in play with code 132040 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
+    - one set-aside card with code 132041 joins the staging area (it is not revealed)
+    - one set-aside card with code 132039 joins the staging area (it is not revealed)
+
+132073:B:1 (back): Players cannot defeat this stage while Smaug the Magnificent is in play.
+  132073:constant:1: Constant
+    only if the card with code 132041 is in play
+    - the players cannot defeat this stage while this holds
+
+132073:B:2 (back): Forced: If the total number of progress on this stage is greater than the total remaining hit points on Smaug the Magnificent, remove Smaug the Magnificent from play.
+  132073:forced:1: Forced on the event progressPlaced (heard about this card)
+    only if remaining hit points of "Smaug the Magnificent" (its hit points less its damage, at least 0) is less than progress of this card
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the card in play with code 132041 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play) [also {"byQuest":true}]
+  132073:forced:2: Forced after a card takes damage (heard about enemy (any player controls) or in the staging area, named "Smaug the Magnificent")
+    only if remaining hit points of "Smaug the Magnificent" (its hit points less its damage, at least 0) is less than progress of this card
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the card in play with code 132041 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play) [also {"byQuest":true}]
+
+132073:B:3 (back): If the players defeat this stage, they have won the game and discovered any treasure successfully burgled from The Lonely Mountain.
+  132073:constant:2: Constant
+    - this card: stat holdsWin (defeating this final stage does not win the game: it stays the current quest card, defeated, and its own Forced effects win the game or reset the quest) 1, while this card is in play
+  132073:forced:3: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players win the game
+
+## 132074 Thieves! Fire! Murder!
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+132074:A:1 (front): When Revealed: Remove all progress from Smaug the Golden and set him aside, out of play. Then, add Smaug the Magnificent to the staging area.
+  132074:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the card in play with code 132040 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
+    - one set-aside card with code 132041 joins the staging area (it is not revealed)
+    - this card: stat holdsWin (defeating this final stage does not win the game: it stays the current quest card, defeated, and its own Forced effects win the game or reset the quest) 1, while this card is in play
+
+132074:B:1 (back): Forced: After placing the 7th progress token on this stage, remove all damage from Smaug the Magnificent and set him aside, out of play. Then, add Smaug the Golden to the staging area and reset the quest deck to stage 2B.
+  132074:forced:1: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the card in play with code 132039 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play)
+    - the card in play with code 132041 (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and its tokens; a later step can bring it back (nothing when no card with the code is in play) [also {"byQuest":true}]
+    - one set-aside card with code 132040 joins the staging area (it is not revealed)
+    - the players return to stage 2 of the quest deck (side B: the stage comes back as if just beginning, with no progress; the progress on the active location and every other card stay; no When Revealed or Setup resolves again)
+
+(rendered pieces: 195 by template, 4 as JSON)

@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect, Instruction } from "../../src/catalog/boundary.ts";
 import type { ReduceContext } from "../../src/rules/engine/reduce.ts";
 
-import { countOf, KNOWN, knownOf, probeTable, problemsOf, smokeScenario, type EncounterSummary, type KnownFailure } from "./encounter.ts";
+import { countOf, formatSummary, KNOWN, knownOf, lossesOf, probeTable, problemsOf, replayCommand, smokeScenario, soakNote, soakDeadline, soakStart, type EncounterSummary, type KnownFailure } from "./encounter.ts";
 import { encounterCards, probeCard, type Probe } from "./encounter-cards.ts";
 import { playGame, type GameSummary } from "./encounter-games.ts";
 import type { EncounterWorld } from "./encounter-world.ts";
@@ -91,6 +91,8 @@ describe("known failures and flags", () => {
     steps: 0,
     rounds: 0,
     ended: "problem",
+    lossReason: null,
+    idle: [],
     problem: { game: over.game ?? 5, seed: over.seed ?? 6, profile: "strong", seats: 2, step: 80, round: 3, window: "response", intent: { type: "Trigger", cardId: "i3", effectId: "141024:response:1" }, message: "The reducer refused an offered intent: Travel was refused", ...over },
   });
   const summary = (games: GameSummary[]): EncounterSummary => ({ scenario: "a-shadow-of-the-past", cards: [], games, ms: 0 });
@@ -110,6 +112,22 @@ describe("known failures and flags", () => {
     expect(problemsOf(summary([game()]), KNOWN)).toHaveLength(1);
   });
 
+  it("says how many games were won and lost, and the lost ones by reason, most frequent first", () => {
+    const ended = (ended: GameSummary["ended"], lossReason: string | null = null): GameSummary => ({ ...game(), ended, lossReason, problem: null });
+    const games = [ended("lost", "No seats remain"), ended("won"), ended("lost", "Faramir left play"), ended("lost", "No seats remain"), ended("lost", "no reason recorded")];
+    expect(lossesOf(games)).toEqual([["No seats remain", 2], ["Faramir left play", 1], ["no reason recorded", 1]]);
+    expect(formatSummary(summary(games))).toContain("5 games (1 won, 4 lost (No seats remain x2, Faramir left play x1, no reason recorded x1), 0 problems)");
+    // A soak that wins nothing says so: 0 won, with no loss list when nothing was lost either.
+    expect(formatSummary(summary([ended("won")]))).toContain("1 games (1 won, 0 lost, 0 problems)");
+    expect(lossesOf([game()])).toEqual([]);
+  });
+
+  it("prints the command that plays a soak's games again, and says KNOWN is not matched in a soak", () => {
+    expect(replayCommand("the-oath", 123456, 40)).toBe("pnpm test encounter the-oath --from=123456 --games=40 --games-only");
+    expect(soakNote("the-oath", 123456, 40)).toContain("--from=123456 --games=40 --games-only");
+    expect(soakNote("the-oath", 123456, 40)).toContain("does not match KNOWN");
+  });
+
   it("rejects a count that is not a whole number", () => {
     expect(countOf("games", "12")).toBe(12);
     expect(countOf("games", "0")).toBe(0);
@@ -117,4 +135,26 @@ describe("known failures and flags", () => {
     expect(() => countOf("games", "")).toThrow();
     expect(() => countOf("games", "-1")).toThrow();
   });
+
+  it("numbers the games from --from, so a soak plays seeds the committed 0 to 23 do not", async () => {
+    const summary = await smokeScenario(SCENARIO, { games: 2, from: 5000, cards: false });
+    expect(summary.games.map((one) => [one.game, one.seed])).toEqual([
+      [5000, 5001],
+      [5001, 5002],
+    ]);
+    expect(summary.cards).toEqual([]);
+    expect(problemsOf(summary)).toEqual([]);
+  }, 60_000);
+
+  it("plays games until its deadline and at least one, and starts a soak past the committed games", async () => {
+    const summary = await smokeScenario(SCENARIO, { from: 7000, until: performance.now() - 1, cards: false });
+    expect(summary.games.map((one) => one.game)).toEqual([7000]);
+    expect(soakStart(12)).toBe(12);
+    expect(soakStart(undefined, () => 0)).toBe(24);
+    expect(soakStart(undefined, () => 0.5)).toBeGreaterThanOrEqual(24);
+    // The time left is shared by the scenarios left, this one included; none is left with a negative share.
+    expect(soakDeadline(1000, 4000, 3)).toBe(2000);
+    expect(soakDeadline(1000, 4000, 1)).toBe(4000);
+    expect(soakDeadline(5000, 4000, 2)).toBe(5000);
+  }, 60_000);
 });

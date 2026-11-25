@@ -1,4 +1,4 @@
-// Rules: rr.staging-area, rr.lasting-effects (data/rules/entries.json); ledger lines 11060:A:1, 12075:A:1, 143065:A:2, 148015:A:2.
+// Rules: rr.staging-area, rr.lasting-effects (data/rules/entries.json); ledger lines 11060:A:1, 12075:A:1, 143065:A:2, 148015:A:2, 06131:A:1.
 // The engaged enemies that contribute their Threat to the total Threat in the staging area.
 import { modifiedStat } from "../core/keywords.ts";
 import { printedOf, type PrintedCard } from "../core/printed.ts";
@@ -11,7 +11,7 @@ type Cards = ReadonlyMap<string, PrintedCard>;
 
 // An enemy engaged with a player that contributes its Threat to the staging area's ("each Ship enemy engaged with you contributes its Threat", 11060:A:1; "While engaged with a player, Faithless Desecrator contributes its Threat", 12075:A:1). Only the games with
 // ships (`sea`) or an Uncharted deck (`uncharted`) have such a card, so no other game reads the engaged enemies here.
-// `engagedThreatSeat` on a seat ("each enemy engaged with you adds its Threat ... until the end of the round", 143065:A:2) is read live: an enemy that engages that seat later counts too (rr.lasting-effects). With a Trait it counts the enemies with it only ("each Wight enemy engaged with you", 148015:A:2).
+// `engagedThreatSeat` on a seat ("each enemy engaged with you adds its Threat ... until the end of the round", 143065:A:2) is read live: an enemy that engages that seat later counts too (rr.lasting-effects). With a Trait it counts the enemies with it only ("each Wight enemy engaged with you", 148015:A:2; each Orc enemy for the phase, 06131:A:1).
 // On a seat's view once the areas are separate, only the enemies engaged with the players of that area count: the others are in another staging area.
 export function engagedContributors(view: ScenarioState, cards: Cards): ThreatSource[] {
   const found: ThreatSource[] = [];

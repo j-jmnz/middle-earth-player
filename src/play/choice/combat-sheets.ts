@@ -5,9 +5,16 @@
 // players' attack. Each option carries what the engine says it would do (foresight.ts), and a choice that loses the game
 // asks twice.
 import { defenseAsDefender, modifiedStat } from "../../rules/core/keywords.ts";
-import { attackStatAgainst } from "../../rules/families/attack/spectral.ts";
+import { attackStatOf } from "../../rules/families/pelargir/stage-attack.ts";
 import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 
+import { undefendedVillagersLine } from "../readouts/against-the-shadow/amon-din.ts";
+import { undefendedLocationsLine } from "../readouts/against-the-shadow/osgiliath.ts";
+import { bloodAttackLine } from "../readouts/against-the-shadow/blood.ts";
+import { valeAttackNote, valeAttackSource } from "../readouts/against-the-shadow/vale.ts";
+import { undefendedRedirectWords } from "../readouts/against-the-shadow/cair-andros.ts";
+import { alliesArchery, willpowerAttack } from "../readouts/against-the-shadow/druadan.ts";
+import { ALLIES_ARCHERY_WORDS, willpowerAttackWords } from "../words/scenarios/against-the-shadow/druadan.ts";
 import { fateAttackNote, fateTargetNote } from "../words/scenarios/fate.ts";
 import { attackSource } from "../words/scenarios/grapple.ts";
 import { nightDefenderExcess, nightStageAttack } from "../words/scenarios/night.ts";
@@ -27,10 +34,14 @@ function foreseen(game: ScenarioState, ctx: ReduceContext, names: SheetNames, id
   return { stats, suffix: " · destroyed", mark, ...(caution ? { caution } : {}) };
 }
 
-/** The heroes an undefended attack can land on, when there is more than one to choose from. */
-function undefendedSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames, title: string, note: string): Sheet | PlayerIntent {
+/**
+ * The heroes an undefended attack can land on, when there is more than one to choose from. The hero is named at the damage step, after the shadow effect
+ * (rr.step-6-4-3): before it, Leave undefended names none (rr.step-6-4-1).
+ */
+function undefendedSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames, title: string, note: string, redirect: string | null): Sheet | PlayerIntent {
   const heroes = legalTargets(game, { type: "Undefended" }, ctx);
   if (heroes.length <= 1) return heroes[0] ? { type: "Undefended", heroId: heroes[0] } : { type: "Undefended" };
+  if (!game.pendingAttack?.shadowResolved) return { type: "Undefended" };
   const enemyId = game.pendingAttack?.enemyId ?? "";
   const damage = undefendedDamage(game, ctx, enemyId);
   return {
@@ -38,7 +49,7 @@ function undefendedSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNa
     key: `undefended:${game.pendingAttack?.enemyId ?? ""}`,
     step: "Combat",
     title,
-    note: `${note} Undefended: a hero takes all of it.`,
+    note: `${note} ${redirect ?? "Undefended: a hero takes all of it."}`,
     verb: "Damage to",
     confirm: "Take the damage",
     options: heroes.map((id) => {
@@ -61,8 +72,8 @@ function attackNumbers(game: ScenarioState, ctx: ReduceContext): { attack: numbe
 function attackersSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames, enemyId: string): MultiSheet {
   const enemy = game.cards[enemyId];
   const defense = enemy ? modifiedStat(game, enemy, "defense", ctx.cards) : 0;
-  // The stat each row shows is the one the attack reads: Willpower against a Spectral enemy (50312:A:1).
-  const read = attackStatAgainst(game, enemyId, ctx.cards);
+  // The stat each row shows is the one the attack reads: Willpower against a Spectral enemy (50312:A:1), and on stage 3 of The Drúadan Forest (06044:B:2).
+  const read = attackStatOf(game, enemyId, ctx.cards);
   // Another seat's ranged characters may join the attack (rr.ranged, rr.step-6-8-1); the active seat's come first.
   const seats = [game.activeSeat, ...game.seats.map((_, index) => index).filter((index) => index !== game.activeSeat && index < game.seatCount)];
   const characters = seats
@@ -73,7 +84,7 @@ function attackersSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNam
     key: `attackers:${enemyId}`,
     step: "Combat",
     title: `Attack ${names.card(enemyId)}`,
-    note: fateTargetNote(game, ctx, enemyId, defense, names.card(enemyId)) ?? `Defense ${defense}. Choose the characters that attack it.`,
+    note: fateTargetNote(game, ctx, enemyId, defense, names.card(enemyId)) ?? (willpowerAttack(game) ? `${willpowerAttackWords(defense)} Choose the characters that attack it.` : `Defense ${defense}.${valeAttackNote(game, ctx, enemyId)} Choose the characters that attack it.`),
     verb: "Attack",
     stats: statOf(game, ctx, enemyId, "defense"),
     options: characters.map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, read) })),
@@ -91,16 +102,23 @@ export function defenseSheet(game: ScenarioState, ctx: ReduceContext, legal: rea
   // An attack a shadow card makes says where it comes from, as a pick says its card's line (sheets.ts).
   const shadowSource = numbers && game.pendingAttack?.shadowAttack ? ` ${names.card(numbers.enemyId)}'s shadow effect: it attacks you now, and goes back to the top of the encounter deck after combat.` : "";
   // An attack the Thing makes from the staging area while Eye of the Beast is engaged with the defender, or a detached arm's (dcce.grapple, 12050:A:3, 12052:A:3).
-  const source = shadowSource || attackSource(game, ctx, names.card) || fateAttackNote(game, ctx, names.card);
+  const source = shadowSource || attackSource(game, ctx, names.card) || fateAttackNote(game, ctx, names.card) || valeAttackSource(game, ctx);
   const note = numbers ? `Attack ${numbers.attack}.${source}` : "";
   const defenders = has(legal, "DeclareDefender") ? legalTargets(game, { type: "DeclareDefender" }, ctx) : [];
-  const undefended = undefendedSheet(game, ctx, names, title, note);
+  // While stage 1B of The Siege of Cair Andros is current the damage of an undefended attack goes to a Battleground location, not a hero (05072:B:2).
+  // While stage 2B of Encounter at Amon Dîn is current it discards villager tokens from Rescued Villagers instead (06067:B:1).
+  // In Assault on Osgiliath a hero still takes it, and the controlled unique locations of the defending player return to the staging area (06096:A:2).
+  // In The Blood of Gondor Brutal Uruk's attack says what a destroyed character costs its controller: his hidden cards turn faceup (06121:A:1).
+  const redirect = numbers ? (undefendedRedirectWords(game, ctx, numbers.attack) ?? undefendedVillagersLine(game) ?? undefendedLocationsLine(game, ctx) ?? bloodAttackLine(game)) : null;
+  const undefended = undefendedSheet(game, ctx, names, title, note, redirect);
   // Leave undefended with one hero to take it: the armed line says when that hero falls and the game with it.
   const lone = "kind" in undefended ? null : undefended.type === "Undefended" ? undefended.heroId : null;
   const loneCaution = lone && numbers ? foreseen(game, ctx, names, lone, numbers.attack).caution : undefined;
   // The attack on Hrogar's Hill (19083:B:1) says where the damage goes, and arms Leave undefended when the Hill would hold as much as it has quest points.
   const onHill = numbers ? nightStageAttack(game, ctx, numbers.enemyId, defenders.length) : null;
   const cautious = onHill ? onHill.caution : loneCaution;
+  // The damage step of an undefended attack with several heroes to take it: the hero pick is the whole sheet.
+  if ("kind" in undefended && game.pendingAttack?.undefended) return undefended;
   const leave: Alternative =
     "kind" in undefended
       ? { label: "Leave undefended", next: undefended }
@@ -111,7 +129,7 @@ export function defenseSheet(game: ScenarioState, ctx: ReduceContext, legal: rea
     step: "Combat",
     title,
     stats: numbers ? statOf(game, ctx, numbers.enemyId, "attack") : [],
-    note: game.pendingAttack?.undefended ? `${note} This attack is undefended.` : (onHill?.note ?? (defenders.length === 0 ? `${note} No character can defend.` : `${note} Choose a defender, or leave it undefended.`)),
+    note: game.pendingAttack?.undefended ? `${note} This attack is undefended.${redirect ? ` ${redirect}` : ""}` : (onHill?.note ?? (defenders.length === 0 ? `${note} No character can defend.${redirect ? ` ${redirect}` : ""}` : `${note} Choose a defender, or leave it undefended.${redirect ? ` ${redirect}` : ""}`)),
     verb: "Defend with",
     options: defenders.map((id) => {
       const defense = defenseAsDefender(game, id, ctx.cards);
@@ -158,7 +176,7 @@ export function archerySheet(game: ScenarioState, ctx: ReduceContext, names: She
     key: `archery:${game.round}:${total}`,
     step: "Combat",
     title: `Archery ${total}`,
-    note: `Assign ${total} damage among your characters. Defense does not stop it.`,
+    note: `Assign ${total} damage among your characters. Defense does not stop it.${alliesArchery(game, ctx) ? ` ${ALLIES_ARCHERY_WORDS}` : ""}`,
     total: total,
     exact: true,
     options: recipients.map((id) => {

@@ -55,8 +55,9 @@ import { damageHeld, destroyOverwhelmed } from "../core/keywords.ts";
 import { clearEliminated, eliminateHeroless } from "../core/eliminate.ts";
 import { effectsOf } from "../windows/listen.ts";
 import { engagesAgain, optionallyEngaged } from "../families/quest/engage.ts";
+import { noteOptionalEngage } from "../families/pelargir/optional-engage.ts";
 import { syncThreatSaves } from "../families/quest/threat.ts";
-import { eventWaits } from "../families/defense/listen.ts";
+import { attachedHearsHostDamage, eventWaits } from "../families/defense/listen.ts";
 import { announceShadowsDealt } from "../families/defense/shadow.ts";
 import { attackedEarly, earlyAttacks } from "../families/defense/order.ts";
 import { strikeResumes } from "../families/attack/flow.ts";
@@ -68,6 +69,7 @@ import { chooseLookDone, chooseShift, performSailing, sailingStep } from "../fam
 import { askSmaug } from "../families/smaug/deck.ts";
 import { askingToCommit, askingToLook, askingToShift } from "../families/sea/sailing-legal.ts";
 import { askCurrentQuest } from "../families/wilderland/night.ts";
+import { askCurrentStage } from "../families/armies/stages.ts";
 import { phaseEnds } from "../families/angmar/phase.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -176,7 +178,8 @@ export function applyIntent(
       return declineTravel(state, ctx, steps);
     case "Engage": {
       // "After you optionally engage an enemy", and a seat that may optionally engage an additional enemy (09002:A:2).
-      const engaged = optionallyEngaged(engageEnemy(state, state.activeSeat, intent.enemyId, steps), state.activeSeat, intent.enemyId, ctx);
+      // The engagement is marked optional first (a Forced effect of the enemy asks, 05042:A:1), in a game with a record that reads the mark.
+      const engaged = optionallyEngaged(engageEnemy(noteOptionalEngage(state, intent.enemyId, ctx), state.activeSeat, intent.enemyId, steps), state.activeSeat, intent.enemyId, ctx);
       return engagesAgain(engaged, state.activeSeat, ctx) ? engaged : finishOptional(engaged, state.activeSeat);
     }
     case "DeclineEngage":
@@ -220,7 +223,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
     case "beginRound":
       return enterBegin(state, ctx);
     case "resourceGrant":
-      return grant(state, steps, ctx);
+      return askCurrentStage(state, steps) ?? grant(state, steps, ctx);
     case "resourceActions":
       return openPass(state);
     // The Sailing test comes before the characters are committed to the quest (dcce.sailing).
@@ -449,17 +452,20 @@ function commit(state: ScenarioState, cardIds: readonly string[], ctx: ReduceCon
   return committedTo(next, state.activeSeat, cardIds.length);
 }
 
-function undefendedHero(state: ScenarioState, heroId: string | undefined, ctx: ReduceContext): string {
+// The hero the intent names for the undefended attack's damage: the one card that may take it, "" when none may (the attack deals no damage), or undefined
+// while more than one may and the intent names none: the attack is left undefended (6.4.1) and the defending player names the hero at the damage step, once
+// the shadow effect has resolved (rr.step-6-4-3).
+function undefendedHero(state: ScenarioState, heroId: string | undefined, ctx: ReduceContext): string | undefined {
   const heroes = undefendedTargets(state, state.pendingAttack?.seat ?? state.activeSeat, ctx.cards);
   // No hero is left to take the attack (every hero of the seat is held, 18074): nobody does.
   if (heroes.length === 0) return "";
   if (heroes.length === 1) return heroes[0] ?? "";
-  return heroId ?? "";
+  return heroId;
 }
 
 // Whether any card that could answer damage just dealt (a damageDealt Response or Forced effect) is in play or in a hand.
 function damageAnswerable(state: ScenarioState, ctx: ReduceContext): boolean {
   return Object.values(state.cards).some(
-    (card) => (inPlay(card.zone) || card.zone === "hand") && effectsOf(ctx, card.code).some((effect) => effect.trigger === "damageDealt"),
+    (card) => ((inPlay(card.zone) || card.zone === "hand") && effectsOf(ctx, card.code).some((effect) => effect.trigger === "damageDealt")) || attachedHearsHostDamage(state, card, ctx),
   );
 }

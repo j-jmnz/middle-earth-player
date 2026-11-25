@@ -17,7 +17,7 @@ const make = layoutTableFor(ID);
 // The card is revealed from the top of the encounter deck and its choices take their first option.
 
 describe("901006 Twisting Shadows", () => {
-  // "When Revealed: Remove all progress from each Dark location in play." In play is the staging area too (rr.in-play-and-out-of-play; docs/scenarios/dwarrowdelf.md, Into the Pit: "in play" counts the staging area
+  // "When Revealed: Remove all progress from each Dark location in play." In play is the staging area too (rr.in-play-and-out-of-play; docs/scenarios/dwarrowdelf/into-the-pit.md, Into the Pit: "in play" counts the staging area
   // and the active location). Zigil Mineshaft 03038, a Dark location, holds 2 progress in the staging area (as the Cave Torch's Action leaves it).
   it("901006:A:2 removes all progress from a Dark location in the staging area", () => {
     const layout: Layout = { staging: [{ code: "03038", progress: 2 }], deck: ["f0"] };

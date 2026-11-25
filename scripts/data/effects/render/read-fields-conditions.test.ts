@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { CONDITION_TEMPLATES, ERECH_CONDITION_SAMPLES, FOG_CONDITION_SAMPLES, INVESTIGATION_CONDITION_SAMPLES, ESCAPE_CONDITION_SAMPLES, GUARDIAN_CONDITION_SAMPLES, LONG_DARK_CONDITION_SAMPLES, renderCondition, SHARED_CONDITION_SAMPLES } from "./conditions.ts";
+import { BURGLE_CONDITION_SAMPLES, CONDITION_TEMPLATES, ERECH_CONDITION_SAMPLES, SACK_CONDITION_SAMPLES, FOG_CONDITION_SAMPLES, INVESTIGATION_CONDITION_SAMPLES, ESCAPE_CONDITION_SAMPLES, GUARDIAN_CONDITION_SAMPLES, LONG_DARK_CONDITION_SAMPLES, renderCondition, SHARED_CONDITION_SAMPLES } from "./conditions.ts";
 import { FAMILY_CONDITION_SAMPLES } from "./families.ts";
 import type { Obj } from "./kit.ts";
 import { checkPiece, type Render } from "./read-fields-piece.ts";
@@ -48,6 +48,7 @@ describe("effects render read fields, conditions", () => {
     questProgressNoted: [{ kind: "questProgressNoted", is: true, min: 10 }, { kind: "questProgressNoted", is: false }],
     currentQuestProgress: [{ kind: "currentQuestProgress", is: "some" }, { kind: "currentQuestProgress", is: "none" }],
     defendingAgainst: [{ kind: "defendingAgainst", trait: "Undead" }],
+    holderExhausted: [{ kind: "holderExhausted" }],
     versusDefender: [{ kind: "versusDefender", maxHitPoints: 2, maxWillpower: 1, ally: true }],
     attacking: [{ kind: "attacking", card: "host", enemy: { type: "enemy", control: "any" }, notEnemy: { type: "enemy", control: "any" }, alone: true, ranged: true }],
     timeOfDay: [{ kind: "timeOfDay", is: "day" }, { kind: "timeOfDay", is: "night" }],
@@ -57,6 +58,11 @@ describe("effects render read fields, conditions", () => {
     stageProgress: [{ kind: "stageProgress", min: 5 }, { kind: "stageProgress", min: 5, perStartedPlayer: true }],
     victoryPoints: [{ kind: "victoryPoints", min: 20 }],
     firstTreachery: [{ kind: "firstTreachery" }],
+    firstEnemy: [{ kind: "firstEnemy" }],
+    underworldReleased: [{ kind: "underworldReleased" }],
+    deckEmpty: [{ kind: "deckEmpty" }],
+    encounterCanReveal: [{ kind: "encounterCanReveal" }],
+    attachedToHero: [{ kind: "attachedToHero", code: "05019", is: true }, { kind: "attachedToHero", code: "05019", is: false }],
     hitPointsLeft: [{ kind: "hitPointsLeft", code: "09033" }],
     committedThisRound: [{ kind: "committedThisRound" }],
     pileHas: [{ kind: "pileHas", pile: "harad", min: 1, max: 3 }],
@@ -64,7 +70,9 @@ describe("effects render read fields, conditions", () => {
     soleAttacker: [{ kind: "soleAttacker" }],
     lastFortitudeFailed: [{ kind: "lastFortitudeFailed" }],
     ...ESCAPE_CONDITION_SAMPLES,
+    ...BURGLE_CONDITION_SAMPLES,
     ...ERECH_CONDITION_SAMPLES,
+    ...SACK_CONDITION_SAMPLES,
     ...FOG_CONDITION_SAMPLES,
     ...INVESTIGATION_CONDITION_SAMPLES,
     ...GUARDIAN_CONDITION_SAMPLES,

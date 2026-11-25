@@ -1,4 +1,4 @@
-// Rules: rr.immune, mec109.immune-to-player-card-effects, dwd.immune-to-card-effects, faq.legolas-immune-location (data/rules/entries.json).
+// Rules: rr.immune, mec109.immune-to-player-card-effects, hob.immune-to-player-card-effects, dwd.immune-to-card-effects, faq.legolas-immune-location (data/rules/entries.json).
 // A card immune to an effect "cannot be chosen as the target for or affected by" it (rr.immune). A pick never offers such a card (pick.ts), and damage
 // skips it (placeDamage); this guards the cards an instruction names without a pick: the active location, the subject of the event, the other card of it,
 // the attacking enemy. An immune card there ignores the instruction (Lórien Guide's progress on Bucklebury Ferry, Fastred returning Revenant).
@@ -8,6 +8,7 @@ import { hasQuestPoints, printedOf } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { inPlay } from "../core/zones.ts";
 import { immuneToSource } from "../families/misc/guards.ts";
+import { stagingLocations } from "../quest/quest.ts";
 import { activeLocations, progressRoom } from "../families/south/locations.ts";
 import { frameScope, refCard } from "./amounts.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -46,4 +47,9 @@ export function immuneBuffer(state: ScenarioState, sourceId: string | null, ctx:
   if (!sourceId || !isPlayerCardEffect(state, ctx.cards, sourceId)) return false;
   const id = activeLocations(state).find((candidate) => hasQuestPoints(printedOf(ctx.cards, state.cards[candidate]?.code ?? "")) && progressRoom(state, candidate, ctx.cards) > 0);
   return id != null && immuneTo(state, id, sourceId, ctx);
+}
+
+/** The locations in the staging area that an effect of `sourceId` may touch ("each location in the staging area"): an immune one is left out. */
+export function touchableStagingLocations(state: ScenarioState, sourceId: string | null, ctx: ReduceContext): string[] {
+  return stagingLocations(state, ctx.cards).filter((id) => !immuneTo(state, id, sourceId, ctx));
 }

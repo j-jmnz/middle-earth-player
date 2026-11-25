@@ -304,7 +304,9 @@ export function dockFor(
         // A pick whose result the player may not expect (the game lost, resources spent for nothing) asks twice.
         const caution = action.kind === "intent" ? (item?.caution ?? sheet.caution) : undefined;
         primary = caution ? { label, action, arm: true, armed: caution, testID: "sheet-primary" } : { label, action, arm: false, testID: "sheet-primary" };
-        if (!item) why = options.surface === "panel" ? pickWords : "Tap a glowing card to choose it.";
+        // A glow points at a card on the table; rows of words (a sphere, a branch of a Choose) have none, so the sentence points at the rows.
+        const glows = sheet.options.some((option) => table.game.cards[option.id] != null);
+        if (!item) why = options.surface === "panel" ? pickWords : glows ? "Tap a glowing card to choose it." : "Pick one of the choices.";
       }
       // With nothing to pick (no defender is ready, no location to travel to), the alternative is the one filled button.
       if (sheet.alternative && !primary) primary = { ...alternativeButton(sheet.alternative), testID: "sheet-alternative" };

@@ -248,7 +248,7 @@ describe("combat", () => {
     expect(second.state.cards[ids.warg ?? ""]?.damage).toBe(0);
   });
 
-  it("reduces enemy damage by toughness, then destroys at hit points, leaving an indestructible enemy in play", () => {
+  it("reduces enemy damage by toughness, then destroys at hit points, leaving an indestructible enemy in play (mec109.indestructible, hob.indestructible)", () => {
     const tough = enemy("tough", { code: "tough", name: "Tough", type: "enemy", defense: 0, health: 10, keywords: { toughness: 1 } });
     const fragile = enemy("fragile", { code: "fragile", name: "Fragile", type: "enemy", defense: 0, health: 3 });
     const statue = enemy("statue", {

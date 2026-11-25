@@ -16,7 +16,7 @@ import { effectData } from "../encounter/moves.ts";
 // Without a `seat` the enemy must still be engaged and attacks the player it is engaged with; the attack is counted before it starts (the Forced effects of its start push
 // frames over the running effect's). With a `seat` the enemy, engaged with another player or in the staging area, attacks that living player and is not counted.
 // `counting`: an attack with a `seat` is counted too (AttackWithPicked `counted`). `extra`: shadow cards dealt after the usual one ("Deal him 2 additional shadow cards for this attack", 40017:A:3), all of which resolve.
-export function attackWith(state: ScenarioState, enemyId: string, ctx: ReduceContext, steps: EngineStep[], seat?: number, extra = 0, counting = false): ScenarioState {
+export function attackWith(state: ScenarioState, enemyId: string, ctx: ReduceContext, steps: EngineStep[], seat?: number, extra = 0, counting = false, shadow = true): ScenarioState {
   const enemy = state.cards[enemyId];
   if (!enemy) return state;
   const target = seat ?? enemy.controller;
@@ -24,7 +24,8 @@ export function attackWith(state: ScenarioState, enemyId: string, ctx: ReduceCon
   if (!placed || target == null || attackBarred(state, enemyId, target)) return state;
   const data = seat == null || counting ? effectData(state) : undefined;
   const counted = data ? patchTop(state, { data: { ...data, returned: data.returned + 1 } }) : state;
-  let dealt = dealAttackShadow(counted, enemyId, ctx, steps);
+  // `shadow: false`: "Do not deal shadow cards for attacks made by this effect" (132064:A:1).
+  let dealt = shadow ? dealAttackShadow(counted, enemyId, ctx, steps) : counted;
   for (let more = 0; more < extra; more += 1) dealt = dealAdditionalShadow(dealt, enemyId, steps, ctx);
   const begun = beginEnemyAttack(dealt, target, enemyId, ctx, steps, { fromStaging: enemy.zone === "staging" });
   return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } } : begun;

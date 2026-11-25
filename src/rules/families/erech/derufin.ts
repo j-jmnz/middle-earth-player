@@ -1,4 +1,4 @@
-// Rules: rr.ownership-and-control, rr.staging-area (data/rules/entries.json); docs/scenarios/standalone-scenarios.md (The Stone of Erech, Derufin); ledger lines 50302:A:1, 50304:A:1. Derufin, a set aside objective ally, is attached to The Stone of Erech while it lies in the staging area (not revealed, controlled by nobody), and the first player
+// Rules: rr.ownership-and-control, rr.staging-area (data/rules/entries.json); docs/scenarios/standalone-scenarios/the-stone-of-erech.md (The Stone of Erech, Derufin); ledger lines 50302:A:1, 50304:A:1. Derufin, a set aside objective ally, is attached to The Stone of Erech while it lies in the staging area (not revealed, controlled by nobody), and the first player
 // gains control of him after the players travel to it: he leaves the Stone and joins the first player's play area ready, as an ally, who can commit, attack, defend and take damage.
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";

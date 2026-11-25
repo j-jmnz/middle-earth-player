@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { RECORDS as AUTHORED } from "../../../effects/authored/families/misc.ts";
 import { POOL_GENERATED_EFFECTS } from "../../../effects/generated/player-pool.ts";
+import { GENERATED_EFFECTS as HOBBIT_GENERATED } from "../../../effects/generated/the-hobbit.ts";
 import { syncConstants } from "../../interpret/constants.ts";
 import { cardMap, codes, expectOk, fixtureDefinition } from "../../core/test-fixture.ts";
 import { placeDamage } from "../../core/keywords.ts";
@@ -19,7 +20,7 @@ import { enemy, hero, offered, send as sendIntent, table as defenseTable, until 
 import { definePrinted } from "../../core/printed.ts";
 
 // "If Bilbo / Aragorn leaves play, the players lose the game" (131001:A:3, 146002:A:3) is a generated record.
-const RECORDS = [...AUTHORED, ...POOL_GENERATED_EFFECTS.filter((record) => record.lines.some((line) => line === "131001:A:3" || line === "146002:A:3"))];
+const RECORDS = [...AUTHORED, ...[...POOL_GENERATED_EFFECTS, ...HOBBIT_GENERATED].filter((record) => record.lines.some((line) => line === "131001:A:3" || line === "146002:A:3"))];
 const ctx = miscCtx(RECORDS);
 const filler = codes("f", 8);
 

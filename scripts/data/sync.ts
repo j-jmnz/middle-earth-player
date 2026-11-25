@@ -4,6 +4,7 @@ import path from "node:path";
 import { duration, runScript, type Log } from "../log.ts";
 import { packBookletsHere } from "../build/pack-booklets.ts";
 import { DATA_DIR } from "./paths.ts";
+import { SYNC_USAGE, syncArguments } from "./sync-args.ts";
 import { syncDragnCards } from "./sources/dragncards.ts";
 import { recordChanges, type SourceRecord } from "./sources/fetch.ts";
 import { syncHallOfBeorn } from "./sources/hallofbeorn.ts";
@@ -12,6 +13,7 @@ import { syncNightmare } from "./sources/nightmare.ts";
 import { syncPictures } from "./sources/pictures.ts";
 import { syncRingsDb } from "./sources/ringsdb.ts";
 import { syncRules } from "./sources/rules.ts";
+import { declaredOrigin } from "./sources/origins.ts";
 import { syncScans } from "./sources/scans.ts";
 
 // The only network command. Refreshes data/raw and .cache/pdf, then records every pin in data/sources.json.
@@ -40,8 +42,11 @@ function readSources(file: string, log: Log): Record<string, SourceRecord> {
 }
 
 void runScript("data:sync", async (log) => {
-  const argv = process.argv.slice(2);
-  const wanted = argv.filter((arg, at) => !arg.startsWith("--") && argv[at - 1] !== "--pack" && argv[at - 1] !== "--codes");
+  const { wanted, help } = syncArguments(process.argv.slice(2));
+  if (help) {
+    log.info(SYNC_USAGE);
+    return;
+  }
   const unknown = wanted.filter((id) => !ADAPTERS[id]);
   if (unknown.length > 0) throw new Error(`Unknown source ${unknown.join(", ")}. Sources: ${Object.keys(ADAPTERS).join(", ")}`);
   const ids = wanted.length > 0 ? wanted : Object.keys(ADAPTERS);
@@ -62,7 +67,7 @@ void runScript("data:sync", async (log) => {
     const begin = performance.now();
     sourceLog.info("start");
     try {
-      records[id] = await adapter(sourceLog);
+      records[id] = { ...(await adapter(sourceLog)), ...declaredOrigin(id) };
     } catch (error) {
       // The raw files of the sources that finished are on disk, but their pins are not: say so before the error ends the run.
       if (done.length > 0) log.warn(`data/raw was refreshed for ${done.join(", ")}, but sources.json is not written: rerun those sources or restore data/raw with git`);

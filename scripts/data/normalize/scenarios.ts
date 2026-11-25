@@ -12,7 +12,7 @@ import {
 import { CAMPAIGNS, CAMPAIGN_SUFFIX, productOf, scenarioDefs, scenarioSlug, type CampaignDef } from "../campaign-defs.ts";
 import { PLAYER_TYPES, type Overrides } from "./cards.ts";
 import { clausesOf, codesOf, nameIndex, parseSetup, type ParsedSetup } from "./setup-text.ts";
-import { loggedHarad, pileAccepts, questFacts } from "./scenario-piles.ts";
+import { loggedHarad, pileAccepts, questFacts, stagedPerPlayer } from "./scenario-piles.ts";
 import { bookletSetsOf, setupOf } from "./scenario-text.ts";
 import { burdenSetProblems, crossCheckProblems, easyRemovals, easySheetProblem, plain, PLAYER_GROUP, type Deck } from "./scenario-checks.ts";
 import { pilesFromSetup, type Loaded } from "./setup-piles.ts";
@@ -150,7 +150,11 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       // A mode card (The Siege of Annúminas' Standard Game Mode) is listed with the quest cards but is no stage; a quest card the scenario never plays is excluded by an override (the Siege's Epic Multiplayer stages).
       return card && card.type === "quest" && !isNightmareCard(card) && !overrides.scenarioExcluded.some((rule) => rule.scenario === id && rule.code === card.code) ? [card.code] : [];
     });
-    for (const rule of overrides.scenarioStages) if (rule.scenario === id && !questCodes.includes(rule.code)) questCodes.push(rule.code);
+    // An added stage takes its place by stage number (The Battle of Five Armies' stage 1A, which Hall of Beorn's list leaves out, opens the deck); the order of the others stays; a stage with no number sorts last.
+    const added = overrides.scenarioStages.filter((rule) => rule.scenario === id && !questCodes.includes(rule.code));
+    for (const rule of added) questCodes.push(rule.code);
+    const stageNumber = (code: string) => (Number.isNaN(Number.parseInt(byCode.get(code)?.stage ?? "", 10)) ? Number.MAX_SAFE_INTEGER : Number.parseInt(byCode.get(code)?.stage ?? "", 10));
+    if (added.length > 0) questCodes.sort((a, b) => stageNumber(a) - stageNumber(b));
     let stages = questCodes;
 
     // The printed Setup of the first quest stage and of the campaign card.
@@ -239,7 +243,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       easy = easyDeck ? load(easyDeck) : empty;
       if (!easyDeck) local.push(`${id}: no ${easyKey} Easy deck`);
       for (const key of easy.placements.keys()) {
-        if (!normal.placements.has(key)) local.push(`${id}: Easy deck has ${key.replace("\u0000", " in ")} that Normal does not`);
+        if (!normal.placements.has(key) && !stagedPerPlayer(quest, key)) local.push(`${id}: Easy deck has ${key.replace("\u0000", " in ")} that Normal does not`);
       }
       // "Players prepare their fleet" deals all six ship-objectives of The Dream-chaser's Fleet (dcce.prepare-your-fleet), set aside until
       // the players choose; the load list holds the four of the original box, so each ship it lacks (by name) is added, in both decks.
@@ -255,7 +259,6 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       stages = questCodes.filter((code) => !stormcallerStages.has(code));
       const deckStages = [...normal.placements.keys()].filter((key) => key.endsWith("\u0000quest")).map((key) => key.split("\u0000")[0] ?? "");
       // The variants of one stage (Flight from Moria's seven stage 2 cards, Foundations of Stone's four stage 4 cards) are dealt in no printed order, so the load list may list them in another order than Hall of Beorn's.
-      const stageNumber = (code: string) => Number.parseInt(byCode.get(code)?.stage ?? "", 10);
       const sameStages = JSON.stringify(stages) === JSON.stringify(deckStages) || (stages.length === deckStages.length && [...stages].sort().join() === [...deckStages].sort().join() && stages.every((code, at) => stageNumber(code) === stageNumber(deckStages[at] ?? "")));
       if (!sameStages) local.push(`${id}: quest stages disagree: Hall of Beorn ${stages.join(",")} / DragnCards ${deckStages.join(",")}`);
     } else {
@@ -481,6 +484,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         ...(Object.keys(reprints).length > 0 ? { reprints } : {}),
         ...(life != null ? { life } : {}),
         ...(sagaStart ? { sagaStart } : {}),
+        ...(def.treasures ? { treasures: [...def.treasures] } : {}),
         widgets,
         source: { dragnNormal: normalKey, dragnEasy: easyDeck ? easyKey : null, hobSlug: hob.Slug },
         ...(nightmare.data ? { nightmare: nightmare.data } : {}),

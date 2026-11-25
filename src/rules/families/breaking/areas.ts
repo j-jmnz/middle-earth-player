@@ -50,6 +50,11 @@ export function firstOfArea(state: ScenarioState, seat: number): number {
   return [...mine].sort((left, right) => ((left - state.firstPlayer + count) % count) - ((right - state.firstPlayer + count) % count))[0] ?? state.firstPlayer;
 }
 
+// The first player an effect read by `actor` means: the first player of the actor's area while the areas are isolated ("the resolution of each phase occurs as if only the player or players that share any given staging area are currently present in the game", hob.staging-area-creating), else the first player.
+export function firstPlayerFor(state: ScenarioState, actor: number): number {
+  return isolatedAreas(state) ? firstOfArea(state, actor) : state.firstPlayer;
+}
+
 // The seat that heads the area the card is in: its staging area, its active location or the engagement of a player of the area; null for a card in no area (or while stages are not separate).
 export function areaHeadOf(state: ScenarioState, id: string): number | null {
   if (!state.separate) return null;
@@ -211,7 +216,7 @@ export function withView(state: ScenarioState, seat: number | undefined, act: (v
 // An eliminated seat's stage and the encounter cards at it are discarded (mec109.multiple-staging-areas): the cards in its staging area, its active location, go to the
 // encounter discard pile and its stage card to the set-aside pile, as a defeated stage does. Nothing happens when the seat has neither. When players joined the seat
 // (mec108.joining-another-player) they are still in the game and in that area, so the area passes to the first of them clockwise and nothing is discarded
-// (agent recommendation, docs/scenarios/angmar-awakened.md, Escape from Mount Gram).
+// (agent recommendation, docs/scenarios/angmar-awakened/escape-from-mount-gram.md, Escape from Mount Gram).
 export function discardArea(state: ScenarioState, seat: number): ScenarioState {
   const owner = state.seats[seat];
   if (!state.separate || !owner) return state;
