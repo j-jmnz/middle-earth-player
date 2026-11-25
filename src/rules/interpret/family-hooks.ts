@@ -61,6 +61,7 @@ type Hooked = {
   readonly attached: readonly RulesFamily[];
   readonly combat: readonly RulesFamily[];
   readonly optionalEngage: readonly RulesFamily[];
+  readonly deckReset: readonly RulesFamily[];
   readonly questResult: readonly RulesFamily[];
   readonly idle: readonly RulesFamily[];
   readonly idleCards: readonly RulesFamily[];
@@ -87,6 +88,7 @@ function hooked(families: readonly RulesFamily[]): Hooked {
       attached: families.filter((family) => family.attached != null),
       combat: families.filter((family) => family.combat != null),
       optionalEngage: families.filter((family) => family.optionalEngage != null),
+      deckReset: families.filter((family) => family.deckReset?.hold != null),
       questResult: families.filter((family) => family.questResult != null),
       idle: families.filter((family) => family.idle != null),
       idleCards: families.filter((family) => family.idleCards != null),
@@ -174,6 +176,12 @@ export function familyForcedTravel(state: ScenarioState, ctx: ReduceContext, fam
 /** Whether some family says the players cannot pay this instruction of a Travel line now. */
 export function familyTravelUnpayable(state: ScenarioState, instruction: Instruction, ctx: ReduceContext, locationId: string, families: readonly RulesFamily[] = active()): boolean {
   for (const family of hooked(families).unpayable) if (family.travel?.unpayable?.(state, instruction, ctx, locationId) === true) return true;
+  return false;
+}
+
+/** Whether some family holds the encounter discard pile back from an empty deck (families/pelargir/surge-chain.ts): the reset then does not run. */
+export function familyHoldsDeckReset(state: ScenarioState, ctx: ReduceContext, families: readonly RulesFamily[] = active()): boolean {
+  for (const family of hooked(families).deckReset) if (family.deckReset?.hold?.(state, ctx) === true) return true;
   return false;
 }
 

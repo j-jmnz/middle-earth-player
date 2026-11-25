@@ -7,6 +7,7 @@
 import { endedInDefeat } from "../../rules/core/eliminate.ts";
 import { extraPhaseMode, phaseOf, type ModeName, type ScenarioState } from "../../rules/core/state.ts";
 import { progressAttack } from "../readouts/against-the-shadow/druadan.ts";
+import { beforeCombatNote } from "../readouts/against-the-shadow/blood.ts";
 
 // `phase` is the word the pill shows over the step ("" when there is none: Setup, Mulligan); `previousPhase` and `nextPhase` are
 // the phases beside it in the round ("" before the first). `previous` and `next` are the steps beside the step. `additional`: the phase running is an additional instance (Send for Help (Spirit), 11213:A:2);
@@ -143,7 +144,7 @@ export function windowPoint(game: ScenarioState, stat?: string): WindowPoint | n
   // A player's attack on stage 3 of The Drúadan Forest places progress, not damage (06044:B:2); an enemy's attack on a hero still deals damage.
   const progress = id != null && game.pendingAttack?.awaiting == null && game.pendingStrike?.awaiting != null && progressAttack(game) ? PROGRESS_POINTS[id] : undefined;
   const point = progress ?? (id ? POINTS[id] : undefined);
-  return id && point ? { id, ...point, note: progress ? point.note : noteOf(id, point, stat) } : null;
+  return id && point ? { id, ...point, note: progress ? point.note : (beforeCombatNote(game, id) ?? noteOf(id, point, stat)) } : null;
 }
 
 /** The title of a window point by its id ("Before the quest resolves"), or null for an unknown id. */

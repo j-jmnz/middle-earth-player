@@ -11,6 +11,7 @@ import { flagged, type ModeName, type ScenarioState } from "../../rules/core/sta
 import { UNDEFENDED_VILLAGERS_GUIDE } from "../words/scenarios/against-the-shadow/amon-din.ts";
 import { UNDEFENDED_GUIDE as OSGILIATH_GUIDE } from "../words/scenarios/against-the-shadow/osgiliath.ts";
 import { UNDEFENDED_GUIDE } from "../words/scenarios/against-the-shadow/cair-andros.ts";
+import { beforeCombatNote, combatStartDecision } from "../readouts/against-the-shadow/blood.ts";
 import { pointNote, pointTitle } from "./rail.ts";
 import type { QuestStat } from "./quest-stat.ts";
 
@@ -48,6 +49,9 @@ function decisionOf(step: string, stat: QuestStat | undefined, game: ScenarioSta
   if (step === "6.E" && game.questStage != null && game.modifiers.length > 0 && flagged(game, game.questStage, "undefendedToVillagers")) return UNDEFENDED_VILLAGERS_GUIDE;
   // Assault on Osgiliath: the undefended attack still damages a hero, and returns the unique locations a player controls (06096:A:2).
   if (step === "6.E" && game.scenarioId === "assault-on-osgiliath") return OSGILIATH_GUIDE;
+  // The Blood of Gondor: on stage 1 the players turn or take hidden cards at the start of combat, before the shadow cards (06117:B:2).
+  const hidden = combatStartDecision(game, step);
+  if (hidden) return hidden;
   return quest && stat ? quest(stat) : DECISIONS[step];
 }
 
@@ -104,7 +108,7 @@ export function turnReference(game: ScenarioState, title: (id: string) => string
       titles: NAMES[row.id] ? [NAMES[row.id] ?? ""] : row.entries.map((entry) => (title(entry) ?? entry).replace(/^[0-9.ab]+\s*/, "")),
       decision,
       current: row.id === now,
-      windows: (WINDOWS[row.id] ?? []).map((id) => ({ id, title: pointTitle(id) ?? id, note: pointNote(id, stat) ?? "" })),
+      windows: (WINDOWS[row.id] ?? []).map((id) => ({ id, title: pointTitle(id) ?? id, note: beforeCombatNote(game, id) ?? pointNote(id, stat) ?? "" })),
     };
     const last = phases[phases.length - 1];
     if (last && last.phase === row.phase) phases[phases.length - 1] = { phase: row.phase, steps: [...last.steps, step] };

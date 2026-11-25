@@ -33,6 +33,7 @@ import { mountDoomQuestNote } from "./mount-doom.ts";
 import { seatLevel } from "./threat-level.ts";
 import { pelennorQuestWords } from "./pelennor.ts";
 import { undefendedLocationsReadout } from "./against-the-shadow/osgiliath.ts";
+import { bloodDockClause, bloodLossNote, bloodTravel } from "./against-the-shadow/blood.ts";
 import { questMovesWords, undefendedVillagersReadout } from "./against-the-shadow/amon-din.ts";
 import { undefendedRemoves } from "./against-the-shadow/cair-andros.ts";
 import { siegeProgressWords } from "./siege.ts";
@@ -143,13 +144,16 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     if (defenderId && game.cards[defenderId]) {
       const defense = defenseAsDefender(game, defenderId, ctx.cards);
       const destroyed = destroyedWords(game, ctx, defenderId, Math.max(0, strength - defense), cardName, shadowNext);
-      return { kind: "defense", stats: [ATTACK(strength), DEFENSE(defense)], result: `${damageWords(strength, defense)}${shadowNote}${destroyed}` };
+      return { kind: "defense", stats: [ATTACK(strength), DEFENSE(defense)], result: `${damageWords(strength, defense)}${shadowNote}${destroyed}${destroyed ? `${bloodLossNote(game, defenderId)}${bloodDockClause(game, defenderId)}` : ""}` };
     }
     const hit = attack.heroId ?? (picked?.role === "hit" ? picked.id : undefined);
     // Stage 2B of Encounter at Amon Dîn: the attack discards villager tokens from Rescued Villagers and damages no hero.
     const tokens = hit ? undefendedVillagersReadout(game, hit, strength, shadowNext) : null;
     if (hit && tokens) return { kind: "defense", stats: [ATTACK(strength)], result: tokens };
-    if (hit) return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended: ${strength} damage on ${cardName(hit)}${undefendedRemoves(game, hit, strength)}${shadowNote}${destroyedWords(game, ctx, hit, strength, cardName, shadowNext)}${undefendedLocationsReadout(game, ctx)}` };
+    if (hit) {
+      const lost = destroyedWords(game, ctx, hit, strength, cardName, shadowNext);
+      return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended: ${strength} damage on ${cardName(hit)}${undefendedRemoves(game, hit, strength)}${shadowNote}${lost}${lost ? bloodDockClause(game, hit) : ""}${undefendedLocationsReadout(game, ctx)}` };
+    }
     // The one hero the damage may go on (Gollum's attack from the riddle area, a shadow effect that names the hero) is named before it is picked.
     const only = attack.onlyHeroes?.length === 1 && !attack.undefended ? attack.onlyHeroes[0] : undefined;
     if (only && game.cards[only]) return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended, ${cardName(only)} takes ${strength}${shadowNote}` };
@@ -186,8 +190,11 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const location = pickedId ? game.cards[pickedId] : undefined;
     if (!location) return now > 0 ? { kind: "travel", stats: [THREAT(now)], result: "Staging threat now" } : null;
     const after = stagingThreat({ ...area, staging: area.staging.filter((id) => id !== location.id) }, ctx.cards);
-    const points = questPointsOf(game, location, ctx.cards);
-    return { kind: "travel", stats: [THREAT(now), THREAT(after)], join: "then", result: points != null ? `It takes the next ${points} progress before the quest` : null };
+    // The Blood of Gondor: the points the location has once it is active, and the hidden cards the travel takes (blood.ts).
+    const blood = bloodTravel(game, ctx, location.id);
+    const points = blood ? blood.points : questPointsOf(game, location, ctx.cards);
+    const said = points != null ? `It takes the next ${points} progress before the quest` : null;
+    return { kind: "travel", stats: [THREAT(now), THREAT(after)], join: "then", result: blood?.cost ? (said ? `${said}; ${blood.cost}` : blood.cost) : said };
   }
   // The quest, when no attack is going on: committed willpower (and the characters picked to join it) against staging.
   if (game.phase === "Quest" && !game.questResolved && (game.mode === "questCommit" || game.mode === "staging" || game.mode === "resolution")) {

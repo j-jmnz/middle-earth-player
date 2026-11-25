@@ -29,6 +29,8 @@ import { progressAttack, willpowerAttack } from "../readouts/against-the-shadow/
 import { controlChanges, changeWords } from "../readouts/against-the-shadow/osgiliath.ts";
 import { deadVillagers, heldBeat, onVillagers, villagerLines } from "../readouts/against-the-shadow/amon-din.ts";
 import { stackTakes, underHost } from "../readouts/against-the-shadow/stewards-fear.ts";
+import { hiddenChanges, hiddenLines } from "../readouts/against-the-shadow/blood-steps.ts";
+import { HIDDEN_TITLE } from "../words/scenarios/against-the-shadow/blood.ts";
 import { NO_HERO_DAMAGE, VILLAGERS_TITLE } from "../words/scenarios/against-the-shadow/amon-din.ts";
 import { releasedWords, UNDERWORLD_TITLE } from "../words/scenarios/against-the-shadow/stewards-fear.ts";
 
@@ -48,7 +50,7 @@ export const BEAT_MS = 650;
 // `revealed` gives the printed When Revealed lines of a card (the Stormcaller's stage the C side of which was just revealed), or null.
 const SIDE_QUEST_TITLE = "End of the planning phase";
 
-type Names = { card: (cardId: string) => string; questStat?: (before: ScenarioState) => "willpower" | "attack" | "defense"; passes?: (cardId: string) => boolean; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null; stageName?: (cardId: string) => string | null; mustBypass?: (cardId: string) => string | null; atStaging?: (cardId: string) => boolean; fate?: FateNames; forestAdvance?: (before: ScenarioState, after: ScenarioState, stageId: string) => string | null };
+type Names = { card: (cardId: string) => string; typeOf?: (cardId: string) => string | null; questStat?: (before: ScenarioState) => "willpower" | "attack" | "defense"; passes?: (cardId: string) => boolean; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null; stageName?: (cardId: string) => string | null; mustBypass?: (cardId: string) => string | null; atStaging?: (cardId: string) => boolean; fate?: FateNames; forestAdvance?: (before: ScenarioState, after: ScenarioState, stageId: string) => string | null };
 
 // "stage 3 of 4" for the Stormcaller's stage `cardId` (the area's current stage once it has advanced), or "its next stage" for a state that moved on.
 function stormcallerStageWords(state: ScenarioState, cardId: string): string {
@@ -98,6 +100,10 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
     joined.add(index);
     boarded.set(shipAt, (boarded.get(shipAt) ?? 0) + 1);
   });
+
+  // The cards of The Blood of Gondor turned faceup in this intent: an enemy among them engages under its turn line (hiddenLines), not in a beat of its own.
+  const hidden = hiddenChanges(before, after, steps, after.questStage != null && after.cards[after.questStage]?.code === "06118", names.typeOf);
+  const turnedEngaged = new Set(hidden?.seats.flatMap((entry) => entry.turned.filter((turned) => turned.fate.kind === "engaged").map((turned) => turned.id)) ?? []);
 
   steps.forEach((step, index) => {
     switch (step.kind) {
@@ -263,7 +269,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         line(detachLine(names.card(step.enemyId), names.card(step.locationId)), null, [step.enemyId]);
         return;
       case "engage": {
-        if (joined.has(index)) return;
+        if (joined.has(index) || turnedEngaged.has(step.enemyId)) return;
         open(4, `${names.card(step.enemyId)} engages`, "bad");
         line(after.seatCount > 1 ? `${names.card(step.enemyId)} engages Player ${step.seat + 1}` : `${names.card(step.enemyId)} engages you`);
         const count = boarded.get(index);
@@ -346,6 +352,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   // The locations a player took control of or lost in this intent (Assault on Osgiliath): the location is moved by the engine without a step.
   const control = controlChanges(before, after).map((change) => changeWords(change, after.seatCount, names.card(change.id)));
   if (control.length > 0) groups.push({ rank: 8, title: "", tone: "plain", lines: control.map((text) => ({ text, mark: null })), firm: true });
+  // The hidden cards of The Blood of Gondor taken or turned in this intent: a count and a name only once a card is faceup, never a facedown card.
+  // It leads the banner (rank 3, before the engage and damage lines), and tells each enemy it turned under its own turn line.
+  if (hidden) groups.push({ rank: 3, title: HIDDEN_TITLE, tone: "plain", lines: hiddenLines(hidden, names.card).map((text) => ({ text, mark: null })) });
   const held = heldBeat(before, after);
   if (held) groups.push({ rank: 8, title: held.title, tone: "plain", lines: held.lines.map((text) => ({ text, mark: null })) });
 

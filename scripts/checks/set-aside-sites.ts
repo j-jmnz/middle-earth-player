@@ -43,6 +43,7 @@ export const ASIDE_SITES: Readonly<Record<string, AsideSite>> = {
   "families/nightmare/dungeon.ts": { functions: ["takeMorePrisoners"], group: "public", why: "Reads a named set-aside copy, or the stage set aside when it was defeated." },
   "families/nightmare/index.ts": { functions: ["setAsideFromDeck"], group: "public", why: "SetAsideFromDeck: every copy of a named card." },
   "families/pelargir/underworld.ts": { functions: ["buildUnderworldDeck", "hideOneAside"], group: "secret", why: "The underworld deck lies set aside facedown and the Villain and the Plot the seed picks stay set aside facedown (06011:A:1); the others leave the game.", verbs: ["BuildUnderworldDeck", "HideOneAside"] },
+  "families/pelargir/hidden.ts": { functions: ["randomHidden", "takeHidden"], group: "secret", why: "A hidden card is the top card of the encounter deck set aside facedown in a player's play area, and a random pick among them stays unseen (06117:B:1, 06128:A:3).", verbs: ["TakeHiddenCard"] },
   "families/pelargir/stage-remove.ts": { functions: ["removeStage"], group: "notListed", why: "RemoveStage: a quest stage taken out of the quest deck is set aside; quest stages are never listed." },
   "families/poison/stages.ts": { functions: ["advanceOtherPlayers"], group: "notListed", why: "The shared quest stage a lone player leaves is set aside; quest stages are never listed." },
   "families/quest/branch.ts": { functions: ["branchFrom"], group: "notListed", why: "Quest stages." },

@@ -27,6 +27,7 @@ import { mayGainResources } from "../families/misc/guards.ts";
 import { queueHeard } from "../families/quest/events.ts";
 import { countDiscarded } from "../families/south/damage.ts";
 import { refillsAnyTime } from "../families/nightmare/guards.ts";
+import { familyHoldsDeckReset } from "./family-hooks.ts";
 import { hearsEmptyDeck } from "../families/sack/empty-deck.ts";
 import { returnUndeadBeforeReset } from "../families/angmar/run-out.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
@@ -64,6 +65,8 @@ export function resetEncounterDeck(state: ScenarioState, steps: EngineStep[], ct
   if (state.phase !== "Quest" && !refillsAnyTime(state)) return state;
   // A card in play that advances the stage on an empty deck hears it first (131024:B:1, families/sack/empty-deck.ts).
   if (hearsEmptyDeck(state, ctx)) return state;
+  // A family that keeps the pile back from a reset that would repeat for ever says so (families/pelargir/surge-chain.ts).
+  if (familyHoldsDeckReset(state, ctx)) return state;
   return reshuffleDiscard(returnUndeadBeforeReset(state, ctx, steps), steps, "rr.running-out-of-cards");
 }
 

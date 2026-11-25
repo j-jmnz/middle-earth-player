@@ -1,0 +1,266 @@
+Scenario piles that place cards with no record (quest: 06117 The Ambush; quest: 06118 Captured!; staging: 06119 Black Númenorean; staging: 06123 The Cross-roads; setAside: 06132 Faramir; setAside: 06133 Lord Alcaron)
+
+## 06117 The Ambush
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+06117:A:1 (front): Setup: Add The Crossroads and Black Númenorean to the staging area. Put the Faramir and Lord Alcaron objective allies into play. Shuffle the encounter deck and reveal 1 card from the encounter deck per player and add it to the staging area.
+  06117:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the set-aside card with code 06132 enters play under the first player's control, ready
+    - the set-aside card with code 06133 enters play under the first player's control, ready
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+06117:B:1 (back): At the beginning of the quest phase, each player takes 1 hidden card.
+  06117:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - for each player, first player first:
+      - the acting player takes 1 hidden card(s): the top card(s) of the encounter deck are set aside facedown in his play area, unseen and not revealed (no When Revealed effect, no surge, no shadow effect); an empty deck is refilled from the discard pile first, and with both empty no card is taken (as a Travel cost it then cannot be paid); the 5-card limit of Captured! is checked once the whole instruction is done
+
+06117:B:2 (back): At the beginning of the combat phase, each player must either turn each of his hidden cards faceup, or take 1 hidden card.
+  06117:forced:2: Forced when a phase begins
+    only if it is the Combat phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "turn":
+          - the actor (the acting player) turns each hidden card he holds faceup, one at a time, the cards held when the turn begins only (a card taken meanwhile stays facedown): an enemy engages him at once whatever its engagement cost, a treachery is discarded and a location is discarded, with no When Revealed effect
+        * option "take":
+          - the acting player takes 1 hidden card(s): the top card(s) of the encounter deck are set aside facedown in his play area, unseen and not revealed (no When Revealed effect, no surge, no shadow effect); an empty deck is refilled from the discard pile first, and with both empty no card is taken (as a Travel cost it then cannot be paid); the 5-card limit of Captured! is checked once the whole instruction is done
+
+## 06118 Captured!
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+06118:A:1 (front): When Revealed: Place Faramir and Lord Alcaron under Captured! (they are in play but the players cannot gain control of them). Each player turns each of his hidden cards faceup.
+  06118:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each card in play with code 06132, 06133 is placed under this stage: still in play, controlled by no player, committed to nothing; its text cannot be used and its leaving play is not announced
+    - each player, in player order, the first player first, turns each hidden card he holds faceup, one at a time, the cards held when the turn begins only (a card taken meanwhile stays facedown): an enemy engages him at once whatever its engagement cost, a treachery is discarded and a location is discarded, with no When Revealed effect
+
+06118:B:1 (back): Battle. (Characters use their Attack instead of Willpower when questing.)
+  (the keyword part is owned by the card's keywords; the records cover: (Characters use their Attack instead of Willpower when questing.))
+  06118:constant:1: Constant
+    (no instructions: the record only names the printed keyword reminder; the keyword is the card's own and the engine reads it from the card)
+
+06118:B:2 (back): At the beginning of the quest phase, each player takes 1 hidden card.
+  06118:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - for each player, first player first:
+      - the acting player takes 1 hidden card(s): the top card(s) of the encounter deck are set aside facedown in his play area, unseen and not revealed (no When Revealed effect, no surge, no shadow effect); an empty deck is refilled from the discard pile first, and with both empty no card is taken (as a Travel cost it then cannot be paid); the 5-card limit of Captured! is checked once the whole instruction is done
+
+06118:B:3 (back): If a player has 5 hidden cards, he must turn them faceup.
+  06118:constant:2: Constant
+    - this card: stat turnsAtFiveHidden (held by the current quest stage: a player who holds 5 hidden cards turns them faceup, one at a time, once the instruction that gave him the fifth is done; checked at every settle) 1, while this card is in play
+
+06118:B:4 (back): If the players defeat this stage, they have won the game.
+  06118:constant:3: Constant
+    (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
+
+## 06119 Black Númenorean
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+06119:A:1 (front): X is the total number of hidden cards in the game.
+  06119:constant:1: Constant
+    - this card: stat threat the total number of hidden cards in every player's play area, while this card is in play
+
+06119:A:2 (front): Forced: At the end of the round, each player must raise his threat by 1 for each hidden card in his play area.
+  06119:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - for each player, first player first:
+      - raise threat by the number of hidden cards in the acting player's play area (the acting player)
+
+## 06120 Orc Ambusher
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06120:A:1 (front): Forced: After Orc Ambusher engages you, discard 1 non-objective ally you control, if able.
+  06120:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ally (you control) that is not an objective
+    - discard the picked card
+
+06120:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if undefended.)
+  06120:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the attack has no defender: the attacking enemy: stat attack 3, until the end of the attack
+    - then, if the attack has a defender (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 06121 Brutal Uruk
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06121:A:1 (front): Forced: After Brutal Uruk attacks and destroys a character, that character's controller turns all hidden cards in his play area faceup. Deal a shadow card to each enemy turned faceup by this effect and resolve their attacks as normal.
+  06121:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the actor (the acting player) turns each hidden card he holds faceup, one at a time, the cards held when the turn begins only (a card taken meanwhile stays facedown): an enemy engages him at once whatever its engagement cost, a treachery is discarded and a location is discarded, with no When Revealed effect; each enemy turned this way is dealt a shadow card
+
+## 06122 Evil Crow
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06122:A:1 (front): Forced: When Evil Crow engages a player, that player takes 1 hidden card.
+  06122:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    - the acting player takes 1 hidden card(s): the top card(s) of the encounter deck are set aside facedown in his play area, unseen and not revealed (no When Revealed effect, no surge, no shadow effect); an empty deck is refilled from the discard pile first, and with both empty no card is taken (as a Travel cost it then cannot be paid); the 5-card limit of Captured! is checked once the whole instruction is done
+
+06122:A:2 (shadow): Shadow: Take 1 hidden card.
+  06122:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player takes 1 hidden card(s): the top card(s) of the encounter deck are set aside facedown in his play area, unseen and not revealed (no When Revealed effect, no surge, no shadow effect); an empty deck is refilled from the discard pile first, and with both empty no card is taken (as a Travel cost it then cannot be paid); the 5-card limit of Captured! is checked once the whole instruction is done
+
+## 06123 The Cross-roads
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+06123:A:1 (front): The current quest card gains siege (and loses battle).
+  06123:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - currentQuest: stat siege 1, while this card is in play
+    - currentQuest: stat losesBattle (held by the current quest stage: it does not have the Battle keyword it prints) 1, while this card is in play
+
+06123:A:2 (front): X is equal to the number of players in the game.
+  06123:constant:2: Constant
+    - this card: stat threat the number of players, while this card is in play
+
+06123:A:3 (front): Travel: The first player must take 1 hidden card to travel here.
+  06123:travel:1: Travel
+    - the first player takes 1 hidden card(s): the top card(s) of the encounter deck are set aside facedown in his play area, unseen and not revealed (no When Revealed effect, no surge, no shadow effect); an empty deck is refilled from the discard pile first, and with both empty no card is taken (as a Travel cost it then cannot be paid); the 5-card limit of Captured! is checked once the whole instruction is done
+
+## 06124 Southern Road
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06124:A:1 (front): Travel: The first player must take 1 hidden card to travel here.
+  06124:travel:1: Travel
+    - the first player takes 1 hidden card(s): the top card(s) of the encounter deck are set aside facedown in his play area, unseen and not revealed (no When Revealed effect, no surge, no shadow effect); an empty deck is refilled from the discard pile first, and with both empty no card is taken (as a Travel cost it then cannot be paid); the 5-card limit of Captured! is checked once the whole instruction is done
+
+## 06125 Western Road
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06125:A:1 (front): Western Road gets +5 quest points while it is in the staging area.
+  06125:constant:1: Constant
+    only if this card is in the staging area
+    - this card: stat questPoints 5, while this card is in play
+
+06125:A:2 (front): Travel: The first player must take 1 hidden card to travel here.
+  06125:travel:1: Travel
+    - the first player takes 1 hidden card(s): the top card(s) of the encounter deck are set aside facedown in his play area, unseen and not revealed (no When Revealed effect, no surge, no shadow effect); an empty deck is refilled from the discard pile first, and with both empty no card is taken (as a Travel cost it then cannot be paid); the 5-card limit of Captured! is checked once the whole instruction is done
+
+## 06126 Northern Road
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06126:A:1 (front): Travel: The first player must take 1 hidden card to travel here.
+  06126:travel:1: Travel
+    - the first player takes 1 hidden card(s): the top card(s) of the encounter deck are set aside facedown in his play area, unseen and not revealed (no When Revealed effect, no surge, no shadow effect); an empty deck is refilled from the discard pile first, and with both empty no card is taken (as a Travel cost it then cannot be paid); the 5-card limit of Captured! is checked once the whole instruction is done
+
+## 06127 Eastern Road
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06127:A:1 (front): Eastern Road gets +5 quest points while it is in the staging area.
+  06127:constant:1: Constant
+    only if this card is in the staging area
+    - this card: stat questPoints 5, while this card is in play
+
+06127:A:2 (front): Travel: The first player must take 2 hidden cards to travel here.
+  06127:travel:1: Travel
+    - the first player takes 2 hidden card(s): the top card(s) of the encounter deck are set aside facedown in his play area, unseen and not revealed (no When Revealed effect, no surge, no shadow effect); an empty deck is refilled from the discard pile first, and with both empty no card is taken (as a Travel cost it then cannot be paid); the 5-card limit of Captured! is checked once the whole instruction is done
+
+## 06128 The Dark Woods
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06128:A:1 (front): Archery X.
+  06128:constant:1: Constant (record also names 06128:A:2)
+    - this card: stat archeryPlayers 1, while this card is in play
+
+06128:A:2 (front): X is the number of players in the game.
+  06128:constant:1: Constant (record also names 06128:A:1)
+    - this card: stat archeryPlayers 1, while this card is in play
+
+06128:A:3 (front): Forced: After The Dark Woods leaves play as an explored location, the first player discards 1 hidden card.
+  06128:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the first player discards 1 hidden card chosen at random, unseen, to the encounter discard pile: it is not turned faceup, so nothing engages and no When Revealed effect resolves; with none nothing happens
+
+## 06129 Lying in Wait
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06129:A:1 (front): When Revealed: The first player turns each hidden card in his play area faceup. Resolve the "When Revealed" effects of each encounter card turned faceup by this effect. If a location is turned faceup, add it to the staging area.
+  06129:whenRevealed:1: When revealed
+    - the first player turns each hidden card he holds faceup, one at a time, the cards held when the turn begins only (a card taken meanwhile stays facedown): an enemy engages him at once whatever its engagement cost, a treachery is discarded, and a location is added to the staging area when it is turned; once every card is turned the When Revealed effects of the cards turned (an enemy after it has engaged, a treachery, a location) resolve, the first card turned first, and no surge fires
+
+## 06130 Mordor Looms
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06130:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+06130:A:2 (front): When Revealed: Each player takes 1 hidden card.
+  06130:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player takes 1 hidden card(s): the top card(s) of the encounter deck are set aside facedown in his play area, unseen and not revealed (no When Revealed effect, no surge, no shadow effect); an empty deck is refilled from the discard pile first, and with both empty no card is taken (as a Travel cost it then cannot be paid); the 5-card limit of Captured! is checked once the whole instruction is done
+
+06130:A:3 (shadow): Shadow: If this attack destroys a character, that character's controller turns each of his hidden cards faceup.
+  06130:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the player who controlled the character the attack destroyed acts for the instructions that follow in this effect (he may not be the defending player: a Sentinel defender belongs to another player); with no character destroyed the acting player stays
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the actor (the acting player) turns each hidden card he holds faceup, one at a time, the cards held when the turn begins only (a card taken meanwhile stays facedown): an enemy engages him at once whatever its engagement cost, a treachery is discarded and a location is discarded, with no When Revealed effect
+
+## 06131 Conflict at the Crossroads
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+06131:A:1 (front): When Revealed: Until the end of the phase, Orc enemies engaged with players add their Threat to the staging area. If no Orc enemies are engaged with players, Conflict at the Crossroads gains surge.
+  06131:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - actorSeat (Orc only): stat engagedThreatSeat (each enemy engaged with that player adds its Threat to the staging area's total, counted live: an enemy that engages later counts too) 1, until the end of the phase
+    - then, if the number of Orc enemy (any player controls) is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+06131:A:2 (shadow): Shadow: Take 1 hidden card.
+  06131:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player takes 1 hidden card(s): the top card(s) of the encounter deck are set aside facedown in his play area, unseen and not revealed (no When Revealed effect, no surge, no shadow effect); an empty deck is refilled from the discard pile first, and with both empty no card is taken (as a Travel cost it then cannot be paid); the 5-card limit of Captured! is checked once the whole instruction is done
+
+## 06132 Faramir
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+06132:A:1 (front): The first player gains control of Faramir.
+  06132:forced:1: Forced on the event firstPlayerTokenPassed
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card passes to the first player's play area (each time the first player token passes); a card under a stage is not moved
+
+06132:A:2 (front): Combat Action: Exhaust Faramir to turn a hidden card faceup. If that card is an enemy, deal 3 damage to it.
+  06132:action:1: Action (cost: exhaust this card)
+    only if all of: (it is the Combat phase) and (0 is less than the total number of hidden cards in every player's play area) and (there is a ally (you control) named "Faramir" to choose)
+    who acts: only the player who controls it may trigger it, as for any ally; the acting player is that player
+    - the acting player chooses a player who holds a hidden card (no choice with one) and one of that player's hidden cards, picked blind with the game's seed, is turned faceup for him: an enemy takes 3 damage first, and one destroyed never engages; otherwise it engages him at once whatever its engagement cost, a treachery or a location is discarded unresolved
+
+06132:A:3 (front): If Faramir leaves play, the players have lost the game.
+  06132:forced:2: Forced after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players lose the game (Faramir left play)
+
+## 06133 Lord Alcaron
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+06133:A:1 (front): The first player gains control of Lord Alcaron.
+  06133:forced:1: Forced on the event firstPlayerTokenPassed
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card passes to the first player's play area (each time the first player token passes); a card under a stage is not moved
+
+06133:A:2 (front): Action: Exhaust Lord Alcaron to return an enemy engaged with you to the staging area.
+  06133:action:1: Action (cost: exhaust this card)
+    only if all of: (there is a ally (you control) named "Lord Alcaron" to choose) and (there is a enemy (any player controls) engaged with you to choose)
+    who acts: only the player who controls it may trigger it, as for any ally; the acting player is that player
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) engaged with you
+    - return the picked card to the staging area
+
+06133:A:3 (front): If Lord Alcaron leaves play, the players have lost the game.
+  06133:forced:2: Forced after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players lose the game (Lord Alcaron left play)
+
+(rendered pieces: 129 by template, 0 as JSON)

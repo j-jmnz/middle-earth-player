@@ -29,6 +29,7 @@ import { cairAndrosDetail } from "./against-the-shadow/cair-andros-preview.ts";
 import { amonDinDetail } from "../readouts/against-the-shadow/amon-din.ts";
 import { druadanDetail } from "./against-the-shadow/druadan-preview.ts";
 import { osgiliathControlSpeech, osgiliathDetail } from "../readouts/against-the-shadow/osgiliath.ts";
+import { bloodDetail } from "../readouts/against-the-shadow/blood.ts";
 
 /**
  * The text of the engine's Orc Guard stand-in, and of a hero Fallen Into Evil made an enemy (`<code>~enemy`; its card shows the hero's art and its game text
@@ -87,6 +88,9 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   // Assault on Osgiliath: a location a player controls, a unique location's undefended Forced line, Ruined Tower, Pinned Down and Southron Commander (keyed on the scenario).
   const osgiliath = osgiliathDetail(game, ctx, cardId);
   if (osgiliath) return osgiliath;
+  // The Blood of Gondor: a Travel cost of hidden cards, The Cross-roads, the two allies, Black Númenorean (keyed on the scenario).
+  const blood = bloodDetail(game, ctx, cardId);
+  if (blood) return blood;
   const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card) ?? pelennorDetail(game, ctx, card) ?? barrowDetail(game, ctx, cardId, name) ?? cairAndrosDetail(game, ctx, cardId) ?? druadanDetail(game, ctx, cardId, name) ?? underworldLine(game, ctx, cardId) ?? plotLine(game, cardId) ?? amonDinDetail(game, cardId);
   if (lost) return lost;
   const everyone = engagedWithAllWords(game, card);
