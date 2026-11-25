@@ -3,7 +3,8 @@
 // broke. It fails when a page throws, a wait times out or a tap finds nothing; console messages are printed, not failed on.
 //
 //   pnpm browser shot /settings /decks --dark                   # two screens in the dark theme
-//   pnpm browser shot --fixture duo /table/{save} --landscape   # a fixture save (src/campaign/fixtures/registry.ts) on its table
+//   pnpm browser shot --fixture duo /table/{save} --landscape   # a campaign fixture save (src/campaign/fixtures/registry.ts) on its table
+//   pnpm browser shot --fixture isen-lost --landscape           # a standalone fixture: no route, or /standalone/table/{save}
 //   pnpm browser shot --fixture mirkwood-lost --at 40 /table/{save} --landscape   # the moment `pnpm game show mirkwood-lost --at 40` prints
 //   pnpm browser shot --scene the-morgul-vale '{"play":["143010"]}' --landscape   # a table built from a test layout (`pnpm game scene` prints it as text), read-only
 //   pnpm browser shot --moment the-blood-of-gondor/hidden-cards --landscape   # a moment a scenario committed (test/scenarios/<id>/screens.ts); `--moment <id>` shoots all
