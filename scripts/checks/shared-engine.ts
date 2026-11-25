@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 
 import { ROOT } from "./tracked.ts";
 
-// A scenario adds its mechanics to the cycle's family (docs/agents/cycle-procedure.md, Design note for a new system); what it adds to shared engine code stays small. Shared engine code is
+// A scenario adds its mechanics to the cycle's family (docs/agents/cycle-procedure.md, Design of a new system); what it adds to shared engine code stays small. Shared engine code is
 // src/rules and src/catalog outside their `families/` folders. The net lines a branch adds there (git numstat added minus deleted over all shared files together, never below 0, tests and
 // the test helpers below left out) stay at or under SHARED_ENGINE_LIMIT unless a commit of the branch that itself touches shared engine code has `Shared engine: <reason>` in its body.
 // The numbers that set the limit are in the commit message that added it.
@@ -48,7 +48,7 @@ export function sharedEngineProblems(range: { rows: readonly NumstatRow[]; commi
   if (added <= SHARED_ENGINE_LIMIT || range.commits.some((commit) => touches(commit) && SHARED_REASON.test(commit.body))) return [];
   const files = range.rows.filter((row) => isSharedEngine(row.file) && net(row) > 0).sort((a, b) => net(b) - net(a)).slice(0, 3).map((row) => `${row.file} +${net(row)}`);
   return [
-    `the branch adds ${added} lines to shared engine code (limit ${SHARED_ENGINE_LIMIT}; ${files.join(", ")}): put the mechanic in the cycle's family behind one hook, or give the reason in the body of a commit that changes shared engine code, as a line "Shared engine: <reason>" (docs/agents/cycle-procedure.md, Design note for a new system). A stacked branch counts the lines of the branch it starts from until that one merges`,
+    `the branch adds ${added} lines to shared engine code (limit ${SHARED_ENGINE_LIMIT}; ${files.join(", ")}): put the mechanic in the cycle's family behind one hook, or give the reason in the body of a commit that changes shared engine code, as a line "Shared engine: <reason>" (docs/agents/cycle-procedure.md, Design of a new system). A stacked branch counts the lines of the branch it starts from until that one merges`,
   ];
 }
 
