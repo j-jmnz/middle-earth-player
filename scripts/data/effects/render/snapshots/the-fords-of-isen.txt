@@ -1,0 +1,313 @@
+Scenario piles that place cards with no record (quest: 07059 Fight at the Fords; quest: 07060 Dunlending Attack; quest: 07061 Hold the Fords; staging: 07017 The Islet; setAside: 07016 Gríma)
+
+## 07016 Gríma
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+07016:A:1 (front): If free of encounters, the first player gains control of Gríma.
+  07016:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them
+    - this card: stat returnsToStagingArea 1, while this card is in play
+
+07016:A:2 (front): Action: Exhaust Gríma to draw a card.
+  07016:action:1: Action (cost: exhaust this card)
+    who acts: any player may trigger it; the acting player is the one who does
+    - the acting player draws 1 card(s)
+
+07016:A:3 (front): If Gríma leaves play, the players lose the game.
+  07016:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players lose the game
+
+## 07017 The Islet
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+07017:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+07017:A:2 (front): While The Islet is the active location, each Dunland enemy in play gets +1 Threat.
+  07017:constant:1: Constant
+    only if this card is the active location
+    - each Dunland enemy (any player controls) or in the staging area: stat threat 1, while this card is in play
+
+## 07018 Fords of Isen
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07018:A:1 (front): While Fords of Isen is in the staging area, players cannot gain resources from card effects.
+  07018:constant:1: Constant
+    only if this card is in the staging area
+    - the table: stat noCardResources (the hero cannot gain resources from card effects; the resources it collects in the resource phase are not one) 1, while this card is in play
+
+07018:A:2 (front): Forced: After Fords of Isen becomes the active location, each player with fewer than 5 cards in his hand draws cards until he has 5 in his hand.
+  07018:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - for each player, first player first:
+      - the acting player draws the cards in your hand x -1 + 5 card(s)
+
+## 07019 The King's Road
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07019:A:1 (front): While any player has 3 or more cards in hand, The King's Road gets +3 quest points.
+  07019:constant:1: Constant
+    only if some living player's hand holds at least 3 cards
+    - this card: stat questPoints 3, while this card is in play
+
+07019:A:2 (front): While any player has 5 or more cards in hand, The King's Road gains: 'When faced with the option to travel, the players must travel to The King's Road, if able.'
+  07019:constant:2: Constant
+    only if all of: (this card is in the staging area) and (some living player's hand holds at least 5 cards)
+    - while no location is the active location and the players can travel to this location, they must travel to it: the travel step offers no way to decline it or to go elsewhere
+
+## 07020 Gap of Rohan
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07020:A:1 (front): While Gap of Rohan is in the staging area, Dunland enemies get +1 Attack.
+  07020:constant:1: Constant
+    only if this card is in the staging area
+    - each Dunland enemy (any player controls) or in the staging area: stat attack 1, while this card is in play
+
+07020:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, remove 1 time counter from the current quest.
+  07020:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+
+## 07021 Pillaging and Burning
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07021:A:1 (front): When Revealed: Each player draws a card. Each player raises his threat by 1 for each card in his hand.
+  07021:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player draws 1 card(s)
+    - for each player, first player first:
+      - raise threat by the cards in your hand (the acting player)
+
+07021:A:2 (shadow): Shadow: Defending player discards an attachment he controls (each attachment he controls instead if this attack is undefended).
+  07021:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): choose attachment (you control)
+    - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): for each attachment (you control):
+      - discard the picked card
+
+## 07022 Down from the Hills
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07022:A:1 (front): When Revealed: Each player must choose: Either remove 1 time counter from the current quest, or search the encounter deck and discard pile for a Dunland enemy, reveal it, and add it to the staging area. Shuffle the encounter deck. If any player has 5 or more cards in hand, this effect cannot be canceled.
+  07022:whenRevealed:1: When revealed (cannot be canceled while some living player's hand holds at least 5 cards)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "time":
+          - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+        * option "search":
+          - the acting player searches the encounter deck and discard pile for a Dunland enemy, reveals it and adds it to the staging area
+    - shuffle the encounter deck
+
+## 07023 Ill Tidings
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07023:A:1 (front): When Revealed: The first player draws this card into his hand. Ill Tidings cannot leave that player's hand. Then, if the first player has 5 or more cards in his hand, Ill Tidings gains surge.
+  07023:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the rest of the effect is carried out by the first player
+    - this card goes into the acting player's hand, which is no draw from a deck (no card hears a draw), and cannot leave that hand; the reveal does not discard it
+    - then, if 4 is less than the cards in your hand (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+## 07042 Dunland Prowler
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07042:A:1 (front): While any player has 3 or more cards in hand, Dunland Prowler gains surge.
+  07042:constant:1: Constant
+    only if some living player's hand holds at least 3 cards
+    - this card: stat gainsSurge (it has the Surge keyword as it is revealed) 1, while this card is in play
+
+07042:A:2 (front): While any player has 5 or more cards in hand, Dunland Prowler gets +1 Threat.
+  07042:constant:2: Constant
+    only if some living player's hand holds at least 5 cards
+    - this card: stat threat 1, while this card is in play
+
+## 07043 Dunlending Bandit
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07043:A:1 (front): While engaged with a player, Dunlending Bandit gets +1 Attack for each card in that player's hand.
+  07043:constant:1: Constant
+    only if this card is engaged with a player (that player is who "you" means in this record)
+    - this card: stat attack the cards in your hand, while this card is in play
+
+07043:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending player has at least 3 cards in his hand).
+  07043:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the number of card (you control) in hand is at least 3): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the number of card (you control) in hand is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 07044 Dunland Raider
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07044:A:1 (front): Forced: After Dunland Raider engages a player, that player must deal X damage divided among characters he controls where X equals the number of cards in his hand.
+  07044:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    - the acting player assigns the cards in your hand damage among the character (you control), one at a time
+
+07044:A:2 (shadow): Shadow: Discard an attachment you control.
+  07044:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control)
+    - discard the picked card
+
+## 07045 Old Hatreds
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07045:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+07045:A:2 (front): When Revealed: Attach to the current quest. (Counts as a Condition attachment with the text: 'Forced: After a player draws any number of cards, raise his threat by 1.')
+  07045:whenRevealed:1: When revealed
+    - this card is attached to the current quest card (the side quest that is the current quest, else the main quest card) and leaves with it
+  07045:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  07045:forced:1: Forced on the event cardsDrawn
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - raise threat by 1 (the acting player)
+
+## 07046 Dunland Tribesman
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07046:A:1 (front): When Revealed: Each player draws a card.
+  07046:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player draws 1 card(s)
+
+07046:A:2 (front): Forced: After a player draws any number of cards, Dunland Tribesman gets +1 Threat until the end of the round.
+  07046:forced:1: Forced on the event cardsDrawn
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card: stat threat 1, until the end of the round
+
+07046:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack.
+  07046:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack 1, until the end of the attack
+
+## 07047 Dunland Chieftain
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07047:A:1 (front): Forced: After Dunland Chieftain engages a player, discard X cards from the top of the encounter deck where X is the number of cards in the engaged player's hand. Put the topmost Dunland enemy discarded this way into play engaged with that player.
+  07047:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard the cards in your hand card(s) from the top of the encounter deck
+    - of the cards this effect discarded from the encounter deck, the Dunland enemy discarded last is put into play engaged with the acting player (as if it had engaged him; nothing when none was discarded)
+
+## 07048 Dunland Berserker
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07048:A:1 (front): Forced: After the engaged player draws any number of cards, Dunland Berserker makes an attack.
+  07048:forced:1: Forced on the event cardsDrawn
+    only if this card is an enemy engaged with the acting player
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+07048:A:2 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
+  07048:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
+
+## 07049 Wild Men of Dunland
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07049:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+07049:A:2 (front): When Revealed: Attach to the current quest. (Counts as a Condition attachment with the text: 'Forced: After a player draws any number of cards, that player deals 1 damage to a character he controls.')
+  07049:whenRevealed:1: When revealed
+    - this card is attached to the current quest card (the side quest that is the current quest, else the main quest card) and leaves with it
+  07049:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  07049:forced:1: Forced on the event cardsDrawn
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the acting player assigns 1 damage among the character (you control), one at a time
+
+## 07059 Fight at the Fords
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+07059:A:1 (front): Setup: Add The Islet to the staging area and attach Gríma to that location. Each player searches the encounter deck for 1 different Dunland enemy and adds it to the staging area. Shuffle the encounter deck.
+  07059:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - Campaign Setup: the set-aside copy of the card with code 07016 is attached to the card in play named "The Islet" (a card dealt on its Upgraded side stays so); it lies attached, controlled by nobody, not revealed, wherever its host lies, and in no play area; it is a claimed objective, so a host that leaves play lets it go back to the staging area when its text says so
+    - for each player, first player first:
+      - the acting player finds one Dunland enemy in the encounter deck and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
+    - shuffle the encounter deck
+
+07059:B:1 (back): Time 5.
+  07059:constant:1: Constant
+    - Time 5: when this card is revealed, 5 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+07059:B:2 (back): Forced: After the last time counter is removed from this stage, discard Gríma from play.
+  07059:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the card in play titled "Gríma" is discarded from play, although it cannot leave the staging area (the discard supersedes that text)
+
+07059:B:3 (back): The players cannot advance unless the first player controls Gríma.
+  07059:constant:2: Constant
+    only if not (the actor controls the card with code 07016)
+    - the players cannot defeat this stage while this holds
+
+## 07060 Dunlending Attack
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+07060:B:1 (back): When Revealed: Each player searches the encounter deck and discard pile for 1 different Dunland enemy and adds it to the staging area. Shuffle the encounter deck.
+  07060:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one Dunland enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
+    - shuffle the encounter deck
+
+07060:B:2 (back): Time 2.
+  07060:constant:1: Constant
+    - Time 2: when this card is revealed, 2 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+07060:B:3 (back): Forced: After the last time counter is removed from this stage, each player assigns X damage among characters he controls where X is the number of cards in his hand. Place 2 time counters on this stage.
+  07060:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player assigns the cards in your hand damage among the character (you control), one at a time
+    - place 2 resource tokens on this card
+
+## 07061 Hold the Fords
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+07061:A:1 (front): When Revealed: Each player searches the encounter deck and discard pile for a different Dunland enemy and adds it to the staging area. Shuffle the encounter deck.
+  07061:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one Dunland enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
+    - shuffle the encounter deck
+
+07061:B:1 (back): Time 3.
+  07061:constant:1: Constant
+    - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+07061:B:2 (back): Forced: After the last time counter is removed from this stage, discard the top X cards of the encounter deck. X is the number of cards in the first player's hand. Add each enemy discarded this way to the staging area. Put 3 time counters on this stage.
+  07061:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the rest of the effect is carried out by the first player
+    - discard the cards in your hand card(s) from the top of the encounter deck
+    - add the discarded enemies to the staging area
+    - place 3 resource tokens on this card
+
+07061:B:3 (back): While there is at least 1 enemy in play, the players cannot defeat this stage. If the players defeat this stage, they win the game.
+  07061:constant:2: Constant
+    only if there is enemy in play (in the staging area or engaged)
+    - the players cannot defeat this stage while this holds
+  07061:questResolution:1: Quest resolution
+    - the players win the game
+
+(rendered pieces: 167 by template, 0 as JSON)

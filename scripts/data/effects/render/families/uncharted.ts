@@ -7,7 +7,7 @@ const SUBJECT: Readonly<Record<string, string>> = { self: "this card", picked: "
 const subject = (value: unknown): string => SUBJECT[str(value ?? "self")] ?? str(value);
 
 export const UNCHARTED_TEMPLATES: Templates = {
-  AttachSetAsideTo: (i) => ({ text: `Campaign Setup: the set-aside copy of the card with code ${str(i.code)} is attached to the card in play named "${str(i.to)}" (a card dealt on its Upgraded side stays so)${i.uncontrolled === true ? "; it lies attached, controlled by nobody, not revealed, wherever its host lies, and in no play area" : ""}`, read: ["code", "to", "uncontrolled"] }),
+  AttachSetAsideTo: (i) => ({ text: `Campaign Setup: the set-aside copy of the card with code ${str(i.code)} is attached to the card in play named "${str(i.to)}" (a card dealt on its Upgraded side stays so)${i.uncontrolled === true ? "; it lies attached, controlled by nobody, not revealed, wherever its host lies, and in no play area" : ""}${i.claimed === true ? "; it is a claimed objective, so a host that leaves play lets it go back to the staging area when its text says so" : ""}`, read: ["code", "to", "uncontrolled", "claimed"] }),
   LookAtFacedown: (i) => ({ text: `the acting player looks at the facedown side of ${subject(i.target)}${typeof i.remove === "number" ? `, after ${i.remove} progress is taken off it` : ""} in a look window (it stays facedown and none of the Forced effects of its other side happen)`, read: ["target", "remove"] }),
   FlipUncharted: (i) => ({ text: `${subject(i.target)} turns to its other side and loses all its progress; it is announced as flipped over, which "After this card is flipped over while active" Forced effects hear`, read: ["target"] }),
   FlipDoubleSided: (i) => ({ text: `${subject(i.target)}, a double-sided location whose two sides are two cards, shows its other side${i.keepProgress === true ? " and keeps its progress" : " and loses all its progress"}; the flip is announced like FlipUncharted's (nothing while the table holds noFlipActive and the card is the active location)`, read: ["target", "keepProgress"] }),
@@ -36,7 +36,7 @@ export const UNCHARTED_TEMPLATES: Templates = {
 };
 
 export const UNCHARTED_SAMPLES: Samples = {
-  AttachSetAsideTo: [{ verb: "AttachSetAsideTo", code: "11192", to: "Raider Flagship", uncontrolled: true }],
+  AttachSetAsideTo: [{ verb: "AttachSetAsideTo", code: "11192", to: "Raider Flagship", uncontrolled: true }, { verb: "AttachSetAsideTo", code: "07016", to: "The Islet", uncontrolled: true, claimed: true }],
   LookAtFacedown: [{ verb: "LookAtFacedown", target: "picked", remove: 4 }],
   FlipUncharted: [{ verb: "FlipUncharted", target: "subject" }],
   FlipDoubleSided: [{ verb: "FlipDoubleSided", target: "picked", keepProgress: true }],

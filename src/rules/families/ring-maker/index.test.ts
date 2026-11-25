@@ -141,6 +141,45 @@ describe("Gríma lying on The Islet (07059:A:1, 07016:A:1)", () => {
   });
 });
 
+describe("the players cannot advance without Gríma (07059:B:3)", () => {
+  it("07059:B:3 a full stage waits while Gríma lies on The Islet and advances once the first player gains him", () => {
+    const t = table({ stage: STAGE_1, staging: [ISLET], setAside: [GRIMA], progress: 99 });
+    const lying = run(t, t.state, { verb: "AttachSetAsideTo", code: GRIMA, to: "The Islet", uncontrolled: true, claimed: true });
+    const stage = lying.questStage ?? "";
+    const waiting = settle({ ...lying, window: null, mode: "stopped" }, t.ctx, []);
+    expect(waiting.questStage).toBe(stage);
+    const freed = destroyCard(waiting, idOf(waiting, ISLET), t.ctx.cards, [], { explored: true });
+    const done = settle({ ...freed, window: null, mode: "stopped" }, t.ctx, []);
+    expect(done.cards[idOf(done, GRIMA)]).toMatchObject({ zone: "play", controller: 0 });
+    expect(done.questStage).not.toBe(stage);
+  });
+});
+
+describe("Gríma leaves play (07016:A:3)", () => {
+  const held = () => {
+    const t = table({ seats: 2, staging: [ISLET], setAside: [GRIMA] });
+    const lying = run(t, t.state, { verb: "AttachSetAsideTo", code: GRIMA, to: "The Islet", uncontrolled: true, claimed: true });
+    const freed = settle({ ...destroyCard(lying, idOf(lying, ISLET), t.ctx.cards, [], { explored: true }), window: null, mode: "stopped" }, t.ctx, []);
+    return { t, state: freed };
+  };
+
+  it("07016:A:3 a first player who is eliminated while he holds Gríma loses the game for everyone", () => {
+    const { t, state } = held();
+    expect(state.cards[idOf(state, GRIMA)]?.controller).toBe(0);
+    const out = { ...state, seats: state.seats.map((seat, index) => (index === 0 ? { ...seat, eliminated: true } : seat)) } as ScenarioState;
+    const done = settle({ ...out, window: null, mode: "stopped" }, t.ctx, []);
+    expect(done.lost).toBe(true);
+  });
+
+  it("07059:B:2 Gríma discarded by the stage loses the game, held or lying on The Islet", () => {
+    const { t, state } = held();
+    expect(run(t, state, { verb: "DiscardNamedFromPlay", name: "Gríma" }).lost).toBe(true);
+    const lying = table({ staging: [ISLET], setAside: [GRIMA] });
+    const on = run(lying, lying.state, { verb: "AttachSetAsideTo", code: GRIMA, to: "The Islet", uncontrolled: true, claimed: true });
+    expect(run(lying, on, { verb: "DiscardNamedFromPlay", name: "Gríma" }).lost).toBe(true);
+  });
+});
+
 describe("noCardResources on the table (07018:A:1)", () => {
   it("07018:A:1 no hero gains resources from a card while Fords of Isen is in the staging area, and the collection has no card", () => {
     const t = table({ staging: ["07018"] });
