@@ -4,16 +4,16 @@ import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/ru
 import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenarios.ts";
 import type { PolicyOptions } from "../../harness/auto-player.ts";
 import { fillerLoadout, HERO_STATS, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
-import { chooseFirstOrLast, policyIntent, type Policy } from "../../harness/policy-kit.ts";
+import { archeryLeastDamaged, attackAllTogether, chooseFirstOrLast, commitAllBut, policyIntent, undefendedLeastDamaged, type Policy } from "../../harness/policy-kit.ts";
 
 const cycle = loadCampaign("haradrim");
 const umbar = loadAnyScenario("escape-from-umbar");
 
 // Test helper. A whole standalone game of Escape from Umbar played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. TODO: say how the players travel, engage and answer the choices this scenario asks.
+// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. The players commit every hero but one to the quest (the one that stays home attacks), nobody defends (the hero with the least damage takes an attack), the first Distribute puts all the archery damage on the least damaged character, the heroes attack together every enemy they reach (stage 1B and 2B cannot be defeated while a player is engaged) and every choice takes its first option.
 export const UMBAR_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
-// "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
-export type UmbarDecks = "strong" | "weak" | "brittle";
+// "strong": big-number heroes that win; "weak": heroes too small to quest, so the main quest has no progress; "brittle": strong questers that die to an attack; "tense": strong heroes that start at a threat of 14 each, so the threat reaches 50.
+export type UmbarDecks = "strong" | "weak" | "brittle" | "tense";
 
 export const umbarLoadout = fillerLoadout;
 
@@ -42,8 +42,13 @@ export const DEFAULT_POLICY: UmbarPolicy = { choose: "first" };
 //   engageUpTo(most, options)  the optional engagement step: engage the enemy of the lowest `rank` (`allow` permits) while engaged with fewer than `most`
 //   triggerActions(effectIds, oncePerRound)  an Action or Response of the records named, each time (or once a round) the engine offers it and the seat can pay
 //   passCommitWhile(when)  the quest commit: pass without committing while `when` holds
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go in the list, before the auto-player's.
-const rules = (policy: UmbarPolicy): Policy => [chooseFirstOrLast(policy.choose)];
+const rules = (policy: UmbarPolicy): Policy => [
+  chooseFirstOrLast(policy.choose),
+  commitAllBut(1),
+  archeryLeastDamaged(),
+  undefendedLeastDamaged(),
+  attackAllTogether(),
+];
 
 // Every intent is one the reducer listed.
 export function umbarIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: UmbarPolicy = DEFAULT_POLICY): PlayerIntent {
@@ -55,14 +60,24 @@ export type UmbarGame = PlayedGame;
 // The goldens (src/campaign/scenarios/escape-from-umbar/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type UmbarGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: UmbarDecks; outcome: "won" | "lost"; policy?: Partial<UmbarPolicy>; lossReason?: string };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Nightmare) and a few losses (each way the scenario can be lost), each on a fixed seed.
-export const UMBAR_GOLDENS: readonly UmbarGolden[] = [];
+// The games to pin (about 1000 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and Easy, and each way to lose: "Seize Them!" (no progress on the main quest at the end of a round it was in play for the whole of: round 1 with
+// heroes too weak to quest, or a long game in which the enemies' attacks take every progress off), every player's threat at 50 (heroes that start at a threat of 14) and every hero destroyed (heroes too brittle for the Sentries).
+export const UMBAR_GOLDENS: readonly UmbarGolden[] = [
+  { name: "true solo, won, Normal", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed, won, Normal", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, won, Easy", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "two-handed, won, Easy", seatCount: 2, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "true solo, lost, Seize Them! in round 1", seatCount: 1, seed: 8, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "The main quest held no progress" },
+  { name: "true solo, lost, Seize Them! after a long game", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "The main quest held no progress" },
+  { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 2, difficulty: "Normal", decks: "tense", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed, lost, threat reaches 50", seatCount: 2, seed: 1, difficulty: "Normal", decks: "tense", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed, lost, every hero destroyed", seatCount: 2, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+];
 
 const game = standaloneGame<UmbarDecks, UmbarPolicy>({
   campaign: cycle,
   scenario: umbar,
   stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles and its Nightmare deck.
   codes: [...umbar.cards.map((card) => card.code)],
   intent: umbarIntent,
   policy: DEFAULT_POLICY,
