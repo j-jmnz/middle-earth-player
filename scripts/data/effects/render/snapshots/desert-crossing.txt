@@ -266,10 +266,6 @@ Scenario piles that place cards with no record (quest: 16068 The Desert of Harad
 
 16068:A:1 (front): Setup: Each player searches the encounter deck for a copy of Burnt Sands and adds it to the staging area. Shuffle the encounter deck. Place the heat tracker next to the quest deck and set the temperature to 10.
   16068:setup:1: Setup
-    (steps run in order; a step depends on an earlier one only through its own condition)
-    - for each player, first player first:
-      - the acting player finds one card with code 16025 in the encounter deck and adds it to the staging area (it is not revealed)
-    - shuffle the encounter deck
     - place the heat tracker next to the quest deck and set the temperature to 10 (no "temperature changed" event)
 
 16068:B:1 (back): Forced: After an ally enters play, either exhaust it, or deal 1 damage to it.
@@ -346,4 +342,4 @@ Scenario piles that place cards with no record (quest: 16068 The Desert of Harad
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - if the temperature is at least 60 (false while no heat tracker is set): the players lose the game (The temperature reached 60)
 
-(rendered pieces: 211 by template, 0 as JSON)
+(rendered pieces: 208 by template, 0 as JSON)

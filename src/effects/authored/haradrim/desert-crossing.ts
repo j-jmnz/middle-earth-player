@@ -23,13 +23,13 @@ const EXHAUST_A_CHARACTER: Instruction = { verb: "ForEachPlayer", order: "firstF
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   [
-    // 16068 The Desert of Harad. Setup: each player adds one Burnt Sands from the encounter deck to the staging area (the deck alone: the discard pile is empty), the deck is shuffled, the heat tracker is set to 10.
+    // 16068 The Desert of Harad. Setup: each player adds one Burnt Sands from the encounter deck to the staging area (the scenario's staging pile, perPlayer 1, in data/scenarios/desert-crossing.json, places them), the heat tracker is set to 10.
     {
       id: "16068:setup:1",
       cardCode: "16068",
       lines: ["16068:A:1"],
       timing: "setup",
-      instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "SearchMove", code: "16025", to: "staging", deckOnly: true }] }, { verb: "ShuffleEncounterDeck" }, { verb: "SetTemperature", value: 10 }],
+      instructions: [{ verb: "SetTemperature", value: 10 }],
     },
     // 16068:B:1: after an ally of any player enters play, its controller chooses: exhaust it, or deal 1 damage to it (10078:A:1's form).
     {

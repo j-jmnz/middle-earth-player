@@ -5,13 +5,14 @@ import { z } from "zod";
 import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 const VERBS = [
   // "Place it faceup under this location. While an enemy is under this location, that enemy is considered to be out of play" (16016:A:1): the last picked card leaves play and lies under the source location faceup (PlaceUnderSelf
   // places it facedown); what it had in play is lost and `placedUnder` is queued about it. A card not in play, or no source, changes nothing.
   z.strictObject({ verb: z.literal("PlaceUnderSelfFaceup"), ...when }),
   // "Place the heat tracker next to the quest deck and set the temperature to 10" (16068:A:1): the tracker starts at this value (no event).
-  z.strictObject({ verb: z.literal("SetTemperature"), value: z.number().int().min(0), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("SetTemperature"), value: z.number().int().min(0), ...when }), { setupRuns: "top" }),
   // "Increase the temperature by 4" (16068:B:2), or by a read amount. Does nothing while no tracker is set; a change queues `temperatureChanged`.
   z.strictObject({ verb: z.literal("RaiseTemperature"), amount: positiveAmountSchema, ...when }),
   // "Reduce the temperature by 10" (16023:A:3): never below 0. Does nothing while no tracker is set; a change queues `temperatureChanged`.
