@@ -4,7 +4,9 @@
 import { describe, expect, it } from "vitest";
 
 import { reduce } from "../../../engine/reduce.ts";
+import { patchTop, pushFrame } from "../../../windows/windows.ts";
 import { expectOk } from "../../../core/test-fixture.ts";
+import { idOf } from "../../../../../test/harness/scene-kit.ts";
 import { CODES, opened, table, tokens } from "../../../../../test/scenarios/the-morgul-vale/table.ts";
 import { inOwnSurgeChain } from "../surge-chain.ts";
 
@@ -39,10 +41,22 @@ describe("a surge chain in The Morgul Vale", () => {
     expect(revealed.state.lossReason).toMatch(/10 progress tokens/);
   });
 
-  it("answers false for Terror Drives Them in the discard pile whatever else is there, and for a card the chain has not opened", () => {
-    const { t, start } = quest([], [terror]);
+  // The reveal of the card is past its staging and still open, as inside a surge chain.
+  const inside = (code: string) => {
+    const { t, start } = quest([], [code]);
+    const id = idOf(start.state, code);
+    return { t, state: patchTop(pushFrame(start.state, { frame: "reveal", cardId: id, seat: 0, peril: false, data: { kind: "reveal", hide: null, surge: false } }, []), { step: 6 }) };
+  };
+
+  it("answers true for a Dead City Looms whose reveal is open, and false for Terror Drives Them in the same place: its chain changes the game and runs by the rules (06159:A:2)", () => {
+    const idle = inside(deadCity);
+    expect(inOwnSurgeChain(idle.state, idle.t.ctx)).toBe(true);
+    const placing = inside(terror);
+    expect(inOwnSurgeChain(placing.state, placing.t.ctx)).toBe(false);
+  });
+
+  it("answers false for a card the chain has not opened", () => {
+    const { t, start } = quest([], [deadCity]);
     expect(inOwnSurgeChain(start.state, t.ctx)).toBe(false);
-    const idle = quest([], [deadCity]);
-    expect(inOwnSurgeChain(idle.start.state, idle.t.ctx)).toBe(false);
   });
 });

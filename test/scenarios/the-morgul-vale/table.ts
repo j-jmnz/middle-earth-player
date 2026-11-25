@@ -1,16 +1,12 @@
-// Test helpers for the Morgul Vale tests (src/rules/families/pelargir/vale/verbs.test.ts, vale/combat.test.ts): a table of the scenario, an instruction run on it, the quest and attack windows answered.
-import type { Effect, Instruction } from "../../../src/catalog/boundary.ts";
-import type { EngineStep } from "../../../src/rules/core/intents.ts";
+// Test helpers for the Morgul Vale tests (src/rules/families/pelargir/vale/, src/campaign/scenarios/the-morgul-vale/, src/play/scenarios/the-morgul-vale-table.test.ts): a table of the scenario, an instruction run on it, the quest and attack windows answered. The run, the lookups and the passing intents are the scene kit's (test/harness/scene-kit.ts).
+import type { Effect } from "../../../src/catalog/boundary.ts";
 import type { ScenarioState } from "../../../src/rules/core/state.ts";
 import type { PlayerIntent } from "../../../src/rules/engine/reduce.ts";
-import { settle } from "../../../src/rules/engine/machine.ts";
-import { syncConstants } from "../../../src/rules/interpret/constants.ts";
-import { runInstruction } from "../../../src/rules/interpret/interpret.ts";
 import { playCost } from "../../../src/rules/player/attach.ts";
 import { paymentsFor } from "../../harness/auto-player.ts";
 import { sendUnledgered } from "../../harness/player-table.ts";
 
-import { idOf, legalIntents, send, start as begin, tableFromLayout, type Layout, type LayoutTable, type Run } from "../../harness/scene-kit.ts";
+import { engagedCodes, idOf, legalIntents, opened, PASSING, run, send, tableFromLayout, where, type Layout, type LayoutTable, type Run } from "../../harness/scene-kit.ts";
 
 export const SCENARIO = "the-morgul-vale";
 export const CODES = {
@@ -38,27 +34,10 @@ export const CODES = {
 export const table = (layout: Layout, effects?: readonly Effect[], extra?: readonly string[]): LayoutTable =>
   tableFromLayout(SCENARIO, { ...layout, stage: layout.stage ?? CODES.rearguard }, { ...(effects ? { effects } : {}), ...(extra ? { extra } : {}) });
 
-/** The run of a table's state, constants synced. */
-export const opened = (made: LayoutTable, state: ScenarioState = made.state): Run => begin(syncConstants(state, made.ctx));
-
-/** The state after one instruction ran for a seat and the table settled (the round is stopped while it runs, so only what it does is read). */
-export function run(made: LayoutTable, state: ScenarioState, instruction: Instruction, options: { seat?: number; sourceId?: string | null; steps?: EngineStep[] } = {}): ScenarioState {
-  const steps = options.steps ?? [];
-  const done = settle(runInstruction({ ...state, window: null, mode: "stopped" }, instruction, { seat: options.seat ?? 0, sourceId: options.sourceId ?? null }, made.ctx, steps), made.ctx, steps);
-  return done.window != null || done.stack.length > 0 ? done : { ...done, mode: state.mode, window: state.window, activeSeat: state.activeSeat };
-}
-
-/** The zone of the first card with this code. */
-export const where = (state: ScenarioState, code: string): string | undefined => state.cards[idOf(state, code)]?.zone;
+export { engagedCodes, opened, run, where };
 
 /** The progress tokens on the card with this code. */
 export const tokens = (state: ScenarioState, code: string = CODES.tower): number => state.cards[idOf(state, code)]?.progress ?? 0;
-
-/** The codes of the cards engaged with a seat, in engagement order. */
-export const engagedCodes = (state: ScenarioState, seat = 0): string[] => (state.seats[seat]?.engaged ?? []).map((id) => state.cards[id]?.code ?? "");
-
-// The intents that let a window go by without a decision.
-const PASSING: readonly PlayerIntent["type"][] = ["Pass", "DeclineTravel", "DeclineEngage", "DeclineAttack"];
 
 /**
  * An attack is fought out: a defense window names the hero `heroCode` (the first hero of the player attacked by default) as the one that takes an undefended attack, or declares `defender` when given; a choice takes the option `choose` names (the first by default); every

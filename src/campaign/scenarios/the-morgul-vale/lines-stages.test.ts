@@ -9,12 +9,14 @@ import { noTargetReason } from "../../../rules/player/potential.ts";
 import { dealAdditionalShadow } from "../../../rules/interpret/interpret.ts";
 import { idOf, resolveRecords } from "../../../../test/harness/scene-kit.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
-import { CODES, engagedCodes, fight, opened, run, table, where } from "../../../../test/scenarios/the-morgul-vale/table.ts";
+import { CODES, engagedCodes, fight, opened, playCard, run, table, where } from "../../../../test/scenarios/the-morgul-vale/table.ts";
 
 const { rearguard, betrayal, rider, tower, bodyguard, tracker, murzag, alcaron, nazgul, bridge, vale } = CODES;
 const LIE_LOW = "10081";
 const FORD = "141059";
 const SNARE = "01069";
+const INFIGHTING = "02058";
+const DENETHOR = "01010";
 const damage = (made: ReturnType<typeof table>, state: ReturnType<typeof table>["state"], code: string, amount: number) => run(made, state, { verb: "DamageCard", amount, target: "self" }, { sourceId: idOf(state, code) });
 
 lineSpec("06144:B:1", "Murzag cannot leave play unless destroyed: a shuffle into the deck takes only the other enemy, Ford of Bruinen discards the Tracker and keeps him engaged, and the ability with no other target is not offered", (effects) => {
@@ -129,12 +131,18 @@ lineSpec("06153:A:1", "the Nazgûl cannot have attachments: a Forest Snare can b
   expect(hosts).not.toContain(idOf(t.state, nazgul));
 });
 
-lineSpec("06153:A:2", "each damage instance dealt to the Nazgûl is reduced to 1, whatever its source, with no limit for each round: six separate damage in one round give 6 damage on a card with hit points beyond that", (effects) => {
+lineSpec("06153:A:2", "each damage instance dealt to the Nazgûl is reduced to 1, whatever its source, with no limit for each round: several separate damage instances each add 1, and damage moved onto him by Infighting is cut to 1 as well", (effects) => {
   const t = table({ stage: rider, staging: [tower], engaged: [nazgul] }, effects);
-  const first = damage(t, t.state, nazgul, 3);
-  expect(first.cards[idOf(first, nazgul)]?.damage).toBe(1);
-  const second = damage(t, first, nazgul, 2);
-  expect(second.cards[idOf(second, nazgul)]?.damage).toBe(2);
-  const moved = run(t, second, { verb: "DamageCard", amount: 1, target: "self" }, { sourceId: idOf(second, nazgul) });
-  expect(moved.cards[idOf(moved, nazgul)]?.damage).toBe(3);
+  let state = t.state;
+  [3, 2, 6, 4].forEach((amount, index) => {
+    state = damage(t, state, nazgul, amount);
+    expect(state.cards[idOf(state, nazgul)]?.damage).toBe(index + 1);
+  });
+  expect(state.stageCleared).toBe(false);
+  const moved = table({ stage: rider, engaged: [nazgul, { code: tracker, damage: 2 }], staging: [tower], hand: [INFIGHTING], heroes: [{ code: DENETHOR, resources: 3 }] }, effects, [INFIGHTING, DENETHOR]);
+  const trackerId = idOf(moved.state, tracker);
+  const nazgulId = idOf(moved.state, nazgul);
+  const played = playCard(moved, opened(moved), INFIGHTING, (window) => (window.window?.kind === "choose" ? (window.window.options.includes(trackerId) ? trackerId : window.window.options.includes(nazgulId) ? nazgulId : (window.window.options.at(-1) ?? "")) : ""));
+  expect(played.state.cards[nazgulId]?.damage).toBe(1);
+  expect(played.state.cards[trackerId]?.damage).toBe(0);
 });

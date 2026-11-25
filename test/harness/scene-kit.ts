@@ -1,4 +1,4 @@
-import type { Effect } from "../../src/catalog/boundary.ts";
+import type { Effect, Instruction } from "../../src/catalog/boundary.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import type { EngineStep } from "../../src/rules/core/intents.ts";
 import { definePrinted, type PrintedCard } from "../../src/rules/core/printed.ts";
@@ -10,6 +10,7 @@ import { settle } from "../../src/rules/engine/machine.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 import { syncConstants } from "../../src/rules/interpret/constants.ts";
 import { pushCardEffects } from "../../src/rules/interpret/effect-frames.ts";
+import { runInstruction } from "../../src/rules/interpret/interpret.ts";
 
 import { causeProblems } from "./cause-check.ts";
 import { begin, send, type Run } from "./scene.ts";
@@ -55,6 +56,25 @@ export function codesIn(state: ScenarioState, zone: string): string[] {
 }
 
 /** A card of the staging area or another zone: a code, or a code with its tokens. */
+/** The zone of the first card with this code (a card the table does not have has none). */
+export const where = (state: ScenarioState, code: string): string | undefined => state.cards[idOf(state, code)]?.zone;
+
+/** The codes of the cards engaged with a seat (the first seat by default), in engagement order. */
+export const engagedCodes = (state: ScenarioState, seat = 0): string[] => (state.seats[seat]?.engaged ?? []).map((id) => state.cards[id]?.code ?? "");
+
+/** The run of a table's state, constants synced. */
+export const opened = (made: { state: ScenarioState; ctx: ReduceContext }, state: ScenarioState = made.state): Run => begin(syncConstants(state, made.ctx));
+
+/** The state after one instruction ran for a seat (the window cleared first) and the table settled. The round is stopped while the instruction runs, so only what it does is read; the table is given back as it was unless the instruction opened a window of its own. */
+export function run(made: { ctx: ReduceContext }, state: ScenarioState, instruction: Instruction, options: { seat?: number; sourceId?: string | null; steps?: EngineStep[] } = {}): ScenarioState {
+  const steps = options.steps ?? [];
+  const done = settle(runInstruction({ ...state, window: null, mode: "stopped" }, instruction, { seat: options.seat ?? 0, sourceId: options.sourceId ?? null }, made.ctx, steps), made.ctx, steps);
+  return done.window != null || done.stack.length > 0 ? done : { ...done, mode: state.mode, window: state.window, activeSeat: state.activeSeat };
+}
+
+/** The intents that let a window go by without a decision: pass, decline to travel, engage nobody, attack nobody. */
+export const PASSING: readonly PlayerIntent["type"][] = ["Pass", "DeclineTravel", "DeclineEngage", "DeclineAttack"];
+
 export type Entry = string | { code: string; damage?: number; resources?: number; progress?: number; upgraded?: true };
 // `upgraded`: a ship-objective shows its Upgraded side, side B (The Hunt for the Dreadnaught's ships).
 export const entry = (item: Entry): { code: string; damage: number; resources: number; progress: number; upgraded: boolean } => (typeof item === "string" ? { code: item, damage: 0, resources: 0, progress: 0, upgraded: false } : { code: item.code, damage: item.damage ?? 0, resources: item.resources ?? 0, progress: item.progress ?? 0, upgraded: item.upgraded === true });
