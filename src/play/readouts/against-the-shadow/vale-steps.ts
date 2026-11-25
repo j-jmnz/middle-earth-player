@@ -13,6 +13,12 @@ const NAZGUL = "06153";
 const MURZAG = "06151";
 const VALE = "06155";
 const CAPTAINS: ReadonlySet<string> = new Set([MURZAG, "06152", NAZGUL]);
+// The shadow cards whose record returns the attacker after the attack (06154:A:2 Morgul Road, 06158:A:3 Sleepless Malice), and Morgul Vale's Forced return at the end of the round (06155:A:1): the record and the printed line each step names as its cause.
+const RETURNING: Readonly<Record<string, { effect: string; line: string }>> = {
+  "06154": { effect: "06154:shadow:1", line: "06154:A:2" },
+  "06158": { effect: "06158:shadow:1", line: "06158:A:3" },
+};
+const VALE_RETURN = { effect: "06155:forced:1", line: "06155:A:1" };
 
 /** What a step carries: the tokens on To the Tower after it, the Captain a Bodyguard took damage for, or that the Nazgûl's cut reduced the damage. */
 // `by`: Murzag, whose Forced effect revealed the card or engaged the enemy; `who`: the player whose choice placed the tokens (two players only); `returns`: an enemy went back to the staging area with no step of the engine, by the shadow card `via` or by the Forced effect of the card `via`; `quiet`: a damage step of 0 the Nazgûl's cut left, which the strike's "No damage" already says.
@@ -29,6 +35,9 @@ export function stampVale(steps: readonly EngineStep[], before: ScenarioState, a
   let murzag: string | null = before.pendingAttack != null && before.cards[before.pendingAttack.enemyId]?.code === MURZAG ? before.pendingAttack.enemyId : null;
   let revealed = false;
   let changed = false;
+  // The effect record the open choice window belongs to.
+  const frame = before.window?.kind === "choose" ? before.stack[before.stack.length - 1]?.data : undefined;
+  const asked = frame?.kind === "effect" ? frame.effectId : null;
   const stamped = steps.map((step): EngineStep => {
     if (step.kind === "strike" && step.side === "player") strike = step;
     if (step.kind === "attack" && step.side === "enemy") {
@@ -54,8 +63,8 @@ export function stampVale(steps: readonly EngineStep[], before: ScenarioState, a
     if (step.kind === "progress" && tower && step.targetId === tower.id) {
       now = Math.max(0, now + step.amount);
       changed = true;
-      // The tokens a player's own choice placed name the player (a choice window of a seat was open when the intent began).
-      const chose = before.window?.kind === "choose" && before.seatCount > 1 && step.amount > 0 ? { who: before.window.seat } : {};
+      // The tokens a player's own choice placed name the player: a choice window of a seat was open when the intent began, and this step is the effect record that window belongs to placing them (not another card's token in the same intent).
+      const chose = before.window?.kind === "choose" && before.seatCount > 1 && step.amount > 0 && "effect" in step.cause && step.cause.effect === asked ? { who: before.window.seat } : {};
       return { ...step, vale: { tower: now, ...chose } } as ValeStep;
     }
     if (step.kind === "damage" && strike && step.amount === 0 && before.cards[step.targetId]?.code === NAZGUL && strike.targetId === step.targetId) {
@@ -90,9 +99,14 @@ function returnedSteps(steps: readonly EngineStep[], before: ScenarioState, afte
     if (card.zone !== "engaged" || after.cards[id]?.zone !== "staging") continue;
     const attacked = before.pendingAttack?.enemyId === id || steps.some((step) => step.kind === "attack" && step.side === "enemy" && step.enemyId === id);
     const roundEnd = before.phase === "End of round" || before.phase === "Beginning of round";
-    const via = attacked ? card.shadowId : !roundEnd ? undefined : Object.values(after.cards).find((other) => other.code === VALE && (other.zone === "staging" || other.zone === "engaged"))?.id;
+    // The card that returned it: the shadow card among its own whose record returns the attacker, or Morgul Vale at the end of the round.
+    const shadow = attacked ? [card.shadowId, ...(card.extraShadowIds ?? [])].find((shadowId) => shadowId != null && RETURNING[before.cards[shadowId]?.code ?? ""] != null) : undefined;
+    const vale = attacked || !roundEnd ? undefined : Object.values(after.cards).find((other) => other.code === VALE && (other.zone === "staging" || other.zone === "engaged"))?.id;
+    const via = shadow ?? vale;
     if (!via) continue;
-    out.push({ kind: "damage", targetId: id, amount: 0, cause: { rule: "rr.shadow-effects" }, vale: { returns: { via, shadow: attacked } } } as ValeStep);
+    const record = shadow != null ? RETURNING[before.cards[shadow]?.code ?? ""] : VALE_RETURN;
+    if (!record) continue;
+    out.push({ kind: "damage", targetId: id, amount: 0, cause: { effect: record.effect, line: record.line }, vale: { returns: { via, shadow: shadow != null } } } as ValeStep);
   }
   return out;
 }
