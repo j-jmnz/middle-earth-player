@@ -39,6 +39,14 @@ describe("the Esquires", () => {
     expect(offered[0], "hero, second hero and the second seat's hero").toBe(3);
   });
 
+  // The pick is inside a Choose option: a game with 2 seats lists the heroes of both seats with their owner (seatedRows), a game with 1 seat does not.
+  it("145073:A:1 Setup: with 2 seats the pick of the Esquires marks the sheet to name the owner of each hero", () => {
+    const two = tableFromLayout(ID, { seats: 2, setAside: [ROHAN, GONDOR], stage: "145073", side: "A" }, { effects: EFFECTS });
+    expect(two.state.seatedRows).toBe(true);
+    const solo = tableFromLayout(ID, { setAside: [ROHAN, GONDOR], stage: "145073", side: "A" }, { effects: EFFECTS });
+    expect(solo.state.seatedRows).toBeUndefined();
+  });
+
   it("145014:A:3 Setup: Esquire of Rohan is attached to the hero chosen", () => {
     const made = setUp(ROHAN, EFFECTS);
     expect(made.state.cards[idOf(made.state, ROHAN)]?.host).toBe(made.t.hero2);

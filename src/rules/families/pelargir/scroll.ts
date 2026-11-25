@@ -9,7 +9,6 @@ import { lastPicked } from "../../interpret/player-verbs.ts";
 import type { DamageSource } from "../../core/keywords.ts";
 import { printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
-import { effectsOf } from "../../windows/listen.ts";
 import { attachBlocked } from "../../interpret/restrictions.ts";
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, updateCard } from "../../core/state.ts";
@@ -50,15 +49,6 @@ export function attachObjectiveTo(state: ScenarioState, instruction: Verb<"Attac
   const claimed = objective.claimed === true;
   const attached = updateCard(attachTo(moveCard(state, id, { zone: "attached" }), id, target.id), id, { face: "up", controller: null, ...(claimed ? { claimed: true } : {}) });
   return queueEvent(attached, { trigger: "attached", seat: focus.seat, subject: id, other: target.id });
-}
-
-/**
- * Whether this card is an objective on a hero in play that hears the damage an attack dealt to its hero (Alcaron's Scroll, 05019:A:2, rr.forced). The hero is not destroyed until the Forced effect has been heard, so the Scroll attaches to the enemy while the hero and the Scroll
- * are still in play (docs/scenarios/against-the-shadow/peril-in-pelargir.md, Readings, 05019:A:2 timing vs destruction). Read by damageAnswerable (engine/machine.ts), which holds a character's lethal damage.
- */
-export function objectiveHearsHostDamage(state: ScenarioState, card: CardInstance, ctx: ReduceContext): boolean {
-  if (card.host == null || !inPlay(card.zone) || state.cards[card.host]?.zone !== "heroes" || printedOf(ctx.cards, card.code).type !== "objective") return false;
-  return effectsOf(ctx, card.code).some((effect) => effect.trigger === "damagedByAttack");
 }
 
 /**
