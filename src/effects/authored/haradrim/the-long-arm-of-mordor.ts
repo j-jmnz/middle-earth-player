@@ -46,8 +46,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       condition: { kind: "phase", is: "Planning" },
       instructions: [{ verb: "Pick", pick: { type: "hero", control: "any" } }, { verb: "AddResources", amount: 1, to: "picked" }],
     },
-    // "If Kahliel leaves play, you are eliminated from the game" (and its three twins, copied below): the controller of the objective-hero, however it leaves play. It cannot be modified or blanked.
-    { id: "16031:triggered:1", cardCode: "16031", lines: ["16031:A:2"], timing: "triggered", trigger: "leftPlay", subject: "self", eventSeat: "you", instructions: [{ verb: "EliminatePlayer" }] },
+    // "If Kahliel leaves play, you are eliminated from the game" (and its three twins, copied below): the seat that controlled the objective-hero when it left play (the event's seat; the card, out of play, has no controller to compare), however it leaves play. It cannot be modified or blanked.
+    { id: "16031:triggered:1", cardCode: "16031", lines: ["16031:A:2"], timing: "triggered", trigger: "leftPlay", subject: "self", instructions: [{ verb: "EliminatePlayer" }] },
 
     // 16032 Firyal. After she commits to a quest she looks at the top card of the encounter deck, then may discard it (17008:A:1's form).
     {
@@ -264,8 +264,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "whenRevealed",
       instructions: [
         { verb: "Pick", pick: WARG_HOST },
-        { verb: "AttachSelfToPicked", when: { kind: "canPick", pick: WARG_HOST } },
-        { verb: "ReturnToStaging", target: { kind: "picked" }, when: { kind: "canPick", pick: WARG_HOST } },
+        { verb: "AttachEnemyToPicked", when: { kind: "canPick", pick: WARG_HOST } },
+        { verb: "ReturnToStaging", target: { kind: "picked" }, when: { kind: "matches", card: "picked", pick: { type: "enemy", control: "any", staging: true, trait: "Orc", hasAttachment: { names: ["Mordor Warg"] } } } },
+        { verb: "MoveEncounterCard", card: "self", to: "discard", when: { kind: "not", condition: { kind: "matches", card: "picked", pick: { type: "enemy", control: "any", staging: true, trait: "Orc" } } } },
       ],
     },
     {
@@ -278,7 +279,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         ...(["threat", "attack", "defense", "hitPoints"] as const).map((stat): Instruction => ({ verb: "ModifyStat", stat, amount: 2, until: "whileSourceInPlay", target: "host" })),
       ],
     },
-    { id: "16064:forced:1", cardCode: "16064", lines: ["16064:A:1"], timing: "forced", trigger: "hostLeftPlay", instructions: [{ verb: "MoveEncounterCard", card: "self", to: "staging" }] },
 
     // 16065 Fear of Mordor. Each ally in play gets -1 Willpower, Attack and Defense until the end of the round (141071:A:1's form); Shadow: an additional attack when the attacker's Threat is greater than the defending character's Willpower.
     {
