@@ -20,7 +20,7 @@ export const STRIP = 15;
 export function underMarkBox(rect: Rect, wordWidth: number, countWidth: number, s: number, counted: boolean, atEnd = false, strip = false): UnderBox {
   const token = TOKEN * s;
   const room = rect.w - 4 * s;
-  const top = rect.y + rect.h - token - FOOT_ROW * s - (counted || strip ? token + 2 * s : 0);
+  const top = rect.y + underMarkTop(rect.h, s, counted, strip);
   const words = wordWidth + 10 * s;
   const glyph = 7 * s + 2 * s + countWidth + 8 * s;
   // A pill with no count (Havens Burn's "2/5", "1 held") keeps its short text inside the card at the foot, as it always did.
@@ -31,6 +31,11 @@ export function underMarkBox(rect: Rect, wordWidth: number, countWidth: number, 
   const kind = !atEnd && words <= room ? "words" : glyph <= room ? "count" : "number";
   const width = kind === "words" ? words : kind === "count" ? glyph : Math.min(room, countWidth + 10 * s);
   return { kind, x: atEnd ? rect.x + rect.w - width - 2 * s : rect.x + (rect.w - width) / 2, y: top, width, height: token };
+}
+
+/** How far below the card's top edge the pill's top stands on a rect `height` tall (`underMarkBox` and `footStop` in badge-room.ts read it): the foot row, or one row up when the pill counts something or the card wears a number at its foot. */
+export function underMarkTop(height: number, s: number, counted: boolean, strip: boolean): number {
+  return height - TOKEN * s - FOOT_ROW * s - (counted || strip ? TOKEN * s + 2 * s : 0);
 }
 
 /** The card's box for the pill of a card in the hand: the strip that shows above the bottom edge at rest, so the pill stands at its foot and is not drawn below the screen. Any other zone keeps the whole card. */

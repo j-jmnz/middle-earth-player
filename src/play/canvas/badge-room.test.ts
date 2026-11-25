@@ -1,7 +1,9 @@
 // Rules: docs/design-system-table.md (Tokens and effects). The count of effect pills hidden behind the "N more" pill, which badgeReach keeps a word pill clear of.
 import { describe, expect, it } from "vitest";
 
-import { BADGE_TOP, badgeRoom, hiddenBadges } from "./badge-room.ts";
+import { BADGE_TOP, BADGE_TOP_SHORT, badgeLayout, badgeRoom, badgeShown, footStop, hiddenBadges, type FootMarks } from "./badge-room.ts";
+import { TOKEN } from "./token-spots.ts";
+import { underMarkBox } from "./under-mark.ts";
 
 const PILL = 15;
 
@@ -19,11 +21,104 @@ describe("hiddenBadges", () => {
     expect(hiddenBadges(0, 48, 1, PILL)).toBe(0);
   });
 
-  it("the first row stands below the title band, and the room counts only the rows under it", () => {
+  it("the first row stands below the title band on a card that holds two rows there, and the room counts only the rows under it", () => {
     expect(BADGE_TOP).toBeGreaterThanOrEqual(16);
-    // A card 84 pt tall: the band and the resource token leave 48 pt, two rows of 17 (the gap after the last row is not needed); one that is 70 pt tall still holds two.
+    expect(badgeLayout(70, 1, PILL).top).toBe(BADGE_TOP);
     expect(badgeRoom(70, 1, PILL)).toBe(2);
     expect(badgeRoom(84, 1, PILL)).toBe(2);
     expect(badgeRoom(84 + 17, 1, PILL)).toBe(3);
+  });
+
+  it("a short card keeps its rows from the top edge: the phone's 62 pt card holds two, a 44 pt band one", () => {
+    expect(badgeLayout(62, 1, PILL)).toEqual({ top: BADGE_TOP_SHORT, rows: 2 });
+    expect(badgeLayout(44, 1, PILL)).toEqual({ top: BADGE_TOP_SHORT, rows: 1 });
+    expect(badgeRoom(53, 1, PILL)).toBe(1);
+  });
+
+  it("a card with no room for a row above the resource token draws no pill, and none hides behind a \"more\" pill", () => {
+    expect(badgeRoom(34, 1, PILL)).toBe(0);
+    expect(badgeShown(2, 0)).toEqual({ shown: 0, hidden: 0 });
+    expect(hiddenBadges(2, 34, 1, PILL)).toBe(0);
+  });
+});
+
+// A box on the card, in points from its top edge.
+type Box = { name: string; x: number; y: number; w: number; h: number };
+const overlap = (a: Box, b: Box) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+
+const SCALES = [0.85, 1, 1.25, 1.5];
+const HEIGHTS = [34, 44, 53, 62, 70, 84, 101];
+const HELD: { name: string; marks: (h: number) => FootMarks; counted: boolean; strip: boolean; none?: true }[] = [
+  { name: "no held pill", marks: () => ({ under: null, lifted: false, plain: false }), counted: false, strip: false, none: true },
+  { name: "held pill", marks: (h) => ({ under: { height: h, counted: false, strip: false }, lifted: false, plain: false }), counted: false, strip: false },
+  { name: "held pill over a committed hero's number", marks: (h) => ({ under: { height: h, counted: false, strip: true }, lifted: false, plain: false }), counted: false, strip: true },
+  { name: "held pill with a count", marks: (h) => ({ under: { height: h, counted: true, strip: false }, lifted: false, plain: false }), counted: true, strip: false },
+];
+
+// Every box a card's foot and edge draw: the effect rows (and the "more" pill), the resource token, the held pill and the Willpower pill.
+function boxes(h: number, s: number, effects: number, held: (typeof HELD)[number], resources: boolean): Box[] {
+  const w = Math.max(h / 1.4, 44 * s);
+  const pill = PILL * s;
+  // A card with resources lifts its held pill above the token (the table passes `strip`), so the pill never covers the count.
+  const lift = held.strip || resources;
+  const marks = held.marks(h);
+  if (marks.under) marks.under.strip = lift;
+  const stop = footStop(h, s, marks);
+  const { top, rows } = badgeLayout(h, s, pill, stop);
+  const { shown, hidden } = badgeShown(effects, rows);
+  const out: Box[] = [];
+  for (let i = 0; i < shown + (hidden > 0 ? 1 : 0); i++) out.push({ name: `row ${i}`, x: 2 * s, y: top + i * (pill + 2 * s), w: 32 * s, h: pill });
+  if (resources) out.push({ name: "token", x: 0, y: h - (TOKEN + 1) * s, w: (TOKEN + 1) * s, h: (TOKEN + 1) * s });
+  if (marks.under) {
+    const box = underMarkBox({ x: 0, y: 0, w, h }, 40 * s, 6 * s, s, held.counted, false, lift);
+    out.push({ name: "held", x: box.x, y: box.y, w: box.width, h: box.height });
+  }
+  if (held.strip) out.push({ name: "willpower", x: w / 2 - 16 * s, y: h - pill - 3 * s, w: 32 * s, h: pill });
+  return out;
+}
+
+describe("the effect rows, the resource token and the foot pills never overlap", () => {
+  it("holds at every rect height and UI scale, with 0, 1 and 2 effect pills and each held pill", () => {
+    for (const s of SCALES) {
+      for (const h of HEIGHTS) {
+        for (const held of HELD) {
+          for (const effects of [0, 1, 2, 5]) {
+            for (const resources of [true, false]) {
+              const all = boxes(h, s, effects, held, resources);
+              for (const [i, a] of all.entries()) {
+                // The Willpower pill and the resource token share the foot of a narrow card as they always did (the engine's numbers, not the effect column), so that pair is not asked.
+                for (const b of all.slice(i + 1).filter((box) => ![a.name, box.name].every((name) => name === "token" || name === "willpower"))) expect(overlap(a, b), `h ${h} s ${s} ${effects} effects, ${held.name}, resources ${resources}: ${a.name} over ${b.name}`).toBe(false);
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+
+  it("the 62 pt card keeps two effect rows at Medium with no pill at its foot, and one beside a held pill", () => {
+    const none = HELD[0]!;
+    expect(badgeShown(2, badgeRoom(62, 1, PILL, footStop(62, 1, none.marks(62))))).toEqual({ shown: 2, hidden: 0 });
+    for (const held of HELD.slice(1)) {
+      const rows = badgeRoom(62, 1, PILL, footStop(62, 1, held.marks(62)));
+      expect(rows, held.name).toBeGreaterThanOrEqual(1);
+    }
+    // Mugash under a committed hero with one effect pill: the pill and the lifted held pill both stand.
+    expect(badgeShown(1, badgeRoom(62, 1, PILL, footStop(62, 1, HELD[2]!.marks(62)))).shown).toBe(1);
+  });
+
+  it("an exhausted hero's 44 pt rect, a stacked area's 44 pt band and the smallest card keep their one pill off the token, or draw none", () => {
+    for (const h of [34, 44]) {
+      const all = boxes(h, 1, 1, HELD[0]!, true);
+      expect(all.filter((box) => box.name.startsWith("row")).length, `h ${h}`).toBe(h === 44 ? 1 : 0);
+    }
+  });
+
+  it("the foot stop is the highest pill at the foot, and null with none", () => {
+    expect(footStop(100, 1, { under: null, lifted: false, plain: false })).toBeNull();
+    expect(footStop(100, 1, { under: null, lifted: false, plain: true })).toBe(78);
+    expect(footStop(100, 1, { under: null, lifted: true, plain: true })).toBe(58);
+    expect(footStop(100, 1, { under: { height: 100, counted: false, strip: false }, lifted: false, plain: false })).toBe(78);
+    expect(footStop(100, 1, { under: { height: 60, counted: true, strip: false }, lifted: false, plain: false })).toBe(18);
   });
 });

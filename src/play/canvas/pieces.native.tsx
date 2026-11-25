@@ -6,14 +6,14 @@ import { Circle, DashPathEffect, FilterMode, Group, Image, Line, MipmapMode, Pat
 import type { ReactElement } from "react";
 
 import { cardCorner } from "../../ui/card-corner.ts";
-import { badgeSplit, chipText, moreText, MUST_COMMIT_WORD, type CardEffects } from "../cards/card-effects.ts";
+import { chipText, moreText, MUST_COMMIT_WORD, type CardEffects } from "../cards/card-effects.ts";
 import { SPHERE_TINT, type IconName } from "../../ui/icon-map.ts";
 import { ICONS } from "../../ui/icons/generated.ts";
 import type { CardSlot, Rect } from "../layout/layout.ts";
 import { medallionAt } from "../layout/look-strip.ts";
 import { medallionCount } from "../words/scenarios/sea.ts";
 import { stripText } from "./table-canvas-views.ts";
-import { BADGE_TOP, badgeRoom } from "./badge-room.ts";
+import { badgeLayout, badgeShown } from "./badge-room.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 import { wrapName } from "./wrap.ts";
@@ -262,6 +262,7 @@ export function Badges({
   willpower,
   commitStat,
   questPoints,
+  stop,
   owner,
   stageLoses,
   fonts,
@@ -276,6 +277,8 @@ export function Badges({
   willpower: number | null;
   commitStat: "willpower" | "attack" | "defense";
   questPoints: number | null;
+  // How far below the rect's top the highest pill at the foot stands (footStop in badge-room.ts); the rows stop above it.
+  stop: number | null;
   // Whose stage this is ("P2") once stages are separate between players: told on the progress strip.
   owner?: string | null;
   // Filling the stage loses the game (143075:B:3): the strip's numbers are threat red, with the word.
@@ -290,13 +293,13 @@ export function Badges({
   const { x, y, w, h } = rect;
   const pill = BADGE_H * s;
   const strip = 15 * s;
-  // Rows that fit between the title band and the resource token at the bottom left.
-  const room = badgeRoom(h, s, pill);
+  // Rows that fit between the title band (or the top edge of a short card) and the resource token and the foot pills (badgeLayout).
+  const { top: first, rows: room } = badgeLayout(h, s, pill, stop);
   const items = [...effects.stats.map((badge) => ({ kind: "stat" as const, badge })), ...effects.flags.map((flag) => ({ kind: "flag" as const, flag }))];
-  const { shown: count, hidden } = badgeSplit(items.length, room);
+  const { shown: count, hidden } = badgeShown(items.length, room);
   const shown = items.slice(0, count);
   const rows: ReactElement[] = shown.map((item, index) => {
-    const top = y + BADGE_TOP * s + index * (pill + 2 * s);
+    const top = y + first + index * (pill + 2 * s);
     if (item.kind === "flag" && item.flag.flag === "mustCommit") {
       const width = 15 * s + fonts.badge.getTextWidth(MUST_COMMIT_WORD) + 5 * s;
       return (
@@ -338,7 +341,7 @@ export function Badges({
     );
   });
   if (hidden > 0) {
-    const top = y + BADGE_TOP * s + shown.length * (pill + 2 * s);
+    const top = y + first + shown.length * (pill + 2 * s);
     const more = moreText(hidden);
     const width = fonts.badge.getTextWidth(more) + 12 * s;
     rows.push(
