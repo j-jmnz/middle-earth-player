@@ -4,7 +4,7 @@ import type { ScreenMoment } from "../../harness/screens.ts";
 export const screens: ScreenMoment[] = [
   {
     name: "captain-bodyguard",
-    note: "Stage 1B (06144:B:1): Murzag, the Captain, is engaged with 2 damage while a Morgul Bodyguard lies in the staging area, so damage to him goes to the Bodyguard (06148:A:1; tap either card for its preview); the Tower dial reads 8/10 (06147:A:3: 10 loses).",
+    note: "Stage 1B (06144:B:1): Murzag, the Captain, is engaged with 2 damage while a Morgul Bodyguard lies in the staging area, so damage to him goes to the Bodyguard (06148:A:1; `--tap x,y` on either card shows its preview); the Tower dial reads 8/10 (06147:A:3: 10 loses).",
     layout: { phase: "Combat", stage: "06144", engaged: [{ code: "06151", damage: 2 }], staging: ["06148", { code: "06147", progress: 8 }] },
   },
   {

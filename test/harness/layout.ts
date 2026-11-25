@@ -13,6 +13,7 @@ import { markProgressNoted } from "../../src/rules/families/angmar/progress.ts";
 import { markProgressHeld } from "../../src/rules/families/long-dark/hold.ts";
 import { markCapture } from "../../src/rules/families/captured/entry.ts";
 import { markEnemyDamage } from "../../src/rules/families/encounter/patrol.ts";
+import { takeHidden } from "../../src/rules/families/pelargir/hidden.ts";
 import { takeControlOfLocation } from "../../src/rules/families/pelargir/location-control.ts";
 import { markSeatedRows } from "../../src/rules/families/encounter/seated.ts";
 
@@ -253,9 +254,10 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   state = markSeatedRows(state, ctx);
   state = { ...state, ...opening(layout.phase ?? "Quest"), ...(layout.firstPlayer != null ? { firstPlayer: layout.firstPlayer } : {}) };
   for (const item of layout.hidden ?? []) {
-    const spawned = spawn(state, dealtCode(item), { zone: "setAside" }, "down");
-    const order = Math.max(0, ...Object.values(spawned.state.cards).map((card) => card.hiddenAt ?? 0)) + 1;
-    state = updateCard(spawned.state, spawned.id, { controller: null, owner: typeof item === "string" ? 0 : item.seat, hiddenAt: order });
+    // The card goes on top of the encounter deck and the family's own take sets it aside facedown in the seat's play area.
+    const spawned = spawn(state, dealtCode(item), { zone: "encounterDeck" }, "down");
+    const onTop = { ...spawned.state, encounterDeck: [spawned.id, ...spawned.state.encounterDeck.filter((id) => id !== spawned.id)] };
+    state = takeHidden(onTop, typeof item === "string" ? 0 : item.seat, 1, []);
   }
   for (const code of layout.controlled ?? []) {
     const spawned = spawn(state, code, { zone: "staging" });

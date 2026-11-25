@@ -9,7 +9,7 @@ export const screens: ScreenMoment[] = [
   },
   {
     name: "captured-at-four",
-    note: "Stage 2 Captured! (06118:B:3): a seat holds 4 hidden cards, so the dial reads Hidden 4 beside the total hidden dial, and the quest card (tap it, or shoot without the auto tap) says one more turns them all faceup.",
+    note: "Stage 2 Captured! (06118:B:3): a seat holds 4 hidden cards, so the dial reads Hidden 4 beside the total hidden dial, and the quest card (the shot opens past it) says one more turns them all faceup.",
     layout: { stage: "06118", hidden: ["06119", "06120", "06121", "06122"] },
   },
 ];

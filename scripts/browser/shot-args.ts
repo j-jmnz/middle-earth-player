@@ -54,6 +54,7 @@ export function parseShotArgs(args: readonly string[], root: string): ShotArgs {
     if (arg === "--scene" && args[at + 2]?.startsWith("{")) at += 2;
     else if (VALUED.has(arg)) at += 1;
     else if (arg.startsWith("--") && !BARE.has(arg)) throw new Error(`unknown flag ${arg}`);
+    else if (arg.startsWith("{")) throw new Error("a layout JSON goes directly after the scenario id: --scene <scenario-id> '<layout json>'");
     else if (!arg.startsWith("--")) routes.push(arg.startsWith("/") ? arg : `/${arg}`);
   }
   const size = flagValue(args, "--size");
@@ -66,6 +67,10 @@ export function parseShotArgs(args: readonly string[], root: string): ShotArgs {
   const moment = flagValue(args, "--moment") ?? null;
   if ((sceneId && args[layoutAt]?.startsWith("{") ? 1 : 0) + (sceneFile ? 1 : 0) > 1) throw new Error("give the layout inline or as --scene-file, not both");
   if ([sceneId, moment, flagValue(args, "--fixture")].filter((one) => one != null).length > 1) throw new Error("--scene, --moment and --fixture are three ways to open a table: give one");
+  const table = sceneId ? "--scene" : moment ? "--moment" : null;
+  if (table && routes.length > 0) throw new Error(`${table} opens its own table: give no route (${routes.join(", ")})`);
+  if (table && flagValue(args, "--at") !== undefined) throw new Error(`--at replays a fixture: it does not go with ${table}`);
+  if (moment && moment.split("/").length > 2) throw new Error(`--moment takes <scenario-id> or <scenario-id>/<name>, not ${moment}`);
   return {
     routes,
     fixture: flagValue(args, "--fixture") ?? null,

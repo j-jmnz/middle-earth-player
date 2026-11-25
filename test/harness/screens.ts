@@ -1,5 +1,6 @@
 import { existsSync, readdirSync } from "node:fs";
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 import type { Layout } from "./layout.ts";
 
@@ -10,10 +11,10 @@ export type ScreenMoment = { name: string; layout: Layout; note: string };
 const SCENARIOS = path.resolve(import.meta.dirname, "..", "scenarios");
 
 /** The moments a scenario committed, or none when it has no `screens.ts`. */
-export async function screensOf(scenarioId: string): Promise<ScreenMoment[]> {
-  const file = path.join(SCENARIOS, scenarioId, "screens.ts");
+export async function screensOf(scenarioId: string, root: string = SCENARIOS): Promise<ScreenMoment[]> {
+  const file = path.join(root, scenarioId, "screens.ts");
   if (!existsSync(file)) return [];
-  const loaded = (await import(file)) as { screens?: readonly ScreenMoment[] };
+  const loaded = (await import(pathToFileURL(file).href)) as { screens?: readonly ScreenMoment[] };
   return [...(loaded.screens ?? [])];
 }
 

@@ -76,6 +76,12 @@ describe("parseShotArgs", () => {
     expect(() => parseShotArgs(["--scene", "a", "{}", "--scene-file", "b.json"], "/repo")).toThrow("inline or as --scene-file");
     expect(() => parseShotArgs(["--scene", "a", "--moment", "b"], "/repo")).toThrow("give one");
     expect(() => parseShotArgs(["--fixture", "duo", "--moment", "b"], "/repo")).toThrow("give one");
+    expect(() => parseShotArgs(["--scene", "a", "--landscape", "{}"], "/repo")).toThrow("directly after the scenario id");
+    expect(() => parseShotArgs(["/table", "--moment", "a/b"], "/repo")).toThrow("opens its own table");
+    expect(() => parseShotArgs(["--scene", "a", "{}", "/table"], "/repo")).toThrow("opens its own table");
+    expect(() => parseShotArgs(["--moment", "a/b", "--at", "3"], "/repo")).toThrow("does not go with --moment");
+    expect(() => parseShotArgs(["--scene", "a", "{}", "--at", "3"], "/repo")).toThrow("does not go with --scene");
+    expect(() => parseShotArgs(["--moment", "a/b/c"], "/repo")).toThrow("not a/b/c");
   });
 
   it("puts the fixture's save id in {save}, and opens where the fixture landed when no route is named", () => {

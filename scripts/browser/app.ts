@@ -36,7 +36,7 @@ export type App = {
   context: BrowserContext;
   /**
    * Opens a route in a new page and waits for `wait` (a testID), or for the first testID when none is named, then lets the screen settle. It closes
-   * the page it opened before: the app's database is one OPFS file, and a second tab waits on it forever. `scene` (a SceneDump, src/screens/session/scene-dump.ts) is set as
+   * the page it opened before: the app's database is one OPFS file, and a second tab waits on it forever. `scene` (a SceneDump, src/screens/session/web/scene-dump.ts) is set as
    * `globalThis.__E2E_SCENE__` before the page loads, for the scene's table (src/screens/session/web/standalone-session.canvaskit.ts).
    */
   open: (route: string, options?: { wait?: string; settle?: number; scene?: unknown }) => Promise<Page>;
