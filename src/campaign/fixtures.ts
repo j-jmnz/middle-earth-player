@@ -98,6 +98,7 @@ import assaultFixtures from "./fixtures/assault-on-osgiliath.json";
 import bloodFixtures from "./fixtures/the-blood-of-gondor.json";
 import valeFixtures from "./fixtures/the-morgul-vale.json";
 import umbarFixtures from "./fixtures/escape-from-umbar.json";
+import crossingFixtures from "./fixtures/desert-crossing.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -214,6 +215,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-lonely-mountain": mountainFixtures,
   "the-battle-of-five-armies": armiesFixtures,
   "escape-from-umbar": umbarFixtures,
+  "desert-crossing": crossingFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
