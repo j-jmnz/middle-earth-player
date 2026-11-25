@@ -20,5 +20,8 @@ export const hinderWords = (engaged: boolean): string =>
 /** The line on a location that holds Off Track. */
 export const offTrackHostWords = (): string => "Off Track is attached: +2 quest points. At the end of each refresh phase, 1 more time counter comes off the current quest.";
 
+/** The pill on a hero that holds In Need of Rest: a word that fits a narrow card (the full name is in the preview), and what the reader hears. */
+export const REST_MARK = { text: "Rest", loses: false, speech: "In Need of Rest attached" } as const;
+
 /** The line on the hero that holds In Need of Rest. */
 export const needOfRestHostWords = (host: string): string => `${host} holds In Need of Rest and takes 1 damage each time a time counter comes off the current quest.`;

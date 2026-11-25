@@ -6,6 +6,7 @@ import { captorSeat } from "../../../rules/families/ring-maker/captor.ts";
 import { GRIMA_IN_STAGING, grimaControlledWords, grimaOnWords, illTidingsWords } from "../../words/scenarios/ring-maker/fords-table.ts";
 import { guardWords, heroHoldsWords, mugashHeldWords } from "../../words/scenarios/ring-maker/orc-table.ts";
 import { hinderWords, mugashFreeWords, mugashOnEdgeWords, mugashOnHeroWords, needOfRestHostWords, offTrackHostWords } from "../../words/scenarios/ring-maker/fangorn-table.ts";
+import { IN_NEED_OF_REST } from "../../readouts/ring-maker/fangorn.ts";
 import { GUARD, MUGASH, MUGASH_OBJECTIVE, mugashLyingOn } from "../../readouts/ring-maker/orc.ts";
 
 const GRIMA = "07016";
@@ -16,7 +17,6 @@ const STAGE_1 = "07059";
 const HUORNS: readonly string[] = ["07033", "07034", "07035"];
 const EDGE = "07032";
 const OFF_TRACK = "07057";
-const IN_NEED_OF_REST = "07058";
 
 // The line of Mugash (the objective) on a host: Edge of Fangorn or a hero, by the host's code (`hostId` names it).
 function mugashOnHostWords(game: ScenarioState, hostId: string, name: (id: string) => string): string {

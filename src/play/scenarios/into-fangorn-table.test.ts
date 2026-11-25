@@ -134,6 +134,8 @@ describe("Hinder, Off Track and In Need of Rest", () => {
     expect(detail(both, "dh1")).toMatch(/In Need of Rest/);
     expect(detail(both, "dh1")).toMatch(/holds Mugash/);
     expect(detail(built({}), "dh1")).toBeNull();
+    expect(slotNumbers(rest.state, rest.ctx, idOf(rest.state, "dh1")).under).toMatchObject({ text: "Rest", speech: "In Need of Rest attached" });
+    expect(slotNumbers(rest.state, rest.ctx, idOf(rest.state, "dh2")).under).toBeNull();
   });
 
   it("07057:A:2 and 07058:A:1 name what the pick does", () => {
@@ -148,21 +150,29 @@ describe("the cards stage 3B brings back", () => {
   it("07067:B:2 names the choice from the discard pile, its two types and what happens to Mugash", () => {
     const made = built({ phase: "Refresh", stage: "07067", timeCounters: 0, discard: ["07033", "07034"], deck: ["f0", "f0", "f0", "f0", "f0", "f0"] });
     const sheet = sheetsOf(made, "07067", "forced", (_n, ids) => ids[0] ?? "")[0];
-    expect(sheet?.note).toBe("The last time counter is gone: choose an enemy or objective in the encounter discard pile. Reveal it and add it to the staging area. A chosen Mugash takes the next card as his guard.");
+    expect(sheet?.note).toBe("The last time counter is gone. Choose an enemy or objective in the encounter discard pile. Reveal it and add it to the staging area. A chosen Mugash takes the next card as his guard.");
     expect(sheet?.rows.length).toBeGreaterThan(1);
   });
 });
 
 describe("Heart of Fangorn's refresh cap", () => {
+  it("07036:A:1 binds the count still to choose: each pick leaves one fewer to ready and one fewer to hold", () => {
+    const made = built({ phase: "Refresh", play: ["ally", "ally", "ally", "ally", "ally", "ally", "ally"] });
+    let state = made.state;
+    for (const card of Object.values(state.cards)) if ((card.zone === "play" || card.zone === "heroes") && card.controller === 0) state = updateCard(state, card.id, { exhausted: true });
+    const sheets = sheetsOf({ ...made, state }, "07036", "forced", (_n, ids) => ids[0] ?? "");
+    expect(sheets.map((sheet) => sheet.note.replace(/^.*phase\. /, ""))).toEqual(["9 would ready. Choose 4 to stay exhausted.", "8 would ready. Choose 3 to stay exhausted.", "7 would ready. Choose 2 to stay exhausted.", "6 would ready. Choose 1 to stay exhausted."]);
+  });
+
   it("07036:A:1 names the cap, the count of exhausted characters and the player who chooses", () => {
     const made = built({ phase: "Refresh", play: ["ally", "ally", "ally", "ally"] });
     let state = made.state;
     for (const card of Object.values(state.cards)) if ((card.zone === "play" || card.zone === "heroes") && card.controller === 0) state = updateCard(state, card.id, { exhausted: true });
     const sheet = sheetsOf({ ...made, state }, "07036", "forced", (_n, ids) => ids[0] ?? "")[0];
-    expect(sheet?.note).toBe("Heart of Fangorn: only 5 of your 6 exhausted characters ready this refresh phase. Choose one that stays exhausted.");
+    expect(sheet?.note).toBe("Heart of Fangorn: only 5 of your characters ready this refresh phase. 6 would ready. Choose 1 to stay exhausted.");
     const two = built({ seats: 2, phase: "Refresh", play: ["ally", "ally", "ally", "ally"] });
     let twoState = two.state;
     for (const card of Object.values(twoState.cards)) if ((card.zone === "play" || card.zone === "heroes") && card.controller === 0) twoState = updateCard(twoState, card.id, { exhausted: true });
-    expect(sheetsOf({ ...two, state: twoState }, "07036", "forced", (_n, ids) => ids[0] ?? "")[0]?.note).toMatch(/^Player 1: Heart of Fangorn: only 5 of your 6/);
+    expect(sheetsOf({ ...two, state: twoState }, "07036", "forced", (_n, ids) => ids[0] ?? "")[0]?.note).toBe("Player 1, Heart of Fangorn: only 5 of your characters ready this refresh phase. 6 would ready. Choose 1 to stay exhausted.");
   });
 });
