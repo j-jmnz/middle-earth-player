@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import type { EngineStep } from "../../core/intents.ts";
 import { destroyCard } from "../../core/destroy.ts";
-import { flagged, type ScenarioState } from "../../core/state.ts";
+import { flagged } from "../../core/state.ts";
 import { idOf, opened, resolveRecords, run as runInstruction, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { settle } from "../../engine/machine.ts";
 import { heroGuardedBy } from "../wilderland/carried.ts";
