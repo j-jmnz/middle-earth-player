@@ -87,6 +87,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   },
   { id: "07031:constant:1", cardCode: MUGASH, lines: ["07031:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "returnsToStagingArea", amount: 1, until: "whileSourceInPlay", target: "self" }] },
   { id: "07031:forced:1", cardCode: MUGASH, lines: ["07031:A:3"], timing: "forced", trigger: "damaged", subject: "host", instructions: [{ verb: "MoveEncounterCard", card: "self", to: "deckTop" }] },
+  // A hero destroyed by damage leaves play with the damage that destroyed it, so the cards on it are released (to the staging area) before any "after damage" Forced effect is heard: the card hears the destruction instead, from wherever it went, and
+  // returns to the top of the deck when the hero held damage. A hero discarded with none leaves him in the staging area.
+  { id: "07031:forced:2", cardCode: MUGASH, lines: ["07031:A:3"], timing: "forced", trigger: "hostDefeated", condition: { kind: "matches", card: "other", pick: { type: "hero", control: "any", damaged: true } }, instructions: [{ verb: "MoveEncounterCard", card: "self", to: "deckTop" }] },
 
   // 07032 Edge of Fangorn. Immune to player card effects is its keyword. Travel: the first player searches the encounter deck and discard pile for a Huorn and adds it to the staging area, two with 3 or more players; the deck is shuffled. The travel completes with none found.
   {

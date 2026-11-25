@@ -6,9 +6,13 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { settle } from "../../engine/machine.ts";
 import { flagged } from "../../core/state.ts";
-import { updateCard } from "../../core/state.ts";
+import { ruleCause } from "../../core/cause.ts";
+import { placeDamage } from "../../core/damage.ts";
+import { destroyCard } from "../../core/keywords.ts";
+import { flagged, updateCard, type ScenarioState } from "../../core/state.ts";
+import { moveEncounter } from "../encounter/moves.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
-import { drive, fight, idOf, idsOf, opened, resolveRecords, run, statOf, tableFromLayout, zoneOf, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { drive, fight, idOf, idsOf, opened, resolveRecords, revealedTop, run, statOf, tableFromLayout, zoneOf, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "into-fangorn";
 const table = (layout: Layout) => tableFromLayout(SCENARIO, layout, { extra: [PLAIN] });
@@ -16,6 +20,7 @@ const DARK = "07033";
 const ANGRY = "07034";
 const EDGE = "07032";
 const STAGE_1 = "07065";
+const STAGE_3_CODE = "07067";
 // Dunland enemies the other box deals, as a plain enemy and as the cards a shadow card is taken from.
 const PLAIN = "07042";
 const SHADOWS = ["07050", "07051", "07052"];
@@ -177,5 +182,105 @@ describe("Mugash and the quest stages (07031, 07065 to 07067)", () => {
     const questing = table({ stage: STAGE_3, phase: "Quest", progress: 4, committed: ["dh1"], attached: [{ code: MUGASH, to: "dh1", encounter: true }] });
     const quested = drive(questing, opened(questing), (state) => state.cards[state.questStage ?? ""]?.code !== STAGE_3);
     expect(quested.state.cards[quested.state.questStage ?? ""]?.code).toBe(STAGE_2);
+  });
+});
+
+describe("Mugash as a Guarded objective (07031:A:1 to A:3)", () => {
+  const MUGASH = "07031";
+  const onEdge = (layout: Layout = {}) => table({ stage: STAGE_1, phase: "Quest", staging: [EDGE], setAside: [MUGASH], ...layout });
+  const setup = (layout: Layout = {}) => {
+    const t = onEdge(layout);
+    return { t, state: resolveRecords(t.state, t.ctx, STAGE_1, "setup", t.state.questStage ?? "").state };
+  };
+
+  it("07031:A:2 with Edge of Fangorn gone he lies in the staging area, free to claim; an Action exhausts a ready hero and he attaches to it", () => {
+    const { t, state } = setup();
+    const mugash = idOf(state, MUGASH);
+    expect(state.cards[mugash]?.zone).toBe("attached");
+    const edge = idOf(state, EDGE);
+    // An encounter effect discards Edge of Fangorn (immune to player card effects only).
+    const discarded = moveEncounter(state, edge, "discard", 0, t.ctx, []);
+    expect(discarded.cards[edge]?.zone).toBe("encounterDiscard");
+    expect(discarded.cards[mugash]?.zone).toBe("staging");
+    const claimed = resolveRecords(discarded, t.ctx, MUGASH, "action", mugash);
+    expect(claimed.state.cards[mugash]?.zone).toBe("attached");
+    expect(claimed.state.cards[idOf(claimed.state, "dh1")]?.attachments).toContain(mugash);
+  });
+
+  // Mugash claimed by the first hero: Edge of Fangorn is explored away and the Action resolves, as it does in a game.
+  const hosted = () => {
+    const { t, state } = setup({ deck: ["07050"] });
+    const free = moveEncounter(state, idOf(state, EDGE), "discard", 0, t.ctx, []);
+    const claimed = resolveRecords(free, t.ctx, MUGASH, "action", idOf(free, MUGASH));
+    return { state: claimed.state, ctx: t.ctx };
+  };
+
+  it("07031:A:3 damage to the hero he is attached to sends him to the top of the encounter deck, facedown and controlled by nobody", () => {
+    const t = hosted();
+    const mugash = idOf(t.state, MUGASH);
+    expect(t.state.cards[mugash]?.claimed).toBe(true);
+    const hit = settle(placeDamage(t.state, idOf(t.state, "dh1"), 1, t.ctx.cards, [], "framework", ruleCause("rr.damage")), t.ctx, []);
+    expect(hit.encounterDeck[0]).toBe(mugash);
+    expect(hit.cards[idOf(hit, "dh1")]?.attachments).not.toContain(mugash);
+    expect(hit.cards[mugash]?.zone).toBe("encounterDeck");
+  });
+
+  it("07031:A:3 a hero destroyed by damage sends him to the deck as well, and one discarded with no damage leaves him in the staging area", () => {
+    const t = hosted();
+    const mugash = idOf(t.state, MUGASH);
+    const dead = settle(placeDamage(t.state, idOf(t.state, "dh1"), 9, t.ctx.cards, [], "framework", ruleCause("rr.damage")), t.ctx, []);
+    expect(dead.cards[mugash]?.zone).toBe("encounterDeck");
+    const gone = settle(destroyCard(t.state, idOf(t.state, "dh1"), t.ctx.cards, []), t.ctx, []);
+    expect(gone.cards[mugash]?.zone).toBe("staging");
+  });
+});
+
+describe("the verbs and records of the rest (07032:A:2, 07036:A:1, 07037:A:1, 07067:B:2)", () => {
+  const MUGASH = "07031";
+
+  it("07031:A:1 Mugash revealed from the deck takes the next card as his guard and both lie in the staging area; he cannot be claimed while it is there", () => {
+    const t = table({ stage: STAGE_1, phase: "Quest", deck: [DARK, "07050"] });
+    const state = revealedTop(t, MUGASH);
+    const mugash = idOf(state, MUGASH);
+    expect(zoneOf(state, MUGASH)).toBe("staging");
+    expect(zoneOf(state, DARK)).toBe("staging");
+    expect(state.cards[idOf(state, DARK)]?.host).toBe(mugash);
+  });
+
+  it("07032:A:2 the Travel adds a Huorn to the staging area, a second with 3 or more players, and the travel needs none found", () => {
+    const t = table({ stage: STAGE_1, phase: "Travel", staging: [EDGE], deck: [DARK, ANGRY, "07035"] });
+    const done = resolveRecords(t.state, t.ctx, EDGE, "travel", idOf(t.state, EDGE));
+    expect(zoneOf(done.state, DARK)).toBe("staging");
+    expect(zoneOf(done.state, ANGRY)).toBe("encounterDeck");
+    const none = table({ stage: STAGE_1, phase: "Travel", staging: [EDGE], deck: ["07050"] });
+    expect(resolveRecords(none.state, none.ctx, EDGE, "travel", idOf(none.state, EDGE)).state.cards[idOf(none.state, EDGE)]?.zone).toBe("staging");
+  });
+
+  it("07067:B:2 each player chooses an enemy or objective from the discard pile, reveals it and adds it to the staging area, a different card each", () => {
+    const t = table({ stage: STAGE_3_CODE, phase: "Quest", seats: 2, deck: ["07051", "07052", "07056", "07057", "07058", "07036"], discard: [DARK, ANGRY, "07050"] });
+    const done = resolveRecords(t.state, t.ctx, STAGE_3_CODE, "forced", t.state.questStage ?? "");
+    expect([zoneOf(done.state, DARK), zoneOf(done.state, ANGRY), zoneOf(done.state, "07050")]).toEqual(["staging", "staging", "encounterDiscard"]);
+    expect(done.state.cards[t.state.questStage ?? ""]?.resources).toBe(3);
+  });
+
+  it("07036:A:1 each player keeps the characters beyond 5 exhausted, as many as he chooses; with 5 or fewer none stays", () => {
+    const t = table({ stage: STAGE_1, phase: "Refresh", staging: ["07036", "07036"], play: ["ally", "ally", "ally", "ally", "ally"] });
+    const characters = [...t.state.seats[0]!.heroes, ...idsOf(t.state, "ally")];
+    const tired = characters.reduce((state, id) => updateCard(state, id, { exhausted: true }), t.state);
+    const stayed = (state: ScenarioState) => characters.filter((id) => flagged(state, id, "doesNotReady")).length;
+    const first = idsOf(tired, "07036")[0] ?? "";
+    expect(characters.length).toBe(7);
+    expect(stayed(resolveRecords(tired, t.ctx, "07036", "forced", first).state)).toBe(2);
+    const fewer = characters.slice(0, 5).reduce((state, id) => updateCard(state, id, { exhausted: true }), t.state);
+    expect(stayed(resolveRecords(fewer, t.ctx, "07036", "forced", first).state)).toBe(0);
+  });
+
+  it("07037:A:1 each engaged Huorn attacks and is dealt a shadow card; with none engaged each player searches for a Huorn and puts it into play engaged with him", () => {
+    const attacked = table({ stage: STAGE_1, phase: "Quest", engaged: [DARK], deck: [ANGRY, "07050"] });
+    const hit = resolveRecords(attacked.state, attacked.ctx, "07037", "whenRevealed");
+    expect(zoneOf(hit.state, ANGRY)).toBe("shadow");
+    const searched = table({ stage: STAGE_1, phase: "Quest", deck: [ANGRY, "07050"], discard: [DARK] });
+    const found = resolveRecords(searched.state, searched.ctx, "07037", "whenRevealed");
+    expect(zoneOf(found.state, ANGRY)).toBe("engaged");
   });
 });
