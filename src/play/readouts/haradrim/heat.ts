@@ -8,7 +8,7 @@ import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { temperatureOf } from "../../../rules/families/haradrim/heat.ts";
 import { heldBy } from "../../../rules/core/holder-classes.ts";
 
-import { BLANK_WORD, blankWords, HEAT_LABEL, HEAT_LIMIT, HEAT_NAME, heatLimitWords, heatNearWords, heatWords, noReadyWords } from "../../words/scenarios/haradrim/heat-table.ts";
+import { BLANK_WORD, blankWords, HEAT_LABEL, HEAT_LIMIT, HEAT_NAME, heatLimitWords, heatNearWords, heatPanel, heatWords, noReadyWords } from "../../words/scenarios/haradrim/heat-table.ts";
 import type { TableDial } from "../dials.ts";
 
 
@@ -18,7 +18,7 @@ export function heatDials(game: ScenarioState): readonly TableDial[] {
   if (value == null) return [];
   const level = value >= (HEAT_LIMIT * 9) / 10 ? ("critical" as const) : ("near" as const);
   const near = value >= (HEAT_LIMIT * 4) / 5 ? { warn: { level, words: heatNearWords(value) } } : {};
-  return [{ id: "heat", testID: "desert-heat", label: HEAT_LABEL, name: HEAT_NAME, value, limit: HEAT_LIMIT, warms: true, ...near, limitWords: heatLimitWords, note: heatWords(value) }];
+  return [{ id: "heat", testID: "desert-heat", label: HEAT_LABEL, name: HEAT_NAME, value, limit: HEAT_LIMIT, warms: true, ...near, limitWords: heatLimitWords, note: heatWords(value), lists: [{ heading: HEAT_NAME, lines: heatPanel(value) }], said: heatPanel(value).join(" ") }];
 }
 
 // The active modifiers of a stat that reach the card (its own or its class's), each with the name of the card that put it there: the engine's own facts (`blankText`, `cannotReadyByPlayerCard`), whichever scenario's card made them.

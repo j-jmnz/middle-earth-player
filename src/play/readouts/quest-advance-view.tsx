@@ -26,6 +26,9 @@ import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
 
 const SCRIM = 0.9;
+
+// The dock's waiting sentence names a glowing card, and no card glows under this screen's scrim: the rows are the choice, so the sentence goes.
+const withoutGlow = (dock: TableChoice["dock"]): TableChoice["dock"] => (dock.why != null && /glowing/i.test(dock.why) ? { ...dock, why: null } : dock);
 // A screen this many points tall or less, at Medium, is short for the question's column.
 const SHORT = 440;
 
@@ -135,7 +138,7 @@ export function QuestAdvanceView({
               </ScrollView>
               {tiles.some((tile) => tile.readId) ? <Text className="mt-1 text-label text-muted">Hold a card to read it.</Text> : null}
               <View className="mt-2">
-                <DockButtons key={choice.resetKey} dock={choice.dock} picked={choice.picked} onButton={choice.onButton} />
+                <DockButtons key={choice.resetKey} dock={withoutGlow(choice.dock)} picked={choice.picked} onButton={choice.onButton} />
               </View>
             </View>
           ) : (

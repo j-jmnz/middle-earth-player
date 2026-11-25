@@ -37,6 +37,7 @@ export type Text = string | readonly { when?: Condition; text: string }[];
  * - `bare`: the sheet says the entry's sentence alone, with no printed line of the record after it (a keyword line that holds other keywords, "Surge. Prowl 1.", is no use there).
  * - `owned`: one player's own choice. Two-handed the sentence leads with the player and the sheet adds no "Player N chooses."; solo it has no lead, and a note with no `why` is capitalised.
  * - `verb`: the button's word over a Pick, one or two words ("Exhaust"); "Choose" when absent.
+ * - `title`: the sheet's title over a Pick in place of the card's name, for a count that must stay in view ("{card}: assign {left}").
  * - `labels`: the rows of a Pick that are no card, by option id ("skip", "done"). A key that names a card is refused.
  * - `label`: the row of one branch of a Choose (the entry keyed with the option id).
  * - `bind`: a name for each number a template says, as the `Amount` the engine reads.
@@ -54,6 +55,7 @@ export type Ask = {
   owned?: true;
   bare?: true;
   verb?: string;
+  title?: Text;
   label?: Text;
   labels?: Readonly<Record<string, Text>>;
   bind?: Readonly<Record<string, Amount>>;
@@ -103,7 +105,7 @@ export const textsOf = (text: Text | undefined): string[] => (text === undefined
 
 /** Every template of an entry, variants included. */
 export function templatesOf(entry: Ask): string[] {
-  return [...textsOf(entry.note), ...(entry.why == null ? [] : [entry.why]), ...textsOf(entry.label), ...Object.values(entry.labels ?? {}).flatMap(textsOf), ...textsOf(entry.caution?.text)];
+  return [...textsOf(entry.note), ...(entry.why == null ? [] : [entry.why]), ...textsOf(entry.title), ...textsOf(entry.label), ...Object.values(entry.labels ?? {}).flatMap(textsOf), ...textsOf(entry.caution?.text)];
 }
 
 /** The placeholders of an entry that no value answers: none of `card`, `owner`, `picked`, `host`, `subject`, `ringBearer`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` and `named` names. */
@@ -271,7 +273,8 @@ export function asksPick(a: AskFacts, table?: AsksTable): AskedWords | undefined
     if (caution !== undefined) cautions[id] = caution;
   }
   const owned = hit.entry.owned === true && a.game.seatCount > 1;
-  return { verb: hit.entry.verb ?? "Choose", prompt, ...(owned ? { owned: true as const } : {}), ...(hit.entry.bare === true ? { bare: true as const } : {}), ...(Object.keys(labels).length > 0 ? { labels } : {}), ...(Object.keys(cautions).length > 0 ? { cautions } : {}) };
+  const title = hit.entry.title == null ? null : said(a, hit, hit.entry.title);
+  return { verb: hit.entry.verb ?? "Choose", prompt, ...(title != null ? { title } : {}), ...(owned ? { owned: true as const } : {}), ...(hit.entry.bare === true ? { bare: true as const } : {}), ...(Object.keys(labels).length > 0 ? { labels } : {}), ...(Object.keys(cautions).length > 0 ? { cautions } : {}) };
 }
 
 /** The sentence over a Choose from its entry (the one keyed "Choose"), or undefined. `owned` says it leads with the player. */

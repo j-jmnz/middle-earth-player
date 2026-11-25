@@ -19,6 +19,9 @@ export const heatLimitWords = `the players lose at ${HEAT_LIMIT}`;
 /** The note spoken after the dial: the tens digit the cards read as X, and where the loss stands. */
 export const heatWords = (value: number): string => `The cards read X, the tens digit of the temperature, as ${Math.floor(value / 10)}.`;
 
+/** The lines of the panel a tap on the dial opens (which also lets the dial drop its word where the bar is short): the value, X, and the loss. */
+export const heatPanel = (value: number): readonly string[] => [`The temperature is ${value}.`, `X is its tens digit, ${Math.floor(value / 10)}.`, `The players lose at ${HEAT_LIMIT}.`];
+
 /** The warning near the limit: the temperature and what is left before it. */
 export const heatNearWords = (value: number): string => `${HEAT_LIMIT - value} from the limit of ${HEAT_LIMIT}`;
 
