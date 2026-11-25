@@ -25,22 +25,25 @@ const READY_CHARACTER: PickSpec = { type: "character", control: "you", state: "r
 const OWN_CHARACTER: PickSpec = { type: "character", control: "you" };
 // "Limit 1 per hero" and "Limit 1 per location" (07058, 07057): only a card with no copy of the attachment is a host, so a card with none to take is discarded.
 const COMMITTED_HERO: PickSpec = { type: "hero", control: "any", committed: true, hasAttachment: { names: ["In Need of Rest"], none: true } };
-const OFF_TRACK_HOST: PickSpec = { type: "location", control: "any", hasAttachment: { names: ["Off Track"], none: true } };
+const OFF_TRACK_HOST: PickSpec = { type: "location", control: "any", staging: true, hasAttachment: { names: ["Off Track"], none: true } };
 const ACTIVE_LOCATION: PickSpec = { type: "location", control: "any", active: true };
 // The Forest locations in the staging area (Ancient Forest) and in play (Tangled Woods): Edge of Fangorn is one, and takes both, which come from encounter cards.
 const STAGED_FOREST: PickSpec = { type: "location", control: "any", stagingOnly: true, trait: "Forest" };
-const FOREST_IN_PLAY: PickSpec = { type: "location", control: "any", trait: "Forest" };
+const FOREST_IN_PLAY: PickSpec = { type: "location", control: "any", staging: true, trait: "Forest" };
 // "A hero with Mugash attached" and "Mugash in play" (staged, attached to Edge of Fangorn or to a hero).
 const HERO_WITH_MUGASH: PickSpec = { type: "hero", control: "any", hasAttachment: { names: [MUGASH_NAME] } };
 const MUGASH_IN_PLAY: PickSpec = { type: "card", control: "any", names: [MUGASH_NAME], allInPlay: true };
+const MUGASH_OUT_OF_PLAY: Condition = { kind: "outOfPlay", code: MUGASH };
 const MUGASH_ATTACHED: Condition = { kind: "canPick", pick: HERO_WITH_MUGASH };
 const NO_MUGASH: Condition = { kind: "not", condition: MUGASH_ATTACHED };
 const SHUFFLED: Instruction = { verb: "ShuffleEncounterDeck" };
 // "Shuffle Mugash into the encounter deck" (07065:B:2, 07066:B:2) from wherever he is: in play (attached to Edge of Fangorn or to a hero, or lying in the staging area) or out of play (the encounter discard pile). His old guard stays where it is.
+// Already in the encounter deck (in neither place), he stays and the deck is shuffled: that step is first, because each later step's condition is read when it runs, and a deck he has just joined would pass it.
 const SHUFFLE_MUGASH: Instruction[] = [
+  { ...SHUFFLED, when: { kind: "all", conditions: [{ kind: "not", condition: { kind: "canPick", pick: MUGASH_IN_PLAY } }, { kind: "not", condition: MUGASH_OUT_OF_PLAY }] } },
   { verb: "Pick", pick: MUGASH_IN_PLAY, when: { kind: "canPick", pick: MUGASH_IN_PLAY } },
   { verb: "MoveEncounterCard", card: "picked", to: "shuffle", when: { kind: "canPick", pick: MUGASH_IN_PLAY } },
-  { verb: "ShuffleOutOfPlayIntoEncounterDeck", code: MUGASH, when: { kind: "outOfPlay", code: MUGASH } },
+  { verb: "ShuffleOutOfPlayIntoEncounterDeck", code: MUGASH, when: MUGASH_OUT_OF_PLAY },
 ];
 // "Return the active location to the staging area" (07052:A:1 and A:2).
 const RETURN_ACTIVE: Instruction = { verb: "MoveEncounterCard", card: "activeLocation", to: "staging" };
@@ -86,10 +89,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     instructions: [{ verb: "Pick", pick: READY_HERO }, { verb: "Exhaust", target: { kind: "picked" } }, { verb: "ClaimObjective" }],
   },
   { id: "07031:constant:1", cardCode: MUGASH, lines: ["07031:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "returnsToStagingArea", amount: 1, until: "whileSourceInPlay", target: "self" }] },
-  { id: "07031:forced:1", cardCode: MUGASH, lines: ["07031:A:3"], timing: "forced", trigger: "damaged", subject: "host", instructions: [{ verb: "MoveEncounterCard", card: "self", to: "deckTop" }] },
+  { id: "07031:forced:1", cardCode: MUGASH, lines: ["07031:A:3"], timing: "forced", trigger: "damaged", subject: "host", condition: { kind: "matches", card: "host", pick: { type: "hero", control: "any" } }, instructions: [{ verb: "MoveEncounterCard", card: "self", to: "deckTop" }] },
   // A hero destroyed by damage leaves play with the damage that destroyed it, so the cards on it are released (to the staging area) before any "after damage" Forced effect is heard: the card hears the destruction instead, from wherever it went, and
-  // returns to the top of the deck when the hero held damage. A hero discarded with none leaves him in the staging area.
-  { id: "07031:forced:2", cardCode: MUGASH, lines: ["07031:A:3"], timing: "forced", trigger: "hostDefeated", condition: { kind: "matches", card: "other", pick: { type: "hero", control: "any", damaged: true } }, instructions: [{ verb: "MoveEncounterCard", card: "self", to: "deckTop" }] },
+  // returns to the top of the deck. Only a hero destroyed by damage announces it (core/destroy.ts destroyAndAnnounce): a hero that leaves play any other way, with damage or without, leaves him in the staging area.
+  { id: "07031:forced:2", cardCode: MUGASH, lines: ["07031:A:3"], timing: "forced", trigger: "hostDefeated", instructions: [{ verb: "MoveEncounterCard", card: "self", to: "deckTop" }] },
 
   // 07032 Edge of Fangorn. Immune to player card effects is its keyword. Travel: the first player searches the encounter deck and discard pile for a Huorn and adds it to the staging area, two with 3 or more players; the deck is shuffled. The travel completes with none found.
   {
@@ -120,7 +123,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     lines: ["07037:A:1"],
     timing: "whenRevealed",
     uncancelable: IN_STAGING,
-    instructions: [{ verb: "ImmediateAttackEach", trait: "Huorn", notStaging: true }, EACH_PLAYER([{ verb: "SearchMove", type: "enemy", trait: "Huorn", to: "engaged", when: { kind: "noneReturned" } }]), SHUFFLED],
+    instructions: [{ verb: "ImmediateAttackEach", trait: "Huorn", notStaging: true }, EACH_PLAYER([{ verb: "SearchMove", type: "enemy", trait: "Huorn", to: "engaged", when: { kind: "noneReturned" } }]), { ...SHUFFLED, when: { kind: "noneReturned" } }],
   },
 
   // 07050 Ancient Forest. In the staging area every Forest location there gets +1 Threat and +3 quest points; with two copies, once (does not stack). Shadow: the defending player exhausts a character he controls.
