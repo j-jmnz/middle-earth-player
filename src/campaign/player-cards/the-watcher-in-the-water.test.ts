@@ -72,6 +72,20 @@ describe("Grave Cairn (04054:A:1)", () => {
     expect(stat(endRound(run.state, tab).state, tab, ally, "attack")).toBe(1);
   });
 
+  // "Its Attack" of a character that has left play is its printed Attack: a lasting +2 (Blade Mastery's kind) ended with the character, and
+  // the Brute's printed 3 goes to the ally (docs/brief.md, Player card readings, Grave Cairn).
+  it("04054:A:1 adds the printed Attack of a destroyed character that held a lasting bonus", () => {
+    const tab = scene(EFFECTS);
+    const [brute, ally, cairn] = [idsOf(tab, BRUTE), idsOf(tab, ALLY), idsOf(tab, CAIRN)];
+    const bonus = { instanceId: brute, sourceId: brute, stat: "attack" as const, amount: 2, until: "endOfPhase" as const };
+    const boosted = { ...tab.state, modifiers: [...tab.state.modifiers, bonus] };
+    expect(stat(boosted, tab, brute, "attack")).toBe(3 + 2);
+    let run = destroyed(boosted, tab, brute);
+    run = sendUnledgered(run, { type: "Trigger", cardId: cairn, effectId: "04054:response:1", payments: [{ heroId: idsOf(tab, PAL), amount: 1 }] }, tab.ctx);
+    run = sendUnledgered(run, { type: "Choose", optionId: ally }, tab.ctx);
+    expect(stat(run.state, tab, ally, "attack")).toBe(1 + 3);
+  });
+
   // An enemy that leaves play is not a character.
   it("04054:A:1 is not offered when an enemy leaves play", () => {
     const tab = table(EFFECTS, { heroes: [{ code: PAL, seat: 0 }], allies: [{ code: ALLY, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }], hand: [{ code: CAIRN, seat: 0 }] });

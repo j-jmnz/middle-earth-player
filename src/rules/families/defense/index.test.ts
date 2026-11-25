@@ -174,4 +174,18 @@ describe("after a character takes damage from an enemy attack", () => {
     expect(offered(legalIntents(at, ctx), "16010:response:1")).toBe(true);
     expect(send(at, { type: "Trigger", cardId: ids["16010"]!, effectId: "16010:response:1" }, ctx).cards[ids.dain!]?.resources).toBe(4);
   });
+
+  // Reading (recommended, docs/brief.md, Player card readings): damage that destroys the hero destroys it at once and the Shield is discarded with it (rr.attachment-cards); a Response is used only after its trigger has been resolved (rr.response).
+  // The case holds with and without the line's records: nothing is offered either way.
+  it("16010:A:3 offers no Dwarven Shield Response when the attack's damage destroys its hero", () => {
+    const shield = definePrinted({ code: "16010", name: "Dwarven Shield", type: "attachment", sphere: "leadership", cost: 2 });
+    const { state, ids, ctx } = defendWith(
+      withStopper({ cards: [hero("dain", { traits: ["Dwarf"], defense: 1, health: 1 }), shield, orc, shade], effects: recordsOf(RECORDS, "16010"), heroes: [{ code: "dain" }], attachments: [{ code: "16010", host: "dain" }], enemies: [{ code: "orc" }], encounter: ["shade"] }),
+      "dain",
+    );
+    const after = until(state, ctx, (current) => current.cards[ids.dain!]?.zone === "discard" || responseOpen(current));
+    expect(after.cards[ids.dain!]?.zone).toBe("discard");
+    expect(after.cards[ids["16010"]!]?.zone).toBe("discard");
+    expect(offered(legalIntents(after, ctx), "16010:response:1")).toBe(false);
+  });
 });

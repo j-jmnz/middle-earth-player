@@ -13,7 +13,7 @@ import { familyAttackDamaged } from "../../interpret/family-hooks.ts";
 import { modifiedStat, placeDamage, type DamageSource } from "../../core/keywords.ts";
 import { isCharacterType, printedOf, type PrintedCard } from "../../core/printed.ts";
 import { placeQuestProgress, questPointsOf } from "../../quest/quest.ts";
-import type { CardInstance, ScenarioState } from "../../core/state.ts";
+import type { CardInstance, GameEvent, ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, modifierActive, updateCard } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { queueEvent } from "../../windows/queue.ts";
@@ -134,8 +134,12 @@ export function questDamageCause(state: ScenarioState, ctx: ReduceContext): Ques
   };
 }
 
-// Each character that took damage from the enemy attack in progress and is still in play hears it ("After attached hero takes
-// damage from an enemy attack"): the characters whose damage went up between the two states; the enemy making the attack is the event's other card.
+// Each character that took damage from the enemy attack in progress hears it ("After attached hero takes damage from an enemy
+// attack", "After Dark Bats damages a character"): the characters whose damage went up between the two states; the enemy making the
+// attack is the event's other card. A character that damage destroyed took it all the same (rr.damage: the damage is placed, then the
+// card is destroyed): its event is queued after the leftPlay events and before characterDestroyed, and the cards still in play hear it
+// (rr.forced). The attachments of the dead character left play with it (rr.attachment-cards), so a Response of theirs, used only after
+// the trigger is resolved (rr.response), is not offered; an effect on another card does nothing to a card that is no longer in play.
 export function noteAttackDamage(before: ScenarioState, damaged: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   // A family may act on the damage (an enemy with Venom gives each character it damaged 1 poison: hob.venom-poison, families/poison/venom.ts).
   const after = familyAttackDamaged(before, damaged, ctx, steps);
@@ -143,8 +147,16 @@ export function noteAttackDamage(before: ScenarioState, damaged: ScenarioState, 
   let next = after;
   for (const now of Object.values(after.cards)) {
     const was = before.cards[now.id];
-    if (!was || !inPlay(now.zone) || now.damage <= was.damage || !isCharacterType(printedOf(ctx.cards, now.code))) continue;
-    next = queueEvent(next, { trigger: "damagedByAttack", seat: now.controller, cardId: now.id, subject: now.id, amount: now.damage - was.damage, ...(after.pendingAttack ? { other: after.pendingAttack.enemyId } : {}) });
+    if (!was || !inPlay(was.zone) || now.damage <= was.damage || !isCharacterType(printedOf(ctx.cards, now.code))) continue;
+    const event: GameEvent = { trigger: "damagedByAttack", seat: was.controller, cardId: now.id, subject: now.id, amount: now.damage - was.damage, ...(after.pendingAttack ? { other: after.pendingAttack.enemyId } : {}) };
+    next = inPlay(now.zone) ? queueEvent(next, event) : queueBeforeDestruction(next, event);
   }
   return next;
+}
+
+// The event of damage that destroyed its card goes ahead of that card's "destroyed" event: the damage is heard before the destruction.
+function queueBeforeDestruction(state: ScenarioState, event: GameEvent): ScenarioState {
+  const pending = state.pendingEvents ?? [];
+  const at = pending.findIndex((one) => one.trigger === "characterDestroyed" && one.subject === event.subject);
+  return at < 0 ? queueEvent(state, event) : { ...state, pendingEvents: [...pending.slice(0, at), event, ...pending.slice(at)] };
 }
