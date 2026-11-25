@@ -11,7 +11,8 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
 
 07016:A:2 (front): Action: Exhaust Gríma to draw a card.
   07016:action:1: Action (cost: exhaust this card)
-    who acts: any player may trigger it; the acting player is the one who does
+    only if there is a ally (you control) named "Gríma" to choose
+    who acts: only the player who controls it may trigger it, as for any ally; the acting player is that player
     - the acting player draws 1 card(s)
 
 07016:A:3 (front): If Gríma leaves play, the players lose the game.
@@ -310,4 +311,4 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
   07061:questResolution:1: Quest resolution
     - the players win the game
 
-(rendered pieces: 167 by template, 0 as JSON)
+(rendered pieces: 169 by template, 0 as JSON)

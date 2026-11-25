@@ -39,6 +39,7 @@ The statuses are those of the Readings bullet of `docs/scenarios/the-ring-maker.
 - `07023:A:1` (researched). Ill Tidings goes into the first player's hand as the card he draws in the printed words; it cannot leave the hand and counts in every hand count; the surge check is made once, after it is in the hand, itself included. Not taken: surge each time the hand grows. Basis: the printed line, `rr.staging`. Sources: https://ffg-forum-archive.entropicdreams.com/topic/202960-ill-tidings-and-erestor/ ; https://ffg-forum-archive.entropicdreams.com/topic/100910-fords-of-isen-and-dunland-berserker.
 - `07023:A:1` (recommended). The move into the hand is not a draw from the player deck: no "after a player draws" line hears it. Not taken: it triggers them. Basis: the printed line; the card comes from the encounter deck. Sources: the two pages of the line above (no word on draw triggers); no source settles it.
 - `07018:A:1` (span-settled). The ban covers card effects only; the resource phase collection still happens. Not taken: the collection is blocked. Basis: `faq.moving-resources-is-not-adding`. Source: https://hallofbeorn.com/LotR/Details/Fords-of-Isen-VoI?Lang=EN.
+- `07047:A:1` (recommended). "The topmost Dunland enemy discarded this way" is the Dunland enemy discarded last, the top of the encounter discard pile: each card is discarded one at a time and lands on top of the pile (`rr.destroy` puts a card "on top of" the discard pile). Not taken: the enemy that was highest in the encounter deck (discarded first). Basis: agent recommendation; no official ruling found. Sources read: https://ffg-forum-archive.entropicdreams.com/topic/190320-dunland-chieftan-and-empty-encounter-deck (a relayed answer lets the player choose among the discarded Dunland enemies, empty-deck case only, unofficial), https://ffg-forum-archive.entropicdreams.com/topic/93114-the-battle-of-the-5-armies ("topmost enemy in the discard pile", no order ruling).
 
 ## Readings to confirm
 
@@ -50,3 +51,4 @@ The statuses are those of the Readings bullet of `docs/scenarios/the-ring-maker.
 - `07023:A:1`: recommended. Ill Tidings going into the hand is not a draw.
 - `07045:A:2`, `07049:A:2`: researched, a relayed official answer. The Condition leaves play with the stage; the next stage does not inherit it.
 - `07046:A:2`, `07048:A:1`, `07045:A:2`, `07049:A:2`, `07018:A:2`: researched, community only. One draw is one trigger; each player's draw in the resource phase is its own.
+- `07047:A:1`: recommended. The topmost Dunland enemy is the one discarded last.

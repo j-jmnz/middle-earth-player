@@ -24,9 +24,9 @@ const attachesToQuest = (code: string, line: string): Effect[] => [
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 07016 Gríma (objective ally). While free of encounters the first player gains control of him, as the first player token passes (the record of 18070:A:1); lying on The Islet he is attached to it, and the host leaving play sends him back to the staging area (`returnsToStagingArea`, families/objectives/claimed.ts) instead
-  // of discarding him. Action: exhaust him to draw a card. If he leaves play the players lose.
+  // of discarding him. Action: exhaust him to draw a card; as for any ally only the player who controls him may (a condition naming an ally the actor controls, as 06132:A:2). If he leaves play the players lose.
   { id: "07016:constant:1", cardCode: GRIMA, lines: ["07016:A:1"], timing: "constant", instructions: [{ verb: "GainControlWhenFree", who: "firstPlayer" }, { verb: "ModifyStat", stat: "returnsToStagingArea", amount: 1, until: "whileSourceInPlay", target: "self" }] },
-  { id: "07016:action:1", cardCode: GRIMA, lines: ["07016:A:2"], timing: "action", cost: { kind: "exhaustSelf" }, instructions: [{ verb: "Draw", amount: 1 }] },
+  { id: "07016:action:1", cardCode: GRIMA, lines: ["07016:A:2"], timing: "action", condition: { kind: "canPick", pick: { type: "ally", control: "you", names: ["Gríma"] } }, cost: { kind: "exhaustSelf" }, instructions: [{ verb: "Draw", amount: 1 }] },
   { id: "07016:triggered:1", cardCode: GRIMA, lines: ["07016:A:3"], timing: "triggered", trigger: "leftPlay", subject: "self", instructions: [{ verb: "LoseGame" }] },
 
   // 07017 The Islet. While it is the active location each Dunland enemy in play, staged or engaged, gets +1 Threat.
