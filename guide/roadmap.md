@@ -1,4 +1,4 @@
-<p align="center"><a href="../README.md">Home</a> · <a href="install.md">Install</a> · <a href="faq.md">FAQ</a> · <strong>Roadmap</strong> · <a href="../ACCESSIBILITY.md">Accessibility</a> · <a href="../PRIVACY.md">Privacy</a> · <a href="attribution.md">Attribution</a></p>
+<p align="center"><a href="../README.md">Home</a> · <a href="install.md">Install</a> · <a href="questions.md">FAQ</a> · <strong>Roadmap</strong> · <a href="../ACCESSIBILITY.md">Accessibility</a> · <a href="../PRIVACY.md">Privacy</a> · <a href="attribution.md">Attribution</a></p>
 
 # Roadmap
 

@@ -123,7 +123,7 @@ The Hobbit and the cycles have no campaign, so you play their scenarios one at a
 | --- | --- |
 | [Install](guide/install.md) | Every platform, step by step, and what to do if something goes wrong |
 | [Check a download](guide/install.md#check-a-download-optional) | The SHA-256 of every file and the Android signing certificate |
-| [FAQ](guide/faq.md) | Hidden gestures, settings that are off by default, and where to find things |
+| [FAQ](guide/questions.md) | Hidden gestures, settings that are off by default, and where to find things |
 | [Accessibility](ACCESSIBILITY.md) | Screen readers, text size, contrast and motion: what works and what doesn't yet |
 | [Roadmap](guide/roadmap.md) | The next cycles and the fan-made scenarios, in order |
 | [Attribution](guide/attribution.md) | Where every card, rule and picture comes from |
