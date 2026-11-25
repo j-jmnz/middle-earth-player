@@ -74,6 +74,27 @@ export function run(made: { ctx: ReduceContext }, state: ScenarioState, instruct
 /** The intents that let a window go by without a decision: pass, decline to travel, engage nobody, attack nobody. */
 export const PASSING: readonly PlayerIntent["type"][] = ["Pass", "DeclineTravel", "DeclineEngage", "DeclineAttack"];
 
+/** The game goes on until `stop` holds: every window is passed, a choice takes its first option (or the one `choose` names), an enemy to attack is the first offered. */
+export function drive(made: { ctx: ReduceContext }, from: Run, stop: (state: ScenarioState) => boolean, choose: (state: ScenarioState) => string = (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "")): Run {
+  let current = from;
+  for (let guard = 0; guard < 400 && !stop(current.state) && !current.state.lost && !current.state.stageCleared; guard += 1) {
+    const state = current.state;
+    if (state.window?.kind === "choose") {
+      current = send(current, { type: "Choose", optionId: choose(state) }, made.ctx);
+      continue;
+    }
+    if (state.window?.kind === "chooseEnemy") {
+      current = send(current, { type: "ChooseEnemy", enemyId: state.window.options[0] ?? "" }, made.ctx);
+      continue;
+    }
+    const intents = legalIntents(state, made.ctx);
+    const pass = PASSING.map((type) => intents.find((intent) => intent.type === type)).find((intent) => intent != null);
+    if (!pass) break;
+    current = send(current, pass as PlayerIntent, made.ctx);
+  }
+  return current;
+}
+
 /**
  * An attack is fought out: a defense window names the hero `heroCode` (the first hero of the player attacked by default) as the one that takes an undefended attack, or declares `defender` when given; a choice takes the option `choose` names (the first by default); every
  * other window is passed. Stops once `stop` holds.

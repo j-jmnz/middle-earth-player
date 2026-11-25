@@ -8,7 +8,6 @@ import { idOf, opened, send, type Layout, type Run } from "../../../../test/harn
 
 import { drive, hiddenCodes, table, BOROMIR } from "../../../../test/scenarios/the-blood-of-gondor/table.ts";
 
-export const ALLY = "ally";
 export const tableOf = (effects: readonly Effect[]) => (layout: Layout) => table(layout, effects, [BOROMIR]);
 export const hiddenOf = (state: ScenarioState, seat: number): string[] => hiddenCodes(state, seat);
 export const discardCodes = (state: ScenarioState): string[] => state.encounterDiscard.map((id) => state.cards[id]?.code ?? "");
