@@ -326,7 +326,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     - the card just revealed gains surge
 
 18073:B:2 (back): Forced: When an Orc enemy attacks and damages a character, that character's controller chooses and discards 1 card from his hand.
-  18073:forced:2: Forced on the event damagedByAttack (heard about character (any player controls); event happened to the controller)
+  18073:forced:2: Forced on the event damagedByAttack (heard about character (any player controls))
     only if the attacking enemy is a Orc enemy (any player controls)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - discard 1 cards from hand
