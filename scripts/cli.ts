@@ -61,6 +61,7 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     new: { steps: [{ script: "tools/scenario-new.ts" }], about: "writes and registers a scenario's skeleton files (--dry-run first)" },
     pack: { steps: [{ script: "tools/author-pack.ts" }], about: "writes .agent/pack/<id>.md, the scenario author's context" },
     tests: { steps: [{ script: "tools/scenario-tests.ts" }], about: "after Build, writes a failing row stub in the scenario's spec.test.ts for each record no test names (<scenario-id> --dry-run first)" },
+    words: { steps: [{ script: "tools/scenario-words.ts", node: GAME_NODE }], about: "after Tests, lists what the Words task owes a scenario (each Pick and Choose with its asks entry and the rule it breaks, the Table step rows); --write stubs the missing entries (<scenario-id> --dry-run first)" },
     fixtures: { steps: [{ script: "e2e/fixtures.ts" }], about: "rewrites the save fixtures in src/campaign/fixtures" },
   },
   test: {
