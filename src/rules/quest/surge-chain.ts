@@ -9,3 +9,21 @@ export function inSurgeChain(state: ScenarioState, counts: (code: string) => boo
   const open = new Set(state.stack.filter((frame) => frame.frame === "reveal" && frame.step >= 6).map((frame) => frame.cardId));
   return state.encounterDiscard.every((id) => open.has(id) && counts(state.cards[id]?.code ?? ""));
 }
+
+// The table without what only counts passes: the stack, the seed and its cursor, the id counters, the clock and the order in which cards entered play. Two resets of one chain that find the same table are one lap of a loop that changes nothing.
+function tableMark(state: ScenarioState): string {
+  const { stack: _stack, seed: _seed, seedCursor: _cursor, nextId: _next, frameSeq: _seq, clock: _clock, cards, ...table } = state;
+  return JSON.stringify({ ...table, cards: Object.values(cards).map(({ enteredPlay: _entered, ...card }) => card) });
+}
+
+/** The general end of a surge chain that changes nothing (rr.surge, rr.running-out-of-cards): the reset is about to shuffle the discard pile back inside a chain (every card of it a reveal still open), and the table is the one an earlier reset of the chain found. A chain whose passes change the game (threat, damage, a token, a time counter) finds a new table each pass and goes on. Returns the state to continue with, and whether the reset is held. */
+export function repeatsChain(state: ScenarioState): { state: ScenarioState; held: boolean } {
+  if (!inSurgeChain(state)) return { state, held: false };
+  const mark = tableMark(state);
+  const reveals = state.stack.filter((frame) => frame.frame === "reveal");
+  if (reveals.some((frame) => frame.data.kind === "reveal" && frame.data.chainMark === mark)) return { state, held: true };
+  const top = state.stack[state.stack.length - 1];
+  if (!top || top.frame !== "reveal" || top.data.kind !== "reveal") return { state, held: false };
+  const stack = [...state.stack.slice(0, -1), { ...top, data: { ...top.data, chainMark: mark } }];
+  return { state: { ...state, stack }, held: false };
+}

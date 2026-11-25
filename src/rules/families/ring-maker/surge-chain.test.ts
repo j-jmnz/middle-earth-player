@@ -40,14 +40,18 @@ describe("the ring-maker surge hold", () => {
     expect(inOwnSurgeChain(state, t.ctx)).toBe(false);
   });
 
-  it("runs the Take Cover! chain on, one time counter a pass, until the stage's Time effect fires (the Time effect then reveals from the same lone card and the round engine's step limit ends the game of this test)", () => {
+  it("runs the Take Cover! chain on, one time counter a pass, until the stage's Time effect fires; the lap that finds the same table ends the chain (quest/surge-chain.ts repeatsChain)", () => {
     const t = tableFromLayout(SCENARIO, { stage: STAGE_2, timeCounters: 2, deck: [], piles: OUT });
     const steps: EngineStep[] = [];
-    expect(() => revealFromTop(t.state, t.ctx, COVER, steps)).toThrow("step limit");
+    const end = revealFromTop(t.state, t.ctx, COVER, steps);
     const stage = idOf(t.state, STAGE_2);
-    const resets = steps.findIndex((step) => step.kind === "push" && step.frame === "forced" && step.cardId === stage);
-    expect(resets).toBeGreaterThan(0);
+    const fired = steps.findIndex((step) => step.kind === "push" && step.frame === "forced" && step.cardId === stage);
+    expect(fired).toBeGreaterThan(0);
     // The first pass took a counter and the deck was reset once; the second took the last counter and the Time effect fired.
-    expect(steps.slice(0, resets).filter((step) => step.kind === "resetEncounterDeck")).toHaveLength(1);
+    expect(steps.slice(0, fired).filter((step) => step.kind === "resetEncounterDeck")).toHaveLength(1);
+    // The game goes on: the stack is empty again and the game is not lost.
+
+    expect(end.state.stack).toHaveLength(0);
+    expect(end.state.lost).toBe(false);
   });
 });
