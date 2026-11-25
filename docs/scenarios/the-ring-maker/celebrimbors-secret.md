@@ -3,7 +3,7 @@
 The Ring-maker part 8 (pack `CS`), standalone only, on Easy and Normal (Q04.8, E04.8). Encounter sets Celebrimbor's Secret, Misty Mountain Orcs and Broken Lands (`rm.setup-celebrimbors-secret`; the two other sets are from The Voice of Isengard). The rulesheet defines the Scour keyword (`rm.scour`, with its example) and The Orcs' Search (`rm.the-orcs-search`).
 
 - **Setup.** Stage 1A prints "Add Bellach, The Orcs' Search, and The Secret Chamber to the staging area. Attach Celebrimbor's Mould to The Secret Chamber. Each player adds a different Ost-in-Edhil location to the staging area. Shuffle the encounter deck." (`08122:A:1`). The Setup reader gives a staging step, an attach step and the location step for each player (trait Ost-in-Edhil).
-- **Piles.** The staging pile holds Bellach (08124), The Orcs' Search (08125), The Secret Chamber (08126), Celebrimbor's Mould (08127) and the Ost-in-Edhil locations (Ruined Plaza 08130, Collapsed Tower 08131, Ancient Foundation 08132, City Remains 08133). The quest pile holds two stages. No override.
+- **Piles.** The staging pile holds Bellach (08124), The Orcs' Search (08125), The Secret Chamber (08126) and the Ost-in-Edhil locations (Ruined Plaza 08130, Collapsed Tower 08131, Ancient Foundation 08132, City Remains 08133). DragnCards stages Celebrimbor's Mould (08127), but the Setup attaches it to The Secret Chamber, so an override (`scenarioPiles`) puts it in the set-aside pile. The quest pile holds two stages.
 - **Errata.** None for a card of this scenario.
 
 ## Data

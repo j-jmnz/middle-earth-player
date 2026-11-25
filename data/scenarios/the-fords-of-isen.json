@@ -13,11 +13,11 @@
       "count": 14
     },
     {
-      "name": "Dunland Warriors",
+      "name": "Dunland Raiders",
       "count": 9
     },
     {
-      "name": "Dunland Raiders",
+      "name": "Dunland Warriors",
       "count": 9
     }
   ],
@@ -59,30 +59,6 @@
       "pile": "encounter"
     },
     {
-      "code": "07046",
-      "normal": 2,
-      "easy": 2,
-      "pile": "encounter"
-    },
-    {
-      "code": "07047",
-      "normal": 2,
-      "easy": 0,
-      "pile": "encounter"
-    },
-    {
-      "code": "07048",
-      "normal": 3,
-      "easy": 3,
-      "pile": "encounter"
-    },
-    {
-      "code": "07049",
-      "normal": 2,
-      "easy": 1,
-      "pile": "encounter"
-    },
-    {
       "code": "07042",
       "normal": 3,
       "easy": 3,
@@ -107,6 +83,30 @@
       "pile": "encounter"
     },
     {
+      "code": "07046",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "07047",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "07048",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "07049",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
       "code": "07059",
       "normal": 1,
       "easy": 1,
@@ -125,16 +125,16 @@
       "pile": "quest"
     },
     {
-      "code": "07016",
+      "code": "07017",
       "normal": 1,
       "easy": 1,
       "pile": "staging"
     },
     {
-      "code": "07017",
+      "code": "07016",
       "normal": 1,
       "easy": 1,
-      "pile": "staging"
+      "pile": "setAside"
     }
   ],
   "campaignPlaced": [],

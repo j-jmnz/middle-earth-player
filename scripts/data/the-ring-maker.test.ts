@@ -23,15 +23,15 @@ const def = CYCLE_DEFS.find((campaign) => campaign.id === "the-ring-maker");
 
 // The Normal and Easy encounter decks (the encounter cards that are not set aside or staged), the encounter sets in rulesheet order, the stages, and the cards each scenario stages or sets aside.
 const DECK = {
-  "the-fords-of-isen": { title: "The Fords of Isen", deck: "Q04.1", normal: 32, easy: 22, sets: ["The Fords of Isen", "Dunland Warriors", "Dunland Raiders"], staging: ["07016", "07017"], setAside: [], stages: 3 },
+  "the-fords-of-isen": { title: "The Fords of Isen", deck: "Q04.1", normal: 32, easy: 22, sets: ["The Fords of Isen", "Dunland Raiders", "Dunland Warriors"], staging: ["07017"], setAside: ["07016"], stages: 3 },
   "to-catch-an-orc": { title: "To Catch an Orc", deck: "Q04.2", normal: 33, easy: 27, sets: ["To Catch an Orc", "Misty Mountain Orcs", "Broken Lands"], staging: [], setAside: ["07024", "07025"], stages: 3 },
-  "into-fangorn": { title: "Into Fangorn", deck: "Q04.3", normal: 33, easy: 23, sets: ["Into Fangorn", "Ancient Forest", "Weary Travelers"], staging: ["07031", "07032"], setAside: [], stages: 3 },
+  "into-fangorn": { title: "Into Fangorn", deck: "Q04.3", normal: 33, easy: 23, sets: ["Into Fangorn", "Ancient Forest", "Weary Travelers"], staging: ["07032"], setAside: ["07031"], stages: 3 },
   "the-dunland-trap": { title: "The Dunland Trap", deck: "Q04.4", normal: 42, easy: 31, sets: ["The Dunland Trap", "Dunland Warriors", "Weary Travelers"], staging: [], setAside: ["08014", "08015"], stages: 3 },
   "the-three-trials": { title: "The Three Trials", deck: "Q04.5", normal: 26, easy: 18, sets: ["The Three Trials", "Ancient Forest"], staging: [], setAside: ["08040", "08041", "08042", "08043", "08044", "08045", "08046", "08047", "08048", "08049"], stages: 5 },
   "trouble-in-tharbad": { title: "Trouble in Tharbad", deck: "Q04.6", normal: 32, easy: 24, sets: ["Trouble in Tharbad", "Misty Mountain Orcs"], staging: ["08072"], setAside: ["08068", "08070", "08071"], stages: 2 },
   "the-nin-in-eilph": { title: "The Nîn-in-Eilph", deck: "Q04.7", normal: 29, easy: 23, sets: ["The Nîn-in-Eilph", "Weary Travelers"], staging: ["08106", "08107", "08108", "08109"], setAside: ["08102", "08103"], stages: 8 },
-  "celebrimbors-secret": { title: "Celebrimbor's Secret", deck: "Q04.8", normal: 45, easy: 35, sets: ["Celebrimbor's Secret", "Misty Mountain Orcs", "Broken Lands"], staging: ["08124", "08125", "08126", "08127", "08130", "08131", "08132", "08133"], setAside: [], stages: 2 },
-  "the-antlered-crown": { title: "The Antlered Crown", deck: "Q04.9", normal: 28, easy: 20, sets: ["The Antlered Crown", "Dunland Raiders", "Dunland Warriors"], staging: ["08155"], setAside: ["07042", "07043", "07044", "07046", "07047", "07048", "08150", "08151", "08152"], stages: 3 },
+  "celebrimbors-secret": { title: "Celebrimbor's Secret", deck: "Q04.8", normal: 45, easy: 35, sets: ["Celebrimbor's Secret", "Misty Mountain Orcs", "Broken Lands"], staging: ["08124", "08125", "08126", "08130", "08131", "08132", "08133"], setAside: ["08127"], stages: 2 },
+  "the-antlered-crown": { title: "The Antlered Crown", deck: "Q04.9", normal: 28, easy: 20, sets: ["The Antlered Crown", "Dunland Warriors", "Dunland Raiders"], staging: ["08155"], setAside: ["07042", "07043", "07044", "07046", "07047", "07048", "08150", "08151", "08152"], stages: 3 },
 } as const;
 
 const SETUP_SPANS = {
@@ -75,12 +75,11 @@ describe("The Ring-maker cycle", () => {
     expect([...new Set(scenario.cards.filter((card) => card.pile === "setAside").map((card) => card.code))].sort()).toEqual([...pin.setAside]);
   });
 
-  it("holds the encounter sets of every scenario in the rules span that prints them (the insert for The Voice of Isengard, the rulesheet for a pack)", () => {
-    for (const [id, pin] of Object.entries(DECK)) {
-      const text = rules.get(SETUP_SPANS[id as keyof typeof SETUP_SPANS]) ?? "";
-      expect(text, id).toContain("encounter deck");
-      // The Voice of Isengard's insert and the Dunland Warriors set spell "Weary Travellers" and "Dunlending Warriors" as their rulesheets do not agree: the card data names the sets.
-      for (const set of pin.sets) expect(text.replaceAll("Travellers", "Travelers").replaceAll("Dunlending", "Dunland"), `${id} ${set}`).toContain(set);
+  it("names the rules span that prints each scenario's encounter sets as its Setup span, which the build reads them from (the insert for The Voice of Isengard, the rulesheet for a pack)", () => {
+    for (const id of Object.keys(DECK)) {
+      const span = SETUP_SPANS[id as keyof typeof SETUP_SPANS];
+      expect(def?.scenarios.find((scenario) => scenario.id === id)?.setupSpan, id).toBe(span);
+      expect(rules.get(span) ?? "", id).toContain("encounter deck");
     }
     expect(def?.scenarios.map((scenario) => scenario.id)).toEqual(Object.keys(DECK));
   });

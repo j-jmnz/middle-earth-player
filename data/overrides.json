@@ -3820,6 +3820,27 @@
       "source": "scan 19134.A; dragncards preBuiltDecks.json (Q08.8, E08.8); Ered Mithrin Campaign Expansion rulebook MEC115 p20 (emce.setup-mount-gundabad)"
     },
     {
+      "scenario": "the-fords-of-isen",
+      "code": "07016",
+      "pile": "setAside",
+      "reason": "DragnCards loads Gríma (objective-ally) in the staging area (Q04.1, E04.1). The quest card (07059) prints \"Setup: Add The Islet to the staging area and attach Gríma to that location.\", so he starts attached to The Islet, not staged.",
+      "source": "scan 07059.A; dragncards preBuiltDecks.json (Q04.1, E04.1)"
+    },
+    {
+      "scenario": "into-fangorn",
+      "code": "07031",
+      "pile": "setAside",
+      "reason": "DragnCards loads Mugash (objective) in the staging area (Q04.3, E04.3). The quest card prints \"Setup: Add Edge of Fangorn to the staging area and attach Mugash to that location.\", so he starts attached to Edge of Fangorn, not staged.",
+      "source": "scan 07065.A; dragncards preBuiltDecks.json (Q04.3, E04.3)"
+    },
+    {
+      "scenario": "celebrimbors-secret",
+      "code": "08127",
+      "pile": "setAside",
+      "reason": "DragnCards loads Celebrimbor's Mould in the staging area (Q04.8, E04.8). The quest card (08122) prints \"Setup: ... Attach Celebrimbor's Mould to The Secret Chamber.\", so it starts attached to that location, not staged.",
+      "source": "scan 08122.A; dragncards preBuiltDecks.json (Q04.8, E04.8)"
+    },
+    {
       "scenario": "a-shadow-of-the-past",
       "code": "141017",
       "pile": "campaign",
@@ -4772,7 +4793,7 @@
     }
   ],
   "campaigns": [
-{
+    {
       "id": "haradrim",
       "name": "Haradrim",
       "kind": "cycle",
@@ -5179,6 +5200,30 @@
     }
   ],
   "encounterSetAliases": [
+    {
+      "booklet": "Dunlending Warriors",
+      "set": "Dunland Warriors",
+      "reason": "The Ring-maker rulesheets spell the Dunland encounter sets \"Dunlending\". The cards' set icon and Hall of Beorn print \"Dunland Warriors\". The card wins (authority order); the booklet's spelling is an alias.",
+      "source": "rulesheets rm.setup-the-dunland-trap, rm.setup-the-antlered-crown; hallofbeorn.com/Export/Cards (EncounterSet Dunland Warriors)"
+    },
+    {
+      "booklet": "Dunlending Raiders",
+      "set": "Dunland Raiders",
+      "reason": "The Antlered Crown rulesheet spells the set \"Dunlending Raiders\". The cards and Hall of Beorn print \"Dunland Raiders\". The card wins; the booklet's spelling is an alias.",
+      "source": "rulesheet rm.setup-the-antlered-crown; hallofbeorn.com/Export/Cards (EncounterSet Dunland Raiders)"
+    },
+    {
+      "booklet": "Weary Travellers",
+      "set": "Weary Travelers",
+      "reason": "The Into Fangorn rulesheet uses the British spelling. The cards and Hall of Beorn print \"Weary Travelers\". The card wins; the booklet's spelling is an alias.",
+      "source": "rulesheet rm.setup-into-fangorn; hallofbeorn.com/Export/Cards (EncounterSet Weary Travelers)"
+    },
+    {
+      "booklet": "TM The Antlered Crown",
+      "set": "The Antlered Crown",
+      "reason": "The Antlered Crown rulesheet's text layer carries the trademark sign of the set name as the letters \"TM\". The cards print \"The Antlered Crown\".",
+      "source": "rulesheet rm.setup-the-antlered-crown; scan 08155.A"
+    },
     {
       "booklet": "Journey Down the Anduin",
       "set": "Journey Along the Anduin",

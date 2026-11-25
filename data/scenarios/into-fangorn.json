@@ -107,16 +107,16 @@
       "pile": "quest"
     },
     {
-      "code": "07031",
+      "code": "07032",
       "normal": 1,
       "easy": 1,
       "pile": "staging"
     },
     {
-      "code": "07032",
+      "code": "07031",
       "normal": 1,
       "easy": 1,
-      "pile": "staging"
+      "pile": "setAside"
     }
   ],
   "campaignPlaced": [],

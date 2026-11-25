@@ -3,7 +3,7 @@
 The Ring-maker part 1 (The Voice of Isengard, `VoI`), standalone only, on Easy and Normal (Q04.1, E04.1; DragnCards labels the decks "Fords of Isen"). Encounter sets The Fords of Isen, Dunland Warriors and Dunland Raiders (`rm.setup-the-fords-of-isen`; the two Dunland sets are shared with The Dunland Trap and The Antlered Crown). The cards print the Time X keyword on the three quest stages (`rm.time-x`) and the Gríma objective-ally (`rm.grima-objective-ally`).
 
 - **Setup.** Stage 1A prints "Add The Islet to the staging area and attach Gríma to that location. Each player searches the encounter deck for 1 different Dunland enemy and adds it to the staging area. Shuffle the encounter deck." (`07059:A:1`, read from the scan). The Setup reader turns it into a staging step with an attach step and a search of one Dunland enemy for each player (`scripts/data/normalize/setup-the-ring-maker.ts`).
-- **Piles.** The staging pile holds Gríma (07016) and The Islet (07017) as the load list has them; the Setup attaches Gríma to The Islet, so the build accepts an attached card in the staging pile (`pileAccepts`). The quest pile holds the three stages. No override.
+- **Piles.** The staging pile holds The Islet (07017). DragnCards stages Gríma (07016), but the Setup attaches him to The Islet, so an override (`scenarioPiles`) puts him in the set-aside pile and the scenario author attaches him at Setup. The quest pile holds the three stages.
 - **Errata.** None for a card of this scenario.
 - **Cards of other scenarios.** The Dunland Warriors and Dunland Raiders cards (07042 to 07048) keep one record in each scenario that deals them (`docs/scenarios/the-ring-maker.md`).
 

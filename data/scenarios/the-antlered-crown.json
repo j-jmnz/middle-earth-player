@@ -13,11 +13,11 @@
       "count": 24
     },
     {
-      "name": "Dunland Raiders",
+      "name": "Dunland Warriors",
       "count": 2
     },
     {
-      "name": "Dunland Warriors",
+      "name": "Dunland Raiders",
       "count": 2
     }
   ],
@@ -77,13 +77,13 @@
       "pile": "encounter"
     },
     {
-      "code": "07045",
+      "code": "07049",
       "normal": 2,
       "easy": 1,
       "pile": "encounter"
     },
     {
-      "code": "07049",
+      "code": "07045",
       "normal": 2,
       "easy": 1,
       "pile": "encounter"
@@ -137,24 +137,6 @@
       "pile": "setAside"
     },
     {
-      "code": "07042",
-      "normal": 3,
-      "easy": 3,
-      "pile": "setAside"
-    },
-    {
-      "code": "07043",
-      "normal": 2,
-      "easy": 2,
-      "pile": "setAside"
-    },
-    {
-      "code": "07044",
-      "normal": 2,
-      "easy": 0,
-      "pile": "setAside"
-    },
-    {
       "code": "07046",
       "normal": 2,
       "easy": 2,
@@ -170,6 +152,24 @@
       "code": "07048",
       "normal": 3,
       "easy": 3,
+      "pile": "setAside"
+    },
+    {
+      "code": "07042",
+      "normal": 3,
+      "easy": 3,
+      "pile": "setAside"
+    },
+    {
+      "code": "07043",
+      "normal": 2,
+      "easy": 2,
+      "pile": "setAside"
+    },
+    {
+      "code": "07044",
+      "normal": 2,
+      "easy": 0,
       "pile": "setAside"
     }
   ],

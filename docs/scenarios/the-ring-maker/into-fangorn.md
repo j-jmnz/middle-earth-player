@@ -3,7 +3,7 @@
 The Ring-maker part 3 (The Voice of Isengard, `VoI`), standalone only, on Easy and Normal (Q04.3, E04.3). Encounter sets Into Fangorn, Ancient Forest and Weary Travelers (`rm.setup-into-fangorn`; the insert spells the last "Weary Travellers"; Ancient Forest is shared with The Three Trials, Weary Travelers with The Dunland Trap and The Nîn-in-Eilph). The scenario adds the Hinder keyword (`rm.hinder`) and the "does not stack" clause (`rm.does-not-stack`).
 
 - **Setup.** Stage 1A prints "Add Edge of Fangorn to the staging area and attach Mugash to that location. Shuffle the encounter deck. Reveal X encounter cards where X equals the number of players in the game minus 1." (`07065:A:1`, read from the scan; Hall of Beorn's text adds the word "additional"). The Setup reader gives it a staging step with an attach step, a shuffle and the step `revealPlayersLessOne`.
-- **Piles.** The staging pile holds Edge of Fangorn (07032) and the objective Mugash (07031), as the load list has them. The quest pile holds the three stages. No override.
+- **Piles.** The staging pile holds Edge of Fangorn (07032). DragnCards stages the objective Mugash (07031), but the Setup attaches him to Edge of Fangorn, so an override (`scenarioPiles`) puts him in the set-aside pile. The quest pile holds the three stages.
 - **Errata.** None for a card of this scenario.
 
 ## Data

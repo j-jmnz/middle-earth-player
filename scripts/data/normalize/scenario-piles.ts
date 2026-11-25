@@ -63,7 +63,7 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
       const eachPlayer = clausesOf(quest, "stage").some((clause) => clause.perPlayer != null && clause.codes.includes(code));
       const explorers = clausesOf(quest, "eachPlayerAddsLocation").length > 0 && printed?.type === "location";
       const searched = clausesOf(quest, "searchObjectives").length > 0 && printed?.type === "objective";
-      return said(["stage"]) || steps("attach") || eachPlayer || explorers || searched || fleet || /Setup: Add .* to the staging area/.test(own);
+      return said(["stage"]) || eachPlayer || explorers || searched || fleet || /Setup: Add .* to the staging area/.test(own);
     }
     case "burden":
       return true;
