@@ -8,7 +8,7 @@ import { seedFinderRel } from "../data/effects/seed-finder-paths.ts";
 import { ROOT } from "../data/paths.ts";
 import { runScript, type Log } from "../log.ts";
 import { cycleGameFile, cycleGoldenTestFile, cycleSeedFinderFile, standaloneTestFile } from "./scenario-new-cycle.ts";
-import { asksFile, authoredFile, authoredPath, campaignTestFile, camel, gameFile, goldenTestFile, seedFinderFile, specTestFile, type Facts, type PreviousPart } from "./scenario-new-files.ts";
+import { asksFile, authoredFile, authoredPath, campaignTestFile, camel, gameFile, goldenTestFile, screensFile, seedFinderFile, specTestFile, type Facts, type PreviousPart } from "./scenario-new-files.ts";
 import { parseArgs } from "../cli-args.ts";
 
 // Writes the skeleton of a scenario that data/scenarios already has, and the lines that register it, so the work left is the scenario's own
@@ -16,7 +16,7 @@ import { parseArgs } from "../cli-args.ts";
 //
 //   pnpm scenario new <scenario-id> [--short <name>] [--dry-run]
 //
-// Files (never overwritten: if any exists the command refuses, listing them): the game (test/scenarios/<id>/), the golden test, the campaign test and the
+// Files (never overwritten: if any exists the command refuses, listing them): the game (test/scenarios/<id>/, with its screens.ts), the golden test, the campaign test and the
 // spec rows (src/campaign/scenarios/<id>/), the choice words as an asks file (src/play/words/asks/<id>.ts, listed in its barrel by pnpm data build), the seed finder
 // (scripts/e2e/<id>.ts, or in the campaign's folder: scripts/data/effects/seed-finder-paths.ts), the authored effects file (src/effects/authored/<id>.ts, or in the campaign's folder: scripts/data/effects/authored-paths.ts) and the empty fixture file
 // (src/campaign/fixtures/<id>.json). There is no scene file: the game, the golden test and the campaign test read the scenario from data/, and the card tests are spec rows
@@ -192,6 +192,7 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
 
   const files = [
     { file: `test/scenarios/${id}/game.ts`, text: facts.cycle ? cycleGameFile(facts) : gameFile(facts) },
+    { file: `test/scenarios/${id}/screens.ts`, text: screensFile(facts) },
     { file: `src/campaign/scenarios/${id}/golden.test.ts`, text: facts.cycle ? cycleGoldenTestFile(facts) : goldenTestFile(facts) },
     facts.cycle ? { file: `src/campaign/scenarios/${id}/standalone.test.ts`, text: standaloneTestFile(facts) } : { file: `src/campaign/scenarios/${id}/campaign.test.ts`, text: campaignTestFile(facts) },
     { file: `src/campaign/scenarios/${id}/spec.test.ts`, text: specTestFile(facts) },

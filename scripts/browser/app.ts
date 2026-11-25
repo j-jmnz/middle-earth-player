@@ -36,9 +36,10 @@ export type App = {
   context: BrowserContext;
   /**
    * Opens a route in a new page and waits for `wait` (a testID), or for the first testID when none is named, then lets the screen settle. It closes
-   * the page it opened before: the app's database is one OPFS file, and a second tab waits on it forever.
+   * the page it opened before: the app's database is one OPFS file, and a second tab waits on it forever. `scene` (a SceneDump, src/screens/session/scene-dump.ts) is set as
+   * `globalThis.__E2E_SCENE__` before the page loads, for the scene's table (src/screens/session/web/standalone-session.canvaskit.ts).
    */
-  open: (route: string, options?: { wait?: string; settle?: number }) => Promise<Page>;
+  open: (route: string, options?: { wait?: string; settle?: number; scene?: unknown }) => Promise<Page>;
   /**
    * Writes a fixture save through the e2e route and returns the route it landed on (`/path/save-e2e-<name>`, or a standalone game's table). `at` keeps
    * the fixture's first intents only: the moment `pnpm game show <name> --at <n>` prints.
@@ -121,11 +122,12 @@ export async function openApp(options: AppOptions): Promise<App> {
   };
 
   let current: Page | undefined;
-  const open = async (route: string, opts: { wait?: string; settle?: number } = {}): Promise<Page> => {
+  const open = async (route: string, opts: { wait?: string; settle?: number; scene?: unknown } = {}): Promise<Page> => {
     if (current && !current.isClosed()) await current.close();
     const page = await context.newPage();
     current = page;
     watch(page);
+    if (opts.scene !== undefined) await page.addInitScript((dump) => Object.assign(globalThis, { __E2E_SCENE__: dump }), opts.scene);
     await page.goto(new URL(route, options.base).toString());
     await page.waitForSelector(opts.wait ? selectorOf(opts.wait) : "[data-testid]", { timeout: TIMEOUT });
     await page.waitForTimeout(opts.settle ?? DEFAULT_SETTLE);

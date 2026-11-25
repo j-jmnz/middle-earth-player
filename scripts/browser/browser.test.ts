@@ -67,6 +67,17 @@ describe("parseShotArgs", () => {
     expect(parseShotArgs(["--fixture", "duo", "--at", "5"], "/repo")).toMatchObject({ fixture: "duo", at: 5, routes: [] });
   });
 
+  it("reads a scene with its layout inline or in a file, and a moment, and takes one way to open a table", () => {
+    const inline = parseShotArgs(["--scene", "the-morgul-vale", '{"phase":"Combat"}', "--landscape"], "/repo");
+    expect(inline).toMatchObject({ scene: { scenarioId: "the-morgul-vale", layout: '{"phase":"Combat"}', file: null }, routes: [], size: LANDSCAPE });
+    expect(parseShotArgs(["--scene", "the-morgul-vale", "--scene-file", "layout.json"], "/repo").scene).toEqual({ scenarioId: "the-morgul-vale", layout: null, file: "layout.json" });
+    expect(parseShotArgs(["--moment", "the-morgul-vale/captain-bodyguard"], "/repo")).toMatchObject({ moment: "the-morgul-vale/captain-bodyguard", scene: null });
+    expect(() => parseShotArgs(["--scene-file", "layout.json"], "/repo")).toThrow("--scene <scenario-id>");
+    expect(() => parseShotArgs(["--scene", "a", "{}", "--scene-file", "b.json"], "/repo")).toThrow("inline or as --scene-file");
+    expect(() => parseShotArgs(["--scene", "a", "--moment", "b"], "/repo")).toThrow("give one");
+    expect(() => parseShotArgs(["--fixture", "duo", "--moment", "b"], "/repo")).toThrow("give one");
+  });
+
   it("puts the fixture's save id in {save}, and opens where the fixture landed when no route is named", () => {
     expect(routesOf({ routes: ["/table/{save}"] }, "/path/save-e2e-duo")).toEqual(["/table/save-e2e-duo"]);
     expect(routesOf({ routes: [] }, "/path/save-e2e-duo")).toEqual(["/path/save-e2e-duo"]);

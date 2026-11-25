@@ -166,6 +166,7 @@ describe("pnpm scenario new", () => {
     expect(problems).toEqual([]);
     expect(plan?.files.map((item) => item.file)).toEqual([
       `test/scenarios/${id}/game.ts`,
+      `test/scenarios/${id}/screens.ts`,
       `src/campaign/scenarios/${id}/golden.test.ts`,
       `src/campaign/scenarios/${id}/campaign.test.ts`,
       `src/campaign/scenarios/${id}/spec.test.ts`,

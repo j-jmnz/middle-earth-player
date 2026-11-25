@@ -13,6 +13,7 @@ import { markProgressNoted } from "../../src/rules/families/angmar/progress.ts";
 import { markProgressHeld } from "../../src/rules/families/long-dark/hold.ts";
 import { markCapture } from "../../src/rules/families/captured/entry.ts";
 import { markEnemyDamage } from "../../src/rules/families/encounter/patrol.ts";
+import { takeControlOfLocation } from "../../src/rules/families/pelargir/location-control.ts";
 import { markSeatedRows } from "../../src/rules/families/encounter/seated.ts";
 
 import { gameCodes, loadAnyScenario, loadCampaigns } from "../../scripts/data/load-scenarios.ts";
@@ -89,6 +90,10 @@ export type Layout = {
   sagaHero?: { resources?: number };
   // The table notes the cards placed in the encounter discard pile, as a Setup that sets `noteEncounterDiscards` leaves it (We Must Away, Ere Break of Day: the Key and the Purse hear their own discard).
   noteEncounterDiscards?: true;
+  // The hidden cards of The Blood of Gondor a seat holds (a code for the first seat, or a code and its seat), the one taken first first: set aside facedown in that seat's play area, as the family's own take leaves them (families/pelargir/hidden.ts).
+  hidden?: readonly Dealt[];
+  // The locations of Assault on Osgiliath the first player controls: each is added to the staging area and taken by the family's own verb (families/pelargir/location-control.ts), so it lies in his play area, faceup and noted as controlled.
+  controlled?: readonly string[];
   // Other zones that hold a list of cards (a second deck, a named pile).
   piles?: Partial<Record<PileZone, readonly Entry[]>>;
 };
@@ -247,6 +252,15 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   state = markEnemyDamage(state, ctx);
   state = markSeatedRows(state, ctx);
   state = { ...state, ...opening(layout.phase ?? "Quest"), ...(layout.firstPlayer != null ? { firstPlayer: layout.firstPlayer } : {}) };
+  for (const item of layout.hidden ?? []) {
+    const spawned = spawn(state, dealtCode(item), { zone: "setAside" }, "down");
+    const order = Math.max(0, ...Object.values(spawned.state.cards).map((card) => card.hiddenAt ?? 0)) + 1;
+    state = updateCard(spawned.state, spawned.id, { controller: null, owner: typeof item === "string" ? 0 : item.seat, hiddenAt: order });
+  }
+  for (const code of layout.controlled ?? []) {
+    const spawned = spawn(state, code, { zone: "staging" });
+    state = takeControlOfLocation(spawned.state, { verb: "TakeControlOfLocation", card: "self" }, { seat: spawned.state.firstPlayer, sourceId: spawned.id }, ctx);
+  }
   return { state: syncConstants(state, ctx), ctx, hero: first.id, hero2: secondHero.id, seat1Hero, definition, cards };
 }
 
