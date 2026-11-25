@@ -4,10 +4,10 @@ import { describe, expect, it } from "vitest";
 
 import type { EngineStep } from "../../core/intents.ts";
 import { shadowCards } from "../../core/zones.ts";
-import { idOf, resolveRecords } from "../../../../test/harness/scene-kit.ts";
+import { idOf, resolveRecords, statOf } from "../../../../test/harness/scene-kit.ts";
 import { CODES, engagedCodes, fight, opened, run, table, tokens, where } from "../../../../test/scenarios/the-morgul-vale/table.ts";
 
-const { rearguard, tower, bodyguard, sorcerer, tracker, murzag, deadCity, fog, vale } = CODES;
+const { rearguard, tower, bodyguard, sorcerer, tracker, murzag, deadCity, fog, vale, bridge } = CODES;
 const TOWER_NAME = "To the Tower";
 const FARAMIRS = { hero: "06081", otherHero: "144002", ally: "01014", otherAlly: "21005" } as const;
 
@@ -62,8 +62,10 @@ describe("RemoveAllNamedFromGame", () => {
     const removed = run(t, t.state, { verb: "RemoveAllNamedFromGame", name: "Faramir" }, { steps });
     for (const code of extra) expect(where(removed, code)).toBe("removed");
     expect((removed.pendingEvents ?? []).filter((event) => event.trigger === "leftPlay")).toEqual([]);
-    // The other heroes of the seat stay.
+    // The other heroes of the seat stay; the removed hero is no longer one of the seat's heroes, and its threat stays on the dial (06147:A:2, Readings).
+    expect(removed.seats[0]?.heroes).not.toContain(idOf(removed, FARAMIRS.hero));
     expect(where(removed, "dh1")).toBe("heroes");
+    expect(removed.seats[0]?.threat).toBe(t.state.seats[0]?.threat);
   });
 
   it("leaves a card of another title, and the encounter card Faramir that is no player card, where it lies", () => {
@@ -129,5 +131,27 @@ describe("RevealTopEngaging", () => {
     const after = fight(t, start, (state) => state.phase !== "Combat" || untilEnemyEngaged(tracker)(state), { defender: "01029" });
     expect(engagedCodes(after.state, 1)).toContain(tracker);
     expect(engagedCodes(after.state, 0)).toEqual([]);
+  });
+});
+
+describe("The White Bridge's Threat X and quest points X (06156:A:1)", () => {
+  it("takes the tokens on To the Tower as its Threat and quest points in the staging area, though it prints no Threat, and follows them live", () => {
+    const t = table({ staging: [{ code: tower, progress: 3 }, bridge] });
+    expect(statOf(t.state, t.cards, bridge, "threat")).toBe(3);
+    expect(statOf(t.state, t.cards, bridge, "questPoints")).toBe(3);
+    const more = run(t, t.state, { verb: "PlaceProgressOnNamed", name: TOWER_NAME, amount: 2 });
+    expect(statOf(more, t.cards, bridge, "threat")).toBe(5);
+    expect(statOf(more, t.cards, bridge, "questPoints")).toBe(5);
+  });
+
+  it("takes them as the active location too: the quest explores it with progress equal to the tokens, and with no token it has no quest points and stays active", () => {
+    const explored = table({ phase: "Quest", staging: [{ code: tower, progress: 2 }, murzag], active: bridge, committed: ["dh1", "dh2"] });
+    expect(statOf(explored.state, explored.cards, bridge, "threat")).toBe(2);
+    const afterQuest = fight(explored, opened(explored), (state) => state.phase !== "Quest");
+    expect(where(afterQuest.state, bridge)).toBe("encounterDiscard");
+    const empty = table({ phase: "Quest", staging: [tower, murzag], active: bridge, committed: ["dh1", "dh2"] });
+    expect(statOf(empty.state, empty.cards, bridge, "questPoints")).toBe(0);
+    const afterEmpty = fight(empty, opened(empty), (state) => state.phase !== "Quest");
+    expect(where(afterEmpty.state, bridge)).toBe("activeLocation");
   });
 });

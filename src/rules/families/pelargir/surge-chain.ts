@@ -8,10 +8,10 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 
 const TERROR_DRIVES_THEM = "06159";
 
-/** The deck is empty and every card of the discard pile is a card whose reveal is past its staging and still open (a surge chain, rr.surge): the surge finds no card, the chain ends, and the reset that follows the last reveal (faq.last-encounter-card) runs as usual. Only in a game with a record that takes a hidden card, or one that places progress on To the Tower and has no Terror Drives Them in the chain. */
+/** The deck is empty and every card of the discard pile is a card whose reveal is past its staging and still open (a surge chain, rr.surge): the surge finds no card, the chain ends, and the reset that follows the last reveal (faq.last-encounter-card) runs as usual. Only in a game with a record that takes a hidden card, or one whose To the Tower is in play (its record removes Faramir), and with no Terror Drives Them in the chain. */
 export function inOwnSurgeChain(state: ScenarioState, ctx: ReduceContext): boolean {
   if (state.encounterDeck.length > 0 || state.encounterDiscard.length === 0) return false;
-  if (!gameReads(state, ctx, '"TakeHiddenCard"') && !gameReads(state, ctx, '"PlaceProgressOnNamed"')) return false;
+  if (!gameReads(state, ctx, '"TakeHiddenCard"') && !gameReads(state, ctx, '"RemoveAllNamedFromGame"')) return false;
   const open = new Set(state.stack.filter((frame) => frame.frame === "reveal" && frame.step >= 6).map((frame) => frame.cardId));
   return state.encounterDiscard.every((id) => open.has(id) && state.cards[id]?.code !== TERROR_DRIVES_THEM);
 }

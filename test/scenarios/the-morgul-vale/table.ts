@@ -58,7 +58,7 @@ export const engagedCodes = (state: ScenarioState, seat = 0): string[] => (state
 const PASSING: readonly PlayerIntent["type"][] = ["Pass", "DeclineTravel", "DeclineEngage", "DeclineAttack"];
 
 /**
- * An attack is fought out: a defense window names the hero `heroCode` (dh1 by default) as the one that takes an undefended attack, or declares `defender` when given; a choice takes the option `choose` names (the first by default); every
+ * An attack is fought out: a defense window names the hero `heroCode` (the first hero of the player attacked by default) as the one that takes an undefended attack, or declares `defender` when given; a choice takes the option `choose` names (the first by default); every
  * other window is passed. Stops once `stop` holds.
  */
 export function fight(made: LayoutTable, from: Run, stop: (state: ScenarioState) => boolean, options: { defender?: string; heroCode?: string; choose?: (state: ScenarioState) => string } = {}): Run {
@@ -72,7 +72,7 @@ export function fight(made: LayoutTable, from: Run, stop: (state: ScenarioState)
     if (state.window?.kind === "choose") answer({ type: "Choose", optionId: options.choose ? options.choose(state) : (state.window.options[0] ?? "") });
     else if (state.window?.kind === "chooseEnemy") answer({ type: "ChooseEnemy", enemyId: state.window.options[0] ?? "" });
     else if (options.defender && intents.some((intent) => intent.type === "DeclareDefender")) answer({ type: "DeclareDefender", defenderId: idOf(state, options.defender) });
-    else if (intents.some((intent) => intent.type === "Undefended")) answer({ type: "Undefended", heroId: idOf(state, options.heroCode ?? "dh1") });
+    else if (intents.some((intent) => intent.type === "Undefended")) answer({ type: "Undefended", heroId: options.heroCode ? idOf(state, options.heroCode) : (state.seats[state.window?.kind === "defense" ? state.window.seat : 0]?.heroes[0] ?? "") });
     else {
       const pass = PASSING.map((type) => intents.find((intent) => intent.type === type)).find((intent) => intent != null);
       if (!pass) break;
