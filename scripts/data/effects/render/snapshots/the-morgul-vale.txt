@@ -66,7 +66,7 @@ Scenario piles that place cards with no record (staging: 06155 Morgul Vale; ques
 
 06147:A:3 (front): If 10 or more progress tokens are on To the Tower, the players have lost the game.
   06147:forced:2: Forced on the event progressPlaced (heard about this card)
-    only if this card is a objective (any player controls) with at least 10 progress on it
+    only if this card is a objective (any player controls) with at least 10 progress on it that is in the staging area
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game (10 progress tokens lie on To the Tower)
 

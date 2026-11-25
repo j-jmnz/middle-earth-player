@@ -46,7 +46,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "06146:constant:1", cardCode: "06146", lines: ["06146:B:2"], timing: "constant", instructions: [KEEP_IN_PLAY("Nazgûl of Minas Morgul")] },
     { id: "06146:triggered:1", cardCode: "06146", lines: ["06146:B:3"], timing: "triggered", trigger: "enemyDestroyed", subject: CAPTAIN("Nazgûl of Minas Morgul"), instructions: [{ verb: "WinGame" }] },
 
-    // 06147 To the Tower. A:1: it cannot leave the staging area. A:2: when it is added to the staging area at Setup, every Faramir the players own is removed from the game. A:3: once 10 or more progress tokens lie on it (checked after each placement) the players lose.
+    // 06147 To the Tower. A:1: it cannot leave the staging area. A:2: when it is added to the staging area at Setup, every Faramir the players own is removed from the game. A:3: once 10 or more progress tokens lie on it in the staging area (checked after each placement; the filter's zone scope is `inStaging`, as the engine's self test reads no zone) the players lose.
     { id: "06147:constant:1", cardCode: "06147", lines: ["06147:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", target: "self" }] },
     { id: "06147:forced:1", cardCode: "06147", lines: ["06147:A:2"], timing: "forced", trigger: "addedToStaging", subject: "self", instructions: [{ verb: "RemoveAllNamedFromGame", name: "Faramir" }] },
     {
@@ -56,7 +56,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "forced",
       trigger: "progressPlaced",
       subject: "self",
-      condition: { kind: "matches", card: "self", pick: { type: "objective", control: "any", minProgress: 10 } },
+      condition: { kind: "matches", card: "self", inStaging: true, pick: { type: "objective", control: "any", minProgress: 10 } },
       instructions: [{ verb: "LoseGame", reason: "10 progress tokens lie on To the Tower" }],
     },
 
