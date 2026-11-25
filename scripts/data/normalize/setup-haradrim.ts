@@ -8,7 +8,7 @@ const HARADRIM_PACKS: ReadonlySet<string> = new Set(["TSoH", "M", "RAH", "BtS", 
 // The sentences of the nine stage 1A cards of the Haradrim cycle that the other readers do not read. Each pattern is quoted from a Setup line, names the cards it moves, and returns null for a
 // sentence it does not read (or whose card names find no card), so the scenario stays unbuilt and a name is never dropped silently.
 export function readHaradrim(sentence: string, names: NameIndex): SetupClause[] | null {
-  // A name finds only a card of the cycle's own packs, so a pattern here never reads another cycle's sentence.
+  // The patterns without a name are quoted sentences of this cycle. The name index holds the scenario's own cards (`scope` in scenarios.ts) and the cards its text names; `named` keeps only those of the cycle's packs.
   const own = (code: string): boolean => names.cards.find((card) => card.code === code)?.printings.some((printing) => HARADRIM_PACKS.has(printing.pack)) === true;
   const named = (phrase: string | undefined): string[] => {
     const codes = namedBy(names)(phrase);

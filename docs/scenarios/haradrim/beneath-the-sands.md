@@ -12,7 +12,7 @@ Haradrim part 6 (Beneath the Sands, `BtS`), standalone only, on Easy and Normal 
 
 - Track is in the `keywords` of `data/cards` as "Track 2", "Track 3", "Track 4" tokens; the build lists it among the unknown keyword tokens until the family reads it.
 - Stage 1B discards cards until X locations are discarded and stages them; stage 2A flips Off Track and stages X enemies; stage 3A adds Brood Mother.
-- The Spider's Hive is printed "The Spiders' Hive" on the quest card; the data keeps Hall of Beorn's "The Spider's Hive" (item for issue #269).
+- Quest 17078 is "The Spiders' Hive", as printed on the card and spelled by Hall of Beorn. DragnCards spells it "The Spider's Hive"; no source of `data/cards` reads that spelling.
 
 ## Readings
 
@@ -21,10 +21,6 @@ The statuses are those of the Readings bullet of `docs/scenarios/haradrim.md`. E
 - Track (span-settled). The keyword resolves after the players travel, only while Off Track; X is the active location's Track value; the encounter discard pile is shuffled into the deck when the deck is empty and the discard continues. Basis: `hrd.track`.
 - Off Track and progress (span-settled). While Off Track is in play the players cannot place progress on the main quest; On Track lets them. Basis: `hrd.search-objective`.
 - Lost Underground (`17075:A:1`) (span-settled). "Flip the Search objective to Off Track" on reveal; the objective cannot flip while the side quest is in play; Track is not resolved. Basis: the printed line.
-- Track and the quest phase (recommended). The Forced effect of On Track at the end of the quest phase searches the top 3 cards; the Track keyword is not resolved while On Track. Not taken: Track resolves in both states. Basis: `hrd.track` ("if they are off track"). Sources: the review above states the same; no official ruling.
+- Track and the quest phase (span-settled). The Forced effect of On Track at the end of the quest phase searches the top 3 cards; the Track keyword is not resolved while On Track. Not taken: Track resolves in both states. Basis: `hrd.track` ("if they are off track"). Sources: the review above states the same; no official ruling.
 - Flip resources (span-settled). Flipping from Off Track to On Track discards all resources on the objective. Basis: `hrd.track`.
 - Valour (span-settled). `bts.valour`.
-
-## Readings to confirm
-
-- Track and the quest phase: recommended. See Readings.
