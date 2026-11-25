@@ -13,7 +13,7 @@ import type { CardSlot, Rect } from "../layout/layout.ts";
 import { medallionAt } from "../layout/look-strip.ts";
 import { medallionCount } from "../words/scenarios/sea.ts";
 import { stripText } from "./table-canvas-views.ts";
-import { badgeRoom } from "./badge-room.ts";
+import { BADGE_TOP, badgeRoom } from "./badge-room.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 import { wrapName } from "./wrap.ts";
@@ -290,13 +290,13 @@ export function Badges({
   const { x, y, w, h } = rect;
   const pill = BADGE_H * s;
   const strip = 15 * s;
-  // Rows that fit between the top edge and the resource token at the bottom left.
+  // Rows that fit between the title band and the resource token at the bottom left.
   const room = badgeRoom(h, s, pill);
   const items = [...effects.stats.map((badge) => ({ kind: "stat" as const, badge })), ...effects.flags.map((flag) => ({ kind: "flag" as const, flag }))];
   const { shown: count, hidden } = badgeSplit(items.length, room);
   const shown = items.slice(0, count);
   const rows: ReactElement[] = shown.map((item, index) => {
-    const top = y + 3 * s + index * (pill + 2 * s);
+    const top = y + BADGE_TOP * s + index * (pill + 2 * s);
     if (item.kind === "flag" && item.flag.flag === "mustCommit") {
       const width = 15 * s + fonts.badge.getTextWidth(MUST_COMMIT_WORD) + 5 * s;
       return (
@@ -338,7 +338,7 @@ export function Badges({
     );
   });
   if (hidden > 0) {
-    const top = y + 3 * s + shown.length * (pill + 2 * s);
+    const top = y + BADGE_TOP * s + shown.length * (pill + 2 * s);
     const more = moreText(hidden);
     const width = fonts.badge.getTextWidth(more) + 12 * s;
     rows.push(

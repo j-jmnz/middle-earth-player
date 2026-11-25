@@ -4,9 +4,12 @@ import { badgeSplit } from "../cards/card-effects.ts";
 
 import { TOKEN } from "./token-spots.ts";
 
-/** The rows of pills that fit between the top edge and the resource token at the bottom left (at least 1). `pill` is a pill's height in points. */
+/** Where the first effect pill stands below the card's top edge, in points at Medium: under the title band, so a pill never covers the name (the picture's title, or the name the table prints on a card with no picture). */
+export const BADGE_TOP = 19;
+
+/** The rows of pills that fit between the title band and the resource token at the bottom left (at least 1). `pill` is a pill's height in points. */
 export function badgeRoom(height: number, s: number, pill: number): number {
-  return Math.max(1, Math.floor((height - TOKEN * s - 6 * s) / (pill + 2 * s)));
+  return Math.max(1, Math.floor((height - TOKEN * s - 3 * s - BADGE_TOP * s) / (pill + 2 * s)));
 }
 
 /** The effect pills left out of a card that has `total` of them in `height`: 0 when they all fit, up to all of them when the room leaves one row for the "more" pill alone. */

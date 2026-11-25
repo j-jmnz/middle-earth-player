@@ -1,7 +1,7 @@
 // Rules: docs/design-system-table.md (Tokens and effects). The count of effect pills hidden behind the "N more" pill, which badgeReach keeps a word pill clear of.
 import { describe, expect, it } from "vitest";
 
-import { badgeRoom, hiddenBadges } from "./badge-room.ts";
+import { BADGE_TOP, badgeRoom, hiddenBadges } from "./badge-room.ts";
 
 const PILL = 15;
 
@@ -17,5 +17,12 @@ describe("hiddenBadges", () => {
     expect(hiddenBadges(3, 200, 1, PILL)).toBe(1);
     expect(hiddenBadges(6, 200, 1, PILL)).toBe(4);
     expect(hiddenBadges(0, 48, 1, PILL)).toBe(0);
+  });
+
+  it("the first row stands below the title band, and the room counts only the rows under it", () => {
+    expect(BADGE_TOP).toBeGreaterThanOrEqual(18);
+    // A card 84 pt tall: the band and the resource token leave 44 pt, two rows of 17.
+    expect(badgeRoom(84, 1, PILL)).toBe(2);
+    expect(badgeRoom(84 + 17, 1, PILL)).toBe(3);
   });
 });
