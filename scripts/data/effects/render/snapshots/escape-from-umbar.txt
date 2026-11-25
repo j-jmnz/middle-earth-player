@@ -1,0 +1,311 @@
+Scenario piles that place cards with no record (staging: 16016 Narrow Alleyway; staging: 16017 Umbar Street; staging: 16018 Umbar Square; staging: 16019 Port of Harad; staging: 16020 Haradrim Estate; quest: 16066 Stranded in Umbar; quest: 16067 Flee the City; staging: 16014 "Seize Them!")
+
+## 16014 "Seize Them!"
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+16014:A:1 (front): Forced: After an enemy attacks and destroys a character, remove X progress from the main quest, X is the attacking enemy's Threat.
+  16014:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - remove threat of the event's other card progress from the current quest card (all of it when it holds less)
+
+16014:A:2 (front): At the end of the round, if the main quest has been in play the entire round and there are no progress tokens on it, the players lose the game.
+  16014:triggered:1: Triggered (mandatory, not printed as Forced) at the end of the round
+    only if all of: (the current main quest card was in play before this round began (from Setup or an earlier round), not revealed during it) and (progress of the current quest stage is less than 1)
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the players lose the game (The main quest held no progress at the end of a round it had been in play for)
+
+## 16015 Umbar Sentry
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16015:A:1: Surge. Archery 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+16015:A:2 (front): Forced: When Umbar Sentry attacks, either remove 1 progress token from the main quest, or Umbar Sentry gets +2 Attack for this attack.
+  16015:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player chooses one of:
+      * option "progress" (only if the current quest stage holds at least 1 progress):
+        - remove 1 progress from the current quest card (all of it when it holds less)
+      * option "attack":
+        - this card: stat attack 2, until the end of the attack
+
+## 16016 Narrow Alleyway
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+16016:A:1 (front): Response: After the players travel here, choose a non-unique enemy engaged with a player and place it faceup under this location. While an enemy is under this location, that enemy is considered to be out of play.
+  16016:response:1: Response after the players travel (heard about this card)
+    only if there is a non-unique enemy (any player controls) chosen by the first player to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose non-unique enemy (any player controls) chosen by the first player
+    - the last picked card is placed faceup under this location; while it is there it is out of play
+
+16016:A:2 (front): Forced: After Narrow Alleyway leaves play, put the enemy under it into play, engaged with the first player.
+  16016:forced:1: Forced after a card leaves play (heard about this card only: with no subject, an event about one card is heard by that card alone)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - each card under this location is put into play engaged with the first player instead of the staging area, and counts as engaging them
+
+## 16017 Umbar Street
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+16017:A:1 (front): While Umbar Street is the active location, each enemy gets -1 engagement cost for each progress token on the main quest.
+  16017:constant:1: Constant
+    only if this card is the active location
+    - each enemy (any player controls) or in the staging area: stat engagementCost minus (progress of the current quest stage), while this card is in play
+
+16017:A:2 (shadow): Shadow: Discard an attachment you control.
+  16017:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control)
+    - discard the picked card
+
+## 16018 Umbar Square
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+16018:A:1 (front): While Umbar Square is the active location, it gains: "Response: After an enemy is defeated, place 1 progress on the main quest, bypassing the active location."
+  16018:response:1: Response after an enemy is destroyed (heard about enemy (any player controls) or in the staging area; any player may use it)
+    only if this card is the active location
+    - 1 progress is placed on the main quest stage (a quest effect: a full stage advances)
+
+16018:A:2 (front): Travel: Reveal the top card of the encounter deck to travel here.
+  16018:travel:1: Travel
+    - the acting player reveals an encounter card
+
+## 16019 Port of Harad
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+16019:A:1 (front): X is the number of engaged enemies.
+  16019:constant:1: Constant
+    - this card: stat threat the number of enemy (any player controls), while this card is in play
+
+16019:A:2 (front): Travel: Assign X damage among characters in play to travel here.
+  16019:travel:1: Travel
+    - the acting player assigns the number of enemy (any player controls) damage among the character (any player controls), one at a time
+
+## 16020 Haradrim Estate
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+16020:A:1 (front): While Haradrim Estate is in the staging area, progress cannot be placed here.
+  16020:constant:1: Constant
+    only if this card is in the staging area
+    - this card: stat noProgressPlaced 1, while this card is in play
+
+16020:A:2 (front): Travel: Search the encounter deck and discard pile for a Harad enemy and put it into play engaged with the first player. Then, place 1 progress on the main quest, bypassing the active location. Shuffle the encounter deck.
+  16020:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one Harad enemy in the encounter deck or its discard pile and puts it into play engaged with the first player (it is not revealed)
+    - 1 progress is placed on the main quest stage (a quest effect: a full stage advances)
+    - shuffle the encounter deck
+
+## 16021 Enemy Pursuit
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16021:A:1 (front): When Revealed: Either remove all progress from the main quest, or assign X damage among characters in play. X is the number of progress tokens on the main quest.
+  16021:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "remove" (only if the current quest stage holds at least 1 progress):
+        - remove all the progress from the current quest stage
+      * option "damage" (only if the current quest stage holds at least 1 progress):
+        - the acting player assigns progress of the current quest stage damage among the character (any player controls), one at a time
+
+16021:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
+  16021:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
+
+## 16040 Southron Champion
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16040:A:1 (front): When Revealed: Discard cards from the encounter deck until a Harad enemy is discarded. Add that enemy to the staging area and place a resource token on it. That enemy is "the Champion." While this stage is in play, the Champion gets +2 Threat, +2 Attack, +2 Defense and gains: "Immune to player card effects. The main quest stage cannot be defeated while the Champion is in play."
+  16040:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - cards are discarded from the top of the encounter deck until an enemy with the trait Harad is discarded, or the deck is empty (a deck that runs out has the encounter discard pile shuffled into it first, when it holds one); that card becomes the picked card
+    - then, if the picked card is a Harad enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+    - then, if the picked card is a Harad enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on the picked card
+    - then, if the picked card is a Harad enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card: stat threat 2, while this card is in play
+    - then, if the picked card is a Harad enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card: stat attack 2, while this card is in play
+    - then, if the picked card is a Harad enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card: stat defense 2, while this card is in play
+    - then, if the picked card is a Harad enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card: stat immuneToPlayerCards 1, while this card is in play
+  16040:constant:1: Constant
+    only if there is a enemy (any player controls) or in the staging area, with resources on it to choose
+    - the players cannot defeat this stage while this holds
+
+16040:A:2 (front): The Champion cannot take damage unless there are at least 4 progress tokens here. This stage cannot be defeated while the Champion is in play.
+  16040:constant:2: Constant
+    only if progress of this card is less than 4
+    - each enemy (any player controls) or in the staging area, with resources on it: stat cannotTakeDamage 1, while this card is in play
+  16040:constant:3: Constant
+    only if there is a enemy (any player controls) or in the staging area, with resources on it to choose
+    - the players cannot defeat this stage while this holds
+
+## 16041 Southron Captain
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16041:A:1 (front): While Southron Captain is in the staging area, each other Harad enemy gets +1 Threat.
+  16041:constant:1: Constant
+    only if this card is in the staging area
+    - each Harad enemy (any player controls) or in the staging area, other than this card: stat threat 1, while this card is in play
+
+16041:A:2 (front): While Southron Captain is engaged with you, each other Harad enemy engaged with you gets +1 Attack.
+  16041:constant:2: Constant
+    only if this card is engaged with a player (that player is who "you" means in this record)
+    - each Harad enemy (any player controls) engaged with you, other than this card: stat attack 1, while this card is in play
+
+## 16042 Southron Soldier
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16042:A:1 (front): Forced: After Southron Soldier engages you, either remove 2 progress tokens from the main quest, or Southron Soldier makes an immediate attack.
+  16042:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    - the acting player chooses one of:
+      * option "progress" (only if the current quest stage holds at least 1 progress):
+        - remove 2 progress from the current quest card (all of it when it holds less)
+      * option "attack":
+        - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+16042:A:2 (shadow): Shadow: Choose a non-unique enemy in the staging area. Engage it and deal it a shadow card.
+  16042:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a non-unique enemy (any player controls) in the staging area only, chosen by the first player to choose: choose non-unique enemy (any player controls) in the staging area only, chosen by the first player
+    - then, if there is a non-unique enemy (any player controls) in the staging area only, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): engage the picked card
+    - then, if there is a non-unique enemy (any player controls) in the staging area only, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is dealt a shadow card
+
+## 16043 Southron Archer
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16043:A:1: Archery 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+16043:A:2 (front): Forced: After Southron Archer engages you, either remove 2 progress tokens from the main quest, or discard an ally you control.
+  16043:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    - the acting player chooses one of:
+      * option "progress" (only if the current quest stage holds at least 1 progress):
+        - remove 2 progress from the current quest card (all of it when it holds less)
+      * option "ally" (only if there is a ally (you control) to choose):
+        - choose ally (you control)
+        - discard the picked card
+
+## 16044 Nowhere to Hide
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16044:A:1 (front): When Revealed: The first player discards cards from the top of the encounter deck until an enemy is discarded, and puts that enemy into play engaged with him.
+  16044:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty (a deck that runs out has the encounter discard pile shuffled into it first, when it holds one); that card becomes the picked card
+    - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
+
+16044:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it was engaged this round).
+  16044:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attacking enemy is a enemy (any player controls) that engaged a player this round): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attacking enemy is a enemy (any player controls) that engaged a player this round (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 16045 In Enemy Territory
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16045:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+16045:A:2 (front): Each player cannot have more than 5 cards in his hand. (If you have more than 5, immediately choose and discard cards from your hand until you have only 5.)
+  16045:constant:1: Constant
+    - the table: stat handLimit (no player holds more cards in hand than this; a hand over it discards down to it at the next settle) 5, while this card is in play
+  16045:triggered:1: Triggered (mandatory, not printed as Forced) on the event handOverLimit
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - discard the cards in your hand - 5 cards from hand
+
+16045:A:3 (front): Response: When this stage is defeated, each player draws a card.
+  16045:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card)
+    - for each player, first player first:
+      - the acting player draws 1 card(s)
+
+## 16046 Injured Companion
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16046:A:1 (front): When Revealed: Each player must choose: either raise your threat by 1 for each character you control, or discard a character you control.
+  16046:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "threat":
+          - raise threat by the number of character (you control) (the acting player)
+        * option "discard" (only if there is a character (you control) to choose):
+          - choose character (you control)
+          - discard the picked card
+
+16046:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, raise each player's threat by 1.
+  16046:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 1 (each player)
+
+## 16047 Enfeebled
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16047:A:1 (front): When Revealed: Each player exhausts a character he controls. Until the end of the combat phase, exhausted characters cannot ready.
+  16047:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - choose ready character (you control)
+      - exhaust the picked card
+    - every character in play, now and entering later: stat cannotReadyByPlayerCard 1, endOfCombat
+
+16047:A:2 (shadow): Shadow: Until the end of the round, defending character cannot ready.
+  16047:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the defender: stat cannotReady 1, until the end of the round
+
+## 16066 Stranded in Umbar
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+16066:A:1 (front): Setup: Add "Seize them!" to the staging area. Each player adds 1 different location to the staging area and puts 1 copy of Umbar Sentry into play engaged with him. Shuffle the encounter deck.
+  16066:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one location in the encounter deck and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
+      - the acting player finds one enemy with code 16015 in the encounter deck and puts it into play engaged with them (it is not revealed)
+    - shuffle the encounter deck
+
+16066:B:1 (back): This stage cannot have more than 15 progress tokens on it.
+  16066:constant:1: Constant
+    - this card: stat stageCapped (the stage takes no more progress than its quest points even while it cannot advance; the rest is not placed) 1, while this card is in play
+
+16066:B:2 (back): While at least 1 player is engaged with an enemy, the players cannot defeat this stage.
+  16066:constant:2: Constant
+    only if any of: (there is a enemy (any player controls) engaged with you to choose) or (there is a enemy (any player controls) engaged with another player to choose)
+    - the players cannot defeat this stage while this holds
+
+## 16067 Flee the City
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+16067:A:1 (front): When Revealed: End the current phase. Shuffle the encounter discard pile into the encounter deck. Starting with the first player, each player discards cards from the top of the encounter deck until he discards an enemy, and puts that enemy into play engaged with him.
+  16067:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the phase in progress ends once this effect has finished (what is left of it is skipped: in the quest phase the characters stay exhausted and uncommitted and the quest is not resolved; in the combat phase no attack is made); its end-of-phase Forced effects resolve as it ends
+    - shuffle the encounter discard pile into the encounter deck
+    - for each player, first player first:
+      - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty (a deck that runs out has the encounter discard pile shuffled into it first, when it holds one); that card becomes the picked card
+      - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
+
+16067:B:1 (back): This stage cannot have more than 15 progress tokens on it.
+  16067:constant:1: Constant
+    - this card: stat stageCapped (the stage takes no more progress than its quest points even while it cannot advance; the rest is not placed) 1, while this card is in play
+
+16067:B:2 (back): Forced: At the beginning of the quest phase, if any player is not engaged with an enemy, discard cards from the top of the encounter deck until an enemy is discarded and add it to the staging area.
+  16067:forced:1: Forced when a phase begins
+    only if all of: (it is the Quest phase) and (some living player has no enemy engaged with them)
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty (a deck that runs out has the encounter discard pile shuffled into it first, when it holds one); that card becomes the picked card
+    - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+
+16067:B:3 (back): While at least 1 player is engaged with an enemy, the players cannot defeat this stage. If the players defeat this stage, they win the game.
+  16067:constant:2: Constant
+    only if any of: (there is a enemy (any player controls) engaged with you to choose) or (there is a enemy (any player controls) engaged with another player to choose)
+    - the players cannot defeat this stage while this holds
+
+(rendered pieces: 226 by template, 0 as JSON)
