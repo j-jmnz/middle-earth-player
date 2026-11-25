@@ -34,7 +34,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 07018 Fords of Isen. In the staging area no card effect gives the players resources (the resource phase's collection is no card effect). Forced: when it becomes the active location each player draws up to 5 cards, one draw each.
   { id: "07018:constant:1", cardCode: "07018", lines: ["07018:A:1"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "ModifyStat", stat: "noCardResources", amount: 1, until: "whileSourceInPlay", target: "table" }] },
-  { id: "07018:forced:1", cardCode: "07018", lines: ["07018:A:2"], timing: "forced", trigger: "becameActive", subject: "self", instructions: [EACH_PLAYER([{ verb: "Draw", amount: { hand: true, times: -1, plus: 5 } }])] },
+  { id: "07018:forced:1", cardCode: "07018", lines: ["07018:A:2"], timing: "forced", holdsEvents: true, trigger: "becameActive", subject: "self", instructions: [EACH_PLAYER([{ verb: "Draw", amount: { hand: true, times: -1, plus: 5 } }])] },
 
   // 07019 The King's Road. +3 quest points while any player holds 3 cards; at 5 the players must travel to it, if able.
   { id: "07019:constant:1", cardCode: "07019", lines: ["07019:A:1"], timing: "constant", condition: HAND_3, instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: 3, until: "whileSourceInPlay", target: "self" }] },
@@ -51,7 +51,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   },
 
   // 07021 Pillaging and Burning. Every player draws, then each raises his threat by the cards in his hand (the Forced effects of the draws resolve after the When Revealed). Shadow: the defending player discards an attachment, each of them if undefended.
-  { id: "07021:whenRevealed:1", cardCode: "07021", lines: ["07021:A:1"], timing: "whenRevealed", instructions: [EACH_PLAYER([{ verb: "Draw", amount: 1 }]), EACH_PLAYER([{ verb: "RaiseThreat", amount: HAND, who: "actor" }])] },
+  { id: "07021:whenRevealed:1", cardCode: "07021", lines: ["07021:A:1"], timing: "whenRevealed", holdsEvents: true, instructions: [EACH_PLAYER([{ verb: "Draw", amount: 1 }]), EACH_PLAYER([{ verb: "RaiseThreat", amount: HAND, who: "actor" }])] },
   {
     id: "07021:shadow:1",
     cardCode: "07021",
@@ -70,6 +70,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "07022",
     lines: ["07022:A:1"],
     timing: "whenRevealed",
+    holdsEvents: true,
     uncancelable: HAND_5,
     instructions: [
       EACH_PLAYER([
@@ -123,7 +124,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "07049:forced:1", cardCode: "07049", lines: ["07049:A:2"], timing: "forced", trigger: "cardsDrawn", instructions: [{ verb: "AssignDamage", amount: 1, pick: { type: "character", control: "you" } }] },
 
   // 07046 Dunland Tribesman. When Revealed: each player draws. Forced: after a player draws any number of cards it gets +1 Threat until the end of the round.
-  { id: "07046:whenRevealed:1", cardCode: "07046", lines: ["07046:A:1"], timing: "whenRevealed", instructions: [EACH_PLAYER([{ verb: "Draw", amount: 1 }])] },
+  { id: "07046:whenRevealed:1", cardCode: "07046", lines: ["07046:A:1"], timing: "whenRevealed", holdsEvents: true, instructions: [EACH_PLAYER([{ verb: "Draw", amount: 1 }])] },
   { id: "07046:forced:1", cardCode: "07046", lines: ["07046:A:2"], timing: "forced", trigger: "cardsDrawn", instructions: [{ verb: "ModifyStat", stat: "threat", amount: 1, until: "endOfRound", target: "self" }] },
 
   // 07047 Dunland Chieftain. Forced: when it engages a player, X cards from the top of the encounter deck are discarded, X the cards in his hand; the topmost Dunland enemy among them is put into play engaged with him.

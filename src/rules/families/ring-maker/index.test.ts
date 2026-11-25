@@ -2,14 +2,17 @@
 // The engine the ring-maker family adds for The Fords of Isen: time counters taken off the current quest, a treachery that goes into a hand and stays, the enemy a discard puts into play engaged, a claimed objective lying on a location, and the table-level ban on card resources.
 import { describe, expect, it } from "vitest";
 
-import type { PickSpec } from "../../../catalog/boundary.ts";
+import type { Instruction, PickSpec } from "../../../catalog/boundary.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { destroyCard } from "../../core/keywords.ts";
 import { moveCard } from "../../core/zones.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
+import { leavesPlayPicked } from "../pelargir/vale/cannot-leave.ts";
 import { discardRandom } from "../../interpret/verbs.ts";
 import { settle } from "../../engine/machine.ts";
+import { EFFECTS } from "../../../effects/index.ts";
+import { noChangeReason } from "../../player/potential.ts";
 import { mayGainResources } from "../misc/guards.ts";
 import { idOf, resolveRecords, revealedTop, run, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
@@ -78,6 +81,27 @@ describe("Ill Tidings in a hand (07023:A:1)", () => {
     const discarding: PickSpec = { type: "card", control: "you", from: "hand", discarded: true };
     expect(pickCandidates(state, discarding, 0, [], null, t.ctx)).not.toContain(id);
     expect(pickCandidates(state, { type: "card", control: "you", from: "hand" }, 0, [], null, t.ctx, undefined, undefined, true)).toContain(id);
+  });
+
+  // Dúnedain Pipe (17088:action:1) puts a hand card on the deck, Gildor Inglorion (02079:action:1) swaps one with the deck, Message from Elrond (08032:action:1) gives one: none offers Ill Tidings.
+  it("07023:A:1 a pick that feeds a move out of the hand leaves it out, and an Action whose only target it is is not offered", () => {
+    const lone = tableFromLayout(SCENARIO, { hand: [], play: ["02079"], deck: ["07042", "07043", "07044"] }, { extra: ["02079", "17088", "08032"] });
+    const state = revealedTop(lone, ILL_TIDINGS);
+    const id = idOf(state, ILL_TIDINGS);
+    expect(state.seats[0]?.hand).toEqual([id]);
+    const ofRecord = (record: string) => EFFECTS.find((effect) => effect.id === record)!;
+    const pipe = ofRecord("17088:action:1");
+    const pick = pipe.instructions[0];
+    if (pick?.verb !== "Pick") throw new Error("the Pipe picks first");
+    const from = (instructions: readonly Instruction[]) => pickCandidates(state, pick.pick, 0, [], null, lone.ctx, undefined, undefined, false, { leaves: leavesPlayPicked(instructions) });
+    expect(from(pipe.instructions.slice(1))).not.toContain(id);
+    expect(from([])).toContain(id);
+    const gildor = ofRecord("02079:action:1");
+    expect(noChangeReason(state, gildor, idOf(state, "02079"), 0, lone.ctx)).not.toBeNull();
+    const message = ofRecord("08032:action:1");
+    const each = message.instructions[2];
+    if (each?.verb !== "Each") throw new Error("Message from Elrond gives with an Each");
+    expect(pickCandidates(state, each.pick, 0, [], null, lone.ctx, undefined, undefined, false, { leaves: leavesPlayPicked(each.instructions, true) })).not.toContain(id);
   });
 
   it("an eliminated player's hand leaves with the player", () => {

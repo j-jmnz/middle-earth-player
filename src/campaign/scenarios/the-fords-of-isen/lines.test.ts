@@ -139,6 +139,24 @@ describe("Pillaging and Burning (07021:A:1)", () => {
   });
 });
 
+describe("Draws that Forced effects hear after the whole effect (07018:A:2, 07046:A:1)", () => {
+  // Both players draw before the Berserker engaged with the first player hears his draw and attacks (rr.after, rr.forced: docs/scenarios/the-ring-maker/the-fords-of-isen.md, Readings).
+  const attackAfterEveryDraw = (line: string, staging: string[], act: ReturnType<typeof announce> | ReturnType<typeof reveal>) => {
+    const done = play(SCENARIO, { line, layout: { seats: 2, staging, engaged: [{ code: "07048", seat: 0 }], deckOf: DECKS, hand: [...hand(4, 0), ...hand(4, 1)], deck: ["f0", "f0", "f0", "f0"] }, act, expect: [] }, EFFECTS, false);
+    const steps = done.run.steps;
+    const draws = steps.flatMap((step, at) => (step.kind === "draw" ? [at] : []));
+    return { draws: draws.length, attackAfter: steps.findIndex((step) => step.kind === "attack") > Math.max(...draws) };
+  };
+
+  it("07046:A:1 each player draws a card, and only then the Berserker hears the first player's draw", () => {
+    expect(attackAfterEveryDraw("07046:A:1", [], reveal("07046"))).toEqual({ draws: 2, attackAfter: true });
+  });
+
+  it("07018:A:2 each player draws up to 5, and only then the Berserker hears the first player's draw", () => {
+    expect(attackAfterEveryDraw("07018:A:2", [FORDS], announce("becameActive", FORDS))).toEqual({ draws: 2, attackAfter: true });
+  });
+});
+
 describe("Draws heard by the cards of the box (07045:A:2, 07046:A:2, 07048:A:1, 07049:A:2)", () => {
   const draws = (seat: number): ReturnType<typeof announce> => announce("cardsDrawn", undefined, { seat, amount: 1 });
 

@@ -31,7 +31,7 @@ function costOf(state: ScenarioState, id: string, ctx: ReduceContext): number {
 function remaining(state: ScenarioState, instruction: EachInstruction, taken: readonly string[], seat: number, sourceId: string | null, ctx: ReduceContext): string[] {
   const data = topFrame(state)?.data;
   if (data?.kind !== "effect") return [];
-  const found = pickCandidates(state, instruction.pick, seat, data.picked ?? [], sourceId, ctx, data.x, data.participants, false, { discards: feedsDiscard(instruction.instructions), leaves: leavesPlayPicked(instruction.instructions) });
+  const found = pickCandidates(state, instruction.pick, seat, data.picked ?? [], sourceId, ctx, data.x, data.participants, false, { discards: feedsDiscard(instruction.instructions), leaves: leavesPlayPicked(instruction.instructions, true) });
   const names = new Set(taken.map((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "")).filter((printed) => printed.isUnique).map((printed) => printed.name));
   const budget = instruction.totalCost == null ? null : resolveAmount(state, instruction.totalCost, frameScope(state, seat, sourceId), ctx);
   const spent = taken.reduce((sum, id) => sum + costOf(state, id, ctx), 0);

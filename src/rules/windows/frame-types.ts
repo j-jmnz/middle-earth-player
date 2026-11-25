@@ -132,6 +132,8 @@ export type EffectData = {
   // The seat that controlled the ally DestroyHighestCostAlly destroyed, so "that ally's controller" reanimates it (101162:A:2).
   destroyedController?: number;
   hold?: string;
+  // The events the effect queues wait until it has resolved completely (Effect.holdsEvents).
+  holdsEvents?: true;
   // The card DiscardBottom discarded from the bottom of a deck in this effect (the `discardedCost` condition, families/uncharted/cards.ts).
   discarded?: string;
   // Every card the running effect discarded from the top of a deck, over all the players it acted for, oldest first (the amount `discarded`, families/deck/discarded.ts).
