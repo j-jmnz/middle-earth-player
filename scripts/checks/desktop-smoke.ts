@@ -104,11 +104,26 @@ async function isolation(session: Session): Promise<string> {
   return `${APP_ORIGIN}, preload: ${api.length} members`;
 }
 
+/** What the page shows, for a failure message: its path, its canvases, whether the machine gives a WebGL 2 context (the canvas table needs one) and the start of its text. */
+async function pageState(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const canvases = [...document.querySelectorAll("canvas")].map((canvas) => `${canvas.clientWidth}x${canvas.clientHeight}`);
+    const webgl2 = document.createElement("canvas").getContext("webgl2") !== null;
+    const ids = [...document.querySelectorAll("[data-testid]")].map((node) => node.getAttribute("data-testid")).slice(0, 25);
+    const text = (document.body.innerText || "").replace(/\s+/g, " ").slice(0, 300);
+    return `path ${location.pathname}; canvases [${canvases.join(", ")}]; WebGL 2 ${webgl2 ? "available" : "NOT available"}; test ids [${ids.join(", ")}]; text "${text}"`;
+  });
+}
+
 async function table(session: Session): Promise<string> {
   const { page } = session;
   await goto(page, `/table/${SAVE}`, "table");
   // The canvas is the largest one on the table; give CanvasKit and the first frames time to draw.
-  await page.waitForFunction(() => [...document.querySelectorAll("canvas")].some((canvas) => canvas.clientWidth >= 400 && canvas.clientHeight >= 200), null, { timeout: TIMEOUT });
+  const drawn = await page
+    .waitForFunction(() => [...document.querySelectorAll("canvas")].some((canvas) => canvas.clientWidth >= 400 && canvas.clientHeight >= 200), null, { timeout: TIMEOUT })
+    .then(() => true, () => false);
+  // No canvas in time: say what the page holds, since a timeout alone does not tell a table that opened as the reader table (no WebGL on the machine) from one that did not open.
+  if (!drawn) throw new Error(`no table canvas after ${TIMEOUT / 1000} s: ${await pageState(page)}`);
   await page.waitForTimeout(4000);
   const box = await page.evaluate(() => {
     const canvases = [...document.querySelectorAll("canvas")].map((canvas) => canvas.getBoundingClientRect()).sort((a, b) => b.width * b.height - a.width * a.height);
