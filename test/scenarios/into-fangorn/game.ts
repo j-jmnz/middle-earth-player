@@ -1,19 +1,20 @@
 import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
+import { legalTargets } from "../../../src/rules/engine/reduce.ts";
 import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
 import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenarios.ts";
 import type { PolicyOptions } from "../../harness/auto-player.ts";
 import { fillerLoadout, HERO_STATS, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
-import { chooseFirstOrLast, policyIntent, type Policy } from "../../harness/policy-kit.ts";
+import { attackAllTogether, chooseFirstOrLast, commitAllBut, engageUpTo, policyIntent, triggerActions, undefendedLeastDamaged, type Policy, type Rule } from "../../harness/policy-kit.ts";
 
 const cycle = loadCampaign("the-ring-maker");
 const fangorn = loadAnyScenario("into-fangorn");
 
 // Test helper. A whole standalone game of Into Fangorn played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. TODO: say how the players travel, engage and answer the choices this scenario asks.
-export const FANGORN_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
+// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. Each seat quests with all but one hero and keeps that one home to attack with the others' help: a ready hero claims Mugash when he lies free in the staging area (his host is then exhausted and never takes an undefended attack, so Mugash stays), the players travel to Edge of Fangorn first (it guards Mugash), engage every enemy (the Hinder Huorns included: they make no attack and take no shadow card, and each takes progress off the quest) and defend with nobody.
+export const FANGORN_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: true, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
-export type FangornDecks = "strong" | "weak" | "brittle";
+export type FangornDecks = "strong" | "weak" | "brittle" | "steady";
 
 export const fangornLoadout = fillerLoadout;
 
@@ -42,8 +43,20 @@ export const DEFAULT_POLICY: FangornPolicy = { choose: "first" };
 //   engageUpTo(most, options)  the optional engagement step: engage the enemy of the lowest `rank` (`allow` permits) while engaged with fewer than `most`
 //   triggerActions(effectIds, oncePerRound)  an Action or Response of the records named, each time (or once a round) the engine offers it and the seat can pay
 //   passCommitWhile(when)  the quest commit: pass without committing while `when` holds
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go in the list, before the auto-player's.
-const rules = (policy: FangornPolicy): Policy => [chooseFirstOrLast(policy.choose)];
+// The scenario's own answers are the claim of Mugash, the travel rule and the host rule below, before the kit's.
+const MUGASH = "07031";
+const EDGE = "07032";
+const isMugashHost = (state: ScenarioState, id: string): boolean => Object.values(state.cards).some((card) => card.code === MUGASH && card.host === id);
+// A travel window: Edge of Fangorn when it is offered (it guards Mugash), else the location with the fewest printed quest points, else no travel.
+const travelToEdge: Rule = (state, ctx) => {
+  if (state.window?.kind !== "travel") return null;
+  const options = legalTargets(state, { type: "Travel" }, ctx);
+  const points = (id: string): number => ctx.cards.get(state.cards[id]?.code ?? "")?.questPoints ?? 99;
+  const best = options.find((id) => state.cards[id]?.code === EDGE) ?? [...options].sort((left, right) => points(left) - points(right))[0];
+  return best ? { type: "Travel", locationId: best } : { type: "DeclineTravel" };
+};
+const claimMugash = triggerActions(["07031:action:1"]);
+const rules = (policy: FangornPolicy): Policy => [claimMugash, chooseFirstOrLast(policy.choose), travelToEdge, commitAllBut(1, isMugashHost), undefendedLeastDamaged(isMugashHost), attackAllTogether(), engageUpTo(99)];
 
 // Every intent is one the reducer listed.
 export function fangornIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: FangornPolicy = DEFAULT_POLICY): PlayerIntent {
