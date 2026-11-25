@@ -136,9 +136,10 @@ export function questDamageCause(state: ScenarioState, ctx: ReduceContext): Ques
 
 // Each character that took damage from the enemy attack in progress hears it ("After attached hero takes damage from an enemy
 // attack", "After Dark Bats damages a character"): the characters whose damage went up between the two states; the enemy making the
-// attack is the event's other card. A character that damage destroyed took it all the same: the event is announced for it too, ahead of
-// its destruction (rr.damage: the damage is placed, then the card is destroyed), and is heard by the cards still in play. An effect on
-// the dead character's own attachments is not heard, they left play with it (rr.attachment-cards, rr.forced).
+// attack is the event's other card. A character that damage destroyed took it all the same (rr.damage: the damage is placed, then the
+// card is destroyed): its event is queued after the leftPlay events and before characterDestroyed, and the cards still in play hear it
+// (rr.forced). The attachments of the dead character left play with it (rr.attachment-cards), so a Response of theirs, used only after
+// the trigger is resolved (rr.response), is not offered; an effect on another card does nothing to a card that is no longer in play.
 export function noteAttackDamage(before: ScenarioState, damaged: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   // A family may act on the damage (an enemy with Venom gives each character it damaged 1 poison: hob.venom-poison, families/poison/venom.ts).
   const after = familyAttackDamaged(before, damaged, ctx, steps);
