@@ -363,7 +363,7 @@ Scenario piles that place cards with no record (quest: 16071 Surprise Attack; qu
   16073:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one Orc enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
+      - the acting player finds one Orc enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
     - the first player attaches each hero in the staging area to a different Orc enemy in the staging area that guards no hero: the hero is guarded by that enemy, under no player's control (asked which Orc when several are free; a hero with no Orc left stays in the staging area)
 

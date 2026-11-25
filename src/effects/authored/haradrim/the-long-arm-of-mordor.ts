@@ -310,13 +310,13 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     // 16072 Find the Others. When this stage is defeated each player takes control of one more hero he owns in the staging area, exhausted.
     { id: "16072:forced:1", cardCode: "16072", lines: ["16072:B:3"], timing: "forced", trigger: "questCardDefeated", subject: "self", instructions: [EACH_TAKES_A_HERO] },
 
-    // 16073 Free the Captives. Each player searches the encounter deck and discard pile for a different Orc enemy and adds it to the staging area, the deck is shuffled, and the first player attaches each hero in the staging area to a different Orc enemy there.
+    // 16073 Free the Captives. Each player searches the encounter deck and discard pile for an Orc enemy and adds it to the staging area, the deck is shuffled, and the first player attaches each hero in the staging area to a different Orc enemy there.
     {
       id: "16073:whenRevealed:1",
       cardCode: "16073",
       lines: ["16073:A:1"],
       timing: "whenRevealed",
-      instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "SearchMove", type: "enemy", trait: "Orc", to: "staging", different: true }] }, { verb: "ShuffleEncounterDeck" }, { verb: "GuardStagedHeroes" }],
+      instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "SearchMove", type: "enemy", trait: "Orc", to: "staging" }] }, { verb: "ShuffleEncounterDeck" }, { verb: "GuardStagedHeroes" }],
     },
     // While an enemy guards a hero it gets +1 Threat, Attack and Defense and is immune to player card effects (11192:A:2's form); the hero returns to its owner, exhausted, when the guard leaves play (18074:B:2's form: the user ruling for Lost in Mirkwood holds for any way
     // the guard leaves play); the stage cannot be defeated while an enemy guards a hero.
