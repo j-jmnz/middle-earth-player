@@ -282,6 +282,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 
 11034:A:1 (front): When Revealed: The first player discards the bottom card of his deck. Then, he discards each card in his hand with a printed cost higher than that of the discarded card.
   11034:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the bottom card of the first player's deck goes to its owner's discard pile, announced as discarded from the deck; the effect remembers it, so a later check can read its printed cost
     - from the first player's hand, each card whose printed cost is higher than that of the card just discarded from the deck goes to its owner's discard pile

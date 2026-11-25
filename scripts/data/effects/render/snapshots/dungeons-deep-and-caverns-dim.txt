@@ -52,6 +52,7 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
 
 131031:B:1 (back): When Revealed: The first player gains control of Bilbo Baggins. Reveal 1 encounter card per player and add it to the staging area.
   131031:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - stage 2 is removed from the game with the riddle area; Bilbo Baggins stays with the first player and is no longer limited
     - for each player, first player first:
@@ -132,7 +133,7 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
   131077:forced:1: Forced on the event damagedByAttack (heard about character (any player controls))
     only if the attacking enemy is a Creature enemy (any player controls)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - remove 1 progress from the current quest card (all of it when it holds less)
+    - remove 1 progress from the main quest (all of it when it holds less)
 
 131077:A:2 (front): Riddle: The first player names a sphere, shuffles his deck, and discards the top card. For each of those cards that matches, place 1 progress token on stage 2.
   131077:constant:1: Constant
@@ -209,6 +210,7 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
 
 131081:A:1 (front): When Revealed: The first player must choose to answer the riddle on this card. If he finds at least 1 match, discard cards from the encounter deck until another card with a riddle is discarded. Then, answer that riddle.
   131081:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player answers the riddle of this card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored
     - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): discard cards from the top of the encounter deck until another card with a riddle is discarded (never this card itself), and pick it (the discard pile is shuffled into the deck when it runs out; nothing is picked when no such card is left)
@@ -243,6 +245,7 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
 
 131083:A:1 (front): When Revealed: The first player must choose to answer the riddle on this card. This effect cannot be canceled.
   131083:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     - the first player answers the riddle of this card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored
 
 131083:A:2 (front): Riddle: The first player names a sphere and cost, shuffles his deck, then discards the top 2 cards. For each of those cards that matches both items, place 1 progress token on stage 2.
@@ -254,6 +257,7 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
 
 131084:A:1 (front): When Revealed: The first player names a card type and then discards the top 3 cards of the encounter deck. For each of those cards that does not match the named type, remove 1 progress token from stage 2. This effect cannot be canceled.
   131084:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player names a card type: enemy, location, treachery, objective
     - discard 3 card(s) from the top of the encounter deck

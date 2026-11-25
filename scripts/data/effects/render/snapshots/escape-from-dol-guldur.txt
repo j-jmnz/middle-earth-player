@@ -395,7 +395,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
   900309:whenRevealed:1: When revealed
     - for each player, first player first:
       - if the number of card (you control) in hand is at most 2: the acting player reveals an encounter card
-      - then, if the number of card (you control) in hand is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): discard the cards in your hand - 2 cards from hand
+      - then, if the number of card (you control) in hand is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): discard the cards in your hand - 2 cards from hand (the player chooses which cards, until the hand is down to that many)
 
 900309:A:2 (shadow): Shadow: Discard each card you control that has at least 1 copy of itself in your discard pile. (If this attack is undefended, each player must resolve this effect.)
   900309:shadow:1: Shadow

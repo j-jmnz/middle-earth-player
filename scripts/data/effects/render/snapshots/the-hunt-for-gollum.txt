@@ -96,14 +96,14 @@ Scenario piles that place cards with no record (quest: 02011 The Hunt Begins; qu
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - remove 1 progress from this card
-    - remove 1 progress from the current quest card (all of it when it holds less)
+    - remove 1 progress from the main quest (all of it when it holds less)
 
 02017:A:2 (shadow): Shadow: Remove 1 progress token from the current quest. (2 progress tokens instead if this attack is undefended.)
   02017:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (the attack has no defender): remove 1 progress from the current quest card (all of it when it holds less)
-    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): remove 2 progress from the current quest card (all of it when it holds less)
+    - if not (the attack has no defender): remove 1 progress from the main quest (all of it when it holds less)
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): remove 2 progress from the main quest (all of it when it holds less)
 
 ## 02018 The East Bank
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -165,6 +165,7 @@ Scenario piles that place cards with no record (quest: 02011 The Hunt Begins; qu
 
 02022:A:1 (front): When Revealed: The first player chooses and shuffles a card with the printed Clue trait back into the encounter deck. If there are no Clue cards in play, False Lead gains surge.
   02022:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (there is a Clue objective (any player controls) to choose): this card gains surge (one more encounter card is revealed when it has been resolved)
     - choose Clue objective (any player controls) chosen by the first player
@@ -336,6 +337,7 @@ Scenario piles that place cards with no record (quest: 02011 The Hunt Begins; qu
 
 900408:A:2 (front): When Revealed: The first player chooses a Clue card attached to a hero and attaches it to a Mordor enemy in play, if able.
   900408:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose Mordor enemy (any player controls) or in the staging area, chosen by the first player, that is not guarding an objective
     - then, if there is a Mordor enemy (any player controls) or in the staging area, that is not guarding an objective to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose Clue objective (any player controls) chosen by the first player, that is claimed (attached to a character a player controls)

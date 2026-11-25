@@ -188,6 +188,7 @@ Scenario piles that place cards with no record (quest: 06117 The Ambush; quest: 
 
 06129:A:1 (front): When Revealed: The first player turns each hidden card in his play area faceup. Resolve the "When Revealed" effects of each encounter card turned faceup by this effect. If a location is turned faceup, add it to the staging area.
   06129:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     - the first player turns each hidden card he holds faceup, one at a time, the cards held when the turn begins only (a card taken meanwhile stays facedown): an enemy engages him at once whatever its engagement cost, a treachery is discarded, and a location is added to the staging area when it is turned; once every card is turned the When Revealed effects of the cards turned (an enemy after it has engaged, a treachery, a location) resolve, the first card turned first, and no surge fires
 
 ## 06130 Mordor Looms

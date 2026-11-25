@@ -276,6 +276,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18067:A:1 (front): When Revealed: The first player adds Woodmen Village to the staging area. Each other player reveals an encounter card.
   18067:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - one set-aside card with code 18069 joins the staging area (it is not revealed)
     - for each player, first player first:
@@ -300,6 +301,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18068:A:1 (front): When Revealed: The first player adds The Old Ford to the staging area. Each other player adds the top card of the Evil Creatures deck to the staging area.
   18068:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - one set-aside card with code 18016 joins the staging area (it is not revealed)
     - for each player, first player first:

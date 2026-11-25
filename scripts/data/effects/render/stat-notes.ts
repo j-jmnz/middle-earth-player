@@ -8,7 +8,7 @@ export const FLAG_NOTES: Readonly<Record<string, string>> = {
   noEffectProgress: " (card effects cannot place progress on this stage or on an active location; the progress a successful quest places is not an effect)",
   noQuestProgress: " (no progress can be placed on the current quest while it lasts; the active location still takes its share first)",
   stageCapped: " (the stage takes no more progress than its quest points even while it cannot advance; the rest is not placed)",
-  handLimit: " (no player holds more cards in hand than this; a hand over it discards down to it at the next settle)",
+  handLimit: " (no player holds more cards in hand than this; a hand over it discards down to it at the next settle, the player choosing which cards)",
   stageEntered: " (the round the current main quest card was first seen in play, noted by the engine; round 0 is Setup)",
   progressToQuest: " (progress that a card effect would place on this location goes on the current quest instead, and it is never explored)",
   advancesWhenFreed: " (a stage with no progress and no quest points advances at once when nothing holds it back, with no progress needed)",

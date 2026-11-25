@@ -27,6 +27,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 
 04087:B:1 (back): When Revealed: The first player makes a locate test. If this test is failed, reveal cards from the encounter deck equal to the number of players in the game and add them to the staging area. Then, trigger all "Lost:" effects in play.
   04087:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player makes a locate test: they may discard 1 card from their hand to discard the top card of the encounter deck, again and again; an encounter card that prints PASS passes the test (no ill effects follow), any other lets them try again; the test is failed when they stop or have no card to discard (an empty encounter deck is refilled from the discard pile in the quest phase, and otherwise the test is failed at once)
     - repeat the number of players times:
@@ -47,6 +48,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 
 04088:A:1 (front): When Revealed: The first player attaches Durin's Greaves to a hero of his choice as an attachment.
   04088:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     - attach this card to a hero of any player (the first player chooses among those that carry no copy of this card; with none this card stays where it is)
 
 04088:A:2 (front): Attached hero gets +1 Defense.
@@ -122,6 +124,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 
 04094:A:1 (front): When Revealed: The first player makes a locate test. If this test is failed, deal 2 damage to all characters and trigger all "Lost:" effects in play.
   04094:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player makes a locate test: they may discard 1 card from their hand to discard the top card of the encounter deck, again and again; an encounter card that prints PASS passes the test (no ill effects follow), any other lets them try again; the test is failed when they stop or have no card to discard (an empty encounter deck is refilled from the discard pile in the quest phase, and otherwise the test is failed at once)
     - then, if the last locate test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to each character (any player controls)
@@ -152,6 +155,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 
 04096:A:1 (front): When Revealed: The first player makes a locate test. If this test is failed, raise each player's threat by 7, remove all progress tokens from play, and trigger all "Lost:" effects in play.
   04096:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player makes a locate test: they may discard 1 card from their hand to discard the top card of the encounter deck, again and again; an encounter card that prints PASS passes the test (no ill effects follow), any other lets them try again; the test is failed when they stop or have no card to discard (an empty encounter deck is refilled from the discard pile in the quest phase, and otherwise the test is failed at once)
     - then, if the last locate test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 7 (each player)
@@ -165,6 +169,7 @@ Scenario piles that place cards with no record (quest: 04086 Journey in the Blac
 
 04097:A:1 (front): When Revealed: The first player draws 1 card. Then, that player must choose and discard 4 cards from his hand, if able.
   04097:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player draws 1 card(s)
     - the rest of the effect is carried out by the first player

@@ -414,6 +414,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 
 900510:A:1 (front): When Revealed: The first player chooses a hero in any player's discard pile and removes that hero from the game. Then, heal all damage from each Troll enemy in play. If no damage is removed from any Troll enemy as a result of this effect, Time for Supper gains surge.
   900510:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (any player controls) in the discard pile, chosen by the first player
     - then, if the picked card is a hero (any player controls) in the discard pile (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked card is removed from the game

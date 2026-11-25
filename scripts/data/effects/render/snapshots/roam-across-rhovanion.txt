@@ -124,6 +124,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19040:A:1 (front): When Revealed: The first player must choose: either Wilderland Bear makes an immediate attack against him, or each player discards 1 random card from his hand.
   19040:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "attack":
         - this card attacks the first player now, from the staging area, dealt a shadow card
@@ -190,6 +191,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19044:A:1 (front): When Revealed: The first player loses control of Urdug, then attach Urdug to a location in the staging area as a guarded objective. If he cannot, add 5 to the total Threat in the staging area until the end of the phase. In either case, remove Sneaking Off from the game.
   19044:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the number of card (you control) named "Urdug", chosen by the first player is at least 1: choose location (any player controls) in the staging area only, chosen by the first player
     - then, if the picked card is a location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the card in play with code 19052 goes back to the staging area, controlled by no one, guarded by the last picked card
@@ -253,6 +255,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19048:A:1 (front): When Revealed: The first player searches the encounter deck, discard pile, and victory display for a Grey Moorland, adds it to the staging area, and attaches the set-aside Tiny objective-ally to it as a guarded objective. Shuffle the encounter deck. Each other player reveals an encounter card.
   19048:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one card with code 19041 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
     - one set-aside card with code 19054 joins the staging area (it is not revealed)
@@ -287,6 +290,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19049:A:1 (front): When Revealed: The first player searches the encounter deck, discard pile, and victory display for a Grey Mountain Giant, adds it to the staging area, and attaches the set-aside Urdug's Horn to it as a guarded objective. Shuffle the encounter deck. Each other player reveals an encounter card.
   19049:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one card with code 19038 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
     - one set-aside card with code 19037 joins the staging area (it is not revealed)
@@ -320,6 +324,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19050:A:1 (front): When Revealed: The first player searches the encounter deck, discard pile, and victory display for a Deep Ravine, adds it to the staging area, and attaches the set-aside Durin's Key to it as a guarded objective. Shuffle the encounter deck. Each other player reveals an encounter card.
   19050:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one card with code 19042 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
     - one set-aside card with code 19036 joins the staging area (it is not revealed)
@@ -354,6 +359,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19051:A:1 (front): When Revealed: The first player loses control of both Urdug and Tiny, flips them to their enemy sides, and adds them to the staging area. (Remove any damage that was on them.) Each other player reveals an encounter card.
   19051:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the card in play with code 19052 becomes the card with code 19053, faceup and ready in the staging area, controlled by no one, with no damage; it keeps its resource tokens and its attachments (nothing when no such card is in play)
     - the card in play with code 19054 becomes the card with code 19055, faceup and ready in the staging area, controlled by no one, with no damage; it keeps its resource tokens and its attachments (nothing when no such card is in play)

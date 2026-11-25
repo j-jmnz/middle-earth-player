@@ -147,6 +147,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09024:A:2 (front): When Revealed: The first player loses control of Iârion and places him facedown underneath this stage. When this stage is defeated, the first player takes control of Iârion and exhausts him.
   09024:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     - the card with code 09016 that a player controls lies facedown under this card, still in play, controlled by no one, with what is attached to it; when this card is defeated it returns under the first player, exhausted
 
 09024:A:3 (front): Forced: After the last time counter is removed from this stage, discard Iârion.
@@ -309,6 +310,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 09068:B:3 (back): The players cannot defeat this stage unless the first player controls Iârion. If the players defeat this stage, they win the game.
   09068:constant:2: Constant
     only if not (the actor controls the card with code 09016)
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
     - the players cannot defeat this stage while this holds
 
 ## 10156 Intruders in Chetwood

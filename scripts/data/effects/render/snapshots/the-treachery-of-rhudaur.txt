@@ -181,6 +181,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
 
 10105:A:2 (front): When Revealed: The first player must choose a new quest to be the current quest, if able.
   10105:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     - the first player chooses a quest card other than the current quest (the main quest card, or an encounter side quest in the staging area) to be the current quest until the end of the phase
 
 10105:A:3 (shadow): Shadow: If the defending player does not control at least 1 Clue objective, this attack is considered undefended.

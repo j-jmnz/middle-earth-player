@@ -520,6 +520,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 
 145077:A:1 (front): When Revealed: The first player adds The Witch-king to the staging area (Sorcerer side faceup). Then, he searches the encounter deck and discard pile for a Fell Beast and attaches it to The Witch-king, if able. Shuffle the encounter deck. Each other player reveals an encounter card.
   145077:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the card with code 145080 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - the first player chooses a treachery with the trait Morgul titled "Fell Beast" in the encounter deck or its discard pile (one of each title) that the enemy named "The Witch-king" does not carry yet, and it is attached to that enemy in play (the deck is shuffled by the step after)
@@ -541,6 +542,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 145077:B:3 (back): This stage cannot be defeated unless Aragorn is in play and The Witch-king is in the victory display. If the players defeat this stage, they win the game.
   145077:constant:2: Constant
     only if any of: (the card with code 145001 is not in play) or (the card with code 145080 is not in the victory display)
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
     - the players cannot defeat this stage while this holds
 
 ## 145078 The Battle of the Pelennor Fields

@@ -25,8 +25,3 @@ The statuses are those of the Readings bullet of `docs/scenarios/haradrim.md`. E
 - Set with the most cards (recommended). On a tie the first player chooses among the tied sets (`17150:A:2`). Not taken: a random choice. Basis: the printed line says "the set aside encounter set with the most cards remaining". Sources read: https://visionofthepalantir.com/2019/11/26/the-crossings-of-poros/ (calls the stage 2 advance random and the set "with the most cards remaining"; gives no tie rule and no mechanism), https://hallofbeorn.com/LotR/Details/Harondor-Waste-CoP, https://rulespal.com/the-lord-of-the-rings-the-card-game-the-crossings-of-poros/rulebook, https://www.fantasyflightgames.com/media/ffg_content/lotr-lcg/support/LotR-FAQ.pdf (search result only). No source settles it, so the status stays recommended.
 - Encounter keyword (span-settled). `hrd.encounter-keyword`: a "when revealed" effect of such a card cannot be canceled; as a shadow card it goes to the encounter discard pile.
 - Stage 4A (`17163:A:1`) (span-settled). "Each enemy that belongs to an encounter set denoted by the first icon on each set aside stage 3": the three stage 3A cards set aside name three sets; the enemies come from the deck and the discard pile. Basis: the printed line.
-
-## Readings to confirm
-
-- Random stage: recommended. See Readings.
-- Set with the most cards: recommended. See Readings.

@@ -18,6 +18,9 @@ export function actorNote(effect: Obj, ctx: Ctx): string {
   const timing = effect.timing;
   const trigger = typeof effect.trigger === "string" ? effect.trigger : "";
   const encounterCard = ctx.cardType !== undefined && !PLAYER_TYPES.has(ctx.cardType);
+  // A When Revealed line that opens with "The first player ..." names the acting player itself.
+  const namesFirstPlayer = Array.isArray(effect.lines) && effect.lines.some((id) => typeof id === "string" && /When Revealed: The first player\b/.test(ctx.lineTexts?.get(id) ?? ""));
+  if (timing === "whenRevealed" && encounterCard && namesFirstPlayer) return "the acting player is the first player (the printed line names the first player, not the player who revealed the card)";
   if (timing === "shadow") return "the acting player is the defending player (the player the attack is against)";
   if ((timing === "forced" || timing === "triggered") && encounterCard) {
     if (ATTACK_EVENTS.has(trigger)) return "the acting player is the defending player (the player the attack is against)";

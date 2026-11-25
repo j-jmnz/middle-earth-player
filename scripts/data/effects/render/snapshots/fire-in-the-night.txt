@@ -205,6 +205,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19076:A:1 (front): When Revealed: The first player must either deal 2 damage to a hero he controls, or deal 3 damage to Hrogar's Hill.
   19076:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "hero":
         - choose hero (you control)

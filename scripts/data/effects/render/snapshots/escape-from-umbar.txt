@@ -7,7 +7,7 @@ Scenario piles that place cards with no record (staging: 16016 Narrow Alleyway; 
   16014:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - remove threat of the event's other card progress from the current quest card (all of it when it holds less)
+    - remove threat of the event's other card progress from the main quest (all of it when it holds less)
 
 16014:A:2 (front): At the end of the round, if the main quest has been in play the entire round and there are no progress tokens on it, the players lose the game.
   16014:triggered:1: Triggered (mandatory, not printed as Forced) at the end of the round
@@ -26,7 +26,7 @@ Scenario piles that place cards with no record (staging: 16016 Narrow Alleyway; 
     who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
-        - remove 1 progress from the current quest card (all of it when it holds less)
+        - remove 1 progress from the main quest (all of it when it holds less)
       * option "attack":
         - this card: stat attack 2, until the end of the attack
 
@@ -157,7 +157,7 @@ Scenario piles that place cards with no record (staging: 16016 Narrow Alleyway; 
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
-        - remove 2 progress from the current quest card (all of it when it holds less)
+        - remove 2 progress from the main quest (all of it when it holds less)
       * option "attack":
         - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
@@ -180,7 +180,7 @@ Scenario piles that place cards with no record (staging: 16016 Narrow Alleyway; 
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
-        - remove 2 progress from the current quest card (all of it when it holds less)
+        - remove 2 progress from the main quest (all of it when it holds less)
       * option "ally" (only if there is a ally (you control) to choose):
         - choose ally (you control)
         - discard the picked card
@@ -190,6 +190,7 @@ Scenario piles that place cards with no record (staging: 16016 Narrow Alleyway; 
 
 16044:A:1 (front): When Revealed: The first player discards cards from the top of the encounter deck until an enemy is discarded, and puts that enemy into play engaged with him.
   16044:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty (a deck that runs out has the encounter discard pile shuffled into it first, when it holds one); that card becomes the picked card
     - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
@@ -209,10 +210,10 @@ Scenario piles that place cards with no record (staging: 16016 Narrow Alleyway; 
 
 16045:A:2 (front): Each player cannot have more than 5 cards in his hand. (If you have more than 5, immediately choose and discard cards from your hand until you have only 5.)
   16045:constant:1: Constant
-    - the table: stat handLimit (no player holds more cards in hand than this; a hand over it discards down to it at the next settle) 5, while this card is in play
+    - the table: stat handLimit (no player holds more cards in hand than this; a hand over it discards down to it at the next settle, the player choosing which cards) 5, while this card is in play
   16045:triggered:1: Triggered (mandatory, not printed as Forced) on the event handOverLimit
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - discard the cards in your hand - 5 cards from hand
+    - discard the cards in your hand - 5 cards from hand (the player chooses which cards, until the hand is down to that many)
 
 16045:A:3 (front): Response: When this stage is defeated, each player draws a card.
   16045:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card)
@@ -303,6 +304,7 @@ Scenario piles that place cards with no record (staging: 16016 Narrow Alleyway; 
 16067:B:3 (back): While at least 1 player is engaged with an enemy, the players cannot defeat this stage. If the players defeat this stage, they win the game.
   16067:constant:2: Constant
     only if any of: (there is a enemy (any player controls) engaged with you to choose) or (there is a enemy (any player controls) engaged with another player to choose)
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
     - the players cannot defeat this stage while this holds
 
 (rendered pieces: 224 by template, 0 as JSON)

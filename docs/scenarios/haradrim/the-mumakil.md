@@ -23,7 +23,3 @@ The statuses are those of the Readings bullet of `docs/scenarios/haradrim.md`. E
 - Wild Mûmak limit (span-settled). "Cannot take more than 3 damage each round" is counted for the round; the excess is lost. Basis: the printed line.
 - Mûmak Trail (`17020:A:1`) (span-settled). The gained Response searches for a Wild Mûmak when the location leaves play as an explored location. Basis: the printed line.
 - Side quest (span-settled). `hrd.side-quests-in-play`.
-
-## Readings to confirm
-
-- Attaching a Capture objective: recommended. See Readings.

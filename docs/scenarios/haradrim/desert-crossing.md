@@ -23,7 +23,3 @@ The statuses are those of the Readings bullet of `docs/scenarios/haradrim.md`. E
 - Were-worm shadow (`16028:A:3`) (span-settled). "+2 Attack instead if the temperature is 40 or higher" replaces the +1. Basis: the printed line.
 - Beasts of Legend (`16070:A:1`) (span-settled). "Each player searches the encounter deck, discard pile, and victory display for a Were-worm": one different Were-worm for each player, if able; the cards found in the victory display leave it. Basis: the printed line.
 - Side quests (span-settled). Seek Shade, Find Water and Craft Remedy follow the side-quest rules of Escape from Umbar. Basis: `hrd.side-quests-in-play`.
-
-## Readings to confirm
-
-- Temperature at 0: recommended. See Readings.

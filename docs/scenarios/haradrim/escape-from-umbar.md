@@ -20,7 +20,7 @@ What the table shows of the pieces this scenario's records create (`docs/agents/
 
 - **Enemy faceup under Narrow Alleyway** (`16016:A:1`, `PlaceUnderSelfFaceup`). The enemy is drawn under its host like an attachment, faceup, in every zone the host can be in (the active location, the staging area): `entriesOf` adds `underAlleyway` to the host's `attached` list (`src/play/store/selectors.ts`). The existing peek drawing (`placeUnder`) and the host's "N held" pill (`UnderMarkView`, as for the cards under The Havens Burn) cover the rest; a long press on the location lists the enemy as a full card with the line that says where it lies and when it returns. A new piece: the drawing is the existing one, only the list is new.
 - **The Champion** (`16040:A:1`). The enemy that holds the resource token while Southron Champion is in the staging area wears the word pill "Champion" at the top of its card (the pill of the current quest and of a determined character, `DeterminedMarkView`), in staging and engaged; its preview and the reader say what it gets and that it takes no damage until the side quest holds 4 progress. The resource token itself is drawn by the existing token art.
-- **Hand limit of 5** (`16045:A:2`, flag `handLimit`). A readout on each seat's threat dial, "Hand 4/5" (a seat mark, `umbarHands`, the form of The Road to Isengard's hand mark), with its note spoken after the dial. It warms (near) from one card short of the limit, and says at the limit that a drawn card is discarded at once. It shows only while In Enemy Territory holds the flag.
+- **Hand limit of 5** (`16045:A:2`, flag `handLimit`). A readout on each seat's threat dial, "Hand 4/5" (a seat mark, `umbarHands`, the form of The Road to Isengard's hand mark), with its note spoken after the dial. It warms (near) from one card short of the limit and at it, and is critical over it, where it says the player chooses the cards to discard. It shows only while In Enemy Territory holds the flag.
 - **The 15-progress cap of stages 1B and 2B** (`16066:B:1`, `16067:B:1`, flag `stageCapped`). Covered by the existing quest strip: the stage's progress against its 15 quest points ("n / 15"), which the cap holds at 15; and by the existing stage hold line (`advanceHold`), which shows the printed line "cannot be defeated while any player is engaged with an enemy" (`16066:B:2`, `16067:B:3`) while a player is engaged. No new widget.
 - **The "Seize Them!" loss** (`16014:A:2`). A pill on the card, "Lose at 0" (the ship-loss pill, `ShipLossView`), threat red when the main quest has no progress and has been in play the whole round (`stageInPlayWholeRound`), so the players see the loss coming; the main quest's progress is on its own strip. Its preview and the reader say the rule.
 - **Setup records that create nothing new.** The campaign card's Setup (`141085:setup:1`, the first player claims The One Ring) adds a card attached to a hero, which the table already draws; Stranded in Umbar's Setup (`16066:setup:1`) adds the "Seize Them!" card and locations to the staging area and engages the Umbar Sentries, all drawn by the existing zones.
@@ -64,20 +64,3 @@ The statuses are those of the Readings bullet of `docs/scenarios/haradrim.md`. E
 - Enfeebled Shadow (`16047:A:2`) (recommended). The character that defended the attack cannot ready until the end of the round, the refresh phase included; with no defender nothing. Not taken: any character that defends at some time is held. Basis: the printed line, `rr.lasting-effects`; https://visionofthepalantir.com/2019/09/08/escape-from-umbar/ (reads Enfeebled only).
 - Stages 1B and 2B (`16066:B:1`, `16067:B:1`, `16066:B:2`, `16067:B:3`) (span-settled). A stage holds at most 15 progress tokens, though it cannot advance (the card caps what `faq.progress-without-advancing` allows); it cannot be defeated while any player is engaged with an enemy; defeating 2B wins the game. The flag `stageCapped` does it.
 - Flee the City (`16067:B:2`) (span-settled). Once at the beginning of each quest phase, if any player is not engaged with an enemy, one enemy is discarded from the deck and added to the staging area (one, not one for each player).
-
-## Readings to confirm
-
-- Setup, "1 different location" (`16066:A:1`): recommended, a title. See Readings.
-- "End the current phase" (`16067:A:1`): recommended. See Readings.
-- "Seize Them!" loss (`16014:A:2`): recommended, a stage revealed mid-round is not checked that round. See Readings.
-- Umbar Sentry (`16015:A:2`): recommended, the attacked player chooses. See Readings.
-- Either/or with one option (`16015:A:2`, `16021:A:1`, `16042:A:1`, `16043:A:2`): recommended, one unchallenged community answer only. See Readings.
-- The Champion under Narrow Alleyway (`16016:A:1`): recommended; the engine reads the Champion by its token, so the stage locks lapse after it returns. See Readings.
-- "Engages you" for an enemy put into play engaged (`16042:A:1`, `16043:A:2`): recommended, community discussion only. See Readings.
-- Umbar Square (`16018:A:1`): recommended, the progress goes on the main quest while a side quest is the current quest. See Readings.
-- Port of Harad (`16019:A:2`): recommended, the first player assigns the damage. See Readings.
-- Haradrim Estate (`16020:A:2`): recommended, the cost is paid with no Harad enemy found. See Readings.
-- Enemy Pursuit (`16021:A:1`): recommended, the first player chooses. See Readings.
-- The empty encounter deck (`16040:A:1`, `16044:A:1`, `16067:A:1`, `16067:B:2`): recommended, the discard pile is shuffled in and the discarding goes on. See Readings.
-- Nowhere to Hide Shadow (`16044:A:2`): recommended, any engagement this round counts. See Readings.
-- Enfeebled Shadow (`16047:A:2`): recommended, the defender of the attack is held. See Readings.

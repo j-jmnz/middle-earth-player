@@ -251,6 +251,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141081:A:2 (front): When Revealed: The first player must either exhaust the Ring-bearer or reveal an additional encounter card.
   141081:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "exhaust" (only if there is a ready Ring-bearer hero (any player controls) to choose):
         - choose ready Ring-bearer hero (any player controls)
@@ -271,6 +272,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141082:A:2 (front): When Revealed: The first player must deal X damage divided among heroes he controls where X is the number of players in the game.
   141082:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     - repeat the number of players times:
       - choose hero (you control) chosen by the first player
       - deal 1 damage to the picked card
@@ -288,6 +290,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141083:A:2 (front): When Revealed: The first player raises his threat by 3 and passes the first player token to the next player.
   141083:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 3 (the first player)
     - the first player token passes to the next player in the game (with no other player it stays)
@@ -307,6 +310,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 
 141084:A:2 (front): When Revealed: The first player must exhaust The One Ring. If The One Ring is already exhausted, the first player must discard 2 cards at random from his hand.
   141084:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "exhaust" (only if the card with code 141085 in play is ready):
         - exhaust the card with code 141085 (controlled by the first player)

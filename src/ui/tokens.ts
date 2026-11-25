@@ -55,6 +55,8 @@ export const tableTokens = {
   // Not a palette key: the victory pile's gold coin, under ink numbers (canvas/pieces.native.tsx). Light's is paler than its bronze
   // fellowship, so the ink number keeps 4.5:1 (5.9:1 here, 7.4:1 on Dark).
   coin: "#C9A961",
+  // Not a palette key: the text on a red pill (the engagement cost, the Lose at 0 pill, an attack number, a danger stage pill): bone on the red fill is 3.6:1 on Dark, so Dark reads night on it (5.0:1) and Light the pale onThreat (5.0:1).
+  onThreatPill: "#030405",
   // Not a palette key: "solid" while the phone's Reduce Transparency is on, so surfaces.ts draws every translucent fill opaque (solidTokens).
   veil: "clear",
 } as const;
@@ -109,6 +111,7 @@ const lightTableTokens: TableTokens = {
   phaseDeep: "#4A3A14",
   onPhase: "#FBF5E6",
   coin: "#B8964E",
+  onThreatPill: "#FFF4EC",
   veil: "clear",
 };
 

@@ -254,7 +254,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "progress":
-        - remove 2 progress from the current quest card (all of it when it holds less)
+        - remove 2 progress from the main quest (all of it when it holds less)
       * option "attack":
         - this card: stat attack 2, until the end of the attack
 
@@ -263,7 +263,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
     who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "progress":
-        - remove 2 progress from the current quest card (all of it when it holds less)
+        - remove 2 progress from the main quest (all of it when it holds less)
       * option "attack":
         - the attacking enemy: stat attack 2, until the end of the attack
 
