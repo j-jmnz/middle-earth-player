@@ -1,0 +1,281 @@
+{
+  "id": "the-crossings-of-poros",
+  "name": "The Crossings of Poros",
+  "number": 6,
+  "stages": [
+    "17157",
+    "17158",
+    "17159",
+    "17160",
+    "17161",
+    "17162",
+    "17163"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Crossings of Poros",
+      "count": 15
+    },
+    {
+      "name": "Mountains of Shadow",
+      "count": 0
+    },
+    {
+      "name": "Desert Sands",
+      "count": 0
+    },
+    {
+      "name": "Desert Creatures",
+      "count": 0
+    },
+    {
+      "name": "Harad Soldiers",
+      "count": 0
+    },
+    {
+      "name": "Mordor Orcs",
+      "count": 0
+    }
+  ],
+  "cards": [
+    {
+      "code": "17147",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "17148",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "17149",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "17150",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "17151",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "17152",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "17157",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "17158",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "17159",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "17160",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "17161",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "17162",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "17163",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "17146",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "17145",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "17153",
+      "normal": 3,
+      "easy": 2,
+      "pile": "setAside"
+    },
+    {
+      "code": "17154",
+      "normal": 2,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "17155",
+      "normal": 2,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "17156",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "16048",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "16049",
+      "normal": 3,
+      "easy": 2,
+      "pile": "setAside"
+    },
+    {
+      "code": "16050",
+      "normal": 2,
+      "easy": 2,
+      "pile": "setAside"
+    },
+    {
+      "code": "16051",
+      "normal": 2,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "16052",
+      "normal": 2,
+      "easy": 2,
+      "pile": "setAside"
+    },
+    {
+      "code": "16053",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "16054",
+      "normal": 2,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "16055",
+      "normal": 3,
+      "easy": 3,
+      "pile": "setAside"
+    },
+    {
+      "code": "16040",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "16041",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "16042",
+      "normal": 3,
+      "easy": 2,
+      "pile": "setAside"
+    },
+    {
+      "code": "16043",
+      "normal": 4,
+      "easy": 3,
+      "pile": "setAside"
+    },
+    {
+      "code": "16044",
+      "normal": 3,
+      "easy": 2,
+      "pile": "setAside"
+    },
+    {
+      "code": "16060",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "16061",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "16062",
+      "normal": 3,
+      "easy": 3,
+      "pile": "setAside"
+    },
+    {
+      "code": "16063",
+      "normal": 2,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "16064",
+      "normal": 2,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "16065",
+      "normal": 2,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q07.9",
+    "dragnEasy": "E07.9",
+    "hobSlug": "The-Crossings-of-Poros"
+  }
+}

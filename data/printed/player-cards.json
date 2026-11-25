@@ -1043,7 +1043,7 @@
       ],
       "inert": [],
       "misprints": [],
-      "readBy": "",
+      "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
     },
     {
@@ -3286,6 +3286,1201 @@
       "lines": [
         "Cannot have restricted attachments. Treebeard enters play exhausted and collects 1 resource each resource phase. These resources can be used to pay for Ent cards played from your hand.",
         "Action: Pay 2 resources from Treebeard's pool to ready an Ent character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "16001",
+      "side": "A",
+      "printing": "The Sands of Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Gimli.jpg",
+        "sha256": "09e6a150217f4e5323a40e0a42d2cfb649d22f2c1d39dba833666798f2b57e5e"
+      },
+      "lines": [
+        "Sentinel.",
+        "Response: After Gimli is declared as a defender, spend 1 resource from Gimli's pool to ready another hero. If that hero is Legolas, he gets +1 Attack until the end of the phase. (Limit once per phase.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "16002",
+      "side": "A",
+      "printing": "The Sands of Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Legolas.jpg",
+        "sha256": "12519bc06c5abb02670b1f848932767f8cae202318c5f527d94cd8bb3def0077"
+      },
+      "lines": [
+        "Ranged.",
+        "Response: After Legolas commits to a quest, discard a card from your hand to ready another hero. If that hero is Gimli, he gets +1 Willpower until the end of the phase. (Limit once per phase.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "16003",
+      "side": "A",
+      "printing": "Elves of Lórien",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Greenwood-Archer.jpg",
+        "sha256": "8ef705c40c7b919de13b88c5327ed1d858b01d6b70dbe8dc0a682380d107c5f9"
+      },
+      "lines": [
+        "Ranged.",
+        "Response: After Greenwood Archer enters play, ready a hero."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "16004",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Erebor-Guard.jpg",
+        "sha256": "b5b5f0e623ca0f77735bc957045f5520badb1e1ac900166e9f8860aac2ed48c9"
+      },
+      "lines": [
+        "Sentinel.",
+        "Response: When you play Erebor Guard from your hand, discard the top 2 cards of your deck to reduce its cost by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "16005",
+      "side": "A",
+      "printing": "The Sands of Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Halfling-Bounder.jpg",
+        "sha256": "8622c7857256afc2dee90696364d7a204f7ec82e84eae2df943139c74475f7cf"
+      },
+      "lines": [
+        "While there is a side quest in the victory display, Halfling Bounder gains: \"Response: Discard Halfling Bounder to cancel the 'when revealed' effects of an encounter card that was just revealed from the encounter deck.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "16006",
+      "side": "A",
+      "printing": "The Sands of Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Vigilant-Dúnadan.jpg",
+        "sha256": "9ce72504b1bc3abedda18b09e946fcb4dddc50bf803502b2ae1eb43a2c62b45a"
+      },
+      "lines": [
+        "While there is a side quest in the victory display, Vigilant Dúnadan does not exhaust to defend."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "16007",
+      "side": "A",
+      "printing": "The Sands of Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Unlikely-Friendship.jpg",
+        "sha256": "4d9ccdb59b293b8026b9122b978f9aa657435e9fd1579ee4c78f3d4b6c92dd0d"
+      },
+      "lines": [
+        "Play only if you control a unique character with the Silvan trait and another unique character with the Dwarf trait.",
+        "Action: Draw 1 card and add 1 resource to the resource pool of a hero you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "16008",
+      "side": "A",
+      "printing": "The Sands of Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Well-Warned.jpg",
+        "sha256": "b9fa1937c4a437664a864e947848c52be31aaba78f34703accd714745e6ae5f7"
+      },
+      "lines": [
+        "Play only if you control a unique character with the Noble trait and another unique character with the Scout trait.",
+        "Response: After a player engages an enemy, reduce his threat by X, where X is that enemy's printed Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "16009",
+      "side": "A",
+      "printing": "The Sands of Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Dour-handed.jpg",
+        "sha256": "bb686acaec8b5e73053a9e20ba2f38873e18fd40d9d9e51d843947e0b73b5450"
+      },
+      "lines": [
+        "Action: Deal X damage to an enemy engaged with you. X is the number of side quests in the victory display."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "16010",
+      "side": "A",
+      "printing": "The Sands of Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Dwarven-Shield.jpg",
+        "sha256": "99e5c0971b9cd7eb0613c7f73457aec36df9c1a469f57747bd1e6136dae57e24"
+      },
+      "lines": [
+        "Attach to a Dwarf hero. Restricted.",
+        "Attached hero gets +1 Defense.",
+        "Response: After attached hero takes damage from an enemy attack, exhaust Dwarven Shield to add 1 resource to attached hero's pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "16011",
+      "side": "A",
+      "printing": "The Sands of Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Mirkwood-Long-knife.jpg",
+        "sha256": "2a86bd0cad1e0df23934c66bbf96c1fa05446bb2d76d35a522773708140e4499"
+      },
+      "lines": [
+        "Attach to a Silvan hero. Restricted.",
+        "Attached hero gets +1 Willpower and +1 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "16012",
+      "side": "A",
+      "printing": "The Sands of Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/The-Road-Goes-Ever-On.jpg",
+        "sha256": "9934883378a18a27f51c9b43812376c247da52db92980087a64675f66a4ca752"
+      },
+      "lines": [
+        "Attach to a quest card in play.",
+        "Response: When attached quest is defeated, the first player chooses a player. That player searches his deck for a side quest, adds it to his hand, and shuffles his deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "16013",
+      "side": "A",
+      "printing": "The Sands of Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/The-Storm-Comes.jpg",
+        "sha256": "55799e113965ca9547f0d7c82545fb1033ba54341ad08ceadd021094705f5284"
+      },
+      "lines": [
+        "Limit 1 copy of The Storm Comes in the victory display.",
+        "While this quest is in the victory display, the first ally played by each player each round does not require a resource match."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17001",
+      "side": "A",
+      "printing": "The Mûmakil",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Kahliel.jpg",
+        "sha256": "29cd4f0f001dc15f63aacffe6733c2946ca1f1cacf10eaac38cc01230cf3ee65"
+      },
+      "lines": [
+        "You may use resources from Kahliel's pool to pay for Harad ally cards of any sphere.",
+        "Action: Discard a Harad ally from your hand to ready a Harad character in play. (Limit once per phase.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17002",
+      "side": "A",
+      "printing": "Two-Player Limited Edition Starter",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Two-Player-Limited-Edition-Starter/Andrath-Guardsman.jpg",
+        "sha256": "415dfdafc4272ddb5e1b37e9d903d55a6fd4708c80f72bf84eb5d3c0199fb45e"
+      },
+      "lines": [
+        "Response: After you play Andrath Guardsman from your hand, choose a non-unique enemy engaged with you. That enemy cannot attack you this round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17003",
+      "side": "A",
+      "printing": "The Mûmakil",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Prepare-for-Battle.jpg",
+        "sha256": "e5f955005e4a5282d40a2b2dc7453ab2050913ae9aae10bdffb8a5a1e0ce52ed"
+      },
+      "lines": [
+        "Limit 1 copy of Prepare for Battle in the victory display.",
+        "While this quest is in the victory display, the first player draws an additional card during the resource phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17004",
+      "side": "A",
+      "printing": "The Mûmakil",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Yazan.jpg",
+        "sha256": "776eea28d9ca44bd423bf3e88268e2fa54e9a17d6c3c94e735157744c6beabfb"
+      },
+      "lines": [
+        "Ranged.",
+        "Response: After Yazan is declared as an attacker, deal 1 damage to a non-unique enemy in play. (Limit once per phase.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17005",
+      "side": "A",
+      "printing": "Riders of Rohan",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Wait-no-Longer.jpg",
+        "sha256": "d71b367b41feca7bda6b6791ed83da1638a5781bb20fd9758398016f6ec20742"
+      },
+      "lines": [
+        "Response: At the beginning of the quest phase, search the top 5 cards of the encounter deck for an enemy and put it into play engaged with you. Then, reveal one less encounter card this phase (to a minimum of 0). Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17006",
+      "side": "A",
+      "printing": "The Mûmakil",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Jubayr.jpg",
+        "sha256": "88e15d71ab37b78eda6d9ad769055334b92c9e6d570cbb4d3956169200ac1500"
+      },
+      "lines": [
+        "Sentinel.",
+        "Response: After Jubayr exhausts to defend an attack, discard 1 facedown shadow card from a non-unique enemy. (Limit once per phase.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17008",
+      "side": "A",
+      "printing": "The Mûmakil",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Firyal.jpg",
+        "sha256": "966d1e89f97c0e22b790ef00a89dc1b86916ee97f4c8058c50978c6d79e3aa0a"
+      },
+      "lines": [
+        "Response: After Firyal commits to the quest, look at the top card of the encounter deck. Then, you may discard the looked at card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17009",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Coney-in-a-Trap.jpg",
+        "sha256": "b399ecf7c93588019e289a7a25ca23cffa464f2ec323802d12a0d31bed947966"
+      },
+      "lines": [
+        "Play only if you control a unique character with the Ranger trait and another unique character with the Warrior trait.",
+        "Response: After you engage an enemy, that enemy cannot attack you until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17010",
+      "side": "A",
+      "printing": "The Mûmakil",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Kahliel's-Headdress.jpg",
+        "sha256": "f471716981dcfc61b49a0adfb62cb9948fd1e844594bc98f870171377d1e9269"
+      },
+      "lines": [
+        "Attach to Kahliel. Restricted.",
+        "Each Harad character gets +1 Willpower.",
+        "Refresh Action: Exhaust Kahliel's Headdress to shuffle the topmost Harad ally in your discard pile into your deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17028",
+      "side": "A",
+      "printing": "Race Across Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Thurindir.jpg",
+        "sha256": "770663e2abed6994a5bc83bf5c2f1fd6dade04c4ee46c7647974de2f33366535"
+      },
+      "lines": [
+        "Thurindir gets +1 Willpower for each side quest in the victory display.",
+        "Setup: Search your deck for a side quest and add it to your hand. Shuffle your deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17029",
+      "side": "A",
+      "printing": "Race Across Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Kahliel's-Tribesman.jpg",
+        "sha256": "f23a085583ff2e167f3561c3f67bf78eea9736db4b39467f89ecd81aeeea95e2"
+      },
+      "lines": [
+        "Action: Exhaust Kahliel's Tribesman to choose another Harad character. That character gets +1 Willpower, +1 Attack, and +1 Defense until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17030",
+      "side": "A",
+      "printing": "Race Across Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Steed-of-the-North.jpg",
+        "sha256": "2d97d6d497d22f37d16854ff7bc4d70a781b87e57e59b64da9756dec93006f70"
+      },
+      "lines": [
+        "Attach to a Dúnedain or Ranger hero. Restricted.",
+        "Response: After you engage an enemy, exhaust Steed of the North to ready attached hero."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17031",
+      "side": "A",
+      "printing": "Race Across Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Mighty-Warrior.jpg",
+        "sha256": "c42ee9a08a03894bee0d4c65e30d09e18b4053131c894c861ae96953fb68c3ce"
+      },
+      "lines": [
+        "Attach to a hero. Limit 1 per hero.",
+        "Attached hero gains the Warrior trait.",
+        "Response: After you play Mighty Warrior from your hand, draw a card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17032",
+      "side": "A",
+      "printing": "Race Across Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Proud-Hunters.jpg",
+        "sha256": "088524aab3c093024c02c6d5639d5513f9aa162cc68190f5194595e82a41d54f"
+      },
+      "lines": [
+        "Play only if you control a unique character with the Noble trait and another unique character with the Ranger trait.",
+        "Response: After a hero you control participates in an attack that destroys an enemy, add X resources to that hero's pool. X is the just destroyed enemy's printed Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17033",
+      "side": "A",
+      "printing": "Race Across Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Dúnedain-Pathfinder.jpg",
+        "sha256": "71dcbef617f9f9f940efefe41e747f6a140798b896f55549b380015b16d8c178"
+      },
+      "lines": [
+        "Forced: After Dúnedain Pathfinder enters play, search the top 5 cards of the encounter deck for a non-unique location and add it to the staging area. If no location enters play by this effect, discard Dúnedain Pathfinder. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17034",
+      "side": "A",
+      "printing": "Race Across Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Backtrack.jpg",
+        "sha256": "7141cacfe47c48648b4ef9e012ea22dbcf99b1e662d600f05369fa6558f15f1e"
+      },
+      "lines": [
+        "Play only if the main quest has no keywords.",
+        "Action: Remove X progress from the main quest to place X progress on a location in the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17035",
+      "side": "A",
+      "printing": "Race Across Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Eryn-Galen-Settler.jpg",
+        "sha256": "7ea2407ad01c75830287958c512a55420c1ff8f6bfac1b701c490b0794b09f25"
+      },
+      "lines": [
+        "Response: When the active location leaves play as an explored location, discard Eryn Galen Settler to discard a location in the staging with the same title as the just explored location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17036",
+      "side": "A",
+      "printing": "Race Across Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Explore-Secret-Ways.jpg",
+        "sha256": "4e3cf54003c946c5b903e4475b43735486a4ccb674668750d1853a2f88167f45"
+      },
+      "lines": [
+        "Limit 1 copy of Explore Secret Ways in the victory display.",
+        "While this quest is in the victory display, each location in the staging area with the same title as the active location does not contribute its Threat to the total Threat in the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17037",
+      "side": "A",
+      "printing": "Race Across Harad",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Steward-of-Orthanc.jpg",
+        "sha256": "91b3250d58f9a95a83d9f90b8ac9ee8320255342900de20c87cc235cff381e4e"
+      },
+      "lines": [
+        "Response: When you play an event, give it Doomed 1 to draw a card. You cannot trigger this ability if you have already triggered the ability of a Steward of Orthanc this round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17055",
+      "side": "A",
+      "printing": "Riders of Rohan",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Hirgon.jpg",
+        "sha256": "ff234e595304546f81940a1522d69196eeda461341e54686a95e01ed10ce1e3d"
+      },
+      "lines": [
+        "Response: After Hirgon quests successfully, play a Tactics ally from your hand, reducing its cost by 1 (to a minimum of 1). Then, you may raise your threat by 1 to give that ally +1 Attack and +1 Defense until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17056",
+      "side": "A",
+      "printing": "Beneath the Sands",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Haradrim-Spear.jpg",
+        "sha256": "822163664c629b4aae2c383bffc04d40f5864ee545c115a116b943b2490e6529"
+      },
+      "lines": [
+        "Attach to a Harad character. Restricted.",
+        "Attached character gets +1 Attack.",
+        "Response: After attached character is declared as an attacker, it gets +3 Attack for this attack. After this attack resolves, discard Haradrim Spear."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17057",
+      "side": "A",
+      "printing": "Beneath the Sands",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Hunting-Party.jpg",
+        "sha256": "2fe151e35a9b04b1541a6693e93b730caa93d2e49dc7c950b1f8d618b2aa8e61"
+      },
+      "lines": [
+        "Play only if you control a unique character with the Warrior trait and another unique character with the Scout trait.",
+        "Response: After the players have committed characters to the quest, discard a non-unique enemy in the staging area. Then, reveal an encounter card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17058",
+      "side": "A",
+      "printing": "Riders of Rohan",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/The-Red-Arrow.jpg",
+        "sha256": "c61e93ec568f20d735f644bb081efb75338a4f3b8c5d35e07ccbb4e1dc4c63bf"
+      },
+      "lines": [
+        "Limit 1 per deck. Attach to a Gondor hero.",
+        "Attached hero gets +1 Willpower.",
+        "Valour Response: After attached hero quests successfully, add The Red Arrow to the victory display to search the top 5 cards of your deck for an ally and put it into play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17059",
+      "side": "A",
+      "printing": "Beneath the Sands",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Keep-Watch.jpg",
+        "sha256": "9a46091b0f716bea20524a5bdda3cc05f5e065b8e39790560051540ba86f3ed9"
+      },
+      "lines": [
+        "Limit 1 copy of Keep Watch in the victory display.",
+        "While this quest is in the victory display, each non-unique enemy engaged with a player gets -1 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17060",
+      "side": "A",
+      "printing": "Beneath the Sands",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Rider-of-Rohan.jpg",
+        "sha256": "d404f1a4eb0c0e6941d697d341728131b84c27206f225fe485c6b32aca3e8bba"
+      },
+      "lines": [
+        "While a side quest is in the victory display, Rider of Rohan does not exhaust to quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17061",
+      "side": "A",
+      "printing": "Beneath the Sands",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Fireside-Song.jpg",
+        "sha256": "c3cf5bfc5f38e164511ef7672b2fb61f9117915b55b1d518711ee9d781e4caef"
+      },
+      "lines": [
+        "Attach to a Hobbit hero. Limit 1 per hero.",
+        "Attached hero gets +1 Willpower for each Song attached to it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17062",
+      "side": "A",
+      "printing": "Two-Player Limited Edition Starter",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Two-Player-Limited-Edition-Starter/Dúnedain-Lookout.jpg",
+        "sha256": "601f83d41326670b08caa7192685225212f86f64f53f55bb904e1136204b41aa"
+      },
+      "lines": [
+        "Response: Discard Dúnedain Lookout to cancel the 'when revealed' effects of an enemy just revealed from the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17063",
+      "side": "A",
+      "printing": "Beneath the Sands",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Doughty-Ranger.jpg",
+        "sha256": "259b7260da8e4f203585cdd65cfada4dbec7671a131367c7c49d28afcf9356f3"
+      },
+      "lines": [
+        "Attach to a hero. Limit 1 per hero. Attached hero gains the Ranger trait.",
+        "Response: After you play Doughty Ranger from your hand, draw a card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17064",
+      "side": "A",
+      "printing": "Beneath the Sands",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/The-Free-Peoples.jpg",
+        "sha256": "59b9649776a3f8b7b724eccc2eb5d9776b723c36dc80f55ef37d402347e086c5"
+      },
+      "lines": [
+        "Play only if the characters you control have a total of at least 9 different Traits among them.",
+        "Action: Ready each character in play. Until the end of the phase, each character you control gets +1 Willpower."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17081",
+      "side": "A",
+      "printing": "Riders of Rohan",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Fastred.jpg",
+        "sha256": "0d21daedb3392ed39b287c2572010d5e602d80731361f9726d136c21e241e3e7"
+      },
+      "lines": [
+        "Response: After Fastred defends an enemy attack, return that enemy to the staging area to reduce your threat by 2. (Limit once per phase.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17082",
+      "side": "A",
+      "printing": "The Black Serpent",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Song-of-Hope.jpg",
+        "sha256": "723177febe5854f9ea54b12c1d7187aa85124f1a709b087e193a6bd4b8ca163a"
+      },
+      "lines": [
+        "Attach to a hero. Limit 1 per hero.",
+        "Action: Spend 1 resource from attached hero's pool to give attached hero +1 Willpower until the end of the phase. (Limit 3 times per phase.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17083",
+      "side": "A",
+      "printing": "The Black Serpent",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Burst-into-Song.jpg",
+        "sha256": "e86c179aa425a95ad03c2a4f6e2c4392bba572b46b1150e126a10513fd4a7bd5"
+      },
+      "lines": [
+        "Action: Ready each hero with a Song attachment."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17084",
+      "side": "A",
+      "printing": "The Black Serpent",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Defender-of-Cair-Andros.jpg",
+        "sha256": "c69940a24e7821be11e42690f90fa2183903c1e0473820d1374960ae08d0ae4f"
+      },
+      "lines": [
+        "Defender of Cair Andros gets +X Defense, where X is the tens digit of your threat. (Limit +4 Defense.)",
+        "Valour Response: After Defender of Cair Andros is declared as a defender, deal 1 damage to the attacking enemy."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17085",
+      "side": "A",
+      "printing": "Riders of Rohan",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Oath-of-Eorl.jpg",
+        "sha256": "d9ada4a7d1537770313f7e2f8f4e7c64cee0f4fc70acb18a858c1d38adb862ca"
+      },
+      "lines": [
+        "Play only if you control a unique character with the Rohan trait and another unique character with the Gondor trait.",
+        "Response: At the beginning of the combat phase, you resolve the step in which you attack enemies before resolving enemy attacks this phase. (Each other player resolves the combat phase as normal after you resolve your attacks.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17086",
+      "side": "A",
+      "printing": "The Black Serpent",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Fearless-Scout.jpg",
+        "sha256": "27a8435a4a9d36ae97dde1e83d06e32ae9bf9e65487b716d399d4ce8f4156325"
+      },
+      "lines": [
+        "Attach to a hero. Limit 1 per hero.",
+        "Attached hero gains the Scout trait.",
+        "Response: After you play Fearless Scout from your hand, draw a card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17087",
+      "side": "A",
+      "printing": "The Black Serpent",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Rally-the-West.jpg",
+        "sha256": "d385698a694cb0e2727ffb7c417a9bdb112fb5619f5a1925389e29d822fd6fc7"
+      },
+      "lines": [
+        "Limit 1 copy of Rally the West in the victory display.",
+        "While this quest is in the victory display, each hero gets +1 Willpower."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17088",
+      "side": "A",
+      "printing": "The Black Serpent",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Dúnedain-Pipe.jpg",
+        "sha256": "6beafe4aae04acf4494dd25aad8ad3c50b439de7be8100367ea0eca1e9adab99"
+      },
+      "lines": [
+        "Attach to a Dúnedain character. Limit 1 per character.",
+        "Action: Exhaust Dúnedain Pipe and place a card from your hand on the bottom of your deck to draw a card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17089",
+      "side": "A",
+      "printing": "The Black Serpent",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Old-Toby.jpg",
+        "sha256": "fb8e1183b9751418bf5817729b4d3539b0594e6e3171cff7799e249869c9fcf9"
+      },
+      "lines": [
+        "Action: Draw 1 card for each Pipe you control. Heal 1 damage from each hero with a Pipe attachment."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17090",
+      "side": "A",
+      "printing": "The Black Serpent",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Southron-Refugee.jpg",
+        "sha256": "1b08fc559f8d00c23746c9c8553c9a3a200d832adf4ec91f3fcc959c1d40900c"
+      },
+      "lines": [
+        "Action: Exhaust Southron Refugee to reduce the cost of the next Harad ally you play this phase by 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17109",
+      "side": "A",
+      "printing": "The Dungeons of Cirith Gurat",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Folco-Boffin.jpg",
+        "sha256": "dd39d9c7bb199b51c1df76dd33596bd8bac520920b0839f4584b04161f7f7605"
+      },
+      "lines": [
+        "Folco Boffin gets -1 threat cost for each Hobbit hero you control.",
+        "Action: Discard Folco Boffin to reduce your threat by 7. (Limit once per game.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17110",
+      "side": "A",
+      "printing": "The Dungeons of Cirith Gurat",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Knight-of-Dale.jpg",
+        "sha256": "caa0e2f0064606a2fce4439279543179b8f932cd830b16527d153ef428807c51"
+      },
+      "lines": [
+        "Action: Spend 1 Leadership resource to ready Knight of Dale. (Limit once per round.)",
+        "Valour Action: Ready Knight of Dale. (Limit once per round.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17111",
+      "side": "A",
+      "printing": "The Dungeons of Cirith Gurat",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Diligent-Noble.jpg",
+        "sha256": "35f08df971ef199539ac2ec35caf1d3b9c95175172dd1b29c2054c4ec2b48f08"
+      },
+      "lines": [
+        "Attach to a hero. Limit 1 per hero.",
+        "Attached hero gains the Noble trait.",
+        "Response: After you play Diligent Noble from your hand, draw a card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17112",
+      "side": "A",
+      "printing": "Riders of Rohan",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Riddermark-Knight.jpg",
+        "sha256": "ee2bef5b8f523f385918179e5b3692a285b3965eca11eec0937d0462efc3cf18"
+      },
+      "lines": [
+        "Response: After Riddermark Knight is declared as an attacker, it gets +2 Attack for this attack. At the end of this attack, discard Riddermark Knight."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17113",
+      "side": "A",
+      "printing": "The Dungeons of Cirith Gurat",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Fierce-Defense.jpg",
+        "sha256": "d0193afc71aede53712074b64ce925d51b991fa5ba237ab8e6c1dbf8cb48681d"
+      },
+      "lines": [
+        "Combat Action: Deal 3 damage to a non-unique enemy engaged with you.",
+        "Valour Combat Action: Discard a non-unique enemy engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17114",
+      "side": "A",
+      "printing": "The Dungeons of Cirith Gurat",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Eregion-Survivor.jpg",
+        "sha256": "c74ab9cf989a27884ca39f32a19d222dc5ee3c280273c30f13041349fa64274f"
+      },
+      "lines": [
+        "While you have no cards in your hand, Eregion Survivor gets +1 Willpower, +1 Attack, and +1 Defense."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17115",
+      "side": "A",
+      "printing": "The Dungeons of Cirith Gurat",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Heirs-of-Eärendil.jpg",
+        "sha256": "d759ad134b74f4ba8b6e29d5c64e7a3de88010e1cc21030956eed87e431154ec"
+      },
+      "lines": [
+        "Play only if you control a unique character with the Noldor trait and another unique character with the Dúnedain trait.",
+        "Action: Choose a non-unique location in the staging area and raise your threat by X to discard it. X is the chosen location's printed quest points."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17116",
+      "side": "A",
+      "printing": "The Dungeons of Cirith Gurat",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Leaflock.jpg",
+        "sha256": "56efd88be615aebc5fa5f626a48b161260486711481e5ebc989e4a000d200e18"
+      },
+      "lines": [
+        "Cannot have restricted attachments.",
+        "Enters play exhausted.",
+        "Leaflock gets +1 Willpower for each damaged Ent character you control. (Limit +4 Willpower.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17117",
+      "side": "A",
+      "printing": "The Dungeons of Cirith Gurat",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Legacy-Blade.jpg",
+        "sha256": "5e30ffb5cec8cedfa6c6f859ebbc601d4bada5e18c0a9d57b1e1afe6c075c77e"
+      },
+      "lines": [
+        "Attach to a hero. Restricted.",
+        "Attached hero gets +1 Attack for each side quest in the victory display. (Limit +3 Attack.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17118",
+      "side": "A",
+      "printing": "The Dungeons of Cirith Gurat",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Open-the-Armory.jpg",
+        "sha256": "f9d32aa2c13a89bca404c4a7d05f50d8bff90672bf4cbe20b8c8c47776617c95"
+      },
+      "lines": [
+        "Action: Search the top 10 cards of your deck for a Weapon or Armor attachment and add it to your hand. Shuffle your deck.",
+        "Valour Action: Search the top 5 cards of your deck for a Weapon or Armor attachment and put it into play. Shuffle your deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17136",
+      "side": "A",
+      "printing": "The Crossings of Poros",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Halfast-Gamgee.jpg",
+        "sha256": "d388402f1bda2835209e41104a6659bfb04fc4e8d968a4b0c3ba911ceb09c386"
+      },
+      "lines": [
+        "Reduce the cost to play Halfast Gamgee by 1 for each side quest in the victory display.",
+        "Response: After Halfast Gamgee enters play, add 1 resource to a hero's resource pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17137",
+      "side": "A",
+      "printing": "The Crossings of Poros",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Bulwark-of-the-West.jpg",
+        "sha256": "b6f51ba948c98dff600a1352d7ac30afb71ab36eb4471bf9ed9de5e04503a804"
+      },
+      "lines": [
+        "Action: Discard an ally you control to choose and discard a Condition attachment."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17138",
+      "side": "A",
+      "printing": "The Crossings of Poros",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Beorning-Guardian.jpg",
+        "sha256": "5780a78e1fa21284a9cec1560da299e9901e05be5dfb32ed90ddcacc3007e705"
+      },
+      "lines": [
+        "Response: After Beorning Guardian participates in an attack that destroys an enemy, discard Beorning Guardian to place X progress on a location, where X is the destroyed enemy's printed Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17139",
+      "side": "A",
+      "printing": "The Crossings of Poros",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Followed.jpg",
+        "sha256": "5c890b38a09d90eb5d5feb9652074b9074ad364763b20cc948773df1af11c8c8"
+      },
+      "lines": [
+        "Play into your play area unattached.",
+        "If unattached, attach to the next eligible enemy that engages you.",
+        "While attached enemy is engaged with you, reduce the total Threat in the staging area by X, where X is attached enemy's printed Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17140",
+      "side": "A",
+      "printing": "The Crossings of Poros",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Flight-to-the-Sea.jpg",
+        "sha256": "9458b3ffee61496a5a5d20378eff5bd0d6a6222a6f45c2cefc9e26e25ed171be"
+      },
+      "lines": [
+        "Play only if you control a Noldor or Silvan hero.",
+        "Planning Action: Shuffle a set aside Wind from the Sea into the encounter deck. Then, remove Flight to the Sea from the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17141",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Emyn-Arnen-Ranger.jpg",
+        "sha256": "51a375093b989576f3bc4fb0d9134233bc2125ea6f9da23786d49942bc38e5aa"
+      },
+      "lines": [
+        "Response: After Emyn Arnen Ranger commits to the quest, choose an enemy with a Trap attachment. Until the end of the phase, Emyn Arnen Ranger gets +X Willpower, where X is the chosen enemy's printed Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17142",
+      "side": "A",
+      "printing": "The Crossings of Poros",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/The-Dam-Bursts.jpg",
+        "sha256": "1cd04f505aeeea3f488d8896cac9d5fa5939cb795091ba12ae7cdbb682ff29f7"
+      },
+      "lines": [
+        "Play only if you control a unique character with the Ent trait and another unique character with the Hobbit trait.",
+        "Action: Ready each damaged Ent character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17143",
+      "side": "A",
+      "printing": "Dwarves of Durin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Magic-Ring.jpg",
+        "sha256": "50961cd86438202caa6074f5a47edae4560139d3b883e14382bbadf130748f3e"
+      },
+      "lines": [
+        "Attach to a hero. Limit 1 per hero and 1 per deck.",
+        "Action: Exhaust Magic Ring and raise your threat by 1 to (choose one): heal 1 damage from attached hero, add 1 resource to attached hero's pool, or ready attached hero."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "17144",
+      "side": "A",
+      "printing": "The Crossings of Poros",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Wind-from-the-Sea.jpg",
+        "sha256": "33f964691c5c3664067f5083ed766d5fbe4557faf26f32810b1e949ce64da793"
+      },
+      "lines": [
+        "Encounter.",
+        "When Revealed: Ready each hero committed to the quest and remove Wind from the Sea from the game.",
+        "Shadow: Ready the defending character."
       ],
       "inert": [],
       "misprints": [],

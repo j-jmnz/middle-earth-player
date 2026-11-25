@@ -175,6 +175,15 @@ export type SetupStep =
   | "buildRavenDeck" // The Antlered Crown, "Create the Raven deck (see insert) and set it next to the quest deck": `codes` the enemies of Dunland Warriors and Dunland Raiders (rm.raven-deck)
   | "eachPlayerChoosesRavenEnemy" // The Antlered Crown, "Each player chooses 1 different enemy from the Raven deck and adds it to the staging area"
   | "shuffleRavenDeck" // The Antlered Crown, "Shuffle the encounter deck and Raven deck"
+  // The Haradrim cycle (scripts/data/normalize/setup-haradrim.ts).
+  | "putCopyEngagedEachPlayer" // Escape from Umbar, "Each player adds 1 different location ... and puts 1 copy of Umbar Sentry into play engaged with him": `codes` the enemy, `count` the copies
+  | "setTemperature" // Desert Crossing, "Place the heat tracker next to the quest deck and set the temperature to 10": `count` the temperature (hrd.heat-tracker)
+  | "moveHeroesToStaging" // The Long Arm of Mordor, "Move each hero to the staging area"
+  | "takeObjectiveHero" // The Long Arm of Mordor, "Each player takes control of an objective-hero and adds 2 resources to its resource pool": `codes` the four objective-heroes, `resources` the resources (hrd.objective-heroes)
+  | "heroesInStagingAreaBlank" // The Long Arm of Mordor, the lasting effect on heroes in the staging area (hrd.heroes-in-the-staging-area)
+  | "createOrcsArea" // Race Across Harad, "Create the Orc's area with a second quest deck consisting of stage 1C, 2C, 3C, and 4C as well as Uruk Chieftain": `codes` the four stages and the Chieftain (hrd.prepare-the-orcs-area)
+  | "revealRandomAsideObjective" // The Black Serpent, "The first player randomly selects 1 set aside Harad objective, reveals it, and adds it to the staging area": `codes` the three Harad objectives (hrd.guarded-x)
+  | "captureAllyFromDeck" // The Dungeons of Cirith Gurat, "each player discards cards from the top of his deck until an ally that is not in play is discarded and attaches that ally to an unattached enemy in the staging area" (hrd.captives-of-cirith-gurat)
   | "shuffleAsideBack"; // "Then shuffle 1 'Sacked!' card per player back into the encounter deck" (Shadows of Mirkwood), "... 1 copy of A Foe Beyond per player ..." (Dwarrowdelf): `count` cards, `players` for each player
 
 export type ParsedSetup = { clauses: SetupClause[]; unread: string[] };

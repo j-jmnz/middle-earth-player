@@ -141,7 +141,8 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
       haradrim(2, "desert-crossing", "The Sands of Harad", { setupSpan: "hrd.setup-desert-crossing" }),
       haradrim(3, "the-long-arm-of-mordor", "The Sands of Harad", { setupSpan: "hrd.setup-the-long-arm-of-mordor" }),
       haradrim(4, "the-mumakil", "The Mûmakil", { setupSpan: "hrd.setup-the-mumakil" }),
-      haradrim(5, "race-across-harad", "Race Across Harad", { setupSpan: "hrd.setup-race-across-harad" }),
+      // DragnCards loads the Orc's quest deck (stages 2C to 4C) as a second shared quest deck; the Setup creates it (hrd.prepare-the-orcs-area), so it waits set aside.
+      haradrim(5, "race-across-harad", "Race Across Harad", { setupSpan: "hrd.setup-race-across-harad", groups: { sharedQuestDeck2: "setAside" } }),
       haradrim(6, "beneath-the-sands", "Beneath the Sands", { setupSpan: "hrd.setup-beneath-the-sands" }),
       haradrim(7, "the-black-serpent", "The Black Serpent", { setupSpan: "hrd.setup-the-black-serpent" }),
       haradrim(8, "the-dungeons-of-cirith-gurat", "The Dungeons of Cirith Gurat", { setupSpan: "hrd.setup-the-dungeons-of-cirith-gurat" }),

@@ -1,0 +1,18 @@
+{
+  "id": "haradrim",
+  "name": "Haradrim",
+  "scenarios": [
+    "escape-from-umbar",
+    "desert-crossing",
+    "the-long-arm-of-mordor",
+    "the-mumakil",
+    "race-across-harad",
+    "beneath-the-sands",
+    "the-black-serpent",
+    "the-dungeons-of-cirith-gurat",
+    "the-crossings-of-poros"
+  ],
+  "kind": "cycle",
+  "starterDecks": [],
+  "saga": false
+}

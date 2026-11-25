@@ -1,0 +1,162 @@
+{
+  "id": "the-mumakil",
+  "name": "The Mûmakil",
+  "number": 1,
+  "stages": [
+    "17026",
+    "17027"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Mûmakil",
+      "count": 18
+    },
+    {
+      "name": "Jungle Forest",
+      "count": 2
+    }
+  ],
+  "cards": [
+    {
+      "code": "17016",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "17017",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "17018",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "17019",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "17021",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "17022",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "17023",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "17024",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "17025",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "16059",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "17026",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "17027",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "17020",
+      "normal": 4,
+      "easy": 4,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "16056",
+      "normal": 2,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "16057",
+      "normal": 3,
+      "easy": 2,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "16058",
+      "normal": 3,
+      "easy": 3,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "17011",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "17012",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "17013",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "17014",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "17015",
+      "normal": 4,
+      "easy": 4,
+      "pile": "setAside"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q07.4",
+    "dragnEasy": "E07.4",
+    "hobSlug": "The-Mûmakil"
+  }
+}
