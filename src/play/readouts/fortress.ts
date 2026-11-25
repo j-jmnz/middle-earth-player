@@ -15,6 +15,7 @@ import { cairAndrosStageLines } from "./against-the-shadow/cair-andros.ts";
 import { druadanStageLines } from "./against-the-shadow/druadan.ts";
 import { amonDinHeld, amonDinStageLines } from "./against-the-shadow/amon-din.ts";
 import { bloodStageLines } from "./against-the-shadow/blood.ts";
+import { valeStageLines } from "./against-the-shadow/vale.ts";
 import { stewardsFearStageLines } from "./against-the-shadow/stewards-fear.ts";
 
 /** The tokens on The Defense of Helm's Deep, the number that ends it, the quest stage the players advance to and its name, for the top bar's Defense dial. */
@@ -60,7 +61,7 @@ export function stageDetail(game: ScenarioState, ctx: ReduceContext, code: strin
   const druadan = druadanStageLines(game, ctx, code, (id) => ctx.cards.get(id)?.name ?? id);
   // A stage of Encounter at Amon Dîn that is defeated with the end held says its held line first: the quest-point line would only say it is done.
   const own = druadan.length > 0 || amonDinHeld(game, code) ? [] : [hold ?? (fills ? null : plain)];
-  return [fills, ...own, defense ? DEFENSE_STAGE : null, ...cairAndrosStageLines(game, ctx, code), ...druadan, ...stewardsFearStageLines(game, ctx, code), ...amonDinStageLines(game, code), ...bloodStageLines(game, code)].filter((text) => text != null);
+  return [fills, ...own, defense ? DEFENSE_STAGE : null, ...cairAndrosStageLines(game, ctx, code), ...druadan, ...stewardsFearStageLines(game, ctx, code), ...amonDinStageLines(game, code), ...bloodStageLines(game, code), ...valeStageLines(game, ctx, code)].filter((text) => text != null);
 }
 
 /**

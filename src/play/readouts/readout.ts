@@ -34,6 +34,7 @@ import { seatLevel } from "./threat-level.ts";
 import { pelennorQuestWords } from "./pelennor.ts";
 import { undefendedLocationsReadout } from "./against-the-shadow/osgiliath.ts";
 import { bloodDockClause, bloodLossNote, bloodTravel } from "./against-the-shadow/blood.ts";
+import { valeShieldReadout, valeTravel } from "./against-the-shadow/vale.ts";
 import { questMovesWords, undefendedVillagersReadout } from "./against-the-shadow/amon-din.ts";
 import { undefendedRemoves } from "./against-the-shadow/cair-andros.ts";
 import { siegeProgressWords } from "./siege.ts";
@@ -179,6 +180,9 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     // Stage 3 of The Drúadan Forest: the characters attack with Willpower and the damage is progress on the enemy, against its hit points (06044:B:2), never damage and never "destroyed".
     const progress = progressReadout(game, ctx, enemyId, total, defense, cardName(enemyId), strike?.awaiting === "end");
     if (progress != null) return { kind: "attack", stats: [WILL(total), DEFENSE(defense)], result: progress };
+    // The Morgul Vale: a Morgul Bodyguard takes the damage meant for a Captain (06148:A:1).
+    const shield = valeShieldReadout(game, ctx, enemyId, Math.max(0, total - defense));
+    if (shield) return { kind: "attack", stats: [ATTACK(total), DEFENSE(defense)], result: shield };
     return { kind: "attack", stats: [spectral ? WILL(total) : ATTACK(total), DEFENSE(defense)], result: `${spectralNote}${damageWords(total, defense, placed)}${after}` };
   }
   // Travel: the staging threat now and after the picked location leaves staging, and the progress it takes first (rr.travel).
@@ -193,7 +197,7 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     // The Blood of Gondor: the points the location has once it is active, and the hidden cards the travel takes (blood.ts).
     const blood = bloodTravel(game, ctx, location.id);
     const points = blood ? blood.points : questPointsOf(game, location, ctx.cards);
-    const said = points != null ? `It takes the next ${points} progress before the quest` : null;
+    const said = valeTravel(game, location.id) ?? (points != null ? `It takes the next ${points} progress before the quest` : null);
     return { kind: "travel", stats: [THREAT(now), THREAT(after)], join: "then", result: blood?.cost ? (said ? `${said}; ${blood.cost}` : blood.cost) : said };
   }
   // The quest, when no attack is going on: committed willpower (and the characters picked to join it) against staging.

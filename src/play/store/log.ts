@@ -5,6 +5,7 @@ import { countedOf } from "./counted.ts";
 import { villagersOf } from "./villager-steps.ts";
 import { controlOf } from "../readouts/against-the-shadow/osgiliath-steps.ts";
 import { hiddenLines, hiddenOf } from "../readouts/against-the-shadow/blood-steps.ts";
+import { valeQuiet, valeStepWords } from "../readouts/against-the-shadow/vale-steps.ts";
 import { changeWords } from "../readouts/against-the-shadow/osgiliath.ts";
 import { changedWords } from "../words/scenarios/against-the-shadow/amon-din.ts";
 import { barredWords } from "../words/scenarios/against-the-shadow/osgiliath.ts";
@@ -99,23 +100,23 @@ function words(step: EngineStep, names: LogNames, questStat: string | null): str
       return `${names.card(step.heroId)} gains 1 resource`;
     case "damage":
       // A heal is a damage step with a negative amount (rr.damage).
-      return step.amount < 0 ? `${-step.amount} damage healed on ${names.card(step.targetId)}` : `${step.amount} damage on ${names.card(step.targetId)}`;
+      return valeQuiet(step) ? null : valeStepWords(step, names.card) ?? (step.amount < 0 ? `${-step.amount} damage healed on ${names.card(step.targetId)}` : `${step.amount} damage on ${names.card(step.targetId)}`);
     case "threat":
       return `${player(step.seat)} threat ${signed(step.amount)}`;
     case "life":
       return `The Ring-bearer's life ${signed(step.amount)}`;
     case "progress":
       // A removal (141026:B:2) is a step with a negative amount: say what left the card, never a minus sign.
-      return step.amount < 0 ? `${-step.amount} progress removed from ${names.card(step.targetId)}` : step.amount === 0 ? barredWords(names.card(step.targetId)) : `${step.amount} progress on ${names.card(step.targetId)}`;
+      return valeStepWords(step, names.card) ?? (step.amount < 0 ? `${-step.amount} progress removed from ${names.card(step.targetId)}` : step.amount === 0 ? barredWords(names.card(step.targetId)) : `${step.amount} progress on ${names.card(step.targetId)}`);
     case "destroy":
       // A location placed facedown underneath The Havens Burn is out of play and hidden: the line never names it (dcce.aflame).
       return step.under ? "A location burns and is placed facedown underneath The Havens Burn" : `${names.card(step.targetId)} is destroyed`;
     case "eliminate":
       return `${player(step.seat)} is eliminated`;
     case "reveal":
-      return `${player(step.seat)} reveals ${names.card(step.cardId)}`;
+      return valeQuiet(step) ? null : valeStepWords(step, names.card) ?? `${player(step.seat)} reveals ${names.card(step.cardId)}`;
     case "engage":
-      return `${names.card(step.enemyId)} engages ${player(step.seat)}`;
+      return valeStepWords(step, names.card, null, { count: 2 }) ?? `${names.card(step.enemyId)} engages ${player(step.seat)}`;
     case "commit":
       return `${names.card(step.cardId)} commits to the quest`;
     case "hideCommit":
