@@ -11,6 +11,8 @@ import { engageCaptiveHolders, returnAttachedByName } from "./captor.ts";
 import { engageTopDiscarded } from "./engage.ts";
 import { drawSelfIntoHand } from "./hand.ts";
 import { createOutOfPlayDecks, discardEliminatedDecks, revealOutOfPlay, shuffleHandCardIntoOutOfPlay, shuffleIntoOutOfPlayDecks } from "./outofplay.ts";
+import { capRefresh } from "./refresh-cap.ts";
+import { revealChosenFromDiscard } from "./reveal-chosen.ts";
 import { inOwnSurgeChain } from "./surge-chain.ts";
 import { removeTimeFromQuest } from "./time.ts";
 
@@ -32,6 +34,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return returnAttachedByName(state, instruction, ctx);
     case "ShuffleHandCardIntoOutOfPlay":
       return shuffleHandCardIntoOutOfPlay(state, focus);
+    case "CapRefresh":
+      return capRefresh(state, instruction, focus, ctx, steps);
+    case "RevealChosenFromDiscard":
+      return revealChosenFromDiscard(state, instruction, focus, ctx, steps);
     case "EngageCaptiveHolder":
       return state;
     default:
@@ -39,4 +45,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "ring-maker", verbs: ["RemoveTimeFromQuest", "DrawSelfIntoHand", "EngageTopDiscarded", "CreateOutOfPlayDecks", "ShuffleIntoOutOfPlayDecks", "RevealOutOfPlay", "ShuffleHandCardIntoOutOfPlay", "ReturnAttachedEnemy", "EngageCaptiveHolder"], run, settle: { sweep: (state, ctx, steps) => discardEliminatedDecks(engageCaptiveHolders(state, ctx, steps)) }, deckReset: { hold: inOwnSurgeChain } };
+export const manifest: RulesFamily = { name: "ring-maker", verbs: ["RemoveTimeFromQuest", "DrawSelfIntoHand", "EngageTopDiscarded", "CreateOutOfPlayDecks", "ShuffleIntoOutOfPlayDecks", "RevealOutOfPlay", "ShuffleHandCardIntoOutOfPlay", "ReturnAttachedEnemy", "RevealChosenFromDiscard", "CapRefresh", "EngageCaptiveHolder"], run, settle: { sweep: (state, ctx, steps) => discardEliminatedDecks(engageCaptiveHolders(state, ctx, steps)) }, deckReset: { hold: inOwnSurgeChain } };
