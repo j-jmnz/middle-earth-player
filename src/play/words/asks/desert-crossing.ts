@@ -6,7 +6,7 @@ import type { Ask } from "../asks.ts";
 const TENS = { temperature: "tens" } as const;
 
 export const ASKS: Readonly<Record<string, Ask>> = {
-  // 16068:B:1 (The Desert of Harad, stage 2B): the ally's controller exhausts it or deals it 1 damage.
+  // 16068:B:1 (The Desert of Harad, stage 1B): the ally's controller exhausts it or deals it 1 damage.
   "16068:forced:1 @0 exhaust": { label: "Exhaust {subject}" },
   "16068:forced:1 @0 damage": { label: "Deal 1 damage to {subject}" },
 

@@ -7,6 +7,8 @@ import { expireModifiers, type ScenarioState } from "../../core/state.ts";
 import { holds } from "../../interpret/conditions.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import { finish, idOf, opened, resolveRecords, run as runInstruction, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { endRound } from "../../../../test/harness/card-spec.ts";
+import { playedLayout } from "../../../../test/harness/card-spec-play.ts";
 import { settle } from "../../engine/machine.ts";
 import { runHeat, temperatureOf } from "./heat.ts";
 
@@ -120,12 +122,18 @@ describe("the loss at 60 (16068:B:3, 16069:B:2, 16070:B:3)", () => {
     const lost = apply(made, state, { verb: "RaiseTemperature", amount: 4 });
     expect(temperatureOf(lost)).toBe(60);
     expect(lost.lost).toBe(true);
+    const later = apply(made, lost, { verb: "LowerTemperature", amount: 10 });
+    expect(temperatureOf(later)).toBe(50);
+    expect(later.lost).toBe(true);
+    expect(later.lossReason).toBe("The temperature reached 60");
   });
 
-  it("holds in the middle of an effect: the 16069 stage's +4 loses before its damage is assigned", () => {
-    const { made, state } = heated(56, { stage: "16069", heroes: ["dh1"] });
-    const ended = resolveRecords(state, made.ctx, "16069", "forced", idOf(state, "16069"));
-    expect(ended.state.lost).toBe(true);
+  it("holds in the middle of an effect: the 16069 stage's +4 at the end of the round loses before its damage is assigned", () => {
+    const ended = playedLayout("desert-crossing", { seats: 1, stage: "16069", temperature: 56 }, [endRound]).run.state;
+    expect(temperatureOf(ended)).toBe(60);
+    expect(ended.lost).toBe(true);
+    expect(ended.lossReason).toBe("The temperature reached 60");
+    expect(ended.cards[idOf(ended, "dh1")]?.damage ?? 0).toBe(0);
   });
 
   it("the stage of 16070 loses the same way", () => {
@@ -140,9 +148,13 @@ describe("the loss at 60 (16068:B:3, 16069:B:2, 16070:B:3)", () => {
     expect(revealed.state.lost).toBe(true);
   });
 
-  it("a stage at 59 is not lost while nothing changes the temperature", () => {
+  it("a stage at 59 is not lost while nothing changes the temperature, and a lowering at 0 changes nothing", () => {
     const { made, state } = heated(59, { stage: "16070" });
-    expect(apply(made, state, { verb: "RaiseTemperature", amount: { temperature: "tens", times: 0 } }).lost).toBe(false);
+    expect(apply(made, state, { verb: "RaiseTemperature", amount: 0 }).lost).toBe(false);
+    const cold = heated(0, { stage: "16070" });
+    const after = apply(cold.made, cold.state, { verb: "LowerTemperature", amount: 10 });
+    expect(temperatureOf(after)).toBe(0);
+    expect(after.lost).toBe(false);
   });
 });
 

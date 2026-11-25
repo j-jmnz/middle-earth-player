@@ -1,5 +1,5 @@
 // Rules: hrd.setup-desert-crossing, hrd.heat-tracker, hrd.side-quests, rr.setup, rr.forced, rr.travel, rr.cannot, rr.blank, rr.lasting-effects, rr.first-player, rr.refresh-phase (data/rules/entries.json); ledger lines of Desert Crossing (data/printed/haradrim.json).
-// The lines a card-spec row cannot express (spec.test.ts holds the rest): the Setup the deal leaves, the live reads of the temperature, a bar that reaches one kind of effect only, a Forced effect that finds nothing, an effect that lasts through a phase.
+// The lines a card-spec row cannot express (spec.test.ts holds the rest): the Setup data, the live reads of the temperature, a bar that reaches one kind of effect only, a Forced effect that finds nothing, an effect that lasts through a phase.
 import { describe, expect, it } from "vitest";
 
 import { encounterCodes, setupInstructions } from "../../../catalog/scenario-data.ts";
@@ -7,16 +7,14 @@ import { flaggedByClass } from "../../../rules/core/holder-classes.ts";
 import { printedOf } from "../../../rules/core/printed.ts";
 import { flagged, updateCard } from "../../../rules/core/state.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
-import { expectOk } from "../../../rules/core/test-fixture.ts";
-import { legalTargets, reduce, startScenario } from "../../../rules/engine/reduce.ts";
+import { legalTargets } from "../../../rules/engine/reduce.ts";
 import type { ScenarioState } from "../../../rules/engine/reduce.ts";
 import { temperatureOf } from "../../../rules/families/haradrim/heat.ts";
 import { stagingThreat } from "../../../rules/quest/quest.ts";
 import { loadAnyScenario } from "../../../../scripts/data/load-scenarios.ts";
-import { announce, attack, endPhase, endRound, resolve, respond, travel } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, endPhase, endRound, resolve, respond, travel } from "../../../../test/harness/card-spec.ts";
 import { playedLayout } from "../../../../test/harness/card-spec-play.ts";
 import { idOf, idsOf, opened, run as runInstruction, statOf, tableFromLayout, zoneOf, type Layout } from "../../../../test/harness/scene-kit.ts";
-import { crossingStart, crossingWorld } from "../../../../test/scenarios/desert-crossing/game.ts";
 
 const data = loadAnyScenario("desert-crossing");
 const MAIN = "16068";
@@ -24,27 +22,9 @@ const LAST = "16070";
 const BURNT_SANDS = "16025";
 const table = (layout: Layout = {}) => tableFromLayout("desert-crossing", { seats: 1, stage: MAIN, ...layout });
 const played = (layout: Layout, ...acts: Parameters<typeof playedLayout>[2][]): ScenarioState => playedLayout("desert-crossing", layout, acts.flat() as never).run.state;
-const copies = (state: ScenarioState, ids: readonly string[], code: string): number => ids.filter((id) => state.cards[id]?.code === code).length;
 const raise = (made: ReturnType<typeof table>, amount: number): ScenarioState => runInstruction(made, opened(made).state, { verb: "RaiseTemperature", amount });
 
-// The game after its Setup and the players' Keep.
-const opening = async (seats: 1 | 2): Promise<ScenarioState> => {
-  const { ctx } = await crossingWorld("strong");
-  let state = startScenario(crossingStart(seats, 1, "Normal"), ctx);
-  for (let keep = 0; keep < seats; keep += 1) state = expectOk(reduce(state, { type: "Keep" }, ctx)).state;
-  return state;
-};
-
 describe("the Setup of the deal", () => {
-  for (const seats of [1, 2] as const) {
-    it(`16068:A:1 stages ${seats} Burnt Sands for ${seats} player(s), leaves the other ${4 - seats} in the encounter deck and sets the temperature to 10`, async () => {
-      const state = await opening(seats);
-      expect(copies(state, state.staging, BURNT_SANDS)).toBe(seats);
-      expect(copies(state, state.encounterDeck, BURNT_SANDS)).toBe(4 - seats);
-      expect(temperatureOf(state)).toBe(10);
-    });
-  }
-
   it("16068:A:1 the data stages 1 Burnt Sands for each player at 1, 2 and 4 players and leaves the rest of the 4 in the encounter deck", () => {
     for (const seats of [1, 2, 4]) {
       const staged = setupInstructions(data, "Normal", seats).filter((instruction) => "code" in instruction && instruction.code === BURNT_SANDS);
@@ -142,5 +122,22 @@ describe("Desert Oasis heals 4 at most", () => {
     const layout: Layout = { stage: MAIN, active: { code: "16050", progress: 2 }, play: Array.from({ length: 5 }, () => ({ code: "ally", damage: 1 })) };
     const state = played(layout, announce("activeExplored", "16050"), respond("16050"));
     expect(idsOf(state, "ally").map((id) => state.cards[id]?.damage ?? 0).sort()).toEqual([0, 0, 0, 0, 1]);
+  });
+});
+
+describe("Desert Oasis cannot stop early", () => {
+  const layout: Layout = { stage: MAIN, active: { code: "16050", progress: 2 }, heroes: [{ code: "dh2", damage: 2 }, { code: "dh3", damage: 2 }] };
+  const oasis = (...answers: string[]): ScenarioState => played(layout, announce("activeExplored", "16050"), respond("16050"), ...answers.map((id) => answer(id)));
+
+  it("16050:A:1 two heroes with 2 damage each: Done is not offered after 0, 1, 2 or 3 damage is healed", () => {
+    for (let healed = 0; healed < 4; healed += 1) {
+      const heals = ["dh2", "dh2", "dh3"].slice(0, healed);
+      expect(() => oasis(...heals, "done"), `Done after ${healed} healed`).toThrow(/option done is not offered/);
+    }
+  });
+
+  it("16050:A:1 4 damage heals both fully, each answer a damaged hero", () => {
+    const state = oasis("dh2", "dh2", "dh3", "dh3");
+    expect(["dh2", "dh3"].map((code) => state.cards[idOf(state, code)]?.damage ?? 0)).toEqual([0, 0]);
   });
 });

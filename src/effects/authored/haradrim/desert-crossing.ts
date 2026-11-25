@@ -249,7 +249,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "response",
       trigger: "activeExplored",
       subject: "self",
-      instructions: [{ verb: "HealAmong", amount: 4, pick: { type: "character", control: "any" } }],
+      instructions: [{ verb: "HealAmong", amount: 4, exact: true, pick: { type: "character", control: "any" } }],
     },
     { id: "16050:forced:1", cardCode: "16050", lines: ["16050:A:2"], timing: "forced", trigger: "becameActive", subject: "self", instructions: [EXHAUST_A_CHARACTER] },
 

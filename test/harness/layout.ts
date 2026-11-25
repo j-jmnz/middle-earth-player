@@ -15,6 +15,7 @@ import { markCapture } from "../../src/rules/families/captured/entry.ts";
 import { markEnemyDamage } from "../../src/rules/families/encounter/patrol.ts";
 import { takeHidden } from "../../src/rules/families/pelargir/hidden.ts";
 import { takeControlOfLocation } from "../../src/rules/families/pelargir/location-control.ts";
+import { withTemperature } from "../../src/rules/families/haradrim/heat.ts";
 import { markSeatedRows } from "../../src/rules/families/encounter/seated.ts";
 
 import { gameCodes, loadAnyScenario, loadCampaigns } from "../../scripts/data/load-scenarios.ts";
@@ -198,7 +199,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     for (const item of layout.deckOf ?? []) if (dealtTo(item, seat)) state = spawn(state, dealtCode(item), { zone: "deck", seat }, "down").state;
   }
   if (layout.heroResources) for (const id of Object.keys(state.cards)) if (state.cards[id]?.zone === "heroes") state = updateCard(state, id, { resources: layout.heroResources });
-  if (layout.temperature != null) state = { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "table", stat: "temperature", amount: layout.temperature, until: "endOfGame" }] };
+  if (layout.temperature != null) state = withTemperature(state, layout.temperature);
   if (layout.noteEncounterDiscards) state = { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "table", stat: "noteEncounterDiscards", amount: 1, until: "endOfGame" }] };
   if (layout.sagaHero && "hero" in (world.data.sagaStart ?? {})) {
     const saga = spawn(state, (world.data.sagaStart as { hero: string }).hero, { zone: "heroes", seat: 0 });

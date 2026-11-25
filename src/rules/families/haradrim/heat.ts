@@ -4,10 +4,11 @@
 // never take it below 0, and queue the table event `temperatureChanged` when the value moves (Set queues none), which the stages' loss at 60 answers as soon as the value is reached, in the middle of an effect too.
 import type { Amount, Condition, Instruction } from "../../../catalog/boundary.ts";
 
-import type { AmountScope } from "../../interpret/amounts.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
+import { holds } from "../../interpret/conditions.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { effectsOf } from "../../windows/listen.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { Focus } from "../index.ts";
 
@@ -17,9 +18,25 @@ export function temperatureOf(state: ScenarioState): number | null {
   return held ? held.amount : null;
 }
 
-function withTemperature(state: ScenarioState, value: number): ScenarioState {
+/** The state with the temperature set to `value`: the one writer of the modifier (the verbs here and the test layout call it). */
+export function withTemperature(state: ScenarioState, value: number): ScenarioState {
   const others = state.modifiers.filter((modifier) => !(modifier.instanceId === "table" && modifier.stat === "temperature"));
   return { ...state, modifiers: [...others, { instanceId: "table", sourceId: "table", stat: "temperature", amount: value, until: "endOfGame" }] };
+}
+
+/** The loss a stage in play prints for the temperature ("If the temperature is 60 or higher, the players lose the game"): its own record's reason when the record's condition holds now, else null. A constant, so the loss comes at once, before the rest of the effect that raised it. */
+function stageLoss(state: ScenarioState, focus: Focus, ctx: ReduceContext): ScenarioState | null {
+  const stage = state.questStage ? state.cards[state.questStage] : undefined;
+  if (!stage || state.lost) return null;
+  for (const effect of effectsOf(ctx, stage.code)) {
+    if (effect.timing !== "forced" || effect.trigger !== "temperatureChanged") continue;
+    const scope = { actor: focus.seat, sourceId: stage.id, returned: 0 };
+    for (const instruction of effect.instructions) {
+      if (instruction.verb !== "LoseGame" || (instruction.when && !holds(state, instruction.when, scope, ctx))) continue;
+      return { ...state, lost: true, lossReason: instruction.reason ?? "The temperature ended the game", window: null, pendingAttack: null };
+    }
+  }
+  return null;
 }
 
 /** SetTemperature, RaiseTemperature and LowerTemperature; null for any other verb. */
@@ -34,7 +51,8 @@ export function runHeat(state: ScenarioState, instruction: Instruction, focus: F
       const amount = Math.max(0, resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx));
       const next = Math.max(0, now + (instruction.verb === "RaiseTemperature" ? amount : -amount));
       if (next === now) return state;
-      return queueEvent(withTemperature(state, next), { trigger: "temperatureChanged", seat: null });
+      const moved = withTemperature(state, next);
+      return stageLoss(moved, focus, ctx) ?? queueEvent(moved, { trigger: "temperatureChanged", seat: null });
     }
     default:
       return null;
@@ -42,7 +60,7 @@ export function runHeat(state: ScenarioState, instruction: Instruction, focus: F
 }
 
 /** `{ temperature: "value" | "tens" }`: the temperature or its tens digit, 0 while no tracker is set; null for any other amount. */
-export function temperatureAmount(state: ScenarioState, found: Exclude<Amount, number>, _scope: AmountScope): number | null {
+export function temperatureAmount(state: ScenarioState, found: Exclude<Amount, number>): number | null {
   if (!found.temperature) return null;
   const value = temperatureOf(state) ?? 0;
   return found.temperature === "tens" ? Math.floor(value / 10) : value;

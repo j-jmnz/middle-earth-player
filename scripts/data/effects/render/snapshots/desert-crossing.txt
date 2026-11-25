@@ -174,7 +174,7 @@ Scenario piles that place cards with no record (quest: 16068 The Desert of Harad
 
 16050:A:1 (front): While Desert Oasis is the active location, it gains: "Response: When Desert Oasis is explored, heal 4 damage from among characters in play."
   16050:response:1: Response on the event activeExplored (heard about this card)
-    - the acting player heals up to 4 damage from among character (any player controls), one damage at a time on a damaged card they choose each time, and may stop
+    - the acting player heals 4 damage from among character (any player controls), one damage at a time on a damaged card they choose each time, and cannot stop while a damaged card remains
 
 16050:A:2 (front): Forced: After Desert Oasis becomes the active location, each player exhausts a character he controls.
   16050:forced:1: Forced after this location becomes the active location (heard about this card)

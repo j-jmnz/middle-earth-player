@@ -23,7 +23,7 @@ export const manifest: RulesFamily = {
   verbs: ["PlaceUnderSelfFaceup", "SetTemperature", "RaiseTemperature", "LowerTemperature"],
   run,
   condition: (state, condition) => haradrimCondition(state, condition) ?? temperatureCondition(state, condition),
-  amount: (state, found, scope) => temperatureAmount(state, found, scope),
+  amount: (state, found) => temperatureAmount(state, found),
   // The hook runs after the encounter deck is refilled: it notes the main quest card and announces a hand over the limit.
   settle: { after: (state, ctx, steps) => announceOverLimit(noteStage(state, gameReads(state, ctx, '"kind":"stageInPlayWholeRound"')), steps) },
 };

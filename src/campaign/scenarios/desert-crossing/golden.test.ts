@@ -13,7 +13,7 @@ const crossing = loadAnyScenario("desert-crossing");
 const cardsOf = (state: ScenarioState, code: string) => Object.values(state.cards).filter((card) => card.code === code);
 
 // A permanent golden: whole standalone games of Desert Crossing played by the auto-player (test/scenarios/desert-crossing/game.ts) on fixed seeds, through a win and through each way to lose.
-// A cycle has no Campaign Mode, so a win settles at once with a score and nothing earned. The wins are true solo and two-handed on Normal and Easy: the players quest through the three stages, engage the Were-worms stage 3B adds and defeat 3B
+// A cycle has no Campaign Mode, so a win settles at once with a score and nothing earned. The wins are true solo and two-handed: the players quest through the three stages, engage the Were-worms stage 3B adds and defeat 3B
 // before the temperature reaches 60. The losses are the three ways to lose: the temperature at 60, every player's threat at 50 and every hero destroyed. Update the snapshot only when the change is meant.
 describe("Desert Crossing golden", () => {
   goldenSuite<CrossingGolden, CrossingDecks>({
