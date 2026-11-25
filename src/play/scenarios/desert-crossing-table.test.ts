@@ -7,6 +7,9 @@ import { updateCard } from "../../rules/core/state.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
 import { idOf, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
 
+import { effectById } from "../../rules/windows/listen.ts";
+import { ASKS } from "../words/asks/desert-crossing.ts";
+import { asksOption, type AskFacts } from "../words/asks.ts";
 import { slotNumbers } from "../cards/card-effects.ts";
 import { previewCards } from "../cards/table-preview.ts";
 import { seatMarks, scenarioDials } from "../readouts/scenario-dials.ts";
@@ -83,5 +86,24 @@ describe("a character under Find Water", () => {
     const name = (id: string) => moria.state.cards[id]?.code ?? id;
     const line = JSON.stringify(previewCards(state, moria.ctx, idOf(state, "ally"), (key) => ({ name: name(idOf(state, key)), source: null, text: "" }), name));
     expect(line).toContain("Player card effects cannot ready it (");
+  });
+});
+
+describe("Scorching Sun's shadow choice", () => {
+  const rows = (temperature: number) => {
+    const t = at({ temperature });
+    const record = effectById(t.ctx, "16030:shadow:1");
+    const choose = record?.instructions[0];
+    const asked: AskFacts = { game: t.state, ctx: t.ctx, names: { card: (id) => id, code: (code) => code }, instruction: choose!, effectId: "16030:shadow:1", source: null, options: [] };
+    return { raise: asksOption(asked, "temperature", ASKS), back: asksOption(asked, "return", ASKS) };
+  };
+
+  it("16030:A:3 the raise by 2 says where the temperature ends and asks for a second tap when that is 60", () => {
+    expect(rows(56).raise).toEqual({ label: "Raise the temperature by 2" });
+    expect(rows(57).raise).toEqual({ label: "Raise the temperature by 2" });
+    expect(rows(58).raise).toEqual({ label: "Raise the temperature by 2, to 60", caution: "Tap again: the temperature reaches 60 and the game is lost" });
+    expect(rows(59).raise?.caution).toContain("reaches 60");
+    expect(rows(58).back?.label).toBe("Attacker returns to staging after attack");
+    expect(rows(58).back?.caution).toBeUndefined();
   });
 });
