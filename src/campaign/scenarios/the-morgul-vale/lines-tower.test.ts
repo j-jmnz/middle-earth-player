@@ -4,6 +4,7 @@ import { expect } from "vitest";
 
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { shadowCards } from "../../../rules/core/zones.ts";
+import { stagingThreat } from "../../../rules/quest/quest.ts";
 import { answer, idOf, resolveRecords, revealedTop, revealFromTop, send, statOf } from "../../../../test/harness/scene-kit.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
 import { CODES, engagedCodes, fight, opened, run, table, tokens, where } from "../../../../test/scenarios/the-morgul-vale/table.ts";
@@ -106,7 +107,10 @@ lineSpec("06156:A:1", "The White Bridge: its Threat X and its quest points X are
   const more = place(t, t.state, 2);
   expect(statOf(more, t.cards, bridge, "threat")).toBe(5);
   expect(statOf(more, t.cards, bridge, "questPoints")).toBe(5);
+  // The staging area's total counts it: the Tower prints no Threat, so the total is the 5 tokens' worth of The White Bridge.
+  expect(stagingThreat(more, t.cards)).toBe(5);
   const none = table({ staging: [tower, bridge] }, effects);
+  expect(stagingThreat(none.state, none.cards)).toBe(0);
   expect(statOf(none.state, none.cards, bridge, "threat")).toBe(0);
   expect(statOf(none.state, none.cards, bridge, "questPoints")).toBe(0);
 });
