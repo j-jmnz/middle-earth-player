@@ -100,12 +100,21 @@ export function knownOf(summary: EncounterSummary, known: readonly KnownFailure[
   });
 }
 
+/** The lost games by reason, the most frequent first (ties by the reason's text): `["No seats remain", 18]`. A game that did not end lost has none. */
+export function lossesOf(games: readonly GameSummary[]): [string, number][] {
+  const counts = new Map<string, number>();
+  for (const game of games) if (game.ended === "lost") counts.set(game.lossReason ?? "no reason recorded", (counts.get(game.lossReason ?? "no reason recorded") ?? 0) + 1);
+  return [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "en"));
+}
+
 export function formatSummary(summary: EncounterSummary): string {
   const ended = (kind: GameSummary["ended"]) => summary.games.filter((game) => game.ended === kind).length;
   const knownLines = knownOf(summary);
   const probes = summary.cards.length;
   const notes = summary.cards.filter((result) => result.note != null).length;
-  const head = `${summary.scenario}: ${probes} card probes (${notes} with nothing to run), ${summary.games.length} games (${ended("won")} won, ${ended("lost")} lost, ${ended("problem") - knownLines.length} problems${knownLines.length > 0 ? `, ${knownLines.length} known` : ""}), ${duration(summary.ms)}`;
+  const losses = lossesOf(summary.games);
+  const lostBy = losses.length > 0 ? ` (${losses.map(([reason, count]) => `${reason} x${count}`).join(", ")})` : "";
+  const head = `${summary.scenario}: ${probes} card probes (${notes} with nothing to run), ${summary.games.length} games (${ended("won")} won, ${ended("lost")} lost${lostBy}, ${ended("problem") - knownLines.length} problems${knownLines.length > 0 ? `, ${knownLines.length} known` : ""}), ${duration(summary.ms)}`;
   return [head, ...problemsOf(summary).map((line) => `  problem: ${line}`), ...knownLines.map((line) => `  known: ${line}`)].join("\n");
 }
 

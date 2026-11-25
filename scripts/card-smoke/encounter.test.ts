@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect, Instruction } from "../../src/catalog/boundary.ts";
 import type { ReduceContext } from "../../src/rules/engine/reduce.ts";
 
-import { countOf, KNOWN, knownOf, probeTable, problemsOf, replayCommand, smokeScenario, soakNote, soakDeadline, soakStart, type EncounterSummary, type KnownFailure } from "./encounter.ts";
+import { countOf, formatSummary, KNOWN, knownOf, lossesOf, probeTable, problemsOf, replayCommand, smokeScenario, soakNote, soakDeadline, soakStart, type EncounterSummary, type KnownFailure } from "./encounter.ts";
 import { encounterCards, probeCard, type Probe } from "./encounter-cards.ts";
 import { playGame, type GameSummary } from "./encounter-games.ts";
 import type { EncounterWorld } from "./encounter-world.ts";
@@ -91,6 +91,7 @@ describe("known failures and flags", () => {
     steps: 0,
     rounds: 0,
     ended: "problem",
+    lossReason: null,
     idle: [],
     problem: { game: over.game ?? 5, seed: over.seed ?? 6, profile: "strong", seats: 2, step: 80, round: 3, window: "response", intent: { type: "Trigger", cardId: "i3", effectId: "141024:response:1" }, message: "The reducer refused an offered intent: Travel was refused", ...over },
   });
@@ -109,6 +110,16 @@ describe("known failures and flags", () => {
     expect(problemsOf({ ...summary([game()]), scenario: "the-oath" }, listed)).toHaveLength(1);
     expect(problemsOf(summary([game({ intent: { type: "Pass" } })]), listed)).toHaveLength(1);
     expect(problemsOf(summary([game()]), KNOWN)).toHaveLength(1);
+  });
+
+  it("says how many games were won and lost, and the lost ones by reason, most frequent first", () => {
+    const ended = (ended: GameSummary["ended"], lossReason: string | null = null): GameSummary => ({ ...game(), ended, lossReason, problem: null });
+    const games = [ended("lost", "No seats remain"), ended("won"), ended("lost", "Faramir left play"), ended("lost", "No seats remain"), ended("lost")];
+    expect(lossesOf(games)).toEqual([["No seats remain", 2], ["Faramir left play", 1], ["no reason recorded", 1]]);
+    expect(formatSummary(summary(games))).toContain("5 games (1 won, 4 lost (No seats remain x2, Faramir left play x1, no reason recorded x1), 0 problems)");
+    // A soak that wins nothing says so: 0 won, with no loss list when nothing was lost either.
+    expect(formatSummary(summary([ended("won")]))).toContain("1 games (1 won, 0 lost, 0 problems)");
+    expect(lossesOf([game()])).toEqual([]);
   });
 
   it("prints the command that plays a soak's games again, and says KNOWN is not matched in a soak", () => {
