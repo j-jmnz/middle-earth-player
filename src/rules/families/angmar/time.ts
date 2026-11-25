@@ -43,13 +43,16 @@ function timeCards(state: ScenarioState, ctx: ReduceContext): string[] {
  */
 export function removeTimeCounters(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   let next = state;
-  for (const id of timeCards(state, ctx)) {
-    const card = next.cards[id];
-    if (!card || card.resources <= 0) continue;
-    next = updateCard(next, id, { resources: card.resources - 1 });
-    if (card.resources === 1) next = queueEvent(next, { trigger: "lastTimeCounterRemoved", seat: null, cardId: id, subject: id });
-  }
+  for (const id of timeCards(state, ctx)) next = removeTimeCounterFrom(next, id);
   return next;
+}
+
+/** One time counter comes off this card, if it holds any; the card hears it when that was its last (`lastTimeCounterRemoved`). The refresh phase and the cards that remove a counter (Down from the Hills, Gap of Rohan) share it. */
+export function removeTimeCounterFrom(state: ScenarioState, id: string): ScenarioState {
+  const card = state.cards[id];
+  if (!card || card.resources <= 0) return state;
+  const next = updateCard(state, id, { resources: card.resources - 1 });
+  return card.resources === 1 ? queueEvent(next, { trigger: "lastTimeCounterRemoved", seat: null, cardId: id, subject: id }) : next;
 }
 
 /**
