@@ -18,9 +18,12 @@ concurrency:
   group: mirror
   cancel-in-progress: false
 
+# The mirror's secrets are in the `release` environment, which only `main` and `release/*` may use (docs/releasing.md,
+# Release environment). On another branch the job names no environment and finds no secret.
 jobs:
   push:
     runs-on: ubuntu-latest
+    environment: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')) && 'release' || '' }}
     timeout-minutes: 60
     env:
       # Electron's postinstall downloads its binary (about 110 MB), which this job does not run.

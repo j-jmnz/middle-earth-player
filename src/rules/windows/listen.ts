@@ -91,6 +91,7 @@ export function hears(state: ScenarioState, effect: Effect, listener: CardInstan
   // Damage that cannot be canceled (DamageCard `uncancelable`) is not offered to an ability that cancels it.
   if (event.uncancelable && effect.instructions.some((instruction) => instruction.verb === "CancelDamage")) return false;
   if (effect.notFromDiscard && event.fromDiscard) return false;
+  if (effect.byPlay && !event.byPlay) return false;
   // An event stamped with the clock is heard only by cards that were in play when it occurred (rr.forced: a Forced effect must be in play and active at the time its trigger occurs).
   if (event.at != null && listener.enteredPlay > event.at) return false;
   if (effect.eventSeat) {

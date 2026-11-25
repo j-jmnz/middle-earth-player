@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { backupFileName, hasSqliteHeader, REFUSALS, restoredTables, schemaVerdict } from "./backup-file";
+import { backupFileName, hasForeignSchema, hasSqliteHeader, REFUSALS, restoredTables, schemaVerdict } from "./backup-file";
 
 describe("backup file parts", () => {
   test("the file name carries the local date", () => {
@@ -35,5 +35,18 @@ describe("backup file parts", () => {
 
   test("every refusal is a plain sentence", () => {
     for (const sentence of Object.values(REFUSALS)) expect(sentence).toMatch(/^[A-Z].*\.$/);
+  });
+
+  test("a schema of tables and indexes is the app's own; anything else is foreign", () => {
+    const table = { type: "table", name: "saves", rootpage: 2, sql: "CREATE TABLE `saves` (`id` text PRIMARY KEY NOT NULL)" };
+    const auto = { type: "index", name: "sqlite_autoindex_saves_1", rootpage: 3, sql: null };
+    const index = { type: "index", name: "i", rootpage: 4, sql: "CREATE UNIQUE INDEX i ON saves (id)" };
+    expect(hasForeignSchema([table, auto, index])).toBe(false);
+    expect(hasForeignSchema([table, { type: "trigger", name: "t", rootpage: 0, sql: "CREATE TRIGGER t AFTER INSERT ON saves BEGIN SELECT 1; END" }])).toBe(true);
+    expect(hasForeignSchema([{ type: "view", name: "v", rootpage: 0, sql: "CREATE VIEW v AS SELECT 1" }])).toBe(true);
+    expect(hasForeignSchema([{ type: "table", name: "f", rootpage: 0, sql: "CREATE VIRTUAL TABLE f USING fts5(body)" }])).toBe(true);
+    // A row that calls a view a table is still a view: it has no page and its SQL creates no table.
+    expect(hasForeignSchema([{ type: "table", name: "v", rootpage: 5, sql: "CREATE VIEW v AS SELECT 1" }])).toBe(true);
+    expect(hasForeignSchema([{ type: "table", name: "x", rootpage: 5, sql: null }])).toBe(true);
   });
 });

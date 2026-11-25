@@ -1,5 +1,5 @@
 // The phone's half of a backup (phone-backup-run.ts, PhoneIo): the file goes out through the system, never through the network. iOS opens the share sheet on a copy in the
-// cache (Save to Files, AirDrop); Android has no share sheet for a file without a content provider, so the player picks a folder and the file is written there.
+// cache (Save to Files, AirDrop) and deletes the copy when the sheet closes; Android has no share sheet for a file without a content provider, so the player picks a folder and the file is written there.
 import { reloadAppAsync } from "expo";
 import * as DocumentPicker from "expo-document-picker";
 import { Directory, File, Paths } from "expo-file-system";
@@ -9,10 +9,24 @@ import type { PhoneIo, Picked } from "./phone-backup-run";
 
 async function shareFile(bytes: Uint8Array, name: string): Promise<"shared" | "cancelled"> {
   const file = new File(Paths.cache, name);
-  file.create({ overwrite: true });
-  await file.write(bytes);
-  const result = await Share.share({ url: file.uri });
-  return result.action === Share.dismissedAction ? "cancelled" : "shared";
+  try {
+    file.create({ overwrite: true });
+    await file.write(bytes);
+    const result = await Share.share({ url: file.uri });
+    return result.action === Share.dismissedAction ? "cancelled" : "shared";
+  } finally {
+    // The copy holds every saved game: it does not stay in the cache once the sheet has closed, or when the share failed.
+    removeCopy(file);
+  }
+}
+
+// A copy that cannot be deleted is left to the system, which clears the cache; the backup's own result stands.
+function removeCopy(file: File): void {
+  try {
+    if (file.exists) file.delete();
+  } catch (error: unknown) {
+    console.warn(`The backup's cache copy was not deleted: ${error instanceof Error ? error.message : "unknown error"}`);
+  }
 }
 
 // The folder picker rejects when the player closes it, so a rejection there is a cancel; a failed write after it is an error the caller reports.

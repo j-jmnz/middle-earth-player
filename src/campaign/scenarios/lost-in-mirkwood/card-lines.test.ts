@@ -4,7 +4,7 @@
 // Card specs for the Lost in Mirkwood encounter cards and quest stages, read from their printed lines. `cardSpecs` runs each row again with the records of its line removed, where it must fail.
 // The stand-in heroes dh1 and dh2 have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; f0 and f3 are enemies of Threat 0 and 3 with 1 Attack; "place" is a location of Threat 2 with no trait; every seat starts at threat 28.
 // A travel to an Objective-Location is made at stage 18077, the last level, so its "advance to the next stage, if able" changes nothing there.
-import { answer, attack, cardSpecs, endPhase, committed, count, damageOn, deckCount, defend, endRound, exhausted, quest, resolve, resourcesOn, reveal, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { answer, attack, cardSpecs, endPhase, committed, count, damageOn, deckCount, defend, endRound, exhausted, handCount, quest, resolve, resourcesOn, reveal, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 const ROWS: readonly Row[] = [
   // 18029 to 18032 "Guarded (location)" / "Guarded (enemy)": discard from the encounter deck until a card of that type is discarded, add it to the staging area and attach the objective to it (emce.guarded-x).
@@ -92,6 +92,11 @@ const ROWS: readonly Row[] = [
   // 18073 Dol Guldur Orcs: "When Revealed: Shuffle the Dol Guldur Orcs encounter set into the encounter deck. Then, reveal 1 encounter card per player."
   { line: "18073:A:1", name: "two players: the set joins the deck and 2 cards are revealed", layout: { stage: "18073", side: "A", seats: 2, piles: { orcsDeck: ["f0", "f3"] } }, act: resolve("18073", "whenRevealed", undefined), expect: [zone("f0", "staging"), zone("f3", "staging"), deckCount(0), count("f0", "orcsDeck", 0)] },
   { line: "18073:A:1", name: "no card of the set left to shuffle in: the deck is still shuffled and 1 card per player is revealed", layout: { stage: "18073", side: "A", deck: ["f0", "f0"], piles: { orcsDeck: [] } }, act: resolve("18073", "whenRevealed", undefined), expect: [count("f0", "staging", 1), deckCount(1)] },
+  // "Forced: When an Orc enemy attacks and damages a character, that character's controller chooses and discards 1 card from his hand." Mirkwood Patrol (Orc, 5 Attack) against a 2 Defense hero and against an ally the damage destroys.
+  { line: "18073:B:2", name: "the controller of the damaged defender discards 1 card from his hand", layout: { stage: "18073", hand: ["filler", "filler"] }, act: [attack("18034", { shadow: "f0" }), defend("dh1")], expect: [damageOn("dh1", 3), handCount(1)] },
+  { line: "18073:B:2", name: "a defender the damage destroys is still a character the Orc damaged: its controller discards 1 card", layout: { stage: "18073", play: ["ally"], hand: ["filler", "filler"] }, act: [attack("18034", { shadow: "f0" }), defend("ally")], expect: [zone("ally", "discard"), handCount(1)] },
+  { line: "18073:B:2", name: "with two players the second player's defender is damaged: that player discards, not the first player", layout: { stage: "18073", seats: 2, engaged: [{ code: "18034", seat: 1 }], hand: ["filler", "filler"] }, act: [attack("18034", { shadow: "f0" }), defend("dh3")], expect: [damageOn("dh3", 3), handCount(2, 0), handCount(1, 1)] },
+  { line: "18073:B:2", name: "with two players only the controller of the destroyed defender discards", layout: { stage: "18073", seats: 2, engaged: [{ code: "18034", seat: 1 }], play: [{ code: "ally", seat: 1 }], hand: ["filler", "filler"] }, act: [attack("18034", { shadow: "f0" }), defend("ally")], expect: [zone("ally", "discard"), handCount(2, 0), handCount(1, 1)] },
 ];
 
 cardSpecs("lost-in-mirkwood", ROWS);

@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { obtainiumUrl, renderNotes, type NotesInput } from "./notes.ts";
-import { parseCommit } from "./version.ts";
+import { parseCommit, plainMarkdown } from "./version.ts";
 
 const base: NotesInput = {
   tag: "v0.4.0",
@@ -115,5 +115,17 @@ describe("release notes (docs/agents/release-standards.md, Release notes)", () =
     for (const gone of ["- Windows: download", "- Mac: download", "- Linux: download", "plays fully offline"]) expect(notes).not.toContain(gone);
     expect(notes).toContain("- Android: download the `.apk`");
     expect(notes).toContain("- iPhone and iPad:");
+  });
+
+  it("writes a commit's own words as plain text: no mention, link, picture, code span or HTML", () => {
+    expect(plainMarkdown("Fix @j-jmnz's [link](https://x.test) <img src=x> `code` C:\\dir (#12)")).toBe("Fix @\u200bj-jmnz's \\[link](https://\u200bx.test) \\<img src=x> \\`code\\` C:\\\\dir (#12)");
+    expect(plainMarkdown("See https://x.test and WWW.x.test")).toBe("See https://\u200bx.test and WWW.\u200bx.test");
+    const changes = [parseCommit("fix: Thank @everyone ![x](https://x.test/p.png) (#7)", "Breaking: <b>Saves</b> from @old are lost\n\nSettles #4")];
+    const notes = renderNotes({ tag: "v1.0.0", previousTag: "v0.9.0", repository: "owner/repo", catalogVersion: 1, engineVersion: 1, reach: undefined, changes });
+    expect(notes).toContain("- \\<b>Saves\\</b> from @\u200bold are lost");
+    expect(notes).toContain("- Thank @\u200beveryone !\\[x](https://\u200bx.test/p.png) (#7) · closes #4");
+    expect(notes).not.toMatch(/@\w/);
+    // The links the notes write themselves stay links.
+    expect(notes).toContain("[all changes](https://github.com/owner/repo/compare/v0.9.0...v1.0.0)");
   });
 });

@@ -176,3 +176,23 @@ describe("release.yml desktop jobs", () => {
     for (const glob of ["*-win-x64.*", "*-mac-universal.*", "*-linux-x64.*"]) expect(publish).toContain(glob);
   });
 });
+
+// The signing and mirror secrets live in the `release` environment (docs/releasing.md, Release environment): a job that reads a secret names that
+// environment on main and release/*, and none elsewhere, in every workflow. GITHUB_TOKEN is the run's own token, not a stored secret.
+describe("workflow secrets", () => {
+  const ENVIRONMENT = "    environment: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')) && 'release' || '' }}";
+
+  it("names the release environment in every job that reads a stored secret", () => {
+    const bare: string[] = [];
+    let reading = 0;
+    for (const file of workflows(GITHUB)) {
+      for (const [name, body] of jobs(file)) {
+        if (!/\bsecrets\.(?!GITHUB_TOKEN\b)[A-Za-z_]/.test(body)) continue;
+        reading += 1;
+        if (!body.split("\n").includes(ENVIRONMENT)) bare.push(`${path.basename(file)}: ${name}`);
+      }
+    }
+    expect(bare).toEqual([]);
+    expect(reading).toBeGreaterThan(0);
+  });
+});

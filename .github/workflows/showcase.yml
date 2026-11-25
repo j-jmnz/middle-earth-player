@@ -24,9 +24,12 @@ concurrency:
   group: showcase
   cancel-in-progress: true
 
+# The mirror's secrets are in the `release` environment, which only `main` and `release/*` may use (docs/releasing.md,
+# Release environment). On another branch the capture names no environment and packs from the sources.
 jobs:
   capture:
     runs-on: macos-latest
+    environment: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')) && 'release' || '' }}
     timeout-minutes: 240
     outputs:
       complete: ${{ steps.capture.outcome == 'success' }}
@@ -47,16 +50,28 @@ jobs:
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
           R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
           R2_BUCKET: ${{ vars.R2_BUCKET || secrets.R2_BUCKET }}
+      # A pinned release, checked against its sha256 and unpacked here: no installer script is fetched and run. To move the
+      # pin, download the new release's maestro.zip, hash it (shasum -a 256) and change both values.
       - name: Install Maestro
+        env:
+          MAESTRO_VERSION: 2.12.1
+          MAESTRO_SHA256: 54dbb0716425626604973cbb374c585ca30272375d9ce15177a1152765ddd9d7
         run: |
-          curl -fsSL "https://get.maestro.mobile.dev" | bash
+          curl -fsSL -o "$RUNNER_TEMP/maestro.zip" "https://github.com/mobile-dev-inc/maestro/releases/download/cli-$MAESTRO_VERSION/maestro.zip"
+          echo "$MAESTRO_SHA256  $RUNNER_TEMP/maestro.zip" | shasum -a 256 -c -
+          unzip -q "$RUNNER_TEMP/maestro.zip" -d "$RUNNER_TEMP/maestro-unpacked"
+          mkdir -p "$HOME/.maestro"
+          cp -R "$RUNNER_TEMP/maestro-unpacked/maestro/." "$HOME/.maestro/"
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
       - name: Capture
         id: capture
         continue-on-error: true
+        # The input reaches the shell as a variable, never as script text.
+        env:
+          ONLY: ${{ inputs.only }}
         run: |
           only=()
-          if [ -n "${{ inputs.only }}" ]; then only=(--only "${{ inputs.only }}"); fi
+          if [ -n "$ONLY" ]; then only=(--only "$ONLY"); fi
           pnpm assets capture --build --out "$RUNNER_TEMP/raw" "${only[@]}"
       - name: Post-process
         run: pnpm assets showcase --from "$RUNNER_TEMP/raw" --out "$RUNNER_TEMP/out"

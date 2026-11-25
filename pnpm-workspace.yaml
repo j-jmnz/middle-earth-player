@@ -11,9 +11,13 @@ onlyBuiltDependencies:
   - electron
   - sharp
   - unrs-resolver
-# Security floors for transitive dependencies (pnpm audit): node-forge comes through @expo/cli, minimatch 10 through
-# @expo/fingerprint. typescript-eslint (through eslint-plugin-expo) keeps minimatch 10, since it imports makeRe, which
-# 11 dropped. Drop an entry once its parents require the patched release themselves.
+# Security floors for transitive dependencies (pnpm audit): node-forge comes through @expo/cli, minimatch 9 and 10 through
+# @expo/fingerprint and electron-builder (app-builder-lib, @electron/universal), which use only the Minimatch class and
+# the minimatch function that 11 keeps. The lint plugins (eslint-plugin-import-x, and typescript-eslint through
+# eslint-plugin-expo) keep minimatch 10, since eslint-plugin-import-x imports makeRe, which 11 dropped: pnpm audit still
+# names that path. Drop an entry once its parents require the patched release themselves.
 overrides:
   node-forge: ^1.4.3
   '@expo/fingerprint>minimatch': ^11.0.1
+  'app-builder-lib>minimatch': ^11.0.1
+  '@electron/universal>minimatch': ^11.0.1

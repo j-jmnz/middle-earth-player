@@ -160,12 +160,17 @@ export function sourceInBody(body: string | null | undefined): SourceRef | null 
 // A week: the longest a thread stays open with no message before Discord archives it. A post opens it again.
 const THREAD_ARCHIVE_MINUTES = 10080;
 
+// Channel types of a thread: announcement, public and private.
+const THREAD_TYPES = new Set([10, 11, 12]);
+
 // The thread on a report message: the one already there (a thread started on a message has the message's id), or a new
-// one named `threadName`. Null when there can be none: the message is itself in a thread or a forum post, or the bot
+// one named `threadName`. The message id is only as good as the form or the marker it came from, so a channel found
+// under it counts only when it is a thread of the report's own channel: any other channel is never posted in. Null when there can be none: the message is itself in a thread or a forum post, or the bot
 // may not create threads in the channel (Create Public Threads).
 async function threadOn(env: Env, channelId: string, messageId: string, threadName: string): Promise<string | null> {
   try {
-    if (await discord(env, "GET", `/channels/${messageId}`)) return messageId;
+    const found = await discord<{ type?: number; parent_id?: string | null }>(env, "GET", `/channels/${messageId}`);
+    if (found) return found.type !== undefined && THREAD_TYPES.has(found.type) && found.parent_id === channelId ? messageId : null;
     const thread = await discord<{ id: string }>(env, "POST", `/channels/${channelId}/messages/${messageId}/threads`, {
       name: clip(threadName, 100),
       auto_archive_duration: THREAD_ARCHIVE_MINUTES,
