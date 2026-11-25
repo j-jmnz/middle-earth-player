@@ -4,12 +4,14 @@
 import type { Instruction } from "../../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../../core/intents.ts";
-import type { ScenarioState } from "../../../core/state.ts";
+import { livingSeats, type ScenarioState } from "../../../core/state.ts";
 import type { ReduceContext } from "../../../interpret/interpret.ts";
 import { startReveal } from "../../../windows/frames.ts";
 import type { Focus } from "../../index.ts";
 
-/** RevealTopEngaging: see the schema entry. The revealing seat is the acting player. When the attack eliminated that player, no player is left to engage: the card is still revealed (an enemy goes to the staging area, as the enemies of an eliminated player do: rr.player-elimination). */
+/** RevealTopEngaging: see the schema entry. The revealing seat is the acting player. When the attack eliminated that player, the card is revealed for the first living seat with no engagement (an enemy goes to the staging area, as the enemies of an eliminated player do: rr.player-elimination), so its Surge, the Hide check and the controller go to a seat in the game. */
 export function revealTopEngaging(state: ScenarioState, _instruction: Extract<Instruction, { verb: "RevealTopEngaging" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  return startReveal(state, focus.seat, ctx, steps, undefined, undefined, state.seats[focus.seat]?.eliminated !== true);
+  const gone = state.seats[focus.seat]?.eliminated === true;
+  const seat = gone ? (livingSeats(state)[0] ?? focus.seat) : focus.seat;
+  return startReveal(state, seat, ctx, steps, undefined, undefined, !gone);
 }

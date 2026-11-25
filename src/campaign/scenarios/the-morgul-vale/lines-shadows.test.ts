@@ -128,6 +128,11 @@ lineSpec("06151:A:1", "Forced: when the attack eliminates the player attacked, t
   expect(afterFog.state.seats[1]?.eliminated).toBe(true);
   expect(where(afterFog.state, fog)).toBe("encounterDiscard");
   expect(tokens(afterFog.state)).toBe(3);
+  // A Surge card reveals one more for the first living seat: Terror Drives Them is revealed, and the Tracker under it is staged too.
+  const surge = killed([CODES.terror, tracker, bodyguard], [CODES.terror]);
+  expect(surge.after.state.seats[1]?.eliminated).toBe(true);
+  expect(where(surge.after.state, CODES.terror)).toBe("encounterDiscard");
+  expect(where(surge.after.state, tracker)).toBe("staging");
 });
 
 // The quest explores Morgul Road (4 of its 5 quest points are on it and the heroes bring 2 progress): the first player's Response is offered at once.
