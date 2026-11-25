@@ -29,8 +29,3 @@ Dwarrowdelf part 8 (pack `FoS`), standalone only, on Easy, Normal and Nightmare 
 - Table (no new zone or dial; `docs/design-system-table.md`, Cards, Foundations of Stone): the separate staging areas are drawn as Breaking of the Fellowship's and Escape from Mount Gram's are (`dwd.creating-a-staging-area`, 04113:B:1); a stage 4 reads its progress over its quest points and, in its own Forced line, that it joins another player at the beginning of the travel phase (04114:B:2 to 04117:B:2); the player cards a Nameless enemy holds lie under it, in the staging area and engaged, and Durin's Axe and Helm under their hero (04125:A:1, 04119:A:2, 04120:A:2); the commit window offers only sets that keep to Out of the Depths' ally limit (04118:B:2); the owner is named on each row of a pick that spans seats (the Torch's hero) and in the sentence of every player's own choice. Status: agent recommendation for the wording.
 - Easy mode: the Easy counts of `data/scenarios/foundations-of-stone.json` only.
 - Printed over Hall of Beorn's text: the setup card's "Mitril Lode" is Mithril Lode (see Dwarrowdelf above).
-
-## Readings to confirm
-
-- Foundations of Stone's commit-limit refusal and note wording is agent wording, not user-confirmed.
-- Foundations of Stone readings settled only by community discussion or recommended are marked so in `docs/scenarios/dwarrowdelf/foundations-of-stone.md` (Foundations of Stone). Not user-confirmed.

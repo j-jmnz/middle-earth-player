@@ -37,7 +37,7 @@ The statuses are those of the Readings bullet of `docs/scenarios/against-the-sha
 - `06067:B:1` (recommended). With no token left, or X = 0, nothing is discarded and the hero is still not damaged (the damage is replaced by a discard of zero). Not taken: the hero takes it. No source names the empty case.
 - `06067:B:2`, `06071:A:3` (span-settled). "When the players defeat this stage, end the game" is held while Ghulat is in play: "the game cannot end" is absolute (rr.cannot). The defeated stage stays the current quest card, the game goes on, and the end runs once Ghulat leaves play. Not taken: the game ends at once.
 - `06067:B:2` (recommended). With Ghulat in play after the defeat there is no next stage: play goes on (rounds, Ghulat's attacks and his damage tokens) and the comparison is made with the counts of the moment he leaves play. Not taken: the end is checked only at the defeat. Basis: rr.winning-the-game, rr.cannot; the blog's order (Ghulat in the Victory Display, then the end) is the only voice (R2, R1).
-- `06068:A:2`, `06069:A:2` (researched; the printed lines and one relayed official reply). The printed win line asks for "more villager tokens here than damage tokens on Dead Villagers" and the loss line for "more damage tokens here than villager tokens on Rescued Villagers": neither fires on a tie. No `ats.*` span states the tie; the pack insert says the players need to collect "more" villager tokens (R1). An FFG reply relayed in the forum (https://ffg-forum-archive.entropicdreams.com/topic/270842-encounter-at-amon-din, post of 2018-03-05: "if the number of tokens on Rescued Villagers is the same as Dead Villagers, then you have neither won nor lost", and the rules say nothing more) says a tie is not a win; the community there and in R4 plays it as a loss (the Legendary leagues do). The game has ended (stage 2B was defeated) and the app has no result between won and lost, so a tie is **lost**: the record loses on "not more". Not taken: a tie wins (rr.winning-the-game: the final stage was defeated), or play goes on. The official reply is second-hand and says "neither", which the app cannot show: see Readings to confirm.
+- `06068:A:2`, `06069:A:2` (researched; the printed lines and one relayed official reply). The printed win line asks for "more villager tokens here than damage tokens on Dead Villagers" and the loss line for "more damage tokens here than villager tokens on Rescued Villagers": neither fires on a tie. No `ats.*` span states the tie; the pack insert says the players need to collect "more" villager tokens (R1). An FFG reply relayed in the forum (https://ffg-forum-archive.entropicdreams.com/topic/270842-encounter-at-amon-din, post of 2018-03-05: "if the number of tokens on Rescued Villagers is the same as Dead Villagers, then you have neither won nor lost", and the rules say nothing more) says a tie is not a win; the community there and in R4 plays it as a loss (the Legendary leagues do). The game has ended (stage 2B was defeated) and the app has no result between won and lost, so a tie is **lost**: the record loses on "not more". Not taken: a tie wins (rr.winning-the-game: the final stage was defeated), or play goes on. The official reply is second-hand and says "neither", which the app cannot show.
 - `06068:A:2` (recommended). "The end of the game" is the game's end by stage 2B (or an effect), not a check each round.
 - `06070:A:3` (span-settled). If Lord Alcaron leaves play (destroyed, discarded, removed, his controller eliminated: rr.player-elimination) the players lose, held while Ghulat is in play (rr.cannot).
 - `06070:A:3` (recommended). The loss that Ghulat held back is not forgotten: the players lose when Ghulat leaves play, because the end is blocked, not cancelled. No source speaks of it.
@@ -69,27 +69,6 @@ The statuses are those of the Readings bullet of `docs/scenarios/against-the-sha
 - `06078:A:2`, `06078:A:3` (span-settled). Each player raises threat by the damage tokens on Dead Villagers, read as the effect resolves; the Shadow raises the defending player's threat by 1 for each token. `06078:A:1` Surge and `06079:A:1` Doomed 2 are keyword lines.
 - `06080:A:1` (span-settled). Each player in turn, the first player first, takes 1 token from Rescued Villagers and places it on a location in the staging area, if able: a move, no damage token, no Alcaron. With none placed the card gains surge. Later players are unable once Rescued Villagers is empty; with no location in the staging area nobody is (the active location is not in the staging area). The order is the first player's (recommended; faq.simultaneous-effects).
 - `06080:A:2` (span-settled). +1 Attack for each damage token on Dead Villagers.
-
-## Readings to confirm
-
-- `06066:B:1`: researched, community blog only. The Villagers value is not a cap.
-- `06066:B:2`: recommended. The surplus progress is lost.
-- `06066:B:3`: recommended. The quest advances at once when its last token leaves.
-- `06067:B:1`: recommended. An undefended attack with no token left, or X = 0, damages no hero.
-- `06067:B:2`: recommended. With Ghulat in play play goes on, and the comparison is made when he leaves.
-- `06068:A:1`, `06069:A:1`: recommended. A location that leaves play unexplored takes its tokens to the bank, with no damage token (no source).
-- `06068:A:2`, `06069:A:2`: researched, the insert, a relayed FFG reply ("neither won nor lost") and the forum consensus. A tie loses because the app has no third result.
-- `06068:A:2`: recommended. The end is checked at the end of the game, not each round.
-- `06070:A:2`: recommended. The damage token stays when Alcaron saves the discarded token.
-- `06070:A:3`: recommended. The loss that Ghulat held back runs when he leaves play.
-- `06071:A:2`: recommended. The damage token comes before his Attack is read.
-- `06071:A:3`: recommended. With every player eliminated the game ends in a loss.
-- `06074:A:1`: researched, blog only (any character, Alcaron included); recommended for a tie (the first player chooses).
-- `06075:A:2`: researched, blog only. The discard is also made while it is in the staging area.
-- `06077:A:2`: recommended. The card revealed for the Travel cost resolves as any reveal.
-- `06079:A:2`: researched, blog only. One token for each player, Alcaron saves one.
-- `06080:A:1`: recommended. The first player orders the players.
-- Engine limits: recommended. See Engine notes, Limits.
 
 ## Engine notes
 
