@@ -20,7 +20,3 @@ The official scenarios printed on their own, outside a cycle or a saga (RingsDB'
 - `docs/scenarios/standalone-scenarios/the-mines-of-moria.md`: The Mines of Moria
 - `docs/scenarios/standalone-scenarios/escape-from-khazad-dum.md`: Escape from Khazad-dûm
 - `docs/scenarios/standalone-scenarios/the-hunt-for-the-dreadnaught.md`: The Hunt for the Dreadnaught
-
-## Readings to confirm
-
-Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open points). Delete a line when the user confirms it.

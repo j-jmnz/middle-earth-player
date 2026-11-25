@@ -12,7 +12,7 @@ Before any scenario, the orchestrator writes `.agent/handoff/cycle-plan.md` (not
 - **Shared reading changes.** A reading that changes what the cards of other scenarios do is not part of a scenario. It lands as its own pull request, with its own review, before the scenario that needs it.
 - **User rulings.** `pnpm doc rulings "<words>"` for the cycle's cards and mechanics. Each goes into the briefs that touch it.
 - **Risks.** Mechanics the engine lacks, scans that may be hard to read, scenarios that need a new table widget.
-- **Open items.** The cycle's issues are created with existing labels (`docs/agents/issue-standards.md`). Every item left open is a checklist line there, read back after it is written.
+- **Open items.** The cycle creates no issue and adds no checklist line (`.claude/rules/docs-standards.md`, `docs/phases/STATUS.md`). An item the run finds is fixed in the task that finds it, or in the cycle's fix task before the pull request.
 - **Fan-made.** The publisher is declared with a licence (`docs/brief.md`, Fan-made content), or the orchestrator stops and asks the user.
 - **Nightmare decks** are not part of the run. They are a closing pass that starts when the user asks.
 

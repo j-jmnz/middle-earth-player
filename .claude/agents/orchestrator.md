@@ -55,7 +55,7 @@ If a task cannot be done without changing a behaviour the plan keeps, stop and a
 
 ## Closing
 
-- Update `docs/phases/STATUS.md` as `.claude/rules/docs-standards.md` says (the phase row, Standing decisions, Open items). What was built, the commands, test counts and measures go in the commit messages and your final report.
+- Update `docs/phases/STATUS.md` as `.claude/rules/docs-standards.md` says (the phase row, Standing decisions). What was built, the commands, test counts and measures go in the commit messages and your final report.
 - The plan is done: delete it and any handover the work consumed, and point what cites it at the doc that owns the behaviour (`.claude/rules/docs-standards.md`, Plans, phases and handovers).
 - A scenario phase's last commit carries the measures of `docs/agents/agent-brief.md` (Measure): each writing task records its times with `pnpm scenario time`, and you add a read-only agent's.
 - Before the last commit, check that `pnpm test`, `pnpm lint`, `pnpm typecheck` and `pnpm data check` are green on the final tree. The fix task's full run, green on that tree, counts; do not repeat it. Then commit and push.

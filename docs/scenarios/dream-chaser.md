@@ -72,11 +72,3 @@ The Dream-chaser campaign is nine scenarios played in order: The Grey Havens (Vo
 
 - **Drowned Cave** (12104:A:2). "Each player must discard the top 10 cards of his deck. Then, you may return Drowned Cave to the staging area": a deck of fewer than 10 cards cannot discard in full, so the card stays the active location (`rr.then`; the `thenResolves` condition). Recommended: no ruling covers a short discard before "Then"; `rr.effects` reads "as much as they are able" for the discard itself, which still happens.
 - **Sunken Temple** (12103:A:2). "Discard 1 resource from each objective-ally and each hero's resource pool. Then, you may flip Sunken Temple": a pool with no resource cannot discard 1, so the discard is not in full and Sunken Temple is not offered for flipping (`rr.then`). Recommended on the same ground.
-
-## Readings to confirm
-
-Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open points). Delete a line when the user confirms it.
-
-- Drowned Cave (12104:A:2) and Sunken Temple (12103:A:2): a discard that finds fewer cards or tokens than it names does not resolve in full, so the "Then, you may ..." part is not offered (agent recommendation; no ruling found; https://ffg-forum-archive.entropicdreams.com/topic/137865-ready-and-exhaust read).
-- Command 11203:A:5 and 11204:A:5: the host may be any player's character, and a moved attachment is controlled by its new host's controller (`recommended`, `rr.attachment-cards`, `rr.ownership-and-control` by analogy; docs/brief.md, Player card readings).
-- Spyglass (11180) prints no host, so an effect that attaches it (Command 11203, 11204) may use any character of any player (`recommended`, `rr.attachment-cards`; no ruling names the card). Open item: a hand play still offers only the playing seat's characters; whether a player may play it on another player's character is not settled.
