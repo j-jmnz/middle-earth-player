@@ -50,13 +50,13 @@ export function removeTimeCounters(state: ScenarioState, ctx: ReduceContext): Sc
 
 /**
  * One time counter comes off this card, if it holds any; the card hears it when that was its last (`lastTimeCounterRemoved`). The refresh phase and the cards that remove a counter (Down from the Hills, Gap of Rohan) share it. A counter that comes off the current quest is also announced
- * (`timeCounterRemoved`, "After a time counter is removed from the current quest", 07058:A:1), only in a game that deals a card whose record hears it, so no other game queues it.
+ * (`timeCounterRemoved`, "After a time counter is removed from the current quest", 07058:A:1; an event about no card, so every record that hears it does), only in a game that deals a card whose record hears it, so no other game queues it.
  */
 export function removeTimeCounterFrom(state: ScenarioState, id: string, ctx: ReduceContext): ScenarioState {
   const card = state.cards[id];
   if (!card || card.resources <= 0) return state;
   let next = updateCard(state, id, { resources: card.resources - 1 });
-  if (id === state.questStage && listens(state, ctx, "timeCounterRemoved")) next = queueEvent(next, { trigger: "timeCounterRemoved", seat: null, cardId: id, subject: id });
+  if (id === state.questStage && listens(state, ctx, "timeCounterRemoved")) next = queueEvent(next, { trigger: "timeCounterRemoved", seat: null });
   return card.resources === 1 ? queueEvent(next, { trigger: "lastTimeCounterRemoved", seat: null, cardId: id, subject: id }) : next;
 }
 
