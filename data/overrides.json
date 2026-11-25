@@ -349,6 +349,16 @@
     },
     {
       "match": {
+        "code": "16071"
+      },
+      "set": {
+        "questPoints": null
+      },
+      "reason": "Hall of Beorn lists 0 quest points for Surprise Attack, but the scan of side B prints no quest points box and side A prints none. The stage has none: its Forced effect advances the players to stage 2A after the first progress (16071:B:3), and a stage with 0 quest points would be completed as it is revealed.",
+      "source": "scan 16071.A, scan 16071.B"
+    },
+    {
+      "match": {
         "code": "12041"
       },
       "set": {
