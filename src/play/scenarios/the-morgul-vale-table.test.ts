@@ -21,7 +21,7 @@ import { readoutFor } from "../readouts/readout.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
 import { logLines, type LogNames } from "../store/log.ts";
 import { momentOf } from "../store/outcome.ts";
-import { nextRoundSteps } from "../store/store.ts";
+import { createTableStore, nextRoundSteps } from "../store/store.ts";
 import { instructionWords } from "../words/instruction.ts";
 import { inFate } from "../words/scenarios/fate.ts";
 
@@ -277,6 +277,18 @@ describe("tokens placed and removed on To the Tower (06147:A:3)", () => {
     expect(log).toContain("Player 2 places 1 progress on To the Tower, 1 of 10");
     // Morgul Road removes progress by title like The Fate of Wilderland's records, but that scenario's beats ("holds 2 progress") are not this one's.
     expect(inFate(second.state, two.ctx)).toBe(false);
+  });
+
+  it("the store hands the banner the stamped steps, so the banner words them as the log does", () => {
+    const two = table({ seats: 2, staging: [tower, murzag], deck: [malice, bodyguard, bodyguard] }, undefined, [malice]);
+    const revealed = revealFromTop(two.state, two.ctx, malice, []);
+    const first = send({ state: revealed.state, steps: [] }, { type: "Choose", optionId: "discard" }, two.ctx);
+    const store = createTableStore({ ctx: two.ctx, game: first.state });
+    expect(store.getState().dispatch({ type: "Choose", optionId: "token" })).toBe(true);
+    const moment = store.getState().moment;
+    expect(moment?.kind).toBe("sent");
+    if (moment?.kind !== "sent") return;
+    expect(momentOf(moment.before, moment.after, moment.steps, { card: idName(two, moment.after) })?.lines.map((line) => line.text)).toEqual(["Player 2 places 1 progress on To the Tower, 1 of 10 (Sleepless Malice)"]);
   });
 
   it("a removal says what was taken and the count left", () => {
