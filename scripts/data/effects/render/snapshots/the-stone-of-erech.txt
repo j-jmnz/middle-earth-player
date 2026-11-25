@@ -405,7 +405,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50325:A:1 (front): When Revealed: The first player attaches Driven by Fear to a hero he controls. Counts as a Condition attachment with the text: 'Attached character's Willpower is reduced to 0. Treat attached character's text box as if it was blank (except for Traits.)'
   50325:whenRevealed:1: When revealed
-    - attach this card to a hero the first player controls, one that carries a copy of this card too (the first player chooses it; with none this card is discarded)
+    - attach this card to a hero the first player controls, one that carries a copy of this card too (the first player chooses it; with none this card stays where it is)
   50325:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   50325:constant:2: Constant

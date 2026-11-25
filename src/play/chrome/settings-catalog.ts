@@ -1,7 +1,7 @@
 // How Settings is laid out (docs/design-system.md, Settings; user decision, 2026-11-21): the settings by id, the categories that hold
 // them, the rows the table's settings panel keeps, the search over names, details and the words players use, and the quick setups
 // that change several settings at once. Pure, so a test reads it; the rows themselves are drawn by setting-row.tsx.
-import { BANNER_CLOSES_LINE, EFFECTS_VOLUME_LINE, MUSIC_LINE, MUSIC_VOLUME_LINE, SOUNDS_LINE, CONTRAST_LINE, CONFIRM_TIME_LINE, FOG_LINE, GUIDE_LINE, HAPTICS_LINE, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TABLE_LIST_LINE, TABLE_LIST_WORDS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, TITLE_FACE_LINE, TITLE_FACE_WORDS, ALWAYS_EMPTY_LINE, AWAKE_LINE, DEBUG_LABEL, DEBUG_LINE } from "./settings-words.ts";
+import { BANNER_CLOSES_LINE, EFFECTS_VOLUME_LINE, MUSIC_LINE, MUSIC_VOLUME_LINE, STOP_OTHER_AUDIO_LINE, SOUNDS_LINE, CONTRAST_LINE, CONFIRM_TIME_LINE, FOG_LINE, GUIDE_LINE, HAPTICS_LINE, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TABLE_LIST_LINE, TABLE_LIST_WORDS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, TITLE_FACE_LINE, TITLE_FACE_WORDS, ALWAYS_EMPTY_LINE, AWAKE_LINE, DEBUG_LABEL, DEBUG_LINE } from "./settings-words.ts";
 import type { TableSettings } from "../../ui/table-settings.ts";
 import { CHECK_LABEL, CHECK_LINE } from "../../ui/update/offer.ts";
 import { volumeWords } from "../../ui/sound/volume.ts";
@@ -22,6 +22,7 @@ export type SettingId =
   | "soundVolume"
   | "music"
   | "musicVolume"
+  | "stopOtherAudio"
   | "guide"
   | "stops"
   | "tableList"
@@ -55,6 +56,7 @@ export const SETTING_TITLES: Readonly<Record<SettingId, string>> = {
   soundVolume: "Effects volume",
   music: "Music",
   musicVolume: "Music volume",
+  stopOtherAudio: "Stop other audio",
   guide: "First-game guide",
   stops: "Stops on",
   tableList: "Table as a list",
@@ -82,6 +84,7 @@ const SETTING_DETAILS: Readonly<Record<SettingId, string>> = {
   soundVolume: EFFECTS_VOLUME_LINE,
   music: MUSIC_LINE,
   musicVolume: MUSIC_VOLUME_LINE,
+  stopOtherAudio: STOP_OTHER_AUDIO_LINE,
   guide: GUIDE_LINE,
   stops: STOPS_LINE,
   tableList: TABLE_LIST_LINE,
@@ -109,6 +112,7 @@ export const SETTING_KEYWORDS: Readonly<Record<SettingId, string>> = {
   soundVolume: "audio sfx loud quiet louder softer",
   music: "audio soundtrack score song film mute quiet",
   musicVolume: "audio soundtrack score loud quiet louder softer",
+  stopOtherAudio: "audio music podcast spotify apps background mix pause interrupt",
   guide: "tutorial help hint learn new beginner",
   stops: "pause stop step skip pass auto",
   tableList: "screen reader voiceover talkback blind switch keyboard text",
@@ -136,7 +140,7 @@ export const ACCESSIBILITY_LINE = "Every setting that helps with sight, touch or
 export const CATEGORIES: readonly Category[] = [
   { id: "look", title: "Look", rows: ["theme", "scale", "titleFace", "contrast"], words: "display appearance" },
   { id: "motion", title: "Motion", rows: ["speed", "reduceMotion", "spotlight", "haptics"], words: "animation feel" },
-  { id: "sound", title: "Sound", rows: ["sounds", "soundVolume", "music", "musicVolume"], words: "audio volume" },
+  { id: "sound", title: "Sound", rows: ["sounds", "soundVolume", "music", "musicVolume", "stopOtherAudio"], words: "audio volume" },
   { id: "playing", title: "Playing", rows: ["guide", "stops", "bannerCloses", "timingTips", "confirmTime", "awake", "always"], words: "game table play" },
   { id: "accessibility", title: "Accessibility", note: ACCESSIBILITY_LINE, rows: ["tableList", "scale", "contrast", "reduceMotion", "confirmTime"], words: "a11y access" },
   { id: "performance", title: "Performance", note: PERFORMANCE_LINE, rows: ["quality", "fog"], words: "battery speed slow lag stutter hot" },
@@ -168,6 +172,8 @@ export function shown(id: SettingId, platform: SettingsPlatform): boolean {
   if (id === "tableList") return platform.tableList;
   if (id === "sounds" || id === "soundVolume") return platform.sounds;
   if (id === "music" || id === "musicVolume") return platform.music;
+  // Only a phone can stop another app's audio, and only an app that plays something has a reason to.
+  if (id === "stopOtherAudio") return !platform.computer && (platform.sounds || platform.music);
   return true;
 }
 
