@@ -246,6 +246,12 @@ export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
     "two-handed, won, after the earlier parts, Misplaced Trust",
     "two-handed, won, after the earlier parts, Urdug's Cunning, the last option of every Choose window",
   ],
+  "the-fords-of-isen": [
+    "Easy solo win",
+    "Easy two-handed win",
+    "solo win",
+    "two-handed win",
+  ],
   "the-ghost-of-framsburg": [
     "true solo, Easy, won, Melanwar's and Isolde's lines, a burden of the two Hazard cards for the pool",
     "true solo, brittle, lost with every hero dead",

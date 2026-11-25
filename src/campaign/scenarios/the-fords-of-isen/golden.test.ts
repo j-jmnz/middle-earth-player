@@ -40,13 +40,13 @@ describe("The Fords of Isen golden", () => {
       },
     },
     wins: "ends when Hold the Fords is defeated (the last enemy has left play), settles at once with a score and earns nothing",
-    won(state, golden) {
+    won(state, golden, world) {
       // The last stage is defeated: the quest stays on it, or has just left it.
       const ended = codeOf(state, state.questStage) === "07061" ? "07061" : codeOf(state, state.stageLeft?.from);
       expect(ended, golden.name).toBe("07061");
       // Gríma is in play and the players hold no enemy: 3B cannot be defeated otherwise.
       expect(cardsOf(state, "07016")[0]?.zone, golden.name).toBe("play");
-      expect(Object.values(state.cards).filter((card) => card.type === "enemy" && (card.zone === "staging" || card.zone === "engaged")), golden.name).toEqual([]);
+      expect(Object.values(state.cards).filter((card) => world.cards.get(card.code)?.type === "enemy" && (card.zone === "staging" || card.zone === "engaged")), golden.name).toEqual([]);
       expect(state.seats.slice(0, golden.seatCount).some((seat) => !seat.eliminated), golden.name).toBe(true);
     },
     lost(state, golden) {
