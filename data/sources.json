@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "6cb364445b1549a60aace957690a4134384941586e01fb8adfa62d6941bea820"
+        "value": "9911d95ad379b38ff5f608f29d44be3040aa305ad51aace36ea35d0def1ef282"
       },
-      "fetchedAt": "2026-11-23T17:01:06.787Z",
+      "fetchedAt": "2026-11-25T12:22:33.875Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -399,6 +399,60 @@
           "bytes": 13472
         },
         {
+          "path": "raw/hallofbeorn/Scenarios/The-Fords-of-Isen.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Fords-of-Isen",
+          "sha256": "a30ea07c99781d00860d68eaf328e564718428dd087309afb6a575718a733045",
+          "bytes": 12251
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/To-Catch-an-Orc.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/To-Catch-an-Orc",
+          "sha256": "f6dd1d2e147fad4e2493eef5166df869df75853a0cc93c4e93db2855127ba8be",
+          "bytes": 11761
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Into-Fangorn.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Into-Fangorn",
+          "sha256": "adea04a4c359f1f0cd2f814c19ba3fa392658e160d6efa8498bbc76e6064b2e3",
+          "bytes": 11619
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Dunland-Trap.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Dunland-Trap",
+          "sha256": "6fe8bbeae81a3de58694bf38250992ceccafd6cfecc591bcec3a3ab8bb76e5aa",
+          "bytes": 12514
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Three-Trials.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Three-Trials",
+          "sha256": "321fba31ec3250c2c4c30a2cba7da6031d90e5a539d9ef705801aa6cbf1a3462",
+          "bytes": 17894
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Trouble-in-Tharbad.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Trouble-in-Tharbad",
+          "sha256": "fd248cd952674142161549820c9f3524188eca7e1bb5518e88bb9968163ed4e4",
+          "bytes": 10942
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Nîn-in-Eilph.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Nîn-in-Eilph",
+          "sha256": "4addec66bdffeb53733b44cdcbfa0feb6f0301d667d06f821fb00ddf99a660cc",
+          "bytes": 25752
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Celebrimbor's-Secret.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Celebrimbor's-Secret",
+          "sha256": "7567e308a85aeb802612695c0e9c75b799fdb2b0da00500e4f72572bb4598ae5",
+          "bytes": 11218
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Antlered-Crown.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Antlered-Crown",
+          "sha256": "008b5696976016be01096f033bf6224f267bd43c5711e84e8afa7d497f2d1d11",
+          "bytes": 13001
+        },
+        {
           "path": "raw/hallofbeorn/Scenarios/Intruders-in-Chetwood.json",
           "url": "https://hallofbeorn.com/Export/Scenarios/Intruders-in-Chetwood",
           "sha256": "4f70de48d948fc92d1492b59dc3f4b50dde9737c5d0eed0667edf8ea2855ddc6",
@@ -505,6 +559,60 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/The-City-of-Corsairs",
           "sha256": "98fbb755c66532ade717c951175426fa8ee62c4b288a4285d5cbfba124027e4b",
           "bytes": 19064
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Escape-from-Umbar.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Escape-from-Umbar",
+          "sha256": "70eb39ccfc0727166395092e61c0e34c7287077af5865f4fffc00b4169417ea4",
+          "bytes": 8030
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Desert-Crossing.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Desert-Crossing",
+          "sha256": "27927284b633fb42a1b5bc148661e70659d8a95e222cf28fb9dbeb21dff785dd",
+          "bytes": 10307
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Long-Arm-of-Mordor.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Long-Arm-of-Mordor",
+          "sha256": "9790f4fe93302519cd40eabd133f717afd2557abe9cb3dd08d3123f59fc75b92",
+          "bytes": 13026
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Mûmakil.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Mûmakil",
+          "sha256": "f283d89b6fdb07530ba051c73a175fd50380d7e97646df9b9038ded9b4a1254a",
+          "bytes": 8340
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Race-Across-Harad.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Race-Across-Harad",
+          "sha256": "ac93ac5704845590cc14a6c6776e3187df97c800b5ade70348cf5663601a5358",
+          "bytes": 21375
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Beneath-the-Sands.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Beneath-the-Sands",
+          "sha256": "abc8314896d51a743154df976875c6f2da57ce0766490057ebec71e2964be586",
+          "bytes": 10749
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Black-Serpent.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Black-Serpent",
+          "sha256": "658ae7b209455c06ce9134f40aa1241cc03b0812652e7ce47caf9ebbe8fae736",
+          "bytes": 10880
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Dungeons-of-Cirith-Gurat.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Dungeons-of-Cirith-Gurat",
+          "sha256": "8f9450d9d70cbf8aa00830fb7516d6e89e67b7c4f785c4880841d274afb9c51d",
+          "bytes": 12212
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Crossings-of-Poros.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Crossings-of-Poros",
+          "sha256": "e6314f33bd202a447e051e6787b7610c020f6c6369c78d7e92f6b2b81efb04d6",
+          "bytes": 22507
         },
         {
           "path": "raw/hallofbeorn/Scenarios/Journey-Up-the-Anduin.json",
@@ -5796,9 +5904,9 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "1e3d9f70a47cdf0c78c315f431a5f461fc166c7651c39fd08b7a6627549b6567"
+        "value": "8cdea1315af7681e34930ddaf0a8c4b1babc5d9692c567f1df1a55fee531c158"
       },
-      "fetchedAt": "2026-11-24T20:01:09.182Z",
+      "fetchedAt": "2026-11-25T10:23:22.138Z",
       "files": [
         {
           "path": "pdf/core_set_campaign_cards.pdf",
@@ -11291,10 +11399,22 @@
           "bytes": 3757228
         },
         {
+          "path": "pictures/07059.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1mG9ehFOaBMej6vQaqNDPphGAwegXFkax&export=download&confirm=t",
+          "sha256": "a097f2897fc52e05f72110d2e9a81273e34dcc36e0fc2731de9a86a085e53581",
+          "bytes": 3600219
+        },
+        {
           "path": "pictures/07060.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1mCNiukg1MAxaW717b2JzdMMuJR16LVJv&export=download&confirm=t",
           "sha256": "6e99aa45d7c85156a82ec030dc09e63669c3256d9a28d556811528d3b52e4f31",
           "bytes": 3602581
+        },
+        {
+          "path": "pictures/07060.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1mAV9h6KCV_mM2geTM3hLv43aeLlvaMsc&export=download&confirm=t",
+          "sha256": "3595d6ccd1de4d8a8af231f94b0dd4c9fea02190b9876657c4d6e37abd2455eb",
+          "bytes": 3515146
         },
         {
           "path": "pictures/07061.A.jpg",
@@ -11303,10 +11423,22 @@
           "bytes": 3724278
         },
         {
+          "path": "pictures/07061.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1meJ9Ig_lGXZV11b7ykHIyvrryPn2rfhj&export=download&confirm=t",
+          "sha256": "91f965d8f070de1900533afb76fc01e5138186afe813f08898866b421bdc4441",
+          "bytes": 3694300
+        },
+        {
           "path": "pictures/07062.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1mY0iqAPGmMzlgWibGOB9w4sy7Nz0JICp&export=download&confirm=t",
           "sha256": "05b38e54fee46e230afaccdd5735dcb02536cbc97708211d6d04b588dacd686c",
           "bytes": 3404228
+        },
+        {
+          "path": "pictures/07062.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1mUqNeXSwPM7owx2NGJorz_vPWZu2dGku&export=download&confirm=t",
+          "sha256": "32c3737b51a2cfce3e3123ebb0819ecf478f83a086ae2aa574aa980a9dcc098d",
+          "bytes": 3317875
         },
         {
           "path": "pictures/07063.A.jpg",
@@ -11315,10 +11447,22 @@
           "bytes": 3673545
         },
         {
+          "path": "pictures/07063.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1moRClByhIjQ7xONR_lZKzxI8pS-NmEoZ&export=download&confirm=t",
+          "sha256": "d4ca94e616246260438d974ca41a80a1d45277dad71c7234c45a5ae28092ff67",
+          "bytes": 3627751
+        },
+        {
           "path": "pictures/07064.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1mm-YZOQ-XwxTNZeJGd9OA_M6r9FM8OAM&export=download&confirm=t",
           "sha256": "594df10edac53bf3feffd9aefd43f53a5c2c9089c19d52726ffb8b17485fb2bd",
           "bytes": 3585402
+        },
+        {
+          "path": "pictures/07064.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1mjnZ-W0mgAa3K7OME6JKGpQVBqev86km&export=download&confirm=t",
+          "sha256": "d8e0085abbce93306b16244481c067e1fc3aa29ff7cec4e9ba620fae31926c58",
+          "bytes": 3463426
         },
         {
           "path": "pictures/07065.A.jpg",
@@ -11327,16 +11471,34 @@
           "bytes": 3792364
         },
         {
+          "path": "pictures/07065.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1nAvMDnTW1Y1UK8Q4451ByBZDcgWDFeGg&export=download&confirm=t",
+          "sha256": "81aa704df5fdbcfd23853b25c00ef9ef6c6a721cf0efd987f19cce84bb5ca0ec",
+          "bytes": 3715137
+        },
+        {
           "path": "pictures/07066.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1mxe84mBF2WECGR7fvvbSfTdUVKpHbFS1&export=download&confirm=t",
           "sha256": "426ce5cddc4defc90a207e12b2ef4dc90ae53c882bdcf12bf343b54b1280a863",
           "bytes": 3888963
         },
         {
+          "path": "pictures/07066.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1mqrtQT_72-2kSQFzmjGtEnyoyi-mmF_q&export=download&confirm=t",
+          "sha256": "554bda0e3ad1c783c8bf07e46c0626fb6550c19257b26fcdbce02bb5184b247a",
+          "bytes": 3597029
+        },
+        {
           "path": "pictures/07067.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1oWSCCNE4LAdDo3GDSlZEEhBaCue_N2ZC&export=download&confirm=t",
           "sha256": "309f266d6e9d0dc12a940e7f1d389b372f9b0c3c9c9aecd47f35c7e166ccaf55",
           "bytes": 3801606
+        },
+        {
+          "path": "pictures/07067.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1oVvk6XRX4N6dBXEMBFH2hoNghJdgbwJg&export=download&confirm=t",
+          "sha256": "9979546493e2e47fc857613c01d23ba2bf7c389535a19b727e827dd4ce195f69",
+          "bytes": 3608675
         },
         {
           "path": "pictures/08001.A.jpg",
@@ -11405,16 +11567,34 @@
           "bytes": 3763222
         },
         {
+          "path": "pictures/08011.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1vSYhI2a8QqoVFa9Ji9ATCuShqR6nn9i8&export=download&confirm=t",
+          "sha256": "02c7296156a5fcf9ca91a7acb69afd3554479017030520f9e550a3af83d41c39",
+          "bytes": 3723602
+        },
+        {
           "path": "pictures/08012.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1vRh621L2Lo1s_Ipv3WEDXp_mhPcOhvxY&export=download&confirm=t",
           "sha256": "30c6a3dbfab59e1c6eebcb6a940f2e1e2bc11e9f472402e87d5100234746875f",
           "bytes": 4057864
         },
         {
+          "path": "pictures/08012.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1vtTHLXz6Os34r2H9pooWFGqEWKF5Ip2X&export=download&confirm=t",
+          "sha256": "8d9402b461c4681eb65ef67a1ad8b0f8f56486fd92de0da8ca87785cd70b335a",
+          "bytes": 3889080
+        },
+        {
           "path": "pictures/08013.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1vgEPN8KbuQHUTigmHYxuFrDBJNdCswqL&export=download&confirm=t",
           "sha256": "f9b4a56a9b68b3c6c2ab3afe0b8bb553cd9fc4eed6494328ce6d4cb623885d72",
           "bytes": 3638193
+        },
+        {
+          "path": "pictures/08013.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1vY1YXrJcp3M0kpiumB2mJfUFySfNwlSy&export=download&confirm=t",
+          "sha256": "766e20bc81d550dc4fa5b182442af050ae3c3c5529c3bb82bf3ffffb3202a216",
+          "bytes": 3459731
         },
         {
           "path": "pictures/08014.A.jpg",
@@ -11549,10 +11729,22 @@
           "bytes": 3888386
         },
         {
+          "path": "pictures/08035.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1y1GKooFfA59QSKRy1sLfbnrkqtLmYRlu&export=download&confirm=t",
+          "sha256": "d64fcd74eaa524e2524804d53e6da6a0f5c88c926ef5845d10902806d19114aa",
+          "bytes": 3929898
+        },
+        {
           "path": "pictures/08036.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1xq4dOfGLkUH2eKXrLwYBYb-tDTxZS6Se&export=download&confirm=t",
           "sha256": "37ae2380ac715987557f547f754ace13f8c834400505257e93c6e9631cd761db",
           "bytes": 3898895
+        },
+        {
+          "path": "pictures/08036.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1yMcuoSwwIjURIfnfMIO0uhFX-bqY0lon&export=download&confirm=t",
+          "sha256": "454ca4f8156cc71c65e817f009010b79103c58177697ad2da1121275884daf74",
+          "bytes": 3792297
         },
         {
           "path": "pictures/08037.A.jpg",
@@ -11561,16 +11753,34 @@
           "bytes": 3628931
         },
         {
+          "path": "pictures/08037.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1yEp5XmIIF6yMDs7ZnoEHbkF4DTH4OS-c&export=download&confirm=t",
+          "sha256": "59d3a3194d1f81b7b0c8963d0446b464f9d689ee9cf7b22061e801180903bdf0",
+          "bytes": 3515208
+        },
+        {
           "path": "pictures/08038.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1yAQ3jTyiRv2dbRoZnzR6T1umP9stndiT&export=download&confirm=t",
           "sha256": "90e588c11ac16f097646e95367302d8473d9d145350e31a154069df296ea275a",
           "bytes": 3960985
         },
         {
+          "path": "pictures/08038.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ymnwKFXXnlpEdTE94cPTv1JiR4Kt9icG&export=download&confirm=t",
+          "sha256": "6e25320693c4fd910f0ac1c850ca5cedb43379cb1ff4810ec2f8ccbab355e556",
+          "bytes": 3918808
+        },
+        {
           "path": "pictures/08039.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1yc-PvdQKpMP6LwfsAo8nh9gf5n_whVMw&export=download&confirm=t",
           "sha256": "c3bf6b10a22faecb06bb4a278da2932c031394f57cddc22292152d20ee4a1d04",
           "bytes": 3858257
+        },
+        {
+          "path": "pictures/08039.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1yZRKF-1JuNOOMUoLsfFugHMGPH4cvxQr&export=download&confirm=t",
+          "sha256": "5f6d0c230706813720f8f50033b9b7a3ec5ef4702cd14368f7b4302cff9dd44f",
+          "bytes": 3762639
         },
         {
           "path": "pictures/08040.A.jpg",
@@ -11735,10 +11945,22 @@
           "bytes": 4155215
         },
         {
+          "path": "pictures/08066.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1-6X8E8VP3M1tfkXqOPnbvm14sFQVZy9V&export=download&confirm=t",
+          "sha256": "7443f962a1c28600cf83dc15929c019a4c2775439e721192b855d2cf8ebd6e8c",
+          "bytes": 3921377
+        },
+        {
           "path": "pictures/08067.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1-UiJAa2BRIhZFfyY7eI2rzL7P8L3sLl-&export=download&confirm=t",
           "sha256": "3216aacc528a06e88cb9ae52875fff1e4058d93370c45d43a5ba73aabbe3e3a3",
           "bytes": 3714663
+        },
+        {
+          "path": "pictures/08067.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1-P5iQ1-LyPNjbat7IQcRg7ScuX3owuMC&export=download&confirm=t",
+          "sha256": "f393812b00d8a108f448ffddd9b7a80729a5aa14b4658fb510a19ff7b2caffa7",
+          "bytes": 3625575
         },
         {
           "path": "pictures/08068.A.jpg",
@@ -11903,10 +12125,22 @@
           "bytes": 3668770
         },
         {
+          "path": "pictures/08094.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=10ePuqj1voN3WKUnxXw64jiFH9XvgGPT7&export=download&confirm=t",
+          "sha256": "32f3f92ace8b9bac5e244497b241fe1897d39169927977ebb96e10b03574ab3a",
+          "bytes": 3624264
+        },
+        {
           "path": "pictures/08095.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=10PvVl2WwEILJDCHs_Y1pmR1-GR8mX98r&export=download&confirm=t",
           "sha256": "2e315aa55b22b4b8e6eff83019f683019992cba4e96633dbefcd874e7e18f244",
           "bytes": 3832769
+        },
+        {
+          "path": "pictures/08095.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=10w1M1PEP24pfkyz44ehHToKINNEPndWh&export=download&confirm=t",
+          "sha256": "6d786ae307b065ba386e5760b787caba9c8b9adb0bca241ff43783f615840c5f",
+          "bytes": 3604830
         },
         {
           "path": "pictures/08096.A.jpg",
@@ -11915,10 +12149,22 @@
           "bytes": 1032650
         },
         {
+          "path": "pictures/08096.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC29-96-back-Quest-Through_the_Marsh-A_Weary_Passage-A-The_Nin_in_Eilph.jpg",
+          "sha256": "9ddd89de6991e8311aac94c9d607bf900c39e2858e149e8596168066da3254de",
+          "bytes": 965927
+        },
+        {
           "path": "pictures/08097.A.jpg",
           "url": "https://images.cardgame.tools/lotr/MEC29-97-front-Quest-Through_the_Marsh-A_Forgotten_Land-A-The_Nin_in_Eilph.jpg",
           "sha256": "4ff3849bf893e1357a47b49c6e17e6ba38f29327ac0db873589d64ea68c47a09",
           "bytes": 1032650
+        },
+        {
+          "path": "pictures/08097.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC29-97-back-Quest-Through_the_Marsh-A_Forgotten_Land-A-The_Nin_in_Eilph.jpg",
+          "sha256": "4bbd1ded6d247cb9cdf9acb358185c6799044cc4ca555f44ea6257539b72e8af",
+          "bytes": 1039917
         },
         {
           "path": "pictures/08098.A.jpg",
@@ -11927,10 +12173,22 @@
           "bytes": 3619608
         },
         {
+          "path": "pictures/08098.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=11JP-epKQCpNGhNimuDnvF5pp0C8x8fVm&export=download&confirm=t",
+          "sha256": "bd539a257f91752e2e5b2b5d0165b4f6c85faae3b1e5e792e6b1fb5e78168e59",
+          "bytes": 3712222
+        },
+        {
           "path": "pictures/08099.A.jpg",
           "url": "https://images.cardgame.tools/lotr/MEC29-99-front-Quest-Lost_in_the_Swanfleet-A_Treacherous_Swamp-A-The_Nin_in_Eilph.jpg",
           "sha256": "1592a96ccfb73276151901b8dbd1bb9630f7520e9950824e3e7af527be7f1b47",
           "bytes": 1016059
+        },
+        {
+          "path": "pictures/08099.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC29-99-back-Quest-Lost_in_the_Swanfleet-A_Treacherous_Swamp-A-The_Nin_in_Eilph.jpg",
+          "sha256": "dec9675d41432c18a4c16793e86f1dc1f5b38b53aa1f452c54312e5c5c96799a",
+          "bytes": 1029991
         },
         {
           "path": "pictures/08100.A.jpg",
@@ -11939,10 +12197,22 @@
           "bytes": 1016059
         },
         {
+          "path": "pictures/08100.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC29-100-back-Quest-Lost_in_the_Swanfleet-Creatures_of_a_Forgotten_Age-A-The_Nin_in_Eilph.jpg",
+          "sha256": "c78bc3d8e9ebe5d591a7c01a64def725c0b9da7388f0441ddffdd21504fd5036",
+          "bytes": 1032425
+        },
+        {
           "path": "pictures/08101.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=10zQ9sZv_Q3JK_45CJ1RYpiPLcWDat5Vd&export=download&confirm=t",
           "sha256": "87e87190432c81e6dd0b2e442f5a7fc6b4e0bb86130613d1a73f867c00b0b29d",
           "bytes": 3609184
+        },
+        {
+          "path": "pictures/08101.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=11eem4eN6DcUJBWEEh1ysD2FXNYTy-Q-g&export=download&confirm=t",
+          "sha256": "0171cb9cfa79fd1d8f16a9cf95163878e1e92ddb17da4c328c80a55444321612",
+          "bytes": 3599223
         },
         {
           "path": "pictures/08102.A.jpg",
@@ -12071,10 +12341,22 @@
           "bytes": 3665189
         },
         {
+          "path": "pictures/08122.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=12iDXzTbdeliZpEb6-ByyRMaVglrOIXUe&export=download&confirm=t",
+          "sha256": "bdaa78f7bb6039439a7019fde8fd61ac34e1a3a63c58544d1a2a60ed2b176b67",
+          "bytes": 3594478
+        },
+        {
           "path": "pictures/08123.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=13LfH-tTo_4OLn7LSWOkoxktzd9AvkgKM&export=download&confirm=t",
           "sha256": "4b4cf923214bd8a017c644c601729257df06705320221fa00a6d4c0076c21f81",
           "bytes": 3497778
+        },
+        {
+          "path": "pictures/08123.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=13IwC5eUsgWFN9JRQDznjhSK3XQgvAQ8i&export=download&confirm=t",
+          "sha256": "fa20d2ec26c23d1f399444348a8a66c410d9cd60be62b66024423e7c3de48157",
+          "bytes": 3447317
         },
         {
           "path": "pictures/08124.A.jpg",
@@ -12221,16 +12503,34 @@
           "bytes": 3745961
         },
         {
+          "path": "pictures/08147.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=14dDPdqnQDYqEUCux7V4nJElTJye8GO4v&export=download&confirm=t",
+          "sha256": "5428eda88995af9996bc2061089ac3aca4c049daf5572cf0e640e5f287a06e22",
+          "bytes": 3831978
+        },
+        {
           "path": "pictures/08148.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=156pJ_QvkvkoVBq9h8fWJ2-j7_hT-nAGJ&export=download&confirm=t",
           "sha256": "2fde6d92e75f6304720a9f058b86697e4190d919596891d46fd54fefec4f45d0",
           "bytes": 3697783
         },
         {
+          "path": "pictures/08148.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=151eoI2-fvUKdEF9t5iu1-q_uLAxex-VG&export=download&confirm=t",
+          "sha256": "283ac6948560d67b39d125a55e8d6e0ec1c2998b92d5042eecef995519eec1b4",
+          "bytes": 3700060
+        },
+        {
           "path": "pictures/08149.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=14re4Z7vLv0kZGloEVbsaZo4Kgxav-oa0&export=download&confirm=t",
           "sha256": "675e08b7d14f6917be69b222319f7ac7ff9b20bf9e92d75f5c9b4868a1dfb30a",
           "bytes": 3707918
+        },
+        {
+          "path": "pictures/08149.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=14q20M2yq1SA8FgNvhDq6RRRGHnjsDJ6k&export=download&confirm=t",
+          "sha256": "1c9d42403b3237b935f4c061a9835771276d53fa8ad8c72ba91c7bfd4aaa1d58",
+          "bytes": 3685470
         },
         {
           "path": "pictures/08150.A.jpg",
@@ -30520,9 +30820,9 @@
       "site": "https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/",
       "pin": {
         "kind": "sha256",
-        "value": "304441c37ae5e51e6c3774bf7c3410a5116eaeb86eb222dba46e0d8fc5afe044"
+        "value": "2bf9f0bd09c6f56f08b9e12460083a7922b98b560a51a7c42318ddb95baa195f"
       },
-      "fetchedAt": "2026-11-23T17:01:35.132Z",
+      "fetchedAt": "2026-11-25T12:22:42.979Z",
       "files": [
         {
           "path": "pdf/mec109_rulebook-compressed.pdf",
@@ -30835,6 +31135,84 @@
           "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/rulesheet-the-morgul-vale.pdf",
           "sha256": "f970b37f644a1d515c00f16d0cd1a3f8d379c2f71a53e92117fc799ae4d68372",
           "bytes": 662238
+        },
+        {
+          "path": "pdf/the-voice-of-isengard-rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/the-voice-of-isengard-rulesheet.pdf",
+          "sha256": "c309c8a1d5ec2c1d45cc27f71a51ac69a82713a320ec776c80ebe70f95e9b3a4",
+          "bytes": 5667753
+        },
+        {
+          "path": "pdf/the-dunland-trap-rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/the-dunland-trap-rulesheet.pdf",
+          "sha256": "18dfafe76e9920ce5eba65beaeca4653e7ceb84ce23bbd9d053b39af1bafecd2",
+          "bytes": 433018
+        },
+        {
+          "path": "pdf/the-three-trials-rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/the-three-trials-rulesheet.pdf",
+          "sha256": "2ccecc77a1b560915f79cc46937edaf135562270ec17061676e8496fdf324261",
+          "bytes": 586937
+        },
+        {
+          "path": "pdf/trouble-in-tharbad-rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/trouble-in-tharbad-rulesheet.pdf",
+          "sha256": "0c99d9330ade3c232d1077357b23052822af5f968c74ca1e3c06a0ec00914c6a",
+          "bytes": 357429
+        },
+        {
+          "path": "pdf/mec29-the-nin-in-eilph-rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec29-the-nin-in-eilph-rulesheet.pdf",
+          "sha256": "8258b1eadff2d18d08bd96340e214d2de59915e8bfa393b2b4376c1220edec41",
+          "bytes": 404952
+        },
+        {
+          "path": "pdf/celebrimbors-secret-rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/celebrimbors-secret-rulesheet.pdf",
+          "sha256": "a11cb0f943c8d6def157211d38974444b0f374c7a2e1e24a7312dc63439aeafe",
+          "bytes": 788215
+        },
+        {
+          "path": "pdf/mec31-the-antlered-crown-rulesheet.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec31-the-antlered-crown-rulesheet.pdf",
+          "sha256": "bf9c40e86d1a7742ff701dca0cb75f28102ef63c3f2bcf20edd061199baeb47b",
+          "bytes": 1452206
+        },
+        {
+          "path": "pdf/mec55_rules_webready.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec55_rules_webready.pdf",
+          "sha256": "dda538cf6c73514cdab24f2df02ddfc05e6cd3ee50d9d31f147e6858b84f2ba4",
+          "bytes": 3678999
+        },
+        {
+          "path": "pdf/mec56_rule_set.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec56_rule_set.pdf",
+          "sha256": "6423e20365c78b4fc7443e4ae711dcd6e07fb6591634918ae8d2299bf96f2c32",
+          "bytes": 1355205
+        },
+        {
+          "path": "pdf/mec57_web_race_across_harad-rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec57_web_race_across_harad-rules.pdf",
+          "sha256": "60f47b97c765b9535f65d6b369070d2cf91330ed61729801b58e88c902ff7990",
+          "bytes": 5502300
+        },
+        {
+          "path": "pdf/mec59_web_the_black_serpent-rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec59_web_the_black_serpent-rules.pdf",
+          "sha256": "24c4f78d2eb1e50c0e34c190f0d5061fa76ad24ac1490993d3819d49f911dab1",
+          "bytes": 2861729
+        },
+        {
+          "path": "pdf/mec60_web_the_dungeons_of_cirith-rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec60_web_the_dungeons_of_cirith-rules.pdf",
+          "sha256": "68c7d968c1122f34331e31d97117f3cb99ec20a32ded71991525aaef6c5bd480",
+          "bytes": 3202557
+        },
+        {
+          "path": "pdf/mec61_web_the_crossing_of_poros-rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec61_web_the_crossing_of_poros-rules.pdf",
+          "sha256": "a956ee5ec6b3d9aac87cdcf44a7d79d81327b27398f8bb27a2a47257d5aa3324",
+          "bytes": 3425108
         }
       ]
     },
@@ -30843,9 +31221,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "2532894c28e2ffce1f2217d523be2e7752c6c068f6b485b2069e633652b71b92"
+        "value": "2da881ddf537c3bbebe6dc883ccf83239eb4168b22a650e21edbf42e22300776"
       },
-      "fetchedAt": "2026-11-24T19:48:44.025Z",
+      "fetchedAt": "2026-11-25T12:35:12.903Z",
       "files": [
         {
           "path": "scans/00001.A.jpg",
@@ -35258,16 +35636,1564 @@
           "bytes": 135699
         },
         {
+          "path": "scans/07001.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Éomer.jpg",
+          "sha256": "f795daf80e1a7bd65c48e3a5f23fd3accd7099a5e65852f0d36eb33576123bea",
+          "bytes": 53475
+        },
+        {
+          "path": "scans/07002.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Gríma-Hero.jpg",
+          "sha256": "525d18de44678c5e21cd4490f2ef67439cbad706a77bf882bc0222576aac5148",
+          "bytes": 144047
+        },
+        {
+          "path": "scans/07003.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Saruman.jpg",
+          "sha256": "8457b79ec83427fd07aa0b43caad0b58fe80fbc3a3f949ef03609a7688d5b709",
+          "bytes": 131995
+        },
+        {
+          "path": "scans/07004.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orthanc-Guard.jpg",
+          "sha256": "2935d5ffb63a7262009024442aea301802e396edd1c0b9d8153a011f988b3ce8",
+          "bytes": 131445
+        },
+        {
+          "path": "scans/07005.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Isengard-Messenger.jpg",
+          "sha256": "d2a0a53a33222786b5e54c16f88ad95ab081b702f34aedd7c741703dd13108ff",
+          "bytes": 145304
+        },
+        {
+          "path": "scans/07006.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Westfold-Outrider.jpg",
+          "sha256": "940c3c9e733c17e9a642e39c92c4b58743c73c7fadd9c27f97919654a5a35c57",
+          "bytes": 149670
+        },
+        {
+          "path": "scans/07007.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Westfold-Horse-breeder.jpg",
+          "sha256": "3087c10b56bcef14c688b99b074576bc318998044251e2dbc56d7cd099ea1390",
+          "bytes": 143984
+        },
+        {
+          "path": "scans/07008.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Rohan-Warhorse.jpg",
+          "sha256": "f1b339144ff2ab3038ea4006785240cb08fc228006a99448dc03fc2364663694",
+          "bytes": 140375
+        },
+        {
+          "path": "scans/07009.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Silver-Lamp.jpg",
+          "sha256": "6502094e1b2100adc36063fdfa94829113ef07c0be20f19532bd6181d9e8597a",
+          "bytes": 139384
+        },
+        {
+          "path": "scans/07010.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Keys-of-Orthanc.jpg",
+          "sha256": "682129fe8c073e189225d3d19e2cbf0eceec6efea5883dc8eb7acd83bffae9af",
+          "bytes": 119546
+        },
+        {
+          "path": "scans/07011.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Legacy-of-Númenor.jpg",
+          "sha256": "53c3622c0d7b3be8818e095bb9acdc6b2482515c53c72ee3056c490d014167c8",
+          "bytes": 126882
+        },
+        {
+          "path": "scans/07012.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Deep-Knowledge.jpg",
+          "sha256": "11d7d33a0dd2b1524287f04e1bc249494dff3939679938791dc00e6017caa8c9",
+          "bytes": 123600
+        },
+        {
+          "path": "scans/07013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/The-Wizards's-Voice.jpg",
+          "sha256": "58bb919a37b4be18d284ff8c01908561e342e7d0906a68a0492737ee6504c155",
+          "bytes": 134253
+        },
+        {
+          "path": "scans/07014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Power-of-Orthanc.jpg",
+          "sha256": "699be03aa8eeb41b7dbc84f15153835c9a0b210bb26eb14268f8284a42d68ef5",
+          "bytes": 140684
+        },
+        {
+          "path": "scans/07015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/The-Seeing-stone.jpg",
+          "sha256": "eaa43b2e553020f70904c414f1f9e4973a08ab7fa3d8921aec3ba24550e6bd46",
+          "bytes": 106577
+        },
+        {
+          "path": "scans/07016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Gríma-Objective-Ally.jpg",
+          "sha256": "0138b25d9ef447956820f456fedde7a5af8ee0e02474d52d6bd16e6ac85a3cac",
+          "bytes": 128244
+        },
+        {
+          "path": "scans/07017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/The-Islet.jpg",
+          "sha256": "8e74f9c7c44c9146a0493b3e890f25278e12fac6447a9275c5043cc6c6fbad21",
+          "bytes": 137271
+        },
+        {
+          "path": "scans/07018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Fords-of-Isen.jpg",
+          "sha256": "8df06678a6cf142b82bb9a905df84f593ef4b2800e592711ceaf8ae71b70201d",
+          "bytes": 147517
+        },
+        {
+          "path": "scans/07019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/The-King's-Road.jpg",
+          "sha256": "263c431f2ab13a8c155870bfb747e7a97699292965f964156c75cc632dbba269",
+          "bytes": 133635
+        },
+        {
+          "path": "scans/07020.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Gap-of-Rohan.jpg",
+          "sha256": "737e643a141f395a8a7badd230e11e10efb279c3170b65c1d2c1b887b2ea65a3",
+          "bytes": 134293
+        },
+        {
+          "path": "scans/07021.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Pillaging-and-Burning.jpg",
+          "sha256": "59963a4bd77f3558ad4df931d6c37f5592d7c40acfbb30c737c49a8e7466f47c",
+          "bytes": 142144
+        },
+        {
+          "path": "scans/07022.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Down-from-the-Hills.jpg",
+          "sha256": "60f95a5a39663cb58fa0084a9d7ba2cb3f7c211412f411e2109ed32c274d7af3",
+          "bytes": 143288
+        },
+        {
+          "path": "scans/07023.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Ill-Tidings.jpg",
+          "sha256": "f908d6d40cc728383ff19a37ecbdb62153df14c3bfadca23e85f25be3d82f9cf",
+          "bytes": 129342
+        },
+        {
+          "path": "scans/07024.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Mugash-Enemy.jpg",
+          "sha256": "b1fb5053150878c63e346bf5a331a6e44da7ded3e461d3933542cb4097be17ee",
+          "bytes": 143257
+        },
+        {
+          "path": "scans/07025.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Mugash's-Guard.jpg",
+          "sha256": "f89b6703d81ff4c72b5aab25142dfeb49a6c19021b5d043a53fd4031e8e4790d",
+          "bytes": 145938
+        },
+        {
+          "path": "scans/07026.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Methedras-Orc.jpg",
+          "sha256": "26670fd903b1a79864720babf908e3d0a2aea4deac374c21974723a70f852168",
+          "bytes": 139051
+        },
+        {
+          "path": "scans/07027.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Methedras.jpg",
+          "sha256": "6189eb806d1ebb59bb533e5e68f768f2479dd62abc25481510cd84bd7e03467d",
+          "bytes": 135931
+        },
+        {
+          "path": "scans/07028.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orc-Cave.jpg",
+          "sha256": "05973495a53864ed159f2bb92ee7512cfee359dd170d345973c01d5ba0d59feb",
+          "bytes": 147705
+        },
+        {
+          "path": "scans/07029.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Mugash's-Lair.jpg",
+          "sha256": "70980188896ced8b46995879e4f19390ce6979ba8bfd42804084d4b78b931326",
+          "bytes": 144143
+        },
+        {
+          "path": "scans/07030.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orc-Territory.jpg",
+          "sha256": "59938a709fe83134a97ab1537ffb761828bb362c66e913864e98a704176e2505",
+          "bytes": 138879
+        },
+        {
+          "path": "scans/07031.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Mugash-Objective.jpg",
+          "sha256": "4e34a3938541e38a427311192103ddacf7e43181f6e3f5f30ea136a9dc95a836",
+          "bytes": 138151
+        },
+        {
+          "path": "scans/07032.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Edge-of-Fangorn.jpg",
+          "sha256": "5bc66d2d9df0e777caa74d68bf3092ecf0ffc71fc4acf289931d70f57388d87f",
+          "bytes": 144692
+        },
+        {
+          "path": "scans/07033.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dark-Hearted-Huorn.jpg",
+          "sha256": "fc8d569c829e943bb3f6b1853dc4f914e6766cb4d51db5c912b3ad6a2c8d73ec",
+          "bytes": 153318
+        },
+        {
+          "path": "scans/07034.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Angry-Huorn.jpg",
+          "sha256": "7a10bc2fd90c1bdff236dd9d9cf6f283489fc88c389b901d651dc3b11a9f5fd5",
+          "bytes": 149853
+        },
+        {
+          "path": "scans/07035.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Deadly-Huorn.jpg",
+          "sha256": "0ee88d14fcbe13e445d5b3c2c3857977c5c6d03c1092aa43a4fd6bf30cccd937",
+          "bytes": 162899
+        },
+        {
+          "path": "scans/07036.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Heart-of-Fangorn.jpg",
+          "sha256": "1ce92ee1e0d24258fb5adb74fe33a26790f84436abf1875ab54f76f7c538c197",
+          "bytes": 136109
+        },
+        {
+          "path": "scans/07037.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/The-Forest's-Malice.jpg",
+          "sha256": "b67f3b9d758b12da065e54890daf4f4962fc5a1591e8e23d78a8a9471ef49ebd",
+          "bytes": 141057
+        },
+        {
+          "path": "scans/07038.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orc-Skirmisher.jpg",
+          "sha256": "cd0e9281e9e654d90361be0b18d9d77cd516250be774f059f6a38076502b4138",
+          "bytes": 145393
+        },
+        {
+          "path": "scans/07039.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orc-Hunter.jpg",
+          "sha256": "3c90b78128589ee42428e19981ba6e8ad4307753ada6a7d8887fcb64f2260d5b",
+          "bytes": 140108
+        },
+        {
+          "path": "scans/07040.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orc-Hound.jpg",
+          "sha256": "65a70301133c02d44a3a1740e6dde62f63146ab38d534bd7e615d53a1e115c51",
+          "bytes": 127351
+        },
+        {
+          "path": "scans/07041.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orc-Hunting-Party.jpg",
+          "sha256": "d3347a684428769541926ad694493a179954c7d6fa499a9c0ccfc3c2564ded33",
+          "bytes": 145479
+        },
+        {
+          "path": "scans/07042.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dunland-Prowler.jpg",
+          "sha256": "15d1fc5223157c99ba5582cef8f4bc0937256f0e04ad000c6ab40e23c9934a07",
+          "bytes": 135806
+        },
+        {
+          "path": "scans/07043.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dunlending-Bandit.jpg",
+          "sha256": "0db9f2fe3cae3a5011314005e50a9597b6b673b644f40c70884f9a7df884b675",
+          "bytes": 147774
+        },
+        {
+          "path": "scans/07044.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dunland-Raider.jpg",
+          "sha256": "4171bc3db90e384007d7bc53acb9481d54dfd52caa3bd5636cfaeacf552c303c",
+          "bytes": 132649
+        },
+        {
+          "path": "scans/07045.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Old-Hatreds.jpg",
+          "sha256": "d0bd250dfd85bcaf06b74f496bebdd1181de75dd08fef285906bf6a088fc053f",
+          "bytes": 142506
+        },
+        {
+          "path": "scans/07046.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dunland-Tribesman.jpg",
+          "sha256": "e9b8e44a07ac64e5e2b339d5589085124e0df8ea6d3dff0e1e4af93088ca36ce",
+          "bytes": 141576
+        },
+        {
+          "path": "scans/07047.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dunland-Chieftain.jpg",
+          "sha256": "01b2595b7ddbdba581f2307ef797d4e939af642fc8d528107d680ffe9b171f7a",
+          "bytes": 135434
+        },
+        {
+          "path": "scans/07048.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dunland-Berserker.jpg",
+          "sha256": "f89c073c9ad564ee6c6acbda72bdd40e6cc3ba6ad657bfb4868e125bd9e7a336",
+          "bytes": 140916
+        },
+        {
+          "path": "scans/07049.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Wild-Men-of-Dunland.jpg",
+          "sha256": "e8ab31a75c1fcc7488a6b829762bd48b68f8a682c0bf7913eea065ba04ff2fcc",
+          "bytes": 142351
+        },
+        {
+          "path": "scans/07050.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Ancient-Forest-Location.jpg",
+          "sha256": "50eda95dadf6fc42e43b65d1515fe8c326c2f565a4402077078095f687b7bc95",
+          "bytes": 135215
+        },
+        {
+          "path": "scans/07051.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Tangled-Woods.jpg",
+          "sha256": "b0ad57e8158b69296e7518174608b50b6a8a91ff2f677e68b24d41c101b9e0c8",
+          "bytes": 134183
+        },
+        {
+          "path": "scans/07052.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Turned-Around.jpg",
+          "sha256": "0a732c6ac410024ae959ec12f276b252e82a5c501bc8cac975182f0a6d091cac",
+          "bytes": 148052
+        },
+        {
+          "path": "scans/07053.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Prowling-Wolf.jpg",
+          "sha256": "c6b85fe0bfbba50dbf695266f787ff188fa3e0546012232d375be71c4d6ffee7",
+          "bytes": 139183
+        },
+        {
+          "path": "scans/07054.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Broken-Lands-Location.jpg",
+          "sha256": "3a6c21d1639f9f3cfc6dd00be8e62dcce7d2a7dca9703595cff978e9b7394b96",
+          "bytes": 133219
+        },
+        {
+          "path": "scans/07055.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Take-Cover.jpg",
+          "sha256": "6e385477e43448f0a7106a8ef0267b87debe6aba4d0178a80302f0b966fe99b0",
+          "bytes": 136949
+        },
+        {
+          "path": "scans/07056.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Low-on-Provisions.jpg",
+          "sha256": "6c6715ba877d7bc1f7d730fc63fb92781de11cf2edec983e555b95e3e4f59987",
+          "bytes": 148836
+        },
+        {
+          "path": "scans/07057.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Off-Track.jpg",
+          "sha256": "2b3c809bc0acb693fff5242cd8e1f8f0fa5bbc421b831a265efd642acc42a3ff",
+          "bytes": 138318
+        },
+        {
+          "path": "scans/07058.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/In-Need-of-Rest.jpg",
+          "sha256": "12970bb613c462bce3b026b41e602873b4a3fb4c1f154fc69ae1186cd905ec0b",
+          "bytes": 142858
+        },
+        {
+          "path": "scans/07059.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Fight-at-the-Fords-1A.jpg",
+          "sha256": "4efc95606a85450396fad7092e0bfeb92ccb9ffd18b800e63f5a40fe91fbdb07",
+          "bytes": 173509
+        },
+        {
+          "path": "scans/07059.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Fight-at-the-Fords-1B.jpg",
+          "sha256": "935405e29fa6578f79f5b3d6756fd787b3bc316d54190fc02846e5da9e2ed6c4",
+          "bytes": 154652
+        },
+        {
+          "path": "scans/07060.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dunlending-Attack-2A.jpg",
+          "sha256": "493942bca088e16e7d590878cbc79147303db03dec1bd796e6b5b3ac7ddc5316",
+          "bytes": 175904
+        },
+        {
+          "path": "scans/07060.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dunlending-Attack-2B.jpg",
+          "sha256": "6e9290e9257fbf3a83e78d0a06781e6b191ab8f620ae07bef5a7dcbe0e36be4b",
+          "bytes": 174116
+        },
+        {
+          "path": "scans/07061.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Hold-the-Fords-3A.jpg",
+          "sha256": "82088889892ec6d0277d15eedd24408761daf00c10bfb48c1ee120fb92b80609",
+          "bytes": 169247
+        },
+        {
+          "path": "scans/07061.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Hold-the-Fords-3B.jpg",
+          "sha256": "caee8a2745532ac60b4d61c45faff7896d96dbe553544d12415a27cd9afbd259",
+          "bytes": 162720
+        },
+        {
+          "path": "scans/07062.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orders-from-Orthanc-1A.jpg",
+          "sha256": "8ca8caa0f0ac07fb35e00d73688fcd6a39566524069ff266ecd2de3690921061",
+          "bytes": 171593
+        },
+        {
+          "path": "scans/07062.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orders-from-Orthanc-1B.jpg",
+          "sha256": "e8e46880c55d3f61be59ffd1b75c034033ac6689596753caf4dca8017e9eb065",
+          "bytes": 161402
+        },
+        {
+          "path": "scans/07063.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Searching-for-Mugash-2A.jpg",
+          "sha256": "3548fa975ba6916e412c77644dd5613702f4756e795bf2712dbcb12389b772c2",
+          "bytes": 172499
+        },
+        {
+          "path": "scans/07063.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Searching-for-Mugash-2B.jpg",
+          "sha256": "8fa9cccc4889dbd98e743bbc672b183451f9ee6a386eaafda44324a5c9b1cce4",
+          "bytes": 184115
+        },
+        {
+          "path": "scans/07064.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/The-Wizard's-Prize-3A.jpg",
+          "sha256": "a04707543424d31add5e5b1f2e5b31a4834f1b9d6fb91ac9cd216b641e455ac3",
+          "bytes": 168399
+        },
+        {
+          "path": "scans/07064.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/The-Wizard's-Prize-3B.jpg",
+          "sha256": "cbd9f31052a0db265ae3df10c7f8fd8a85d65800e2a436e1fd8341a686ff5a00",
+          "bytes": 164551
+        },
+        {
+          "path": "scans/07065.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Into-the-Woods-1A.jpg",
+          "sha256": "b87c5510fce1df325dfbb48595f9e6cf1f391eb5d03b148f5db9f5b035266cb9",
+          "bytes": 178168
+        },
+        {
+          "path": "scans/07065.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Into-the-Woods-1B.jpg",
+          "sha256": "f916bbe4ed05fed150b57a5c072871609ecd63b974bcf9592886025652a03dd2",
+          "bytes": 177004
+        },
+        {
+          "path": "scans/07066.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Escape-from-Fangorn-2A.jpg",
+          "sha256": "5ab8e820796d0051ea15abd8bd2aa9c3d3eda1f2b7c5d518ba9f4d3164f1f395",
+          "bytes": 191139
+        },
+        {
+          "path": "scans/07066.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Escape-from-Fangorn-2B.jpg",
+          "sha256": "0674719e8131acdac981a0eb13649ca37067f84f9fd5b42ea3769d95d11b0317",
+          "bytes": 177586
+        },
+        {
+          "path": "scans/07067.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/The-Angry-Forest-3A.jpg",
+          "sha256": "5fdb1303a01302bcd0169a0eae387eb8a0f973d358ac591f5c52ba477f5ee527",
+          "bytes": 180788
+        },
+        {
+          "path": "scans/07067.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/The-Angry-Forest-3B.jpg",
+          "sha256": "5666fa7ebf9146eadc245a96e0b7b7c1a91087ed224ac1f19d2d3ee34f3f41e1",
+          "bytes": 182916
+        },
+        {
+          "path": "scans/08001.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Celeborn.jpg",
+          "sha256": "9b9861eb0b1b51bcceead337dea40817803906276720fea45636677519519a7e",
+          "bytes": 56517
+        },
+        {
+          "path": "scans/08002.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Naith-Guide.jpg",
+          "sha256": "05ec04154ab44fb580dda14501832a5c86d8e31433c1f0f3a242f1bcfab75cd3",
+          "bytes": 66818
+        },
+        {
+          "path": "scans/08003.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Swift-and-Silent.jpg",
+          "sha256": "ed6e35fe71d064afb4414d5f7163eae7b269403e955bc38e1c00f5c5c5a30bd1",
+          "bytes": 55994
+        },
+        {
+          "path": "scans/08004.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Firefoot.jpg",
+          "sha256": "c125acf80d75e462803435d6d791e66bb3c19f7a43287adeb355d927589f8213",
+          "bytes": 67439
+        },
+        {
+          "path": "scans/08005.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Close-Call.jpg",
+          "sha256": "df65171797747452b343c59daa2368c427aea8aa655acb0623e4d142864dc2fd",
+          "bytes": 54070
+        },
+        {
           "path": "scans/08006.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Two-Player-Limited-Edition-Starter/Blue-Mountain-Trader.jpg",
           "sha256": "d0090e93d3e8af35275c3b55ab61c2ff64aab50a0cde156c1251c6117f6186d8",
           "bytes": 2240376
         },
         {
+          "path": "scans/08007.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/The-Fall-of-Gil-Galad.jpg",
+          "sha256": "489972610b869333ffad8ef26506d734e6137652042558d91bf1443077aa4382",
+          "bytes": 69996
+        },
+        {
+          "path": "scans/08008.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Ithilien-Lookout.jpg",
+          "sha256": "96c2136eaceb3294afc9560f68ff789b61e9f01f28e3410f399130aae06e571f",
+          "bytes": 70855
+        },
+        {
+          "path": "scans/08009.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/The-Tree-People.jpg",
+          "sha256": "49d6bca6d9b82594351b2bdda46870d756fa313b2cd17a362806eaf4aea16c3f",
+          "bytes": 65324
+        },
+        {
+          "path": "scans/08010.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/The-White-Council.jpg",
+          "sha256": "3eac91db3652b3d351469cf582eac46512c99dfab2e02a011e1e28d5339db6e4",
+          "bytes": 57482
+        },
+        {
+          "path": "scans/08011.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/The-Road-to-Tharbad-1A.jpg",
+          "sha256": "9b0cc210aa6104d3a76054a4e7af12ebd9abfa239aea4fe6c20acd963a057046",
+          "bytes": 136706
+        },
+        {
+          "path": "scans/08011.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/The-Road-to-Tharbad-1B.jpg",
+          "sha256": "663252f21baa83ff250d2112be5758220e1c9bcf350411152107e62f53479f47",
+          "bytes": 136941
+        },
+        {
+          "path": "scans/08012.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/A-Well-Laid-Trap-2A.jpg",
+          "sha256": "728c66dee88f79db0b2d8455f491ff3d7a32c9c98776841b7ecef7ee7c72b81f",
+          "bytes": 147115
+        },
+        {
+          "path": "scans/08012.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/A-Well-Laid-Trap-2B.jpg",
+          "sha256": "fdd50284299e9f858e9f30fe2a4c4d9d0b50b9ef5cace7ee38ffef0f3b6eed54",
+          "bytes": 141027
+        },
+        {
+          "path": "scans/08013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/No-Way-Out-3A.jpg",
+          "sha256": "0a4dcecacda13b8a5988fd195dc3a9b099ca8d24329f63dc8bfd251037ae149d",
+          "bytes": 130077
+        },
+        {
+          "path": "scans/08013.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/No-Way-Out-3B.jpg",
+          "sha256": "fbb3e102359bcbbd91159c021eba677f0d4be2df406ab8a875ea277bfd1c9745",
+          "bytes": 126395
+        },
+        {
+          "path": "scans/08014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Chief-Turch.jpg",
+          "sha256": "c2dfd490f074a59de0be572924ca0550c181109e503e7c2f0fb3f21428f1919e",
+          "bytes": 63510
+        },
+        {
+          "path": "scans/08015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Munuv-Dûv-Ravine.jpg",
+          "sha256": "f461dc212fa2e59360d1edb95dbbb5094f713a33ead3f00c486a626ebf5346ac",
+          "bytes": 59009
+        },
+        {
+          "path": "scans/08016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Old-South-Road.jpg",
+          "sha256": "0b37ef896b608c33346f995f95a35a72cf0a5e450ac30c3880ffc90206313cb0",
+          "bytes": 65305
+        },
+        {
+          "path": "scans/08017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Boar-Clan-Stalker.jpg",
+          "sha256": "b737b329ede63bb32add6eca0c40f1b357e21c17e1f23aa58aebe896829a6b8c",
+          "bytes": 66252
+        },
+        {
+          "path": "scans/08018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Boar-Clan-Warrior.jpg",
+          "sha256": "fe8195be85aa4f1c6190c94bafdaf00244b7371d5be1dfe4c84b9a65448b7300",
+          "bytes": 65376
+        },
+        {
+          "path": "scans/08019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Hithaeglir-Foothills.jpg",
+          "sha256": "a981948a5facc39db36b86aa897bdd97942a591496ca152c4572d21289f1f4ca",
+          "bytes": 61177
+        },
+        {
+          "path": "scans/08020.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Hills-of-Dunland.jpg",
+          "sha256": "f9e1aaeb23fa92b8efe91babfed3f42060437df7ebd919eedfce04045bb9a1ac",
+          "bytes": 65052
+        },
+        {
+          "path": "scans/08021.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Plains-of-Enedwaith.jpg",
+          "sha256": "fabbd8770e5650978a2ab2eafc91579aca40ba83aadddbf3cc8d9a02d031c7f5",
+          "bytes": 62876
+        },
+        {
+          "path": "scans/08022.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Hithaeglir-Stream.jpg",
+          "sha256": "0845650a51d2892f7aabda723a06e7da068a4c32187d8da74d788b14d5623a58",
+          "bytes": 67361
+        },
+        {
+          "path": "scans/08023.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Frenzied-Attack.jpg",
+          "sha256": "6c260a7f80f0fa9be8240c3e756240bb01732a4341bec27c72ba97a417ba6c72",
+          "bytes": 67506
+        },
+        {
+          "path": "scans/08024.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Dunlending-Ambush.jpg",
+          "sha256": "673287e13d9cc2987ec624d9340ba35746f541809d6751f209256bc3da6fcb97",
+          "bytes": 60509
+        },
+        {
+          "path": "scans/08025.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Idraen.jpg",
+          "sha256": "84e99ad6951c0805a2bc67d3ec8f2c3212adccd67a3ac1e47a16079d16d5d1c9",
+          "bytes": 58609
+        },
+        {
+          "path": "scans/08026.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Rivendell-Scout.jpg",
+          "sha256": "92dc42fe3637e6e660a19db9a9e773cc7f76f5c62e8288f6eb51e963049ed128",
+          "bytes": 61938
+        },
+        {
+          "path": "scans/08027.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Feigned-Voices.jpg",
+          "sha256": "123c927dadfdb0e306fdef90d1b7a9d72df5a79b6e210d09aeb9dae4118300fc",
+          "bytes": 58872
+        },
+        {
+          "path": "scans/08028.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Rúmil.jpg",
+          "sha256": "cb7ee3f1d2de729c409ce1bdd97ef7a01d399c00eb9923e6a2fcac9a377c9240",
+          "bytes": 63415
+        },
+        {
+          "path": "scans/08029.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Elven-Mail.jpg",
+          "sha256": "d94a5ed0d8e4efd5d8a0288fc28267855319c7cc4d7d06dfcd8f0c9d1cf0777f",
+          "bytes": 58963
+        },
+        {
+          "path": "scans/08030.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Greyflood-Wanderer.jpg",
+          "sha256": "11c542bfd931140844c12403adddafec5029850b3ca551cd1840dfe4771abc4d",
+          "bytes": 65265
+        },
+        {
+          "path": "scans/08031.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Warden-of-Arnor.jpg",
+          "sha256": "23b1a1ea538d5baf3c36596f8b11c5ccf6c47a4b6dcd6db90e80755cdfac930c",
+          "bytes": 66883
+        },
+        {
+          "path": "scans/08032.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Message-from-Elrond.jpg",
+          "sha256": "1353ebc7f5b85a3aab0aa6dcc32405e996a85a53e167663bb1c756d3a6bd421c",
+          "bytes": 58884
+        },
+        {
+          "path": "scans/08033.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Noiseless-Movement.jpg",
+          "sha256": "d8ff55a043dfbbd9dc2ac56c8b1598705fef1487b8e74066664a52f3ae97b0bd",
+          "bytes": 60983
+        },
+        {
+          "path": "scans/08034.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Leaf-Brooch.jpg",
+          "sha256": "392a5348d693b8549a371f7ac2a4902bba1fff89ea49932c426d7a18996a6f3e",
+          "bytes": 60737
+        },
+        {
+          "path": "scans/08035.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Trials-Begin-1A.jpg",
+          "sha256": "077fcd39871226ecc1b4880ef32584bba9009b776c934bce63a1c569975238d3",
+          "bytes": 112263
+        },
+        {
+          "path": "scans/08035.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Trials-Begin-1B.jpg",
+          "sha256": "7981b77d9535065a750816e5c0105a05f51693bdfa7749d6237c668e0765437c",
+          "bytes": 109527
+        },
+        {
+          "path": "scans/08036.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Trial-of-Strength-2A.jpg",
+          "sha256": "ba025f942b51991d7fa92bd7e0692fe5126ea5ca41526c81b4194ce283c52b32",
+          "bytes": 117169
+        },
+        {
+          "path": "scans/08036.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Trial-of-Strength-2B.jpg",
+          "sha256": "5df7a5c274993060589f27e6931691eb26ce7fa47b42a6cdd1e1895229c8f376",
+          "bytes": 113827
+        },
+        {
+          "path": "scans/08037.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Trial-of-Perseverance-2A.jpg",
+          "sha256": "23378e586dbed0ef08566e4ce4d64cf6764ca3419b88eb56c4a16c14b4a686b9",
+          "bytes": 131199
+        },
+        {
+          "path": "scans/08037.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Trial-of-Perseverance-2B.jpg",
+          "sha256": "6dbc53d09805dee475a7ea896e9ec7395c14cb08d4c5f91bee1d03d14fc8430b",
+          "bytes": 130517
+        },
+        {
+          "path": "scans/08038.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Trial-of-Intuition-2A.jpg",
+          "sha256": "890657dbe91d90106126a20e04a152ebfe0a2d3e28caa37341a674bd731deeec",
+          "bytes": 122025
+        },
+        {
+          "path": "scans/08038.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Trial-of-Intuition-2B.jpg",
+          "sha256": "c371ceec050aa79c8fdfb1829746bc26af278e86cfcaf4f0cd435c9506e433c9",
+          "bytes": 123841
+        },
+        {
+          "path": "scans/08039.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Antlered-Crown-3A.jpg",
+          "sha256": "e2bdef44dff82e4e9b61a930e15b497ca2008217ed7226bb776fe62f028502c6",
+          "bytes": 114722
+        },
+        {
+          "path": "scans/08039.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Antlered-Crown-3B.jpg",
+          "sha256": "7e901ccb0f4673d7f91a0ab374ac5def9277715a2cbdcd20eea700ac444070f5",
+          "bytes": 118196
+        },
+        {
+          "path": "scans/08040.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Boar's-Guardian.jpg",
+          "sha256": "d258214adf3ccaff7a799def599599df9c98e1ac0089b02d9ac3db2ff4000a8b",
+          "bytes": 66086
+        },
+        {
+          "path": "scans/08041.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Wolf's-Guardian.jpg",
+          "sha256": "3ba6f86f76f6f92574729d0a5670805e1cd0692b22bbceaa844bd4a117bacfcd",
+          "bytes": 61238
+        },
+        {
+          "path": "scans/08042.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Raven's-Guardian.jpg",
+          "sha256": "c0794135a7c392fd8507626223f9c925e89b14dab132c6a3d12a8d80c8dc56f9",
+          "bytes": 63176
+        },
+        {
+          "path": "scans/08043.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Key-of-the-Boar.jpg",
+          "sha256": "7a1b77aac76bd4f8134eff987fe7c9b66b4f626aa39a98127f3475b6b645efd6",
+          "bytes": 64681
+        },
+        {
+          "path": "scans/08044.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Key-of-the-Wolf.jpg",
+          "sha256": "29e764db7acd8d37f5d3f26dfdefd2ce83132aa0bac81a72d586343d473d0980",
+          "bytes": 55202
+        },
+        {
+          "path": "scans/08045.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Key-of-the-Raven.jpg",
+          "sha256": "195ec2d59ef29a021f3b62013a4f1879dfcbdf0a1fe9e7796a7174324acae84e",
+          "bytes": 56417
+        },
+        {
+          "path": "scans/08046.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Hill-Barrow.jpg",
+          "sha256": "22823314853865fbd32d4bcf706aea4b81bbbe364b256eb169f488ed99454643",
+          "bytes": 60424
+        },
+        {
+          "path": "scans/08047.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Cave-Barrow.jpg",
+          "sha256": "a2323f50a8f82f05d8506c4a7cfe3b12b928800cdfcf67037925bd6be6ce7fa1",
+          "bytes": 62589
+        },
+        {
+          "path": "scans/08048.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Stone-Barrow.jpg",
+          "sha256": "04252a5a200523d3e5f4207565a900743de040d43c9cf0c803955cf091f0304b",
+          "bytes": 60557
+        },
+        {
+          "path": "scans/08049.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Hallowed-Circle.jpg",
+          "sha256": "2938af71e6bf80dbd57177535ba7b8522f1b1373d8c4d2fb764f78dcdc49754b",
+          "bytes": 60609
+        },
+        {
+          "path": "scans/08050.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Spirit-of-the-Wild.jpg",
+          "sha256": "f6ae74bb6a8e5b9d871729277859d1c7174b12f51d17e1fd15c7f278aae2ee4d",
+          "bytes": 65670
+        },
+        {
+          "path": "scans/08051.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Cursed-Forest.jpg",
+          "sha256": "2d88c26f632ab07806c298b5fc39248334e2a2d64da68cd169ec8fa096bd316a",
+          "bytes": 66035
+        },
+        {
+          "path": "scans/08052.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Grim-Foothills.jpg",
+          "sha256": "c7e6c8c16c82a3953f5fe02648e029a14b607cc881376d1dc5b86f396ea41c73",
+          "bytes": 56824
+        },
+        {
+          "path": "scans/08053.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Curse-of-the-Wild-Men.jpg",
+          "sha256": "3faf62c90a753a3d5672db97b927f4ef9e11796b7ce527c0047ab3221c057c0d",
+          "bytes": 52135
+        },
+        {
+          "path": "scans/08054.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Guardian's-Fury.jpg",
+          "sha256": "3f577cb07eba560d299d4c2423b6d59662d8d3129f9827748f171003c013258c",
+          "bytes": 62383
+        },
+        {
+          "path": "scans/08055.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Wild-Tenacity.jpg",
+          "sha256": "ed5f149eabade51e7d8338a2157ae90e43b814f2f76ad5081dad05ea97c4ff5a",
+          "bytes": 58360
+        },
+        {
+          "path": "scans/08056.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Haldir-of-Lórien.jpg",
+          "sha256": "f357c1bcd18e7e60f1b59281edd893cc6001b5ba9e4de5c2a634ce5c381e2188",
+          "bytes": 68266
+        },
+        {
+          "path": "scans/08057.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Herald-of-Anórien.jpg",
+          "sha256": "6ba4535ff00d84251ea4133925336077e591cdb85f0dec9a139cae9133521d34",
+          "bytes": 61574
+        },
+        {
+          "path": "scans/08058.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/O-Lórien.jpg",
+          "sha256": "d23f716cf1faf0561c77f075c4735ed7ee8bc0537654a76ae5284a07c53176b6",
+          "bytes": 63175
+        },
+        {
+          "path": "scans/08059.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Gwaihir.jpg",
+          "sha256": "de283e170644c2dbde6ff848c44fcac5eb048b1bb319784cf5559bda7a5b6dae",
+          "bytes": 61274
+        },
+        {
+          "path": "scans/08060.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Pursuing-the-Enemy.jpg",
+          "sha256": "7587508d08639339c45b79ceba5993989ba6c67e1905596a3e9ff1101648ce0a",
+          "bytes": 61938
+        },
+        {
+          "path": "scans/08061.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Courage-Awakened.jpg",
+          "sha256": "88bace54d3c5ee0964d07f5c0b8f0e9de811eb2b7e87760ce51a026920b9887a",
+          "bytes": 62563
+        },
+        {
+          "path": "scans/08062.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Free-to-Choose.jpg",
+          "sha256": "39ad39b98813b073f56d13a0213d7e59d36cfc0e3f49499aebd925e02370ccb7",
+          "bytes": 58309
+        },
+        {
+          "path": "scans/08063.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Galadhrim-Minstrel.jpg",
+          "sha256": "e9d6e0058c5df2b9a0d42ab257c8f9c9d572405a5236b6ba7a450935aba70a4e",
+          "bytes": 60594
+        },
+        {
+          "path": "scans/08064.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Lembas.jpg",
+          "sha256": "c2f92ac9b29c5f13bd34b7c1b2136b5eeccc1e9707719688c8a0b4bf3062ffab",
+          "bytes": 63316
+        },
+        {
+          "path": "scans/08065.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Defender-of-the-Naith.jpg",
+          "sha256": "14b0ac2a68ed7e3df8c7ef26cb4c717e9924bf34fba60a118fa516a294a9967d",
+          "bytes": 63679
+        },
+        {
+          "path": "scans/08066.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Double-Dealings-1A.jpg",
+          "sha256": "863c0e48badb6608820f0335624e6e0d6511e07ec82ba64cf8c41a4188555265",
+          "bytes": 152580
+        },
+        {
+          "path": "scans/08066.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Double-Dealings-1B.jpg",
+          "sha256": "9c587c105512e15e64a396c3ea2ed3bccb90c7cf9ecf10d3923f94d404f0c1fc",
+          "bytes": 149097
+        },
+        {
+          "path": "scans/08067.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Escape-from-Tharbad-2A.jpg",
+          "sha256": "a580ffded6e597d55f914c589d43ca0a396d065394c57db72ba0e4b7fa17fc93",
+          "bytes": 124200
+        },
+        {
+          "path": "scans/08067.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Escape-from-Tharbad-2B.jpg",
+          "sha256": "0458c1b12f8819291f4d3ef2b49f8d1f851dbb742c5f63107879dc9eae529a84",
+          "bytes": 112439
+        },
+        {
+          "path": "scans/08068.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Nalir.jpg",
+          "sha256": "d5a1f415d9dedd6072258bcfde2c7f53420295308c94cf601f7b6d3a37b3bdad",
+          "bytes": 61901
+        },
+        {
+          "path": "scans/08069.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/The-Empty-Mug.jpg",
+          "sha256": "b58830d9977f56ded2030d23e6f66a149182f4dd9671c1da2ceee6526146f7ef",
+          "bytes": 63134
+        },
+        {
+          "path": "scans/08070.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Bellach.jpg",
+          "sha256": "a7af68313a4302c6c1a9cd27667cf800cc7c13cee58cde953aa2e9497ce83c67",
+          "bytes": 57720
+        },
+        {
+          "path": "scans/08071.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/The-Crossing-at-Tharbad.jpg",
+          "sha256": "7d770c8262546f9a7ad3d76223e0cf7ad29409b71cffcee31bd168b32c48f756",
+          "bytes": 63586
+        },
+        {
+          "path": "scans/08072.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Spy-from-Mordor.jpg",
+          "sha256": "4100484e0186e67c770bd828ba95e097f143601a6a02280b69bd11a55b639705",
+          "bytes": 60482
+        },
+        {
+          "path": "scans/08073.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Bellach's-Marauder.jpg",
+          "sha256": "dec3c4d281bc8250a23cd6e38f3c1378c69546d58f32129387084204713c37a0",
+          "bytes": 63319
+        },
+        {
+          "path": "scans/08074.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Streets-of-Tharbad.jpg",
+          "sha256": "4e98bcc9a007e381755f25e8958d1336f74aeb55e7327f765711084815b5ce4d",
+          "bytes": 63393
+        },
+        {
+          "path": "scans/08075.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Tharbad-Hideout.jpg",
+          "sha256": "c64264ab9c97f4025d4b462de27ad9205c8ea196804d17e61458d8b1ea752a89",
+          "bytes": 59024
+        },
+        {
+          "path": "scans/08076.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Ruins-of-the-Second-Age.jpg",
+          "sha256": "3d7d61610977cc8e56dfff83757652af23412c27e8b546dbccff2466c9bfb88c",
+          "bytes": 63920
+        },
+        {
+          "path": "scans/08077.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Seedy-Inn.jpg",
+          "sha256": "c6ca10a8f3e9fad22abd6944dd3886a086d2ec43afe0522c1843e7fa4ff5f27a",
+          "bytes": 58115
+        },
+        {
+          "path": "scans/08078.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Hidden-Alleyway.jpg",
+          "sha256": "806a630d2805fa19534e74f15e73c61b3d955e4133ee0b5648f62d5b90ac5741",
+          "bytes": 61292
+        },
+        {
+          "path": "scans/08079.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Decrepit-Rooftops.jpg",
+          "sha256": "dde5fd5c46d8fff21f526d71f2cefdf28f5adad2ba953cd00b65c8b65056ea9f",
+          "bytes": 64375
+        },
+        {
+          "path": "scans/08080.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Constant-Tail.jpg",
+          "sha256": "2eea3a6960fe22cae6a4e293875f6befd42552be439136dd59cd9c71f1d63b77",
+          "bytes": 54142
+        },
+        {
+          "path": "scans/08081.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Conspicuous-Lot.jpg",
+          "sha256": "4ae540d8111a7925229f15109eff6f3c790f1329adeb08472069b947e59d396a",
+          "bytes": 57723
+        },
+        {
+          "path": "scans/08082.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Cornered.jpg",
+          "sha256": "a472319b693fba31f392b5861178055a2f3a85525df17611424e9466a1f1b015",
+          "bytes": 57652
+        },
+        {
+          "path": "scans/08083.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Get-That-Dwarf.jpg",
+          "sha256": "8f6ca00489814548451ded58f26f0c8057bfccc735db93cf2fc8f20266ea6360",
+          "bytes": 65983
+        },
+        {
+          "path": "scans/08084.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Mablung.jpg",
+          "sha256": "4ec5b4301ac885fcaca0fb0fc1e9e13b28c30d2bcec0d9af1c4b02b49a14393f",
+          "bytes": 53162
+        },
+        {
+          "path": "scans/08085.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Follow-Me.jpg",
+          "sha256": "56a519c72e9d1836130190236d2b853958846e3bef93d1ae9cc7ea8a40c15e6a",
+          "bytes": 133131
+        },
+        {
+          "path": "scans/08086.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Tighten-Our-Belts.jpg",
+          "sha256": "5e3bdb964ea4e6e3686638ee41ff7ee86870820c2f7185b71eca8ee2e373188b",
+          "bytes": 145168
+        },
+        {
+          "path": "scans/08087.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Galadhon-Archer.jpg",
+          "sha256": "0709466b9de1531be2714c6889528acdcee43e960a99fe545f305eb35196ff1d",
+          "bytes": 142760
+        },
+        {
+          "path": "scans/08088.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Bow-of-the-Galadhrim.jpg",
+          "sha256": "c6e3641123ebccfee3bb524b585f34821605d1b84b5cb34df661d565efb293f4",
+          "bytes": 152754
+        },
+        {
+          "path": "scans/08089.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Celduin-Traveler.jpg",
+          "sha256": "ae85184a4cc1cf61003fea586b5dca187309d0f406a839401ea3e4abb10db884",
+          "bytes": 143090
+        },
+        {
+          "path": "scans/08090.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Island-Amid-Perils.jpg",
+          "sha256": "e79617f7c88b4175c2b16b4882f90e40df5f822099ad9d217895d4910e470c27",
+          "bytes": 151228
+        },
+        {
+          "path": "scans/08091.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Mirkwood-Pioneer.jpg",
+          "sha256": "ea167f907382789ed1cdd0c729f1a2ac7c1a0226a25c2cad09d59afcfe1d5c0c",
+          "bytes": 149990
+        },
+        {
           "path": "scans/08092.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Wingfoot.jpg",
           "sha256": "6e053a138830db779fa7f5d70b79bba55bd026929bc6bd9001d6ac20a2e8b945",
           "bytes": 1003470
+        },
+        {
+          "path": "scans/08093.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Defender-of-the-West.jpg",
+          "sha256": "8adc452bf1042c31004bb3b28a9caefe7df4bbdb1717a86d893a2708477d089a",
+          "bytes": 141466
+        },
+        {
+          "path": "scans/08094.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Fleeing-from-Tharbad-1A.jpg",
+          "sha256": "71c0434e94a14cda762387dba90845a5d48969a9d1332b326ae90cbcdb073c22",
+          "bytes": 182909
+        },
+        {
+          "path": "scans/08094.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Fleeing-from-Tharbad-1B.jpg",
+          "sha256": "7822d825c6518d10d4506b6930823822cff4e92c405b3617b24372b0ef244cd6",
+          "bytes": 168532
+        },
+        {
+          "path": "scans/08095.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Through-the-Marsh-No-End-in-Sight-2A.jpg",
+          "sha256": "56cf2bd85ba6859531ac32ad8a2d5f52903cdfc05feb0947c285544ba049d96e",
+          "bytes": 194406
+        },
+        {
+          "path": "scans/08095.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Through-the-Marsh-No-End-in-Sight-2B.jpg",
+          "sha256": "ca87e878fc89d50d71497d673f010eae18ea8a11f61cb410f6684cbda5b35cac",
+          "bytes": 176161
+        },
+        {
+          "path": "scans/08096.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Through-the-Marsh-A-Weary-Passage-2A.jpg",
+          "sha256": "56cf2bd85ba6859531ac32ad8a2d5f52903cdfc05feb0947c285544ba049d96e",
+          "bytes": 194406
+        },
+        {
+          "path": "scans/08096.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Through-the-Marsh-A-Weary-Passage-2B.jpg",
+          "sha256": "efc59ef792a86b5626a52befae4e949ce8938566da28332e14b997e2e4a2757c",
+          "bytes": 175409
+        },
+        {
+          "path": "scans/08097.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Through-the-Marsh-A-Forgotten-Land-2A.jpg",
+          "sha256": "56cf2bd85ba6859531ac32ad8a2d5f52903cdfc05feb0947c285544ba049d96e",
+          "bytes": 194406
+        },
+        {
+          "path": "scans/08097.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Through-the-Marsh-A-Forgotten-Land-2B.jpg",
+          "sha256": "d09f10f545c7874985137c2c391d265538f0255c80d0b35a226fc52a23bcc40f",
+          "bytes": 175932
+        },
+        {
+          "path": "scans/08098.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Lost-in-the-Swanfleet-Impassable-Marshland-3A.jpg",
+          "sha256": "111d9fabc72e1ac9ec26628ab7ad8ffe7c28a69fbc1fe6ec4bd4d8e9ad76d803",
+          "bytes": 177601
+        },
+        {
+          "path": "scans/08098.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Lost-in-the-Swanfleet-Impassable-Marshland-3B.jpg",
+          "sha256": "fc39f4f653b2369193e2cd5c4877d707b6ea7c5820a806bd5a7b8088bc71fddd",
+          "bytes": 185500
+        },
+        {
+          "path": "scans/08099.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Lost-in-the-Swanfleet-A-Treacherous-Swamp-3A.jpg",
+          "sha256": "111d9fabc72e1ac9ec26628ab7ad8ffe7c28a69fbc1fe6ec4bd4d8e9ad76d803",
+          "bytes": 177601
+        },
+        {
+          "path": "scans/08099.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Lost-in-the-Swanfleet-A-Treacherous-Swamp-3B.jpg",
+          "sha256": "774df7e0fe034ccd805ccabb6a342a92fdfc41916269f71d82998e3b3c63f1c8",
+          "bytes": 192088
+        },
+        {
+          "path": "scans/08100.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Lost-in-the-Swanfleet-Creatures-of-a-Forgotten-Age-3A.jpg",
+          "sha256": "111d9fabc72e1ac9ec26628ab7ad8ffe7c28a69fbc1fe6ec4bd4d8e9ad76d803",
+          "bytes": 177601
+        },
+        {
+          "path": "scans/08100.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Lost-in-the-Swanfleet-Creatures-of-a-Forgotten-Age-3B.jpg",
+          "sha256": "35b62108d06b9b6f7798f284567b2aa9da57d30394a67c2926577d0009719c58",
+          "bytes": 183094
+        },
+        {
+          "path": "scans/08101.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Out-of-the-Swamp-4A.jpg",
+          "sha256": "1c793fcef9f9dbeff95f96bec683e43367387a36c441e077fe1d7d436b04c6fc",
+          "bytes": 192647
+        },
+        {
+          "path": "scans/08101.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Out-of-the-Swamp-4B.jpg",
+          "sha256": "b5c7b5298dffbe934cfea1130aa6a3df108b1f9cbfe9ba01edaf4ba7d2ced6b5",
+          "bytes": 189983
+        },
+        {
+          "path": "scans/08102.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Nalir.jpg",
+          "sha256": "ca757df869d6e858b4ed3d6b59a019044dc050b90ae7f1d7df3e4e95f4fe3658",
+          "bytes": 146249
+        },
+        {
+          "path": "scans/08103.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Ancient-Marsh-dweller.jpg",
+          "sha256": "056764fd8f3cab84d8399bf28ef5af4440852b6f086dedcbd84da0f572585d89",
+          "bytes": 157459
+        },
+        {
+          "path": "scans/08104.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Giant-Swamp-Adder.jpg",
+          "sha256": "0db29a19f4741231451f0c4746df45cdbdc7d41c71d93b80009022e21c12f680",
+          "bytes": 162344
+        },
+        {
+          "path": "scans/08105.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Neekerbreekers.jpg",
+          "sha256": "6809e104af1a5eff0110961a38fe4de672de39799884079f6847d9d77bfa02c4",
+          "bytes": 158732
+        },
+        {
+          "path": "scans/08106.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Fen-of-Reeds.jpg",
+          "sha256": "a220bb0eee3c556cba5716172eed71fd28524989afa183e38405102e9ad6d35a",
+          "bytes": 141282
+        },
+        {
+          "path": "scans/08107.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Finger-of-Glanduin.jpg",
+          "sha256": "45fea99eb52ef19b0ce74a010d718e380d980292647b8cffdc520deef9f9752b",
+          "bytes": 149360
+        },
+        {
+          "path": "scans/08108.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Hidden-Eyot.jpg",
+          "sha256": "bbe552c941271132331bd67f320ad2d810387073073d0ed812967f7cb7666087",
+          "bytes": 136967
+        },
+        {
+          "path": "scans/08109.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Sinking-Bog.jpg",
+          "sha256": "8a55031e1ef15c988d7186ae285a67c93388e409d783acae3fecc260ecf00428",
+          "bytes": 144182
+        },
+        {
+          "path": "scans/08110.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Shifting-Marshland.jpg",
+          "sha256": "40ffbe95093acc7b66414efee77937463f761a21c564d20aff65bfda1ef52440",
+          "bytes": 155636
+        },
+        {
+          "path": "scans/08111.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Remnants-of-Elder-Days.jpg",
+          "sha256": "b2e79e05c6bac96a1d32fa3e5da84ef1cca649062b6569f33abc7c091ce9c849",
+          "bytes": 151978
+        },
+        {
+          "path": "scans/08112.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Galadriel.jpg",
+          "sha256": "77d06fa1ac4c38f63bce2ad0e1b11ba1f208c4473e0fc5e3908f6f8dcb811e32",
+          "bytes": 56304
+        },
+        {
+          "path": "scans/08113.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Heir-of-Mardil.jpg",
+          "sha256": "ca0736fdde26d5f3b9a6093d947cfec81a6a671fdccc5a4e4eb199db39f7e38f",
+          "bytes": 133679
+        },
+        {
+          "path": "scans/08114.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Orophin.jpg",
+          "sha256": "cd94626971ff91b5c76ffd3cb580f123747b4aee902adca2114e8177d7a17cc7",
+          "bytes": 132992
+        },
+        {
+          "path": "scans/08115.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Henneth-Annûn-Guard.jpg",
+          "sha256": "6cf7496a65a7597239632e351e1e020f81c2df01d4c653d83074c0cf15bd22af",
+          "bytes": 124758
+        },
+        {
+          "path": "scans/08116.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Charge-of-the-Rohirrim.jpg",
+          "sha256": "b2006ea911fea03c985489c1589d51da3a4855d9fa6434a105075cad39c4c560",
+          "bytes": 115774
+        },
+        {
+          "path": "scans/08117.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Galadriel's-Handmaiden.jpg",
+          "sha256": "5ad91bf0a8e959ef22512154aa17fc35cba2866136e34f5f2f0886e0ace38df5",
+          "bytes": 126494
+        },
+        {
+          "path": "scans/08118.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Mirror-of-Galadriel.jpg",
+          "sha256": "f7ea24e26e6762e6f2ffc73a70b7ea7b87f4d93b613f747e7c37cc679fdc9507",
+          "bytes": 130400
+        },
+        {
+          "path": "scans/08119.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Wandering-Ent.jpg",
+          "sha256": "5bd69cc248f7b86c92fd7096a7c3a3422de50c999a35a4f1649d561506d40217",
+          "bytes": 144990
+        },
+        {
+          "path": "scans/08120.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Cloak-of-Lórien.jpg",
+          "sha256": "60ee0bdb272f511346f0c25218dad7c85a8aa69d80b30cf13a7cf565910fef2b",
+          "bytes": 130586
+        },
+        {
+          "path": "scans/08121.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Nenya.jpg",
+          "sha256": "f554547e5894f73189aa82a16c410cce5e779c39eea89c0c58a191ce7e16e976",
+          "bytes": 104698
+        },
+        {
+          "path": "scans/08122.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/The-Ruins-of-Ost-in-Edhil-1A.jpg",
+          "sha256": "c8ad360784ba4cc19123e3624208ce2840b5e172ace008551936ac9d4d1a87d4",
+          "bytes": 115037
+        },
+        {
+          "path": "scans/08122.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/The-Ruins-of-Ost-in-Edhil-1B.jpg",
+          "sha256": "6f70ab78d705bde80b7cdbfd0a602a0330bcd17fb511bf7febca4e33b9b7e626",
+          "bytes": 102940
+        },
+        {
+          "path": "scans/08123.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/The-Enemy's-Servant-2A.jpg",
+          "sha256": "62fe06ef830d4c414ac8a64ab44549d2383d6ca0b4ec5e561dbc359ee614cf9c",
+          "bytes": 119046
+        },
+        {
+          "path": "scans/08123.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/The-Enemy's-Servant-2B.jpg",
+          "sha256": "bcefdae1a5b23a727557e133c52095a1ecc1ebbd39f32cf3e013f78bc16a7ea1",
+          "bytes": 113532
+        },
+        {
+          "path": "scans/08124.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Bellach.jpg",
+          "sha256": "faa86619bf551a05bd9290ea4e493630b2717d67368b191ad592d6b2c4fc2c8f",
+          "bytes": 116207
+        },
+        {
+          "path": "scans/08125.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/The-Orcs'-Search.jpg",
+          "sha256": "14e95e12aff2289ccb5189a72b4a73961c3c300d596904efa1f9b6ef8ded8519",
+          "bytes": 104225
+        },
+        {
+          "path": "scans/08126.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/The-Secret-Chamber.jpg",
+          "sha256": "c6424fe8d6c9327bfc9d412812c9a4b287b5c3ce415779709d8e2147f7146600",
+          "bytes": 120086
+        },
+        {
+          "path": "scans/08127.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Celebrimbor's-Mould.jpg",
+          "sha256": "d8a49ec5d4297c5fe91caffcfdb8fb339a8ad9b805100f139b3ca48c657c898a",
+          "bytes": 98737
+        },
+        {
+          "path": "scans/08128.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Bellach's-Scout.jpg",
+          "sha256": "91e2ec9271fa2d3acf1377afe1ce98b9faebb60b74f38ef25d169c09eea4d20c",
+          "bytes": 122012
+        },
+        {
+          "path": "scans/08129.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Prowling-Orc.jpg",
+          "sha256": "bc5e2c71a152d1490ae6caf818e72a29135cb191ca402cb10e2aab68c2856876",
+          "bytes": 127846
+        },
+        {
+          "path": "scans/08130.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Ruined-Plaza.jpg",
+          "sha256": "b45f1997b8386e27ced709877d158442ec095fc96c0e2c82e2e1722e437ab359",
+          "bytes": 129808
+        },
+        {
+          "path": "scans/08131.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Collapsed-Tower.jpg",
+          "sha256": "e4d40f42121d4b2d7ff77a3fb7d582b36a983734588345744f5e31721d1d4569",
+          "bytes": 124598
+        },
+        {
+          "path": "scans/08132.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Ancient-Foundation.jpg",
+          "sha256": "af5466a8cc50d7b4296723cfacd7c59bfd6776ba8c431e114abd681a6ce0bb8e",
+          "bytes": 125416
+        },
+        {
+          "path": "scans/08133.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/City-Remains.jpg",
+          "sha256": "89094b43e27bd395093026ae66addc55106fd4293ae2250e1984b712e12331bf",
+          "bytes": 119612
+        },
+        {
+          "path": "scans/08134.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Discovered.jpg",
+          "sha256": "e069eb53c6730480017382237b0a547554e0d8470c8d35a5513f7460c37c40ff",
+          "bytes": 130071
+        },
+        {
+          "path": "scans/08135.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Desecrated-Ruins.jpg",
+          "sha256": "641720ba0f35f2325c7fd9350d305068f835cae26c72419e716aca3d3779030e",
+          "bytes": 123930
+        },
+        {
+          "path": "scans/08136.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Spies-from-Mordor.jpg",
+          "sha256": "de5c5778642eb1427da7b30c42f7d1985d8621bf2938034f29760f3ca18d36bb",
+          "bytes": 132269
+        },
+        {
+          "path": "scans/08137.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Erkenbrand.jpg",
+          "sha256": "8572751a9d08c8f8a60e11873e793b65277ec0acdcf08c981481e2e67ae33ed3",
+          "bytes": 158744
+        },
+        {
+          "path": "scans/08138.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Warden-of-Helm's-Deep.jpg",
+          "sha256": "279449e5e0b04442a22d8350e5d143475d291de9051fd7c81124f768066d0f3b",
+          "bytes": 142613
+        },
+        {
+          "path": "scans/08139.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/The-Day's-Rising.jpg",
+          "sha256": "3863dd6a18892185cefc8a0c527428173d9a33d81536d6845df27e1e89244ecb",
+          "bytes": 146172
+        },
+        {
+          "path": "scans/08140.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Captain-of-Gondor.jpg",
+          "sha256": "7240528d3676133ff333777df4826f91d1f86859b28f3254aca4abfaf6f48c80",
+          "bytes": 156537
+        },
+        {
+          "path": "scans/08141.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Booming-Ent.jpg",
+          "sha256": "73fd9673c83fd6e9a19d038bdedd25a1862dcbcb713127d65ee756d6552a4118",
+          "bytes": 153411
+        },
+        {
+          "path": "scans/08142.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Ride-Them-Down.jpg",
+          "sha256": "cec9a5ce31db9409f26c0aa2ea0fd3927375fce9acb343ec70732b9b738e3e10",
+          "bytes": 149016
+        },
+        {
+          "path": "scans/08143.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Shadows-Give-Way.jpg",
+          "sha256": "8bce274eabce67d8e2b8087fae110363e2c4857319a80f6484b573002520deaa",
+          "bytes": 135124
+        },
+        {
+          "path": "scans/08144.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Don't-Be-Hasty.jpg",
+          "sha256": "765d1833dfd1b9fa8220098cceabc64ea22c9d6aea478858b3a8d96ff7b53601",
+          "bytes": 151061
+        },
+        {
+          "path": "scans/08145.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Waters-of-Nimrodel.jpg",
+          "sha256": "4362df7ba81467c82f7601185bab4710977b9386dbf51024d8be0b2a33465dcc",
+          "bytes": 140902
+        },
+        {
+          "path": "scans/08146.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Treebeard.jpg",
+          "sha256": "a40e025c4d65308bc938dc1cd298131aa09d1f3da1536c165a842eec294eec3f",
+          "bytes": 158980
+        },
+        {
+          "path": "scans/08147.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Battle-for-Dunland-1A.jpg",
+          "sha256": "3563d554818b18c5b38f68fbf8f72e7a298992027331f013fe02c7a30549b19e",
+          "bytes": 205027
+        },
+        {
+          "path": "scans/08147.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Battle-for-Dunland-1B.jpg",
+          "sha256": "9befce33a25c590a178d3010bebd67c3462f40974860c4efc7b6948db975c0c2",
+          "bytes": 207074
+        },
+        {
+          "path": "scans/08148.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/The-Raven-Clan-2A.jpg",
+          "sha256": "96d8b7b6040678cd0eefa012f3052c52b94a269ddf06843644abc044bec303c4",
+          "bytes": 200049
+        },
+        {
+          "path": "scans/08148.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/The-Raven-Clan-2B.jpg",
+          "sha256": "bc442881b8444eb658ea334acce6ad64549b15a8a6dc9b77fdb568f1f25f1025",
+          "bytes": 187652
+        },
+        {
+          "path": "scans/08149.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/The-Last-Stage-3A.jpg",
+          "sha256": "3bd89b8af21199eb5e788200475cc803c1182539058c065f9996e0428e314de4",
+          "bytes": 197186
+        },
+        {
+          "path": "scans/08149.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/The-Last-Stage-3B.jpg",
+          "sha256": "f766bae860b0d5c7b4bee534b8502de85573b965d1eac801fe3a41c4a69de92b",
+          "bytes": 188501
+        },
+        {
+          "path": "scans/08150.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Chief-Turch.jpg",
+          "sha256": "27ed1bcfb52f2d304bb9a608b14c60b0ede1771c6922528d42f12506da080fff",
+          "bytes": 145634
+        },
+        {
+          "path": "scans/08151.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Raven-Chief.jpg",
+          "sha256": "e463d197887869f9989a201432a35873b289a88fe2552e13fbd8796c567c159c",
+          "bytes": 156143
+        },
+        {
+          "path": "scans/08152.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Raven-Chief's-Camp.jpg",
+          "sha256": "34c353d1096d32397d04c6c581619c40faccbf6c78e1e0643e33cf06b764459e",
+          "bytes": 142449
+        },
+        {
+          "path": "scans/08153.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Raven-Warrior.jpg",
+          "sha256": "b7a307e89fd11f36478793a6cc563c4ed107703f6b16943ad34e0a339bdcba44",
+          "bytes": 140758
+        },
+        {
+          "path": "scans/08154.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Raven-Skirmisher.jpg",
+          "sha256": "d90aa3530603e859c3e4183d64f0de2650a19ae717cd19cd96eabe9ef4d60114",
+          "bytes": 146244
+        },
+        {
+          "path": "scans/08155.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Raven-War-camp.jpg",
+          "sha256": "9aa995c88d0b3ab6b9bf04da452c0ae6f763aad36a05998e38e1ae9ab4069b8c",
+          "bytes": 142504
+        },
+        {
+          "path": "scans/08156.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Raven-Village.jpg",
+          "sha256": "bca12dcda2c7fce7d53f93d30623e7c5915b3546d101c46a9ebd135e86ed0751",
+          "bytes": 142670
+        },
+        {
+          "path": "scans/08157.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Dunland-Battlefield.jpg",
+          "sha256": "53b4bbcc6b0456e4fbce8bf2d15475bac07e44d7254885d824c59011d243991c",
+          "bytes": 156926
+        },
+        {
+          "path": "scans/08158.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Raven-Country.jpg",
+          "sha256": "1909e06440ce4d99169f5c656b37d3dc86fcc990dffe373743b9dbc2364546bb",
+          "bytes": 152075
+        },
+        {
+          "path": "scans/08159.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Raising-the-Cry.jpg",
+          "sha256": "c6209fdf7b5804ccc6545f76503eef7e952f4bda143849ffd2453f7c41ca4317",
+          "bytes": 152067
+        },
+        {
+          "path": "scans/08160.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Fierce-Folk.jpg",
+          "sha256": "5add66a87cc10bef2dd5cda557c83658a6a39c4598c6ed2c8b9243ecec82554d",
+          "bytes": 152779
+        },
+        {
+          "path": "scans/08161.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Driven-Back.jpg",
+          "sha256": "5c46b42acba9ba1c34c2b51cd472d959b691660d09225afd6fc667d8e1c54f8b",
+          "bytes": 135344
         },
         {
           "path": "scans/09016.A.jpg",
@@ -43460,16 +45386,1630 @@
           "bytes": 133796
         },
         {
+          "path": "scans/16001.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Gimli.jpg",
+          "sha256": "09e6a150217f4e5323a40e0a42d2cfb649d22f2c1d39dba833666798f2b57e5e",
+          "bytes": 158233
+        },
+        {
+          "path": "scans/16002.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Legolas.jpg",
+          "sha256": "12519bc06c5abb02670b1f848932767f8cae202318c5f527d94cd8bb3def0077",
+          "bytes": 165269
+        },
+        {
+          "path": "scans/16003.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Greenwood-Archer.jpg",
+          "sha256": "8ef705c40c7b919de13b88c5327ed1d858b01d6b70dbe8dc0a682380d107c5f9",
+          "bytes": 139782
+        },
+        {
+          "path": "scans/16004.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Erebor-Guard.jpg",
+          "sha256": "b5b5f0e623ca0f77735bc957045f5520badb1e1ac900166e9f8860aac2ed48c9",
+          "bytes": 148438
+        },
+        {
+          "path": "scans/16005.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Halfling-Bounder.jpg",
+          "sha256": "8622c7857256afc2dee90696364d7a204f7ec82e84eae2df943139c74475f7cf",
+          "bytes": 163384
+        },
+        {
+          "path": "scans/16006.A.png",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Vigilant-Dúnadan.jpg",
+          "sha256": "9ce72504b1bc3abedda18b09e946fcb4dddc50bf803502b2ae1eb43a2c62b45a",
+          "bytes": 265129
+        },
+        {
+          "path": "scans/16007.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Unlikely-Friendship.jpg",
+          "sha256": "4d9ccdb59b293b8026b9122b978f9aa657435e9fd1579ee4c78f3d4b6c92dd0d",
+          "bytes": 150277
+        },
+        {
+          "path": "scans/16008.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Well-Warned.jpg",
+          "sha256": "b9fa1937c4a437664a864e947848c52be31aaba78f34703accd714745e6ae5f7",
+          "bytes": 147456
+        },
+        {
+          "path": "scans/16009.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Dour-handed.jpg",
+          "sha256": "bb686acaec8b5e73053a9e20ba2f38873e18fd40d9d9e51d843947e0b73b5450",
+          "bytes": 142104
+        },
+        {
+          "path": "scans/16010.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Dwarven-Shield.jpg",
+          "sha256": "99e5c0971b9cd7eb0613c7f73457aec36df9c1a469f57747bd1e6136dae57e24",
+          "bytes": 158617
+        },
+        {
+          "path": "scans/16011.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Mirkwood-Long-knife.jpg",
+          "sha256": "2a86bd0cad1e0df23934c66bbf96c1fa05446bb2d76d35a522773708140e4499",
+          "bytes": 141061
+        },
+        {
+          "path": "scans/16012.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/The-Road-Goes-Ever-On.jpg",
+          "sha256": "9934883378a18a27f51c9b43812376c247da52db92980087a64675f66a4ca752",
+          "bytes": 153161
+        },
+        {
+          "path": "scans/16013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/The-Storm-Comes.jpg",
+          "sha256": "55799e113965ca9547f0d7c82545fb1033ba54341ad08ceadd021094705f5284",
+          "bytes": 142467
+        },
+        {
+          "path": "scans/16014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Seize-Them.jpg",
+          "sha256": "b056bd8bd82b906d6c683c0e7b8ad47aaf137f32da92dd52e876f226a152242a",
+          "bytes": 152692
+        },
+        {
+          "path": "scans/16015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Umbar-Sentry.jpg",
+          "sha256": "fc7458f4a54603e798514b81742b4f1bb335adb106283f6ff04e81630f4c7c73",
+          "bytes": 153386
+        },
+        {
+          "path": "scans/16016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Narrow-Alleyway.jpg",
+          "sha256": "c61b8b007b845dc00f2ae96622f2142085f6eea94deadec04b0f9e4221b5b4c9",
+          "bytes": 147423
+        },
+        {
+          "path": "scans/16017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Umbar-Street.jpg",
+          "sha256": "9fba4884d428c992b0909a6b75600133524b973d1b5e2ffc6fff8d4629bb65c5",
+          "bytes": 141783
+        },
+        {
+          "path": "scans/16018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Umbar-Square.jpg",
+          "sha256": "7ed189277f53e62e585663d6cc9822b3adc8809419099fce4137e31efe4858ae",
+          "bytes": 150562
+        },
+        {
+          "path": "scans/16019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Port-of-Harad.jpg",
+          "sha256": "d3ba8102f1e44e4d25505e183604eb6d1d207e3782e09463f388f6421e764889",
+          "bytes": 142926
+        },
+        {
+          "path": "scans/16020.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Haradrim-Estate.jpg",
+          "sha256": "1d63d414854376388ac1c48c82c3974f34e9cac72f24761d04b938b98cbd3bbc",
+          "bytes": 149075
+        },
+        {
+          "path": "scans/16021.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Enemy-Pursuit.jpg",
+          "sha256": "69b2051837a1cbc52952c76979ff2681d9efd840ccd3fe10007ba865b7a25fc9",
+          "bytes": 153024
+        },
+        {
+          "path": "scans/16022.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Mirage.jpg",
+          "sha256": "c585a80518c9fab42701f762efef5a75b6933fe36ec2b218d2d6e87989d39216",
+          "bytes": 137399
+        },
+        {
+          "path": "scans/16023.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Seek-Shade.jpg",
+          "sha256": "4902155c19e673390b87709810922e36a12acf3e36f033430748f83bcac422cf",
+          "bytes": 125687
+        },
+        {
+          "path": "scans/16024.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Carrion-Bird.jpg",
+          "sha256": "2c5d0150217c0c0c477d7bb3bd95ee8fcc4f34b2332928f6e29d97838e8adf0a",
+          "bytes": 147194
+        },
+        {
+          "path": "scans/16025.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Burnt-Sands.jpg",
+          "sha256": "3d44dab20c4083ae0fe0d502aeb5981007d7f8bf1811064ed1671c919f5bfd75",
+          "bytes": 130084
+        },
+        {
+          "path": "scans/16026.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Scorched-Hamada.jpg",
+          "sha256": "2399e34ea13e6bbeba759c96c166b70bd7d69274ada8bdebb2e54a26753f9bae",
+          "bytes": 148601
+        },
+        {
+          "path": "scans/16027.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Parched-Wadi.jpg",
+          "sha256": "1a7194bce10eb24c02cc3033d731f5b1f8d87f0e989e57f710d431cf5da00659",
+          "bytes": 157445
+        },
+        {
+          "path": "scans/16028.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Were-worm.jpg",
+          "sha256": "258c55669073f76f04636667d7029c217f16918d85acc212769843d4ac186b42",
+          "bytes": 149530
+        },
+        {
+          "path": "scans/16029.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Unbearable-Heat.jpg",
+          "sha256": "1a419ec8224adb1a321a123ee245243aa394f2fd3fdaa598069a6179f70aecfa",
+          "bytes": 128477
+        },
+        {
+          "path": "scans/16030.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Scorching-Sun.jpg",
+          "sha256": "0ad8480497dd479cdfa5b9e8b512c815b8492829db37f7fc393fec864ae2b462",
+          "bytes": 136476
+        },
+        {
+          "path": "scans/16031.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Kahliel.jpg",
+          "sha256": "03c6fbd544c9d32bbb0fcc9082d6d9270ab784ab7b9187ed8542f207abbf8024",
+          "bytes": 146427
+        },
+        {
+          "path": "scans/16032.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Firyal.jpg",
+          "sha256": "f87e665080bbcab23746d0db43ac79d3da480947b4f086687409c01400cdb3c7",
+          "bytes": 145314
+        },
+        {
+          "path": "scans/16033.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Yazan.jpg",
+          "sha256": "19e12e35b79778fb477f502100d3fe1ec45eea65fdc3bc15acaec561d76bf5d9",
+          "bytes": 149994
+        },
+        {
+          "path": "scans/16034.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Jubayr.jpg",
+          "sha256": "f8831728299889bed7c6105554743781b6b24d8365482d1062b443847ae4be1a",
+          "bytes": 148609
+        },
+        {
+          "path": "scans/16035.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Sauron's-Enforcers.jpg",
+          "sha256": "93e78554b8a6f8330dd267d99cc568fc3a4b34eecbcf71fdaa7a80bdc2e0c451",
+          "bytes": 149324
+        },
+        {
+          "path": "scans/16036.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Southron-Boma.jpg",
+          "sha256": "2eee826aaa218b6056a5a86b62e03dd18f4adfdc839631120061cd9d10506e20",
+          "bytes": 156231
+        },
+        {
+          "path": "scans/16037.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Village-Hut.jpg",
+          "sha256": "9191b10b4b366e9c39bf7529e2fafafb392a8306d5b3235c57033a22a29f6571",
+          "bytes": 157403
+        },
+        {
+          "path": "scans/16038.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Savage-Attack.jpg",
+          "sha256": "8515bb7bb3485dd8bbabb58dab6f4ba9bf3f62bda28c7e345d1bd0dfe7e72cc4",
+          "bytes": 149811
+        },
+        {
+          "path": "scans/16039.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Overrun-by-Orcs.jpg",
+          "sha256": "b2dc146ffc76cd053448f1470aa4e989d1494e72b7ed2be0f804c2bfb3128b0f",
+          "bytes": 161902
+        },
+        {
+          "path": "scans/16040.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Southron-Champion.jpg",
+          "sha256": "880086f21a3ef19b2d284311609f41346af197c8e9ef082451acd04ca950feb6",
+          "bytes": 148973
+        },
+        {
+          "path": "scans/16041.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Southron-Captain.jpg",
+          "sha256": "2b49fcecea803a03aab5fa0816254aa01814c6d9d3abe0380029343bdcf38e79",
+          "bytes": 140621
+        },
+        {
+          "path": "scans/16042.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Southron-Soldier.jpg",
+          "sha256": "a6af8dd1a9e5f698b696b633cbf17ae37d11d9986c233658455705afb507e0fb",
+          "bytes": 141100
+        },
+        {
+          "path": "scans/16043.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Southron-Archer.jpg",
+          "sha256": "667f58b26b585d7a38efead4b464bb12a34f0cd18716d93119db55085b6baa9c",
+          "bytes": 148139
+        },
+        {
+          "path": "scans/16044.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Nowhere-to-Hide.jpg",
+          "sha256": "7feabce5b8c1173f1fe73873864e7ffb2c25d11a001381859a9da987c6a2dd7e",
+          "bytes": 145930
+        },
+        {
+          "path": "scans/16045.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/In-Enemy-Territory.jpg",
+          "sha256": "ea69525ad394619f838f20418fde0071b2615f178bbe1afb1f760d28db7beac4",
+          "bytes": 139224
+        },
+        {
+          "path": "scans/16046.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Injured-Companion.jpg",
+          "sha256": "9198d9d8e5d71b389d4f9a171738982aee84743a7e29e59d2f9f23c5fc142e3c",
+          "bytes": 151450
+        },
+        {
+          "path": "scans/16047.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Enfeebled.jpg",
+          "sha256": "38569d185c6fd83b214a0dff1c068143a9cf02b11a85e3427c6bf89cb65c2fc4",
+          "bytes": 149285
+        },
+        {
+          "path": "scans/16048.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Find-Water.jpg",
+          "sha256": "8387843a0dcf1eb8848cd645b4124cc6351c7bb360e5549af358e76bad15dfb6",
+          "bytes": 133007
+        },
+        {
+          "path": "scans/16049.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Towering-Dunes.jpg",
+          "sha256": "fb7bbf255b027645259e5037256b4ba3227cf296bc4188ef41bc351cdeca197d",
+          "bytes": 130842
+        },
+        {
+          "path": "scans/16050.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Desert-Oasis.jpg",
+          "sha256": "5a053ce78ce42b53080bd0f3c9a20d475d0af1f126b255edd804ba1f7a300509",
+          "bytes": 146342
+        },
+        {
+          "path": "scans/16051.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Sandstorm.jpg",
+          "sha256": "e5b8241b0abf9597f99b33ee5d3014733247d9478ff0411c50a71e3b28b87996",
+          "bytes": 147078
+        },
+        {
+          "path": "scans/16052.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Heat-Exhaustion.jpg",
+          "sha256": "61d1edfe3cd986ebcafa9f1cba5c13d0a7e4fb1cfda7c757db5b76c235ad482c",
+          "bytes": 125472
+        },
+        {
+          "path": "scans/16053.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Craft-Remedy.jpg",
+          "sha256": "04b6f195a339ba9f424c162652a04ce818714362e6e2a3f1a68c821971dfe6bc",
+          "bytes": 135536
+        },
+        {
+          "path": "scans/16054.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Sand-Viper.jpg",
+          "sha256": "63e1305bedda6d4f1a906688a676feb2a811e6d5c747c8f9d45f103bf7f7536f",
+          "bytes": 148343
+        },
+        {
+          "path": "scans/16055.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Giant-Scorpion.jpg",
+          "sha256": "30dfe1aa0036a92d5ece9f7d8a091a2769f274a8ac7c30267ea0d091921c4483",
+          "bytes": 153858
+        },
+        {
+          "path": "scans/16056.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Jungle-Trail.jpg",
+          "sha256": "12bd502615a7073cea408613d99ef676217561cc37734aa2739b86ce63f99c34",
+          "bytes": 154027
+        },
+        {
+          "path": "scans/16057.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Forest-Clearing.jpg",
+          "sha256": "2542ec27118952c4ad93f3d38bd333a5ca3aad9178846fd775f592050108296f",
+          "bytes": 154024
+        },
+        {
+          "path": "scans/16058.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Dense-Jungle.jpg",
+          "sha256": "577bfd53ea72ac1a460fe82e04e732688abf9a16135513b99b192cde914054e2",
+          "bytes": 151968
+        },
+        {
+          "path": "scans/16059.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Overgrown.jpg",
+          "sha256": "4203b039acb7221a2ecaeecd8ffb3f37b73f527f7fee65a1ee81fd83530b2520",
+          "bytes": 149078
+        },
+        {
+          "path": "scans/16060.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Uruks-of-the-Eye.jpg",
+          "sha256": "7773fa7a6b362094e74cdab87fbcdc1a8c3faa8ed0f9e0b31d814bc4cb3aa8f8",
+          "bytes": 134232
+        },
+        {
+          "path": "scans/16061.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Uruk-Chieftain.jpg",
+          "sha256": "eedf663d9b312e13c5bf5fd7eeedd9403fadff9552ab4d2b510d37667dd03ea0",
+          "bytes": 144827
+        },
+        {
+          "path": "scans/16062.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Uruk-of-Mordor.jpg",
+          "sha256": "f55d47bf1b4db456aeeafaae1656de2f7cd6c8a1edd66b112e631310db0412fa",
+          "bytes": 148637
+        },
+        {
+          "path": "scans/16063.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Uruk-Warg-rider.jpg",
+          "sha256": "d08b5a8f6fcc194cf88e53314a8e4e114ec7ae8ccc5111cc8a79e47c300cfad5",
+          "bytes": 151309
+        },
+        {
+          "path": "scans/16064.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Mordor-Warg.jpg",
+          "sha256": "387c5882d74771f23f5ee0c1f305121a22de71d68329b6068884376d2c88deb2",
+          "bytes": 155706
+        },
+        {
+          "path": "scans/16065.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Fear-of-Mordor.jpg",
+          "sha256": "20ea08f5e027c062ac689ce637161f113c5673b0804013f5ace8ce3c67c55c3b",
+          "bytes": 152488
+        },
+        {
+          "path": "scans/16066.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Stranded-in-Umbar-1A.jpg",
+          "sha256": "5c1d6b90c585dd15ede06764a1375adb8d5446dbdac12d659bab8792a4f7f133",
+          "bytes": 148903
+        },
+        {
+          "path": "scans/16066.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Stranded-in-Umbar-1B.jpg",
+          "sha256": "700293c2e45f3e5c713c15b6be13330846ccf9779eeda7f0496af02048c706ce",
+          "bytes": 152350
+        },
+        {
+          "path": "scans/16067.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Flee-the-City-2A.jpg",
+          "sha256": "04ca1f556e0af6d8e5084deaa0db80e6e20c6d3e55bd562df2f80c1c49d7a839",
+          "bytes": 136829
+        },
+        {
+          "path": "scans/16067.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Flee-the-City-2B.jpg",
+          "sha256": "481ddc4048600e82e23c342669a708fa3245816e55736e313b5c455f717ddd81",
+          "bytes": 144790
+        },
+        {
+          "path": "scans/16068.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/The-Desert-of-Harad-1A.jpg",
+          "sha256": "68caa075abb147cb22742e9ec77cd97ce79b2065df9b9909ffe7c4dcec517c70",
+          "bytes": 123786
+        },
+        {
+          "path": "scans/16068.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/The-Desert-of-Harad-1B.jpg",
+          "sha256": "26efbc7947c27fe6fe1a1317109c6aeb5f2434a5e2e8fc86e9ebd0268f34265a",
+          "bytes": 123998
+        },
+        {
+          "path": "scans/16069.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Under-the-Merciless-Sun-2A.jpg",
+          "sha256": "91e3395cf6119f8c94df73beb50913146320386eec5e0dc5c3e9e814435b5239",
+          "bytes": 124931
+        },
+        {
+          "path": "scans/16069.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Under-the-Merciless-Sun-2B.jpg",
+          "sha256": "e74feeac31a5759447e45139247052cb7ebb5c778fa5b35dab317130d39a952d",
+          "bytes": 132388
+        },
+        {
+          "path": "scans/16070.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Beasts-of-Legend-3A.jpg",
+          "sha256": "55170c018a9efd685448ac2ffa0e722256e76889e17ff032662417124d8e69c9",
+          "bytes": 144680
+        },
+        {
+          "path": "scans/16070.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Beasts-of-Legend-3B.jpg",
+          "sha256": "72bf2995bf3a30daca05e5e997404173e9bd814cf9589bede202f4e6faabc0cd",
+          "bytes": 152470
+        },
+        {
+          "path": "scans/16071.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Surprise-Attack-1A.jpg",
+          "sha256": "75fc2d80449dbfd29b8224e250d4aa65e11a985da79b9d95a2a52e20cded01f7",
+          "bytes": 148828
+        },
+        {
+          "path": "scans/16071.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Surprise-Attack-1B.jpg",
+          "sha256": "f092324d82d68b1135e222789f81af67ff3de6f0e28fa75a28336bebbffa8158",
+          "bytes": 144890
+        },
+        {
+          "path": "scans/16072.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Find-the-Others-2A.jpg",
+          "sha256": "5efd6602a94f1edfca5947e5c9f1a0c9e26957104ab9441be69b581812b9c528",
+          "bytes": 135796
+        },
+        {
+          "path": "scans/16072.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Find-the-Others-2B.jpg",
+          "sha256": "46765511b772a8b6126246e6b8033072dcc05af67a6900bbad4302fd70b5f6f2",
+          "bytes": 144942
+        },
+        {
+          "path": "scans/16073.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Free-the-Captives-3A.jpg",
+          "sha256": "1e7d9099073370c6b37488dc50ce3f10b1d9a5dce7583f541e33c0d0008d745d",
+          "bytes": 163299
+        },
+        {
+          "path": "scans/16073.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Free-the-Captives-3B.jpg",
+          "sha256": "46ed8b4a27c057e36495a1ba814d8617e0bee22692e50048f8467c0a53a442b3",
+          "bytes": 154544
+        },
+        {
+          "path": "scans/16074.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Escape-into-the-Jungle-4A.jpg",
+          "sha256": "8364ef27a45ab73de6d3a8410fdc1126b705585bb4b1d5314493f89f240a93e5",
+          "bytes": 141665
+        },
+        {
+          "path": "scans/16074.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Sands-of-Harad/Escape-into-the-Jungle-4B.jpg",
+          "sha256": "db342499060197cb3b7e25dba2a771435b92562c1c1a796f9cc9924c45204b41",
+          "bytes": 149313
+        },
+        {
+          "path": "scans/17001.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Kahliel.jpg",
+          "sha256": "29cd4f0f001dc15f63aacffe6733c2946ca1f1cacf10eaac38cc01230cf3ee65",
+          "bytes": 160148
+        },
+        {
+          "path": "scans/17002.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Two-Player-Limited-Edition-Starter/Andrath-Guardsman.jpg",
+          "sha256": "415dfdafc4272ddb5e1b37e9d903d55a6fd4708c80f72bf84eb5d3c0199fb45e",
+          "bytes": 2145211
+        },
+        {
+          "path": "scans/17003.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Prepare-for-Battle.jpg",
+          "sha256": "e5f955005e4a5282d40a2b2dc7453ab2050913ae9aae10bdffb8a5a1e0ce52ed",
+          "bytes": 162696
+        },
+        {
+          "path": "scans/17004.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Yazan.jpg",
+          "sha256": "776eea28d9ca44bd423bf3e88268e2fa54e9a17d6c3c94e735157744c6beabfb",
+          "bytes": 152175
+        },
+        {
+          "path": "scans/17005.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Wait-no-Longer.jpg",
+          "sha256": "d71b367b41feca7bda6b6791ed83da1638a5781bb20fd9758398016f6ec20742",
+          "bytes": 152686
+        },
+        {
+          "path": "scans/17006.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Jubayr.jpg",
+          "sha256": "88e15d71ab37b78eda6d9ad769055334b92c9e6d570cbb4d3956169200ac1500",
+          "bytes": 149567
+        },
+        {
           "path": "scans/17007.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Dwarf-Pipe.jpg",
           "sha256": "1af20856d82e6114f8f10e3e3898949840a104b3e20c615c5414e43d4c0171ce",
           "bytes": 144340
         },
         {
+          "path": "scans/17008.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Firyal.jpg",
+          "sha256": "966d1e89f97c0e22b790ef00a89dc1b86916ee97f4c8058c50978c6d79e3aa0a",
+          "bytes": 148003
+        },
+        {
+          "path": "scans/17009.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Coney-in-a-Trap.jpg",
+          "sha256": "b399ecf7c93588019e289a7a25ca23cffa464f2ec323802d12a0d31bed947966",
+          "bytes": 143771
+        },
+        {
+          "path": "scans/17010.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Kahliel's-Headdress.jpg",
+          "sha256": "f471716981dcfc61b49a0adfb62cb9948fd1e844594bc98f870171377d1e9269",
+          "bytes": 158124
+        },
+        {
+          "path": "scans/17011.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Horse-hair-Lasso.jpg",
+          "sha256": "3c0f1f5f3280afa9411084e2c249f3af058239be9631fa54771e8a5315dccd03",
+          "bytes": 150466
+        },
+        {
+          "path": "scans/17012.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Poisoned-Spear.jpg",
+          "sha256": "caa26b4872f6a98720962c1d8e39c23c1a3400ae561b3dd2fe654bf8e8ac8b3f",
+          "bytes": 152504
+        },
+        {
+          "path": "scans/17013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Pit-Trap.jpg",
+          "sha256": "aa281ed5df7224d5e2a47618c1e0271a913d68fcf989de8ecbc47e2fcb70f95b",
+          "bytes": 151940
+        },
+        {
+          "path": "scans/17014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Noose-of-Vines.jpg",
+          "sha256": "a5b5edbe3bbd7a997aa5dd4e53d5c3a4f5897881861bed44dbd014d0ddb7a5fb",
+          "bytes": 152355
+        },
+        {
+          "path": "scans/17015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Wild-Mûmak.jpg",
+          "sha256": "a6ff8ce7d4bf522bb0cfc0d1b1d60982933fa1ba59bfc3e67846689db453e99c",
+          "bytes": 157374
+        },
+        {
+          "path": "scans/17016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Harad-Tiger.jpg",
+          "sha256": "dbd8110f0addbd65260e87ab5a25eb8e9c348acaecb54dfa25bb615282a0601c",
+          "bytes": 153985
+        },
+        {
+          "path": "scans/17017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Territorial-Ape.jpg",
+          "sha256": "fc397f3e2c14f92c1547013d9710752536a376842c709ea7440e9b7beb1eaa87",
+          "bytes": 145552
+        },
+        {
+          "path": "scans/17018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Strangling-Python.jpg",
+          "sha256": "f503cd0ba510d9eea7b938319a6e6453f762fad43b5fe776542e16545e3e1898",
+          "bytes": 156671
+        },
+        {
+          "path": "scans/17019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Giant-Centipede.jpg",
+          "sha256": "f8b682beea693a26a800f58ecf3478937de1c2de9f2653b9a413750443689252",
+          "bytes": 159797
+        },
+        {
+          "path": "scans/17020.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Mûmak-Trail.jpg",
+          "sha256": "30cf67a842f8401ddbacc411faebafce9801f40ccaadcc5ca8d306ed9b15e2c4",
+          "bytes": 155115
+        },
+        {
+          "path": "scans/17021.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Stampeding-Oliphaunt.jpg",
+          "sha256": "2673b627f648bd88b02436d40384071810e139f13db86b0776a70e4ad135a9ee",
+          "bytes": 167512
+        },
+        {
+          "path": "scans/17022.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/The-Savage-South.jpg",
+          "sha256": "2110f1a2953016f617a7806be1f5a2d022a2fee42783ef400430164c520c1831",
+          "bytes": 173449
+        },
+        {
+          "path": "scans/17023.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Terrible-Fever.jpg",
+          "sha256": "d86ce9ac6220f5aaf78e4b975a9d1ad51a8532c5a4b9f21a9fd3c6db31ce14cb",
+          "bytes": 154506
+        },
+        {
+          "path": "scans/17024.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Biting-Insects.jpg",
+          "sha256": "03baac9ac51ca1233abbcb696c16172887c81c75c6d0c9c5ecbd020771b27bfe",
+          "bytes": 172939
+        },
+        {
+          "path": "scans/17025.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Guardians-of-the-Jungle.jpg",
+          "sha256": "d92082f00b2e8902cbd175188dffeb1e45e93856a9b30ef98196fb51af2aa5bb",
+          "bytes": 152373
+        },
+        {
+          "path": "scans/17026.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Welcome-to-the-Jungle-1A.jpg",
+          "sha256": "81040df4d751c6a9cb61f27d32fd0302b966ed9ad86ab143b4e69c9da9617bab",
+          "bytes": 172046
+        },
+        {
+          "path": "scans/17026.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Welcome-to-the-Jungle-1B.jpg",
+          "sha256": "cddd437730958f100d271353b8d99096c649d53385aa33810f246f8cc89c7237",
+          "bytes": 160539
+        },
+        {
+          "path": "scans/17027.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Capture-the-Oliphaunts-2A.jpg",
+          "sha256": "79cd8d38d1cd1cff52a52b7d17807f90991e34950ca5424cb1b786a8faed5a3f",
+          "bytes": 157280
+        },
+        {
+          "path": "scans/17027.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Mumakil/Capture-the-Oliphaunts-2B.jpg",
+          "sha256": "20114f9bce299f711641ae6c42089957965ae5938e539575e5510815a2e126f1",
+          "bytes": 148367
+        },
+        {
+          "path": "scans/17028.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Thurindir.jpg",
+          "sha256": "770663e2abed6994a5bc83bf5c2f1fd6dade04c4ee46c7647974de2f33366535",
+          "bytes": 910942
+        },
+        {
+          "path": "scans/17029.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Kahliel's-Tribesman.jpg",
+          "sha256": "f23a085583ff2e167f3561c3f67bf78eea9736db4b39467f89ecd81aeeea95e2",
+          "bytes": 971162
+        },
+        {
+          "path": "scans/17030.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Steed-of-the-North.jpg",
+          "sha256": "2d97d6d497d22f37d16854ff7bc4d70a781b87e57e59b64da9756dec93006f70",
+          "bytes": 1035987
+        },
+        {
+          "path": "scans/17031.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Mighty-Warrior.jpg",
+          "sha256": "c42ee9a08a03894bee0d4c65e30d09e18b4053131c894c861ae96953fb68c3ce",
+          "bytes": 985038
+        },
+        {
+          "path": "scans/17032.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Proud-Hunters.jpg",
+          "sha256": "088524aab3c093024c02c6d5639d5513f9aa162cc68190f5194595e82a41d54f",
+          "bytes": 974335
+        },
+        {
+          "path": "scans/17033.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Dúnedain-Pathfinder.jpg",
+          "sha256": "71dcbef617f9f9f940efefe41e747f6a140798b896f55549b380015b16d8c178",
+          "bytes": 948660
+        },
+        {
+          "path": "scans/17034.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Backtrack.jpg",
+          "sha256": "7141cacfe47c48648b4ef9e012ea22dbcf99b1e662d600f05369fa6558f15f1e",
+          "bytes": 990944
+        },
+        {
+          "path": "scans/17035.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Eryn-Galen-Settler.jpg",
+          "sha256": "7ea2407ad01c75830287958c512a55420c1ff8f6bfac1b701c490b0794b09f25",
+          "bytes": 950139
+        },
+        {
+          "path": "scans/17036.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Explore-Secret-Ways.jpg",
+          "sha256": "4e3cf54003c946c5b903e4475b43735486a4ccb674668750d1853a2f88167f45",
+          "bytes": 931562
+        },
+        {
+          "path": "scans/17037.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Steward-of-Orthanc.jpg",
+          "sha256": "91b3250d58f9a95a83d9f90b8ac9ee8320255342900de20c87cc235cff381e4e",
+          "bytes": 984788
+        },
+        {
+          "path": "scans/17038.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Tamed-Mûmak.jpg",
+          "sha256": "78e00ffa34a0d68f57caffbe819914260dfdbe49324f1a174c38b25df1929ae9",
+          "bytes": 1028362
+        },
+        {
+          "path": "scans/17039.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/River-Harnen.jpg",
+          "sha256": "3d4f08ba55e64e411d47ce4f7b175b99da00d77df8487ebf58a8812b5ab0278d",
+          "bytes": 1001733
+        },
+        {
+          "path": "scans/17040.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Expanse-of-Harad.jpg",
+          "sha256": "5e1c77cb4f53a382d02d1e8ff1eabfe4e3ba3c58bf879be227f730b7b2a8d056",
+          "bytes": 1017946
+        },
+        {
+          "path": "scans/17041.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Blistering-Erg.jpg",
+          "sha256": "69763135cca3f32cf78537b70bd4ab94d63920121edfe925b9061bb2b781c253",
+          "bytes": 1020711
+        },
+        {
+          "path": "scans/17042.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Harad-Road.jpg",
+          "sha256": "46a28ac542111a2cdf48e6847b89d4bc18ccb1b2441aa064dff5c00396fd8fba",
+          "bytes": 987511
+        },
+        {
+          "path": "scans/17043.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Uruk-Pursuer.jpg",
+          "sha256": "30d3b14e1c516e9b081460e512e03645a42ecc7da57be3da52d203e676cc0335",
+          "bytes": 958158
+        },
+        {
+          "path": "scans/17044.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Racing-Warg.jpg",
+          "sha256": "b4aa693e6da0985a0a5fc4121268bda091517a54affa5c93483cef7d6c27b634",
+          "bytes": 907456
+        },
+        {
+          "path": "scans/17045.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Pursuers-from-Mordor.jpg",
+          "sha256": "bc239ae1023cf56b273246f75b79d4c4b99e4eb1e4e904cc85c924cab76a372d",
+          "bytes": 1016432
+        },
+        {
+          "path": "scans/17046.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Howling-at-their-Heels.jpg",
+          "sha256": "6f792611672e1ca2bbc3d06bab154d1bbf03ae22e4bd469c71c1ce4b5d9d68ad",
+          "bytes": 1005456
+        },
+        {
+          "path": "scans/17047.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Setting-Out-1A.jpg",
+          "sha256": "a24e5dbb3138f0a5e2c9661bc9082105ce6c60e2a9ab7d79536cfbede5048b5b",
+          "bytes": 966276
+        },
+        {
+          "path": "scans/17047.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Setting-Out-1B.jpg",
+          "sha256": "7b309a4a328837431bf19fe8f318a35548b9f3adae70c7ee672e8fb5c8168d14",
+          "bytes": 998111
+        },
+        {
+          "path": "scans/17048.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Racing-North-2A.jpg",
+          "sha256": "c71b2c23d38d4f2028c89dcf71355f582daf3d9751462b18eb08f9dc31b85bbb",
+          "bytes": 918439
+        },
+        {
+          "path": "scans/17048.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Racing-North-2B.jpg",
+          "sha256": "64c4b73ea5b6fd61e7c754959479c525498308f35ee3cc17f11f379677205dff",
+          "bytes": 956805
+        },
+        {
+          "path": "scans/17049.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Hunted-in-Harad-3A.jpg",
+          "sha256": "32a86ecd2a3af73a132ddb0e2616db709f5ea57961694d8028b01ed90213e653",
+          "bytes": 947019
+        },
+        {
+          "path": "scans/17049.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Hunted-in-Harad-3B.jpg",
+          "sha256": "d18aab524ef96dd7a48dd931421e2ffd2807904530f7754b3cec7bee5d5c0eb5",
+          "bytes": 980464
+        },
+        {
+          "path": "scans/17050.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/The-Ford-of-Harnen-4A.jpg",
+          "sha256": "c2cc031883b7be5c8242f12e5edb8108f23c9eaa11af870f909f2863332473c1",
+          "bytes": 960549
+        },
+        {
+          "path": "scans/17050.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/The-Ford-of-Harnen-4B.jpg",
+          "sha256": "e7daa42d0abd147135e70a1aa2993e76f916ed2a21f0537931266721dcbdc1dd",
+          "bytes": 1002660
+        },
+        {
+          "path": "scans/17051.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Setting-Out-C-1C.jpg",
+          "sha256": "17f103cb7cba3499f44ea385dfe37fe3b2bd916688503211fc9d70b49f0205be",
+          "bytes": 943469
+        },
+        {
+          "path": "scans/17051.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Setting-Out-C-1D.jpg",
+          "sha256": "1b891330e9084f1da9bb3722a3490b0e7a2414e299022119c33169eb88ff4443",
+          "bytes": 1009937
+        },
+        {
+          "path": "scans/17052.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Racing-North-C-2C.jpg",
+          "sha256": "ea231342be65aed2724eec9f8971cdf0d78b6d979ff7607e762a10d8105b0120",
+          "bytes": 919064
+        },
+        {
+          "path": "scans/17052.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Racing-North-C-2D.jpg",
+          "sha256": "5c09cd85e41bdd64609ec64adeb48aff2223e97c97a4795c416ecd0009d15615",
+          "bytes": 976527
+        },
+        {
+          "path": "scans/17053.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Hunted-in-Harad-C-3C.jpg",
+          "sha256": "77046e7b69e7e55e369ae1f6a7e83f724247c03e4483e2bfbdcd0d2ef2487e29",
+          "bytes": 933352
+        },
+        {
+          "path": "scans/17053.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/Hunted-in-Harad-C-3D.jpg",
+          "sha256": "365f4a841bdeb7cd3ff4dcb3e5be5e8086d21adb93ea51c43f6c7e1cb2607f69",
+          "bytes": 988516
+        },
+        {
+          "path": "scans/17054.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/The-Ford-of-Harnen-C-4C.jpg",
+          "sha256": "c3c99993144c2de75784b8e652c75cc0760da5341e61b7a3bb2cbeb1f6003907",
+          "bytes": 945429
+        },
+        {
+          "path": "scans/17054.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Race-Across-Harad/The-Ford-of-Harnen-C-4D.jpg",
+          "sha256": "3b541b5b137517231b0151ecbb514d6e28fc6763902e58306d8ae2865e53b8d9",
+          "bytes": 1009413
+        },
+        {
+          "path": "scans/17055.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Hirgon.jpg",
+          "sha256": "ff234e595304546f81940a1522d69196eeda461341e54686a95e01ed10ce1e3d",
+          "bytes": 970239
+        },
+        {
+          "path": "scans/17056.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Haradrim-Spear.jpg",
+          "sha256": "822163664c629b4aae2c383bffc04d40f5864ee545c115a116b943b2490e6529",
+          "bytes": 976435
+        },
+        {
+          "path": "scans/17057.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Hunting-Party.jpg",
+          "sha256": "2fe151e35a9b04b1541a6693e93b730caa93d2e49dc7c950b1f8d618b2aa8e61",
+          "bytes": 872352
+        },
+        {
+          "path": "scans/17058.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/The-Red-Arrow.jpg",
+          "sha256": "c61e93ec568f20d735f644bb081efb75338a4f3b8c5d35e07ccbb4e1dc4c63bf",
+          "bytes": 1031111
+        },
+        {
+          "path": "scans/17059.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Keep-Watch.jpg",
+          "sha256": "9a46091b0f716bea20524a5bdda3cc05f5e065b8e39790560051540ba86f3ed9",
+          "bytes": 996299
+        },
+        {
+          "path": "scans/17060.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Rider-of-Rohan.jpg",
+          "sha256": "d404f1a4eb0c0e6941d697d341728131b84c27206f225fe485c6b32aca3e8bba",
+          "bytes": 955202
+        },
+        {
+          "path": "scans/17061.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Fireside-Song.jpg",
+          "sha256": "c3cf5bfc5f38e164511ef7672b2fb61f9117915b55b1d518711ee9d781e4caef",
+          "bytes": 925246
+        },
+        {
+          "path": "scans/17062.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Two-Player-Limited-Edition-Starter/Dúnedain-Lookout.jpg",
+          "sha256": "601f83d41326670b08caa7192685225212f86f64f53f55bb904e1136204b41aa",
+          "bytes": 2285115
+        },
+        {
+          "path": "scans/17063.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Doughty-Ranger.jpg",
+          "sha256": "259b7260da8e4f203585cdd65cfada4dbec7671a131367c7c49d28afcf9356f3",
+          "bytes": 975587
+        },
+        {
+          "path": "scans/17064.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/The-Free-Peoples.jpg",
+          "sha256": "59b9649776a3f8b7b724eccc2eb5d9776b723c36dc80f55ef37d402347e086c5",
+          "bytes": 944690
+        },
+        {
+          "path": "scans/17065.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Brood-Mother.jpg",
+          "sha256": "a5c104238655432e3c020fae6e25c2ed83d0e0284968dfd47fb3e3e65368068e",
+          "bytes": 964841
+        },
+        {
+          "path": "scans/17066.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Hive-Guardian.jpg",
+          "sha256": "9e91d72dd6e241ec855f5dd36abd80552a80f22a4536f21b0ced1aeb8a1f2111",
+          "bytes": 910390
+        },
+        {
+          "path": "scans/17067.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Spider-Broodling.jpg",
+          "sha256": "4567d58dff5d79766131e0e95201bbb4d8378899191f85a3fe89970fe0ea9f1b",
+          "bytes": 901794
+        },
+        {
+          "path": "scans/17068.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Spider-Burrow.jpg",
+          "sha256": "d13922ebc9d020a65528123d42d199377e8917a77fbf97576f847bdae4ef31f2",
+          "bytes": 966784
+        },
+        {
+          "path": "scans/17069.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Pitch-Black-Tunnel.jpg",
+          "sha256": "d4a15207c396fc7dfe9ae4032461555cfc394146466d15a07eca9fd62db5981c",
+          "bytes": 927394
+        },
+        {
+          "path": "scans/17070.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Nest-of-Vermin.jpg",
+          "sha256": "b63b5f56a7e64a7f966c4c238e6c307aa9dfd736c122a54675e38d666b0eacc3",
+          "bytes": 963149
+        },
+        {
+          "path": "scans/17071.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Cobwebbed-Cavern.jpg",
+          "sha256": "be21af89ef89ac412fa6ee4b53e1eb39f93639864833bb281791d65ffee82292",
+          "bytes": 933816
+        },
+        {
+          "path": "scans/17072.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Blocked-Passage.jpg",
+          "sha256": "e3319d27ac0f5755de54ab951425b9e8f241ec0b15a7c78fa5d871a65dd031d8",
+          "bytes": 945489
+        },
+        {
+          "path": "scans/17073.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Forced-Off-Track.jpg",
+          "sha256": "b76a5e92786061dd4565c36a153eabbf9088cd2e76a5c36d6c9a5c93f50a5b69",
+          "bytes": 939308
+        },
+        {
+          "path": "scans/17074.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Grabbed-by-Spiders.jpg",
+          "sha256": "66975da2ff0ff3e682f70fbd4165da880396b8104a433cda2cd7ad1656f82a90",
+          "bytes": 942163
+        },
+        {
+          "path": "scans/17075.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Lost-Underground.jpg",
+          "sha256": "5c8610177a116df037b5d3d7898cde56a0ae75dfd7c04cca219a1e6f4d23be7f",
+          "bytes": 848684
+        },
+        {
+          "path": "scans/17076.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Searching-the-Caves-1A.jpg",
+          "sha256": "6c03618691c5c1d217676aac2622fb1b19f1d6b98f8d1e0b946e528fce8a2f32",
+          "bytes": 931836
+        },
+        {
+          "path": "scans/17076.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Searching-the-Caves-1B.jpg",
+          "sha256": "d145e0679f0287136f79f72bcf2941d00277f838dfe37d507ff8c29c0ddfd751",
+          "bytes": 938534
+        },
+        {
+          "path": "scans/17077.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Getting-Closer-2A.jpg",
+          "sha256": "b1fc2c2dbeb10e4cc4cb911647a1623568ffd98d9e36308ac4b8b5c12e2036b8",
+          "bytes": 889852
+        },
+        {
+          "path": "scans/17077.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Getting-Closer-2B.jpg",
+          "sha256": "09d23ede57f808342f2faa01204ef963e0682216b5788fa4a9e7ec910282201e",
+          "bytes": 886195
+        },
+        {
+          "path": "scans/17078.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/The-Spider's-Hive-3A.jpg",
+          "sha256": "baae3e75f5fa51911f429d506fdaff5d8f5ecaddcb18d7a53b8c48b11f7d2543",
+          "bytes": 901303
+        },
+        {
+          "path": "scans/17078.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/The-Spider's-Hive-3B.jpg",
+          "sha256": "393b490eee0421a07b0d226310793c82a1eaedbac4e62ccf21619cfbc6aba65c",
+          "bytes": 892570
+        },
+        {
+          "path": "scans/17079.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/Off-Track.jpg",
+          "sha256": "c141d693492d3eb6fc3ae7a5453f496295c405d248942dcf12b547d68ac6b694",
+          "bytes": 964864
+        },
+        {
+          "path": "scans/17080.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/On-Track.jpg",
+          "sha256": "b6a3f40adfa79b0ca80ea6c26a074f7852ea302faafe320c0053fb77b63a049c",
+          "bytes": 947315
+        },
+        {
+          "path": "scans/17081.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Fastred.jpg",
+          "sha256": "0d21daedb3392ed39b287c2572010d5e602d80731361f9726d136c21e241e3e7",
+          "bytes": 918135
+        },
+        {
+          "path": "scans/17082.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Song-of-Hope.jpg",
+          "sha256": "723177febe5854f9ea54b12c1d7187aa85124f1a709b087e193a6bd4b8ca163a",
+          "bytes": 980671
+        },
+        {
+          "path": "scans/17083.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Burst-into-Song.jpg",
+          "sha256": "e86c179aa425a95ad03c2a4f6e2c4392bba572b46b1150e126a10513fd4a7bd5",
+          "bytes": 964897
+        },
+        {
+          "path": "scans/17084.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Defender-of-Cair-Andros.jpg",
+          "sha256": "c69940a24e7821be11e42690f90fa2183903c1e0473820d1374960ae08d0ae4f",
+          "bytes": 949234
+        },
+        {
+          "path": "scans/17085.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Oath-of-Eorl.jpg",
+          "sha256": "d9ada4a7d1537770313f7e2f8f4e7c64cee0f4fc70acb18a858c1d38adb862ca",
+          "bytes": 1002452
+        },
+        {
+          "path": "scans/17086.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Fearless-Scout.jpg",
+          "sha256": "27a8435a4a9d36ae97dde1e83d06e32ae9bf9e65487b716d399d4ce8f4156325",
+          "bytes": 984827
+        },
+        {
+          "path": "scans/17087.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Rally-the-West.jpg",
+          "sha256": "d385698a694cb0e2727ffb7c417a9bdb112fb5619f5a1925389e29d822fd6fc7",
+          "bytes": 989897
+        },
+        {
+          "path": "scans/17088.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Dúnedain-Pipe.jpg",
+          "sha256": "6beafe4aae04acf4494dd25aad8ad3c50b439de7be8100367ea0eca1e9adab99",
+          "bytes": 913441
+        },
+        {
+          "path": "scans/17089.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Old-Toby.jpg",
+          "sha256": "fb8e1183b9751418bf5817729b4d3539b0594e6e3171cff7799e249869c9fcf9",
+          "bytes": 976457
+        },
+        {
+          "path": "scans/17090.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Southron-Refugee.jpg",
+          "sha256": "1b08fc559f8d00c23746c9c8553c9a3a200d832adf4ec91f3fcc959c1d40900c",
+          "bytes": 962407
+        },
+        {
+          "path": "scans/17091.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Banner-of-the-Serpent.jpg",
+          "sha256": "6af22e09fff6b9bf8e56406f34e887cc62f6557f5ec96832f94da3bd06929b9c",
+          "bytes": 988000
+        },
+        {
+          "path": "scans/17092.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/The-Serpent's-Garb.jpg",
+          "sha256": "bc77df7e612fff2ad22da3f3dbb2ebb60b7630ef964cef1f1b77bdeba60dec64",
+          "bytes": 1000917
+        },
+        {
+          "path": "scans/17093.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Summons-from-Mordor.jpg",
+          "sha256": "b5670fa26ca785759ba0e69ee153833150794eb1a97d86cccd14b71cc8ee3947",
+          "bytes": 975177
+        },
+        {
+          "path": "scans/17094.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/The-Black-Serpent.jpg",
+          "sha256": "eb899e7ceec27f0f762014f9b8481e95c8c8f349cd9c9694c5608db6b98c98f8",
+          "bytes": 909176
+        },
+        {
+          "path": "scans/17095.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Serpent-Guard.jpg",
+          "sha256": "16e41ece876aa55afe3f5ee3eb975dfa2eec80a806028506cea577a2114f1595",
+          "bytes": 926804
+        },
+        {
+          "path": "scans/17096.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/The-Serpent's-Redoubt.jpg",
+          "sha256": "e5f574e1fd8d82bb2bd148128f2b1545569adee0424ed8165c1435428dbcbc8f",
+          "bytes": 1012106
+        },
+        {
+          "path": "scans/17097.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Roofless-Tower.jpg",
+          "sha256": "20958a0d48af572210e2e37ac9e7020e5bda308e0baaf36a25db52f505ccc3a1",
+          "bytes": 949992
+        },
+        {
+          "path": "scans/17098.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Desert-Bastion.jpg",
+          "sha256": "a6c89d3ace3ebee309cfcfcaf615c6c35baec840f78ec89e3ef1ee6c6d04f21a",
+          "bytes": 1005113
+        },
+        {
+          "path": "scans/17099.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Southron-Camp.jpg",
+          "sha256": "5dd61e1cabbd39260d4c2aa7a54db08a72805ed65bfb5a79297c715e6f527d1f",
+          "bytes": 937951
+        },
+        {
+          "path": "scans/17100.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Broken-Courtyard.jpg",
+          "sha256": "0e24995f86e0a6ce4e2bcc3552a764c8089a7533f13c53634d79aede32807f5e",
+          "bytes": 991880
+        },
+        {
+          "path": "scans/17101.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Bold-and-Grim.jpg",
+          "sha256": "ad057260a42a408b72c838642c8469ee9ecc4d3f154711c890ee23e659b79e5b",
+          "bytes": 974437
+        },
+        {
+          "path": "scans/17102.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/No-Quarter.jpg",
+          "sha256": "2953dae05c3ed15adbc9a2b21eeea122d3b94473029a2dc470a1d3af7eb5b1e8",
+          "bytes": 983510
+        },
+        {
+          "path": "scans/17103.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Chaos-in-the-Night.jpg",
+          "sha256": "4d0fcb4454477675948bd4f6cf2b88e0aaad8473bac5ca6f7dd7a0fea6c14597",
+          "bytes": 950770
+        },
+        {
+          "path": "scans/17104.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Don't-Let-Them-Escape.jpg",
+          "sha256": "f0928427bb6ab5c4b1ccd046b53da0a1e79ef1f28e02b02d83479e2b920b755a",
+          "bytes": 991718
+        },
+        {
+          "path": "scans/17106.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/The-Crossroads-Fort-1A.jpg",
+          "sha256": "3204273bb076e66020506a4fa9d658762362e864132f1401070f14e5eeea1615",
+          "bytes": 1025470
+        },
+        {
+          "path": "scans/17106.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/The-Crossroads-Fort-1B.jpg",
+          "sha256": "8db27a6c9a995bd7e3b9ffb2f3c27639e5bda828f64e1dc04728d539649cc686",
+          "bytes": 951476
+        },
+        {
+          "path": "scans/17107.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Battle-in-the-Camp-2A.jpg",
+          "sha256": "0dac65d3e582d2b6b24efc4416105973c7b0ce8a4c661eca76558141bf7db1fa",
+          "bytes": 1016931
+        },
+        {
+          "path": "scans/17107.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Battle-in-the-Camp-2B.jpg",
+          "sha256": "bf2bb450ae192c30b7ec66c6337bd6adf51809f04d0b74d567fcb14b0a68a00d",
+          "bytes": 939135
+        },
+        {
+          "path": "scans/17108.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Defeat-the-Serpent-3A.jpg",
+          "sha256": "8b8f486be4bc6d03a26a720270830f77948fbd4b28e3f2e4fab7b03905762276",
+          "bytes": 997682
+        },
+        {
+          "path": "scans/17108.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Black-Serpent/Defeat-the-Serpent-3B.jpg",
+          "sha256": "222e22c28e8a098258a87e4d41d52151f52222c564cb9e6ffdf38154a2ee497d",
+          "bytes": 936768
+        },
+        {
+          "path": "scans/17109.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Folco-Boffin.jpg",
+          "sha256": "dd39d9c7bb199b51c1df76dd33596bd8bac520920b0839f4584b04161f7f7605",
+          "bytes": 292369
+        },
+        {
+          "path": "scans/17110.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Knight-of-Dale.jpg",
+          "sha256": "caa0e2f0064606a2fce4439279543179b8f932cd830b16527d153ef428807c51",
+          "bytes": 284633
+        },
+        {
+          "path": "scans/17111.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Diligent-Noble.jpg",
+          "sha256": "35f08df971ef199539ac2ec35caf1d3b9c95175172dd1b29c2054c4ec2b48f08",
+          "bytes": 271431
+        },
+        {
+          "path": "scans/17112.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Riddermark-Knight.jpg",
+          "sha256": "ee2bef5b8f523f385918179e5b3692a285b3965eca11eec0937d0462efc3cf18",
+          "bytes": 274620
+        },
+        {
+          "path": "scans/17113.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Fierce-Defense.jpg",
+          "sha256": "d0193afc71aede53712074b64ce925d51b991fa5ba237ab8e6c1dbf8cb48681d",
+          "bytes": 264104
+        },
+        {
+          "path": "scans/17114.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Eregion-Survivor.jpg",
+          "sha256": "c74ab9cf989a27884ca39f32a19d222dc5ee3c280273c30f13041349fa64274f",
+          "bytes": 257928
+        },
+        {
+          "path": "scans/17115.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Heirs-of-Eärendil.jpg",
+          "sha256": "d759ad134b74f4ba8b6e29d5c64e7a3de88010e1cc21030956eed87e431154ec",
+          "bytes": 261553
+        },
+        {
+          "path": "scans/17116.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Leaflock.jpg",
+          "sha256": "56efd88be615aebc5fa5f626a48b161260486711481e5ebc989e4a000d200e18",
+          "bytes": 261318
+        },
+        {
+          "path": "scans/17117.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Legacy-Blade.jpg",
+          "sha256": "5e30ffb5cec8cedfa6c6f859ebbc601d4bada5e18c0a9d57b1e1afe6c075c77e",
+          "bytes": 293532
+        },
+        {
+          "path": "scans/17118.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Open-the-Armory.jpg",
+          "sha256": "f9d32aa2c13a89bca404c4a7d05f50d8bff90672bf4cbe20b8c8c47776617c95",
+          "bytes": 299867
+        },
+        {
+          "path": "scans/17119.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/The-Captives-of-Cirith-Gurat.jpg",
+          "sha256": "977b568468c8dd97eeeabca40f31e42da3a6cb290fe2a2a682529712b986ba46",
+          "bytes": 298298
+        },
+        {
+          "path": "scans/17120.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Abaan.jpg",
+          "sha256": "17071a9ddfb2193678082c4143b98d67f349f6557b84bf8c01aab7b4047d8959",
+          "bytes": 295530
+        },
+        {
+          "path": "scans/17121.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Jailer-of-Cirith-Gurat.jpg",
+          "sha256": "01b7113180607832227e73497a84b4b16d09baa355f75f49b4758923ceff288c",
+          "bytes": 283352
+        },
+        {
+          "path": "scans/17122.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Prison-Guard.jpg",
+          "sha256": "2acab6fb622025e9a22d16fb2a5df8b8c72ac86047ce1b2507ae5d05e9846a97",
+          "bytes": 272019
+        },
+        {
+          "path": "scans/17123.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Dungeon-Warg.jpg",
+          "sha256": "eef614369147cf93f5f555ee090e9be89f340adef627759a11beca98b648d2cf",
+          "bytes": 266568
+        },
+        {
+          "path": "scans/17124.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Gate-of-Iron.jpg",
+          "sha256": "655a42ddfff62dd17b80a811f9babd8af16e096654a011d9536363106fb7e615",
+          "bytes": 289801
+        },
+        {
+          "path": "scans/17125.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Dungeon-Cell.jpg",
+          "sha256": "c2ab3112db77bbb2c21a6168fc3955f651faf47c5da52343ee139aa557c35f10",
+          "bytes": 272543
+        },
+        {
+          "path": "scans/17126.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Uruk-Guardroom.jpg",
+          "sha256": "0a580458b4aa9ab1785aa2702201ff952ff7ab1a1afe5bcf10852f65cf0f8d40",
+          "bytes": 307251
+        },
+        {
+          "path": "scans/17127.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Mines-of-Cirith-Gurat.jpg",
+          "sha256": "7b392cc509ab62a3df47df6d6d238e10dba00f752dd8723e7a20ab42f275cd00",
+          "bytes": 278213
+        },
+        {
+          "path": "scans/17128.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Torture-Room.jpg",
+          "sha256": "0853b579355d025e3f3c050edffb1bed1ca92d08c08d912a7b2e0a7968859897",
+          "bytes": 281015
+        },
+        {
+          "path": "scans/17129.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Taken-Prisoner.jpg",
+          "sha256": "e10eef0ae18658ca8d8419ef01c481d71ecff4fd1056e98166e9b6c07123a781",
+          "bytes": 262711
+        },
+        {
+          "path": "scans/17130.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Tormented-by-Orcs.jpg",
+          "sha256": "a46c23505a58349820bb04221792e45fdccac07f7aef7952eb6409427d3dbf67",
+          "bytes": 256114
+        },
+        {
+          "path": "scans/17131.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Captured.jpg",
+          "sha256": "fcaab89903fafbc3b019700c9495f18dda5b61b5b08c1394fe5e8af7b2eb5eaf",
+          "bytes": 262265
+        },
+        {
+          "path": "scans/17132.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Rescue-the-Prisoners-1A.jpg",
+          "sha256": "eb69f7654070eba8da0378f69f8a66d33017f8e39a9c66c1ea4a2ce58e4dcd44",
+          "bytes": 286482
+        },
+        {
+          "path": "scans/17132.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Rescue-the-Prisoners-1B.jpg",
+          "sha256": "2c4876da7b75ed039ee84300354e6611e2d653dce5fb69fef98607b1dcb6d3fa",
+          "bytes": 277943
+        },
+        {
+          "path": "scans/17133.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Sneak-Past-the-Guards-2A.jpg",
+          "sha256": "e57cad37b8fd7ee6069aa192fa9fff70353ef1f2a7cc16a9c624d896b04636d9",
+          "bytes": 289674
+        },
+        {
+          "path": "scans/17133.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Sneak-Past-the-Guards-2B.jpg",
+          "sha256": "944c09bf45ac6247bf7c4a16b1000819fb11fc05ccaca5e3762f0ab7c79d114d",
+          "bytes": 254368
+        },
+        {
+          "path": "scans/17134.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Fight-Your-Way-Out-3A.jpg",
+          "sha256": "a68dc2a87af7c6d01bbeb0e1ca41ab7f2b2355c15ed5fd8896a6140f9e293b4f",
+          "bytes": 305599
+        },
+        {
+          "path": "scans/17134.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dungeons-of-Cirith-Gurat/Fight-Your-Way-Out-3B.jpg",
+          "sha256": "827ba4ed8e1e680190b820678cd2968cca00387acf7504a117fe37ef32a3f0b2",
+          "bytes": 296428
+        },
+        {
           "path": "scans/17135.A.jpg",
           "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/b62716d9-5e70-4ec1-bcb7-852f67299e82.jpg",
           "sha256": "6e385ad0dc0df1fce41cdfb0a50d4a974f25997fab2962b75055f6048e130876",
           "bytes": 158779
+        },
+        {
+          "path": "scans/17136.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Halfast-Gamgee.jpg",
+          "sha256": "d388402f1bda2835209e41104a6659bfb04fc4e8d968a4b0c3ba911ceb09c386",
+          "bytes": 902764
+        },
+        {
+          "path": "scans/17137.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Bulwark-of-the-West.jpg",
+          "sha256": "b6f51ba948c98dff600a1352d7ac30afb71ab36eb4471bf9ed9de5e04503a804",
+          "bytes": 599927
+        },
+        {
+          "path": "scans/17138.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Beorning-Guardian.jpg",
+          "sha256": "5780a78e1fa21284a9cec1560da299e9901e05be5dfb32ed90ddcacc3007e705",
+          "bytes": 609643
+        },
+        {
+          "path": "scans/17139.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Followed.jpg",
+          "sha256": "5c890b38a09d90eb5d5feb9652074b9074ad364763b20cc948773df1af11c8c8",
+          "bytes": 934640
+        },
+        {
+          "path": "scans/17140.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Flight-to-the-Sea.jpg",
+          "sha256": "9458b3ffee61496a5a5d20378eff5bd0d6a6222a6f45c2cefc9e26e25ed171be",
+          "bytes": 764418
+        },
+        {
+          "path": "scans/17141.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Emyn-Arnen-Ranger.jpg",
+          "sha256": "51a375093b989576f3bc4fb0d9134233bc2125ea6f9da23786d49942bc38e5aa",
+          "bytes": 813596
+        },
+        {
+          "path": "scans/17142.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/The-Dam-Bursts.jpg",
+          "sha256": "1cd04f505aeeea3f488d8896cac9d5fa5939cb795091ba12ae7cdbb682ff29f7",
+          "bytes": 810561
+        },
+        {
+          "path": "scans/17143.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dwarves-of-Durin/Magic-Ring.jpg",
+          "sha256": "50961cd86438202caa6074f5a47edae4560139d3b883e14382bbadf130748f3e",
+          "bytes": 787028
+        },
+        {
+          "path": "scans/17144.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Wind-from-the-Sea.jpg",
+          "sha256": "33f964691c5c3664067f5083ed766d5fbe4557faf26f32810b1e949ce64da793",
+          "bytes": 810893
+        },
+        {
+          "path": "scans/17145.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Poros-Garrison.jpg",
+          "sha256": "8516a3ad18c6feb2de3caeb455dc2ee81a7a11bef55625b04b7471a09687c3dc",
+          "bytes": 905610
+        },
+        {
+          "path": "scans/17146.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/The-Black-Serpent.jpg",
+          "sha256": "07cd37e8435cf978d5ffe77c8d80ca43deeb9de3dcf27e3ee70815682ed70a96",
+          "bytes": 810805
+        },
+        {
+          "path": "scans/17147.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Southron-Outrider.jpg",
+          "sha256": "ab888c2f819bb4bab87b958e96c3fd558d255c43d19621601cb9e14b64591c0c",
+          "bytes": 918170
+        },
+        {
+          "path": "scans/17148.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Uruk-Prowler.jpg",
+          "sha256": "ac07451d06494923a92f71cbcbc75d7077ad99468930ef49f97aff42871266b2",
+          "bytes": 890893
+        },
+        {
+          "path": "scans/17149.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Desert-Warg.jpg",
+          "sha256": "045ff34b7b0180661c710ef87a5033cabf6d6c2412c0367f0c946803d4120ba7",
+          "bytes": 701088
+        },
+        {
+          "path": "scans/17150.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Desolate-Land.jpg",
+          "sha256": "472e87e39b835ac07c9fe4abe730df0299b3ef518bb19b9d3b6bc699b44d44fe",
+          "bytes": 882908
+        },
+        {
+          "path": "scans/17151.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Harondor-Waste.jpg",
+          "sha256": "656cdaa295f8b5c36d1a08cdb1636af901ad9a7c3b690a1898d373d9491a2a72",
+          "bytes": 961075
+        },
+        {
+          "path": "scans/17152.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Danger-Close-Behind.jpg",
+          "sha256": "9aff4fd426a2ed813eb29f21efa2c1226d54ad05b19ffb9f107f2723aa77ffcb",
+          "bytes": 858165
+        },
+        {
+          "path": "scans/17153.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Foothills-of-Mordor.jpg",
+          "sha256": "0d7888d2d197c661e2731c16fa8e14f98d509a9f033f33045cf6d79b50fe6d57",
+          "bytes": 290369
+        },
+        {
+          "path": "scans/17154.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Shadowy-Vale.jpg",
+          "sha256": "f40be8d79b017c70374bb61ba9887b1be4f74fb0f1a268fe07c58a621fff4e80",
+          "bytes": 265133
+        },
+        {
+          "path": "scans/17155.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Mountains-of-Shadow.jpg",
+          "sha256": "93aaac4598ccf9073baaba2dda7a0ff9a48ce6dcd795330475f9723512022758",
+          "bytes": 230282
+        },
+        {
+          "path": "scans/17156.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Find-a-Way-Down.jpg",
+          "sha256": "93775ab233efee540d8e73b9ce89e7444e79b7da6cae8b685aabd39bd83400d5",
+          "bytes": 375916
+        },
+        {
+          "path": "scans/17157.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Flight-to-Gondor-1A.jpg",
+          "sha256": "b774462cea0487b49aa6607bf6170fd9e5de4a36b09d2b0a898aa168315334fa",
+          "bytes": 253062
+        },
+        {
+          "path": "scans/17157.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Flight-to-Gondor-1B.jpg",
+          "sha256": "3bbcbfae1d504c3409a28a900566af99222eac941aa8cb2cb34a63d62e64b7f8",
+          "bytes": 254599
+        },
+        {
+          "path": "scans/17158.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/The-Desert-Path-2A.jpg",
+          "sha256": "9244e5188d785f8e7fd77246e682c50886d437e814df1dc0e66a9635938d9e1c",
+          "bytes": 300189
+        },
+        {
+          "path": "scans/17158.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/The-Desert-Path-2B.jpg",
+          "sha256": "2d12cc2ff7f5cee1d2e37e9194ceeb1858f603b6b7da68305138ab5a21c2b074",
+          "bytes": 242415
+        },
+        {
+          "path": "scans/17159.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/The-Ephel-Dúath-2A.jpg",
+          "sha256": "3bab2fcee39fccba888d9cbb18f7b0f8f0420646876f0dc2d8ebc862176125eb",
+          "bytes": 304705
+        },
+        {
+          "path": "scans/17159.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/The-Ephel-Dúath-2B.jpg",
+          "sha256": "71598d0f7baec2a090d3744b6d27552d2f643346d9f57a673b56df0904d54e57",
+          "bytes": 231276
+        },
+        {
+          "path": "scans/17160.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Deadly-Creatures-3A.jpg",
+          "sha256": "d149ce0ee22b097c5600e8f5b86c410da71b5edcfda5ff6fe13afa6a2f080cde",
+          "bytes": 414334
+        },
+        {
+          "path": "scans/17160.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Deadly-Creatures-3B.jpg",
+          "sha256": "b7f85d886fab5bd3915d8b7c2ccae76d4e2e330cbbb2389eb81970bb5fa2c4d4",
+          "bytes": 289275
+        },
+        {
+          "path": "scans/17161.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Southron-Pursuit-3A.jpg",
+          "sha256": "b173a3781b429c2d82ba7058c1d65c5ae0f14a438f33e769674d2c6a3f26b64d",
+          "bytes": 467213
+        },
+        {
+          "path": "scans/17161.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Southron-Pursuit-3B.jpg",
+          "sha256": "6c57ddc45867d9ed892e9d85a94fa39e84fa505ec4f35956fd8f7031b5d822cd",
+          "bytes": 441123
+        },
+        {
+          "path": "scans/17162.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Orc-Patrols-3A.jpg",
+          "sha256": "61b570b0f81864570a778d47d7a5f6896648d6f0166d3036ab49a0ad6332ca42",
+          "bytes": 289073
+        },
+        {
+          "path": "scans/17162.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Orc-Patrols-3B.jpg",
+          "sha256": "9d89f83ebc8370a8bc62a1609a53bbef81adbec3ca31d174c8b2236794e9aff2",
+          "bytes": 439549
+        },
+        {
+          "path": "scans/17163.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Battle-at-the-Crossings-4A.jpg",
+          "sha256": "5ce27438bdf55c50637dbc9ae5a931c08a93acdc9651b98b255fd3397b5e7be3",
+          "bytes": 407321
+        },
+        {
+          "path": "scans/17163.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Crossings-of-Poros/Battle-at-the-Crossings-4B.jpg",
+          "sha256": "3a1273ed9514a9820c15332a09e1ea2dc3d2b00ed9681f01f43b683c3984c710",
+          "bytes": 266610
         },
         {
           "path": "scans/18016.A.jpg",

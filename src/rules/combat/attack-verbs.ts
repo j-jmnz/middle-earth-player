@@ -13,7 +13,7 @@ import { addModifier } from "../core/keywords.ts";
 import { headOf, isolatedAreas } from "../families/breaking/areas.ts";
 import { addClassModifier, ALLIES_CLASS, CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, ENEMIES_CLASS, QUESTING_CHARACTERS_CLASS, isClassHolder, isTraitedEnemies, isTraitedLocations, isTraitedStaging, STAGING_CLASS, traitedEnemies, traitedLocations, traitedStaging, ownCharacters } from "../core/holder-classes.ts";
 import type { ScenarioState } from "../core/state.ts";
-import { livingSeats } from "../core/state.ts";
+import { inPlay, livingSeats } from "../core/state.ts";
 import type { VerbFocus } from "../interpret/verbs.ts";
 import { moveCard } from "../core/zones.ts";
 import { declaredDefenders } from "../families/defense/defenders.ts";
@@ -132,7 +132,9 @@ export function modifyStat(
     case "other":
     case "host": {
       const id = refCard(state, instruction.target, frameScope(state, focus.seat, sourceId));
-      targets = id ? [id] : [];
+      // A card out of play takes no modifier from a card ability (rr.in-play-and-out-of-play): the dead character an event is about
+      // does not carry "cannot ready" into the round when its card is put into play again.
+      targets = id && inPlay(state.cards[id]?.zone ?? "removed") ? [id] : [];
       break;
     }
     // A number a seat holds (the cards it draws in the resource phase): the actor's, or the picked player's.

@@ -145,7 +145,7 @@ jobs:
       ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
       # app.config.js stamps the version and versionCode from this.
       APP_VERSION: ${{ needs.plan.outputs.version }}
-      APK_NAME: middle-earth-player-${{ needs.plan.outputs.tag }}${{ inputs.dry_run && '-dry-run' || '' }}.apk
+      APK_NAME: middle-earth-player${{ inputs.dry_run && '-dry-run' || '' }}.apk
     outputs:
       caches: ${{ steps.caches.outputs.keys }} ${{ steps.metro.outputs.key }}
     steps:
@@ -309,7 +309,7 @@ jobs:
       APP_VERSION: ${{ needs.plan.outputs.version }}
       APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
       SIGNED: ${{ needs.plan.outputs.ios_signed }}
-      IPA_NAME: middle-earth-player-${{ needs.plan.outputs.tag }}${{ inputs.dry_run && '-dry-run' || '' }}.ipa
+      IPA_NAME: middle-earth-player${{ inputs.dry_run && '-dry-run' || '' }}.ipa
       MIN_IOS_SDK: "27.1"
     outputs:
       caches: ${{ steps.caches.outputs.keys }} ${{ steps.metro.outputs.key }}
@@ -510,7 +510,6 @@ jobs:
         shell: bash
     env:
       APP_VERSION: ${{ needs.plan.outputs.version }}
-      TAG: ${{ needs.plan.outputs.tag }}
     steps:
       # Git for Windows checks text out with CRLF, which changes hashFiles('pnpm-lock.yaml'): the Windows cache keys would not
       # be the lockfile hash the cleanup job keeps, so their stale entries were never deleted.
@@ -557,7 +556,7 @@ jobs:
         name: Check and name the installers
         env:
           DRY_RUN: ${{ inputs.dry_run }}
-        run: pnpm --silent desktop stage --tag "$TAG" --out "$RUNNER_TEMP/out" --github-output $([ "$DRY_RUN" = "true" ] && echo --suffix -dry-run)
+        run: pnpm --silent desktop stage --out "$RUNNER_TEMP/out" --github-output $([ "$DRY_RUN" = "true" ] && echo --suffix -dry-run)
       # The packed app, not the checkout's: it must start, be cross-origin isolated, load a picture and a booklet page from its own bundle and
       # make no request off app://, and report the tag's version.
       - name: Launch the packed app

@@ -354,18 +354,16 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "19052:forced:1", cardCode: "19052", lines: ["19052:A:3"], timing: "forced", trigger: "characterDestroyed", subject: "self", instructions: [{ verb: "LoseGame", reason: "Urdug was destroyed" }] },
     // 19053 Urdug (enemy; Indestructible and Immune are keywords): while engaged with a player he makes an immediate attack at the beginning of the quest phase; if it deals damage Urdug and Tiny return to the staging area.
     { id: "19053:forced:1", cardCode: "19053", lines: ["19053:A:2"], timing: "forced", trigger: "beginningOfPhase", condition: { kind: "all", conditions: [{ kind: "phase", is: "Quest" }, { kind: "sourceIn", zone: "engaged" }] }, instructions: [{ verb: "ImmediateAttack" }] },
-    ...(["damagedByAttack", "characterDestroyedByAttack"] as const).map(
-      (trigger, at): Effect => ({
-        id: `19053:forced:${at + 2}`,
-        cardCode: "19053",
-        lines: ["19053:A:2"],
-        timing: "forced",
-        trigger,
-        subject: { type: "character", control: "any" },
-        condition: { kind: "all", conditions: [{ kind: "phase", is: "Quest" }, { kind: "sourceIn", zone: "engaged" }, { kind: "matches", card: "other", pick: { type: "enemy", control: "any", names: ["Urdug"] } }] },
-        instructions: [{ verb: "Pick", pick: { type: "enemy", control: "any", staging: true, names: ["Tiny"] } }, { verb: "ReturnToStaging", target: { kind: "picked" }, when: { kind: "matches", card: "picked", pick: NAMED("Tiny") } }, { verb: "ReturnToStaging", target: { kind: "self" } }],
-      }),
-    ),
+    {
+      id: "19053:forced:2",
+      cardCode: "19053",
+      lines: ["19053:A:2"],
+      timing: "forced",
+      trigger: "damagedByAttack",
+      subject: { type: "character", control: "any" },
+      condition: { kind: "all", conditions: [{ kind: "phase", is: "Quest" }, { kind: "sourceIn", zone: "engaged" }, { kind: "matches", card: "other", pick: { type: "enemy", control: "any", names: ["Urdug"] } }] },
+      instructions: [{ verb: "Pick", pick: { type: "enemy", control: "any", staging: true, names: ["Tiny"] } }, { verb: "ReturnToStaging", target: { kind: "picked" }, when: { kind: "matches", card: "picked", pick: NAMED("Tiny") } }, { verb: "ReturnToStaging", target: { kind: "self" } }],
+    },
     // 19054 Tiny (objective ally): the first player gains control of him once nothing guards him (a claim); after he exhausts the first player raises their threat by 2; the players lose the game if he is destroyed.
     { id: "19054:constant:1", cardCode: "19054", lines: ["19054:A:2"], timing: "constant", instructions: [{ verb: "GainControlWhenFree", who: "firstPlayer", claim: true }] },
     { id: "19054:forced:1", cardCode: "19054", lines: ["19054:A:3"], timing: "forced", trigger: "exhausted", subject: "self", instructions: [{ verb: "RaiseThreat", amount: 2, who: "firstPlayer" }] },

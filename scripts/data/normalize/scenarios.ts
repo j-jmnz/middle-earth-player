@@ -12,7 +12,7 @@ import {
 import { CAMPAIGNS, CAMPAIGN_SUFFIX, productOf, scenarioDefs, scenarioSlug, type CampaignDef } from "../campaign-defs.ts";
 import { PLAYER_TYPES, type Overrides } from "./cards.ts";
 import { clausesOf, codesOf, nameIndex, parseSetup, type ParsedSetup } from "./setup-text.ts";
-import { loggedHarad, pileAccepts, questFacts, stagedPerPlayer } from "./scenario-piles.ts";
+import { dealtSide, loggedHarad, pileAccepts, questFacts, stagedPerPlayer } from "./scenario-piles.ts";
 import { bookletSetsOf, setupOf } from "./scenario-text.ts";
 import { burdenSetProblems, crossCheckProblems, easyRemovals, easySheetProblem, plain, PLAYER_GROUP, type Deck } from "./scenario-checks.ts";
 import { pilesFromSetup, type Loaded } from "./setup-piles.ts";
@@ -216,9 +216,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         // One physical card with two catalog cards for its sides: `card` is the side faceup, `other` its back. A folded card (Card.back) has none.
         if (other && other.code === card.code) other = null;
         if (other && eliteFaceup && card.type !== eliteFaceup && other.type === eliteFaceup) [card, other] = [other, card];
-        // A two-sided card the Setup has the first player take control of is dealt on the side it names (Haldan, not Woodmen Village).
-        const controlled = def.takeControlFaceup === true && clausesOf(quest, "step").some((clause) => clause.step === "takeControl" && other != null && clause.codes.includes(other.code) && !clause.codes.includes(card?.code ?? ""));
-        if (other && controlled) [card, other] = [other, card];
+        ({ card, other } = dealtSide(card, other, pile, quest, def.takeControlFaceup === true));
         const was = pile;
         const moved = overrides.scenarioPiles.find((rule) => rule.scenario === id && rule.code === card?.code && (rule.from === undefined || rule.from === was));
         if (moved) pile = moved.pile;
@@ -255,8 +253,10 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
           easy.placements.set(keyOf(ship.code, "setAside"), 1);
         }
       }
-      const stormcallerStages = new Set([...normal.placements.keys()].filter((key) => key.endsWith("\u0000stormcallerQuests")).map((key) => key.split("\u0000")[0] ?? ""));
-      stages = questCodes.filter((code) => !stormcallerStages.has(code));
+      // A quest card dealt to a stormcaller deck or set aside is no stage of the players' deck.
+      const setAsideQuest = (key: string): boolean => key.split("\u0000")[1] === "setAside" && byCode.get(key.split("\u0000")[0] ?? "")?.type === "quest";
+      const notPlayersStages = new Set([...normal.placements.keys()].filter((key) => key.endsWith("\u0000stormcallerQuests") || setAsideQuest(key)).map((key) => key.split("\u0000")[0] ?? ""));
+      stages = questCodes.filter((code) => !notPlayersStages.has(code));
       const deckStages = [...normal.placements.keys()].filter((key) => key.endsWith("\u0000quest")).map((key) => key.split("\u0000")[0] ?? "");
       // The variants of one stage (Flight from Moria's seven stage 2 cards, Foundations of Stone's four stage 4 cards) are dealt in no printed order, so the load list may list them in another order than Hall of Beorn's.
       const sameStages = JSON.stringify(stages) === JSON.stringify(deckStages) || (stages.length === deckStages.length && [...stages].sort().join() === [...deckStages].sort().join() && stages.every((code, at) => stageNumber(code) === stageNumber(deckStages[at] ?? "")));

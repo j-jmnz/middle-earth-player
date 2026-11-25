@@ -1,0 +1,3154 @@
+{
+  "campaign": "the-ring-maker",
+  "conventions": [
+    "One entry per code and side. Side A is the front, side B the back of a double-sided card; a shadow effect is a line of side A.",
+    "lines are the ability text of the text box in print order, one ability per line: no title, traits, stats, flavor text, or Victory line. Keyword lines (Surge., Hide 2.) stay.",
+    "Icons are written as the words Hall of Beorn uses (Willpower, Attack, Defense, Threat, Lore, Fellowship). Apostrophes are straight.",
+    "A printed typo is written corrected in lines, and the printed wording is kept under misprints.",
+    "inert lists line numbers that need no effect record, with the reason. A line that is only keywords the engine reads is owned by the keyword."
+  ],
+  "entries": [
+    {
+      "code": "07059",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Fight-at-the-Fords-1A.jpg",
+        "sha256": "4efc95606a85450396fad7092e0bfeb92ccb9ffd18b800e63f5a40fe91fbdb07"
+      },
+      "lines": [
+        "Setup: Add The Islet to the staging area and attach Gríma to that location. Each player searches the encounter deck for 1 different Dunland enemy and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07062",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orders-from-Orthanc-1A.jpg",
+        "sha256": "8ca8caa0f0ac07fb35e00d73688fcd6a39566524069ff266ecd2de3690921061"
+      },
+      "lines": [
+        "Setup: Each player removes the top 20 cards of his deck and places them aside, as an out-of-play deck. The first player takes Mugash plus 1 Mugash's Guard for each other player in the game and randomly shuffles one facedown into each player's out-of-play deck. Place any remaining copies of Mugash's Guard aside, out of play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07065",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Into-the-Woods-1A.jpg",
+        "sha256": "b87c5510fce1df325dfbb48595f9e6cf1f391eb5d03b148f5db9f5b035266cb9"
+      },
+      "lines": [
+        "Setup: Add Edge of Fangorn to the staging area and attach Mugash to that location. Shuffle the encounter deck. Reveal X encounter cards where X equals the number of players in the game minus 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08011",
+      "side": "A",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/The-Road-to-Tharbad-1A.jpg",
+        "sha256": "9b0cc210aa6104d3a76054a4e7af12ebd9abfa239aea4fe6c20acd963a057046"
+      },
+      "lines": [
+        "Setup: Set Chief Turch and Munuv Dûv Ravine aside, out of play. Make Old South Road the active location. Each player searches the encounter deck for a Boar Clan enemy and puts it into play engaged with him. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08035",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Trials-Begin-1A.jpg",
+        "sha256": "077fcd39871226ecc1b4880ef32584bba9009b776c934bce63a1c569975238d3"
+      },
+      "lines": [
+        "Setup: Set aside all 3 Guardian enemies, all 3 Key objectives, all 3 Barrow locations, and Hallowed Circle."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08066",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Double-Dealings-1A.jpg",
+        "sha256": "863c0e48badb6608820f0335624e6e0d6511e07ec82ba64cf8c41a4188555265"
+      },
+      "lines": [
+        "Setup: Set Bellach and The Crossing at Tharbad aside, out of play. Search the encounter deck for 1 copy of Spy From Mordor per player, and add them to the staging area. Make The Empty Mug the active location. The first player takes control of Nalir, as an ally. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08094",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Fleeing-from-Tharbad-1A.jpg",
+        "sha256": "71c0434e94a14cda762387dba90845a5d48969a9d1332b326ae90cbcdb073c22"
+      },
+      "lines": [
+        "Setup: The first player takes control of Nalir. Set the Ancient Marsh-dweller aside, out of play. Each player searches the encounter deck for a different location and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08122",
+      "side": "A",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/The-Ruins-of-Ost-in-Edhil-1A.jpg",
+        "sha256": "c8ad360784ba4cc19123e3624208ce2840b5e172ace008551936ac9d4d1a87d4"
+      },
+      "lines": [
+        "Setup: Add Bellach, The Orcs' Search, and The Secret Chamber to the staging area. Attach Celebrimbor's Mould to The Secret Chamber. Each player adds a different Ost-in-Edhil location to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08147",
+      "side": "A",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Battle-for-Dunland-1A.jpg",
+        "sha256": "3563d554818b18c5b38f68fbf8f72e7a298992027331f013fe02c7a30549b19e"
+      },
+      "lines": [
+        "Setup: The first player takes control of Chief Turch. Set Raven Chief and Raven Chief's Camp aside, out of play. Reveal 1 copy of Dunland Battlefield and make it the active location. Reveal 1 copy of Raven War-camp and add it to the staging area. Create the Raven deck (see insert) and set it next to the quest deck. Each player chooses 1 different enemy from the Raven deck and adds it to the staging area. Shuffle the encounter deck and Raven deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07016",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Gríma-Objective-Ally.jpg",
+        "sha256": "0138b25d9ef447956820f456fedde7a5af8ee0e02474d52d6bd16e6ac85a3cac"
+      },
+      "lines": [
+        "If free of encounters, the first player gains control of Gríma.",
+        "Action: Exhaust Gríma to draw a card.",
+        "If Gríma leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07017",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/The-Islet.jpg",
+        "sha256": "8e74f9c7c44c9146a0493b3e890f25278e12fac6447a9275c5043cc6c6fbad21"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "While The Islet is the active location, each Dunland enemy in play gets +1 Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07018",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Fords-of-Isen.jpg",
+        "sha256": "8df06678a6cf142b82bb9a905df84f593ef4b2800e592711ceaf8ae71b70201d"
+      },
+      "lines": [
+        "While Fords of Isen is in the staging area, players cannot gain resources from card effects.",
+        "Forced: After Fords of Isen becomes the active location, each player with fewer than 5 cards in his hand draws cards until he has 5 in his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07019",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/The-King's-Road.jpg",
+        "sha256": "263c431f2ab13a8c155870bfb747e7a97699292965f964156c75cc632dbba269"
+      },
+      "lines": [
+        "While any player has 3 or more cards in hand, The King's Road gets +3 quest points.",
+        "While any player has 5 or more cards in hand, The King's Road gains: 'When faced with the option to travel, the players must travel to The King's Road, if able.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07020",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Gap-of-Rohan.jpg",
+        "sha256": "737e643a141f395a8a7badd230e11e10efb279c3170b65c1d2c1b887b2ea65a3"
+      },
+      "lines": [
+        "While Gap of Rohan is in the staging area, Dunland enemies get +1 Attack.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, remove 1 time counter from the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07021",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Pillaging-and-Burning.jpg",
+        "sha256": "59963a4bd77f3558ad4df931d6c37f5592d7c40acfbb30c737c49a8e7466f47c"
+      },
+      "lines": [
+        "When Revealed: Each player draws a card. Each player raises his threat by 1 for each card in his hand.",
+        "Shadow: Defending player discards an attachment he controls (each attachment he controls instead if this attack is undefended)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07022",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Down-from-the-Hills.jpg",
+        "sha256": "60f95a5a39663cb58fa0084a9d7ba2cb3f7c211412f411e2109ed32c274d7af3"
+      },
+      "lines": [
+        "When Revealed: Each player must choose: Either remove 1 time counter from the current quest, or search the encounter deck and discard pile for a Dunland enemy, reveal it, and add it to the staging area. Shuffle the encounter deck. If any player has 5 or more cards in hand, this effect cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07023",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Ill-Tidings.jpg",
+        "sha256": "f908d6d40cc728383ff19a37ecbdb62153df14c3bfadca23e85f25be3d82f9cf"
+      },
+      "lines": [
+        "When Revealed: The first player draws this card into his hand. Ill Tidings cannot leave that player's hand. Then, if the first player has 5 or more cards in his hand, Ill Tidings gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07042",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dunland-Prowler.jpg",
+        "sha256": "15d1fc5223157c99ba5582cef8f4bc0937256f0e04ad000c6ab40e23c9934a07"
+      },
+      "lines": [
+        "While any player has 3 or more cards in hand, Dunland Prowler gains surge.",
+        "While any player has 5 or more cards in hand, Dunland Prowler gets +1 Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07043",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dunlending-Bandit.jpg",
+        "sha256": "0db9f2fe3cae3a5011314005e50a9597b6b673b644f40c70884f9a7df884b675"
+      },
+      "lines": [
+        "While engaged with a player, Dunlending Bandit gets +1 Attack for each card in that player's hand.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending player has at least 3 cards in his hand)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07044",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dunland-Raider.jpg",
+        "sha256": "4171bc3db90e384007d7bc53acb9481d54dfd52caa3bd5636cfaeacf552c303c"
+      },
+      "lines": [
+        "Forced: After Dunland Raider engages a player, that player must deal X damage divided among characters he controls where X equals the number of cards in his hand.",
+        "Shadow: Discard an attachment you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07045",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Old-Hatreds.jpg",
+        "sha256": "d0bd250dfd85bcaf06b74f496bebdd1181de75dd08fef285906bf6a088fc053f"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Attach to the current quest. (Counts as a Condition attachment with the text: 'Forced: After a player draws any number of cards, raise his threat by 1.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07046",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dunland-Tribesman.jpg",
+        "sha256": "e9b8e44a07ac64e5e2b339d5589085124e0df8ea6d3dff0e1e4af93088ca36ce"
+      },
+      "lines": [
+        "When Revealed: Each player draws a card.",
+        "Forced: After a player draws any number of cards, Dunland Tribesman gets +1 Threat until the end of the round.",
+        "Shadow: Attacking enemy gets +1 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07047",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dunland-Chieftain.jpg",
+        "sha256": "01b2595b7ddbdba581f2307ef797d4e939af642fc8d528107d680ffe9b171f7a"
+      },
+      "lines": [
+        "Forced: After Dunland Chieftain engages a player, discard X cards from the top of the encounter deck where X is the number of cards in the engaged player's hand. Put the topmost Dunland enemy discarded this way into play engaged with that player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07048",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dunland-Berserker.jpg",
+        "sha256": "f89c073c9ad564ee6c6acbda72bdd40e6cc3ba6ad657bfb4868e125bd9e7a336"
+      },
+      "lines": [
+        "Forced: After the engaged player draws any number of cards, Dunland Berserker makes an attack.",
+        "Shadow: Attacking enemy makes an additional attack after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07049",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Wild-Men-of-Dunland.jpg",
+        "sha256": "e8ab31a75c1fcc7488a6b829762bd48b68f8a682c0bf7913eea065ba04ff2fcc"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Attach to the current quest. (Counts as a Condition attachment with the text: 'Forced: After a player draws any number of cards, that player deals 1 damage to a character he controls.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07059",
+      "side": "B",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Fight-at-the-Fords-1B.jpg",
+        "sha256": "935405e29fa6578f79f5b3d6756fd787b3bc316d54190fc02846e5da9e2ed6c4"
+      },
+      "lines": [
+        "Time 5.",
+        "Forced: After the last time counter is removed from this stage, discard Gríma from play.",
+        "The players cannot advance unless the first player controls Gríma."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07060",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dunlending-Attack-2A.jpg",
+        "sha256": "493942bca088e16e7d590878cbc79147303db03dec1bd796e6b5b3ac7ddc5316"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07060",
+      "side": "B",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dunlending-Attack-2B.jpg",
+        "sha256": "6e9290e9257fbf3a83e78d0a06781e6b191ab8f620ae07bef5a7dcbe0e36be4b"
+      },
+      "lines": [
+        "When Revealed: Each player searches the encounter deck and discard pile for 1 different Dunland enemy and adds it to the staging area. Shuffle the encounter deck.",
+        "Time 2.",
+        "Forced: After the last time counter is removed from this stage, each player assigns X damage among characters he controls where X is the number of cards in his hand. Place 2 time counters on this stage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07061",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Hold-the-Fords-3A.jpg",
+        "sha256": "82088889892ec6d0277d15eedd24408761daf00c10bfb48c1ee120fb92b80609"
+      },
+      "lines": [
+        "When Revealed: Each player searches the encounter deck and discard pile for a different Dunland enemy and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07061",
+      "side": "B",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Hold-the-Fords-3B.jpg",
+        "sha256": "caee8a2745532ac60b4d61c45faff7896d96dbe553544d12415a27cd9afbd259"
+      },
+      "lines": [
+        "Time 3.",
+        "Forced: After the last time counter is removed from this stage, discard the top X cards of the encounter deck. X is the number of cards in the first player's hand. Add each enemy discarded this way to the staging area. Put 3 time counters on this stage.",
+        "While there is at least 1 enemy in play, the players cannot defeat this stage. If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07024",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Mugash-Enemy.jpg",
+        "sha256": "b1fb5053150878c63e346bf5a331a6e44da7ded3e461d3933542cb4097be17ee"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Forced: After Mugash is defeated, the first player attaches him to a hero he controls and exhausts that hero. (Counts as a Captive attachment with the text: 'Attached hero cannot ready. If attached hero leaves play, the players lose the game.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07025",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Mugash's-Guard.jpg",
+        "sha256": "f89b6703d81ff4c72b5aab25142dfeb49a6c19021b5d043a53fd4031e8e4790d"
+      },
+      "lines": [
+        "While a player controls a hero with Mugash attached, Mugash's Guard engages that player.",
+        "Forced: After Mugash's Guard destroys a character, if Mugash is attached to a hero, return Mugash to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07026",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Methedras-Orc.jpg",
+        "sha256": "26670fd903b1a79864720babf908e3d0a2aea4deac374c21974723a70f852168"
+      },
+      "lines": [
+        "Forced: When Methedras Orc attacks, the defending player shuffles 1 random card from his hand into his out-of-play deck.",
+        "Shadow: If this attack destroys a character, remove 1 time counter from the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07027",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Methedras.jpg",
+        "sha256": "6189eb806d1ebb59bb533e5e68f768f2479dd62abc25481510cd84bd7e03467d"
+      },
+      "lines": [
+        "While Methedras is the active location, each location in the staging area gets +1 Threat.",
+        "Forced: When Methedras leaves play as an explored location, each player Searches 3."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07028",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orc-Cave.jpg",
+        "sha256": "05973495a53864ed159f2bb92ee7512cfee359dd170d345973c01d5ba0d59feb"
+      },
+      "lines": [
+        "Forced: After Orc Cave leaves play as an explored location, the first player Searches 5.",
+        "Travel: Discard the top X cards of the encounter deck to travel here. X is the number of players in the game. Add each Orc enemy discarded this way to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07029",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Mugash's-Lair.jpg",
+        "sha256": "70980188896ced8b46995879e4f19390ce6979ba8bfd42804084d4b78b931326"
+      },
+      "lines": [
+        "Forced: At the beginning of the encounter phase, reveal the top card of each player's out-of-play deck. Add each revealed enemy to the staging area and discard the rest.",
+        "Shadow: Defending player discards an attachment he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07030",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orc-Territory.jpg",
+        "sha256": "59938a709fe83134a97ab1537ffb761828bb362c66e913864e98a704176e2505"
+      },
+      "lines": [
+        "When Revealed: Each player searches the encounter deck and discard pile for a location and adds it to the staging area. If the total Threat in the staging area is less than the total Willpower of all characters committed to the quest, each Orc enemy engaged with a player makes an immediate attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07038",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orc-Skirmisher.jpg",
+        "sha256": "cd0e9281e9e654d90361be0b18d9d77cd516250be774f059f6a38076502b4138"
+      },
+      "lines": [
+        "Forced: After Orc Skirmisher engages a player, that player must either deal 3 damage to a character he controls, or remove 1 time counter from the current quest.",
+        "Shadow: Attacking enemy gets +1 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07039",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orc-Hunter.jpg",
+        "sha256": "3c90b78128589ee42428e19981ba6e8ad4307753ada6a7d8887fcb64f2260d5b"
+      },
+      "lines": [
+        "When Revealed: Either reveal an additional encounter card, or remove 1 time counter from the current quest.",
+        "Shadow: Attacking enemy makes an additional attack after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07040",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orc-Hound.jpg",
+        "sha256": "65a70301133c02d44a3a1740e6dde62f63146ab38d534bd7e615d53a1e115c51"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: After Orc Hound engages a player, that player must exhaust a character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07041",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orc-Hunting-Party.jpg",
+        "sha256": "d3347a684428769541926ad694493a179954c7d6fa499a9c0ccfc3c2564ded33"
+      },
+      "lines": [
+        "When Revealed: Deal each Orc enemy in play a shadow card. Each Orc enemy gets -15 engagement cost until the end of the round. If there are no Orc enemies in the staging area, Orc Hunting Party gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07053",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Prowling-Wolf.jpg",
+        "sha256": "c6b85fe0bfbba50dbf695266f787ff188fa3e0546012232d375be71c4d6ffee7"
+      },
+      "lines": [
+        "While engaged with a player, Prowling Wolf gets +1 Attack for each location in the staging area.",
+        "Shadow: Defending player exhausts a character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07054",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Broken-Lands-Location.jpg",
+        "sha256": "3a6c21d1639f9f3cfc6dd00be8e62dcce7d2a7dca9703595cff978e9b7394b96"
+      },
+      "lines": [
+        "While Broken Lands is in the staging area, progress cannot be placed on locations in the staging area.",
+        "Shadow: Attacking enemy gets +1 Attack for each location in the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07055",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Take-Cover.jpg",
+        "sha256": "6e385477e43448f0a7106a8ef0267b87debe6aba4d0178a80302f0b966fe99b0"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Either deal 1 damage to each exhausted character, or remove 1 time counter from the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07062",
+      "side": "B",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orders-from-Orthanc-1B.jpg",
+        "sha256": "e8e46880c55d3f61be59ffd1b75c034033ac6689596753caf4dca8017e9eb065"
+      },
+      "lines": [
+        "When Revealed: Each player searches the encounter deck for a Mountain location and adds it to the staging area. Shuffle the encounter deck. Then, advance to stage 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07063",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Searching-for-Mugash-2A.jpg",
+        "sha256": "3548fa975ba6916e412c77644dd5613702f4756e795bf2712dbcb12389b772c2"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07063",
+      "side": "B",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Searching-for-Mugash-2B.jpg",
+        "sha256": "8fa9cccc4889dbd98e743bbc672b183451f9ee6a386eaafda44324a5c9b1cce4"
+      },
+      "lines": [
+        "Time 2.",
+        "Forced: After the last time counter is removed from this stage, shuffle the discard pile into the encounter deck and reveal 2 encounter cards per player. Place 2 time counters on this stage.",
+        "Response: After questing successfully, cancel all progress that would be placed on this stage. Then, place 1 time counter on this stage. Or, if Mugash is in play, advance to stage 3."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07064",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/The-Wizard's-Prize-3A.jpg",
+        "sha256": "a04707543424d31add5e5b1f2e5b31a4834f1b9d6fb91ac9cd216b641e455ac3"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07064",
+      "side": "B",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/The-Wizard's-Prize-3B.jpg",
+        "sha256": "cbd9f31052a0db265ae3df10c7f8fd8a85d65800e2a436e1fd8341a686ff5a00"
+      },
+      "lines": [
+        "Time 3.",
+        "Forced: After the last time counter is removed from this stage, return Mugash to the staging area and reveal X encounter cards. X is the number of players in the game minus 1. Place 3 time counters on this stage.",
+        "Progress cannot be placed on this stage unless Mugash is attached to a hero.",
+        "If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07031",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Mugash-Objective.jpg",
+        "sha256": "4e34a3938541e38a427311192103ddacf7e43181f6e3f5f30ea136a9dc95a836"
+      },
+      "lines": [
+        "Guarded.",
+        "Action: Exhaust a hero to claim this objective when it is free of encounters. Attach Mugash to that hero.",
+        "Forced: After attached hero takes damage, return Mugash to the top of the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07032",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Edge-of-Fangorn.jpg",
+        "sha256": "5bc66d2d9df0e777caa74d68bf3092ecf0ffc71fc4acf289931d70f57388d87f"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Travel: Search the encounter deck and discard pile for a Huorn enemy and add it to the staging area to travel here (2 Huorn enemies instead if there are 3 or more players in the game)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07033",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Dark-Hearted-Huorn.jpg",
+        "sha256": "fc8d569c829e943bb3f6b1853dc4f914e6766cb4d51db5c912b3ad6a2c8d73ec"
+      },
+      "lines": [
+        "Hinder. Cannot have attachments.",
+        "Forced: At the beginning of each resource phase, the engaged player must raise his threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07034",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Angry-Huorn.jpg",
+        "sha256": "7a10bc2fd90c1bdff236dd9d9cf6f283489fc88c389b901d651dc3b11a9f5fd5"
+      },
+      "lines": [
+        "Hinder. Cannot have attachments.",
+        "Forced: At the beginning of each resource phase, Angry Huorn attacks the engaged player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07035",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Deadly-Huorn.jpg",
+        "sha256": "0ee88d14fcbe13e445d5b3c2c3857977c5c6d03c1092aa43a4fd6bf30cccd937"
+      },
+      "lines": [
+        "Hinder. Cannot have attachments.",
+        "Forced: At the beginning of each resource phase, the engaged player must deal 3 damage to a character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07036",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Heart-of-Fangorn.jpg",
+        "sha256": "1ce92ee1e0d24258fb5adb74fe33a26790f84436abf1875ab54f76f7c538c197"
+      },
+      "lines": [
+        "While Heart of Fangorn is in the staging area, each player cannot refresh more than 5 characters during the refresh phase.",
+        "Shadow: Attacking enemy makes an additional attack after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07037",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/The-Forest's-Malice.jpg",
+        "sha256": "b67f3b9d758b12da065e54890daf4f4962fc5a1591e8e23d78a8a9471ef49ebd"
+      },
+      "lines": [
+        "When Revealed: Each Huorn enemy engaged with a player makes an immediate attack. If no attack was made as a result of this effect, each player must search the encounter deck and discard pile for a Huorn enemy and put it into play engaged with him. This effect cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07050",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Ancient-Forest-Location.jpg",
+        "sha256": "50eda95dadf6fc42e43b65d1515fe8c326c2f565a4402077078095f687b7bc95"
+      },
+      "lines": [
+        "While Ancient Forest is in the staging area, each Forest location in the staging area gets +1 Threat and +3 quest points. This ability does not stack with other copies of Ancient Forest.",
+        "Shadow: Defending player exhausts a character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07051",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Tangled-Woods.jpg",
+        "sha256": "b0ad57e8158b69296e7518174608b50b6a8a91ff2f677e68b24d41c101b9e0c8"
+      },
+      "lines": [
+        "While Tangled Woods is in the staging area, each Forest location in play gains: 'Travel: Exhaust a hero to travel here.' This ability does not stack with other copies of Tangled Woods."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07052",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Turned-Around.jpg",
+        "sha256": "0a732c6ac410024ae959ec12f276b252e82a5c501bc8cac975182f0a6d091cac"
+      },
+      "lines": [
+        "When Revealed: Either remove 1 time counter from a card in play, or return the active location to the staging area.",
+        "Shadow: If this attack is undefended, return the active location to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07056",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Low-on-Provisions.jpg",
+        "sha256": "6c6715ba877d7bc1f7d730fc63fb92781de11cf2edec983e555b95e3e4f59987"
+      },
+      "lines": [
+        "When Revealed: Each player must assign X damage among characters he controls where X is the number of characters that player controls.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character is undamaged.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07057",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Off-Track.jpg",
+        "sha256": "2b3c809bc0acb693fff5242cd8e1f8f0fa5bbc421b831a265efd642acc42a3ff"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Attach to a location in play. (Counts as a Condition attachment with the text: 'Limit 1 per location. Attached location gets +2 quest points and Gain: 'Forced: Remove an additional time counter from the current quest at the end of each refresh phase, if able.'')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07058",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/In-Need-of-Rest.jpg",
+        "sha256": "12970bb613c462bce3b026b41e602873b4a3fb4c1f154fc69ae1186cd905ec0b"
+      },
+      "lines": [
+        "When Revealed: Remove a hero from the quest and attach In Need of Rest to that hero. (Counts as a Condition attachment with the text: 'Limit 1 per hero. Forced: After a time counter is removed from the current quest, attached hero takes 1 damage.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07065",
+      "side": "B",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Into-the-Woods-1B.jpg",
+        "sha256": "f916bbe4ed05fed150b57a5c072871609ecd63b974bcf9592886025652a03dd2"
+      },
+      "lines": [
+        "Time 4.",
+        "Forced: After the last time counter is removed from this stage, shuffle Mugash into the encounter deck and advance to stage 3.",
+        "The players cannot advance to stage 2 unless Mugash is attached to a hero."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07066",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Escape-from-Fangorn-2A.jpg",
+        "sha256": "5ab8e820796d0051ea15abd8bd2aa9c3d3eda1f2b7c5d518ba9f4d3164f1f395"
+      },
+      "lines": [
+        "When Revealed: Each player searches the encounter deck and discard pile for a Huorn enemy and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07066",
+      "side": "B",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Escape-from-Fangorn-2B.jpg",
+        "sha256": "0674719e8131acdac981a0eb13649ca37067f84f9fd5b42ea3769d95d11b0317"
+      },
+      "lines": [
+        "Time 4.",
+        "Forced: After the last time counter is removed from this stage, shuffle Mugash into the encounter deck and advance to stage 3A.",
+        "The players cannot defeat this stage unless Mugash is attached to a hero.",
+        "If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07067",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/The-Angry-Forest-3A.jpg",
+        "sha256": "5fdb1303a01302bcd0169a0eae387eb8a0f973d358ac591f5c52ba477f5ee527"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "07067",
+      "side": "B",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/The-Angry-Forest-3B.jpg",
+        "sha256": "5666fa7ebf9146eadc245a96e0b7b7c1a91087ed224ac1f19d2d3ee34f3f41e1"
+      },
+      "lines": [
+        "Time 3.",
+        "Forced: After the last time counter is removed from this stage, discard the top 5 cards of the encounter deck. Each player must choose an enemy or objective in the discard pile, reveal it and add it to the staging area. Place 3 time counters on this stage.",
+        "Forced: After placing progress here, if there is at least 6 progress on this stage and Mugash is attached to a hero, advance to stage 2A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08011",
+      "side": "B",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/The-Road-to-Tharbad-1B.jpg",
+        "sha256": "663252f21baa83ff250d2112be5758220e1c9bcf350411152107e62f53479f47"
+      },
+      "lines": [
+        "Time 2.",
+        "Forced: After the last time counter is removed from this stage, each player discards his hand and draws 2 cards. Place 2 time counters on this stage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08012",
+      "side": "A",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/A-Well-Laid-Trap-2A.jpg",
+        "sha256": "728c66dee88f79db0b2d8455f491ff3d7a32c9c98776841b7ecef7ee7c72b81f"
+      },
+      "lines": [
+        "When Revealed: Make Munuv Dûv Ravine the active location (returning any previous active location to the staging area). Each player discards each Item and each Mount attachment he controls. Each player chooses 1 ally he controls and discards each other ally he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08012",
+      "side": "B",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/A-Well-Laid-Trap-2B.jpg",
+        "sha256": "fdd50284299e9f858e9f30fe2a4c4d9d0b50b9ef5cace7ee38ffef0f3b6eed54"
+      },
+      "lines": [
+        "When Revealed: Each player searches the encounter deck and discard pile for a Boar Clan enemy and puts it into play engaged with him. Shuffle the encounter deck. Each player shuffles his discard pile into his draw deck and draws 1 card.",
+        "Forced: At the end of the combat phase, advance to stage 3A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08013",
+      "side": "A",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/No-Way-Out-3A.jpg",
+        "sha256": "0a4dcecacda13b8a5988fd195dc3a9b099ca8d24329f63dc8bfd251037ae149d"
+      },
+      "lines": [
+        "When Revealed: Put Chief Turch into play, engaged with the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08013",
+      "side": "B",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/No-Way-Out-3B.jpg",
+        "sha256": "fbb3e102359bcbbd91159c021eba677f0d4be2df406ab8a875ea277bfd1c9745"
+      },
+      "lines": [
+        "Time X. X is 5 times the number of players in the game.",
+        "If a hero is destroyed at this stage, the players lose the game.",
+        "Forced: After the last time counter is removed from this stage, the players make engagement checks. Then, each engaged enemy makes an attack. If no heroes are destroyed by these attacks, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08014",
+      "side": "A",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Chief-Turch.jpg",
+        "sha256": "c2dfd490f074a59de0be572924ca0550c181109e503e7c2f0fb3f21428f1919e"
+      },
+      "lines": [
+        "Cannot have attachments. Cannot leave play.",
+        "Chief Turch engages the first player.",
+        "Forced: After an enemy engages a player, remove 1 time counter from the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08015",
+      "side": "A",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Munuv-Dûv-Ravine.jpg",
+        "sha256": "f461dc212fa2e59360d1edb95dbbb5094f713a33ead3f00c486a626ebf5346ac"
+      },
+      "lines": [
+        "Dunland enemies get +1 Attack and +1 Defense."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08016",
+      "side": "A",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Old-South-Road.jpg",
+        "sha256": "0b37ef896b608c33346f995f95a35a72cf0a5e450ac30c3880ffc90206313cb0"
+      },
+      "lines": [
+        "Forced: At the end of the refresh phase, remove 1 time counter from the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08017",
+      "side": "A",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Boar-Clan-Stalker.jpg",
+        "sha256": "b737b329ede63bb32add6eca0c40f1b357e21c17e1f23aa58aebe896829a6b8c"
+      },
+      "lines": [
+        "Boar Clan Stalker gets +1 Attack and +1 Defense for each resource token on it (limit +4).",
+        "Forced: After the engaged player draws any number of cards, put a resource token on Boar Clan Stalker."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08018",
+      "side": "A",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Boar-Clan-Warrior.jpg",
+        "sha256": "fe8195be85aa4f1c6190c94bafdaf00244b7371d5be1dfe4c84b9a65448b7300"
+      },
+      "lines": [
+        "Forced: After the engaged player draws any number of cards, deal Boar Clan Warrior a shadow card.",
+        "Shadow: Attacking enemy gets +1 Attack for each shadow card on it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08019",
+      "side": "A",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Hithaeglir-Foothills.jpg",
+        "sha256": "a981948a5facc39db36b86aa897bdd97942a591496ca152c4572d21289f1f4ca"
+      },
+      "lines": [
+        "Surge.",
+        "X is the number of resource tokens on this card.",
+        "Forced: After a player draws any number of cards, place 1 resource token here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08020",
+      "side": "A",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Hills-of-Dunland.jpg",
+        "sha256": "f9e1aaeb23fa92b8efe91babfed3f42060437df7ebd919eedfce04045bb9a1ac"
+      },
+      "lines": [
+        "While Hills of Dunland is in the staging area, it gains: 'Forced: After a player draws any number of cards, discard the top card of the encounter deck. If the discarded card is a Dunland enemy, put it into play engaged with that player. This ability does not stack with other copies of Hills of Dunland.'",
+        "Travel: Each player draws a card to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08021",
+      "side": "A",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Plains-of-Enedwaith.jpg",
+        "sha256": "fabbd8770e5650978a2ab2eafc91579aca40ba83aadddbf3cc8d9a02d031c7f5"
+      },
+      "lines": [
+        "While Plains of Enedwaith is the active location, players do not draw a card during the resource phase.",
+        "Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if undefended)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08022",
+      "side": "A",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Hithaeglir-Stream.jpg",
+        "sha256": "0845650a51d2892f7aabda723a06e7da068a4c32187d8da74d788b14d5623a58"
+      },
+      "lines": [
+        "While Hithaeglir Stream is the active location, players draw 2 cards during the resource phase instead of 1.",
+        "Shadow: Attacking enemy gets +1 Attack. Deal it an additional shadow card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08023",
+      "side": "A",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Frenzied-Attack.jpg",
+        "sha256": "6c260a7f80f0fa9be8240c3e756240bb01732a4341bec27c72ba97a417ba6c72"
+      },
+      "lines": [
+        "When Revealed: Each player draws a card. Each player discards each ally from his hand. If no allies are discarded this way, Frenzied Attack gains surge.",
+        "Shadow: Until the end of the round, attacking enemy cannot take damage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08024",
+      "side": "A",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/Dunlending-Ambush.jpg",
+        "sha256": "673287e13d9cc2987ec624d9340ba35746f541809d6751f209256bc3da6fcb97"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Attach to the active location. (Counts as a Condition attachment with the text: 'Limit 1 per location. Forced: After attached location is explored, each player searches the encounter deck and discard pile for a Dunland enemy and puts it into play engaged with him. Shuffle the encounter deck.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08035",
+      "side": "B",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Trials-Begin-1B.jpg",
+        "sha256": "7981b77d9535065a750816e5c0105a05f51693bdfa7749d6237c668e0765437c"
+      },
+      "lines": [
+        "When Revealed: The players advance to a stage 2A quest of their choice."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08036",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Trial-of-Strength-2A.jpg",
+        "sha256": "ba025f942b51991d7fa92bd7e0692fe5126ea5ca41526c81b4194ce283c52b32"
+      },
+      "lines": [
+        "When Revealed: Randomly choose 1 of the remaining set aside Guardian enemies and 1 of the remaining set aside Barrow locations, reveal them, and add them to the staging area. Find the set aside Key objective that shares a Trait with the just revealed Guardian enemy and attach it to that enemy."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08036",
+      "side": "B",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Trial-of-Strength-2B.jpg",
+        "sha256": "5df7a5c274993060589f27e6931691eb26ce7fa47b42a6cdd1e1895229c8f376"
+      },
+      "lines": [
+        "Each Guardian enemy engages the first player. Barrow locations cannot be the active location and are immune to player card effects.",
+        "When the players control the current trial's Key objective, add all Barrow locations in play to the victory display and immediately advance to a stage 2A of the players' choice. If all stage 2 quests have been defeated, advance to stage 3A, instead."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08037",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Trial-of-Perseverance-2A.jpg",
+        "sha256": "23378e586dbed0ef08566e4ce4d64cf6764ca3419b88eb56c4a16c14b4a686b9"
+      },
+      "lines": [
+        "When Revealed: Randomly choose 1 of the remaining set aside Barrow locations and add it to the staging area. Then, randomly choose 1 of the remaining set aside Key objectives and attach it to that Barrow location. Find the set aside Guardian enemy that shares a Trait with the Key objective in play and reveal it, adding it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08037",
+      "side": "B",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Trial-of-Perseverance-2B.jpg",
+        "sha256": "6dbc53d09805dee475a7ea896e9ec7395c14cb08d4c5f91bee1d03d14fc8430b"
+      },
+      "lines": [
+        "Each Guardian enemy engages the first player. Guardian enemies cannot be damaged or leave play except by quest effect.",
+        "When the players control the current trial's Key objective, add all Guardian enemies in play to the victory display and immediately advance to a stage 2A of the players' choice. If all stage 2 quests have been defeated, advance to stage 3A, instead."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08038",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Trial-of-Intuition-2A.jpg",
+        "sha256": "890657dbe91d90106126a20e04a152ebfe0a2d3e28caa37341a674bd731deeec"
+      },
+      "lines": [
+        "When Revealed: Randomly choose 1 of the remaining set aside Guardian enemies and 1 of the remaining set aside Barrow locations, reveal them, and add them to the staging area. Shuffle the encounter discard pile into the encounter deck. Find the set aside Key objective that shares a Trait with the just revealed Guardian enemy and shuffle it into the bottom 10 cards of the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08038",
+      "side": "B",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Trial-of-Intuition-2B.jpg",
+        "sha256": "c371ceec050aa79c8fdfb1829746bc26af278e86cfcaf4f0cd435c9506e433c9"
+      },
+      "lines": [
+        "Each Guardian enemy engages the first player. Any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead. (Progress is placed on the active location before triggering this effect.)",
+        "When the players control the current trial's Key objective, add all Guardian enemies and Barrow locations in play to the victory display and immediately advance to a stage 2A of the players' choice. If all stage 2 quests have been defeated, advance to stage 3A, instead."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08039",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Antlered-Crown-3A.jpg",
+        "sha256": "e2bdef44dff82e4e9b61a930e15b497ca2008217ed7226bb776fe62f028502c6"
+      },
+      "lines": [
+        "When Revealed: Add Hallowed Circle to the staging area. Reveal each Guardian enemy in the victory display, adding them to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08039",
+      "side": "B",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Antlered-Crown-3B.jpg",
+        "sha256": "7e901ccb0f4673d7f91a0ab374ac5def9277715a2cbdcd20eea700ac444070f5"
+      },
+      "lines": [
+        "Each Guardian enemy engages the player who controls the Key objective with a Trait shared by that enemy.",
+        "Players cannot defeat this stage unless Hallowed Circle is in the victory display. If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08040",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Boar's-Guardian.jpg",
+        "sha256": "d258214adf3ccaff7a799def599599df9c98e1ac0089b02d9ac3db2ff4000a8b"
+      },
+      "lines": [
+        "Cannot have non-Key attachments.",
+        "Time 2. Forced: After the last time counter is removed from Boar's Guardian, the engaged player must discard an ally he controls. Place 2 time counters on Boar's Guardian."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08041",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Wolf's-Guardian.jpg",
+        "sha256": "3ba6f86f76f6f92574729d0a5670805e1cd0692b22bbceaa844bd4a117bacfcd"
+      },
+      "lines": [
+        "Cannot have non-Key attachments.",
+        "Time 3. Forced: After the last time counter is removed from Wolf's Guardian, it makes an immediate attack against the engaged player. Place 3 time counters on Wolf's Guardian."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08042",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Raven's-Guardian.jpg",
+        "sha256": "c0794135a7c392fd8507626223f9c925e89b14dab132c6a3d12a8d80c8dc56f9"
+      },
+      "lines": [
+        "Cannot have non-Key attachments.",
+        "Time 4. Forced: After the last time counter is removed from Raven's Guardian, deal 1 damage to each character controlled by the engaged player. Place 4 time counters on Raven's Guardian."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08043",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Key-of-the-Boar.jpg",
+        "sha256": "7a1b77aac76bd4f8134eff987fe7c9b66b4f626aa39a98127f3475b6b645efd6"
+      },
+      "lines": [
+        "If unattached, the first player must claim Key of the Boar and attach it to a hero he controls.",
+        "If Key of the Boar is discarded, add it to the staging area.",
+        "Shadow: Shuffle Key of the Boar back into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08044",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Key-of-the-Wolf.jpg",
+        "sha256": "29e764db7acd8d37f5d3f26dfdefd2ce83132aa0bac81a72d586343d473d0980"
+      },
+      "lines": [
+        "If unattached, the first player must claim Key of the Wolf and attach it to a hero he controls.",
+        "If Key of the Wolf is discarded, add it to the staging area.",
+        "Shadow: Shuffle Key of the Wolf back into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08045",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Key-of-the-Raven.jpg",
+        "sha256": "195ec2d59ef29a021f3b62013a4f1879dfcbdf0a1fe9e7796a7174324acae84e"
+      },
+      "lines": [
+        "If unattached, the first player must claim Key of the Raven and attach it to a hero he controls.",
+        "If Key of the Raven is discarded, add it to the staging area.",
+        "Shadow: Shuffle Key of the Raven back into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08046",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Hill-Barrow.jpg",
+        "sha256": "22823314853865fbd32d4bcf706aea4b81bbbe364b256eb169f488ed99454643"
+      },
+      "lines": [
+        "Forced: When a Guardian enemy attacks, deal it 1 additional shadow card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08047",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Cave-Barrow.jpg",
+        "sha256": "a2323f50a8f82f05d8506c4a7cfe3b12b928800cdfcf67037925bd6be6ce7fa1"
+      },
+      "lines": [
+        "The players, as a group, cannot have more than 5 allies in play. (If there are more than 5 allies in play, discard allies until only 5 remain.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08048",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Stone-Barrow.jpg",
+        "sha256": "04252a5a200523d3e5f4207565a900743de040d43c9cf0c803955cf091f0304b"
+      },
+      "lines": [
+        "Forced: After a Guardian enemy attacks, raise each player's threat by X, where X is that enemy's Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08049",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Hallowed-Circle.jpg",
+        "sha256": "2938af71e6bf80dbd57177535ba7b8522f1b1373d8c4d2fb764f78dcdc49754b"
+      },
+      "lines": [
+        "Immune to player card effects. X is the number of players in the game.",
+        "Travel: The players must exhaust 3 Key objectives.",
+        "Forced: After the players travel here, each engaged Guardian enemy makes an immediate attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08050",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Spirit-of-the-Wild.jpg",
+        "sha256": "f6ae74bb6a8e5b9d871729277859d1c7174b12f51d17e1fd15c7f278aae2ee4d"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Spirit of the Wild gets +1 Threat and +1 Attack for each Key objective the players control.",
+        "Shadow: Attacking enemy gets +1 Attack for each Key objective the players control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08051",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Cursed-Forest.jpg",
+        "sha256": "2d88c26f632ab07806c298b5fc39248334e2a2d64da68cd169ec8fa096bd316a"
+      },
+      "lines": [
+        "Travel: Search the encounter deck and discard pile for a Spirit enemy and add it to the staging area.",
+        "Shadow: If this attack destroys a character, remove a time counter from an enemy, if able."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08052",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Grim-Foothills.jpg",
+        "sha256": "c7e6c8c16c82a3953f5fe02648e029a14b607cc881376d1dc5b86f396ea41c73"
+      },
+      "lines": [
+        "Doomed 2.",
+        "X is the number of players in the game.",
+        "While Grim Foothills is in the staging area, progress must be placed on Grim Foothills before it can be placed on the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08053",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Curse-of-the-Wild-Men.jpg",
+        "sha256": "3faf62c90a753a3d5672db97b927f4ef9e11796b7ce527c0047ab3221c057c0d"
+      },
+      "lines": [
+        "When Revealed: Deal 1 damage to each non-unique character in play. If the players control 3 Key objectives, Curse of the Wild Men gains surge.",
+        "Shadow: Attacking enemy gets +1 Attack for each Key objective the players control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08054",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Guardian's-Fury.jpg",
+        "sha256": "3f577cb07eba560d299d4c2423b6d59662d8d3129f9827748f171003c013258c"
+      },
+      "lines": [
+        "When Revealed: Each Guardian enemy makes an attack. If there are no Guardian enemies in play, reveal a random Guardian enemy from the victory display, and add it to the staging area.",
+        "Shadow: If attacking enemy is a Guardian, it makes an additional attack after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08055",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/Wild-Tenacity.jpg",
+        "sha256": "ed5f149eabade51e7d8338a2157ae90e43b814f2f76ad5081dad05ea97c4ff5a"
+      },
+      "lines": [
+        "When Revealed: Remove X time counters from each enemy in play with the time keyword, where X is the number of players.",
+        "Shadow: If attacking enemy is a Guardian, deal it 2 additional shadow cards for this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08066",
+      "side": "B",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Double-Dealings-1B.jpg",
+        "sha256": "9c587c105512e15e64a396c3ea2ed3bccb90c7cf9ecf10d3923f94d404f0c1fc"
+      },
+      "lines": [
+        "Time 4.",
+        "Forced: After the last time counter is removed from this quest, reduce each player's threat elimination level by 10 for the remainder of the game. Then, place 4 time counters on this stage.",
+        "Forced: After 1 or more progress is placed on this quest, cancel all progress and reduce each player's threat by an equal amount.",
+        "When all players have 0 threat, immediately proceed to stage 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08067",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Escape-from-Tharbad-2A.jpg",
+        "sha256": "a580ffded6e597d55f914c589d43ca0a396d065394c57db72ba0e4b7fa17fc93"
+      },
+      "lines": [
+        "When Revealed: Add Bellach and The Crossing at Tharbad to the staging area. Then, shuffle the encounter discard pile into the encounter deck and discard cards from the encounter deck until X Orc enemies have been discarded, where X is the number of players in the game. Add all discarded Orc enemies to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08067",
+      "side": "B",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Escape-from-Tharbad-2B.jpg",
+        "sha256": "0458c1b12f8819291f4d3ef2b49f8d1f851dbb742c5f63107879dc9eae529a84"
+      },
+      "lines": [
+        "Time 3.",
+        "Forced: After the last time counter is removed from the quest, either raise each player's threat by 3 or Bellach makes an immediate attack against Nalir. Then, place 3 time counters on this stage.",
+        "Progress that would be placed on this quest are instead placed on The Crossing at Tharbad.",
+        "Forced: After a character leaves play, raise its controller's threat by 2."
+      ],
+      "inert": [],
+      "misprints": [
+        {
+          "line": 3,
+          "printed": "Progress that would be placed on this quest are instead placed on The Crossing of Tharbad."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08068",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Nalir.jpg",
+        "sha256": "d5a1f415d9dedd6072258bcfde2c7f53420295308c94cf601f7b6d3a37b3bdad"
+      },
+      "lines": [
+        "The first player gains control of Nalir.",
+        "Forced: At the beginning of the refresh phase, raise your threat by 1 for each player in the game.",
+        "If Nalir leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08069",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/The-Empty-Mug.jpg",
+        "sha256": "b58830d9977f56ded2030d23e6f66a149182f4dd9671c1da2ceee6526146f7ef"
+      },
+      "lines": [
+        "Players cannot reduce their threat.",
+        "While The Empty Mug is in the victory display, the current quest gains 'Forced: After a player card effect reduces a player's threat, remove it from the game.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08070",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Bellach.jpg",
+        "sha256": "a7af68313a4302c6c1a9cd27667cf800cc7c13cee58cde953aa2e9497ce83c67"
+      },
+      "lines": [
+        "X is the number of players in the game.",
+        "Orc and Creature enemies get -30 engagement cost and +1 Threat.",
+        "Forced: When Bellach is destroyed, shuffle him into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08071",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/The-Crossing-at-Tharbad.jpg",
+        "sha256": "7d770c8262546f9a7ad3d76223e0cf7ad29409b71cffcee31bd168b32c48f756"
+      },
+      "lines": [
+        "Immune to player card effects. Cannot leave the staging area.",
+        "The Crossing at Tharbad gets +2 quest points for each player in the game.",
+        "When The Crossing at Tharbad is explored, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08072",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Spy-from-Mordor.jpg",
+        "sha256": "4100484e0186e67c770bd828ba95e097f143601a6a02280b69bd11a55b639705"
+      },
+      "lines": [
+        "Forced: When Spy From Mordor attacks, remove 1 time counter from the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08073",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Bellach's-Marauder.jpg",
+        "sha256": "dec3c4d281bc8250a23cd6e38f3c1378c69546d58f32129387084204713c37a0"
+      },
+      "lines": [
+        "While Bellach's Marauder is engaged with a player, it gains: 'Forced: After a time counter is removed from the current quest, deal Bellach's Marauder 2 shadow cards.'",
+        "Shadow: Remove 1 time counter from the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08074",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Streets-of-Tharbad.jpg",
+        "sha256": "4e98bcc9a007e381755f25e8958d1336f74aeb55e7327f765711084815b5ce4d"
+      },
+      "lines": [
+        "Progress cannot be placed on Streets of Tharbad while it is in the staging area.",
+        "While Streets of Tharbad is the active location, enemies get -20 engagement cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08075",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Tharbad-Hideout.jpg",
+        "sha256": "c64264ab9c97f4025d4b462de27ad9205c8ea196804d17e61458d8b1ea752a89"
+      },
+      "lines": [
+        "Surge.",
+        "While Tharbad Hideout is the active location, time counters cannot be removed from the current quest.",
+        "Forced: At the beginning of the quest phase, place 1 progress on Tharbad Hideout."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08076",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Ruins-of-the-Second-Age.jpg",
+        "sha256": "3d7d61610977cc8e56dfff83757652af23412c27e8b546dbccff2466c9bfb88c"
+      },
+      "lines": [
+        "While Ruins of the Second Age is in the staging area, City locations get +1 Threat.",
+        "While Ruins of the Second Age is the active location, deal engaged enemies 1 additional shadow card at the beginning of the combat phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08077",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Seedy-Inn.jpg",
+        "sha256": "c6ca10a8f3e9fad22abd6944dd3886a086d2ec43afe0522c1843e7fa4ff5f27a"
+      },
+      "lines": [
+        "Travel: Search the encounter deck and discard pile for a Spy enemy and add it to the staging area. Shuffle the encounter deck.",
+        "Shadow: Raise the defending player's threat by X, where X is the amount of damage dealt by this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08078",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Hidden-Alleyway.jpg",
+        "sha256": "806a630d2805fa19534e74f15e73c61b3d955e4133ee0b5648f62d5b90ac5741"
+      },
+      "lines": [
+        "Travel: Raise each player's threat by X to travel here. X is the number of enemies in play.",
+        "Forced: After traveling to Hidden Alleyway, add 1 time counter to the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08079",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Decrepit-Rooftops.jpg",
+        "sha256": "dde5fd5c46d8fff21f526d71f2cefdf28f5adad2ba953cd00b65c8b65056ea9f"
+      },
+      "lines": [
+        "While Decrepit Rooftops is the active location, enemies get +1 Threat and do not make engagement checks.",
+        "Forced: After traveling to Decrepit Rooftops, return all engaged enemies to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08080",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Constant-Tail.jpg",
+        "sha256": "2eea3a6960fe22cae6a4e293875f6befd42552be439136dd59cd9c71f1d63b77"
+      },
+      "lines": [
+        "When Revealed: Return all engaged enemies to the staging area. Then, the first player either removes 1 time counter from the current quest or each Spy enemy in the staging area gets +2 Threat until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08081",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Conspicuous-Lot.jpg",
+        "sha256": "4ae540d8111a7925229f15109eff6f3c790f1329adeb08472069b947e59d396a"
+      },
+      "lines": [
+        "When Revealed: Each player raises his threat by 1 for each ally he controls. Then, if any player's threat is 20 or less, this card gains surge.",
+        "Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if the defending player's threat is 20 or less)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08082",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Cornered.jpg",
+        "sha256": "a472319b693fba31f392b5861178055a2f3a85525df17611424e9466a1f1b015"
+      },
+      "lines": [
+        "When Revealed: The first player either removes 1 time counter from the current quest or each enemy gets -20 engagement cost and +1 Attack until the end of the round.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending player's threat is 20 or less)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08083",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Get-That-Dwarf.jpg",
+        "sha256": "8f6ca00489814548451ded58f26f0c8057bfccc735db93cf2fc8f20266ea6360"
+      },
+      "lines": [
+        "When Revealed: The enemy in the staging area with the highest Attack engages the first player and makes an immediate attack against Nalir. If there are no enemies in the staging area, Get That Dwarf! gains surge.",
+        "Shadow: If this attack is undefended, deal 2 damage to Nalir."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08094",
+      "side": "B",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Fleeing-from-Tharbad-1B.jpg",
+        "sha256": "7822d825c6518d10d4506b6930823822cff4e92c405b3617b24372b0ef244cd6"
+      },
+      "lines": [
+        "When Revealed: Advance to a random stage 2A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08095",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Through-the-Marsh-No-End-in-Sight-2A.jpg",
+        "sha256": "56cf2bd85ba6859531ac32ad8a2d5f52903cdfc05feb0947c285544ba049d96e"
+      },
+      "lines": [
+        "When Revealed: Raise each player's threat by 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08095",
+      "side": "B",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Through-the-Marsh-No-End-in-Sight-2B.jpg",
+        "sha256": "ca87e878fc89d50d71497d673f010eae18ea8a11f61cb410f6684cbda5b35cac"
+      },
+      "lines": [
+        "Time 3.",
+        "Forced: After the last time counter is removed from this stage, advance to a different stage 2A at random. Return this stage to the quest deck.",
+        "Player card effects cannot be used to gain resources or draw cards.",
+        "Forced: When the players defeat this stage, advance to a random stage 3A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08096",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Through-the-Marsh-A-Weary-Passage-2A.jpg",
+        "sha256": "56cf2bd85ba6859531ac32ad8a2d5f52903cdfc05feb0947c285544ba049d96e"
+      },
+      "lines": [
+        "When Revealed: Raise each player's threat by 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08096",
+      "side": "B",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Through-the-Marsh-A-Weary-Passage-2B.jpg",
+        "sha256": "efc59ef792a86b5626a52befae4e949ce8938566da28332e14b997e2e4a2757c"
+      },
+      "lines": [
+        "Time 3.",
+        "Forced: After the last time counter is removed from this stage, advance to a different stage 2A at random. Return this stage to the quest deck.",
+        "In order to commit characters to the quest, a player must first discard a card at random from his hand.",
+        "Forced: When the players defeat this stage, advance to a random stage 3A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08097",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Through-the-Marsh-A-Forgotten-Land-2A.jpg",
+        "sha256": "56cf2bd85ba6859531ac32ad8a2d5f52903cdfc05feb0947c285544ba049d96e"
+      },
+      "lines": [
+        "When Revealed: Raise each player's threat by 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08097",
+      "side": "B",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Through-the-Marsh-A-Forgotten-Land-2B.jpg",
+        "sha256": "d09f10f545c7874985137c2c391d265538f0255c80d0b35a226fc52a23bcc40f"
+      },
+      "lines": [
+        "Time 3.",
+        "Forced: After the last time counter is removed from this stage, advance to a different stage 2A at random. Return this stage to the quest deck.",
+        "Each player cannot play more than 1 card each round.",
+        "Forced: When the players defeat this stage, advance to a random stage 3A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08098",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Lost-in-the-Swanfleet-Impassable-Marshland-3A.jpg",
+        "sha256": "111d9fabc72e1ac9ec26628ab7ad8ffe7c28a69fbc1fe6ec4bd4d8e9ad76d803"
+      },
+      "lines": [
+        "When Revealed: Raise each player's threat by 1. Add Ancient Marsh-dweller to the staging area (from out of play or engaged with a player) and heal all damage from it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08098",
+      "side": "B",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Lost-in-the-Swanfleet-Impassable-Marshland-3B.jpg",
+        "sha256": "fc39f4f653b2369193e2cd5c4877d707b6ea7c5820a806bd5a7b8088bc71fddd"
+      },
+      "lines": [
+        "Time 3.",
+        "Forced: After the last time counter is removed from this stage, advance to a different stage 3A at random. Return this stage to the quest deck.",
+        "Each location in play gets +1 Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08099",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Lost-in-the-Swanfleet-A-Treacherous-Swamp-3A.jpg",
+        "sha256": "111d9fabc72e1ac9ec26628ab7ad8ffe7c28a69fbc1fe6ec4bd4d8e9ad76d803"
+      },
+      "lines": [
+        "When Revealed: Raise each player's threat by 1. Add Ancient Marsh-dweller to the staging area (from out of play or engaged with a player) and heal all damage from it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08099",
+      "side": "B",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Lost-in-the-Swanfleet-A-Treacherous-Swamp-3B.jpg",
+        "sha256": "774df7e0fe034ccd805ccabb6a342a92fdfc41916269f71d82998e3b3c63f1c8"
+      },
+      "lines": [
+        "Time 3.",
+        "Forced: After the last time counter is removed from this stage, advance to a different stage 3A at random. Return this stage to the quest deck.",
+        "Each player cannot ready more than 5 characters during the refresh phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08100",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Lost-in-the-Swanfleet-Creatures-of-a-Forgotten-Age-3A.jpg",
+        "sha256": "111d9fabc72e1ac9ec26628ab7ad8ffe7c28a69fbc1fe6ec4bd4d8e9ad76d803"
+      },
+      "lines": [
+        "When Revealed: Raise each player's threat by 1. Add Ancient Marsh-dweller to the staging area (from out of play or engaged with a player) and heal all damage from it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08100",
+      "side": "B",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Lost-in-the-Swanfleet-Creatures-of-a-Forgotten-Age-3B.jpg",
+        "sha256": "35b62108d06b9b6f7798f284567b2aa9da57d30394a67c2926577d0009719c58"
+      },
+      "lines": [
+        "Time 3.",
+        "Forced: After the last time counter is removed from this stage, advance to a different stage 3A at random. Return this stage to the quest deck.",
+        "Each enemy in the staging area gets -20 engagement cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08101",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Out-of-the-Swamp-4A.jpg",
+        "sha256": "1c793fcef9f9dbeff95f96bec683e43367387a36c441e077fe1d7d436b04c6fc"
+      },
+      "lines": [
+        "When Revealed: Add Ancient Marsh-dweller to the staging area (from out of play or engaged with a player) and heal all damage from it. Then, Ancient Marsh-dweller makes an attack against each player in player order."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08101",
+      "side": "B",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Out-of-the-Swamp-4B.jpg",
+        "sha256": "b5c7b5298dffbe934cfea1130aa6a3df108b1f9cbfe9ba01edaf4ba7d2ced6b5"
+      },
+      "lines": [
+        "Time 2.",
+        "Forced: After the last time counter is removed from this stage, Ancient Marsh-dweller makes an attack against each player in order. Place 2 time counters on this stage.",
+        "When Ancient Marsh-dweller is defeated, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08102",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Nalir.jpg",
+        "sha256": "ca757df869d6e858b4ed3d6b59a019044dc050b90ae7f1d7df3e4e95f4fe3658"
+      },
+      "lines": [
+        "The first player gains control of Nalir.",
+        "Forced: At the beginning of the refresh phase, raise your threat by 1 for each player in the game.",
+        "If Nalir leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08103",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Ancient-Marsh-dweller.jpg",
+        "sha256": "056764fd8f3cab84d8399bf28ef5af4440852b6f086dedcbd84da0f572585d89"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Ancient Marsh-dweller gets +1 Threat and +1 Attack for each resource token on it.",
+        "Forced: After any number of time counters are removed from the current quest, place a resource token here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08104",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Giant-Swamp-Adder.jpg",
+        "sha256": "0db29a19f4741231451f0c4746df45cdbdc7d41c71d93b80009022e21c12f680"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Forced: After any number of time counters are removed from the current quest, Giant Swamp Adder attacks the engaged player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08105",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Neekerbreekers.jpg",
+        "sha256": "6809e104af1a5eff0110961a38fe4de672de39799884079f6847d9d77bfa02c4"
+      },
+      "lines": [
+        "Forced: After any number of time counters are removed from the current quest, the engaged player must deal 2 damage to an ally he controls.",
+        "Shadow: Deal 1 damage to the defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08106",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Fen-of-Reeds.jpg",
+        "sha256": "a220bb0eee3c556cba5716172eed71fd28524989afa183e38405102e9ad6d35a"
+      },
+      "lines": [
+        "While Fen of Reeds is in the staging area, it gains: 'Forced: After the players advance to a quest stage, each player must exhaust a character he controls.'",
+        "Shadow: Attacking enemy gets +1 Attack for each time counter on the quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08107",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Finger-of-Glanduin.jpg",
+        "sha256": "45fea99eb52ef19b0ce74a010d718e380d980292647b8cffdc520deef9f9752b"
+      },
+      "lines": [
+        "While Finger of Glanduin is in the staging area, it gains: 'Forced: At the end of each round, remove 1 progress from each location in play.'",
+        "Shadow: If this attack destroys a character remove all progress from the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08108",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Hidden-Eyot.jpg",
+        "sha256": "bbe552c941271132331bd67f320ad2d810387073073d0ed812967f7cb7666087"
+      },
+      "lines": [
+        "Response: After Hidden Eyot leaves play as an explored location, place 2 time counters on the current quest.",
+        "Travel: Each player must exhaust a character he controls to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08109",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Sinking-Bog.jpg",
+        "sha256": "8a55031e1ef15c988d7186ae285a67c93388e409d783acae3fecc260ecf00428"
+      },
+      "lines": [
+        "While Sinking Bog is in the staging area, each character gets -1 Willpower, -1 Attack, and -1 Defense for each Item attached to it. This ability does not stack with other copies of Sinking Bog.",
+        "Shadow: Defending character gets -1 Defense for this attack for each attachment attached to it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08110",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Shifting-Marshland.jpg",
+        "sha256": "40ffbe95093acc7b66414efee77937463f761a21c564d20aff65bfda1ef52440"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Remove 1 time counter from the current quest.",
+        "Shadow: Attacking enemy makes an additional attack after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08111",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Remnants-of-Elder-Days.jpg",
+        "sha256": "b2e79e05c6bac96a1d32fa3e5da84ef1cca649062b6569f33abc7c091ce9c849"
+      },
+      "lines": [
+        "When Revealed: Each player must search the encounter deck and discard pile for a Creature enemy and put it into play engaged with him. Shuffle the encounter deck. This effect cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08122",
+      "side": "B",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/The-Ruins-of-Ost-in-Edhil-1B.jpg",
+        "sha256": "6f70ab78d705bde80b7cdbfd0a602a0330bcd17fb511bf7febca4e33b9b7e626"
+      },
+      "lines": [
+        "Time 3.",
+        "Forced: After the last time counter is removed from this stage, trigger each Scour effect currently in play. Place 3 time counters on this stage.",
+        "Bellach is immune to player card effects and cannot be engaged.",
+        "The players cannot advance unless Celebrimbor's Mould is attached to a hero."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08123",
+      "side": "A",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/The-Enemy's-Servant-2A.jpg",
+        "sha256": "62fe06ef830d4c414ac8a64ab44549d2383d6ca0b4ec5e561dbc359ee614cf9c"
+      },
+      "lines": [
+        "When Revealed: Trigger each Scour effect currently in play. Bellach makes an attack against the player who controls Celebrimbor's Mould. Then, attach Celebrimbor's Mould to Bellach."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08123",
+      "side": "B",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/The-Enemy's-Servant-2B.jpg",
+        "sha256": "bcefdae1a5b23a727557e133c52095a1ecc1ebbd39f32cf3e013f78bc16a7ea1"
+      },
+      "lines": [
+        "Time 3.",
+        "Forced: After the last time counter is removed from this stage, trigger each Scour effect currently in play. Place 3 time counters on this stage.",
+        "Unless there is at least 12 progress on this stage, Bellach is immune to player card effects and cannot be engaged.",
+        "The players cannot win unless Celebrimbor's Mould is attached to a hero. If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08124",
+      "side": "A",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Bellach.jpg",
+        "sha256": "faa86619bf551a05bd9290ea4e493630b2717d67368b191ad592d6b2c4fc2c8f"
+      },
+      "lines": [
+        "X is the number of cards underneath The Orcs' Search.",
+        "Scour: Each player must search the encounter deck and discard pile for an Orc enemy and add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08125",
+      "side": "A",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/The-Orcs'-Search.jpg",
+        "sha256": "14e95e12aff2289ccb5189a72b4a73961c3c300d596904efa1f9b6ef8ded8519"
+      },
+      "lines": [
+        "When a location has damage equal to its printed quest points, place it facedown underneath The Orcs' Search.",
+        "Forced: At the end of the refresh phase, raise each player's threat by 1 for each card underneath The Orcs' Search."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08126",
+      "side": "A",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/The-Secret-Chamber.jpg",
+        "sha256": "c6424fe8d6c9327bfc9d412812c9a4b287b5c3ce415779709d8e2147f7146600"
+      },
+      "lines": [
+        "X is the number of players in the game. Immune to player card effects.",
+        "Travel: Remove 3 progress from the current quest to travel here.",
+        "If The Secret Chamber is placed underneath The Orcs' Search, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08127",
+      "side": "A",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Celebrimbor's-Mould.jpg",
+        "sha256": "d8a49ec5d4297c5fe91caffcfdb8fb339a8ad9b805100f139b3ca48c657c898a"
+      },
+      "lines": [
+        "If Celebrimbor's Mould is free of encounters, the first player claims it and attaches it to a hero he controls.",
+        "If the attached hero leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08128",
+      "side": "A",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Bellach's-Scout.jpg",
+        "sha256": "91e2ec9271fa2d3acf1377afe1ce98b9faebb60b74f38ef25d169c09eea4d20c"
+      },
+      "lines": [
+        "When Revealed: Either place 3 damage on the active location, or reveal an additional encounter card.",
+        "Scour: Place 1 damage on the active location.",
+        "Shadow: Place 1 damage on the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08129",
+      "side": "A",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Prowling-Orc.jpg",
+        "sha256": "bc5e2c71a152d1490ae6caf818e72a29135cb191ca402cb10e2aab68c2856876"
+      },
+      "lines": [
+        "Forced: After Prowling Orc attacks, place 1 damage on the active location.",
+        "Scour: Prowling Orc engages the player with the highest threat and makes an immediate attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08130",
+      "side": "A",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Ruined-Plaza.jpg",
+        "sha256": "b45f1997b8386e27ced709877d158442ec095fc96c0e2c82e2e1722e437ab359"
+      },
+      "lines": [
+        "Forced: After Ruined Plaza enters the staging area, place 1 damage here.",
+        "Shadow: Defending player assigns X damage among characters he controls. X is the number of cards underneath The Orcs' Search."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08131",
+      "side": "A",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Collapsed-Tower.jpg",
+        "sha256": "e4d40f42121d4b2d7ff77a3fb7d582b36a983734588345744f5e31721d1d4569"
+      },
+      "lines": [
+        "Surge.",
+        "Scour: Return this location to the staging area and place 2 damage here.",
+        "Shadow: Excess damage dealt by this attack must be placed on the active location, if able."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08132",
+      "side": "A",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Ancient-Foundation.jpg",
+        "sha256": "af5466a8cc50d7b4296723cfacd7c59bfd6776ba8c431e114abd681a6ce0bb8e"
+      },
+      "lines": [
+        "Scour: Assign X damage among locations in play. X is the number of locations in play. This ability does not stack with other copies of Ancient Foundation.",
+        "Travel: Place 1 damage on this location to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08133",
+      "side": "A",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/City-Remains.jpg",
+        "sha256": "89094b43e27bd395093026ae66addc55106fd4293ae2250e1984b712e12331bf"
+      },
+      "lines": [
+        "Forced: After placing any amount of progress here, trigger the topmost Scour effect in the discard pile, if able.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, raise each player's threat by 1 for each card underneath The Orcs' Search."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08134",
+      "side": "A",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Discovered.jpg",
+        "sha256": "e069eb53c6730480017382237b0a547554e0d8470c8d35a5513f7460c37c40ff"
+      },
+      "lines": [
+        "When Revealed: Either trigger each Scour effect currently in play, or each player places a random card from his hand facedown underneath The Orcs' Search.",
+        "Shadow: If this attack destroys a character, place that character facedown underneath The Orcs' Search."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08135",
+      "side": "A",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Desecrated-Ruins.jpg",
+        "sha256": "641720ba0f35f2325c7fd9350d305068f835cae26c72419e716aca3d3779030e"
+      },
+      "lines": [
+        "When Revealed: Place 3 damage on the active location. If there is no active location, Desecrated Ruins gains surge.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys an ally, place X damage on the active location. X is that ally's cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08136",
+      "side": "A",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/Spies-from-Mordor.jpg",
+        "sha256": "de5c5778642eb1427da7b30c42f7d1985d8621bf2938034f29760f3ca18d36bb"
+      },
+      "lines": [
+        "When Revealed: Each player must exhaust X characters he controls. X is the number of cards underneath The Orcs' Search. If no characters are exhausted this way, Spies from Mordor gains surge.",
+        "Shadow: Defending player discards a non-objective attachment he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08147",
+      "side": "B",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Battle-for-Dunland-1B.jpg",
+        "sha256": "9befce33a25c590a178d3010bebd67c3462f40974860c4efc7b6948db975c0c2"
+      },
+      "lines": [
+        "Time 3.",
+        "Forced: After the last time counter is removed from this stage, remove 1 time counter from each location in play. Place 3 time counters on this stage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08148",
+      "side": "A",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/The-Raven-Clan-2A.jpg",
+        "sha256": "96d8b7b6040678cd0eefa012f3052c52b94a269ddf06843644abc044bec303c4"
+      },
+      "lines": [
+        "When Revealed: Shuffle the Raven deck discard pile into the Raven deck. Then, starting with the first player, each player takes the top card of the Raven deck and adds it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08148",
+      "side": "B",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/The-Raven-Clan-2B.jpg",
+        "sha256": "bc442881b8444eb658ea334acce6ad64549b15a8a6dc9b77fdb568f1f25f1025"
+      },
+      "lines": [
+        "Time 3.",
+        "Forced: After the last time counter is removed from this stage, reveal the top card of the Raven deck and add it to the staging area. Place 3 time counters on this stage.",
+        "Each location in the staging area gets +2 quest points."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08149",
+      "side": "A",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/The-Last-Stage-3A.jpg",
+        "sha256": "3bd89b8af21199eb5e788200475cc803c1182539058c065f9996e0428e314de4"
+      },
+      "lines": [
+        "When Revealed: Add Raven Chief and Raven Chief's Camp to the staging area. Take the top X cards from the Raven deck and add them to the staging area. X is the number of players minus 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08149",
+      "side": "B",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/The-Last-Stage-3B.jpg",
+        "sha256": "f766bae860b0d5c7b4bee534b8502de85573b965d1eac801fe3a41c4a69de92b"
+      },
+      "lines": [
+        "Time 2.",
+        "Forced: After the last time counter is removed from this stage, each engaged enemy makes an attack. Place 2 time counters on this stage.",
+        "At the end of the round, if Raven Chief is in the victory display, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08150",
+      "side": "A",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Chief-Turch.jpg",
+        "sha256": "27ed1bcfb52f2d304bb9a608b14c60b0ede1771c6922528d42f12506da080fff"
+      },
+      "lines": [
+        "The first player gains control of Chief Turch.",
+        "Immune to player card effects. Chief Turch does not exhaust to defend.",
+        "If Chief Turch leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08151",
+      "side": "A",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Raven-Chief.jpg",
+        "sha256": "e463d197887869f9989a201432a35873b289a88fe2552e13fbd8796c567c159c"
+      },
+      "lines": [
+        "Cannot have attachments. While Raven Chief's Camp is in play, Raven Chief cannot be damaged.",
+        "Forced: When Raven Chief attacks, remove 1 time counter from the active location, if able."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08152",
+      "side": "A",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Raven-Chief's-Camp.jpg",
+        "sha256": "34c353d1096d32397d04c6c581619c40faccbf6c78e1e0643e33cf06b764459e"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Time 3. Forced: After the last time counter is removed from this location, exhaust each damaged character. Place 3 time counters on this location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08153",
+      "side": "A",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Raven-Warrior.jpg",
+        "sha256": "b7a307e89fd11f36478793a6cc563c4ed107703f6b16943ad34e0a339bdcba44"
+      },
+      "lines": [
+        "Forced: After Raven Warrior engages a player, remove X time counters from locations in play. X is the number of cards in the engaged player's hand.",
+        "Shadow: Defending player discards an attachment he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08154",
+      "side": "A",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Raven-Skirmisher.jpg",
+        "sha256": "d90aa3530603e859c3e4183d64f0de2650a19ae717cd19cd96eabe9ef4d60114"
+      },
+      "lines": [
+        "When Revealed: Either remove 1 time counter from the active location, or reveal an additional encounter card.",
+        "Shadow: Attacking enemy gets +X Attack, where X is the Time X value on the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08155",
+      "side": "A",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Raven-War-camp.jpg",
+        "sha256": "9aa995c88d0b3ab6b9bf04da452c0ae6f763aad36a05998e38e1ae9ab4069b8c"
+      },
+      "lines": [
+        "Time 3. Forced: After the last time counter is removed from this location, starting with the first player, each player draws the top card of the Raven deck and puts it into play engaged with him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08156",
+      "side": "A",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Raven-Village.jpg",
+        "sha256": "bca12dcda2c7fce7d53f93d30623e7c5915b3546d101c46a9ebd135e86ed0751"
+      },
+      "lines": [
+        "Time 2. Forced: After the last time counter is removed from this location, reveal the top card of the Raven deck and add it to the staging area.",
+        "Shadow: Deal attacking enemy 2 additional shadow cards from the Raven deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08157",
+      "side": "A",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Dunland-Battlefield.jpg",
+        "sha256": "53b4bbcc6b0456e4fbce8bf2d15475bac07e44d7254885d824c59011d243991c"
+      },
+      "lines": [
+        "Time 3. Forced: After the last time counter is removed from this location, each player assigns X damage among characters he controls, where X is the number of cards in his hand.",
+        "Shadow: Deal 1 damage to the defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08158",
+      "side": "A",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Raven-Country.jpg",
+        "sha256": "1909e06440ce4d99169f5c656b37d3dc86fcc990dffe373743b9dbc2364546bb"
+      },
+      "lines": [
+        "Time 4. Forced: After the last time counter is removed from this location, each player raises his threat by the number of cards in his hand.",
+        "Shadow: Defending player assigns X damage among characters he controls. X is the Time X value on the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08159",
+      "side": "A",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Raising-the-Cry.jpg",
+        "sha256": "c6209fdf7b5804ccc6545f76503eef7e952f4bda143849ffd2453f7c41ca4317"
+      },
+      "lines": [
+        "When Revealed: Remove 1 time counter from each location in play. Place X time counters on each location in play with no time counters on it. X is the 'Time X' value on that location. If there are no locations in the staging area, Raising the Cry gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08160",
+      "side": "A",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Fierce-Folk.jpg",
+        "sha256": "5add66a87cc10bef2dd5cda557c83658a6a39c4598c6ed2c8b9243ecec82554d"
+      },
+      "lines": [
+        "Doomed 3.",
+        "When Revealed: Each player draws 3 cards. Until the end of the round, players cannot play events.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, remove 1 time counter from the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "08161",
+      "side": "A",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Driven-Back.jpg",
+        "sha256": "5c46b42acba9ba1c34c2b51cd472d959b691660d09225afd6fc667d8e1c54f8b"
+      },
+      "lines": [
+        "When Revealed: Remove all progress from each location in the staging area. Increase the total Threat in the staging area by 1 for each progress removed this way. If no progress was removed by this effect, Driven Back gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    }
+  ]
+}

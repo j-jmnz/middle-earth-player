@@ -93,8 +93,9 @@ describe("The first treachery each quest phase (146075:B:2)", () => {
   it("gives the first treachery revealed in the quest phase surge: the next card is revealed after it, and that one is not marked", () => {
     const run = reveals(["t1", "t2", "t3"]);
     expect(revealed(run.steps)).toBe(2);
-    const first = Object.values(run.state.cards).find((card) => card.code === "t1");
-    expect(run.state.modifiers.filter((modifier) => modifier.stat === "immuneToPlayerCards").map((modifier) => modifier.instanceId)).toEqual([first?.id]);
+    // The immunity lasts "until it leaves play" (rr.in-play-and-out-of-play): the surge discarded the first treachery, so no card holds it now, and the phase remembers that one was revealed.
+    expect(run.state.modifiers.filter((modifier) => modifier.stat === "immuneToPlayerCards")).toEqual([]);
+    expect(run.state.modifiers.some((modifier) => modifier.stat === "treacheryRevealed")).toBe(true);
   });
 
   it("marks only the first: a second reveal in the same quest phase draws one card", () => {

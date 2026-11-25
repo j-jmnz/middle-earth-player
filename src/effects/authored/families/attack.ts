@@ -129,7 +129,7 @@ export const RECORDS: readonly Effect[] = [
 
   // Spear of the Mark, Bow of the Galadhrim, Ranger Spear: +1 Attack, +2 instead against some enemies.
   { id: "06137:constant:2", cardCode: "06137", lines: ["06137:A:2"], timing: "constant", instructions: [host(1), host(1, { kind: "attacking", enemy: IN_STAGING })] },
-  { id: "08088:constant:2", cardCode: "08088", lines: ["08088:A:3"], timing: "constant", instructions: [host(1), host(1, { kind: "attacking", notEnemy: { ...ENEMY, engaged: "you" } })] },
+  { id: "08088:constant:2", cardCode: "08088", lines: ["08088:A:2"], timing: "constant", instructions: [host(1), host(1, { kind: "attacking", notEnemy: { ...ENEMY, engaged: "you" } })] },
   { id: "12145:constant:2", cardCode: "12145", lines: ["12145:A:2"], timing: "constant", instructions: [host(1), host(1, { kind: "attacking", enemy: { ...ENEMY, hasAttachment: {} } })] },
 
   // Forth Eorlingas!: each Rohan hero in play may attack the staging area this phase.

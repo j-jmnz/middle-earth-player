@@ -1,0 +1,192 @@
+{
+  "id": "the-nin-in-eilph",
+  "name": "The Nîn-in-Eilph",
+  "number": 4,
+  "stages": [
+    "08094",
+    "08095",
+    "08096",
+    "08097",
+    "08098",
+    "08099",
+    "08100",
+    "08101"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Nîn-in-Eilph",
+      "count": 18
+    },
+    {
+      "name": "Weary Travelers",
+      "count": 7
+    }
+  ],
+  "cards": [
+    {
+      "code": "08104",
+      "normal": 4,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "08105",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "08106",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "08107",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "08108",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "08109",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "08110",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "08111",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "07056",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "07057",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "07058",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "08094",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "08095",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "08096",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "08097",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "08098",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "08099",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "08100",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "08101",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "08106",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "08107",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "08108",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "08109",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "08102",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "08103",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q04.7",
+    "dragnEasy": "E04.7",
+    "hobSlug": "The-Nîn-in-Eilph"
+  }
+}

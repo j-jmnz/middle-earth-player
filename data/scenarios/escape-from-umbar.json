@@ -1,0 +1,179 @@
+{
+  "id": "escape-from-umbar",
+  "name": "Escape from Umbar",
+  "number": 1,
+  "stages": [
+    "16066",
+    "16067"
+  ],
+  "encounterSets": [
+    {
+      "name": "Escape from Umbar",
+      "count": 13
+    },
+    {
+      "name": "Harad Soldiers",
+      "count": 12
+    },
+    {
+      "name": "Harad Territory",
+      "count": 6
+    }
+  ],
+  "cards": [
+    {
+      "code": "16015",
+      "normal": 5,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "16016",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "16017",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "16018",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "16019",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "16020",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "16021",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "16040",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "16041",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "16042",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "16043",
+      "normal": 4,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "16044",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "16045",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "16046",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "16047",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "16066",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "16067",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "16014",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "16016",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "16017",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "16018",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "16019",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "16020",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q07.1",
+    "dragnEasy": "E07.1",
+    "hobSlug": "Escape-from-Umbar"
+  }
+}
