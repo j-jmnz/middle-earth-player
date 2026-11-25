@@ -10,10 +10,10 @@ import { attackAllTogether, chooseFirstOrLast, commitAllBut, engageUpTo, policyI
 const cycle = loadCampaign("the-ring-maker");
 const fangorn = loadAnyScenario("into-fangorn");
 
-// Test helper. A whole standalone game of Into Fangorn played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
+// Test helper. A whole standalone game of Into Fangorn played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive) and the decks free
 // events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. Each seat quests with all but one hero and keeps that one home to attack with the others' help: a ready hero claims Mugash when he lies free in the staging area (his host is then exhausted and never takes an undefended attack, so Mugash stays), the players travel to Edge of Fangorn first (it guards Mugash), engage every enemy (the Hinder Huorns included: they make no attack and take no shadow card, and each takes progress off the quest) and defend with nobody.
 export const FANGORN_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: true, act: false };
-// "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
+// "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": slow questers with 3 hit points; "steady": slow questers (willpower 6) that survive.
 export type FangornDecks = "strong" | "weak" | "brittle" | "steady";
 
 export const fangornLoadout = fillerLoadout;
@@ -68,14 +68,23 @@ export type FangornGame = PlayedGame;
 // The goldens (src/campaign/scenarios/into-fangorn/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type FangornGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: FangornDecks; outcome: "won" | "lost"; policy?: Partial<FangornPolicy>; lossReason?: string };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Nightmare) and a few losses (each way the scenario can be lost), each on a fixed seed.
-export const FANGORN_GOLDENS: readonly FangornGolden[] = [];
+// The games to pin (about 450 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and Easy, every one by defeating stage 2 with Mugash on a hero (stage 3 cannot win). The strong heroes win in 3 rounds; the
+// steady ones (willpower 6) are slow, so the Easy games run their Time out: stage 3, back to stage 2 and the win. The losses are the two ways to lose here, each solo and two-handed: every player's threat reaches 50 (heroes too weak to quest) and every hero destroyed (heroes too brittle).
+export const FANGORN_GOLDENS: readonly FangornGolden[] = [
+  { name: "solo win", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed win", seatCount: 2, seed: 3, difficulty: "Normal", decks: "steady", outcome: "won" },
+  { name: "Easy solo win through stage 3", seatCount: 1, seed: 7, difficulty: "Easy", decks: "steady", outcome: "won" },
+  { name: "Easy two-handed win through stage 3", seatCount: 2, seed: 3, difficulty: "Easy", decks: "steady", outcome: "won" },
+  { name: "solo loss: threat", seatCount: 1, seed: 2, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed loss: threat", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
+  { name: "solo loss: every hero destroyed", seatCount: 1, seed: 6, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed loss: every hero destroyed", seatCount: 2, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+];
 
 const game = standaloneGame<FangornDecks, FangornPolicy>({
   campaign: cycle,
   scenario: fangorn,
-  stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles and its Nightmare deck.
+  stats: { ...HERO_STATS, brittle: { threat: 3, willpower: 6, attack: 12, defense: 0, health: 3 } },
   codes: [...fangorn.cards.map((card) => card.code)],
   intent: fangornIntent,
   policy: DEFAULT_POLICY,
