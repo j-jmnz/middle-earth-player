@@ -27,6 +27,7 @@ import { mayGainResources } from "../families/misc/guards.ts";
 import { queueHeard } from "../families/quest/events.ts";
 import { countDiscarded } from "../families/south/damage.ts";
 import { refillsAnyTime } from "../families/nightmare/guards.ts";
+import { repeatsChain } from "../quest/surge-chain.ts";
 import { familyHoldsDeckReset } from "./family-hooks.ts";
 import { hearsEmptyDeck } from "../families/sack/empty-deck.ts";
 import { returnUndeadBeforeReset } from "../families/angmar/run-out.ts";
@@ -67,7 +68,10 @@ export function resetEncounterDeck(state: ScenarioState, steps: EngineStep[], ct
   if (hearsEmptyDeck(state, ctx)) return state;
   // A family that keeps the pile back from a reset that would repeat for ever says so (families/pelargir/surge-chain.ts).
   if (familyHoldsDeckReset(state, ctx)) return state;
-  return reshuffleDiscard(returnUndeadBeforeReset(state, ctx, steps), steps, "rr.running-out-of-cards");
+  // A surge chain whose last lap changed nothing ends here (quest/surge-chain.ts).
+  const chain = repeatsChain(state);
+  if (chain.held) return state;
+  return reshuffleDiscard(returnUndeadBeforeReset(chain.state, ctx, steps), steps, "rr.running-out-of-cards");
 }
 
 // The encounter discard pile back into an empty encounter deck, shuffled, whatever the phase: what a rule that says "if the deck is ever empty" does (the Fortitude test, mec113.fortitude-tests).
