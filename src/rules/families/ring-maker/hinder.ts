@@ -12,7 +12,11 @@ function onlyInCombat(condition: Condition | undefined): boolean {
   return condition.kind === "all" && condition.conditions.some(onlyInCombat);
 }
 
-const barsAttack = (effect: Effect): boolean => effect.timing === "constant" && onlyInCombat(effect.condition) && effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === "cannotAttack");
+// A bar on the card's own attack: `target` is the card ("self", or none) and no `holders` pick stands in its place. A record that bars other cards' attacks (a `target` of "enemies" or "host", `holders`) never hides its own attack from the tray.
+const barsOwnAttack = (instruction: Effect["instructions"][number]): boolean =>
+  instruction.verb === "ModifyStat" && instruction.stat === "cannotAttack" && instruction.holders == null && (instruction.target == null || instruction.target === "self");
+
+export const barsAttack = (effect: Effect): boolean => effect.timing === "constant" && onlyInCombat(effect.condition) && effect.instructions.some(barsOwnAttack);
 
 /** Whether the records of this card code bar its attack in the combat phase (the Hinder keyword): such an enemy, engaged, makes no attack in the coming combat phase. False for every other card. */
 export function hindersInCombat(ctx: ReduceContext, code: string): boolean {
