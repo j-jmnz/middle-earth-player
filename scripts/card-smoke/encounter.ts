@@ -100,10 +100,10 @@ export function knownOf(summary: EncounterSummary, known: readonly KnownFailure[
   });
 }
 
-/** The lost games by reason, the most frequent first (ties by the reason's text): `["No seats remain", 18]`. A game that did not end lost has none. */
+/** The lost games by reason, the most frequent first (ties by the reason's text): `["No seats remain", 18]`. A game that did not end lost has none; a lost game always has its reason (`recordGame`, encounter-games.ts, records it). */
 export function lossesOf(games: readonly GameSummary[]): [string, number][] {
   const counts = new Map<string, number>();
-  for (const game of games) if (game.ended === "lost") counts.set(game.lossReason ?? "no reason recorded", (counts.get(game.lossReason ?? "no reason recorded") ?? 0) + 1);
+  for (const { ended, lossReason } of games) if (ended === "lost" && lossReason !== null) counts.set(lossReason, (counts.get(lossReason) ?? 0) + 1);
   return [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], "en"));
 }
 

@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import type { Ask } from "../../src/play/words/asks.ts";
 import { entryProblems } from "../../test/harness/words-judge.ts";
-import { extendAsks, newAsksFile, renderWordsStubs, statusOf, tableRows } from "./scenario-words.ts";
+import { extendAsks, newAsksFile, renderWordsStubs, statusOf, STATUS_MEANING, tableRows } from "./scenario-words.ts";
 
 // pnpm scenario words <id>: the rows the Words task owes, the stubs for the missing entries, and the Table step rows code can answer.
 const valid = (source: string): boolean => ts.transpileModule(source, { reportDiagnostics: true, compilerOptions: { module: ts.ModuleKind.ESNext } }).diagnostics?.length === 0;
@@ -20,11 +20,17 @@ describe("scenario words status", () => {
     expect(statusOf(pick("bare"), {}, [])).toEqual({ status: "breaks", detail: "bare" });
   });
 
-  it("calls a row with no entry MISSING when the words test fails or only this scenario deals the card, else chain; a Choose's sentence is optional", () => {
+  it("calls a row with no entry MISSING only when the words test fails; with the families' words passing it is `review` for a card only this scenario deals and `chain` for a shared one; a Choose's sentence is optional", () => {
     expect(statusOf(pick("a bare \"Choose a hero.\""), undefined, []).status).toBe("MISSING");
-    expect(statusOf(pick(null), undefined, [], true).status).toBe("MISSING");
+    expect(statusOf(pick("a bare \"Choose a hero.\""), undefined, [], true).status).toBe("MISSING");
+    expect(statusOf(pick(null), undefined, [], true).status).toBe("review");
     expect(statusOf(pick(null), undefined, [], false).status).toBe("chain");
     expect(statusOf({ kind: "choose", verdict: null }, undefined, [], true).status).toBe("optional");
+  });
+
+  it("has one meaning for each status, the set the header and the docs name", () => {
+    expect(Object.keys(STATUS_MEANING)).toEqual(["ok", "breaks", "MISSING", "review", "chain", "optional", "ORPHAN"]);
+    expect(STATUS_MEANING.review).toContain("What each task is held to, Words");
   });
 });
 
@@ -37,11 +43,15 @@ describe("scenario words stubs", () => {
 
   it("adds the stubs before the end of the ASKS table, keeps every entry, and refuses a file with no table", () => {
     const source = 'import type { Ask } from "../asks.ts";\n\nexport const ASKS: Readonly<Record<string, Ask>> = {\n  // a\n  "9:forced:1 @0 Pick": { note: "Say it." },\n};\n';
-    const text = extendAsks(source, STUBS) ?? "";
+    const text = extendAsks("asks.ts", source, STUBS);
     expect(text.indexOf('"9:forced:1 @0 Pick"')).toBeLessThan(text.indexOf('"1:forced:1 @0 Pick"'));
     expect(text.endsWith("},\n};\n")).toBe(true);
     expect(valid(text)).toBe(true);
-    expect(extendAsks("nothing\n", STUBS)).toBeNull();
+    expect(() => extendAsks("asks.ts", "nothing\n", STUBS)).toThrow(/asks\.ts has no/);
+    // A table that does not end with a line `};` is not written into at the wrong place.
+    const loose = 'export const ASKS: Readonly<Record<string, Ask>> = {\n  "a @0 Pick": { note: "x" },\n}\nexport const OTHER = {\n};\n';
+    expect(() => extendAsks("src/play/words/asks/odd.ts", loose, STUBS)).toThrow(/src\/play\/words\/asks\/odd\.ts: the ASKS table does not end with a line `\};`/);
+    expect(() => extendAsks("asks.ts", "export const ASKS: Readonly<Record<string, Ask>> = {\n", STUBS)).toThrow(/asks\.ts/);
   });
 
   it("makes a new file for a scenario with none", () => {

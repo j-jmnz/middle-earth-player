@@ -6,11 +6,12 @@ import type { Effect } from "../../src/catalog/boundary.ts";
 import { scenarioDefinition } from "../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import { ASKS_BY_SCENARIO } from "../../src/play/words/asks/index.ts";
-import type { Ask, AsksTable } from "../../src/play/words/asks.ts";
+import { askKey, type Ask, type AsksTable } from "../../src/play/words/asks.ts";
 import type { ChoiceNames } from "../../src/play/words/choice.ts";
 import { blankScenario } from "../../src/rules/core/state.ts";
 import type { ReduceContext } from "../../src/rules/interpret/interpret.ts";
 import { walk } from "../../test/harness/record-walk.ts";
+import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 import { askRows, entryProblems, renderedEntry, tailsOf, type AskRow, type WordsTable } from "../../test/harness/words-judge.ts";
 import { parseArgs } from "../cli-args.ts";
 import { loadRenderEnv } from "../data/effects/render/scenario.ts";
@@ -26,27 +27,38 @@ import { scenarioCodes } from "./test-scenario.ts";
 //   pnpm scenario words <scenario-id> [--write | --dry-run]
 //
 // 1. Every Pick and Choose of the records of the cards the scenario deals (the walk and the verdicts of `pnpm test scenario <id> --words`: test/harness/words-judge.ts, askRows), with its entry in
-//    src/play/words/asks/<id>.ts: `ok` (an entry that breaks no rule), `breaks` (an entry that does: the rule of docs/design-system-table.md, Choice tray, the words tests check, or a todo stub), `MISSING`
-//    (no entry, and the families' own words fail the words test or only this scenario deals the card), `chain` (no entry, the families' words pass and another scenario deals the card too: an entry is optional), `optional` (a Choose's own sentence,
-//    which the sheet's lead can say). An entry that names no record path is `ORPHAN`.
+//    src/play/words/asks/<id>.ts and a status (`STATUS_MEANING` below says what each means). An entry that names no record path is `ORPHAN`.
 // 2. The Table step, as far as code can tell: the widgets the scenario's definition declares and whether the table reads each, the readout files that name the scenario's id, the setup records to check by hand, the
 //    scenario file's Table section, and the table test.
-// `--write` adds a stub entry (the key, the printed line as a comment, a `todo`) for each MISSING row (with `--all`, each `chain` row too), never touching an entry that exists, so a second run writes nothing. The stub fails the asks test of the scenario
+// `--write` adds a stub entry (the key, the printed line as a comment, a `todo`) for each MISSING row (with `--all`, each `review` and `chain` row too), never touching an entry that exists, so a second run writes nothing. The stub fails the asks test of the scenario
 // (`entryProblems`, test/harness/words-judge.ts) until it is filled and its `todo` deleted. `--dry-run` lists what `--write` would add.
 
 export const SCENARIO_WORDS_USAGE = "usage: pnpm scenario words <scenario-id> [--write | --dry-run] [--all]";
 
-export type Status = "ok" | "breaks" | "MISSING" | "chain" | "optional" | "ORPHAN";
+/** What each status of a row means: the one definition (the header and docs/development.md, Commands, point here). */
+export const STATUS_MEANING = {
+  ok: "an entry that breaks no rule",
+  breaks: "an entry that breaks a rule of docs/design-system-table.md, Choice tray (the words tests check them), or is a todo stub",
+  MISSING: "no entry, and the scenario's words test fails without one",
+  review: "no entry, the families' words pass and only this scenario deals the card: the author judges whether the family's sentence names the result (docs/agents/cycle-procedure.md, What each task is held to, Words)",
+  chain: "no entry, the families' words pass and another playable or scaffolded scenario deals the card too: an entry is optional",
+  optional: "a Choose's own sentence, which the sheet's lead can say",
+  ORPHAN: "an entry that names no record path of a card the scenario deals",
+} as const;
+export type Status = keyof typeof STATUS_MEANING;
 export type Line = { key: string; status: Status; detail: string; printed: string };
 
-/** The status of one row: the entry's own problems when it has one; with none, MISSING when the words test fails on the families' words or the card is `own` (no other scenario deals it), else `chain`. */
+/** The status of one row: the entry's own problems when it has one; with none, MISSING when the words test fails on the families' words, else `review` for a card only this scenario deals (`own`) and `chain` for one another scenario deals too. */
 export function statusOf(row: Pick<AskRow, "kind" | "verdict">, entry: Ask | undefined, entryFaults: readonly string[], own = false): { status: Status; detail: string } {
   if (entry) return entryFaults.length > 0 || (row.verdict?.problem ?? null) !== null ? { status: "breaks", detail: [...entryFaults, ...(row.verdict?.problem ? [row.verdict.problem] : [])].join("; ") } : { status: "ok", detail: "" };
   if (row.kind === "choose") return { status: "optional", detail: "no sentence entry: the sheet's own lead says it" };
   const said = row.verdict ? row.verdict.line.slice(row.verdict.key.length + 2) : "";
   if (row.verdict?.problem) return { status: "MISSING", detail: `the words test fails: ${row.verdict.problem}` };
-  return own ? { status: "MISSING", detail: `a card only this scenario deals, so the task owes its entry (the families say "${said}")` } : { status: "chain", detail: `the families say "${said}", the words test passes and another scenario deals the card: an entry is optional (--all stubs it)` };
+  return own ? { status: "review", detail: `a card only this scenario deals: judge whether the families' sentence "${said}" names the result, else write the entry (--all stubs it)` } : { status: "chain", detail: `the families say "${said}", the words test passes and another scenario deals the card: an entry is optional (--all stubs it)` };
 }
+
+// The statuses that are work to do: a `chain` or `optional` row needs nothing unless the author chooses to write the entry.
+const OPEN: readonly Status[] = ["MISSING", "review", "breaks", "ORPHAN"];
 
 const oneLine = (text: string): string => text.replace(/\s+/g, " ").trim();
 
@@ -65,13 +77,14 @@ export function renderWordsStubs(rows: readonly { key: string; kind: AskRow["kin
   return out.join("\n");
 }
 
-/** The asks file's text with `block` added before the closing `};` of its ASKS table, or null when the file has no `export const ASKS ... = {` table. */
-export function extendAsks(source: string, block: string): string | null {
+/** The asks file's text with `block` added before the closing `};` of its ASKS table. Throws, naming `file`, when the file has no `export const ASKS ... = {` table or the table does not end with a line `};` (the first line that starts in column 0 after the opening). */
+export function extendAsks(file: string, source: string, block: string): string {
   const start = /^export const ASKS\b[^\n]*= \{$/m.exec(source);
-  if (!start) return null;
-  const close = /^\};$/m.exec(source.slice(start.index + start[0].length));
-  if (!close) return null;
-  const at = start.index + start[0].length + close.index;
+  if (!start) throw new Error(`${file} has no \`export const ASKS ... = {\` table to extend: add the entries by hand`);
+  const from = start.index + start[0].length;
+  const close = /^\S[^\n]*$/m.exec(source.slice(from));
+  if (!close || close[0] !== "};") throw new Error(`${file}: the ASKS table does not end with a line \`};\` (the first line in column 0 after it is ${close ? JSON.stringify(close[0]) : "missing"}): add the entries by hand`);
+  const at = from + close.index;
   return `${source.slice(0, at)}${block}\n${source.slice(at)}`;
 }
 
@@ -158,14 +171,14 @@ function main(log: Log): void {
   for (const effect of records) {
     walk(effect.instructions, (instruction, next, _after, at) => {
       for (const tail of tailsOf(instruction)) {
-        paths.add(`${effect.id} @${at} ${tail}`);
+        paths.add(askKey(effect.id, at, tail));
         const rendered = renderedEntry(t, effect, instruction, next, at, tail, asks);
         if (rendered) faults.set(rendered.key, rendered.problems.map((problem) => problem.slice(problem.indexOf(": ") + 2)));
       }
     });
   }
-  // A card is the scenario's own when no other scenario deals it: its words are this file's to write, while a shared card's may be left to the families or to the other scenario's file.
-  const elsewhere = new Set(loadScenarios().filter((other) => other.id !== id).flatMap((other) => [...dealtCodes(campaigns, [other], { nightmare: true })]));
+  // A card is the scenario's own when no other playable or scaffolded scenario deals it (WORDS_SCENARIOS, the ones the words test reads): its words are this file's to judge, while a shared card's may be left to the families or to the other scenario's file.
+  const elsewhere = new Set(loadScenarios().filter((other) => other.id !== id && WORDS_SCENARIOS.includes(other.id)).flatMap((other) => [...dealtCodes(campaigns, [other], { nightmare: true })]));
   const lines: Line[] = rows.map((row) => {
     const entry = asks[row.key];
     const own = entry ? [...entryProblems(row.key, entry).map((problem) => problem.slice(row.key.length + 2)), ...(faults.get(row.key) ?? [])] : [];
@@ -174,14 +187,14 @@ function main(log: Log): void {
   for (const key of Object.keys(asks)) if (!paths.has(key)) lines.push({ key, status: "ORPHAN", detail: "names no record path of a card the scenario deals", printed: "" });
 
   const count = (status: Status): number => lines.filter((line) => line.status === status).length;
-  log.info(`${id}: ${lines.length - count("ORPHAN")} Picks and Choose rows over ${records.length} records. ok ${count("ok")}, breaks ${count("breaks")}, MISSING ${count("MISSING")}, chain ${count("chain")}, optional ${count("optional")}, ORPHAN ${count("ORPHAN")}`);
+  log.info(`${id}: ${lines.length - count("ORPHAN")} Picks and Choose rows over ${records.length} records. ${(Object.keys(STATUS_MEANING) as Status[]).map((status) => `${status} ${count(status)}`).join(", ")}`);
   log.info(`Asks (src/play/words/asks/${id}.ts), work down the lines marked [ ]:`);
   for (const line of lines) {
-    const open = line.status === "MISSING" || line.status === "breaks" || line.status === "ORPHAN";
+    const open = OPEN.includes(line.status);
     if (!open && !verbose()) continue;
     log.info(`  [${open ? " " : "x"}] ${line.status.padEnd(8)} ${line.key}${line.detail ? `  <- ${line.detail}` : ""}${open && line.printed ? `\n               printed: ${oneLine(line.printed).slice(0, 130)}` : ""}`);
   }
-  if (!verbose()) log.info(`  (${lines.length - count("MISSING") - count("breaks") - count("ORPHAN")} rows that need nothing are left out: --verbose lists them)`);
+  if (!verbose()) log.info(`  (${lines.filter((line) => !OPEN.includes(line.status)).length} rows that need nothing are left out: --verbose lists them)`);
 
   // Part 2: the Table step.
   const files = new Map<string, string>();
@@ -193,9 +206,9 @@ function main(log: Log): void {
   log.info("The Table step (docs/agents/agent-brief.md, Scenario procedure), as far as code can tell:");
   for (const row of table) log.info(`  [${row.state === "NOT READ" || row.state === "missing" || row.state === "check by hand" ? " " : "x"}] ${row.state.padEnd(13)} ${row.what}: ${row.detail}`);
 
-  // --write: a stub for each MISSING row.
+  // --write: a stub for each MISSING row (with --all, each review and chain row too).
   const all = parsed.flags.has("all");
-  const missing = rows.filter((row) => ((status) => status === "MISSING" || (all && status === "chain"))(lines.find((line) => line.key === row.key)?.status));
+  const missing = rows.filter((row) => ((status) => status === "MISSING" || (all && (status === "review" || status === "chain")))(lines.find((line) => line.key === row.key)?.status));
   const target = path.join(ROOT, `src/play/words/asks/${id}.ts`);
   const stubs = renderWordsStubs(missing.map((row) => ({ key: row.key, kind: row.kind, effectId: row.effect.id, cardName: names.code(row.effect.cardCode), timing: row.effect.timing, printed: printedOf(row.effect) })));
   if (missing.length === 0) {
@@ -208,12 +221,8 @@ function main(log: Log): void {
     return;
   }
   const source = existsSync(target) ? readFileSync(target, "utf8") : null;
-  const text = source === null ? newAsksFile(id, scenario.name, stubs) : extendAsks(source, stubs);
-  if (text === null) {
-    log.error(`src/play/words/asks/${id}.ts has no \`export const ASKS ... = {\` table to extend: add the entries by hand`);
-    process.exitCode = 1;
-    return;
-  }
+  const file = `src/play/words/asks/${id}.ts`;
+  const text = source === null ? newAsksFile(id, scenario.name, stubs) : extendAsks(file, source, stubs);
   writeFileSync(target, text);
   log.info(`wrote ${missing.length} stubs to src/play/words/asks/${id}.ts${source === null ? " (new file: run pnpm data build to list it in the barrel)" : ""}; each fails \`pnpm test scenario ${id} --words\` until its todo is replaced by the words`);
 }

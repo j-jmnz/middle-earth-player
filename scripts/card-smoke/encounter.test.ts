@@ -114,7 +114,7 @@ describe("known failures and flags", () => {
 
   it("says how many games were won and lost, and the lost ones by reason, most frequent first", () => {
     const ended = (ended: GameSummary["ended"], lossReason: string | null = null): GameSummary => ({ ...game(), ended, lossReason, problem: null });
-    const games = [ended("lost", "No seats remain"), ended("won"), ended("lost", "Faramir left play"), ended("lost", "No seats remain"), ended("lost")];
+    const games = [ended("lost", "No seats remain"), ended("won"), ended("lost", "Faramir left play"), ended("lost", "No seats remain"), ended("lost", "no reason recorded")];
     expect(lossesOf(games)).toEqual([["No seats remain", 2], ["Faramir left play", 1], ["no reason recorded", 1]]);
     expect(formatSummary(summary(games))).toContain("5 games (1 won, 4 lost (No seats remain x2, Faramir left play x1, no reason recorded x1), 0 problems)");
     // A soak that wins nothing says so: 0 won, with no loss list when nothing was lost either.
