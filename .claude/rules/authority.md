@@ -12,7 +12,7 @@ An open point is a reading of a card, a rule or an effect that `data/` and the o
 2. **Community discussion**: BoardGameGeek, the lotrlcg subreddit, and the FFG and Hall of Beorn forums. It settles the point only when its answer is clear and agreed.
 3. **The agent's recommendation**, when neither settles it, with the reason.
 
-A reading is marked `researched` (with the URLs read) or `recommended` (with the URLs read and why none settled it). It goes to its scenario's file `docs/scenarios/<box>/<id>.md` (`<box>.md` for what its scenarios share, `docs/brief.md` for the core round and the player cards), with its source URL or "agent recommendation"; a `recommended` reading, or one settled only by community discussion, also gets a line in that file's Readings to confirm until the user confirms it. A scan that cannot be read is the one question for the user: the printed card cannot be taken from a discussion.
+A reading is marked `researched` (with the URLs read) or `recommended` (with the URLs read and why none settled it). It goes to its scenario's file `docs/scenarios/<box>/<id>.md` (`<box>.md` for what its scenarios share, `docs/brief.md` for the core round and the player cards), with its source URL or "agent recommendation". The recommendation settles the point; the user confirms no reading (user instruction, 2026-11-25). A scan that cannot be read is the one question for the user: the printed card cannot be taken from a discussion.
 
 ## Changes
 

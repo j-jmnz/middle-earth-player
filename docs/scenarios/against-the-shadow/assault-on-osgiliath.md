@@ -73,27 +73,6 @@ Statuses are those of `docs/scenarios/against-the-shadow.md` (Readings). Format:
 - `06106:A:2` (recommended). Tie between equal-Threat locations: the player picks. Not taken: the first player picks. Basis: printed, no source. Sources: no source for ties; recommend the player whose location it is; confirm.
 - `06106:A:2` (researched). Surge happens even if the When Revealed is canceled (06106:A:1 keyword). Not taken: n/a. Basis: VotP; rr.surge. Sources: https://visionofthepalantir.com/2018/04/20/assault-on-osgiliath.
 
-## Readings to confirm
-
-Each is a `recommended` reading, or one settled only by community discussion. Full rows under Readings.
-
-- `06091:A:1`: Setup picks come from the encounter deck and are added to the staging area without revealing them, so a Haradrim Elite chosen there attacks.
-- `06091:A:1`: Players choose in player order, first player first, and a later player cannot take a copy an earlier one took.
-- `06091:B:2`: Control stays with the player who took it when the first-player token passes.
-- `06091:B:2`: A controlled location explored again goes to the current first player; the seat that held it loses control of it, and its Ruined Tower returns.
-- `06091:B:1`: Explorer's Almanac (11011): the progress from questing that it lets a staging location take is placed by the quest, not by a player card effect, so the bar does not stop it.
-- `06091:B:1`: A player card with a "then" part after barred progress on a staged location is not offered while no legal target exists. No pool card reads this way yet.
-- `06091:B:3`: The win is checked in the end-of-round window after the refresh phase, not right after combat.
-- `06095:A:1`: Southron Commander's attacks run in player order from the first player, each finished before the next starts.
-- `06096:A:1`: West Gate's Action may be used from a controlled West Gate; control is lost as it becomes the active location.
-- `06099:A:2`: The Old Bridge's resources may come from any of the paying player's heroes, in any split.
-- `06100:A:1`: With West Quarter and East Quarter both active, the quest has Siege and Battle at once and counts Defense. No card gives that case (Ruined Tower is the only second slot).
-- `06100:A:2`, `06101:A:2`, `06104:A:2`: The controller of the destroyed character picks among tied highest-Threat locations.
-- `06104:A:1`: Pinned Down's X is fixed when it resolves.
-- `06106:A:2`: The player picks among tied highest-Threat locations.
-- `06098:A:1`, `06098:A:2`, `06099:A:1`, `06099:A:2`, `06102:A:3`: settled only by the Vision of the Palantir review, a blog gloss of the printed line.
-- `06100:A:1`: researched on a designer's forum answer (Caleb) that covers West Quarter alone.
-
 ## Engine notes
 
 The control of locations is in the family `pelargir` (`src/catalog/families/pelargir.ts`, `src/rules/families/pelargir/location-control.ts`, `undefended.ts`, `progress-bar.ts` and `ruined-tower.ts`, the one place that names `06103`; the render templates are in `scripts/data/effects/render/families/pelargir.ts`; line tests `src/campaign/scenarios/assault-on-osgiliath/lines-*.test.ts` and `spec.test.ts`, the table helper `test/scenarios/assault-on-osgiliath/table.ts`). Shared code holds these additions, each read only when a record of this scenario sets its flag, filter or stat: the filter `controlled` on a location pick and the controlled locations in a plain location pick (`src/rules/interpret/pick.ts`, read only while a card holds `controlSeat`), the bar on a player card's progress (`placeProgress` in `src/rules/interpret/effect-verbs.ts`, the pick flag `places` in `effect-frames.ts` and `player/potential.ts`), the `until` of a constant Siege or Battle (`src/rules/interpret/constants.ts`) and the render's two trigger lines.

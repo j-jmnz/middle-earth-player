@@ -16,9 +16,3 @@ The first cycle (2011): The Hunt for Gollum, Conflict at the Carrock, A Journey 
 - `docs/scenarios/shadows-of-mirkwood/the-hills-of-emyn-muil.md`: The Hills of Emyn Muil
 - `docs/scenarios/shadows-of-mirkwood/the-dead-marshes.md`: The Dead Marshes
 - `docs/scenarios/shadows-of-mirkwood/return-to-mirkwood.md`: Return to Mirkwood
-
-## Readings to confirm
-
-Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open points). Delete a line when the user confirms it.
-
-- Readings settled only by community discussion are marked so under each scenario in `docs/scenarios/shadows-of-mirkwood.md` (Shadows of Mirkwood). Not user-confirmed.
