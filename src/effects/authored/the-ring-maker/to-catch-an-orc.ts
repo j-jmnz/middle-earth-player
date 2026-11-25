@@ -47,8 +47,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [{ verb: "ModifyStat", stat: "cannotReady", amount: 1, until: "whileSourceInPlay", target: "host" }, { verb: "ModifyStat", stat: "lossOnLeavingPlay", amount: 1, until: "whileSourceInPlay", target: "host" }],
   },
 
-  // 07025 Mugash's Guard. While a player controls a hero with Mugash attached the Guard engages him (the settle sweep, families/ring-maker/captor.ts). Forced: after it destroys a character, Mugash goes back to the staging area if he is attached to a hero.
-  { id: "07025:constant:1", cardCode: GUARD, lines: ["07025:A:1"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "EngageCaptiveHolder", captive: MUGASH_NAME }] },
+  // 07025 Mugash's Guard. While a player controls a hero with Mugash attached the Guard in the staging area or engaged with another player engages him (the settle sweep, families/ring-maker/captor.ts). Forced: after it destroys a character, Mugash goes back to the staging area if he is attached to a hero.
+  { id: "07025:constant:1", cardCode: GUARD, lines: ["07025:A:1"], timing: "constant", condition: { kind: "any", conditions: [IN_STAGING, { kind: "sourceIn", zone: "engaged" }] }, instructions: [{ verb: "EngageCaptiveHolder", captive: MUGASH_NAME }] },
   {
     id: "07025:forced:1",
     cardCode: GUARD,

@@ -27,7 +27,7 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ReturnAttachedEnemy"), name: z.string().min(1), ...when }),
   // "The defending player shuffles 1 random card from his hand into his out-of-play deck" (07026:A:1): the actor puts one random card of its hand, not one that cannot leave the hand, facedown into its out-of-play deck, which is shuffled. An empty hand does nothing.
   z.strictObject({ verb: z.literal("ShuffleHandCardIntoOutOfPlay"), random: z.literal(true), ...when }),
-  // "While a player controls a hero with Mugash attached, Mugash's Guard engages that player" (07025:A:1), a constant marker on the Guard: in the staging area it engages the seat that controls a hero with the enemy of this title attached, at once and whatever its engagement cost. The settle sweep is
+  // "While a player controls a hero with Mugash attached, Mugash's Guard engages that player" (07025:A:1), a constant marker on the Guard: in the staging area, or engaged with another seat, it engages the seat that controls a hero with the enemy of this title attached, at once and whatever its engagement cost. The settle sweep is
   // families/ring-maker/captor.ts; the run does nothing.
   z.strictObject({ verb: z.literal("EngageCaptiveHolder"), captive: z.string().min(1) }),
 ] as const;

@@ -8,6 +8,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
+import { holds } from "../../interpret/conditions.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import { engageWith } from "../../quest/quest.ts";
 import { returnAttachedEnemy } from "../angmar/reanimate/attached.ts";
@@ -15,7 +16,10 @@ import { effectsOfCard } from "../misc/text.ts";
 
 /** The title a card's `EngageCaptiveHolder` record names, or null for a card without one (a card that shows no such text, or any card of another game). */
 function captiveOf(state: ScenarioState, ctx: ReduceContext, card: CardInstance): string | null {
+  const scope = { actor: card.controller ?? 0, sourceId: card.id, returned: 0 };
   for (const effect of effectsOfCard(state, ctx, card)) {
+    // The record's own condition says where the Guard works (staging or engaged).
+    if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
     for (const instruction of effect.instructions) if (instruction.verb === "EngageCaptiveHolder") return instruction.captive;
   }
   return null;

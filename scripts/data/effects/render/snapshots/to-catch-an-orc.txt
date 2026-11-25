@@ -28,8 +28,8 @@ Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc
 
 07025:A:1 (front): While a player controls a hero with Mugash attached, Mugash's Guard engages that player.
   07025:constant:1: Constant
-    only if this card is in the staging area
-    - (constant, does nothing when run) while this enemy is in the staging area it engages the player who controls a hero with Mugash attached, at once and whatever its engagement cost
+    only if any of: (this card is in the staging area) or (this card is engaged with a player (that player is who "you" means in this record))
+    - (constant, does nothing when run) while this enemy is in the staging area or engaged with another player it engages the player who controls a hero with Mugash attached, at once and whatever its engagement cost
 
 07025:A:2 (front): Forced: After Mugash's Guard destroys a character, if Mugash is attached to a hero, return Mugash to the staging area.
   07025:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
@@ -279,4 +279,4 @@ Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc
   07064:questResolution:1: Quest resolution
     - the players win the game
 
-(rendered pieces: 169 by template, 0 as JSON)
+(rendered pieces: 171 by template, 0 as JSON)
