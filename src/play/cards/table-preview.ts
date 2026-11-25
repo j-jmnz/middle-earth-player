@@ -1,5 +1,6 @@
 // What a long press on a table card shows (card-preview.tsx): the card, the cards attached to it and its face-up shadow cards,
 // each with the effects on it now, opened on the card that was pressed. Pure: the screen hands over how a code is pictured.
+import { umbarDetail } from "../readouts/haradrim/umbar.ts";
 import { stageSeat, viewOf } from "../../rules/families/breaking/areas.ts";
 import { isLostIsland } from "../../rules/families/uncharted/pick.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
@@ -127,7 +128,7 @@ export function previewCards(
     const looked = game.window?.kind === "look" && game.window.side === "A" && game.window.cardIds.includes(id);
     const described = describe(card.code, looked ? card.code : pictureKey(card));
     const lostIsland = !looked && isLostIsland(card, ctx);
-    const detail = dungeonDetail(game, ctx, id, cardName) ?? oathDetail(game, ctx, id) ?? ([grappleDetail(game, id), shipLoss(game, ctx, id)?.speech].filter((part) => part != null).join(". ") || null);
+    const detail = dungeonDetail(game, ctx, id, cardName) ?? oathDetail(game, ctx, id) ?? umbarDetail(game, ctx, id, cardName) ?? ([grappleDetail(game, id), shipLoss(game, ctx, id)?.speech].filter((part) => part != null).join(". ") || null);
     // The Heading card: titled by its step and its course, listing the four steps with the current one marked, and drawn turned a quarter turn per step (dcce.heading). A peek never changes the dial.
     const heading = game.sea?.headingCard === id ? headingStepOf(game.sea?.heading) : null;
     const turned = heading ? { title: headingPreviewTitle(heading), turn: headingLook(heading).turn } : {};

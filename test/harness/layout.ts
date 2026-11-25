@@ -83,8 +83,8 @@ export type Layout = {
   pursuit?: number;
   // A hero stand-in lies faceup as a Captive under the card with the code `under` (The Uruk-hai, 143069:A:1).
   captive?: { hero: string; under: string };
-  // Cards lying facedown under the first card with the code `to` (the enemies under The Black Gate, 144027:A:2).
-  under?: readonly { code: string; to: string }[];
+  // Cards lying facedown under the first card with the code `to` (the enemies under The Black Gate, 144027:A:2); `up` lays one faceup (the enemy under Narrow Alleyway, 16016:A:1).
+  under?: readonly { code: string; to: string; up?: true }[];
   // The Night objective in play beside the current quest (The Stone of Erech, 50301:A:1): a code, or a code with its progress.
   night?: Entry;
   // The scenario's saga hero (Bilbo Baggins in The Hobbit, the loadout deals him) is a hero of the first seat, with this many resources in his pool.
@@ -237,7 +237,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   }
   for (const hidden of layout.under ?? []) {
     const spawned = spawn(state, hidden.code, { zone: "under", locationId: idOf(state, hidden.to) }, "down");
-    state = spawned.state;
+    state = hidden.up ? updateCard(spawned.state, spawned.id, { face: "up" }) : spawned.state;
   }
   if (layout.captive) state = holdCaptive(state, idOf(state, layout.captive.hero), idOf(state, layout.captive.under));
   if (layout.pursuit != null) state = { ...state, pursuit: layout.pursuit };
