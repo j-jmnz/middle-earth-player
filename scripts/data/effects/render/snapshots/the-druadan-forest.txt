@@ -93,7 +93,7 @@ Scenario piles that place cards with no record (quest: 06042 The Pursuit; quest:
     who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "pay" (only if the living players' heroes that can pay for a card of any sphere hold at least 1 resource(s) in all):
-        - the players as a group spend 1 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
+        - the players as a group spend 1 resource(s) from any hero they control, an objective-hero included (no resource icon is matched), choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
       * option "return":
         - when the attack in progress ends:
           - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
@@ -131,7 +131,7 @@ Scenario piles that place cards with no record (quest: 06042 The Pursuit; quest:
     who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "pay" (only if the living players' heroes that can pay for a card of any sphere hold at least 1 resource(s) in all):
-        - the players as a group spend 1 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
+        - the players as a group spend 1 resource(s) from any hero they control, an objective-hero included (no resource icon is matched), choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
       * option "return":
         - when the attack in progress ends:
           - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
@@ -228,7 +228,7 @@ Scenario piles that place cards with no record (quest: 06042 The Pursuit; quest:
     - for each player, first player first:
       - the acting player chooses one of:
         * option "pay" (only if not (the resource tokens on hero (you control) is less than the number of attachment (you control))):
-          - the acting player spend the number of attachment (you control) resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
+          - the acting player spend the number of attachment (you control) resource(s) from any hero they control, an objective-hero included (no resource icon is matched), choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
         * option "discard" (only if there is a attachment (you control) to choose):
           - the acting player discards each attachment (you control)
 

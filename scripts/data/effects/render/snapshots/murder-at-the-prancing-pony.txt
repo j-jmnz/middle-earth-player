@@ -312,7 +312,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
   50718:travel:1: Travel
     note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player's heroes hold fewer resources than they must spend (read by the investigation family)
     - for each player, first player first:
-      - the acting player spend 1 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
+      - the acting player spend 1 resource(s) from any hero they control, an objective-hero included (no resource icon is matched), choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
 
 ## 50719 Old Warehouse
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -385,7 +385,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
     - raise threat by 1 (the acting player)
     - then, if the actor's heroes that can pay for a card of any sphere hold at least 1 resource(s) in all (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player looks at the bottom card of the Investigation deck (nothing is shuffled or moved); a card looked at that hears the look (Taken by Surprise) resolves once this effect is done
     - then, if the actor's heroes that can pay for a card of any sphere hold at least 1 resource(s) in all (checked when this step runs, after the steps above; not tied to whether they did anything): discard this card
-    - the acting player spend 1 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
+    - the acting player spend 1 resource(s) from any hero they control, an objective-hero included (no resource icon is matched), choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
 
 ## 50723 Lawless Ruffian
 (the scenario deals it into the encounter pile; the piles place it, no record does)

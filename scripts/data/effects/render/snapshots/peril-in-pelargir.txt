@@ -134,7 +134,7 @@ Scenario piles that place cards with no record (quest: 05065 The Leaping Fish; q
   05039:travel:1: Travel
     note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player's heroes hold fewer resources than they must spend (read by the investigation family)
     - for each player, first player first:
-      - the acting player spend 1 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
+      - the acting player spend 1 resource(s) from any hero they control, an objective-hero included (no resource icon is matched), choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
 
 05039:A:3 (shadow): Shadow: Defending player discards all resources in his heroes' resource pools.
   05039:shadow:1: Shadow

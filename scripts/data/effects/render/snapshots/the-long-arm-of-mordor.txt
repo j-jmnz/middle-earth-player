@@ -12,7 +12,7 @@ Scenario piles that place cards with no record (quest: 16071 Surprise Attack; qu
 
 16031:A:2 (front): If Kahliel leaves play, you are eliminated from the game.
   16031:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
-    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    who acts: the acting player is the player who controlled the card when it left play (the leave-play event names that player, the card having no controller afterwards)
     - the acting player is eliminated from the game by a card effect
 
 ## 16032 Firyal
@@ -29,7 +29,7 @@ Scenario piles that place cards with no record (quest: 16071 Surprise Attack; qu
 
 16032:A:2 (front): If Firyal leaves play, you are eliminated from the game.
   16032:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
-    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    who acts: the acting player is the player who controlled the card when it left play (the leave-play event names that player, the card having no controller afterwards)
     - the acting player is eliminated from the game by a card effect
 
 ## 16033 Yazan
@@ -47,7 +47,7 @@ Scenario piles that place cards with no record (quest: 16071 Surprise Attack; qu
 
 16033:A:3 (front): If Yazan leaves play, you are eliminated from the game.
   16033:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
-    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    who acts: the acting player is the player who controlled the card when it left play (the leave-play event names that player, the card having no controller afterwards)
     - the acting player is eliminated from the game by a card effect
 
 ## 16034 Jubayr
@@ -65,7 +65,7 @@ Scenario piles that place cards with no record (quest: 16071 Surprise Attack; qu
 
 16034:A:3 (front): If Jubayr leaves play, you are eliminated from the game.
   16034:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
-    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    who acts: the acting player is the player who controlled the card when it left play (the leave-play event names that player, the card having no controller afterwards)
     - the acting player is eliminated from the game by a card effect
 
 ## 16035 Sauron's Enforcers
@@ -94,7 +94,7 @@ Scenario piles that place cards with no record (quest: 16071 Surprise Attack; qu
   16036:travel:1: Travel
     note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player's heroes hold fewer resources than they must spend (read by the investigation family)
     - for each player, first player first:
-      - the acting player spend 1 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
+      - the acting player spend 1 resource(s) from any hero they control, an objective-hero included (no resource icon is matched), choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
 
 16036:A:3 (shadow): Shadow: If the defending character is an objective-hero, ready it and cancel all damage from this attack.
   16036:shadow:1: Shadow
@@ -325,7 +325,7 @@ Scenario piles that place cards with no record (quest: 16071 Surprise Attack; qu
 
 16071:B:1 (back): Damage from undefended attacks must be dealt to a hero in the staging area, if able.
   16071:constant:1: Constant
-    - the table: stat undefendedToStaged (the damage of undefended attacks goes to a hero in the staging area, the attacked player naming which, while one can take it; with none it goes to the player's own heroes) 1, while this card is in play
+    - the damage of undefended attacks must be dealt to a hero in the staging area if able: the attacked player names which hero takes it, and with none able it goes to the player's own heroes, while this card is in play
 
 16071:B:2 (back): The first card each player plays each phase does not require a resource match.
   16071:constant:2: Constant
@@ -344,7 +344,7 @@ Scenario piles that place cards with no record (quest: 16071 Surprise Attack; qu
 
 16072:B:1 (back): Damage from undefended attacks must be dealt to a hero in the staging area, if able.
   16072:constant:1: Constant
-    - the table: stat undefendedToStaged (the damage of undefended attacks goes to a hero in the staging area, the attacked player naming which, while one can take it; with none it goes to the player's own heroes) 1, while this card is in play
+    - the damage of undefended attacks must be dealt to a hero in the staging area if able: the attacked player names which hero takes it, and with none able it goes to the player's own heroes, while this card is in play
 
 16072:B:2 (back): The first card each player plays each phase does not require a resource match.
   16072:constant:2: Constant
@@ -365,7 +365,7 @@ Scenario piles that place cards with no record (quest: 16071 Surprise Attack; qu
     - for each player, first player first:
       - the acting player finds one Orc enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
-    - the first player attaches each hero in the staging area to a different Orc enemy in the staging area that guards no hero: the hero is guarded by that enemy, under no player's control (asked which Orc when several are free; a hero with no Orc left stays in the staging area)
+    - the first player attaches each hero in the staging area to a different Orc enemy in the staging area that guards no hero: the hero is guarded by that enemy, under no player's control, immune to player card effects, and with a blank text box (the settle sweep marks each guarded hero; asked which Orc when several are free; a hero with no Orc left stays in the staging area)
 
 16073:B:1 (back): While an enemy is guarding a hero it gets +1 Threat, +1 Attack, +1 Defense and is immune to player card effects.
   16073:constant:1: Constant

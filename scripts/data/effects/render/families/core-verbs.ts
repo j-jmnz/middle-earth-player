@@ -63,7 +63,7 @@ export const CORE_TEMPLATES: Templates = {
   }),
   SpendResources: (i, ctx) => ({
     text: i.target === undefined
-      ? `${i.group === true ? "the players as a group" : "the acting player"} spend ${amt(i.amount, ctx)} resource(s) from heroes with ${typeof i.sphere === "string" ? `the ${SPHERE(i.sphere)} icon` : "this card's sphere icon"}, choosing a hero for each resource${i.group === true ? " (any player's)" : " (their own)"} (with fewer resources than that, nothing is spent)`
+      ? `${i.group === true ? "the players as a group" : "the acting player"} spend ${amt(i.amount, ctx)} resource(s) from ${typeof i.sphere === "string" ? `heroes with the ${SPHERE(i.sphere)} icon` : "any hero they control, an objective-hero included (no resource icon is matched)"}, choosing a hero for each resource${i.group === true ? " (any player's)" : " (their own)"} (with fewer resources than that, nothing is spent)`
       : `${amt(i.amount, ctx)} resource(s) are spent from the pool of ${cardRef(i.target)} (nobody chooses; a pool with fewer spends nothing)`,
     read: ["amount", "target", "sphere", "group", "paid"],
   }),

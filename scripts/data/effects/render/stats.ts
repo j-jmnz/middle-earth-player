@@ -103,6 +103,8 @@ export const STAT_TEMPLATES: Readonly<Record<string, Template>> = {
     const sign = i.subtract === true ? "minus " : "";
     const resources = `${i.eachResource === true ? " for each resource on the holder" : ""}${isObj(i.eachAttached) ? ` for each ${pick(i.eachAttached, ctx)} attached to the holder${i.eachAttached.facedownUnder === true ? " (here: each facedown player card under the holder)" : ""}` : ""}`;
     const stacking = i.doesNotStack === true ? " (does not stack: only the oldest copy of this card in play gives it)" : "";
+    // The Long Arm of Mordor's stage rule, said as the card prints it: the table flag's gloss alone reads as a stat.
+    if (i.stat === "undefendedToStaged") return { text: `the damage of undefended attacks must be dealt to a hero in the staging area if able: the attacked player names which hero takes it, and with none able it goes to the player's own heroes, ${untilWords(i.until)}`, read: ["stat", "amount", "until", "target"] };
     return { text: `${holders}${trait}: stat ${str(i.stat)}${STAT_NOTE[str(i.stat)] ?? ""} ${sign}${amount(i.amount, ctx)}${per}${resources}, ${untilWords(i.until)}${stacking}`, read: ["stat", "amount", "until", "holders", "target", "per", "trait", "subtract", "eachResource", "doesNotStack", "eachAttached"] };
   },
   // A restriction read from the record's own fields; one the template does not word (attach, heroLimit, travelOnly) prints as JSON.
