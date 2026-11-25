@@ -80,14 +80,15 @@ function watchErrors(show: (text: string) => void): void {
  * animations and the canvases' drawing), `draw` Skia's recording of the canvases' scenes (watchDraws), `db` the page's waits on the database worker, `save` the
  * copies of the saves to storage, `audio` the audio players' blessing and making, `tap` the taps (their count; no time), `img` the pictures the browser decoded
  * (the time each took off the page), `tex` the whole pictures handed to the graphics chip and `texpx` their size in thousands of pixels (in place of a time), `sub`
- * the parts of a picture handed over (the letters' atlas), and `shader` the drawing programs it compiled and linked (watchGraphics). `busy` is how long the page's
+ * the parts of a picture handed over (the letters' atlas), and `shader` the drawing programs it compiled and linked; `ctx` counts the WebGL contexts made, since each canvas has
+ * its own and compiles its programs again (watchGraphics). `busy` is how long the page's
  * own thread was held, whatever held it: the sum of the waits over 12 ms between one message and the next of a channel that answers itself (watchBusy). A second
  * with a low frame rate and no `busy` was slowed by the browser or the graphics chip, not by the page's script.
  */
 export type Work = Partial<Record<SpanName, readonly [ms: number, count: number]>>;
 
 /** The order the log prints the work in. */
-export const SPAN_ORDER: readonly SpanName[] = ["busy", "raf", "draw", "db", "save", "audio", "tap", "img", "tex", "texpx", "sub", "shader"];
+export const SPAN_ORDER: readonly SpanName[] = ["busy", "raf", "draw", "db", "save", "audio", "tap", "img", "tex", "texpx", "sub", "shader", "ctx"];
 
 /**
  * One second of the meter: its frame rate, its longest frame, how many of its frames took over two frames' time, how long its frames ran late in all (`late`: what
@@ -255,6 +256,19 @@ function watchGraphics(): void {
     timeMethod(context, "linkProgram", "shader");
   }
   window.addEventListener("pointerup", () => note("tap", 0), true);
+  // A new WebGL context: every canvas makes one, and a context starts with no program compiled.
+  const canvas = window.HTMLCanvasElement?.prototype as { getContext?: (...args: unknown[]) => unknown } | undefined;
+  const getContext = canvas?.getContext;
+  if (canvas && getContext) {
+    const made = new WeakSet<object>();
+    canvas.getContext = function counted(this: object, ...args: unknown[]) {
+      if (String(args[0]).startsWith("webgl") && !made.has(this)) {
+        made.add(this);
+        note("ctx", 0);
+      }
+      return getContext.apply(this, args);
+    };
+  }
 }
 
 // How often the log goes to the site, and the most seconds one sending holds.
