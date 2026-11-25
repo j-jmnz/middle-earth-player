@@ -1,12 +1,14 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
+import ts from "typescript";
 import { describe, expect, it } from "vitest";
 
 import { authoredRelOfScenario } from "../data/effects/authored-paths.ts";
 import { loadCampaignsInOrder } from "../data/load-scenarios.ts";
 import { planScenario, SCENARIO_NEW_USAGE, scenarioNewArguments, type Repo } from "./scenario-new.ts";
+import { POLICY_KIT_RULES } from "../../test/harness/policy-kit.ts";
 
 // pnpm scenario new <scenario-id>: it plans from data/scenarios and the registries as they are, edits them only by inserting lines, never
 // overwrites a file, and refuses an id that has no scenario file. Nothing is written here: the plan is read, and the CLI runs with --dry-run.
@@ -252,6 +254,53 @@ describe("pnpm scenario new", () => {
     expect(run.output).toContain(`src/campaign/scenarios/${id}/spec.test.ts`);
     for (const item of plan?.files ?? []) expect(exists(item.file), item.file).toBe(false);
     for (const edit of plan?.edits ?? []) expect(repo.read(edit.file), edit.file).toBe(edit.before);
+  });
+});
+
+// The type errors of a generated game.ts, written where its relative imports resolve (test/scenarios/<folder>/game.ts) and checked with the project's compiler on that one file; the files are deleted whatever happens.
+function typeErrorsOf(text: string): string[] {
+  const folder = `test/scenarios/zz-scaffold-check-${process.pid}`;
+  const config = `tsconfig.scaffold-check-${process.pid}.json`;
+  try {
+    mkdirSync(path.join(ROOT, folder), { recursive: true });
+    writeFileSync(path.join(ROOT, folder, "game.ts"), text);
+    writeFileSync(path.join(ROOT, config), JSON.stringify({ extends: "./tsconfig.json", compilerOptions: { types: ["node"] }, include: [`${folder}/game.ts`, "expo-env.d.ts", "nativewind-env.d.ts"] }));
+    const run = spawnSync(path.join(ROOT, "node_modules", ".bin", "tsrs"), ["-p", config, "--noEmit"], { cwd: ROOT, encoding: "utf8" });
+    return `${run.stdout}${run.stderr}`.split("\n").filter((line) => line.trim() !== "");
+  } finally {
+    rmSync(path.join(ROOT, folder), { recursive: true, force: true });
+    rmSync(path.join(ROOT, config), { force: true });
+  }
+}
+
+// The game.ts skeleton of a campaign scenario and of a cycle scenario starts from the play policy kit (test/harness/policy-kit.ts), with a comment that lists the kit's rules.
+describe("the game.ts skeleton", () => {
+  const kit = readFileSync(path.join(ROOT, "test/harness/policy-kit.ts"), "utf8");
+  const exported = [...kit.matchAll(/^export (?:function|const) (\w+)/gm)].map((found) => found[1] as string).filter((name) => name !== "policyIntent" && name !== "POLICY_KIT_RULES");
+
+  // A campaign scenario (the-drowned-ruins) and a cycle scenario (the-hunt-for-gollum).
+  it.each(["the-drowned-ruins", "the-hunt-for-gollum"])("of %s calls the kit, lists its rules and type-checks against the harness", (id) => {
+    const view = without(id);
+    const { plan } = planScenario(id, {}, view.repo, view.exists);
+    const text = plan?.files.find((item) => item.file === `test/scenarios/${id}/game.ts`)?.text ?? "";
+    expect(text).toContain('from "../../harness/policy-kit.ts"');
+    expect(text).toContain("policyIntent(rules(policy)");
+    expect(text).not.toContain("nextIntent");
+    for (const name of exported) expect(text, name).toContain(`//   ${name}`);
+    expect(ts.transpileModule(text, { reportDiagnostics: true, compilerOptions: { module: ts.ModuleKind.ESNext } }).diagnostics).toEqual([]);
+    // The type check takes about 3 s a skeleton (tsrs on the one file and what it imports), so it is a unit test, not a step of the scaffold.
+    expect(typeErrorsOf(text)).toEqual([]);
+  }, 60_000);
+
+  it("fails the type check on a skeleton that misuses the harness", () => {
+    const view = without("the-hunt-for-gollum");
+    const { plan } = planScenario("the-hunt-for-gollum", {}, view.repo, view.exists);
+    const text = plan?.files.find((item) => item.file === "test/scenarios/the-hunt-for-gollum/game.ts")?.text ?? "";
+    expect(typeErrorsOf(text.replace("policy.choose", "policy.chose")).join("\n")).toContain("TS2551");
+  }, 60_000);
+
+  it("lists exactly the rules the kit exports", () => {
+    expect(POLICY_KIT_RULES.map(([name]) => /^\w+/.exec(name)?.[0])).toEqual(exported);
   });
 });
 

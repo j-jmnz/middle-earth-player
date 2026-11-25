@@ -33,7 +33,7 @@ You build one scenario's engine half. The procedure is `docs/agents/agent-brief.
 ## Words
 
 - Inputs: the hand-off note with the Tests part. The records are final: a record that must change goes back to the orchestrator.
-- Do: asks for each Pick and Choose, with `pnpm test scenario <id> --words` read against `docs/design-system-table.md` (Choice tray); the Table step (`docs/agents/agent-brief.md`, Scenario procedure, The Table step) with its citations in the scenario's file `docs/scenarios/<box>/<id>.md`.
+- Do: asks for each Pick and Choose, starting from `pnpm scenario words <id>` (`--write` stubs what is missing), with `pnpm test scenario <id> --words` read against `docs/design-system-table.md` (Choice tray); the Table step (`docs/agents/agent-brief.md`, Scenario procedure, The Table step) with its citations in the scenario's file `docs/scenarios/<box>/<id>.md`.
 - Hand back: the asks entries and the sentences `--words` printed, the Table step's widgets and files, each gate with its result and whether the tree changed after it. Touch no golden, fixture, seed finder or campaign test.
 - Checks: `pnpm test scenario <id> --words`, then the light exit (`docs/agents/agent-brief.md`, Scenario procedure, The exit is paid once).
 

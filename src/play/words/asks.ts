@@ -47,6 +47,8 @@ export type Text = string | readonly { when?: Condition; text: string }[];
  *   the game, and on a Choose it is read for the branch the entry is keyed with. A warning that holds whatever is picked is a `when` that does not read `picked`; there is no sheet-wide caution.
  */
 export type Ask = {
+  /** A stub `pnpm scenario words <id> --write` wrote for a Pick or Choose with no words: the scenario's words tests fail while it is set, so the author writes the entry from the printed line and deletes it. */
+  todo?: string;
   note?: Text;
   why?: string;
   owned?: true;
