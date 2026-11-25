@@ -13,7 +13,8 @@ import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-pas
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { FRODO, SAM, begin, idsOf, send, type Run, type Table } from "../../../test/harness/scene.ts";
-import { attach, endRound, hosts, playerTableFor } from "../../../test/harness/player-table.ts";
+import { legalIntents } from "../../rules/engine/reduce.ts";
+import { attach, choices, endRound, hosts, play, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
 
 const GALADRIEL = "142003";
 const ELROND = "142005";
@@ -51,6 +52,22 @@ describe("Galadriel and Elrond (142003:A:1, 142005:A:1)", () => {
       expect(ended.cards[idsOf(tab, ALLY)]?.zone).toBe("play");
     });
   }
+});
+
+describe("Galadriel puts an attachment found into play (142003:A:2)", () => {
+  // "search the top 5 cards of your deck for an attachment of cost 3 or less and put it into play": the line names no host and the attachment found prints no "Attach to" line (the stand-in "plain"), so the heroes and allies of both
+  // seats are offered; put on the other player's hero it is that player's to control (rr.attachment-cards).
+  lineSpec("142003:A:2", "Galadriel: an attachment that prints no \"Attach to\" line goes on a character of any player", (effects) => {
+    const tab = table(effects, { seats: 2, heroes: [{ code: PAL, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: ALLY, seat: 1 }], hand: [{ code: GALADRIEL, seat: 0 }], playerDeck: [{ code: "plain", seat: 0 }] });
+    const [mine = "", theirs = ""] = tab.ids[PAL] ?? [];
+    let run = play(begin(tab.state), tab, idsOf(tab, GALADRIEL));
+    const trigger = legalIntents(run.state, tab.ctx).find((intent) => intent.type === "Trigger");
+    if (trigger) run = sendUnledgered(run, trigger, tab.ctx);
+    // The one attachment in the top 5 is picked by the engine; the host is the choice.
+    expect(choices(run.state, tab).sort()).toEqual([mine, theirs, idsOf(tab, ALLY), idsOf(tab, GALADRIEL)].sort());
+    run = sendUnledgered(run, { type: "Choose", optionId: theirs }, tab.ctx);
+    expect(run.state.cards[idsOf(tab, "plain")]).toMatchObject({ zone: "play", host: theirs, controller: 1 });
+  });
 });
 
 describe("Wizard Pipe (142009:A:1)", () => {

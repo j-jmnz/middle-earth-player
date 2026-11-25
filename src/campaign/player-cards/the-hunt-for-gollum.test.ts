@@ -98,6 +98,16 @@ describe("Dúnedain Mark (02002:A:1, A:2)", () => {
   });
 });
 
+describe("Dúnedain Mark moved to another player's hero (02002:A:3)", () => {
+  // "attach Dúnedain Mark to another hero.": the line names no player, so the other seat's hero is offered; the Mark then belongs to that player's play area (rr.attachment-cards, rr.ownership-and-control), still owned by the seat that brought it.
+  lineSpec("02002:A:3", "Dúnedain Mark: the other player's hero takes control of the Mark it receives", (effects) => {
+    const tab = table(effects, { seats: 2, heroes: [{ code: LEAD, seat: 0 }, { code: TAC, seat: 1 }], attached: [{ code: MARK, host: LEAD }] });
+    const mark = idsOf(tab, MARK);
+    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: mark, effectId: "02002:action:1", payments: [{ heroId: idsOf(tab, LEAD), amount: 1 }] }, tab.ctx);
+    expect(run.state.cards[mark]).toMatchObject({ host: idsOf(tab, TAC), controller: 1 });
+  });
+});
+
 describe("Winged Guardian (02004:A:2, A:3)", () => {
   // "Winged Guardian cannot have restricted attachments.": a restricted attachment that attaches to any character is offered the hero
   // and the other ally, not the Guardian; an attachment that is not restricted is offered the Guardian too.

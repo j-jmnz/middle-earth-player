@@ -34,6 +34,7 @@ const LEGOLAS = "01005";
 const EOWYN = "01007";
 const BERAVOR = "01012";
 const STEWARD = "01026";
+const SPYGLASS = "11180"; // an Item that prints no "Attach to" line
 const PAL = "pal";
 const ALLY = "ally";
 const CARD = "card";
@@ -51,7 +52,7 @@ const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
-  const cards = new Map([...starter.cards, ...(await loadPrinted([GILDOR, EXILE, BOWMASTER, RECKLESS, ODO, DEFIANT, HELM, COUNCIL, ARAGORN, LEGOLAS, EOWYN, BERAVOR, STEWARD]))]);
+  const cards = new Map([...starter.cards, ...(await loadPrinted([GILDOR, EXILE, BOWMASTER, RECKLESS, ODO, DEFIANT, HELM, COUNCIL, ARAGORN, LEGOLAS, EOWYN, BERAVOR, STEWARD, SPYGLASS]))]);
   cards.set(HOBBIT, definePrinted({ code: HOBBIT, name: "Hobbit Ally", type: "ally", sphere: "spirit", cost: 1, willpower: 1, attack: 1, defense: 1, health: 2, traits: ["Hobbit"] }));
   for (const code of [HOBBIT_TWO, HOBBIT_THREE]) cards.set(code, definePrinted({ code, name: code, type: "ally", sphere: "spirit", cost: 1, willpower: 1, attack: 1, defense: 1, health: 2, traits: ["Hobbit"] }));
   cards.set(MAN, definePrinted({ code: MAN, name: "Man Ally", type: "ally", sphere: "spirit", cost: 1, willpower: 1, attack: 1, defense: 1, health: 2 }));
@@ -247,6 +248,20 @@ describe("Helm of Secrecy (22090:A:1, A:2)", () => {
     expect(run.state.seats[0]?.heroes).toEqual([aragorn, eowyn]);
     expect(run.state.cards[steward]?.host).toBe(eowyn);
     expect(run.state.cards[beravor]?.zone).toBe("removed");
+  });
+});
+
+describe("Helm of Secrecy moves another player's attachment (22090:A:2)", () => {
+  // "moving all eligible attachments to the hero from your collection": Spyglass prints no "Attach to" line and belongs to the other player, who put it on Beravor; it is eligible for the new hero all the same.
+  lineSpec("22090:A:2", "Helm of Secrecy: an attachment of another player that prints no \"Attach to\" line moves to the swapped-in hero", (effects) => {
+    const placed = table(effects, { seats: 2, heroes: [{ code: ARAGORN, seat: 0 }, { code: BERAVOR, seat: 0 }, { code: LEGOLAS, seat: 1 }], attached: [{ code: SPYGLASS, host: BERAVOR }], hand: [{ code: HELM, seat: 0 }] });
+    const [beravor, spyglass] = [idsOf(placed, BERAVOR), idsOf(placed, SPYGLASS)];
+    const tab = { ...placed, state: updateCard(placed.state, spyglass, { owner: 1 }) };
+    let run = play(begin(tab.state), tab, idsOf(tab, HELM));
+    run = sendUnledgered(run, { type: "Choose", optionId: beravor }, tab.ctx);
+    const eowyn = choices(run.state, tab).find((id) => run.state.cards[id]?.code === EOWYN) ?? "";
+    run = sendUnledgered(run, { type: "Choose", optionId: eowyn }, tab.ctx);
+    expect(run.state.cards[spyglass]).toMatchObject({ host: eowyn, zone: "play" });
   });
 });
 

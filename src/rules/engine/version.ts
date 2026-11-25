@@ -174,9 +174,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 40, scenarios: "all", note: "A location is explored as soon as its progress equals its quest points, whatever changed them: when the players travel to a location that took enough progress in the staging area, and when its quest points drop, like The Old Ford when an enemy leaves play." },
   { version: 41, scenarios: ["peril-in-pelargir", "the-battle-of-the-pelennor-fields"], note: "When a setup effect lets the first player choose a hero for a card such as Alcaron's Scroll or an Esquire, the heroes of every player are offered, not only the first player's own, and with 2 or more players every choice in The Battle of the Pelennor Fields whose cards belong to more than one player names the owner on each row." },
   { version: 41, scenarios: ["peril-in-pelargir"], note: "When an enemy's attack deals enough damage to destroy the hero with Alcaron's Scroll, the Scroll attaches to that enemy first and then the hero is destroyed, so the Scroll no longer goes back to the staging area." },
+  { version: 42, scenarios: "all", note: "An effect that attaches, moves or puts into play an attachment (Command, Long Lake Trader, the Dúnedain attachments, Helm of Secrecy, Galadriel, Open the Armory, Ring of Thrór) can use a character of another player as the host, also for a card that prints no Attach to line, like Spyglass; the other player then controls a moved attachment, and the move is announced to the seat that controls it after the move." },
 ];
 
-export const ENGINE_VERSION = 41;
+export const ENGINE_VERSION = 42;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

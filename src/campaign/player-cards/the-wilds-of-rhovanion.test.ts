@@ -33,6 +33,8 @@ const MAP = "18010";
 // Warrior Sword: a Tactics Weapon of cost 1 for a Tactics or Warrior character.
 const SWORD = "19089";
 const NECKLACE = "18011";
+// Spyglass: an Item that prints no "Attach to" line.
+const SPYGLASS = "11180";
 const GREEN_HILL = "141036";
 const ALLY = "ally";
 const PAL = "pal";
@@ -43,7 +45,7 @@ const table = playerTableFor(() => base);
 
 beforeAll(async () => {
   const starter = await starterBase();
-  const codes = [ARAGORN, GIMLI, DENETHOR, SPEARMAN, STEWARD, PLATE, BRAND, BARD, SENTRY, LOOKOUT, WARRIOR, TRADER, HAUBERK, BOW, MAP, SWORD, NECKLACE, GREEN_HILL];
+  const codes = [ARAGORN, GIMLI, DENETHOR, SPEARMAN, STEWARD, PLATE, BRAND, BARD, SENTRY, LOOKOUT, WARRIOR, TRADER, HAUBERK, BOW, MAP, SWORD, NECKLACE, GREEN_HILL, SPYGLASS];
   base = { ...starter, cards: new Map([...starter.cards, ...(await loadPrinted(codes))]) };
 });
 
@@ -211,5 +213,18 @@ describe("Long Lake Trader (18006:A:1)", () => {
     const run = sendUnledgered(begin(withMap.state), { type: "Trigger", cardId: idsOf(tab, TRADER), effectId: "18006:action:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, BARD), idsOf(tab, TRADER)].sort());
     expect(run.state.cards[necklace]).toMatchObject({ zone: "setAside", host: idsOf(tab, GREEN_HILL) });
+  });
+});
+
+describe("Long Lake Trader moves an Item to another player's character (18006:A:1)", () => {
+  // "to another eligible character": the line names no player and Spyglass prints no "Attach to" line, so the other player's hero is offered too; the Item stays the Trader's player's until it is moved,
+  // then belongs to the player who controls its new host (rr.attachment-cards).
+  lineSpec("18006:A:1", "Long Lake Trader: an Item that prints no \"Attach to\" line may go to a character of another player, which then controls it", (effects) => {
+    const tab = table(effects, { seats: 2, heroes: [{ code: BARD, seat: 0 }, { code: ARAGORN, seat: 0 }, { code: GIMLI, seat: 1 }], attached: [{ code: SPYGLASS, host: BARD }], allies: [{ code: TRADER, seat: 0 }] });
+    const spyglass = idsOf(tab, SPYGLASS);
+    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, TRADER), effectId: "18006:action:1" }, tab.ctx);
+    expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, ARAGORN), idsOf(tab, GIMLI), idsOf(tab, TRADER)].sort());
+    const done = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, GIMLI) }, tab.ctx);
+    expect(done.state.cards[spyglass]).toMatchObject({ host: idsOf(tab, GIMLI), controller: 1 });
   });
 });
