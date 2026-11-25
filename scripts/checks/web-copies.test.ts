@@ -100,11 +100,11 @@ const COPIES: readonly { phone: string; web: string; from?: string; to?: string;
     phone: "node_modules/expo-sqlite/web/WorkerChannel.ts",
     web: "src/screens/data/web/worker-channel.ts",
     edits: [
-      ["import { Deferred } from './Deferred';\nimport { serialize, deserialize } from './SyncSerializer';\nimport {\n", "import { Deferred } from '../../../../node_modules/expo-sqlite/web/Deferred';\nimport { serialize, deserialize } from '../../../../node_modules/expo-sqlite/web/SyncSerializer';\nimport { SYNC_CLOCK_EVERY, syncWaitExpired } from './sync-wait';\nimport {\n"],
+      ["import { Deferred } from './Deferred';\nimport { serialize, deserialize } from './SyncSerializer';\nimport {\n", "import { Deferred } from '../../../../node_modules/expo-sqlite/web/Deferred';\nimport { serialize, deserialize } from '../../../../node_modules/expo-sqlite/web/SyncSerializer';\nimport { SYNC_CLOCK_EVERY, noteSyncWait, syncWaitExpired } from './sync-wait';\nimport {\n"],
       ["} from './web.types';", "} from '../../../../node_modules/expo-sqlite/web/web.types';"],
       [
         "  let i = 0;\n  // @ts-expect-error: Remove this when TypeScript supports Atomics.pause\n  const useAtomicsPause = typeof Atomics.pause === 'function';\n  while (Atomics.load(lock, 0) === PENDING) {\n    ++i;\n\n    if (useAtomicsPause) {\n      if (i > 1_000_000) {\n        throw new Error('Sync operation timeout');\n      }\n      // @ts-expect-error: Remove this when TypeScript supports Atomics.pause\n      Atomics.pause();\n    } else {\n      // NOTE(kudo): Unfortunate for the busy loop,\n      // because we don't have a way for main thread to yield its execution to other callbacks.\n      if (i > 1000_000_000) {\n        throw new Error('Sync operation timeout');\n      }\n    }\n  }\n",
-        "  const startedAt = performance.now();\n  let i = 0;\n  const useAtomicsPause = typeof Atomics.pause === 'function';\n  while (Atomics.load(lock, 0) === PENDING) {\n    ++i;\n\n    if (i % SYNC_CLOCK_EVERY === 0 && syncWaitExpired(startedAt, performance.now())) {\n      throw new Error('Sync operation timeout');\n    }\n    if (useAtomicsPause) {\n      Atomics.pause();\n    }\n  }\n",
+        "  const startedAt = performance.now();\n  let i = 0;\n  const useAtomicsPause = typeof Atomics.pause === 'function';\n  while (Atomics.load(lock, 0) === PENDING) {\n    ++i;\n\n    if (i % SYNC_CLOCK_EVERY === 0 && syncWaitExpired(startedAt, performance.now())) {\n      throw new Error('Sync operation timeout');\n    }\n    if (useAtomicsPause) {\n      Atomics.pause();\n    }\n  }\n  noteSyncWait(startedAt, performance.now());\n",
       ],
     ],
   },

@@ -1,9 +1,9 @@
 // A copy of expo-sqlite's web/WorkerChannel.ts, served in its place on the web platform by metro.config.js (the phone never bundles it). The one change is the wait in
-// `invokeWorkerSync`: a wall-clock deadline (sync-wait.ts) instead of a spin count. scripts/checks/web-copies.test.ts fails when expo-sqlite's file changes, so the copy follows it.
+// `invokeWorkerSync`: a wall-clock deadline (sync-wait.ts) instead of a spin count, reported to the web app's test meter when it shows. scripts/checks/web-copies.test.ts fails when expo-sqlite's file changes, so the copy follows it.
 
 import { Deferred } from '../../../../node_modules/expo-sqlite/web/Deferred';
 import { serialize, deserialize } from '../../../../node_modules/expo-sqlite/web/SyncSerializer';
-import { SYNC_CLOCK_EVERY, syncWaitExpired } from './sync-wait';
+import { SYNC_CLOCK_EVERY, noteSyncWait, syncWaitExpired } from './sync-wait';
 import {
   type SQLiteWorkerMessageType,
   type MessageTypeMap,
@@ -139,6 +139,7 @@ export function invokeWorkerSync<T extends SQLiteWorkerMessageType & keyof Resul
       Atomics.pause();
     }
   }
+  noteSyncWait(startedAt, performance.now());
 
   const length = new Uint32Array(resultArray.buffer, 0, 1)[0];
   const resultCopy = new Uint8Array(length);

@@ -1,7 +1,7 @@
 // The browser's half of the web app's saves (memory-databases.ts): reading the two snapshot files (snapshot.ts) from the origin's private file storage, and writing one
 // from a worker of its own. Safari's engine writes such a file only through a sync access handle, which only a worker has; and that worker must not be expo-sqlite's,
 // because the page waits on that one for every database call, and on Safari a worker growing a file waits on the page.
-import { decodeSnapshot, encodeSnapshot, newestOf, SLOTS, SNAPSHOT_DIRECTORY, type Slot, type Stored } from "./snapshot";
+import { decodeSnapshot, HEADER_BYTES, newestOf, SLOTS, SNAPSHOT_DIRECTORY, snapshotHeader, type Slot, type Stored } from "./snapshot";
 
 // A file or a lock that is busy is asked again this many times, this far apart: a page that reloads opens while the page before it may still hold the file.
 const READ_TRIES = 6;
@@ -37,16 +37,16 @@ export async function readNewest(): Promise<Stored | null> {
 // The worker's whole program. Each call is awaited, since an older Safari returns a promise from a sync access handle's methods.
 const WORKER_SOURCE = `
 self.onmessage = async (event) => {
-  const { id, directory, name, buffer } = event.data;
+  const { id, directory, name, header, data, at } = event.data;
   try {
     const root = await navigator.storage.getDirectory();
     const folder = await root.getDirectoryHandle(directory, { create: true });
     const file = await folder.getFileHandle(name, { create: true });
     const handle = await file.createSyncAccessHandle();
     try {
-      const bytes = new Uint8Array(buffer);
-      await handle.write(bytes, { at: 0 });
-      await handle.truncate(bytes.byteLength);
+      await handle.write(new Uint8Array(header), { at: 0 });
+      await handle.write(new Uint8Array(data), { at });
+      await handle.truncate(at + data.byteLength);
       await handle.flush();
     } finally {
       await handle.close();
@@ -74,12 +74,13 @@ export function snapshotWriter(): SnapshotWriter {
     else call.resolve();
   });
   return async (data, generation, slot) => {
-    const file = await encodeSnapshot(data, generation);
+    const header = await snapshotHeader(data, generation);
     const id = nextId;
     nextId += 1;
     await new Promise<void>((resolve, reject) => {
       waiting.set(id, { resolve, reject });
-      worker.postMessage({ id, directory: SNAPSHOT_DIRECTORY, name: slot, buffer: file.buffer }, [file.buffer]);
+      // The data's own buffer goes to the worker (it is this copy's alone: the database worker handed it over for it), so nothing is copied here.
+      worker.postMessage({ id, directory: SNAPSHOT_DIRECTORY, name: slot, header: header.buffer, data: data.buffer, at: HEADER_BYTES }, [header.buffer, data.buffer as ArrayBuffer]);
     });
   };
 }

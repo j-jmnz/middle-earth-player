@@ -13,18 +13,26 @@ const LENGTH_AT = 16;
 const HASH_AT = 20;
 export const HEADER_BYTES = 52;
 
+// The digest reads the bytes where they are: a database is megabytes, and a copy of it for each save is time the page does not have.
 async function sha256(data: Uint8Array): Promise<Uint8Array> {
-  return new Uint8Array(await crypto.subtle.digest("SHA-256", data.slice().buffer));
+  return new Uint8Array(await crypto.subtle.digest("SHA-256", data as Uint8Array<ArrayBuffer>));
 }
 
-/** The file for `data` as generation `generation` (a whole number that grows by one with each file written). */
-export async function encodeSnapshot(data: Uint8Array, generation: number): Promise<Uint8Array> {
-  const file = new Uint8Array(HEADER_BYTES + data.length);
-  const view = new DataView(file.buffer);
-  file.set(MAGIC, 0);
+/** The header that goes before `data` in its file, as generation `generation` (a whole number that grows by one with each file written). */
+export async function snapshotHeader(data: Uint8Array, generation: number): Promise<Uint8Array> {
+  const header = new Uint8Array(HEADER_BYTES);
+  const view = new DataView(header.buffer);
+  header.set(MAGIC, 0);
   view.setFloat64(GENERATION_AT, generation);
   view.setUint32(LENGTH_AT, data.length);
-  file.set(await sha256(data), HASH_AT);
+  header.set(await sha256(data), HASH_AT);
+  return header;
+}
+
+/** The whole file for `data`: its header, then the data. The writer sends the two apart, so it makes no second copy of the data (snapshot-store.ts). */
+export async function encodeSnapshot(data: Uint8Array, generation: number): Promise<Uint8Array> {
+  const file = new Uint8Array(HEADER_BYTES + data.length);
+  file.set(await snapshotHeader(data, generation), 0);
   file.set(data, HEADER_BYTES);
   return file;
 }

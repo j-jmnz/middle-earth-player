@@ -2,6 +2,8 @@
 // so a device says what a headless browser cannot. `?scale=1` (or 1.5) makes the table's canvases draw at that many pixels for each CSS pixel in place of the device's
 // (an iPad's 2 is four times the pixels of 1), `?fps=1` shows the frame rate, a log of the last minute (a tap on the meter stops it and copies the log) and the first error the page reports, with where it was thrown; `?scale=0` and `?fps=0` turn each off. Both are kept in localStorage, since they are read
 // before any database opens. Skia's web views read window.devicePixelRatio when they are made, so the scale is set before CanvasKit loads (skia-web-load.ts).
+import { onSpan } from "./meter-span.ts";
+
 const SCALE_KEY = "middle-earth-player.render-scale";
 const FPS_KEY = "middle-earth-player.frame-meter";
 
@@ -77,9 +79,15 @@ function watchErrors(show: (text: string) => void): void {
  * One second of the meter: its frame rate, its longest frame, how many of its frames took over two frames' time, how long its frames ran late in all (`late`: what
  * each took beyond a sixtieth of a second), and how long the animation frame callbacks ran (`raf`: the animations and the canvases' drawing). A second whose `late`
  * is far over its `raf` lost its time outside the drawing: React's work, the engine, a save, or the browser's own layout, painting and graphics. `draw` is how
- * long Skia took to record the canvases' scenes again, and `draws` how many times it did (watchDraws).
+ * long Skia took to record the canvases' scenes again, and `draws` how many times it did (watchDraws). `db` is how long the page waited on the database worker and
+ * `dbs` how many calls that was; `save` is how long copies of the saves to storage ran and `saves` how many (meter-span.ts).
  */
-export type Second = { fps: number; worst: number; slow: number; late: number; raf: number; draw: number; draws: number };
+export type Second = { fps: number; worst: number; slow: number; late: number; raf: number; draw: number; draws: number; db: number; dbs: number; save: number; saves: number };
+
+/** What the page did in a second beside drawing frames: the sums the meter reads and clears. */
+export type Work = { raf: number; draw: number; draws: number; db: number; dbs: number; save: number; saves: number };
+
+const NO_WORK: Work = { raf: 0, draw: 0, draws: 0, db: 0, dbs: 0, save: 0, saves: 0 };
 
 // A frame over this is one the eye sees as a stutter at 60 frames a second.
 const SLOW_MS = 34;
@@ -89,16 +97,20 @@ const FRAME_MS = 1000 / 60;
 export const LOG_SECONDS = 60;
 
 /** A second's frames as its log entry. */
-export function secondOf(gaps: readonly number[], raf: number = 0, draw: number = 0, draws: number = 0): Second {
+export function secondOf(gaps: readonly number[], work: Work = NO_WORK): Second {
   const total = gaps.reduce((sum, gap) => sum + gap, 0);
   return {
     fps: total > 0 ? Math.round((1000 * gaps.length) / total) : 0,
     worst: Math.round(Math.max(0, ...gaps)),
     slow: gaps.filter((gap) => gap > SLOW_MS).length,
     late: Math.round(gaps.reduce((sum, gap) => sum + Math.max(0, gap - FRAME_MS), 0)),
-    raf: Math.round(raf),
-    draw: Math.round(draw),
-    draws,
+    raf: Math.round(work.raf),
+    draw: Math.round(work.draw),
+    draws: work.draws,
+    db: Math.round(work.db),
+    dbs: work.dbs,
+    save: Math.round(work.save),
+    saves: work.saves,
   };
 }
 
@@ -112,15 +124,13 @@ export function summaryLine(log: readonly Second[]): string {
 
 /** The log as text to send: the summary, then each second's frame rate and longest frame, oldest first. */
 export function logText(log: readonly Second[], scale: number): string {
-  return [`x${scale}  ${summaryLine(log)}`, ...log.map((second, index) => `${String(index + 1).padStart(2)}  ${second.fps} fps  worst ${second.worst} ms  late ${second.late}  raf ${second.raf}  draw ${second.draw}/${second.draws}`)].join("\n");
+  return [`x${scale}  ${summaryLine(log)}`, ...log.map((second, index) => `${String(index + 1).padStart(2)}  ${second.fps} fps  worst ${second.worst} ms  late ${second.late}  raf ${second.raf}  draw ${second.draw}/${second.draws}  db ${second.db}/${second.dbs}  save ${second.save}/${second.saves}`)].join("\n");
 }
 
-// How long the animation frame callbacks ran since the meter last read it. Every caller asks the window for a frame at call time, so wrapping it here times them all.
-let rafBusy = 0;
-
-// How long Skia took to record scenes since the meter last read it, and how many it recorded.
-let drawBusy = 0;
-let drawCount = 0;
+// What the page did since the meter last read it. Every caller asks the window for a frame at call time, so wrapping it in watchFrames times the callbacks all.
+let work: Work = { ...NO_WORK };
+// The size of the last copy of the saves to storage, for the meter's first line.
+let savedBytes = 0;
 
 type Recorder = { finishRecordingAsPicture: (...args: unknown[]) => unknown };
 
@@ -137,8 +147,8 @@ export function watchDraws(skia: { PictureRecorder: () => unknown }): void {
     const finish = recorder.finishRecordingAsPicture.bind(recorder);
     recorder.finishRecordingAsPicture = (...args) => {
       const picture = finish(...args);
-      drawBusy += performance.now() - started;
-      drawCount += 1;
+      work.draw += performance.now() - started;
+      work.draws += 1;
       return picture;
     };
     return recorder;
@@ -153,13 +163,23 @@ function watchFrames(): void {
       try {
         callback(now);
       } finally {
-        rafBusy += performance.now() - started;
+        work.raf += performance.now() - started;
       }
     });
 }
 
 function startMeter(): void {
   watchFrames();
+  onSpan((name, ms, bytes) => {
+    if (name === "db") {
+      work.db += ms;
+      work.dbs += 1;
+    } else {
+      work.save += ms;
+      work.saves += 1;
+      if (bytes !== undefined) savedBytes = bytes;
+    }
+  });
   const box = document.createElement("div");
   box.setAttribute("aria-hidden", "true");
   box.style.cssText = "position:fixed;left:4px;bottom:4px;z-index:2147483647;max-width:90vw;max-height:80vh;overflow:auto;padding:2px 6px;border-radius:4px;background:#000c;color:#fff;font:12px/16px monospace;pointer-events:none;white-space:pre-wrap";
@@ -186,7 +206,7 @@ function startMeter(): void {
     event.stopPropagation();
     paused = !paused;
     if (paused) {
-      const text = logText(log, window.devicePixelRatio);
+      const text = `saves ${(savedBytes / 1048576).toFixed(1)} MB\n${logText(log, window.devicePixelRatio)}`;
       rate.textContent = "STOPPED. Tap to clear and go on.";
       summary.textContent = text;
       void navigator.clipboard?.writeText(text).catch(() => undefined);
@@ -202,11 +222,9 @@ function startMeter(): void {
     if (!paused) {
       gaps.push(now - last);
       if (now - shown >= 1000) {
-        log = [...log, secondOf(gaps, rafBusy, drawBusy, drawCount)].slice(-LOG_SECONDS);
-        rafBusy = 0;
-        drawBusy = 0;
-        drawCount = 0;
-        rate.textContent = `${meterLine(gaps, window.devicePixelRatio)}  (tap to stop)`;
+        log = [...log, secondOf(gaps, work)].slice(-LOG_SECONDS);
+        work = { ...NO_WORK };
+        rate.textContent = `${meterLine(gaps, window.devicePixelRatio)}  saves ${(savedBytes / 1048576).toFixed(1)} MB  (tap to stop)`;
         summary.textContent = summaryLine(log);
         gaps = [];
         shown = now;

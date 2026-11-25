@@ -2,7 +2,7 @@
 // private file storage that expo-sqlite's worker writes while the page waits for it (worker-channel.ts). Safari's engine, which every browser on an iPhone and an iPad
 // uses, cannot do that: a worker that grows a file there waits on the page, the page is waiting on the worker, and the call ends as "Sync operation timeout".
 // So here both databases live in the worker's memory, where no call touches storage, and user.db is copied to storage after each write by a second worker
-// (flusher.ts, snapshot-store.ts). A move is in storage a moment after it is accepted, not before the next line runs: a page the system ends in between loses that move
+// (flusher.ts, snapshot-store.ts). A move is in storage a moment after it is accepted (a quarter of a second, then the copy's own time), not before the next line runs: a page the system ends in between loses that move
 // and nothing else. catalog.db is read from the bundle at each launch, so it is always this build's.
 import { drizzle } from "drizzle-orm/expo-sqlite";
 import { migrate } from "drizzle-orm/expo-sqlite/migrator";
@@ -18,10 +18,31 @@ import { backfillRunTable } from "../run-store";
 import { meta } from "../user-schema";
 import { createFlusher } from "./flusher";
 import { registerFlush } from "./saved";
-import { holdOnlyPage, readNewest, snapshotWriter } from "./snapshot-store";
+import { holdOnlyPage, readNewest, snapshotWriter, type SnapshotWriter } from "./snapshot-store";
+import { span } from "../../../ui/web/meter-span";
 
 /** What the open fails with in a second tab or window; the database error screen shows it. */
 export const OPEN_ELSEWHERE = "The app is open in another tab or window. Close this one, or close the other and reload.";
+
+// How long after a write its copy starts. One action writes several times (the move, the checkpoint, a run), and each copy serializes the whole database in the
+// worker the page waits on for its next call: so the writes of one action share one copy, begun once the action's own work is done.
+const COPY_AFTER_MS = 250;
+
+// A copy's time, from the database's serializing to the file written, and its size, for the web app's test meter (src/ui/web/meter-span.ts).
+function timedCopy(serialize: () => Promise<Uint8Array>, persist: SnapshotWriter): { serialize: () => Promise<Uint8Array>; persist: SnapshotWriter } {
+  let started = 0;
+  return {
+    serialize: () => {
+      started = performance.now();
+      return serialize();
+    },
+    persist: async (data, generation, slot) => {
+      const bytes = data.byteLength;
+      await persist(data, generation, slot);
+      span("save", performance.now() - started, bytes);
+    },
+  };
+}
 
 // How often the copy is asked for with no write seen: a write that went past the query log (a raw statement) is still copied.
 const SWEEP_MS = 5000;
@@ -61,10 +82,9 @@ export async function openInMemory(): Promise<AppDatabases> {
   const userSqlite = stored ? await openFromBytes(stored.data) : await openEmpty();
   const flusher = createFlusher({
     changes: async () => (await userSqlite.getFirstAsync<{ n: number }>("SELECT total_changes() AS n"))?.n ?? 0,
-    serialize: () => userSqlite.serializeAsync(),
-    persist: snapshotWriter(),
+    ...timedCopy(() => userSqlite.serializeAsync(), snapshotWriter()),
     start: { generation: stored?.generation ?? 0, slot: stored?.slot ?? null, changes: 0 },
-    soon: (task) => setTimeout(task, 0),
+    soon: (task) => setTimeout(task, COPY_AFTER_MS),
     onError: (error) => console.warn(`The game was not copied to storage (${error instanceof Error ? error.message : "unknown error"}); it is tried again at the next move`),
   });
   registerFlush(flusher.flush);
