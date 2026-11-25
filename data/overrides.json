@@ -3802,6 +3802,116 @@
       },
       "reason": "Hall of Beorn spells the stage 1 quest card 'The Gathering of Clouds' in its title and slug and in the scan addresses, which answer 403. The card prints 'The Gathering of the Clouds' (the scan, DragnCards' deck Q0A.6), and the spelled-right addresses serve both sides.",
       "source": "scan 132075.A (hallofbeorn.com/Export/QuestCards, Slug The-Gathering-of-Clouds-THOtD); s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Hobbit-On-the-Doorstep/The-Gathering-of-the-Clouds-1A.jpg; dragncards Q0A.6"
+    },
+    {
+      "match": {
+        "code": "16023"
+      },
+      "set": {
+        "questPoints": 6
+      },
+      "reason": "Hall of Beorn gives this encounter side quest no quest points. The scan prints a quest points box of 6, so progress can be placed on it as a quest card (hrd.side-quests-in-play).",
+      "source": "scan 16023.A"
+    },
+    {
+      "match": {
+        "code": "16040"
+      },
+      "set": {
+        "questPoints": 4
+      },
+      "reason": "Hall of Beorn gives this encounter side quest no quest points. The scan prints a quest points box of 4, so progress can be placed on it as a quest card (hrd.side-quests-in-play).",
+      "source": "scan 16040.A"
+    },
+    {
+      "match": {
+        "code": "16045"
+      },
+      "set": {
+        "questPoints": 8
+      },
+      "reason": "Hall of Beorn gives this encounter side quest no quest points. The scan prints a quest points box of 8, so progress can be placed on it as a quest card (hrd.side-quests-in-play).",
+      "source": "scan 16045.A"
+    },
+    {
+      "match": {
+        "code": "16048"
+      },
+      "set": {
+        "questPoints": 6
+      },
+      "reason": "Hall of Beorn gives this encounter side quest no quest points. The scan prints a quest points box of 6, so progress can be placed on it as a quest card (hrd.side-quests-in-play).",
+      "source": "scan 16048.A"
+    },
+    {
+      "match": {
+        "code": "16053"
+      },
+      "set": {
+        "questPoints": 6
+      },
+      "reason": "Hall of Beorn gives this encounter side quest no quest points. The scan prints a quest points box of 6, so progress can be placed on it as a quest card (hrd.side-quests-in-play).",
+      "source": "scan 16053.A"
+    },
+    {
+      "match": {
+        "code": "16060"
+      },
+      "set": {
+        "questPoints": 5
+      },
+      "reason": "Hall of Beorn gives this encounter side quest no quest points. The scan prints a quest points box of 5, so progress can be placed on it as a quest card (hrd.side-quests-in-play).",
+      "source": "scan 16060.A"
+    },
+    {
+      "match": {
+        "code": "17025"
+      },
+      "set": {
+        "questPoints": 6
+      },
+      "reason": "Hall of Beorn gives this encounter side quest no quest points. The scan prints a quest points box of 6, so progress can be placed on it as a quest card (hrd.side-quests-in-play).",
+      "source": "scan 17025.A"
+    },
+    {
+      "match": {
+        "code": "17075"
+      },
+      "set": {
+        "questPoints": 5
+      },
+      "reason": "Hall of Beorn gives this encounter side quest no quest points. The scan prints a quest points box of 5, so progress can be placed on it as a quest card (hrd.side-quests-in-play).",
+      "source": "scan 17075.A"
+    },
+    {
+      "match": {
+        "code": "17104"
+      },
+      "set": {
+        "questPoints": 6
+      },
+      "reason": "Hall of Beorn gives this encounter side quest no quest points. The scan prints a quest points box of 6, so progress can be placed on it as a quest card (hrd.side-quests-in-play).",
+      "source": "scan 17104.A"
+    },
+    {
+      "match": {
+        "code": "17131"
+      },
+      "set": {
+        "questPoints": 5
+      },
+      "reason": "Hall of Beorn gives this encounter side quest no quest points. The scan prints a quest points box of 5, so progress can be placed on it as a quest card (hrd.side-quests-in-play).",
+      "source": "scan 17131.A"
+    },
+    {
+      "match": {
+        "code": "17156"
+      },
+      "set": {
+        "questPoints": 6
+      },
+      "reason": "Hall of Beorn gives this encounter side quest no quest points. The scan prints a quest points box of 6, so progress can be placed on it as a quest card (hrd.side-quests-in-play).",
+      "source": "scan 17156.A"
     }
   ],
   "scenarioPiles": [
