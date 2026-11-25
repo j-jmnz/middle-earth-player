@@ -222,6 +222,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 
 04020:A:1 (front): When Revealed: Return the top 2 Snow cards in the encounter discard pile to the top of the encounter deck. If this effect returned less than 2 Snow treachery cards, Fell Voices gains surge.
   04020:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the rest of the effect is carried out by the first player
     - return the topmost 2 Snow card(s) of the encounter discard pile to the top of the encounter deck, facedown (the cards ArrangeEncounter may reorder) (they are not revealed: no When Revealed, no engagement; the number returned, the treachery cards only, is counted)
@@ -233,6 +234,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 
 04021:A:1 (front): When Revealed: The first player (choose 1): removes all progress tokens from play, or reveals 2 cards from the encounter deck and adds them to the staging area.
   04021:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "remove":
         - remove all the progress from each location (any player controls)

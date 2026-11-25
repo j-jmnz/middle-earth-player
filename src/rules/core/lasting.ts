@@ -95,6 +95,8 @@ export const ENGINE_MADE_EFFECTS: ReadonlySet<ModifierStat> = new Set<ModifierSt
   "watchDamage",
   "watchDiscard",
   "watchReadyHost",
+  // The round the main quest card came into play, noted by the haradrim settle hook (families/haradrim/stage.ts): held by the table, source the stage; it lapses with the stage.
+  "stageEntered",
 ]);
 
 // A modifier a record's verb made ends; so does one whose stat is in neither list; a mark of the engine stays; so does every constant effect's modifier (`origin`, rebuilt from the effect list)

@@ -242,6 +242,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144054:A:1 (front): When Revealed: The first player must choose: either search the encounter deck, discard pile, and victory display for a Nazgûl enemy and add it to the staging area, or exhaust The One Ring and reveal the top card of the encounter deck.
   144054:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "search" (only if the encounter deck or its discard pile holds a Nazgûl card):
         - the acting player finds one Nazgûl enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
@@ -263,6 +264,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144055:A:2 (front): When Revealed: Either flip Sméagol to Gollum, or Gollum makes an immediate attack. The first player may spend 1 Fellowship resource and exhaust The One Ring to cancel this effect.
   144055:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "flip" (only if the card with code 144076 is in play):
         - flip Sméagol to Gollum: discard his damage; he enters play ready, engaged with the first player (nothing if Sméagol is not in play)
@@ -351,6 +353,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144066:constant:2: Constant
     only if not (the actor controls the card with code 144076)
     who acts: the acting player is the first player (a quest stage belongs to no player; while the stages are split between the players, the player whose stage it is)
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
     - the players cannot defeat this stage while this holds
 
 ## 144075 Gollum

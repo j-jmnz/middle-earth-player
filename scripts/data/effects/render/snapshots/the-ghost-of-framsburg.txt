@@ -391,6 +391,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 19111:B:3 (back): This stage cannot be defeated unless Fram's Shade is in the victory display. When the players defeat this stage, they win the game.
   19111:constant:3: Constant
     only if the card with code 19098 is not in the victory display
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
     - the players cannot defeat this stage while this holds
 
 (rendered pieces: 238 by template, 0 as JSON)

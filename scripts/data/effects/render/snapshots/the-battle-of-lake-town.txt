@@ -196,6 +196,7 @@ Scenario piles that place cards with no record (quest: 50201 Terror from the Mou
 
 50213:A:1 (front): When Revealed: Choose and shuffle 1 Pier location from the victory display back into the encounter deck. If no location was shuffled into the encounter deck by this effect, Catching Fire gains surge.
   50213:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "shuffle" (only if there is a Pier location (any player controls) in the victory display to choose):
         - choose Pier location (any player controls) in the victory display

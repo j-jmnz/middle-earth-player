@@ -23,7 +23,3 @@ The statuses are those of the Readings bullet of `docs/scenarios/haradrim.md`. E
 - Abaan (`17120:A:1`) (span-settled). "While Abaan is free of encounters, the first player gains control of Abaan"; attached to Dungeon Cell he is guarded by it. Basis: the printed line.
 - Ally that is not in play (span-settled). The discard stops at the first ally that no player has in play (unique allies in play are skipped). Basis: the printed line.
 - Setup ally (span-settled). The captured ally keeps its owner. Basis: `hrd.captives-of-cirith-gurat`.
-
-## Readings to confirm
-
-- Captured!: recommended. See Readings.

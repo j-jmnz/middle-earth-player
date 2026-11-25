@@ -99,6 +99,7 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
     - a riddle: the first player names a card type (ally, event, attachment or treasure), a sphere (leadership, spirit, lore, tactics or Baggins), a cost (0 to 6), shuffles his deck and discards its top 3 card(s); each discarded card that matches every named item puts 1 progress on stage 2 (a marker, read when the riddle is answered)
   131075:whenRevealed:1: When revealed
     only if this card is being revealed from the encounter deck and no card ignores riddles: the first player may answer its riddle
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "answer":
         - the first player answers the riddle of this card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored
@@ -119,6 +120,7 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
     - a riddle: the first player names a card type (ally, event, attachment or treasure), shuffles his deck and discards its top 2 card(s); each discarded card that matches every named item puts 1 progress on stage 2 (a marker, read when the riddle is answered)
   131076:whenRevealed:1: When revealed
     only if this card is being revealed from the encounter deck and no card ignores riddles: the first player may answer its riddle
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "answer":
         - the first player answers the riddle of this card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored
@@ -132,13 +134,14 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
   131077:forced:1: Forced on the event damagedByAttack (heard about character (any player controls))
     only if the attacking enemy is a Creature enemy (any player controls)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - remove 1 progress from the current quest card (all of it when it holds less)
+    - remove 1 progress from the main quest (all of it when it holds less)
 
 131077:A:2 (front): Riddle: The first player names a sphere, shuffles his deck, and discards the top card. For each of those cards that matches, place 1 progress token on stage 2.
   131077:constant:1: Constant
     - a riddle: the first player names a sphere (leadership, spirit, lore, tactics or Baggins), shuffles his deck and discards its top 1 card(s); each discarded card that matches every named item puts 1 progress on stage 2 (a marker, read when the riddle is answered)
   131077:whenRevealed:1: When revealed
     only if this card is being revealed from the encounter deck and no card ignores riddles: the first player may answer its riddle
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "answer":
         - the first player answers the riddle of this card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored
@@ -198,6 +201,7 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
     - a riddle: the first player names a card type (ally, event, attachment or treasure), a cost (0 to 6), shuffles his deck and discards its top 3 card(s); each discarded card that matches every named item puts 1 progress on stage 2 (a marker, read when the riddle is answered)
   131080:whenRevealed:2: When revealed
     only if this card is being revealed from the encounter deck and no card ignores riddles: the first player may answer its riddle
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "answer":
         - the first player answers the riddle of this card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored
@@ -232,6 +236,7 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
     - a riddle: the first player names a card type (ally, event, attachment or treasure), a sphere (leadership, spirit, lore, tactics or Baggins), shuffles his deck and discards its top 3 card(s); each discarded card that matches every named item puts 1 progress on stage 2 (a marker, read when the riddle is answered)
   131082:whenRevealed:2: When revealed
     only if this card is being revealed from the encounter deck and no card ignores riddles: the first player may answer its riddle
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "answer":
         - the first player answers the riddle of this card: he names its items, the top cards of his deck are discarded (Bilbo's Magic Ring may discard more), each match is 1 progress on stage 2, and with no match the riddle failed (Gollum hears it); this card then goes to the encounter discard pile; nothing while riddle effects are ignored

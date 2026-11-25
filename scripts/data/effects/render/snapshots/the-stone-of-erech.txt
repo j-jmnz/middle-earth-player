@@ -389,6 +389,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50324:A:1 (front): When Revealed: The first player must choose: skip the next travel phase, or each player must pass his hand to the player on his left (discard your hand instead if you are the only player in the game).
   50324:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "skipTravel":
         - skip the travel phase this round: the table holds skipTravel until the end of the round, and the round goes from the quest phase to the encounter phase with no travel window

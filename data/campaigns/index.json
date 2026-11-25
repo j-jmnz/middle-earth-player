@@ -133,7 +133,7 @@
     "id": "haradrim",
     "name": "Haradrim",
     "scenarioCount": 9,
-    "playable": false,
+    "playable": true,
     "kind": "cycle",
     "box": null,
     "released": "2016-11-23",

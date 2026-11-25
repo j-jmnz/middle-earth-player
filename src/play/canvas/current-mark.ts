@@ -16,5 +16,7 @@ export function currentMark(rect: Rect, wordWidth: number, pill: number, s: numb
   const word = wordWidth + 10 * s;
   if (word <= room) return { kind: "word", x: right - word, y: rect.y + 1 * s, width: word, height: pill };
   const dot = short ? pill : 9 * s;
-  return { kind: "dot", x: Math.max(left, right - dot), y: rect.y + 1 * s + (pill - dot) / 2, width: dot, height: dot };
+  // The dot keeps inside the card when the badge column leaves no room (left past right): it never lies past the card's right edge.
+  const x = Math.min(Math.max(left, right - dot), rect.x + rect.w - dot);
+  return { kind: "dot", x, y: rect.y + 1 * s + (pill - dot) / 2, width: dot, height: dot };
 }

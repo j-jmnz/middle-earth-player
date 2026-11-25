@@ -22,7 +22,3 @@ The statuses are those of the Readings bullet of `docs/scenarios/haradrim.md`. E
 - No match (user ruling, `docs/scenarios/ered-mithrin.md`). An empty encounter deck while resolving the keyword: the discard pile is shuffled in and the discard continues; if no card of the type exists the objective is unguarded. Basis: that ruling.
 - Capital letters (span-settled). Summons from Mordor prints "GUarded (location)" on the card; the ledger corrects it. Basis: the scan (`17093:A:1`).
 - Attached objectives (span-settled). The Action of each Harad objective is usable by the player who controls it once a hero holds it; while attached to an encounter card the passive lines apply. Basis: the printed lines.
-
-## Readings to confirm
-
-None beyond the user ruling above.

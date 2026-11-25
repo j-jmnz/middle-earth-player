@@ -153,6 +153,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 51009:B:3 (back): Players cannot defeat this stage while Rider of Mirkwood is in play. If the players defeat this stage, they win the game.
   51009:constant:4: Constant
     only if the card with code 51011 is in play
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
     - the players cannot defeat this stage while this holds
   51009:questResolution:1: Quest resolution
     - the players win the game
@@ -209,6 +210,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51013:A:1 (front): When Revealed: The first player chooses a card in his hand. The opposing team looks at the first player's hand and chooses a different card to place faceup under Necromancer's Pass as a guarded objective. While Necromancer's Pass is guarding a card, copies of that card cannot be played. When Necromancer's Pass is explored, return the guarded card to its owner's hand.
   51013:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the rest of the effect is carried out by the first player
     - choose card (you control) in hand, chosen by the first player
@@ -221,6 +223,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51014:A:1 (front): When Revealed: The highest Attack enemy in the staging area makes an immediate attack against the first player. If no attack is made this way, Pursued by Shadow gains surge.
   51014:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, with the highest Attack of those, as the table shows it (ties: the chooser decides), chosen by the first player
     - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area, dealt a shadow card
@@ -740,7 +743,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
   51050:forced:1: Forced at the end of the round
     only if this card is in the staging area
     who acts: the acting player is the first player (a phase has no player of its own)
-    - remove 2 progress from the current quest card (all of it when it holds less)
+    - remove 2 progress from the main quest (all of it when it holds less)
 
 51050:A:2 (front): Travel: Raise each player's threat by 2.
   51050:travel:1: Travel

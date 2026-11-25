@@ -107,7 +107,7 @@ Scenario piles that place cards with no record (activeLocation: 05028 Ithilien R
 05046:A:2 (shadow): Shadow: Remove X progress tokens from the current quest, where X is the attacking enemy's Threat.
   05046:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - remove threat of the attacking enemy progress from the current quest card (all of it when it holds less)
+    - remove threat of the attacking enemy progress from the main quest (all of it when it holds less)
 
 ## 05047 Secluded Glade
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -118,7 +118,7 @@ Scenario piles that place cards with no record (activeLocation: 05028 Ithilien R
 05047:A:2 (shadow): Shadow: Remove X progress tokens from the current quest, where X is the attacking enemy's Threat.
   05047:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - remove threat of the attacking enemy progress from the current quest card (all of it when it holds less)
+    - remove threat of the attacking enemy progress from the main quest (all of it when it holds less)
 
 ## 05048 Lost Companion
 (the scenario deals it into the encounter pile; the piles place it, no record does)

@@ -113,6 +113,7 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
 
 07023:A:1 (front): When Revealed: The first player draws this card into his hand. Ill Tidings cannot leave that player's hand. Then, if the first player has 5 or more cards in his hand, Ill Tidings gains surge.
   07023:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the rest of the effect is carried out by the first player
     - this card goes into the acting player's hand, which is no draw from a deck (no card hears a draw), and cannot leave that hand; the reveal does not discard it
@@ -308,6 +309,7 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
 07061:B:3 (back): While there is at least 1 enemy in play, the players cannot defeat this stage. If the players defeat this stage, they win the game.
   07061:constant:2: Constant
     only if there is enemy in play (in the staging area or engaged)
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
     - the players cannot defeat this stage while this holds
   07061:questResolution:1: Quest resolution
     - the players win the game

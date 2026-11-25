@@ -22,6 +22,7 @@ import { grimaLyingOn } from "../readouts/ring-maker/fords.ts";
 import { mugashLyingOn } from "../readouts/ring-maker/orc.ts";
 import { lootDeckWords, lootGuardWords } from "../words/loot.ts";
 import { lootUnder } from "../../rules/families/sidequests/loot.ts";
+import { alleywayMark, championMark, seizeMark } from "../readouts/haradrim/umbar.ts";
 import { stackMark } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { capturedPill } from "../words/scenarios/angmar/gram-table.ts";
 import { capturedOwners } from "../readouts/gram.ts";
@@ -326,10 +327,10 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     // An Aflame location in play: its damage against the value that destroys it.
     fire: card != null && inPlay(card.zone) ? fireMark(aflameTally(game, cardId, ctx)) : null,
     // A Ship location while the stage that loses at a total Threat of 9 is in play: its Threat against that total (12041:B:2).
-    loss: card != null && inPlay(card.zone) ? shipLoss(game, ctx, cardId) : null,
+    loss: card != null && inPlay(card.zone) ? (shipLoss(game, ctx, cardId) ?? seizeMark(game, ctx, cardId)) : null,
     place: card?.zone === "staging" ? stagingPlace(game, cardId) : null,
     side: sideQuestMark(game, ctx, cardId),
-    determined: determinedMark(game, ctx, cardId),
+    determined: determinedMark(game, ctx, cardId) ?? championMark(game, ctx, cardId),
     dead: deadSpeech(game, ctx.cards, cardId),
     combat: card != null ? combatNumber(game, ctx, card) : null,
   };
@@ -378,6 +379,9 @@ function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): Unde
   // The facedown underworld cards under a location of The Steward's Fear: "2 underworld", never which cards (06018:A:1).
   const stack = stackMark(game, cardId);
   if (stack) return stack;
+  // The enemy faceup under Narrow Alleyway in Escape from Umbar: "1 held", the enemy named to the reader (readouts/haradrim/umbar.ts).
+  const alleyway = alleywayMark(game, ctx, cardId);
+  if (alleyway) return alleyway;
   // The cards captured underneath a card in Escape from Mount Gram: "3 captured", with their owners spoken (readouts/gram.ts).
   const owners = game.capture != null ? capturedOwners(game, cardId) : [];
   if (owners.length > 0) return capturedPill(owners);

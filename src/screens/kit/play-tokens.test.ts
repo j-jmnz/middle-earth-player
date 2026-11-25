@@ -6,7 +6,7 @@ import { palettes } from "./palette.js";
 
 // docs/design-system.md: the canvas copies felt, feltLight and the marks it draws from the palette. They must not drift. The keys that
 // build depth (surfaces.ts) and the lit edge are the table's own.
-const OWN = new Set(["lit", "depth", "shade", "primaryTop", "primaryMid", "phase", "phaseTop", "phaseMid", "phaseDeep", "onPhase", "coin", "veil"]);
+const OWN = new Set(["lit", "depth", "shade", "primaryTop", "primaryMid", "phase", "phaseTop", "phaseMid", "phaseDeep", "onPhase", "coin", "onThreatPill", "veil"]);
 describe("table tokens", () => {
   for (const theme of ["dark", "light"] as const) {
     it(`${theme} copy matches its palette, key for key`, () => {
@@ -34,6 +34,12 @@ describe("table tokens", () => {
       expect(contrast(t.phase, t.night)).toBeGreaterThanOrEqual(4.5);
       expect(contrast(t.phase, t.dusk)).toBeGreaterThanOrEqual(4.5);
       expect(contrast(t.onPhase, t.phaseMid)).toBeGreaterThanOrEqual(4.5);
+    });
+
+    it(`${theme} text on the red pills reads at 4.5:1`, () => {
+      const t = tableTokensByTheme[theme];
+      const [hi, lo] = [luminance(t.onThreatPill), luminance(t.threat)].sort((x, y) => y - x);
+      expect((hi! + 0.05) / (lo! + 0.05)).toBeGreaterThanOrEqual(4.5);
     });
   }
 });

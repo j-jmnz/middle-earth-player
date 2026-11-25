@@ -57,4 +57,14 @@ describe("the current-quest pill", () => {
     expect(currentMark(card(56), 66.5, PILL, 1, 0, true)).toMatchObject({ kind: "dot", width: PILL, height: PILL });
     expect(currentMark(card(56), 79.2, PILL, 1, 0, false)).toMatchObject({ kind: "dot", width: 9, height: 9 });
   });
+
+  it("keeps the dot inside the card when the badge column is wider than the room, and moves no dot that fits", () => {
+    const rect = card(70);
+    const crowded = currentMark(rect, 66.5, PILL, 1, 60, true);
+    expect(crowded.kind).toBe("dot");
+    expect(crowded.x + crowded.width).toBeLessThanOrEqual(rect.x + rect.w);
+    // With room the dot stays where it was: the right edge of the free space, or the badge column's edge.
+    const roomy = currentMark(card(90), 79.2, PILL, 1, 0, false);
+    expect(roomy.x).toBe(card(90).x + 90 - (TOKEN + 2) - 2 - 9);
+  });
 });

@@ -6,6 +6,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat, releaseAttachments } from "../../core/keywords.ts";
 import { queueEvent } from "../../windows/queue.ts";
+import { restricted } from "../../interpret/restrictions.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
@@ -39,6 +40,8 @@ export function placeOnSideQuest(from: ScenarioState, questId: string, wanted: n
 export function defeatSideQuest(state: ScenarioState, questId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const quest = state.cards[questId];
   if (!quest) return state;
+  // "This stage cannot be defeated while the Champion is in play" (16040:A:2): a side quest whose own record bars advancing stays where it is, full, until the bar lifts (rr.cannot). The check reads any Restrict on advancing whose source is the side quest itself; a side quest whose own Restrict on advancing names only the main quest would hold itself here too.
+  if (restricted(state, ctx, "advance").some((rule) => rule.sourceId === questId)) return state;
   // A card the side quest holds under it in play comes back to its players (Rescue Iârion, families/angmar/hold.ts).
   const into = flipsInto(ctx, quest.code);
   // An encounter side quest is no player's card: the seat that revealed it does not control it as it leaves play, so the player cards facedown under it stay there for its own effect (09051:A:2) instead of going to a discard pile. A player side quest stays its player's.

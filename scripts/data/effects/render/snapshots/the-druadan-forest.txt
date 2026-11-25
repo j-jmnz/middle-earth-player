@@ -9,6 +9,7 @@ Scenario piles that place cards with no record (quest: 06042 The Pursuit; quest:
 
 06042:B:1 (back): When Revealed: Reveal 1 card from the encounter deck per player and add it to the staging area.
   06042:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player reveals the number of players encounter cards, one after the other, each in a staging of its own
 
 ## 06043 An Untimely End

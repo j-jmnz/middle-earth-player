@@ -134,6 +134,7 @@ Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc
 
 07039:A:1 (front): When Revealed: Either reveal an additional encounter card, or remove 1 time counter from the current quest.
   07039:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "reveal":
         - the acting player reveals an encounter card
@@ -206,6 +207,7 @@ Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc
 
 07055:A:2 (front): When Revealed: Either deal 1 damage to each exhausted character, or remove 1 time counter from the current quest.
   07055:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "damage" (only if there is a exhausted character (any player controls) to choose):
         - deal 1 damage to each exhausted character (any player controls)

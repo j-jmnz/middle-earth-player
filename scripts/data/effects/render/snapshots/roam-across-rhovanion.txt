@@ -124,6 +124,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19040:A:1 (front): When Revealed: The first player must choose: either Wilderland Bear makes an immediate attack against him, or each player discards 1 random card from his hand.
   19040:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "attack":
         - this card attacks the first player now, from the staging area, dealt a shadow card

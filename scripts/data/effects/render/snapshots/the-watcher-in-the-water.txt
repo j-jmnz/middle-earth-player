@@ -86,7 +86,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 04066:A:2 (shadow): Shadow: Remove 1 progress token from the current quest.
   04066:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - remove 1 progress from the current quest card (all of it when it holds less)
+    - remove 1 progress from the main quest (all of it when it holds less)
 
 ## 04067 Perilous Swamp
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -98,7 +98,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 04067:A:2 (shadow): Shadow: Remove 1 progress token from the current quest.
   04067:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - remove 1 progress from the current quest card (all of it when it holds less)
+    - remove 1 progress from the main quest (all of it when it holds less)
 
 ## 04068 Makeshift Passage
 (the scenario deals it into the encounter pile; the piles place it, no record does)

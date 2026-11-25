@@ -33,6 +33,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
 
 04140:B:1 (back): When Revealed: Durin's Bane makes an immediate attack on the first player. Add Dark Pit to the staging area.
   04140:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
     - the picked enemy attacks the first player now, from the staging area, dealt a shadow card
@@ -115,6 +116,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
 
 04146:A:1 (front): When Revealed: Durin's Bane gets +3 Attack until the end of the round. The first player may remove 1 questing hero he controls from the quest to cancel this effect.
   04146:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "remove" (only if there is a hero (you control) committed to the quest, chosen by the first player to choose):
         - choose hero (you control) committed to the quest, chosen by the first player
@@ -136,6 +138,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
 
 04147:A:2 (front): When Revealed: Heal 5 damage from Durin's Bane, if able. The first player may remove 1 questing hero he controls from the quest to cancel this effect.
   04147:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "remove" (only if there is a hero (you control) committed to the quest, chosen by the first player to choose):
         - choose hero (you control) committed to the quest, chosen by the first player
@@ -163,6 +166,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
 
 04149:A:1 (front): When Revealed: Durin's Bane makes an immediate attack against the first player (deal and resolve a shadow card).
   04149:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Durin's Bane"
     - the picked enemy attacks the first player now, from the staging area, dealt a shadow card

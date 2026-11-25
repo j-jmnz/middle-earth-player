@@ -25,7 +25,3 @@ The statuses are those of the Readings bullet of `docs/scenarios/haradrim.md`. E
 - Printed spelling (span-settled). Stage 2D, 3D and 4D print "Orc's area" and "Orcs' area"; both name the same area. Basis: the scans (`17052:B:2`, `17053:B:2`).
 - River Harnen (`17039:A:2`) (span-settled). The players cannot travel there unless stage 4B holds at least 20 progress; the ledger reads "there is at least 20 progress". Basis: the printed line.
 - Doomed X on player cards (span-settled). `hrd.doomed-x-player-cards`, `rr.doomed-x`.
-
-## Readings to confirm
-
-- A side quest as the current quest: recommended. See Readings.

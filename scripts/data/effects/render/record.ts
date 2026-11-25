@@ -147,6 +147,9 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   const keywordReminder = ctx.finalStage === true && effect.timing === "constant" && Array.isArray(effect.lines) && effect.lines.length > 0 && effect.lines.every((id) => typeof id === "string" && KEYWORD_REMINDER.test(ctx.lineTexts?.get(id) ?? ""));
   if (instructions.length === 0 && keywordReminder) lines.push("  (no instructions: the record only names the printed keyword reminder; the keyword is the card's own and the engine reads it from the card)");
   else if (instructions.length === 0) lines.push(winsOnDefeat ? "  (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)" : "  (no instructions: the record only names the printed line, and the engine runs no step for it)");
+  // A final stage whose printed line also says "If the players defeat this stage, they win the game" has the same win, beside the record's own instructions (a Restrict that holds the defeat).
+  const printedWin = ctx.finalStage === true && effect.timing === "constant" && instructions.length > 0 && Array.isArray(effect.lines) && effect.lines.some((id) => typeof id === "string" && /they win the game/i.test(ctx.lineTexts?.get(id) ?? ""));
+  if (printedWin) lines.push("  note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule");
   if (instructions.length > 1) lines.push("  (steps run in order; a step depends on an earlier one only through its own condition)");
   const inner = { ...ctx, timing: typeof effect.timing === "string" ? effect.timing : undefined, ...(effect.trigger === "engaged" ? { engagedSeat: true } : {}) };
   instructions.forEach((instruction, at) => lines.push(...renderInstruction(instruction, inner, 1, at > 0)));

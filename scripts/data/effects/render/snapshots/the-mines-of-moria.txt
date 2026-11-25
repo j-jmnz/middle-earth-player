@@ -272,7 +272,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 51218:A:1 (front): Forced: After Spider Broodling engages you, remove 2 progress from the main quest.
   51218:forced:1: Forced after an enemy engages a player (heard about this card)
     who acts: the acting player is the player the enemy engaged
-    - remove 2 progress from the current quest card (all of it when it holds less)
+    - remove 2 progress from the main quest (all of it when it holds less)
 
 51218:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, remove 2 progress from the main quest.
   51218:shadow:1: Shadow
@@ -280,7 +280,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
-      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): remove 2 progress from the current quest card (all of it when it holds less)
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): remove 2 progress from the main quest (all of it when it holds less)
 
 ## 51219 Spider Burrow
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -451,6 +451,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51230:A:1 (front): When Revealed: Either no more than 4 progress can be placed on the current quest this phase, or Web-spinner gains surge.
   51230:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "cap":
         - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 4, until the end of the phase
@@ -468,19 +469,20 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51231:A:1 (front): Travel: Remove 2 progress from the main quest.
   51231:travel:1: Travel
-    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the current quest card holds less progress than must be removed (read by the quest family)
-    - remove 2 progress from the current quest card (all of it when it holds less)
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the main quest holds less progress than must be removed (read by the quest family)
+    - remove 2 progress from the main quest (all of it when it holds less)
 
 51231:A:2 (shadow): Shadow: Remove 2 progress from the main quest.
   51231:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - remove 2 progress from the current quest card (all of it when it holds less)
+    - remove 2 progress from the main quest (all of it when it holds less)
 
 ## 51232 Foul Air
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 51232:A:1 (front): When Revealed: The first player must choose: either deal 1 damage to each character committed to the quest, or raise each player's threat by 1 and end the quest phase without resolving the quest.
   51232:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "damage":
         - deal 1 damage to each character (any player controls) committed to the quest

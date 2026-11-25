@@ -35,6 +35,12 @@ export { DREADNAUGHT_SAMPLES, ERECH_SAMPLES, FOG_SAMPLES, GULDUR_SAMPLES, GUARDI
 type Made = { text: string; read: readonly string[]; children?: readonly Obj[] };
 type Template = (ins: Obj, ctx: Ctx) => Made | null;
 
+// The note on a hand amount: `{ hand: true, plus: -N }` is "until N cards are left"; a hand amount with no negative `plus` gets none.
+const handLeft = (amount: unknown): string => {
+  if (!isObj(amount) || !("hand" in amount) || typeof amount.plus !== "number" || amount.plus >= 0) return "";
+  return ` (the player chooses which cards, until ${-amount.plus} cards are left)`;
+};
+
 const amount = (value: unknown, ctx: Ctx): string => renderAmount(value, ctx, renderPick);
 
 // The most ChooseX allows: its one amount, or the least of several (the engine takes the smallest of `max`).
@@ -113,7 +119,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   Ready: (i) => ({ text: `ready ${typeof i.target === "string" && i.target === "allCharacters" ? "every character" : cardRef(i.target ?? "self")}`, read: ["target"] }),
   Discard: (i) => ({ text: `discard ${target(i.target)}${i.counted === true ? " (a card discarded out of play counts for the effect's noneDiscarded condition: the part after \"then\" resolves only if the discard did)" : ""}`, read: ["target", "counted"] }),
   Destroy: (i) => ({ text: `${target(i.target)} is destroyed (not discarded: rr.destroy)`, read: ["target"] }),
-  DiscardFromHand: (i, ctx) => ({ text: `${ctx.engagedSeat === true ? "the player the enemy engaged discards" : "discard"} ${amount(i.amount, ctx)} card${ctx.engagedSeat === true && i.amount === 1 ? "" : "s"} from ${ctx.engagedSeat === true ? "their " : ""}hand`, read: ["amount"] }),
+  DiscardFromHand: (i, ctx) => ({ text: `${ctx.engagedSeat === true ? "the player the enemy engaged discards" : "discard"} ${amount(i.amount, ctx)} card${ctx.engagedSeat === true && i.amount === 1 ? "" : "s"} from ${ctx.engagedSeat === true ? "their " : ""}hand${handLeft(i.amount)}`, read: ["amount"] }),
   Draw: (i, ctx) => {
     // "Draws cards until he has N in his hand": the amount is N less the hand, and a hand of N or more draws nothing.
     const upTo = i.amount === undefined ? null : topUpTo(i.amount);
@@ -358,7 +364,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   RemoveSideQuestsFromGame: (i) => ({ text: `each card in the staging area titled ${quoted(Array.isArray(i.names) ? i.names : [])} (an encounter side quest, quest side up) is removed from the game, not added to the victory display; its attachments are discarded`, read: ["names"] }),
   FlipWhenDefeated: (i) => ({ text: `when this side quest is defeated it is not added to the victory display: it flips over into the objective with code ${str(i.into)} and stays in the staging area, faceup and unclaimed`, read: ["into"] }),
   RemoveProgressAmong: (i, ctx) => ({ text: `the acting player removes ${amount(i.amount, ctx)} progress from among the quest cards in play, one token at a time from the card they choose (all of it when fewer are there)`, read: ["amount", "left"] }),
-  RemoveProgressFromQuest: (i, ctx) => ({ text: `remove ${amount(i.amount, ctx)} progress from ${i.each === true ? "each quest card in play (the main quest card, each encounter side quest in the staging area and each player side quest)" : "the current quest card"} (all of it when it holds less)`, read: ["amount", "each"] }),
+  RemoveProgressFromQuest: (i, ctx) => ({ text: `remove ${amount(i.amount, ctx)} progress from ${i.each === true ? "each quest card in play (the main quest card, each encounter side quest in the staging area and each player side quest)" : "the main quest"} (all of it when it holds less)`, read: ["amount", "each"] }),
   PlaceProgressOnQuestCard: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} progress on the picked quest card, directly (the active location does not take it)`, read: ["amount"] }),
   DiscardEach: (i, ctx) => ({ text: `the acting player discards each ${pick(i.pick, ctx)}`, read: ["pick"] }),
   EachExhaustsOne: () => ({ text: "in player order, each player exhausts a ready character they control, choosing it (a player with none exhausts none)", read: ["seat"] }),
