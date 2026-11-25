@@ -82,7 +82,7 @@ describe("Ill Tidings in a hand (07023:A:1)", () => {
 
   it("an eliminated player's hand leaves with the player", () => {
     const { state, id } = dealt();
-    const out = { ...state, seats: state.seats.map((seat, index) => (index === 0 ? { ...seat, eliminated: true } : seat)) } as ScenarioState;
+    const out = { ...state, seats: state.seats.map((seat, index) => (index === 0 ? { ...seat, eliminated: true } : seat)) } as unknown as ScenarioState;
     expect(moveCard(out, id, { zone: "encounterDiscard" }).cards[id]?.zone).toBe("encounterDiscard");
   });
 
@@ -132,7 +132,7 @@ describe("Gríma lying on The Islet (07059:A:1, 07016:A:1)", () => {
   it("07016:A:1 when The Islet leaves play he is back in the staging area, then the first player gains control", () => {
     const { t, state, grima, islet } = lying();
     const steps: never[] = [];
-    const explored = destroyCard(state, islet, t.ctx.cards, steps, { explored: true });
+    const explored = destroyCard(state, islet, t.ctx.cards, steps, true);
     expect(explored.cards[grima]?.zone).toBe("staging");
     expect(explored.cards[grima]?.claimed).toBeUndefined();
     const claimed = settle({ ...explored, window: null, mode: "stopped" }, t.ctx, steps);
@@ -148,7 +148,7 @@ describe("the players cannot advance without Gríma (07059:B:3)", () => {
     const stage = lying.questStage ?? "";
     const waiting = settle({ ...lying, window: null, mode: "stopped" }, t.ctx, []);
     expect(waiting.questStage).toBe(stage);
-    const freed = destroyCard(waiting, idOf(waiting, ISLET), t.ctx.cards, [], { explored: true });
+    const freed = destroyCard(waiting, idOf(waiting, ISLET), t.ctx.cards, [], true);
     const done = settle({ ...freed, window: null, mode: "stopped" }, t.ctx, []);
     expect(done.cards[idOf(done, GRIMA)]).toMatchObject({ zone: "play", controller: 0 });
     expect(done.questStage).not.toBe(stage);
@@ -159,14 +159,14 @@ describe("Gríma leaves play (07016:A:3)", () => {
   const held = () => {
     const t = table({ seats: 2, staging: [ISLET], setAside: [GRIMA] });
     const lying = run(t, t.state, { verb: "AttachSetAsideTo", code: GRIMA, to: "The Islet", uncontrolled: true, claimed: true });
-    const freed = settle({ ...destroyCard(lying, idOf(lying, ISLET), t.ctx.cards, [], { explored: true }), window: null, mode: "stopped" }, t.ctx, []);
+    const freed = settle({ ...destroyCard(lying, idOf(lying, ISLET), t.ctx.cards, [], true), window: null, mode: "stopped" }, t.ctx, []);
     return { t, state: freed };
   };
 
   it("07016:A:3 a first player who is eliminated while he holds Gríma loses the game for everyone", () => {
     const { t, state } = held();
     expect(state.cards[idOf(state, GRIMA)]?.controller).toBe(0);
-    const out = { ...state, seats: state.seats.map((seat, index) => (index === 0 ? { ...seat, eliminated: true } : seat)) } as ScenarioState;
+    const out = { ...state, seats: state.seats.map((seat, index) => (index === 0 ? { ...seat, eliminated: true } : seat)) } as unknown as ScenarioState;
     const done = settle({ ...out, window: null, mode: "stopped" }, t.ctx, []);
     expect(done.lost).toBe(true);
   });
