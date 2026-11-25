@@ -6,10 +6,12 @@ import { updateCard } from "../../../rules/core/state.ts";
 import { moveCard } from "../../../rules/core/zones.ts";
 import { timeOnReveal } from "../../../rules/families/angmar/time.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
+import { destroyCard } from "../../../rules/core/keywords.ts";
+import { mayGainResources } from "../../../rules/families/misc/guards.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { announce, endRound, reveal, rowProblems, type Row } from "../../../../test/harness/card-spec.ts";
 import { play } from "../../../../test/harness/card-spec-play.ts";
-import { fightEnemy, finish, idOf, legalIntents, resolveRecords, revealFromTop, run, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { fightEnemy, finish, idOf, legalIntents, resolveRecords, revealedTop, revealFromTop, run, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "the-fords-of-isen";
 const GRIMA = "07016";
@@ -186,5 +188,58 @@ describe("The last enemy leaves play (07061:B:3)", () => {
     expect(waiting.stageCleared).toBeFalsy();
     const gone = moveCard(waiting, idOf(waiting, "07042"), { zone: "encounterDiscard" });
     expect(settle({ ...gone, window: null, mode: "stopped" }, t.ctx, []).stageCleared).toBe(true);
+  });
+});
+
+describe("Advancing with Gríma (07059:B:3)", () => {
+  it("07059:B:3 the first player controls Gríma: the players advance to the next stage", () => {
+    expect(holds({ line: "07059:B:3", layout: { stage: STAGE_1, progress: 3, play: [GRIMA], deck: ["f0", "f0"] }, act: { act: "quest", outcome: "success" }, expect: { expect: "resourcesOn", code: STAGE_2, value: 2 } })).toEqual([]);
+  });
+});
+
+describe("The Fords of Isen Setup and the cards no spec row holds (07016:A:1, 07018:A:1, 07023:A:1, 07047:A:1, 07059:A:1)", () => {
+  const lying = () => {
+    const t = table({ seats: 2, stage: STAGE_1, staging: [ISLET], setAside: [GRIMA], deck: ["07042", "07043", "f0"], deckOf: DECKS });
+    const state = resolveRecords(t.state, t.ctx, STAGE_1, "setup", t.state.questStage ?? "").state;
+    return { t, state };
+  };
+
+  it("07059:A:1 Setup lays Gríma on The Islet, and each player adds a different Dunland enemy from the encounter deck to the staging area", () => {
+    const { state } = lying();
+    expect(state.cards[idOf(state, GRIMA)]).toMatchObject({ zone: "attached", host: idOf(state, ISLET), controller: null });
+    expect(state.cards[idOf(state, "07042")]?.zone).toBe("staging");
+    expect(state.cards[idOf(state, "07043")]?.zone).toBe("staging");
+  });
+
+  it("07016:A:1 when The Islet leaves play Gríma is in the staging area, and the first player gains control of him", () => {
+    const { t, state } = lying();
+    const explored = destroyCard(state, idOf(state, ISLET), t.ctx.cards, [], true);
+    expect(explored.cards[idOf(explored, GRIMA)]?.zone).toBe("staging");
+    const done = settle({ ...explored, window: null, mode: "stopped" }, t.ctx, []);
+    expect(done.cards[idOf(done, GRIMA)]).toMatchObject({ zone: "play", controller: 0 });
+    expect(done.lost).toBeFalsy();
+  });
+
+  it("07018:A:1 no card gives a hero a resource while Fords of Isen is in the staging area, and the resource phase still does", () => {
+    const t = table({ staging: [FORDS, "07042"] });
+    const hero = t.state.seats[0]?.heroes[0] ?? "";
+    expect(mayGainResources(t.state, hero, idOf(t.state, "07042"), t.ctx)).toBe(false);
+    expect(mayGainResources(t.state, hero, null, t.ctx)).toBe(true);
+  });
+
+  it("07023:A:1 Ill Tidings goes into the first player's hand and stays there: no discard takes it out", () => {
+    const t = table({ hand: ["event", "ally"], deck: ["f0", "f0"] });
+    const state = revealedTop(t, "07023");
+    const id = idOf(state, "07023");
+    expect(state.cards[id]?.zone).toBe("hand");
+    expect(moveCard(state, id, { zone: "encounterDiscard" }).cards[id]?.zone).toBe("hand");
+  });
+
+  it("07047:A:1 the topmost Dunland enemy discarded this way is the last one discarded", () => {
+    const t = table({ hand: hand(3, 0), deck: ["07042", "07043", "07044", "f0"] });
+    const done = resolveRecords(t.state, t.ctx, "07047", "forced").state;
+    expect(done.cards[idOf(done, "07044")]?.zone).toBe("engaged");
+    expect(done.cards[idOf(done, "07042")]?.zone).toBe("encounterDiscard");
+    expect(done.cards[idOf(done, "07043")]?.zone).toBe("encounterDiscard");
   });
 });

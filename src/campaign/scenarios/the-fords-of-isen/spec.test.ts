@@ -1,7 +1,7 @@
 // Rules: rr.forced, rr.drawing-cards, rr.constant-ability, rr.travel, rr.shadow-effects, rr.attachment-cards, rm.time-x, rr.quest-advancement, rr.search (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { announce, attack, cardSpecs, count, damageOn, defend, drew, handCount, notWon, offers, quest, resourcesOn, reveal, resolve, stat, flag, threat, window, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, attack, cardSpecs, count, damageOn, defend, drew, handCount, lost, notWon, offers, progressOn, quest, resourcesOn, reveal, resolve, stat, flag, threat, window, zone, type Row } from "../../../../test/harness/card-spec.ts";
 import type { Dealt } from "../../../../test/harness/layout.ts";
 
 // Card specs for The Fords of Isen (the-ring-maker part 1): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
@@ -76,6 +76,10 @@ const ROWS: readonly Row[] = [
   { line: "07061:A:1", name: "When Revealed: each player adds a different Dunland enemy from the deck or the discard pile to the staging area", layout: { seats: 2, stage: STAGE_3, side: "A", deck: [PROWLER, "f0"], discard: [BANDIT] }, act: resolve(STAGE_3, "whenRevealed"), expect: [zone(PROWLER, "staging"), zone(BANDIT, "staging")] },
   { line: "07061:B:2", name: "Forced: after the last counter the top cards are discarded, one for each card in the first player's hand, the enemies among them join the staging area and 3 counters go on the stage", layout: { seats: 2, stage: STAGE_3, hand: [...hand(2, 0), ...hand(4, 1)], deck: [PROWLER, "place", BANDIT] }, act: announce("lastTimeCounterRemoved", STAGE_3), expect: [zone(PROWLER, "staging"), zone(BANDIT, "encounterDeck"), resourcesOn(STAGE_3, 3)] },
   { line: "07061:B:3", name: "While an enemy is in play the players cannot defeat the stage", layout: { stage: STAGE_3, progress: 16, staging: [PROWLER] }, act: quest("success"), expect: notWon },
+  // 07059 Fight at the Fords side B: the players cannot advance unless the first player controls Gríma; the last counter discards him.
+  { line: "07059:B:3", name: "The players cannot advance while the first player does not control Gríma: the progress stays on the stage", layout: { stage: STAGE_1, progress: 3, deck: ["f0", "f0"] }, act: quest("success"), expect: [progressOn(STAGE_1, 7), resourcesOn(STAGE_2, 0)] },
+  { line: "07059:B:2", name: "Forced: after the last time counter is removed Gríma is discarded and the players lose", layout: { stage: STAGE_1, play: [GRIMA] }, act: announce("lastTimeCounterRemoved", STAGE_1), expect: lost },
+  { line: "07016:A:3", name: "If Gríma leaves play the players lose the game", layout: { play: [GRIMA] }, act: [attack("07044", { undefended: false }), defend(GRIMA)], expect: [zone(GRIMA, "encounterDiscard"), lost] },
 ];
 
 if (ROWS.length > 0) cardSpecs("the-fords-of-isen", ROWS);
