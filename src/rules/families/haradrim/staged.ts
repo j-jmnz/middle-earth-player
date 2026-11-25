@@ -13,6 +13,7 @@ import { printedOf } from "../../core/printed.ts";
 import { flagged, livingSeats, updateCard, type CardInstance, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
+import { damageBarred } from "../defense/damage.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { effectData } from "../encounter/moves.ts";
 import { holdCaptive, releaseCaptive } from "../captives/index.ts";
@@ -38,7 +39,7 @@ export function moveHeroesToStaging(state: ScenarioState): ScenarioState {
 }
 
 // The option the actor chose (`focus.chosen`), the only option, or undefined when the actor must be asked.
-function chosenOf(options: readonly string[], focus: Focus): string | undefined {
+export function chosenOf(options: readonly string[], focus: Focus): string | undefined {
   return focus.chosen != null && options.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;
 }
 
@@ -118,5 +119,7 @@ export function markStagedHeroes(state: ScenarioState, ctx: ReduceContext): Scen
 /** The `combat.undefended` hook: while a stage holds `undefendedToStaged`, the heroes in the staging area take the damage of an undefended attack, the attacked player naming which; none when no hero is there (the damage then goes to the player's own heroes). */
 export function undefendedStaged(state: ScenarioState): readonly string[] {
   if (state.modifiers.length === 0 || !flagged(state, "table", "undefendedToStaged")) return [];
-  return stagedHeroes(state).map((card) => card.id);
+  // A hero that cannot take this attack's damage is not offered, and a shadow effect that names the heroes the damage must go on (`onlyHeroes`) still binds, as for the player's own heroes (combat.ts undefendedTargets).
+  const only = state.pendingAttack?.onlyHeroes;
+  return stagedHeroes(state).map((card) => card.id).filter((id) => !damageBarred(state, id, "combat", null) && (only == null || only.includes(id)));
 }

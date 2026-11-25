@@ -274,6 +274,13 @@ describe("16071:B:1 undefendedToStaged: damage from undefended attacks goes to a
     const made = table();
     expect(undefendedStaged(withFlag(made.state))).toEqual([]);
   });
+
+  it("a shadow effect that names the heroes the damage must go on (onlyHeroes) leaves out the staged hero it does not name", () => {
+    const { state, heroes } = staged();
+    const attack = { enemyId: "x", seat: 0, immediate: false } as unknown as NonNullable<ScenarioState["pendingAttack"]>;
+    const named = { ...state, pendingAttack: { ...attack, onlyHeroes: [heroes[0] ?? ""] } };
+    expect(undefendedStaged(named)).toEqual([heroes[0]]);
+  });
 });
 
 describe("record ownership", () => {

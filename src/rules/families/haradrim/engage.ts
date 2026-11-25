@@ -13,6 +13,7 @@ import { askTarget } from "../../windows/choices.ts";
 import { engageEnemy, engageWith } from "../../quest/quest.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
+import { chosenOf } from "./staged.ts";
 
 export function engageSeatWithMost(state: ScenarioState, instruction: Extract<Instruction, { verb: "EngageSeatWithMost" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = focus.sourceId;
@@ -23,8 +24,8 @@ export function engageSeatWithMost(state: ScenarioState, instruction: Extract<In
   const seats = counts.filter((entry) => entry.count === most).map((entry) => entry.seat);
   if (seats.length === 0) return state;
   const options = seats.map((seat) => `seat:${seat}`);
-  const chosen = focus.chosen != null && options.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;
-  if (!chosen) return effectData(state) ? askTarget(state, { instruction, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, options) : state;
+  const chosen = chosenOf(options, focus);
+  if (!chosen) return effectData(state) ? askTarget(state, { instruction, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, options) : { ...state, failure: `${instruction.verb} needs a choice, and no effect is asking` };
   const seat = Number(chosen.slice("seat:".length));
   if (enemy.zone === "engaged" && enemy.controller === seat) return state;
   if (enemy.zone === "engaged") return flagged(state, id, "cannotBeEngaged") ? state : engageWith(state, seat, id, steps);
