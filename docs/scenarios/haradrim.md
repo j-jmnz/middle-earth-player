@@ -27,7 +27,7 @@ The cycle of 2016: the deluxe expansion The Sands of Harad (`TSoH`, three scenar
 
 The player card readings use the same statuses. The keys are `<code>:<line>`, written from the scan-read ledger (`data/printed/player-cards.json`).
 
-- Valour (`17058`, `17084`, `17110`, `17113`, `17118`) (span-settled). A Valour Action or Response can only be used by a player whose threat is 40 or higher; an event with a Valour effect and another one gives the choice of one. Basis: `bts.valour`.
+- Valour (`17058`, `17084`, `17110`, `17113`, `17118`) (span-settled). A Valour Action or Response can only be used by a player whose threat is 40 or higher (Fierce Defense's is a Valour Combat Action, so it also needs the Combat phase); an event with a Valour effect and another one gives the choice of one. Basis: `bts.valour`.
 - Side quests of the player pool (`16013`, `17003`, `17036`, `17059`, `17087`) (span-settled). A player side quest is played in the planning phase for its cost and placed in the staging area; "Limit 1 copy in the victory display" sends a second defeated copy to its owner's discard pile. Basis: `hrd.player-side-quests`, `hrd.limit-one-in-victory-display`, `docs/brief.md` (Player side quests, contracts and saga cards).
 - Encounter (`17144`) (span-settled). Wind from the Sea is a player card with an encounter back, set aside at Setup and shuffled in by Flight to the Sea (`17140`). Basis: `hrd.encounter-keyword`.
 - `17135:A:1` (span-settled). Quickbeam's printed text is the ledger's: "Cannot have restricted attachments." and the Action that deals 2 damage to ready him; Hall of Beorn's erratum marker matches it. Basis: the scan.
