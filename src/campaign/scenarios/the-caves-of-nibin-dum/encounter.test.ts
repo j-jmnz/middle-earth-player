@@ -15,7 +15,7 @@ import { spawn } from "../../../rules/core/zones.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 import { codesIn, fight, loadCavesWorld, cavesTable, resolveReveal, settleChoices, type CavesLayout, type CavesWorld } from "../../../../test/scenarios/the-caves-of-nibin-dum/scene.ts";
 import { reveal } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
-import { first, type Run, send, start } from "../../../../test/harness/scene-kit.ts";
+import { finish, first, revealFromTop, type Run, send, start } from "../../../../test/harness/scene-kit.ts";
 
 let world: CavesWorld;
 
@@ -248,6 +248,20 @@ describe("Watchful Eyes (41040:A:1)", () => {
     const eyes = run.state.cards[first(run.state, "41040")];
     expect(eyes?.zone).toBe("attached");
     expect(heroes(run.state).map((card) => card.id)).toContain(eyes?.host);
+  });
+
+  it("is attached to a hero of the first player, who chooses it, when the second seat reveals it", () => {
+    const made = make({ seats: 2, deck: ["f0"] });
+    const asked: number[] = [];
+    const run = finish({ state: revealFromTop(made.state, made.ctx, "41040", [], 1).state, steps: [] }, made.ctx, (now) => {
+      if (now.window?.kind !== "choose") return "";
+      asked.push(now.window.seat);
+      return now.window.options[0] ?? "";
+    });
+    const host = run.state.cards[first(run.state, "41040")]?.host;
+    expect(asked).toEqual([0]);
+    expect(host).not.toBe(made.seat1Hero);
+    expect(run.state.seats[0]?.heroes).toContain(host);
   });
 
   it("has an encounter card revealed and added to the staging area at the end of the combat phase if the attached hero is exhausted", () => {

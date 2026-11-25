@@ -145,25 +145,25 @@ export function finish(run: Run, ctx: ReduceContext, pick?: (state: ScenarioStat
 
 /**
  * The card is put face down on top of the encounter deck and revealed by the first player (`startReveal`), the round stopped where it is, and the effects the reveal pushed are settled. The choices and looks they open
- * are left to the caller (`finish`, or an auto-player). Shared by the card-spec `reveal` action and the encounter smoke (scripts/card-smoke/encounter-cards.ts).
+ * are left to the caller (`finish`, or an auto-player). `seat` is the seat that reveals it (the first player by default). Shared by the card-spec `reveal` action and the encounter smoke (scripts/card-smoke/encounter-cards.ts).
  */
-export function revealFromTop(state: ScenarioState, ctx: ReduceContext, code: string, steps: EngineStep[]): { state: ScenarioState; id: string } {
+export function revealFromTop(state: ScenarioState, ctx: ReduceContext, code: string, steps: EngineStep[], seat?: number): { state: ScenarioState; id: string } {
   const spawned = spawn({ ...state, window: null, mode: "stopped" }, code, { zone: "encounterDeck" }, "down");
   const top = { ...spawned.state, encounterDeck: [spawned.id, ...spawned.state.encounterDeck.filter((id) => id !== spawned.id)] };
-  return { state: settle(startReveal(top, top.firstPlayer, ctx, steps), ctx, steps), id: spawned.id };
+  return { state: settle(startReveal(top, seat ?? top.firstPlayer, ctx, steps), ctx, steps), id: spawned.id };
 }
 
 /**
  * The card's records of this timing resolve now (a When Revealed in the quest phase, a Setup), and the look windows and choices they
  * open are answered. `source` is the card they belong to (spawned in the staging area when absent). The mode stops the round where it
- * is, so only what the records do is read, unless `stopped` is false.
+ * is, so only what the records do is read, unless `stopped` is false. `seat` is the seat the records run for (the first player by default).
  */
-export function resolveRecords(state: ScenarioState, ctx: ReduceContext, code: string, timing: Effect["timing"], source?: string, pick?: (state: ScenarioState) => string, stopped = true): Run & { id: string } {
+export function resolveRecords(state: ScenarioState, ctx: ReduceContext, code: string, timing: Effect["timing"], source?: string, pick?: (state: ScenarioState) => string, stopped = true, seat?: number): Run & { id: string } {
   const spawned = source ? { state, id: source } : spawn(state, code, { zone: "staging" });
   const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === timing);
   const steps: EngineStep[] = [];
   const frame = timing === "whenRevealed" ? "whenRevealed" : timing === "setup" ? "setup" : timing === "travel" ? "travel" : timing === "shadow" ? "shadow" : "forced";
-  const pushed = pushCardEffects(spawned.state, frame, spawned.id, spawned.state.firstPlayer, false, effects, ctx, steps);
+  const pushed = pushCardEffects(spawned.state, frame, spawned.id, seat ?? spawned.state.firstPlayer, false, effects, ctx, steps);
   const run = finish({ state: settle({ ...pushed, window: null, ...(stopped ? { mode: "stopped" as const } : {}) }, ctx, steps), steps }, ctx, pick);
   if (causeProblems(run.steps).length > 0) throw new Error(`Steps without a cause: ${causeProblems(run.steps).join("; ")}`);
   return { ...run, id: spawned.id };

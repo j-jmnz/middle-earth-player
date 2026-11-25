@@ -297,7 +297,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 
 41040:A:1 (front): When Revealed: The first player attaches Watchful Eyes to one of his heroes. (Counts as a Condition attachment with the text: "Limit 1 per hero. Forced: If attached hero is exhausted at the end of the combat phase, reveal 1 card from the encounter deck and add it to the staging area.")
   41040:whenRevealed:1: When revealed
-    - attach this card to a hero the acting player controls that carries no copy of this card (the acting player, the first player in a When Revealed, chooses it; with none this card stays where it is)
+    - attach this card to a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card stays where it is)
   41040:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   41040:forced:1: Forced at the end of the phase
