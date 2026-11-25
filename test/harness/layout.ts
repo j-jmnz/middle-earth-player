@@ -76,7 +76,7 @@ export type Layout = {
   // `"easy"`: the scenario's Easy Mode card instead (The Hunt for the Dreadnaught, 40001:B:1).
   modeCard?: true | "easy";
   // Cards attached to the first card of `to`, wherever it lies (an attachment is spawned in play and attached).
-  // `encounter`: an encounter card attached the way its own effect attaches it (zone attached, controlled by no one, not claimed): the Sack cards, the Troll Key and the Troll Purse.
+  // `encounter`: an encounter card attached the way its own effect attaches it (zone attached, controlled by no one, not claimed): the Sack cards, the Troll Key and the Troll Purse; an enemy lies as an attachment (Mugash, 07024:A:2).
   attached?: readonly { code: string; to: string; encounter?: true }[];
   // The codes of the cards committed to the quest (a hero stand-in, an ally of `play`).
   committed?: readonly string[];
@@ -230,7 +230,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     if (attachment.encounter) {
       const spawned = spawn(state, attachment.code, { zone: "play", seat: 0 });
       state = attachTo(moveCard(spawned.state, spawned.id, { zone: "attached" }), spawned.id, host);
-      state = updateCard(state, spawned.id, { controller: null });
+      state = updateCard(state, spawned.id, { controller: null, ...(cards.get(attachment.code)?.type === "enemy" ? { asAttachment: true } : {}) });
       continue;
     }
     const spawned = spawn(state, attachment.code, { zone: "play", seat: 0 });
