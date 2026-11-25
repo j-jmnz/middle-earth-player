@@ -1,6 +1,6 @@
 // Rules: rr.forced, rr.reveal, rr.shadow-effects, rr.then, rr.in-play-and-out-of-play, rr.attachment-cards, rr.optional-engagement, rr.travel, rr.search, rr.running-out-of-cards (data/rules/entries.json).
 // An independent audit of Peril in Pelargir (card-audit): each test is written from the printed line and the rule spans, never from the record or the scenario's own tests, on the smallest table the scene kit builds, and each runs again
-// without its line's records (`lineSpec`). A test that shows the engine not doing what the card prints is an `it.fails` under a `// FAULT:` comment; a reading no document settles is marked `// OPEN:`.
+// without its line's records (`lineSpec`). A test that shows the engine not doing what the card prints is an `it.fails` under a `// FAULT:` comment; a reading no document settles is marked `// OPEN:`; a gap no play reaches is marked `// KNOWN:`.
 import { expect } from "vitest";
 
 import { updateCard, type GameEvent, type ScenarioState } from "../../../rules/core/state.ts";

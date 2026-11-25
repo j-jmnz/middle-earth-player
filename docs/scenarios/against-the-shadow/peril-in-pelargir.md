@@ -127,7 +127,6 @@ No tracker, dial or zone: no record creates one. The one held card is Alcaron's 
 
 Where the engine does not read a reading above to the letter, and why.
 
-- `05019:A:2` (timing vs destruction): the Scroll attaches to the enemy when the hero survives the damage. When the damage is lethal and no Response in play or in hand could cancel it, the engine destroys the hero as the damage is placed, before the Forced effect is heard, so the Scroll goes to the staging area (the reading not taken). A hero whose destruction waits for a cancel Response hears the Forced effect first. The fix is a hold of lethal damage in `src/rules/core/keywords.ts` (`placeDamageHere`), a shared engine file this scenario does not change.
 - `05041:A:1` (counts-as text): the engine announces an exhaust that is the cost of an Action only through the Action (`abilityTriggered`), not as `exhausted` (`docs/agents/effect-authoring.md`, Not expressible yet): a hero that exhausts to pay for another card's Action raises the controller's threat once through the ability, not once more for the exhaust.
 - `05066:B:2` and `05067:B:3` (later attach): the stage advances at the next settle with no window open (`advanceFreed`, `src/rules/quest/stage-reveal.ts`), so a Scroll attached in an action window advances it when the window closes.
 
@@ -135,7 +134,7 @@ Where the engine does not read a reading above to the letter, and why.
 
 - `05019:A:2` (damaged): researched (community discussion only). "damaged by an enemy attack" = damage tokens were placed on the hero by that attack (rr.damage step 3). Damage cancelled or reduced to 0 by defense ... See Readings.
 - `05019:A:2` (redirected damage): recommended. Damage the Thug or Collateral Damage shadow redirects to the Scroll hero is damage "by an enemy attack": the Forced fires and the Scroll attaches to ... See Readings.
-- `05019:A:2` (timing vs destruction): recommended (the engine takes the alternative for lethal damage, see Engine notes). the Forced resolves as damage is placed, while the hero and the Scroll are still in play; the Scroll attaches to the enemy, then the hero is ... See Readings.
+- `05019:A:2` (timing vs destruction): recommended. the Forced resolves as damage is placed, while the hero and the Scroll are still in play; the Scroll attaches to the enemy, then the hero is ... See Readings.
 - `05020:A:2` (shadow, redirect): researched (community discussion only). all damage of the attack goes to the Scroll hero (any player's hero), in place of the defender or the undefended assignment, before damage is placed. ... See Readings.
 - `05020:A:2` (no Scroll hero): researched (community discussion only). If no hero has the Scroll (staging, on an enemy), "if able" fails and the defender takes the damage as normal. See Readings.
 - `05023:A:1` (which discards): recommended. Counts a location discarded from the top by the Fish, by Collateral Damage, and by any other effect that names "from the top of the encounter deck". ... See Readings.

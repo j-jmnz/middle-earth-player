@@ -1,6 +1,6 @@
 // Rules: rr.forced, rr.reveal, rr.shadow-effects, rr.then, rr.in-play-and-out-of-play, rr.attachment-cards, rr.optional-engagement, rr.travel, rr.search, rr.running-out-of-cards (data/rules/entries.json).
 // An independent audit of Peril in Pelargir (card-audit): each test is written from the printed line and the rule spans, never from the record or the scenario's own tests, on the smallest table the scene kit builds, and each runs again
-// without its line's records (`lineSpec`). A test that shows the engine not doing what the card prints is an `it.fails` under a `// FAULT:` comment; a reading no document settles is marked `// OPEN:`.
+// without its line's records (`lineSpec`). A test that shows the engine not doing what the card prints is an `it.fails` under a `// FAULT:` comment; a reading no document settles is marked `// OPEN:`; a gap no play reaches is marked `// KNOWN:`.
 import { expect, it } from "vitest";
 
 import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
@@ -11,8 +11,7 @@ import { EFFECTS } from "../../../effects/index.ts";
 import { tbl, scrolled, zoneOf, hasScroll, threatOf, engagedOf, scrollOn, scrollAction, passUntil, shadowFight, LOW, resourcesOn, engage, quested, quays } from "./audit-kit.ts";
 
 // ---- more of the lines above, on the cases that are hardest to get right ----
-// OPEN: the scenario file reads "when damaged" as before the destruction (Readings, 05019:A:2 timing vs destruction, recommended; Engine notes names the deviation); the printed words say the Scroll attaches to the enemy that damaged its hero. Kept as the card prints it.
-it.fails("05019:A:2 Forced: when the damage destroys the Scroll hero the Scroll is attached to the attacking enemy and is not left in the staging area", () => {
+it("05019:A:2 Forced: when the damage destroys the Scroll hero the Scroll is attached to the attacking enemy and is not left in the staging area", () => {
   const out = fightEnemy((layout) => scrolled(EFFECTS, layout), "f0", "05044", { seats: 1 as const }, { tweak: (state, made) => updateCard(state, made.hero, { damage: 4 }) });
   expect(out.run.state.cards[out.made.hero]?.zone, "4 + 3 damage on 6 hit points destroys the hero").not.toBe("heroes");
   expect(hasScroll(out.run.state, idOf(out.run.state, "05044")), "the Scroll went onto the enemy").toBe(true);
