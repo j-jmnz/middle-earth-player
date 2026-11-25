@@ -115,6 +115,8 @@ export const amountExprSchema = z.strictObject({
   discardedThreat: z.literal(true).optional(),
   // The Willpower the character the attack destroyed had in play, kept when the attack damaged it ("raise your threat by the destroyed character's Willpower", 10107:A:2); 0 when none was kept. Read by the angmar family.
   destroyedWillpower: z.literal(true).optional(),
+  // The total Willpower of all characters committed to the quest, every player's, as the quest counts it ("the total Willpower of all characters committed to the quest", 07030:A:1). Read by the ring-maker family.
+  committedWillpower: z.literal(true).optional(),
   // The number of quest cards in play: the main quest card, the side quests in the staging area, encounter and player, at least 1 ("X is the number of quest cards in play", 09016:A:1; mec108.side-quests-in-play). Read by the angmar family.
   questCards: z.literal(true).optional(),
   // The quest stages in play with no progress token on them: stages 2 to 4 in play together, the only stage before them and stage 5 after them ("for each quest stage in play with no progress on it", 132054:A:2; 132057:A:1). Read by the armies family.
