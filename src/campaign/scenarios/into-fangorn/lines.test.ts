@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { runInstruction } from "../../../rules/interpret/interpret.ts";
+import { crossBoundary } from "../../../rules/windows/triggers.ts";
 import { fight, idOf, idsOf, opened, resolveRecords, run, statOf, tableFromLayout, zoneOf, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "into-fangorn";
@@ -225,6 +226,18 @@ describe("the encounter cards that attach (07057:A:2, 07058:A:1)", () => {
     const done = fight(t, opened(t), (state) => state.round > t.state.round);
     // One counter comes off for the stage's own Time and one for Off Track.
     expect(done.state.cards[done.state.questStage ?? ""]?.resources).toBe(2);
+  });
+});
+
+describe("the order at the end of the refresh phase (07057:A:2, mec108.time-x)", () => {
+  it("07057:A:2 Off Track's counter comes off before the stage's own: its Forced effect is on top of the stack and the stage's removal under it", () => {
+    const t = table({ stage: STAGE_1, timeCounters: 4, phase: "Refresh", staging: [EDGE], attached: [offTrack] });
+    // The refresh phase has just ended: the boundary pushes the stage's own removal first and the Forced effects after it, so the last one pushed (the top) resolves first.
+    const crossed = crossBoundary({ ...t.state, phase: "Planning", boundaryPhase: "Refresh" }, t.ctx, []);
+    const at = (id: string) => crossed.stack.findIndex((frame) => JSON.stringify(frame).includes(id));
+    expect(at("time:refresh")).toBeGreaterThanOrEqual(0);
+    expect(at("07057:forced:1")).toBeGreaterThan(at("time:refresh"));
+    expect(crossed.cards[crossed.questStage ?? ""]?.resources).toBe(4);
   });
 });
 

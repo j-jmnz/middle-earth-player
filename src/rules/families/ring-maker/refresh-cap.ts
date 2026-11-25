@@ -24,8 +24,8 @@ function readying(state: ScenarioState, seat: number, ctx: ReduceContext): strin
 }
 
 /**
- * CapRefresh: the actor keeps the characters beyond `amount` that would ready exhausted, one at a time of its own choice (asked once per character; the last choice goes at once). A second Heart of Fangorn finds the cap already met and keeps none more. Nothing happens
- * with `amount` characters or fewer to ready.
+ * CapRefresh: the characters the actor controls that would ready are `readying`. With more than `amount` of them the actor holds one back at a time, chosen among all of them that would still ready (asked once for each character held back, the last one too; with no effect
+ * frame to ask in, the first one is held). Each holds `doesNotReady` until the end of the phase and leaves `readying`, so the choices stop when `amount` remain and a second Heart of Fangorn finds the cap met and holds none more. With `amount` or fewer to ready nothing happens.
  */
 export function capRefresh(state: ScenarioState, instruction: Verb<"CapRefresh">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const seat = focus.seat;

@@ -149,8 +149,8 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
   07050:constant:1: Constant
     only if this card is in the staging area
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each Forest location (any player controls) in the staging area only: stat threat 1, while this card is in play (does not stack: only the oldest copy of this card in play gives it)
-    - each Forest location (any player controls) in the staging area only: stat questPoints 3, while this card is in play (does not stack: only the oldest copy of this card in play gives it)
+    - each Forest location (any player controls) in the staging area only: stat threat 1, while this card is in play (does not stack: only the oldest copy of this card in play whose condition holds gives it)
+    - each Forest location (any player controls) in the staging area only: stat questPoints 3, while this card is in play (does not stack: only the oldest copy of this card in play whose condition holds gives it)
 
 07050:A:2 (shadow): Shadow: Defending player exhausts a character he controls.
   07050:shadow:1: Shadow
@@ -165,7 +165,7 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
 07051:A:1 (front): While Tangled Woods is in the staging area, each Forest location in play gains: 'Travel: Exhaust a hero to travel here.' This ability does not stack with other copies of Tangled Woods.
   07051:constant:1: Constant
     only if this card is in the staging area
-    - each Forest location (any player controls) or in the staging area: stat travelExhaust 1, while this card is in play (does not stack: only the oldest copy of this card in play gives it)
+    - each Forest location (any player controls) or in the staging area: stat travelExhaust 1, while this card is in play (does not stack: only the oldest copy of this card in play whose condition holds gives it)
 
 ## 07052 Turned Around
 (the scenario deals it into the encounter pile; the piles place it, no record does)
