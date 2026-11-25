@@ -92,8 +92,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("LoseControlOfLocation"), card: cardRefSchema.optional(), ...when }),
   // "that character's controller must ..." (06100:A:2, 06101:A:2, 06104:A:2; a Shadow effect the attack leaves for its end): the player who controlled the character the attack destroyed (a Sentinel defender may belong to another player than the one attacked) acts for the instructions that follow in the effect. Nothing changes when the attack destroyed no character.
   z.strictObject({ verb: z.literal("ActForDestroyedController"), ...when }),
-  // "Add it to the staging area" read as an entry the card's own Forced effect hears (05053:A:1, ats.setup-assault-on-osgiliath, 06091:A:1): the card the reference names (`picked`: the card an earlier SearchMove with `remember` put in the staging area) is announced as added to the staging area. SearchMove announces it for an ambush enemy alone, so a record opts in with this verb; a card not in the staging area is left as it is.
-  z.strictObject({ verb: z.literal("AnnounceAddedToStaging"), card: cardRefSchema.optional(), ...when }),
+  // "Add it to the staging area" read as an entry the card's own Forced effect hears (05053:A:1, ats.setup-assault-on-osgiliath, 06091:A:1): the card the reference names (`picked`: the card an earlier SearchMove with `remember` put in the staging area) is announced as added to the staging area. SearchMove announces it for an ambush enemy alone, so a record opts in with this verb; a card not in the staging area is left as it is. A quest card's Setup that names it runs at the start (the piles place the cards, so The Morgul Vale's Setup only announces To the Tower, 06144:A:1).
+  verbFlags(z.strictObject({ verb: z.literal("AnnounceAddedToStaging"), card: cardRefSchema.optional(), ...when }), { setupRuns: "top" }),
   // The Blood of Gondor (ats.hidden-cards): "take 1 hidden card" (06117:B:1, 06122:A:1, 06124:A:1): the acting player (`who: firstPlayer` for a Travel cost, "The first player must take 1 hidden card to travel here", 06123:A:3) sets the top `amount` cards of the encounter deck facedown in his play area, unseen and not revealed, as one
   // instruction (the 5-card limit of Captured! is checked once it is done). An empty deck is refilled from the discard pile first; with both empty no card is taken, and a Travel cost of it cannot be paid. src/rules/families/pelargir/hidden.ts.
   z.strictObject({ verb: z.literal("TakeHiddenCard"), who: z.enum(["actor", "firstPlayer"]).optional(), amount: z.number().int().positive().optional(), ...when }),
@@ -112,12 +112,12 @@ const VERBS = [
   // The engine's own, last in the frame of a treachery that Lying in Wait turned faceup: the treachery lies in the staging area while its When Revealed effect resolves and goes to the encounter discard pile after it, as a revealed treachery does (rr.step-3-3). No record names it.
   z.strictObject({ verb: z.literal("DiscardResolved"), ...when }),
   // The Morgul Vale (ats.captain-enemies, ats.setup-the-morgul-vale-to-the-tower): "place 1 progress token on To the Tower" (06149:A:2, 06150:A:2, 06152:A:1, 06155:A:2, 06157:A:1, 06158:A:2, 06159:A:2): `amount` progress tokens go on the card in play with this title (the staging area counts as play) as the engine places progress on a card, one placement, so a card that hears
-  // "progress placed" hears it once. With no such card in play nothing happens. src/rules/families/pelargir/tower.ts.
+  // "progress placed" hears it once. With no such card in play nothing happens. src/rules/families/pelargir/vale/tower.ts.
   z.strictObject({ verb: z.literal("PlaceProgressOnNamed"), name: z.string().min(1), amount: positiveAmountSchema, ...when }),
   // "Remove Faramir from the game" (06147:A:2, ats.setup-the-morgul-vale-to-the-tower): every card a player owns with this title, in a deck, a hand, a discard pile or play (a hero or an ally, its attachments with it), goes out of the game, and nothing is announced as leaving play.
   z.strictObject({ verb: z.literal("RemoveAllNamedFromGame"), name: z.string().min(1), ...when }),
   // "Reveal the top card of the encounter deck. If that card is an enemy, put it into play engaged with the defending player" (06151:A:1): the top card is revealed in full for the acting player (the player the attack was against): its Doomed, When Revealed effects and Surge resolve, an enemy is put into play engaged with him, never staged,
-  // and dealt no shadow card, a location or an objective goes to the staging area and a treachery to the discard pile. An empty deck is reset from the discard pile only in the quest phase (rr.running-out-of-cards): in any other phase, Murzag's attack in the combat phase, nothing is revealed. src/rules/families/pelargir/reveal-engaged.ts.
+  // and dealt no shadow card, a location or an objective goes to the staging area and a treachery to the discard pile. An empty deck is reset from the discard pile only in the quest phase (rr.running-out-of-cards): in any other phase, Murzag's attack in the combat phase, nothing is revealed. src/rules/families/pelargir/vale/reveal-engaged.ts.
   z.strictObject({ verb: z.literal("RevealTopEngaging"), ...when }),
 ] as const;
 
@@ -199,12 +199,12 @@ const FLAGS = [
   "turnsAtFiveHidden",
   // On a location a player controls: the seat that took control, plus 1 (no record sets it; TakeControlOfLocation writes it and a settle sweep reads it to see the control lost). Held until the control is lost.
   "controlSeat",
-  // On a Captain enemy while its stage is current: it cannot leave play unless it is destroyed ("Murzag cannot leave play unless destroyed", 06144:B:1, 06145:B:1, 06146:B:2). A Pick that feeds a verb taking the card out of play any other way leaves it out, so no player is offered a target whose effect cannot happen (rr.cannot; src/rules/families/pelargir/cannot-leave.ts);
+  // On a Captain enemy while its stage is current: it cannot leave play unless it is destroyed ("Murzag cannot leave play unless destroyed", 06144:B:1, 06145:B:1, 06146:B:2). A Pick that feeds a verb taking the card out of play any other way leaves it out, so no player is offered a target whose effect cannot happen (rr.cannot; src/rules/families/pelargir/vale/cannot-leave.ts);
   // a shuffle of the staging area leaves it where it is, and a settle sweep puts it back in the staging area when an effect with no pick moved it out of play anyway. Returning it to the staging area is not leaving play.
   "cannotLeavePlay",
-  // On each Captain enemy while a Morgul Bodyguard is in play: damage that would be dealt to it is dealt to one Bodyguard instead ("Any damage that would be dealt to a Captain enemy is dealt to 1 Morgul Bodyguard instead", 06148:A:1; src/rules/families/defense/damage.ts damageGoesTo asks families/pelargir/bodyguard.ts).
+  // On each Captain enemy while a Morgul Bodyguard is in play: damage that would be dealt to it is dealt to one Bodyguard instead ("Any damage that would be dealt to a Captain enemy is dealt to 1 Morgul Bodyguard instead", 06148:A:1; src/rules/families/defense/damage.ts damageGoesTo asks families/pelargir/vale/bodyguard.ts).
   "shieldedByBodyguard",
-  // On an enemy until the end of the attack: a shadow effect ended this attack ("Attacking enemy engages the next player and makes an immediate attack", 06148:A:2), so no damage is dealt and no shadow card that is left resolves (src/rules/combat/shadow.ts resolveAttack asks families/pelargir/switch.ts).
+  // On an enemy until the end of the attack: a shadow effect ended this attack ("Attacking enemy engages the next player and makes an immediate attack", 06148:A:2), so no damage is dealt and no shadow card that is left resolves (src/rules/combat/shadow.ts resolveAttack asks families/pelargir/vale/switch.ts).
   "attackSwitched",
 ] as const;
 

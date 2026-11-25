@@ -1,16 +1,16 @@
 // Rules: rr.in-play-and-out-of-play, rr.removed-from-game, rr.objective-cards, ats.setup-the-morgul-vale-to-the-tower (data/rules/entries.json); ledger lines 06147:A:2, 06149:A:2, 06150:A:2, 06152:A:1.
 // The two verbs of The Morgul Vale that work on a card by its title: progress tokens placed on To the Tower, and every copy of Faramir removed from the game at Setup.
-import type { Instruction } from "../../../catalog/boundary.ts";
+import type { Instruction } from "../../../../catalog/boundary.ts";
 
-import type { EngineStep } from "../../core/intents.ts";
-import { isPlayerType, printedOf } from "../../core/printed.ts";
-import type { ScenarioState } from "../../core/state.ts";
-import { moveCard } from "../../core/zones.ts";
-import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
-import { placeProgress } from "../../interpret/effect-verbs.ts";
-import type { ReduceContext } from "../../interpret/interpret.ts";
-import { namedInPlay } from "../misc/amounts.ts";
-import type { Focus } from "../index.ts";
+import type { EngineStep } from "../../../core/intents.ts";
+import { isPlayerType, printedOf } from "../../../core/printed.ts";
+import type { ScenarioState } from "../../../core/state.ts";
+import { moveCard } from "../../../core/zones.ts";
+import { frameScope, resolveAmount } from "../../../interpret/amounts.ts";
+import { placeProgress } from "../../../interpret/effect-verbs.ts";
+import type { ReduceContext } from "../../../interpret/interpret.ts";
+import { namedInPlay } from "../../misc/amounts.ts";
+import type { Focus } from "../../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 

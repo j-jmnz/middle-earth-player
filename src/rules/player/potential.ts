@@ -34,7 +34,7 @@ import { pickCandidates, seatsOf } from "../interpret/pick.ts";
 import { deckPool } from "../families/uncharted/pick.ts";
 import { aboutCard } from "../windows/listen.ts";
 import { placesPicked } from "../families/pelargir/progress-bar.ts";
-import { leavesPlayPicked } from "../families/pelargir/cannot-leave.ts";
+import { leavesPlayPicked } from "../families/pelargir/vale/cannot-leave.ts";
 import { spendsLockedHost, spendsPicked } from "../families/pelargir/spending.ts";
 import { allIdle } from "./idle.ts";
 import { readsEffect } from "./idle-reads.ts";

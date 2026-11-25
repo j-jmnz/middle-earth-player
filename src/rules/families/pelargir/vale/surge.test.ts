@@ -3,10 +3,10 @@
 // places a token on each pass, so its chain runs on by the rules to the letter and ends at the tenth token, when the players lose.
 import { describe, expect, it } from "vitest";
 
-import { reduce } from "../../engine/reduce.ts";
-import { expectOk } from "../../core/test-fixture.ts";
-import { CODES, opened, table, tokens } from "../../../../test/scenarios/the-morgul-vale/table.ts";
-import { inOwnSurgeChain } from "./surge-chain.ts";
+import { reduce } from "../../../engine/reduce.ts";
+import { expectOk } from "../../../core/test-fixture.ts";
+import { CODES, opened, table, tokens } from "../../../../../test/scenarios/the-morgul-vale/table.ts";
+import { inOwnSurgeChain } from "../surge-chain.ts";
 
 const { tower, murzag, deadCity, terror, tracker } = CODES;
 

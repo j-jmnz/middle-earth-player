@@ -48,7 +48,7 @@ import { seatPickMatches } from "../families/wilderland/seat-pick.ts";
 import { mostResources } from "../families/burgle/pick.ts";
 import { committedInStaging } from "../families/pelargir/committed.ts";
 import { pickBarred } from "../families/pelargir/progress-bar.ts";
-import { pickKeepsInPlay } from "../families/pelargir/cannot-leave.ts";
+import { pickKeepsInPlay } from "../families/pelargir/vale/cannot-leave.ts";
 import { resourcesLocked } from "../families/pelargir/spending.ts";
 
 // What a filter is read against: who is choosing or counting, the effect's source, what it has picked, its X, and the
@@ -70,7 +70,7 @@ export type PickContext = {
   spends?: boolean;
   // The cards chosen get progress from the instruction after the pick (PlaceProgressOn picked): the bar on player cards leaves out a staged location (families/pelargir/progress-bar.ts).
   places?: boolean;
-  // The cards chosen are taken out of play, not destroyed, by the instructions after the pick (a discard, a shuffle, a return to a hand): a card that cannot leave play is not offered (families/pelargir/cannot-leave.ts).
+  // The cards chosen are taken out of play, not destroyed, by the instructions after the pick (a discard, a shuffle, a return to a hand): a card that cannot leave play is not offered (families/pelargir/vale/cannot-leave.ts).
   leaves?: boolean;
 };
 

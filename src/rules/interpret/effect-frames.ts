@@ -18,7 +18,7 @@ import { chooseEach } from "../families/deck/each.ts";
 import { lookedDeckSeat } from "../families/deck/rules.ts";
 import { feedsDiscard, pickCandidates } from "./pick.ts";
 import { placesPicked } from "../families/pelargir/progress-bar.ts";
-import { leavesPlayPicked } from "../families/pelargir/cannot-leave.ts";
+import { leavesPlayPicked } from "../families/pelargir/vale/cannot-leave.ts";
 import { spendsPicked } from "../families/pelargir/spending.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "../core/state.ts";

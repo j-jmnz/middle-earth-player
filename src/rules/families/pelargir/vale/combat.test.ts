@@ -2,11 +2,11 @@
 // The damage a Morgul Bodyguard takes for a Captain and the attack its Shadow ends, on the table of the scenario with real attacks: a hero's attack on Murzag, damage dealt by an effect, and enemy attacks answered by the players.
 import { describe, expect, it } from "vitest";
 
-import type { EngineStep } from "../../core/intents.ts";
-import { shadowCards } from "../../core/zones.ts";
-import { dealAdditionalShadow } from "../../interpret/interpret.ts";
-import { idOf, send } from "../../../../test/harness/scene-kit.ts";
-import { CODES, engagedCodes, fight, opened, run, table, tokens, where } from "../../../../test/scenarios/the-morgul-vale/table.ts";
+import type { EngineStep } from "../../../core/intents.ts";
+import { shadowCards } from "../../../core/zones.ts";
+import { dealAdditionalShadow } from "../../../interpret/interpret.ts";
+import { idOf, send } from "../../../../../test/harness/scene-kit.ts";
+import { CODES, engagedCodes, fight, opened, run, table, tokens, where } from "../../../../../test/scenarios/the-morgul-vale/table.ts";
 
 const { tower, bodyguard, tracker, murzag, nazgul, alcaron, sorcerer } = CODES;
 const BOROMIR = "05002";

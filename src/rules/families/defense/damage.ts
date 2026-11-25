@@ -19,7 +19,7 @@ import { patchTop, topFrame } from "../../windows/windows.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { defendingAgainst } from "../angmar/combat.ts";
 import { scrollDamageTarget } from "../pelargir/scroll.ts";
-import { bodyguardTarget } from "../pelargir/bodyguard.ts";
+import { bodyguardTarget } from "../pelargir/vale/bodyguard.ts";
 import { listened, queueHeard, trimFollowUps } from "./listen.ts";
 import { bilboDamageBarred } from "../riddles/gollum.ts";
 

@@ -3,10 +3,10 @@
 // sweeps cards skips him, the staging area shuffled keeps both cards and their tokens and still counts them, an effect with no pick that moves him out of play is undone, and his destruction advances the quest and wins the game.
 import { describe, expect, it } from "vitest";
 
-import { flagged } from "../../core/state.ts";
-import { noTargetReason } from "../../player/potential.ts";
-import { idOf, resolveRecords, revealedTop } from "../../../../test/harness/scene-kit.ts";
-import { CODES, engagedCodes, fight, opened, run, table, tokens, where } from "../../../../test/scenarios/the-morgul-vale/table.ts";
+import { flagged } from "../../../core/state.ts";
+import { noTargetReason } from "../../../player/potential.ts";
+import { idOf, resolveRecords, revealedTop } from "../../../../../test/harness/scene-kit.ts";
+import { CODES, engagedCodes, fight, opened, run, table, tokens, where } from "../../../../../test/scenarios/the-morgul-vale/table.ts";
 
 const { rearguard, rider, tower, bodyguard, tracker, murzag, alcaron, nazgul, vale, powerOfMordor } = CODES;
 const LIE_LOW = "10081";

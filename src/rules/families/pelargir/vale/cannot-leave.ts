@@ -5,16 +5,16 @@
 // 2. The staging area shuffled into the encounter deck leaves it where it is, though it still counts (families/pelargir/staging.ts).
 // 3. An effect with no Pick that moves it out of play anyway (a discard of "the attacking enemy", a sweep of every enemy) is undone by the settle sweep below: the Captain returns to the staging area, unless it was destroyed in this intent (the sweep reads the `destroy` step), because the move helpers
 //    of core/zones.ts refuse only a card that cannot leave the staging area. What it lost on the way (its damage, its attachments, its shadow cards, the Forced and Response effects that heard it leave) is not restored.
-import type { Instruction } from "../../../catalog/boundary.ts";
+import type { Instruction } from "../../../../catalog/boundary.ts";
 
-import type { EngineStep } from "../../core/intents.ts";
-import { gameReads } from "../../core/game-reads.ts";
-import { printedOf } from "../../core/printed.ts";
-import type { ScenarioState } from "../../core/state.ts";
-import { flagged, inPlay, updateCard } from "../../core/state.ts";
-import { moveCard } from "../../core/zones.ts";
-import type { ReduceContext } from "../../interpret/interpret.ts";
-import { effectsOf } from "../../windows/listen.ts";
+import type { EngineStep } from "../../../core/intents.ts";
+import { gameReads } from "../../../core/game-reads.ts";
+import { printedOf } from "../../../core/printed.ts";
+import type { ScenarioState } from "../../../core/state.ts";
+import { flagged, inPlay, updateCard } from "../../../core/state.ts";
+import { moveCard } from "../../../core/zones.ts";
+import type { ReduceContext } from "../../../interpret/interpret.ts";
+import { effectsOf } from "../../../windows/listen.ts";
 
 // The destinations of MoveEncounterCard that are out of play.
 const OUT_OF_PLAY: ReadonlySet<string> = new Set(["deckTop", "deckBottom", "shuffle", "discard", "victory", "removed"]);

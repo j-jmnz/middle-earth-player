@@ -1,4 +1,4 @@
-// Test helpers for the Morgul Vale tests (src/rules/families/pelargir/vale.test.ts, vale-combat.test.ts): a table of the scenario, an instruction run on it, the quest and attack windows answered.
+// Test helpers for the Morgul Vale tests (src/rules/families/pelargir/vale/verbs.test.ts, vale/combat.test.ts): a table of the scenario, an instruction run on it, the quest and attack windows answered.
 import type { Effect, Instruction } from "../../../src/catalog/boundary.ts";
 import type { EngineStep } from "../../../src/rules/core/intents.ts";
 import type { ScenarioState } from "../../../src/rules/core/state.ts";

@@ -2,10 +2,10 @@
 // The engine facts of the three verbs The Morgul Vale adds to the pelargir family, each on the table of the scenario with its own records: progress tokens placed on To the Tower by title, every Faramir removed from the game at Setup, and the card Murzag reveals put into play engaged with the defending player.
 import { describe, expect, it } from "vitest";
 
-import type { EngineStep } from "../../core/intents.ts";
-import { shadowCards } from "../../core/zones.ts";
-import { idOf, resolveRecords, statOf } from "../../../../test/harness/scene-kit.ts";
-import { CODES, engagedCodes, fight, opened, run, table, tokens, where } from "../../../../test/scenarios/the-morgul-vale/table.ts";
+import type { EngineStep } from "../../../core/intents.ts";
+import { shadowCards } from "../../../core/zones.ts";
+import { idOf, resolveRecords, statOf } from "../../../../../test/harness/scene-kit.ts";
+import { CODES, engagedCodes, fight, opened, run, table, tokens, where } from "../../../../../test/scenarios/the-morgul-vale/table.ts";
 
 const { rearguard, tower, bodyguard, sorcerer, tracker, murzag, deadCity, fog, vale, bridge } = CODES;
 const TOWER_NAME = "To the Tower";
