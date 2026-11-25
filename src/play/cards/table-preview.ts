@@ -76,9 +76,9 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
   return { title: name, detail: near ? `${near} ${lines}` : lines };
 }
 
-// What a card lying on another card is called in the host's preview: its own printed type for an objective (Mugash on Edge of Fangorn, Gríma on The Islet), "Attachment" for the rest.
-function hostedRole(type: string): string {
-  return type === "objective" ? "Objective" : type === "objective-ally" ? "Objective ally" : "Attachment";
+// What a card lying on another card is called in the host's preview: its own printed type line for an objective or a ship-objective ("Objective" for Mugash on Edge of Fangorn, "Objective Ally" for Gríma on The Islet), "Attachment" for the rest.
+export function hostedRole(printed: { type: string; typeName: string }): string {
+  return printed.type === "objective" || printed.type === "ship-objective" ? printed.typeName || "Objective" : "Attachment";
 }
 
 // The resource tokens on a time stage are its time counters (rm.time-x), so its sheet says "3 time counters".
@@ -136,7 +136,7 @@ export function previewCards(
     if (earlier.includes(id)) return [earlierStage(game, ctx, card.code, describe)];
     // The loot a location guards is under it, out of play, and still its player's (22024:B:2).
     const loot = game.lootDecks != null && card.zone === "under" && card.controller != null;
-    const role = index === 0 ? null : card.zone === "shadow" ? "Shadow card" : loot ? LOOT_ROLE : (underAlleywayRole(game, id) ?? (card.host ? hostedRole(printedOf(ctx.cards, card.code).type) : null));
+    const role = index === 0 ? null : card.zone === "shadow" ? "Shadow card" : loot ? LOOT_ROLE : (underAlleywayRole(game, id) ?? (card.host ? hostedRole(printedOf(ctx.cards, card.code)) : null));
     // The effects on it, then what a delayed effect will do to it (Sneak Attack's return); for the pressed hand card, why it
     // does not glow.
     const effects = [...effectLines(game, ctx, id, cardName), ...delayedLines(game, id, cardName)];
