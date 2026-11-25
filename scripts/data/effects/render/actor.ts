@@ -15,7 +15,7 @@ const controllerOnly = (effect: Obj, ctx: Ctx): boolean => ctx.cardName !== unde
 
 const makesFirstPlayerAct = (step: unknown): boolean => {
   const ins = step as Obj | null;
-  return ins !== null && typeof ins === "object" && (ins.who === "firstPlayer" || (ins.verb === "ForEachPlayer" && ins.order === "firstFirst" && ins.limit === 1));
+  return ins !== null && typeof ins === "object" && (ins.who === "firstPlayer" || (ins.verb === "ForEachPlayer" && ins.order === "firstFirst" && ins.limit === 1 && ins.seats === undefined));
 };
 
 // A line saying who the acting player is, or "" when the record's fields do not decide it.
@@ -23,7 +23,7 @@ export function actorNote(effect: Obj, ctx: Ctx): string {
   const timing = effect.timing;
   const trigger = typeof effect.trigger === "string" ? effect.trigger : "";
   const encounterCard = ctx.cardType !== undefined && !PLAYER_TYPES.has(ctx.cardType);
-  // A When Revealed record that itself makes the first player act: `who: firstPlayer` on a step, or a ForEachPlayer that starts with the first player and stops after one.
+  // A When Revealed record that itself makes the first player act: `who: firstPlayer` on a step, or a ForEachPlayer with no seats filter (a filter such as engaged or guardian does not start at the first player) that starts with the first player and stops after one.
   if (timing === "whenRevealed" && encounterCard && Array.isArray(effect.instructions) && effect.instructions.some(makesFirstPlayerAct)) return "the acting player is the first player (the record names the first player, not the player who revealed the card)";
   if (timing === "shadow") return "the acting player is the defending player (the player the attack is against)";
   if ((timing === "forced" || timing === "triggered") && encounterCard) {

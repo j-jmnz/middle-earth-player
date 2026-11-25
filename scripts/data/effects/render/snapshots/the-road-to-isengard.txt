@@ -387,7 +387,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     - for each player, first player first:
       - the acting player draws 6 card(s)
     - for each player, first player first:
-      - discard the cards in your hand - 6 cards from hand (the player chooses which cards, until the hand is down to that many)
+      - discard the cards in your hand - 6 cards from hand (the player chooses which cards, until 6 cards are left)
     - Campaign Setup: the set-aside copy of the card with code 143048 is attached to the card in play named "Saruman" (a card dealt on its Upgraded side stays so)
 
 143080:B:1 (back): While Orthanc is the active location, Saruman is considered to be engaged with the first player.

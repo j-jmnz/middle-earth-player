@@ -35,6 +35,12 @@ export { DREADNAUGHT_SAMPLES, ERECH_SAMPLES, FOG_SAMPLES, GULDUR_SAMPLES, GUARDI
 type Made = { text: string; read: readonly string[]; children?: readonly Obj[] };
 type Template = (ins: Obj, ctx: Ctx) => Made | null;
 
+// The note on a hand amount: `{ hand: true, plus: -N }` is "until N cards are left"; a hand amount with no negative `plus` gets none.
+const handLeft = (amount: unknown): string => {
+  if (!isObj(amount) || !("hand" in amount) || typeof amount.plus !== "number" || amount.plus >= 0) return "";
+  return ` (the player chooses which cards, until ${-amount.plus} cards are left)`;
+};
+
 const amount = (value: unknown, ctx: Ctx): string => renderAmount(value, ctx, renderPick);
 
 // The most ChooseX allows: its one amount, or the least of several (the engine takes the smallest of `max`).
@@ -113,7 +119,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   Ready: (i) => ({ text: `ready ${typeof i.target === "string" && i.target === "allCharacters" ? "every character" : cardRef(i.target ?? "self")}`, read: ["target"] }),
   Discard: (i) => ({ text: `discard ${target(i.target)}${i.counted === true ? " (a card discarded out of play counts for the effect's noneDiscarded condition: the part after \"then\" resolves only if the discard did)" : ""}`, read: ["target", "counted"] }),
   Destroy: (i) => ({ text: `${target(i.target)} is destroyed (not discarded: rr.destroy)`, read: ["target"] }),
-  DiscardFromHand: (i, ctx) => ({ text: `${ctx.engagedSeat === true ? "the player the enemy engaged discards" : "discard"} ${amount(i.amount, ctx)} card${ctx.engagedSeat === true && i.amount === 1 ? "" : "s"} from ${ctx.engagedSeat === true ? "their " : ""}hand${typeof i.amount === "object" && i.amount !== null && "hand" in i.amount ? " (the player chooses which cards, until the hand is down to that many)" : ""}`, read: ["amount"] }),
+  DiscardFromHand: (i, ctx) => ({ text: `${ctx.engagedSeat === true ? "the player the enemy engaged discards" : "discard"} ${amount(i.amount, ctx)} card${ctx.engagedSeat === true && i.amount === 1 ? "" : "s"} from ${ctx.engagedSeat === true ? "their " : ""}hand${handLeft(i.amount)}`, read: ["amount"] }),
   Draw: (i, ctx) => ({ text: `${who(i.who ?? "actor")} draws ${i.amount === undefined ? "1" : amount(i.amount, ctx)} card(s)${typeof i.perHero === "string" ? ` for each ${i.perHero} hero` : ""}${i.from === "bottom" ? " from the bottom of the deck" : ""}`, read: ["who", "amount", "perHero", "from"] }),
   RaiseThreat: (i, ctx) => ({ text: `raise threat by ${i.amount === undefined ? "1" : amount(i.amount, ctx)} (${who(i.who ?? "actor")})${isObj(i.perCommitted) ? ` for each ${typeof i.perCommitted.exceptSphere === "string" ? `non-${i.perCommitted.exceptSphere} ` : ""}${str(i.perCommitted.type)} committed to the quest` : ""}`, read: ["amount", "who", "perCommitted"] }),
   LowerThreat: (i, ctx) => ({ text: `lower threat by ${amount(i.amount, ctx)} (${who(i.who)})`, read: ["amount", "who"] }),

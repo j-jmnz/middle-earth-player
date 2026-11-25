@@ -214,7 +214,7 @@ Scenario piles that place cards with no record (staging: 16016 Narrow Alleyway; 
     - the table: stat handLimit (no player holds more cards in hand than this; a hand over it discards down to it at the next settle, the player choosing which cards) 5, while this card is in play
   16045:triggered:1: Triggered (mandatory, not printed as Forced) on the event handOverLimit
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - discard the cards in your hand - 5 cards from hand (the player chooses which cards, until the hand is down to that many)
+    - discard the cards in your hand - 5 cards from hand (the player chooses which cards, until 5 cards are left)
 
 16045:A:3 (front): Response: When this stage is defeated, each player draws a card.
   16045:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card)
