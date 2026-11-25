@@ -56,7 +56,7 @@ describe("agent context", () => {
     expect(stale, "these are back under the limit: delete them from LARGE_SECTIONS").toEqual([]);
   });
 
-  it("keeps docs/phases/STATUS.md to pointers: open work is a line in its area's issue", () => {
+  it("keeps docs/phases/STATUS.md to pointers: Open items are pointers to users' issues", () => {
     expect(statusProblems()).toEqual([]);
   });
 

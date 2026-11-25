@@ -76,11 +76,11 @@ export function largeSections(): Record<string, number> {
 export function statusProblems(): string[] {
   const file = "docs/phases/STATUS.md";
   const problems: string[] = [];
-  if (bytes(file) > STATUS_BYTES) problems.push(`${file} is ${bytes(file)} bytes, over ${STATUS_BYTES}: open work goes to its area's issue`);
+  if (bytes(file) > STATUS_BYTES) problems.push(`${file} is ${bytes(file)} bytes, over ${STATUS_BYTES}: cut it`);
   const text = read(file);
   const open = /^## Open items\n([\s\S]*?)(?=^## )/m.exec(text)?.[1] ?? "";
   for (const line of open.split("\n")) {
-    if (/^#{3,} /.test(line)) problems.push(`${file}: Open items has a subsection ("${line}"); list the work in its area's issue`);
+    if (/^#{3,} /.test(line)) problems.push(`${file}: Open items has a subsection ("${line}"); Open items holds pointers only`);
     if (/^\s*[-*] /.test(line) && !/#\d+/.test(line)) problems.push(`${file}: an Open items line names no issue: "${line.slice(0, 80)}"`);
   }
   return problems;
@@ -160,7 +160,7 @@ export function missingDocPaths(): string[] {
   return [...found].sort();
 }
 
-/** Code that names STATUS for an open item: an open item is a line in its area's issue, so the code names the issue. */
+/** Code that names STATUS for an open item: the code names the issue instead. */
 export function codeCitingStatus(): string[] {
   return tracked()
     .filter((file) => /^(src|scripts|test)\//.test(file) && /\.(ts|tsx)$/.test(file) && !SELF.test(file))

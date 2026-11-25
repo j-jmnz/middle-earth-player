@@ -6,7 +6,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 
 - A phase is a file in `docs/phases/` with its spec, dependencies and exit, and a row in the table below. If nothing is active, the only legal start is the lowest-numbered phase whose dependencies are completed.
 - When you start a phase, set it to `active` with a one-line note. Do not mark the next phase active. More than one phase may be active only when their files say they can run beside each other.
-- A phase is completed when its exit is green and `/reviewer` reports no blocks (one review round when `orchestrator` runs it: `.claude/agents/orchestrator.md`, One review round). A phase that changes `src/screens` or `src/play` also needs `/ux` to report no blocks. Then delete its row and its file; what is still open goes to its area's issue (Open items).
+- A phase is completed when its exit is green and `/reviewer` reports no blocks (one review round when `orchestrator` runs it: `.claude/agents/orchestrator.md`, One review round). A phase that changes `src/screens` or `src/play` also needs `/ux` to report no blocks. Then delete its row and its file; what is still open is fixed first.
 - A scenario phase has an engine half and a screen half (`docs/agents/agent-brief.md`, Scenario procedure). When the engine half's exit is green and reviewed, write `engine done` in the note and leave the phase `active`. The phase is completed when both halves are.
 - Current counts live in code: the engine version in `src/rules/engine/version.ts`, the playable scenarios in `src/campaign/playable.ts`, the printed lines no record owns in `src/effects/open-lines.ts` (`pnpm effects open`).
 
@@ -19,12 +19,10 @@ No phase is open.
 
 ## Open items
 
-Open work is tracked as GitHub issues, one per area, with one checklist line per item. Read the issue of the area your task touches, not all of them. A new open item is a line in its area's issue, or a new issue with an existing label (`docs/agents/issue-standards.md`).
+Open work that users filed is tracked as GitHub issues. Read the issue of the area your task touches, not all of them. An agent creates no issue and adds no line to one: it fixes an open item it finds (user instruction, 2026-11-25; `.claude/rules/docs-standards.md`, `docs/phases/STATUS.md`).
 
 - Rules and engine: #274. Angmar Awakened: #184. The Two Towers and The Return of the King: #186. Dwarrowdelf: #185. Shadows of Mirkwood: #182. Standalone scenarios: #183. Against the Shadow: #245. The Ring-maker: #270.
 - Screens and code: #187. Against the Shadow screens and data: #246. The Ring-maker screens and data: #276. Desktop: #181. Cards tab views: #178. Sound and music: #179. README showcase: #180. Releases: #177.
-
-A reading no official source settles is not an open item: it is in the section `Readings to confirm` of its box's file in `docs/scenarios/` (or of `docs/brief.md` for the core round and the player cards), until the user confirms it.
 
 ## Standing decisions
 - A scenario has a `-lost` save fixture and no `-won` one; no agent searches for a won game, and `--won` and `--search` run only when the user asks (user, 2026-11-22; `docs/architecture.md`, Tests).
