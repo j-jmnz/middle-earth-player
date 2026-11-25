@@ -94,8 +94,8 @@ Scenario piles that place cards with no record (staging: 16016 Narrow Alleyway; 
 16020:A:2 (front): Travel: Search the encounter deck and discard pile for a Harad enemy and put it into play engaged with the first player. Then, place 1 progress on the main quest, bypassing the active location. Shuffle the encounter deck.
   16020:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player finds one Harad enemy in the encounter deck or its discard pile and puts it into play engaged with the first player (it is not revealed)
-    - 1 progress is placed on the main quest stage (a quest effect: a full stage advances)
+    - the acting player finds one Harad enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed); it is the picked card afterward
+    - then, if the picked card is a Harad enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): 1 progress is placed on the main quest stage (a quest effect: a full stage advances)
     - shuffle the encounter deck
 
 ## 16021 Enemy Pursuit
@@ -305,4 +305,4 @@ Scenario piles that place cards with no record (staging: 16016 Narrow Alleyway; 
     only if any of: (there is a enemy (any player controls) engaged with you to choose) or (there is a enemy (any player controls) engaged with another player to choose)
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 222 by template, 0 as JSON)
+(rendered pieces: 224 by template, 0 as JSON)

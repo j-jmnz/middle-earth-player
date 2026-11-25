@@ -23,6 +23,8 @@ const CHAMPION_IN_PLAY: Cond = { kind: "canPick", pick: CHAMPION };
 const SOME_PLAYER_ENGAGED: Cond = { kind: "any", conditions: [{ kind: "canPick", pick: { type: "enemy", control: "any", engaged: "you" } }, { kind: "canPick", pick: { type: "enemy", control: "any", engaged: "other" } }] };
 // The enemy the encounter deck's discards found, when one was found: the card picked is out of the deck and not yet in play.
 const FOUND_HARAD: Cond = { kind: "matches", card: "picked", pick: { type: "enemy", control: "any", trait: "Harad" }, inPlay: false };
+// "Then, place 1 progress": only once the search found a Harad enemy and put it into play (rr.then).
+const FOUND_HARAD_IN_PLAY: Cond = { kind: "matches", card: "picked", pick: { type: "enemy", control: "any", trait: "Harad" } };
 const FOUND_ENEMY: Cond = { kind: "matches", card: "picked", pick: { type: "enemy", control: "any" }, inPlay: false };
 // "Starting with the first player, each player discards cards from the top of the encounter deck until he discards an enemy, and puts that enemy into play engaged with him": the discard pile is shuffled back into an empty deck (faq.last-encounter-card).
 const DISCARD_AN_ENEMY_AND_ENGAGE: Extract<Instruction, { verb: "ForEachPlayer" }>["instructions"] = [
@@ -148,14 +150,14 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "16019:constant:1", cardCode: "16019", lines: ["16019:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { count: { type: "enemy", control: "any" } }, until: "whileSourceInPlay", target: "self" }] },
     { id: "16019:travel:1", cardCode: "16019", lines: ["16019:A:2"], timing: "travel", instructions: [{ verb: "AssignDamage", amount: { count: { type: "enemy", control: "any" } }, pick: { type: "character", control: "any" } }] },
 
-    // 16020 Haradrim Estate. Travel: the first player searches the deck and discard pile for a Harad enemy and puts it into play engaged with him (the cost is paid with none found), then 1 progress goes on the main quest past the active location, then the deck is shuffled.
+    // 16020 Haradrim Estate. Travel: the first player searches the deck and discard pile for a Harad enemy and puts it into play engaged with him (the cost is paid with none found), then, only when one was found, 1 progress goes on the main quest past the active location, then the deck is shuffled.
     copyLine("51228:A:1", "16020:A:1"),
     {
       id: "16020:travel:1",
       cardCode: "16020",
       lines: ["16020:A:2"],
       timing: "travel",
-      instructions: [{ verb: "SearchMove", trait: "Harad", type: "enemy", to: "engagedFirstPlayer" }, { verb: "AddStageProgress", amount: 1 }, { verb: "ShuffleEncounterDeck" }],
+      instructions: [{ verb: "SearchMove", trait: "Harad", type: "enemy", to: "engaged", remember: true }, { verb: "AddStageProgress", amount: 1, when: FOUND_HARAD_IN_PLAY }, { verb: "ShuffleEncounterDeck" }],
     },
 
     // 16021 Enemy Pursuit. When Revealed: the first player chooses: all progress comes off the main quest, or X damage is assigned among the characters in play, X the progress on the main quest (with none, nothing can be done).
@@ -220,7 +222,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [{ verb: "ModifyStat", stat: "attack", amount: 1, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", engaged: "you", trait: "Harad", other: true } }],
     },
 
-    // 16042 Southron Soldier. Forced: after it engages you (also put into play engaged), either 2 progress off the main quest or it makes an immediate attack. The Shadow effect is Onslaught of Mordor's (146040:A:2), the defending player picks.
+    // 16042 Southron Soldier. Forced: after it engages you (also put into play engaged), either 2 progress off the main quest or it makes an immediate attack. The Shadow effect is Onslaught of Mordor's (146040:A:2), the first player chooses (rr.the-word-choose).
     {
       id: "16042:forced:1",
       cardCode: "16042",
