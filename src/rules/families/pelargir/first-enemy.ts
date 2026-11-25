@@ -21,9 +21,11 @@ export function noteFirstEnemy(state: ScenarioState, cardId: string, ctx: Reduce
   return { ...state, modifiers: [...state.modifiers, mark("table", "firstEnemyNoted", "endOfRound"), mark(cardId, "firstEnemy", "endOfPhase")] };
 }
 
-/** The conditions `firstEnemy`, `underworldReleased` and `deckEmpty`: the enemy the answered reveal is about is the first the encounter deck revealed this round. Null for any other condition. */
+/** The conditions `firstEnemy`, `underworldReleased`, `encounterCanReveal` and `deckEmpty`: the enemy the answered reveal is about is the first the encounter deck revealed this round. Null for any other condition. */
 export function pelargirCondition(state: ScenarioState, condition: Condition, scope: Scope): boolean | null {
   if (condition.kind === "underworldReleased") return underworldReleased(state);
   if (condition.kind === "deckEmpty") return someDeckEmpty(state);
+  // The encounter deck is reset from the discard pile in the quest phase only (rr.running-out-of-cards).
+  if (condition.kind === "encounterCanReveal") return state.encounterDeck.length > 0 || (state.phase === "Quest" && state.encounterDiscard.length > 0);
   return condition.kind === "firstEnemy" ? scope.subject != null && flagged(state, scope.subject, "firstEnemy") : null;
 }

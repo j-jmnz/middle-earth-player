@@ -7,6 +7,7 @@ import { flagged, inPlay, type CardInstance, type ScenarioState } from "../../..
 import { printedOf } from "../../../rules/core/printed.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { attachmentHostIds } from "../../../rules/player/attach.ts";
+import { playWindowReason } from "../../../rules/player/planning.ts";
 import { bodyguardTarget } from "../../../rules/families/pelargir/vale/bodyguard.ts";
 
 import {
@@ -182,9 +183,11 @@ export const valeTravel = (game: ScenarioState, locationId: string): string | nu
 export function valeRefusal(game: ScenarioState, ctx: ReduceContext, cardId: string, attachment: boolean): string {
   const card = game.cards[cardId];
   if (!live(game) || !card) return "";
-  const captain = Object.values(game.cards).some((other) => CAPTAINS.has(other.code) && inPlay(other.zone) && flagged(game, other.id, "cannotLeavePlay"));
+  // The Captain is named only when his flag is the reason: the engine asked again with every flag lifted finds the card a target.
+  const unflagged = { ...game, modifiers: game.modifiers.filter((modifier) => modifier.stat !== "cannotLeavePlay") };
+  const captain = !attachment && Object.values(game.cards).some((other) => CAPTAINS.has(other.code) && inPlay(other.zone) && flagged(game, other.id, "cannotLeavePlay")) && playWindowReason(unflagged, cardId, ctx) == null;
   const nazgulId = attachment ? Object.values(game.cards).find((other) => other.code === NAZGUL && inPlay(other.zone))?.id : undefined;
   const lifted = nazgulId ? { ...game, modifiers: game.modifiers.filter((modifier) => !(modifier.stat === "cannotHaveAttachments" && modifier.instanceId === nazgulId)) } : null;
   const nazgul = nazgulId != null && lifted != null && attachmentHostIds(lifted, game.activeSeat, card.code, ctx).includes(nazgulId);
-  return `${captain && !attachment ? CAPTAIN_REFUSAL : ""}${nazgul ? NAZGUL_REFUSAL : ""}`;
+  return `${captain ? CAPTAIN_REFUSAL : ""}${nazgul ? NAZGUL_REFUSAL : ""}`;
 }

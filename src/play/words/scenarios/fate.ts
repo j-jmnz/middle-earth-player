@@ -19,9 +19,9 @@ import { seatSays } from "../seat.ts";
 
 type Choose = Extract<Instruction, { verb: "Choose" }>;
 
-/** Whether the game is The Fate of Wilderland's: a card in it has a record that takes progress off a card by its title (RemoveProgressFrom), a verb only this scenario's records use. */
+/** Whether the game is The Fate of Wilderland's: its scenario, with a record that takes progress off a card by its title (RemoveProgressFrom). Other scenarios use that verb too (The Morgul Vale's Morgul Road), so the verb alone is no mark of it. */
 export function inFate(game: ScenarioState, ctx: ReduceContext): boolean {
-  return gameReads(game, ctx, '"verb":"RemoveProgressFrom"');
+  return game.scenarioId === "the-fate-of-wilderland" && gameReads(game, ctx, '"verb":"RemoveProgressFrom"');
 }
 
 const within = (steps: readonly Instruction[], test: (step: Instruction) => boolean): boolean => steps.some(test);

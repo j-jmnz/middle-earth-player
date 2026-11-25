@@ -5,6 +5,7 @@ import { expect } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
+import { updateCard } from "../../../rules/core/state.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { dealAdditionalShadow } from "../../../rules/interpret/interpret.ts";
 import { idOf, legalIntents, send } from "../../../../test/harness/scene-kit.ts";
@@ -105,6 +106,28 @@ lineSpec("06151:A:1", "Forced: the enemy is engaged with the player attacked, al
   const after = fight(t, start, (state) => state.phase !== "Combat" || stagedOrEngaged(tracker)(state), { defender: SPEARMAN });
   expect(engagedCodes(after.state, 1)).toContain(tracker);
   expect(engagedCodes(after.state, 0)).toEqual([]);
+});
+
+lineSpec("06151:A:1", "Forced: when the attack eliminates the player attacked, the card is still revealed: an enemy goes to the staging area (no player is left to engage), a treachery resolves, a location is staged (rr.player-elimination)", (effects) => {
+  const killed = (deck: readonly string[], extra?: readonly string[]) => {
+    // The only hero of the second player has taken all but 1 of its health, so the undefended attack destroys it and eliminates the seat.
+    const made = murzagAttack(effects, deck, { heroes: [] }, extra);
+    const hero = idOf(made.t.state, "dh3");
+    made.start = opened(made.t, updateCard(made.t.state, hero, { damage: 5 }));
+    return { made, after: fight(made.t, made.start, (state) => state.phase !== "Combat" || state.encounterDiscard.some((id) => deck.includes(state.cards[id]?.code ?? "")) || stagedOrEngaged(deck[0] ?? "")(state), { heroCode: "dh3" }) };
+  };
+  const enemy = killed([tracker, bodyguard]);
+  expect(enemy.after.state.seats[1]?.eliminated).toBe(true);
+  expect(where(enemy.after.state, tracker)).toBe("staging");
+  expect(engagedCodes(enemy.after.state, 0)).toEqual([]);
+  const place = killed([vale, bodyguard]);
+  expect(where(place.after.state, vale)).toBe("staging");
+  const treachery = murzagAttack(effects, [fog, vale], { heroes: [] }, [fog]);
+  const hurt = opened(treachery.t, updateCard(treachery.t.state, idOf(treachery.t.state, "dh3"), { damage: 5 }));
+  const afterFog = fight(treachery.t, hurt, (state) => state.phase !== "Combat" || state.encounterDiscard.some((id) => state.cards[id]?.code === fog), { heroCode: "dh3", choose: () => "tokens" });
+  expect(afterFog.state.seats[1]?.eliminated).toBe(true);
+  expect(where(afterFog.state, fog)).toBe("encounterDiscard");
+  expect(tokens(afterFog.state)).toBe(3);
 });
 
 // The quest explores Morgul Road (4 of its 5 quest points are on it and the heroes bring 2 progress): the first player's Response is offered at once.

@@ -104,7 +104,7 @@ export function keepIntent(kept: Kept, before: ScenarioState, after: ScenarioSta
   const steps = carryHidden(given, before, after);
   return {
     roundSteps: nextRoundSteps(kept.roundSteps, before, after, steps, ctx),
-    history: nextUndoable(kept.history, after, { before, roundSteps: kept.roundSteps, intent, steps }),
+    history: nextUndoable(kept.history, after, { before, roundSteps: kept.roundSteps, intent, steps: stampVale(steps, before, after) }),
   };
 }
 
@@ -114,7 +114,7 @@ export function keepIntent(kept: Kept, before: ScenarioState, after: ScenarioSta
  */
 export function nextRoundSteps(previous: readonly EngineStep[], before: ScenarioState, after: ScenarioState, steps: readonly EngineStep[], ctx?: ReduceContext): readonly EngineStep[] {
   if (steps.length === 0) return previous;
-  const kept = stampVale(stampHidden(stampControl(stampVillagers(stampCounted(steps, before, ctx), before, after), before, after), before, after, ctx ? typeIn(after, ctx.cards) : undefined), before);
+  const kept = stampVale(stampHidden(stampControl(stampVillagers(stampCounted(steps, before, ctx), before, after), before, after), before, after, ctx ? typeIn(after, ctx.cards) : undefined), before, after);
   return after.round !== before.round ? [...kept] : [...previous, ...kept];
 }
 
@@ -169,10 +169,12 @@ export function createTableStore(input: TableInput): TableStore {
       accepted?.();
       // A choice of The Blood of Gondor that moved a hidden card and returned no step still shows (blood-steps.ts).
       const steps = carryHidden(result.steps, before, result.state);
+      // The banner words the steps as the log does: The Morgul Vale's notes on them (vale-steps.ts) are applied first, and any other game's steps stay as they are.
+      const told = stampVale(steps, before, result.state);
       // A round ends with its refresh: setup (round 0) ends with no summary.
       const crossed = result.state.round !== before.round && before.round > 0;
-      const ended = crossed ? { ended: { round: before.round, steps: finishedRoundSteps([...get().roundSteps, ...steps]) } } : {};
-      const moment: TableMoment = { seq: (get().moment?.seq ?? 0) + 1, kind: "sent", before, after: result.state, steps, ...ended };
+      const ended = crossed ? { ended: { round: before.round, steps: finishedRoundSteps([...get().roundSteps, ...told]) } } : {};
+      const moment: TableMoment = { seq: (get().moment?.seq ?? 0) + 1, kind: "sent", before, after: result.state, steps: told, ...ended };
       const shows = steps.length > 0 || crossed;
       set({
         ...showing(result.state),

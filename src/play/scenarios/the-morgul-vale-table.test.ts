@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import { dealAdditionalShadow } from "../../rules/interpret/interpret.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
-import { idOf, send } from "../../../test/harness/scene-kit.ts";
+import { idOf, revealFromTop, send } from "../../../test/harness/scene-kit.ts";
 import { CODES, fight, opened, run, table } from "../../../test/scenarios/the-morgul-vale/table.ts";
 
 import { cardKeywords } from "../cards/card-keywords.ts";
@@ -23,8 +23,9 @@ import { logLines, type LogNames } from "../store/log.ts";
 import { momentOf } from "../store/outcome.ts";
 import { nextRoundSteps } from "../store/store.ts";
 import { instructionWords } from "../words/instruction.ts";
+import { inFate } from "../words/scenarios/fate.ts";
 
-const { murzag, alcaron, nazgul, tower, bodyguard, tracker, sorcerer, bridge, betrayal, rider, terror, deadCity, malice } = CODES;
+const { murzag, alcaron, nazgul, tower, bodyguard, tracker, sorcerer, bridge, betrayal, rider, terror, deadCity, malice, road, vale } = CODES;
 const BOROMIR = "05002";
 const ARAGORN = "01001";
 const FARAMIR_HERO = "06081";
@@ -32,6 +33,7 @@ const FARAMIR_ALLY = "01014";
 const DENETHOR = "01010";
 const FOREST_SNARE = "01069";
 const INFIGHTING = "02058";
+const DWARVEN_TOMB = "01053";
 
 type Made = ReturnType<typeof table>;
 const nameOf = (made: Made) => (code: string) => made.cards.get(code)?.name ?? code;
@@ -108,14 +110,14 @@ describe("the three stages and their Captains (06144:B:1, 06145:B:1, 06146:B:2, 
     const made = table({ staging: [tower, bodyguard, murzag, alcaron, nazgul] });
     const state = opened(made).state;
     expect(detail(made, state, murzag)).toBe(
-      "Captain. He cannot leave play unless destroyed: no card or effect can discard him, shuffle him into a deck, return him to a hand or take him out of the game; destroying him advances the quest. 1 Morgul Bodyguard in play takes the damage meant for him, so he takes none. After he attacks, the top card of the encounter deck is revealed in full for the player he attacked: an enemy is put into play engaged with that player, with no shadow card, and attacks this phase; a location goes to the staging area; a treachery is discarded once it resolves.",
+      "Captain. He cannot leave play unless destroyed. Destroying him advances the quest. 1 Morgul Bodyguard in play takes the damage meant for him. After he attacks, reveal the top encounter card for the player he attacked. An enemy engages that player and attacks this phase. A location goes to the staging area. A treachery resolves and is discarded.",
     );
     expect(detail(made, state, alcaron)).toBe(
       "Captain of stage 2. Once that stage is current he cannot leave play unless destroyed. Each attack he begins places 1 progress token on To the Tower (0 of 10 now). Each shadow card dealt to him with no shadow effect gives him one more attack after this one.",
     );
     expect(detail(made, state, nazgul)).toBe("Captain of stage 3. Once that stage is current he cannot leave play unless destroyed. Each damage he takes is cut to 1, with no limit for the round. No attachment can be attached to him. Damage a Morgul Bodyguard takes for him is not cut.");
     const last = table({ stage: rider, staging: [tower, nazgul] });
-    expect(detail(last, opened(last).state, nazgul)).toBe("Captain. He cannot leave play unless destroyed: no card or effect can discard him, shuffle him into a deck, return him to a hand or take him out of the game; destroying him wins the game. Each damage he takes is cut to 1, with no limit for the round. No attachment can be attached to him.");
+    expect(detail(last, opened(last).state, nazgul)).toBe("Captain. He cannot leave play unless destroyed. Destroying him wins the game. Each damage he takes is cut to 1, with no limit for the round. No attachment can be attached to him.");
   });
 
   it("a Captain destroyed advances the stage, and the banner says so", () => {
@@ -130,8 +132,14 @@ describe("the three stages and their Captains (06144:B:1, 06145:B:1, 06146:B:2, 
     const made = table({ stage: rider, phase: "Planning", engaged: [nazgul], staging: [tower], hand: [INFIGHTING, FOREST_SNARE], heroes: [{ code: DENETHOR, resources: 3 }] }, undefined, [INFIGHTING, FOREST_SNARE, DENETHOR]);
     const state = opened(made).state;
     const why = (code: string) => whyNotPlayable(state, made.ctx, idOf(state, code), idName(made, state));
-    expect(valeRefusal(state, made.ctx, idOf(state, INFIGHTING), false)).toBe(" A Captain cannot leave play unless destroyed, so no card can discard, return or remove him.");
+    // Infighting leaves no card out of play, so lifting the Captain's flag gives it no target: no sentence.
+    expect(valeRefusal(state, made.ctx, idOf(state, INFIGHTING), false)).toBe("");
     expect(valeRefusal(table({ staging: [tower] }).state, made.ctx, idOf(state, INFIGHTING), false)).toBe("");
+    // A card with no target for another reason gets no sentence about the Captain: lifting his flag would not give it one.
+    const staged = table({ stage: rider, phase: "Planning", engaged: [nazgul], staging: [tower], hand: [DWARVEN_TOMB], heroes: [{ code: DENETHOR, resources: 3 }] }, undefined, [DWARVEN_TOMB, DENETHOR]);
+    const none = opened(staged).state;
+    expect(whyNotPlayable(none, staged.ctx, idOf(none, DWARVEN_TOMB), idName(staged, none))).not.toContain("Captain");
+    expect(valeRefusal(none, staged.ctx, idOf(none, DWARVEN_TOMB), false)).toBe("");
     expect(why(FOREST_SNARE)).toBe("No card can take it now. No attachment can attach to the Nazgûl of Minas Morgul.");
   });
 });
@@ -164,8 +172,8 @@ describe("the Bodyguard, the Nazgûl and the attack sheets (06148:A:1, 06153:A:2
     const attacked = send(at, { type: "DeclareAttackers", enemyId: idOf(at.state, nazgul), attackerIds: ids }, made.ctx);
     const done = fight(made, attacked, (state) => state.mode !== "playerAttacks");
     const { banner, log } = told(made, at.state, done.state, done.steps as never[]);
-    expect(banner).toEqual(["Attack 6 against defense 4", "1 damage on Nazgûl of Minas Morgul, cut from 2", "Threat +1"]);
-    expect(log).toContain("1 damage on Nazgûl of Minas Morgul, cut from 2");
+    expect(banner).toEqual(["Attack 6 against defense 4", "1 damage on Nazgûl of Minas Morgul, cut to 1", "Threat +1"]);
+    expect(log).toContain("1 damage on Nazgûl of Minas Morgul, cut to 1");
   });
 
   it("an attack that deals the Nazgûl nothing says no damage once, and no damage of 0 follows", () => {
@@ -179,7 +187,23 @@ describe("the Bodyguard, the Nazgûl and the attack sheets (06148:A:1, 06153:A:2
 
   it("the Bodyguard's own preview says whose damage it takes and how much it holds", () => {
     const made = table({ staging: [tower, { code: bodyguard, damage: 2 }, { code: bodyguard }] });
-    expect(detail(made, opened(made).state, bodyguard)).toBe("While it is in play, damage meant for a Captain goes whole to the Morgul Bodyguard with the most damage, with no Defense taken off. 2 Morgul Bodyguards in play. This one has 2 of 6 damage.");
+    expect(detail(made, opened(made).state, bodyguard)).toBe("While it is in play, damage meant for a Captain goes whole to the Morgul Bodyguard with the most damage. The Bodyguard's own Defense does not reduce it. 2 Morgul Bodyguards in play. This one has 2 of 6 damage.");
+  });
+
+  it("an enemy that goes back to the staging area by a shadow card, or by Morgul Vale at the end of the round, says so in the banner and the log", () => {
+    const made = table({ phase: "Combat", staging: [tower], engaged: [murzag], deck: [road, bodyguard, bodyguard] });
+    const id = made.state.seats[0]?.engaged[0] ?? "";
+    const first = fight(made, opened(made, dealAdditionalShadow(made.state, id, [], made.ctx)), (state) => state.pendingAttack != null && state.window?.kind === "defense", { heroCode: "dh1" });
+    const answered = send(first, { type: "Undefended", heroId: idOf(first.state, "dh1") }, made.ctx);
+    const { banner, log } = told(made, first.state, answered.state, answered.steps.slice(first.steps.length) as never[]);
+    expect(answered.state.cards[id]?.zone).toBe("staging");
+    expect(banner).toContain("Murzag returns to the staging area (Morgul Road's shadow effect)");
+    expect(log).toContain("Murzag returns to the staging area (Morgul Road's shadow effect)");
+    // The end of the round: the stamp reads the move of an engaged enemy to the staging area when Morgul Vale is in play.
+    const round = table({ phase: "Refresh", staging: [tower, vale], engaged: [murzag] });
+    const before = { ...opened(round).state, phase: "Beginning of round" as const };
+    const gone = { ...before, cards: { ...before.cards, [idOf(before, murzag)]: { ...before.cards[idOf(before, murzag)], zone: "staging" as const } } } as ScenarioState;
+    expect(told(round, before, gone, [{ kind: "draw", seat: 0, cardId: "x", cause: { rule: "rr.step-1-3" } }] as never[]).log).toContain("Murzag returns to the staging area (Morgul Vale's effect at the end of the round)");
   });
 
   it("an enemy a Bodyguard's shadow sends to the next player is told in the banner and on the new attack's sheet", () => {
@@ -243,6 +267,18 @@ describe("tokens placed and removed on To the Tower (06147:A:3)", () => {
     expect(told(made, withTokens(made, 9), nine, more).banner).toEqual(["1 progress on To the Tower, 10 of 10: the players lose the game"]);
   });
 
+  it("a token a player chooses to place names the player and is told once", () => {
+    const two = table({ seats: 2, staging: [tower, murzag], deck: [malice, bodyguard, bodyguard] }, undefined, [malice]);
+    const revealed = revealFromTop(two.state, two.ctx, malice, []);
+    const first = send({ state: revealed.state, steps: [] }, { type: "Choose", optionId: "discard" }, two.ctx);
+    const second = send(first, { type: "Choose", optionId: "token" }, two.ctx);
+    const { banner, log } = told(two, first.state, second.state, second.steps.slice(first.steps.length) as never[]);
+    expect(banner).toEqual(["Player 2 places 1 progress on To the Tower, 1 of 10 (Sleepless Malice)"]);
+    expect(log).toContain("Player 2 places 1 progress on To the Tower, 1 of 10");
+    // Morgul Road removes progress by title like The Fate of Wilderland's records, but that scenario's beats ("holds 2 progress") are not this one's.
+    expect(inFate(second.state, two.ctx)).toBe(false);
+  });
+
   it("a removal says what was taken and the count left", () => {
     const seven = withTokens(made, 7);
     const steps: never[] = [];
@@ -276,7 +312,7 @@ describe("To the Tower and the chips of the scenario", () => {
   it("To the Tower's preview says it stays, what counts it and the tokens against the 10", () => {
     const made = table({ staging: [tower] });
     expect(detail(made, withTokens(made, 4), tower)).toBe(
-      "Objective. It stays in the staging area all game: no card or effect can shuffle, discard or take it, and it is never engaged. The Power of Mordor counts it. It holds 4 of the 10 progress tokens that lose the game. Progress tokens go on it, never on the active location or the quest.",
+      "Objective. It stays in the staging area all game: no card or effect can shuffle, discard or take it, and it is never engaged. The Power of Mordor counts it. It holds 4 of the 10 progress tokens that lose the game. Card effects place progress tokens on it; questing never does.",
     );
   });
 

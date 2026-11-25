@@ -134,6 +134,15 @@ lineSpec("06157:A:1", "Impenetrable Fog: the first player takes 3 tokens as one 
   expect(cards.staging.filter((id) => cards.cards[id]?.code === bodyguard)).toHaveLength(2);
 });
 
+lineSpec("06157:A:1", "Impenetrable Fog: the reveal is offered only when a card can be revealed: with the deck empty in the combat phase the 3 tokens are placed at once, and in the quest phase the discard pile resets the deck, so both are offered", (effects) => {
+  const combat = table({ seats: 2, phase: "Combat", staging: [tower, murzag], deck: [], discard: [bodyguard] }, effects, [fog]);
+  const noCard = revealFromTop(combat.state, combat.ctx, fog, []);
+  expect(noCard.state.window?.kind).not.toBe("choose");
+  expect(tokens(noCard.state)).toBe(3);
+  const quest = table({ seats: 2, phase: "Quest", staging: [tower, murzag], deck: [], discard: [bodyguard] }, effects, [fog]);
+  expect(revealFromTop(quest.state, quest.ctx, fog, []).state.window).toMatchObject({ kind: "choose", options: ["tokens", "reveal"] });
+});
+
 lineSpec("06158:A:2", "Sleepless Malice: each player chooses for himself, in turn, the first player first: 3 random cards from his hand, or 1 token; a player with fewer than 3 cards may choose the discard and discards what he holds", (effects) => {
   const t = table({ seats: 2, staging: [tower, murzag], deck: [bodyguard, bodyguard, bodyguard], hand: Array.from({ length: 4 }, () => "filler") }, effects, [malice]);
   const revealed = revealFromTop(t.state, t.ctx, malice, []);

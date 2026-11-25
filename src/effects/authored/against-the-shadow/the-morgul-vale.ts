@@ -18,6 +18,8 @@ const KEEP_IN_PLAY = (name: string): Instruction => ({ verb: "ModifyStat", stat:
 const ADVANCE_WHEN_DESTROYED = (code: string, line: string, name: string): Effect => ({ id: `${code}:forced:1`, cardCode: code, lines: [line], timing: "forced", trigger: "enemyDestroyed", subject: CAPTAIN(name), instructions: [{ verb: "AdvanceStage" }] });
 const NO_TOKENS: Condition = { kind: "less", left: TOKENS, right: 1 };
 const A_TOKEN: Condition = { kind: "less", left: 0, right: TOKENS };
+// A card can be revealed: the deck holds one, or it is the quest phase and the discard pile can reset an empty deck (rr.running-out-of-cards). A player may not choose an effect that cannot happen at all (rr.the-word-choose).
+const CAN_REVEAL: Condition = { kind: "encounterCanReveal" };
 const NOT_UNDEFENDED: Condition = { kind: "undefended", is: false };
 // Another player is in the game and the attacker is engaged (an enemy that attacks from the staging area has no next player to engage): the Bodyguard's shadow can end the attack.
 const CAN_SWITCH: Condition = {
@@ -147,7 +149,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "06157",
       lines: ["06157:A:1"],
       timing: "whenRevealed",
-      instructions: [{ verb: "Choose", who: "firstPlayer", options: [{ id: "tokens", instructions: [PLACE(3)] }, { id: "reveal", instructions: [{ verb: "RevealEncounter", who: "firstPlayer", times: { players: true } }] }] }],
+      instructions: [{ verb: "Choose", who: "firstPlayer", options: [{ id: "tokens", instructions: [PLACE(3)] }, { id: "reveal", requires: CAN_REVEAL, instructions: [{ verb: "RevealEncounter", who: "firstPlayer", times: { players: true } }] }] }],
     },
 
     // 06158 Sleepless Malice (Doomed 2 is a keyword). A:2: each player in turn, the first player first, discards 3 cards at random from his hand (all of them when he holds fewer) or places 1 token on To the Tower. A:3 (Shadow): the attacker returns to the staging area after the attack.

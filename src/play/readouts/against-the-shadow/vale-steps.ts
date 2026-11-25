@@ -4,22 +4,23 @@
 import type { Cause } from "../../../rules/core/cause.ts";
 import type { EngineStep, ScenarioState } from "../../../rules/engine/reduce.ts";
 
-import { bodyguardTookWords, cutWords, murzagEngagesWords, murzagRevealsWords, switchEngagesWords, towerStepWords } from "../../words/scenarios/against-the-shadow/vale.ts";
+import { bodyguardTookWords, cutWords, murzagEngagesWords, returnsWords, murzagRevealsWords, switchEngagesWords, towerStepWords } from "../../words/scenarios/against-the-shadow/vale.ts";
 
 const SCENARIO = "the-morgul-vale";
 const TOWER = "06147";
 const BODYGUARD = "06148";
 const NAZGUL = "06153";
 const MURZAG = "06151";
+const VALE = "06155";
 const CAPTAINS: ReadonlySet<string> = new Set([MURZAG, "06152", NAZGUL]);
 
-/** What a step carries: the tokens on To the Tower after it, the Captain a Bodyguard took damage for, or the damage the Nazgûl's cut reduced. */
-// `by`: Murzag, whose Forced effect revealed the card or engaged the enemy; `quiet`: a damage step of 0 the Nazgûl's cut left, which the strike's "No damage" already says.
-export type ValeNote = { tower?: number; for?: string; cutFrom?: number; by?: string; quiet?: true; switched?: true };
+/** What a step carries: the tokens on To the Tower after it, the Captain a Bodyguard took damage for, or that the Nazgûl's cut reduced the damage. */
+// `by`: Murzag, whose Forced effect revealed the card or engaged the enemy; `who`: the player whose choice placed the tokens (two players only); `returns`: an enemy went back to the staging area with no step of the engine, by the shadow card `via` or by the Forced effect of the card `via`; `quiet`: a damage step of 0 the Nazgûl's cut left, which the strike's "No damage" already says.
+export type ValeNote = { who?: number; returns?: { via: string; shadow: boolean }; tower?: number; for?: string; cut?: true; by?: string; quiet?: true; switched?: true };
 export type ValeStep = EngineStep & { vale?: ValeNote };
 
 /** The steps with each progress step on To the Tower stamped with the count it leaves, and each damage step a Bodyguard or the Nazgûl took after a player's strike stamped with why. The same steps in another scenario. */
-export function stampVale(steps: readonly EngineStep[], before: ScenarioState): readonly EngineStep[] {
+export function stampVale(steps: readonly EngineStep[], before: ScenarioState, after?: ScenarioState): readonly EngineStep[] {
   if (before.scenarioId !== SCENARIO || steps.length === 0) return steps;
   const tower = Object.values(before.cards).find((card) => card.code === TOWER && card.zone === "staging");
   let now = tower?.progress ?? 0;
@@ -53,7 +54,9 @@ export function stampVale(steps: readonly EngineStep[], before: ScenarioState): 
     if (step.kind === "progress" && tower && step.targetId === tower.id) {
       now = Math.max(0, now + step.amount);
       changed = true;
-      return { ...step, vale: { tower: now } } as ValeStep;
+      // The tokens a player's own choice placed name the player (a choice window of a seat was open when the intent began).
+      const chose = before.window?.kind === "choose" && before.seatCount > 1 && step.amount > 0 ? { who: before.window.seat } : {};
+      return { ...step, vale: { tower: now, ...chose } } as ValeStep;
     }
     if (step.kind === "damage" && strike && step.amount === 0 && before.cards[step.targetId]?.code === NAZGUL && strike.targetId === step.targetId) {
       changed = true;
@@ -69,12 +72,29 @@ export function stampVale(steps: readonly EngineStep[], before: ScenarioState): 
       const strength = Math.max(0, strike.attack - strike.defense);
       if (code === NAZGUL && strike.targetId === step.targetId && strength > step.amount) {
         changed = true;
-        return { ...step, vale: { cutFrom: strength } } as ValeStep;
+        return { ...step, vale: { cut: true } } as ValeStep;
       }
     }
     return step;
   });
-  return changed ? stamped : steps;
+  const back = after ? returnedSteps(steps, before, after) : [];
+  return changed || back.length > 0 ? [...stamped, ...back] : steps;
+}
+
+// An enemy engaged before the intent and in the staging area after it, with no player eliminated: a shadow card that returns its attacker (Morgul Road, Sleepless Malice) or Morgul Vale's return at the end of the round. The engine returns it with no step, so the table adds one
+// (a damage of 0 on the enemy, which carries the words) to its own copy of the steps.
+function returnedSteps(steps: readonly EngineStep[], before: ScenarioState, after: ScenarioState): EngineStep[] {
+  if (steps.some((step) => step.kind === "eliminate")) return [];
+  const out: EngineStep[] = [];
+  for (const [id, card] of Object.entries(before.cards)) {
+    if (card.zone !== "engaged" || after.cards[id]?.zone !== "staging") continue;
+    const attacked = before.pendingAttack?.enemyId === id || steps.some((step) => step.kind === "attack" && step.side === "enemy" && step.enemyId === id);
+    const roundEnd = before.phase === "End of round" || before.phase === "Beginning of round";
+    const via = attacked ? card.shadowId : !roundEnd ? undefined : Object.values(after.cards).find((other) => other.code === VALE && (other.zone === "staging" || other.zone === "engaged"))?.id;
+    if (!via) continue;
+    out.push({ kind: "damage", targetId: id, amount: 0, cause: { rule: "rr.shadow-effects" }, vale: { returns: { via, shadow: attacked } } } as ValeStep);
+  }
+  return out;
 }
 
 /** The note a kept step carries, or null. */
@@ -90,9 +110,10 @@ export function valeStepWords(step: EngineStep, card: (id: string) => string, fr
   if (step.kind === "reveal" && note.by != null) return murzagRevealsWords(card(note.by), card(step.cardId));
   if (step.kind === "engage" && note.switched === true) return switchEngagesWords(card(step.enemyId), seats && seats.count > 1 ? `Player ${step.seat + 1}` : "you");
   if (step.kind === "engage" && note.by != null) return murzagEngagesWords(card(note.by), card(step.enemyId), seats && seats.count > 1 ? `Player ${step.seat + 1}` : "you");
-  if (step.kind === "progress" && note.tower != null) return `${towerStepWords(step.amount, card(step.targetId), note.tower)}${from ? ` (${from})` : ""}`;
+  if (step.kind === "progress" && note.tower != null) return `${towerStepWords(step.amount, card(step.targetId), note.tower, note.who != null ? `Player ${note.who + 1}` : undefined)}${from ? ` (${from})` : ""}`;
   if (step.kind === "damage" && note.for != null) return bodyguardTookWords(step.amount, card(step.targetId), card(note.for));
-  if (step.kind === "damage" && note.cutFrom != null) return cutWords(card(step.targetId), note.cutFrom);
+  if (step.kind === "damage" && note.returns != null) return returnsWords(card(step.targetId), card(note.returns.via), note.returns.shadow);
+  if (step.kind === "damage" && note.cut === true) return cutWords(card(step.targetId));
   return null;
 }
 

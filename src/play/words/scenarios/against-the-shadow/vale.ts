@@ -49,15 +49,15 @@ export function stageLines(parts: { where: string; last: boolean; bodyguards: nu
 
 /** A Captain's preview line while his stage holds him: what he cannot do, what his destruction does, and who takes his damage. */
 export function captainWords(stage: number, current: boolean, destroyWins: boolean, bodyguards: number): string {
-  const then = destroyWins ? "destroying him wins the game" : "destroying him advances the quest";
-  const shield = bodyguards > 0 ? ` ${plural(bodyguards, "Morgul Bodyguard")} in play take${bodyguards === 1 ? "s" : ""} the damage meant for him, so he takes none.` : "";
+  const then = destroyWins ? "wins the game" : "advances the quest";
+  const shield = bodyguards > 0 ? ` ${plural(bodyguards, "Morgul Bodyguard")} in play take${bodyguards === 1 ? "s" : ""} the damage meant for him.` : "";
   if (!current) return `Captain of stage ${stage}. Once that stage is current he cannot leave play unless destroyed.`;
-  return `Captain. He cannot leave play unless destroyed: no card or effect can discard him, shuffle him into a deck, return him to a hand or take him out of the game; ${then}.${shield}`;
+  return `Captain. He cannot leave play unless destroyed. Destroying him ${then}.${shield}`;
 }
 
 /** Murzag's line: what his Forced effect reveals and for whom. */
 export const murzagWords = (seatCount: number, seat: number | null): string =>
-  `After he attacks, the top card of the encounter deck is revealed in full for the player he attacked${seat != null && seatCount > SOLO ? `, Player ${seat + 1} now` : ""}: an enemy is put into play engaged with that player, with no shadow card, and attacks this phase; a location goes to the staging area; a treachery is discarded once it resolves.`;
+  `After he attacks, reveal the top encounter card for the player he attacked${seat != null && seatCount > SOLO ? ` (Player ${seat + 1} now)` : ""}. An enemy engages that player and attacks this phase. A location goes to the staging area. A treachery resolves and is discarded.`;
 
 /** Lord Alcaron's line: his tokens and his additional attacks. */
 export const alcaronWords = (count: number): string =>
@@ -69,11 +69,11 @@ export const nazgulWords = (bodyguards: number): string =>
 
 /** A Morgul Bodyguard's line: whose damage it takes, and the count. */
 export const bodyguardWords = (bodyguards: number, damage: number, hits: number): string =>
-  `While it is in play, damage meant for a Captain goes whole to the Morgul Bodyguard with the most damage, with no Defense taken off. ${plural(bodyguards, "Morgul Bodyguard")} in play. This one has ${damage} of ${hits} damage.`;
+  `While it is in play, damage meant for a Captain goes whole to the Morgul Bodyguard with the most damage. The Bodyguard's own Defense does not reduce it. ${plural(bodyguards, "Morgul Bodyguard")} in play. This one has ${damage} of ${hits} damage.`;
 
 /** To the Tower's preview line. */
 export const towerWords = (count: number): string =>
-  `Objective. It stays in the staging area all game: no card or effect can shuffle, discard or take it, and it is never engaged. The Power of Mordor counts it. It holds ${count} of the ${TOWER_LIMIT} progress tokens that lose the game. Progress tokens go on it, never on the active location or the quest.`;
+  `Objective. It stays in the staging area all game: no card or effect can shuffle, discard or take it, and it is never engaged. The Power of Mordor counts it. It holds ${count} of the ${TOWER_LIMIT} progress tokens that lose the game. Card effects place progress tokens on it; questing never does.`;
 
 /** The White Bridge's preview line: X, its Threat and quest points now, and what none does. `active`: it is the active location. */
 export function bridgeWords(count: number, active: boolean): string {
@@ -91,7 +91,7 @@ export const shieldWords = (captain: string, bodyguard: string, damage: number, 
 
 /** The dock readout for a player's attack on a shielded Captain. `amount`: the damage; `left`: what the Bodyguard has left before it is destroyed. */
 export const shieldReadout = (amount: number, bodyguard: string, captain: string, left: number): string =>
-  amount <= 0 ? "No damage" : `${amount} damage on ${bodyguard}, not ${captain}${amount >= left ? "; it is destroyed" : `; ${left - amount} more destroys it`}`;
+  amount <= 0 ? `No damage; it would go to ${bodyguard}` : `${amount} damage on ${bodyguard}, not ${captain}${amount >= left ? "; it is destroyed" : `; ${left - amount} more destroys it`}`;
 
 /** The attack sheet's line for the Nazgûl: each damage is cut to 1. */
 export const NAZGUL_SHEET = "He takes 1 damage at most from each attack.";
@@ -111,9 +111,9 @@ export const CAPTAIN_REFUSAL = " A Captain cannot leave play unless destroyed, s
 export const NAZGUL_REFUSAL = " No attachment can attach to the Nazgûl of Minas Morgul.";
 
 /** The banner's and the log's line for a placement or removal on To the Tower: the amount and the count it reaches. */
-export function towerStepWords(amount: number, name: string, now: number): string {
+export function towerStepWords(amount: number, name: string, now: number, who?: string): string {
   const reaches = now >= TOWER_LIMIT ? `${now} of ${TOWER_LIMIT}: the players lose the game` : `${now} of ${TOWER_LIMIT}`;
-  return amount < 0 ? `${-amount} progress removed from ${name}, ${reaches}` : `${amount} progress on ${name}, ${reaches}`;
+  return amount < 0 ? `${-amount} progress removed from ${name}, ${reaches}` : who ? `${who} places ${amount} progress on ${name}, ${reaches}` : `${amount} progress on ${name}, ${reaches}`;
 }
 
 /** The banner's line for damage that went to a Morgul Bodyguard in a Captain's place. */
@@ -126,8 +126,11 @@ export const murzagEngagesWords = (murzag: string, enemy: string, who: string): 
 /** The banner's and the log's line for the enemy a Morgul Bodyguard's shadow effect sent to the next player. */
 export const switchEngagesWords = (enemy: string, who: string): string => `A Morgul Bodyguard's shadow effect ends the attack with no damage: ${enemy} engages ${who} and attacks ${who} now`;
 
+/** The line for an enemy that went back to the staging area: by a shadow card's effect, or by the Forced effect of Morgul Vale at the end of the round. */
+export const returnsWords = (enemy: string, via: string, shadow: boolean): string => `${enemy} returns to the staging area (${via}'s ${shadow ? "shadow effect" : "effect at the end of the round"})`;
+
 /** The banner's line for damage cut to 1 on the Nazgûl. */
-export const cutWords = (name: string, was: number): string => `1 damage on ${name}, cut from ${was}`;
+export const cutWords = (name: string): string => `1 damage on ${name}, cut to 1`;
 
 /** The words of the verbs this scenario added, in a sentence of a choice or a response. Null for any other verb. */
 export function valeWords(instruction: Instruction): string | null {

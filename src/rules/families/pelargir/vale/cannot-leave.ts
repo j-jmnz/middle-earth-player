@@ -78,7 +78,7 @@ function destroyedHere(steps: readonly EngineStep[], id: string): boolean {
 
 /** The settle sweep: the current stage's Captain that lies out of play (not set aside, not destroyed in this intent) returns to the staging area. Inert unless the game reads `cannotLeavePlay`. */
 export function captainKept(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  if (state.modifiers.length === 0 || state.lost || state.stack.length > 0 || !gameReads(state, ctx, '"cannotLeavePlay"')) return state;
+  if (state.modifiers.length === 0 || state.lost || state.stageCleared || state.stack.length > 0 || state.pendingAttack || state.pendingStrike || !gameReads(state, ctx, '"cannotLeavePlay"')) return state;
   const name = keptName(state, ctx);
   if (name == null) return state;
   const captain = Object.values(state.cards).find((card) => printedOf(ctx.cards, card.code).type === "enemy" && printedOf(ctx.cards, card.code).name === name);
