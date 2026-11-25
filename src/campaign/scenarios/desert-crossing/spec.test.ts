@@ -1,7 +1,7 @@
 // Rules: hrd.heat-tracker, hrd.side-quests, rr.forced, rr.travel, rr.cannot, rr.engaged, rr.search, rr.shadow-effects, rr.modifiers, rr.blank, rr.active-location, rr.explored (data/rules/entries.json); ledger lines of Desert Crossing (data/printed/haradrim.json).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, cardSpecs, classFlag, count, counter, damageOn, deckCount, endRound, exhausted, flag, handCount, lost, progressOn, resolve, respond, window, stagingThreat, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, notWon, quest, answer, attack, cardSpecs, classFlag, count, counter, damageOn, deckCount, endRound, exhausted, flag, handCount, lost, progressOn, resolve, respond, window, stagingThreat, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Desert Crossing (haradrim part 2): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
@@ -9,7 +9,33 @@ import { announce, answer, attack, cardSpecs, classFlag, count, counter, damageO
 const MAIN = "16068";
 const LAST = "16070";
 
+const MIDDLE = "16069";
+
 const ROWS: readonly Row[] = [
+  // 16068:B:2 "Forced: At the end of the round, increase the temperature by 4." 16068:B:3 "If the temperature is 60 or higher, the players lose the game." Scorching Sun (+4) takes 56 to 60 exactly.
+  { line: "16068:B:2", name: "Forced: at the end of the round the temperature rises by 4", layout: { stage: MAIN, temperature: 31 }, act: endRound, expect: counter("temperature", 35) },
+  { line: "16068:B:3", name: "the players lose the game as soon as the temperature is 60", layout: { stage: MAIN, temperature: 56 }, act: resolve("16030", "whenRevealed"), expect: [counter("temperature", 60), lost] },
+
+  // 16069:A:1 "When Revealed: Increase the temperature by 2. Shuffle the encounter discard pile into the encounter deck and reveal 1 encounter card per player." Two players reveal the two cards of the shuffled pile.
+  { line: "16069:A:1", name: "When Revealed: the temperature rises by 2, the discard pile is shuffled in and each player reveals a card", layout: { stage: MIDDLE, seats: 2, temperature: 20, deck: ["f0"], discard: ["f3"] }, act: resolve("16069", "whenRevealed"), expect: [counter("temperature", 22), zone("f0", "staging"), zone("f3", "staging")] },
+  // 16069:B:1 "Forced: At the end of the round, increase the temperature by 4. Then, each player assigns X damage among characters he controls, where X is the tens digit of the temperature." 36 becomes 40: 4 damage, not 3.
+  { line: "16069:B:1", name: "Forced: at the end of the round the temperature rises by 4, then X damage is assigned, X read after the rise", layout: { stage: MIDDLE, temperature: 36 }, act: endRound, expect: [counter("temperature", 40), damageOn("dh1", 4)] },
+  // 16069:B:2 "If the temperature is 60 or higher, the players lose the game."
+  { line: "16069:B:2", name: "the players lose the game as soon as the temperature is 60", layout: { stage: MIDDLE, temperature: 56 }, act: resolve("16030", "whenRevealed"), expect: [counter("temperature", 60), lost] },
+
+  // 16070:B:3 "While at least 1 Were-worm is in play, the players cannot defeat this stage. If the players defeat this stage, they win the game. If the temperature is 60 or higher, the players lose the game." The heroes' 4 Willpower beats the Threat.
+  { line: "16070:B:3", name: "this stage cannot be defeated while a Were-worm is in play: the quest is not won", layout: { stage: LAST, progress: 14, temperature: 10, staging: ["16028"] }, act: quest("success"), expect: notWon },
+  { line: "16070:B:3", name: "the players lose the game as soon as the temperature is 60", layout: { stage: LAST, temperature: 56 }, act: resolve("16030", "whenRevealed"), expect: [counter("temperature", 60), lost] },
+
+  // 16023:A:3 "Response: When Seek Shade is defeated, reduce the temperature by 10."
+  { line: "16023:A:3", name: "Response: the temperature falls by 10 when the side quest is defeated", layout: { stage: MAIN, temperature: 25, staging: [{ code: "16023", progress: 6 }] }, act: [announce("questDefeated", "16023"), respond("16023")], expect: counter("temperature", 15) },
+
+  // 16025:A:1 "While the temperature is 40 or higher, Burnt Sands gets +2 Threat." It has Threat 2 and counts in the staging area.
+  { line: "16025:A:1", name: "In the staging area it gets +2 Threat at a temperature of 40 or higher", layout: { stage: MAIN, temperature: 40, staging: ["16025"] }, act: [], expect: stat("16025", "threat", 4) },
+
+  // 16026:A:1 "X is the tens digit of the temperature." Threat X.
+  { line: "16026:A:1", name: "X, the Threat of Scorched Hamada, is the tens digit of the temperature", layout: { stage: MAIN, temperature: 30, staging: ["16026"] }, act: [], expect: stat("16026", "threat", 3) },
+
   // 16022:A:1 "... Make that location the active location." The shuffled pile holds the old active location (the discard pile includes it) and the deck's one other location; the seed picks the new one.
   { line: "16022:A:1", name: "When Revealed: the active location is discarded and a location found in the reshuffled deck becomes the active location", layout: { stage: MAIN, seed: 1, active: "16026", deck: ["16027", "f0"] }, act: resolve("16022", "whenRevealed"), expect: [zone("16027", "activeLocation"), zone("16026", "encounterDiscard")] },
 
