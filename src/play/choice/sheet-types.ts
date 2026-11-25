@@ -48,6 +48,8 @@ export type PickSheet = {
   step: string;
   title: string;
   note: string | null;
+  // The printed line a Choose or a Pick note ends with (the card's own words, after the sentence that asks); the quest advance screen on a short phone sets it below the rows (quest-advance-view.tsx).
+  printed?: string | null;
   // What a screen reader hears in place of `note`, where the note names a glow or a drag; read only under useReaderMode (use-table-choice.ts).
   readerNote?: string | null;
   // The action the primary button names with the chosen option ("Defend with" Sam).
