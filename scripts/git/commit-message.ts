@@ -4,13 +4,15 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { runScript, type Log } from "../log.ts";
+import { parseNumstat } from "../checks/shared-engine.ts";
+import { attributionLine } from "./attribution.ts";
 import { rangeProblems } from "./range-rules.ts";
 
 // Checks commit subjects against .claude/rules/commit-standards.md (Subject line): "<type>: <summary>", one of the
 // types below, at most 72 characters, no closing period, the summary an action (its first word an imperative verb). A message file and a range also have their bodies checked for a
 // Claude Code session link, which the repository is public enough to keep out, and for a GitHub closing keyword before an issue
 // number, which would close the issue at the merge instead of at the release (commit-standards.md, Body), for a co-author line
-// that names Claude, and for a Pipeline measure without each task's times and the review findings.
+// that names Claude, and for a Pipeline measure without each task's times and the review findings; a range also needs a Shared engine line past the limit of scripts/checks/shared-engine.ts.
 // Usage: pnpm commit:check "<subject>"... checks the subjects given; --range <base>..<head> checks every non-merge
 // commit in the range (CI checks a pull request's commits and its title, which becomes the squash commit's subject);
 // --file <path> checks a message file (the commit-msg hook, .githooks/commit-msg); --description <path> checks only the body
@@ -92,6 +94,8 @@ export function bodyProblem(message: string): string | undefined {
   if (session !== undefined) return `"${subjectOf(message)}" names a Claude Code session ("${session.trim()}"); leave the link out`;
   const coAuthor = lines.find((text) => CLAUDE_CO_AUTHOR.test(text.trim()));
   if (coAuthor !== undefined) return `"${subjectOf(message)}" has "${coAuthor.trim()}"; no commit or pull request names Claude as a co-author`;
+  const attribution = attributionLine(lines.join("\n"));
+  if (attribution !== undefined) return `"${subjectOf(message)}" has an attribution line ("${attribution}"); no commit or pull request description carries one (commit-standards.md, Body)`;
   const body = lines.join("\n");
   if (PIPELINE_MEASURE.test(body) && !PIPELINE_PARTS.every((part) => part.test(body)))
     return `"${subjectOf(message)}" has a Pipeline measure without each task's wait minutes, writing minutes and the review findings (docs/agents/agent-brief.md, Measure); a measure of any other change is "Measure:"`;
@@ -164,7 +168,8 @@ function branchProblems(range: string, bodies: readonly string[]): string[] {
     }
   };
   const changed = git(["diff", "--name-only", base, to]).split("\n").filter((file) => file !== "");
-  return rangeProblems({ changed, bodies, playable: { base: shown(base), head: shown(to) } });
+  const numstat = parseNumstat(git(["diff", "--numstat", "--no-renames", base, to]));
+  return rangeProblems({ changed, bodies, playable: { base: shown(base), head: shown(to) }, numstat });
 }
 
 function main(log: Log): void {
