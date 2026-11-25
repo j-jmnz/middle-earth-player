@@ -191,18 +191,16 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         { verb: "ModifyStat", stat: "immuneToPlayerCards", amount: 1, until: "whileSourceInPlay", target: "picked", when: { kind: "matches", card: "picked", pick: { type: "enemy", control: "any", trait: "Harad" } } },
       ],
     },
-    // 16040:A:1, the Champion's gained text: the main quest stage cannot be defeated while the Champion is in play.
-    { id: "16040:constant:1", cardCode: "16040", lines: ["16040:A:1"], timing: "constant", condition: CHAMPION_IN_PLAY, instructions: [{ verb: "Restrict", what: "advance" }] },
-    // 16040:A:2: the Champion takes no damage while this stage holds fewer than 4 progress; this stage cannot be defeated while the Champion is in play (a stage with a Restrict is held by the side quest sweep too).
+    // 16040:A:2: the Champion takes no damage while this stage holds fewer than 4 progress; this stage cannot be defeated while the Champion is in play. A Restrict on advancing holds every stage at once, so the same record also keeps the main quest stage from being defeated while the Champion is in play, the second sentence of the text the Champion gains (16040:A:1); the side quest is held by families/sidequests/quest.ts.
     {
-      id: "16040:constant:2",
+      id: "16040:constant:1",
       cardCode: "16040",
       lines: ["16040:A:2"],
       timing: "constant",
       condition: { kind: "less", left: { stat: "progress", of: "self" }, right: 4 },
       instructions: [{ verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "whileSourceInPlay", holders: CHAMPION }],
     },
-    { id: "16040:constant:3", cardCode: "16040", lines: ["16040:A:2"], timing: "constant", condition: CHAMPION_IN_PLAY, instructions: [{ verb: "Restrict", what: "advance" }] },
+    { id: "16040:constant:2", cardCode: "16040", lines: ["16040:A:2"], timing: "constant", condition: CHAMPION_IN_PLAY, instructions: [{ verb: "Restrict", what: "advance" }] },
 
     // 16041 Southron Captain. In the staging area each other Harad enemy gets +1 Threat; engaged with you, each other Harad enemy engaged with you gets +1 Attack.
     {

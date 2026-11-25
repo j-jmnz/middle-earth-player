@@ -127,15 +127,12 @@ Scenario piles that place cards with no record (staging: 16016 Narrow Alleyway; 
     - then, if the picked card is a Harad enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card: stat attack 2, while this card is in play
     - then, if the picked card is a Harad enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card: stat defense 2, while this card is in play
     - then, if the picked card is a Harad enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card: stat immuneToPlayerCards 1, while this card is in play
-  16040:constant:1: Constant
-    only if there is a enemy (any player controls) or in the staging area, with resources on it to choose
-    - the players cannot defeat this stage while this holds
 
 16040:A:2 (front): The Champion cannot take damage unless there are at least 4 progress tokens here. This stage cannot be defeated while the Champion is in play.
-  16040:constant:2: Constant
+  16040:constant:1: Constant
     only if progress of this card is less than 4
     - each enemy (any player controls) or in the staging area, with resources on it: stat cannotTakeDamage 1, while this card is in play
-  16040:constant:3: Constant
+  16040:constant:2: Constant
     only if there is a enemy (any player controls) or in the staging area, with resources on it to choose
     - the players cannot defeat this stage while this holds
 
@@ -308,4 +305,4 @@ Scenario piles that place cards with no record (staging: 16016 Narrow Alleyway; 
     only if any of: (there is a enemy (any player controls) engaged with you to choose) or (there is a enemy (any player controls) engaged with another player to choose)
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 226 by template, 0 as JSON)
+(rendered pieces: 222 by template, 0 as JSON)
