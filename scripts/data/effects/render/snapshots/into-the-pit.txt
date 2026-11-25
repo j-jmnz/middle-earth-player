@@ -301,7 +301,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03062:A:1 (front): When Revealed: The first player attaches Watchful Eyes to one of his heroes. (Counts as a Condition attachment with the text: "Limit 1 per hero. Forced: If attached hero is exhausted at the end of the combat phase, reveal 1 card from the encounter deck and add it to the staging area.")
   03062:whenRevealed:1: When revealed
-    - attach this card to a hero the acting player controls that carries no copy of this card (the acting player, the first player in a When Revealed, chooses it; with none this card stays where it is)
+    - attach this card to a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card stays where it is)
   03062:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   03062:forced:1: Forced at the end of the phase
@@ -316,7 +316,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
   03063:forced:1: Forced after a card is revealed (heard about Goblin enemy (any player controls); only when the encounter deck revealed it)
     only if this card is in the staging area
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - remove 1 progress from the current quest card (all of it when it holds less)
+    - remove 1 progress from the main quest (all of it when it holds less)
 
 03063:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if attacking enemy is a Goblin.)
   03063:shadow:1: Shadow
@@ -432,7 +432,9 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 901002:A:1 (front): When Revealed: The first player must search the encounter deck and discard pile for X Orc enemies and add them to the staging area, where X is 1 plus the number of players in the game. One of these choices must be Patrol Sentry and one must be Patrol Leader, if able.
   901002:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
+    - the rest of the effect is carried out by the first player
     - the acting player finds one Orc enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); while the card with code 901003 is there to be found, the search must take it (the first search of the effect that can)
     - the acting player finds one Orc enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); while the card with code 03014 is there to be found, the search must take it (the first search of the effect that can)
     - repeat the number of players - 1 times:
@@ -552,4 +554,4 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
     who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat defense 3, until the end of the phase
 
-(rendered pieces: 305 by template, 0 as JSON)
+(rendered pieces: 306 by template, 0 as JSON)

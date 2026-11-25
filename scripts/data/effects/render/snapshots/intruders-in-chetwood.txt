@@ -150,7 +150,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     - the card with code 09016 that a player controls lies facedown under this card, still in play, controlled by no one, with what is attached to it; when this card is defeated it returns under the first player, exhausted
 
 09024:A:3 (front): Forced: After the last time counter is removed from this stage, discard Iârion.
-  09024:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card only: with no subject, an event about one card is heard by that card alone)
+  09024:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card only: with no subject, an event about one card is heard by that card alone)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card held under this card is discarded from where it lies, and leaves play
 
@@ -159,6 +159,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09043:A:1 (front): When Revealed: Either discard 1 ally from play, or reveal an additional encounter card.
   09043:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "ally" (only if there is a ally (any player controls) to choose):
         - choose ally (any player controls) chosen by the first player
@@ -250,6 +251,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09049:A:2 (front): When Revealed: Either search the encounter deck and discard pile for an encounter side quest and reveal it, or choose a different quest card in play to be the current quest until the end of the phase. Shuffle the encounter deck.
   09049:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player chooses one of:
       * option "search" (only if the encounter deck or its discard pile holds a side quest):
@@ -309,6 +311,8 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 09068:B:3 (back): The players cannot defeat this stage unless the first player controls Iârion. If the players defeat this stage, they win the game.
   09068:constant:2: Constant
     only if not (the actor controls the card with code 09016)
+    who acts: the acting player is the first player (a quest stage belongs to no player; while the stages are split between the players, the player whose stage it is)
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
     - the players cannot defeat this stage while this holds
 
 ## 10156 Intruders in Chetwood

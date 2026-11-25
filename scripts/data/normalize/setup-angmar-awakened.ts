@@ -67,7 +67,7 @@ export function readAngmarAwakened(sentence: string, names: NameIndex, before: r
     const codes = named(ETTENMOORS_SAFE_AND_QUESTS);
     return codes.length === 7 ? [step("revealSafeLocationGuarded", { codes })] : null;
   }
-  if ((match = /^Search the encounter deck for 1 copy of (.+?) per player and add them to the staging area$/i.exec(sentence))) {
+  if ((match = /^Search the encounter deck for 1 copy of (.+?) per player,? and add them to the staging area$/i.exec(sentence))) {
     const codes = names.codesOf(match[1] ?? "");
     return codes.length === 0 ? null : [{ kind: "stage", codes, perPlayer: 1, count: 0 }];
   }

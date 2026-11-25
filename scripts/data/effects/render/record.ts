@@ -36,7 +36,7 @@ const ABOUT_ONE_CARD: ReadonlySet<string> = new Set(["questDefeated", "lastTimeC
 const TRIGGER: Readonly<Record<string, string>> = {
   questFailed: "after the players quest unsuccessfully",
   questDefeated: "after a side quest is defeated (its progress reached its quest points)",
-  lastTimeCounterRemoved: "after the last time counter is removed from a card at the end of the refresh phase",
+  lastTimeCounterRemoved: "after the last time counter is removed from a card, at the end of the refresh phase or by a card effect",
   flipped: "after a card is flipped over (the FlipCard verb)",
   questSucceeded: "after the players quest successfully",
   enemyDestroyed: "after an enemy is destroyed",
@@ -127,10 +127,11 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   if (effect.fromVictory === true) notes.push("used from the victory display");
   if (effect.byEncounterDeck === true) notes.push("only when the encounter deck revealed it");
   if (effect.notFromDiscard === true) notes.push("not for a card found in the encounter discard pile");
+  if (effect.byPlay === true) notes.push("only when a player played the attachment");
   if (effect.early === true) notes.push("resolves before the other Forced effects of the moment");
   if (isObj(effect.cancel)) notes.push(`may be canceled by paying ${str(effect.cancel.cost)}`);
   if (isObj(effect.uncancelable)) notes.push(`cannot be canceled while ${renderCondition(effect.uncancelable, ctx)}`);
-  const head = done(ctx, `${timing}${trigger}${notes.length > 0 ? ` (${notes.join("; ")})` : ""}`, effect, ["id", "cardCode", "lines", "timing", "trigger", "subject", "eventSeat", "limit", "cost", "anyPlayer", "answeredBy", "fromHand", "fromVictory", "byEncounterDeck", "notFromDiscard", "early", "cancel", "uncancelable", "condition", "instructions"]);
+  const head = done(ctx, `${timing}${trigger}${notes.length > 0 ? ` (${notes.join("; ")})` : ""}`, effect, ["id", "cardCode", "lines", "timing", "trigger", "subject", "eventSeat", "limit", "cost", "anyPlayer", "answeredBy", "fromHand", "fromVictory", "byEncounterDeck", "notFromDiscard", "byPlay", "early", "cancel", "uncancelable", "condition", "instructions"]);
   const lines = [`${str(effect.id)}: ${head}`];
   if (effect.condition !== undefined) lines.push(`  only if ${renderCondition(effect.condition, ctx)}`);
   const instructions = Array.isArray(effect.instructions) ? effect.instructions : [];
@@ -146,8 +147,11 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   const keywordReminder = ctx.finalStage === true && effect.timing === "constant" && Array.isArray(effect.lines) && effect.lines.length > 0 && effect.lines.every((id) => typeof id === "string" && KEYWORD_REMINDER.test(ctx.lineTexts?.get(id) ?? ""));
   if (instructions.length === 0 && keywordReminder) lines.push("  (no instructions: the record only names the printed keyword reminder; the keyword is the card's own and the engine reads it from the card)");
   else if (instructions.length === 0) lines.push(winsOnDefeat ? "  (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)" : "  (no instructions: the record only names the printed line, and the engine runs no step for it)");
+  // A final stage whose printed line also says "If the players defeat this stage, they win the game" has the same win, beside the record's own instructions (a Restrict that holds the defeat).
+  const printedWin = ctx.finalStage === true && effect.timing === "constant" && instructions.length > 0 && Array.isArray(effect.lines) && effect.lines.some((id) => typeof id === "string" && /they win the game/i.test(ctx.lineTexts?.get(id) ?? ""));
+  if (printedWin) lines.push("  note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule");
   if (instructions.length > 1) lines.push("  (steps run in order; a step depends on an earlier one only through its own condition)");
-  const inner = effect.trigger === "engaged" ? { ...ctx, engagedSeat: true } : ctx;
+  const inner = { ...ctx, timing: typeof effect.timing === "string" ? effect.timing : undefined, ...(effect.trigger === "engaged" ? { engagedSeat: true } : {}) };
   instructions.forEach((instruction, at) => lines.push(...renderInstruction(instruction, inner, 1, at > 0)));
   return lines;
 }

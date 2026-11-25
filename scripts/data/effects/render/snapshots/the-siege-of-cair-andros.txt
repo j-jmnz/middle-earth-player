@@ -187,6 +187,7 @@ Scenario piles that place cards with no record (quest: 05072 The Defense; quest:
 
 05061:A:2 (front): When Revealed: Count the number of encounter cards in the staging area and shuffle them into the encounter deck. Reveal an equal number of cards from the encounter deck and add them to the staging area. This effect cannot be canceled.
   05061:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - every card in the staging area (enemies, locations, objectives) leaves play and is shuffled into the encounter deck; X is how many cards there were (0 when there were none)
     - the first player reveals X encounter cards, one after the other, each in a staging of its own
@@ -303,6 +304,7 @@ Scenario piles that place cards with no record (quest: 05072 The Defense; quest:
 
 05076:B:2 (back): When Revealed: Reveal 1 card per player from the encounter deck and add it to the staging area.
   05076:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player reveals the number of players encounter cards, one after the other, each in a staging of its own
 
 05076:B:3 (back): If the players have collected 4 or more victory points, The Last Battle gains battle and loses siege.

@@ -32,11 +32,15 @@ concurrency:
   group: release-pipeline
   cancel-in-progress: false
 
+# Every job that reads a signing or mirror secret names the `release` environment, which holds those secrets and lets
+# only `main` and `release/*` deploy (docs/releasing.md, Release environment): a branch with a changed workflow cannot
+# read them. On any other branch the job names no environment, so a dry run there builds without the secrets.
 jobs:
   plan:
     # Off when the run only adds the desktop app to a release, so every build, the checks and publish are skipped with it.
     if: ${{ inputs.add_desktop_from_run == '' }}
     runs-on: ubuntu-latest
+    environment: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')) && 'release' || '' }}
     timeout-minutes: 10
     outputs:
       tag: ${{ steps.plan.outputs.tag }}
@@ -97,6 +101,7 @@ jobs:
   assets:
     needs: plan
     runs-on: ubuntu-latest
+    environment: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')) && 'release' || '' }}
     timeout-minutes: 60
     env:
       # Electron's postinstall downloads its binary (about 110 MB); only the desktop job runs it.
@@ -137,6 +142,7 @@ jobs:
   android:
     needs: [plan]
     runs-on: ubuntu-latest
+    environment: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')) && 'release' || '' }}
     timeout-minutes: 150
     permissions:
       contents: read
@@ -145,7 +151,7 @@ jobs:
       ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
       # app.config.js stamps the version and versionCode from this.
       APP_VERSION: ${{ needs.plan.outputs.version }}
-      APK_NAME: middle-earth-player-${{ needs.plan.outputs.tag }}${{ inputs.dry_run && '-dry-run' || '' }}.apk
+      APK_NAME: middle-earth-player${{ inputs.dry_run && '-dry-run' || '' }}.apk
     outputs:
       caches: ${{ steps.caches.outputs.keys }} ${{ steps.metro.outputs.key }}
     steps:
@@ -299,6 +305,7 @@ jobs:
     # The Xcode 27 image: an app built with an SDK older than iOS 27.1 runs letterboxed on a folding iPhone's inner screen,
     # in a compatibility window that also ignores the table's landscape lock. macos-latest has only Xcode 26.
     runs-on: xcode-27
+    environment: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')) && 'release' || '' }}
     timeout-minutes: 180
     permissions:
       contents: read
@@ -309,7 +316,7 @@ jobs:
       APP_VERSION: ${{ needs.plan.outputs.version }}
       APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
       SIGNED: ${{ needs.plan.outputs.ios_signed }}
-      IPA_NAME: middle-earth-player-${{ needs.plan.outputs.tag }}${{ inputs.dry_run && '-dry-run' || '' }}.ipa
+      IPA_NAME: middle-earth-player${{ inputs.dry_run && '-dry-run' || '' }}.ipa
       MIN_IOS_SDK: "27.1"
     outputs:
       caches: ${{ steps.caches.outputs.keys }} ${{ steps.metro.outputs.key }}
@@ -501,6 +508,7 @@ jobs:
           - { os: macos, runner: macos-latest }
           - { os: windows, runner: windows-latest }
     runs-on: ${{ matrix.runner }}
+    environment: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')) && 'release' || '' }}
     timeout-minutes: 120
     permissions:
       contents: read
@@ -510,7 +518,6 @@ jobs:
         shell: bash
     env:
       APP_VERSION: ${{ needs.plan.outputs.version }}
-      TAG: ${{ needs.plan.outputs.tag }}
     steps:
       # Git for Windows checks text out with CRLF, which changes hashFiles('pnpm-lock.yaml'): the Windows cache keys would not
       # be the lockfile hash the cleanup job keeps, so their stale entries were never deleted.
@@ -557,7 +564,7 @@ jobs:
         name: Check and name the installers
         env:
           DRY_RUN: ${{ inputs.dry_run }}
-        run: pnpm --silent desktop stage --tag "$TAG" --out "$RUNNER_TEMP/out" --github-output $([ "$DRY_RUN" = "true" ] && echo --suffix -dry-run)
+        run: pnpm --silent desktop stage --out "$RUNNER_TEMP/out" --github-output $([ "$DRY_RUN" = "true" ] && echo --suffix -dry-run)
       # The packed app, not the checkout's: it must start, be cross-origin isolated, load a picture and a booklet page from its own bundle and
       # make no request off app://, and report the tag's version.
       - name: Launch the packed app
@@ -725,6 +732,7 @@ jobs:
     # An explicit test: the implicit success() would also skip it when the optional desktop build, upstream of publish, failed.
     if: ${{ !cancelled() && needs.publish.result == 'success' && needs.publish.outputs.added != 'true' && needs.plan.outputs.ios_signed == 'true' }}
     runs-on: macos-latest
+    environment: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')) && 'release' || '' }}
     timeout-minutes: 90
     steps:
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
@@ -747,8 +755,15 @@ jobs:
           PILOT_NOTIFY_EXTERNAL_TESTERS: "true"
           FASTLANE_SKIP_UPDATE_CHECK: "1"
           FASTLANE_HIDE_CHANGELOG: "1"
+          # The pinned fastlane gem, checked against the sha256 RubyGems lists for it. Its dependencies resolve at install.
+          FASTLANE_VERSION: 2.242.0
+          FASTLANE_SHA256: c1df04d5ba83049b239c9979727c2adf05f19e8bd8ad9e183a3df27029d16d2e
         run: |
-          command -v fastlane >/dev/null || brew install fastlane
+          (cd "$RUNNER_TEMP" && gem fetch fastlane -v "$FASTLANE_VERSION")
+          echo "$FASTLANE_SHA256  $RUNNER_TEMP/fastlane-$FASTLANE_VERSION.gem" | shasum -a 256 -c -
+          export GEM_HOME="$RUNNER_TEMP/gems" GEM_PATH="$RUNNER_TEMP/gems"
+          gem install "$RUNNER_TEMP/fastlane-$FASTLANE_VERSION.gem" --no-document --install-dir "$GEM_HOME"
+          fastlane() { "$GEM_HOME/bin/fastlane" "$@"; }
           node -e 'const fs = require("node:fs"); fs.writeFileSync(process.argv[1], JSON.stringify({ key_id: process.env.ASC_KEY_ID, issuer_id: process.env.ASC_ISSUER_ID, key: Buffer.from(process.env.ASC_KEY, "base64").toString("utf8"), in_house: false }))' "$RUNNER_TEMP/asc-key.json"
           # What to Test holds at most 4000 characters.
           export PILOT_CHANGELOG="$(head -c 3900 "$RUNNER_TEMP/notes.md")"
@@ -761,6 +776,7 @@ jobs:
   add-desktop:
     if: ${{ inputs.add_desktop_from_run != '' }}
     runs-on: ubuntu-latest
+    environment: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/')) && 'release' || '' }}
     timeout-minutes: 30
     permissions:
       contents: write

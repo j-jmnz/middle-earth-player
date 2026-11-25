@@ -12,6 +12,7 @@ import {
   dialScale,
   DIAL_SIZE,
   dialZones,
+  keepWidest,
   EDGE_FADE,
   HEADING_BADGE_OVER,
   HEADING_BADGE_W,
@@ -295,5 +296,19 @@ describe("the scenario dials' words (dialZones)", () => {
 
   it("still scrolls when the row is too wide even without the words", () => {
     expect(dialZones(bar, 600, labelled, 1, bar / 2).scroll).toBe(true);
+  });
+});
+
+describe("keepWidest", () => {
+  const was = { key: "a|Time", width: 300 };
+  it("keeps the wider width for the same key: the wordless row's narrower event is kept out", () => {
+    expect(keepWidest(was, "a|Time", 200)).toBe(was);
+    expect(keepWidest(was, "a|Time", 300)).toBe(was);
+  });
+  it("takes a wider width for the same key", () => {
+    expect(keepWidest(was, "a|Time", 320)).toEqual({ key: "a|Time", width: 320 });
+  });
+  it("takes the new width for a new key, even a narrower one: a dial whose label got shorter under the same id is measured again", () => {
+    expect(keepWidest(was, "a|Time left", 200)).toEqual({ key: "a|Time left", width: 200 });
   });
 });

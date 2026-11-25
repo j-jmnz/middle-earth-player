@@ -16,8 +16,13 @@ import { areaRoleOf, stageFactsOf } from "../store/stormcaller-table.ts";
 import { AREA_APART, AREA_TOGETHER, stageLines } from "../words/scenarios/stormcaller.ts";
 import { shipLoss, type ShipLoss } from "../words/scenarios/grapple.ts";
 import { heldWords } from "../words/scenarios/sea.ts";
+import { heldByName, ILL_TIDINGS_MARK } from "../words/scenarios/ring-maker/fords-table.ts";
+import { heldInHand } from "../../rules/families/ring-maker/hand.ts";
+import { grimaLyingOn } from "../readouts/ring-maker/fords.ts";
+import { mugashLyingOn } from "../readouts/ring-maker/orc.ts";
 import { lootDeckWords, lootGuardWords } from "../words/loot.ts";
 import { lootUnder } from "../../rules/families/sidequests/loot.ts";
+import { alleywayMark, championMark, seizeMark } from "../readouts/haradrim/umbar.ts";
 import { stackMark } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { capturedPill } from "../words/scenarios/angmar/gram-table.ts";
 import { capturedOwners } from "../readouts/gram.ts";
@@ -318,14 +323,14 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     engagement: cost != null ? { cost, engages: engagesAt(game, ctx).get(cardId) === seat } : null,
     delayed: game.delayed.some((entry) => actsOn(entry, cardId)),
     // The cards underneath The Havens Burn against the number that loses (11038:A:2); `loses` when one more card does.
-    under: card != null && inPlay(card.zone) ? (underMark(burnTally(game, cardId, ctx)) ?? heldMark(game, ctx, cardId) ?? lootMark(game, ctx, cardId) ?? poisonMark(game, ctx, cardId)) : null,
+    under: card != null && inPlay(card.zone) ? (underMark(burnTally(game, cardId, ctx)) ?? heldMark(game, ctx, cardId) ?? lootMark(game, ctx, cardId) ?? poisonMark(game, ctx, cardId)) : handHeldMark(game, cardId),
     // An Aflame location in play: its damage against the value that destroys it.
     fire: card != null && inPlay(card.zone) ? fireMark(aflameTally(game, cardId, ctx)) : null,
     // A Ship location while the stage that loses at a total Threat of 9 is in play: its Threat against that total (12041:B:2).
-    loss: card != null && inPlay(card.zone) ? shipLoss(game, ctx, cardId) : null,
+    loss: card != null && inPlay(card.zone) ? (shipLoss(game, ctx, cardId) ?? seizeMark(game, ctx, cardId)) : null,
     place: card?.zone === "staging" ? stagingPlace(game, cardId) : null,
     side: sideQuestMark(game, ctx, cardId),
-    determined: determinedMark(game, ctx, cardId),
+    determined: determinedMark(game, ctx, cardId) ?? championMark(game, ctx, cardId),
     dead: deadSpeech(game, ctx.cards, cardId),
     combat: card != null ? combatNumber(game, ctx, card) : null,
   };
@@ -363,12 +368,20 @@ function underMark(tally: { count: number; limit: number } | null): UnderMark | 
   return tally ? burnMark(tally) : null;
 }
 
+// Ill Tidings in a hand (07023:A:1): a card that cannot leave the hand wears the "held" pill the cards held under another do.
+function handHeldMark(game: ScenarioState, cardId: string): UnderMark | null {
+  return heldInHand(game, cardId) ? { ...ILL_TIDINGS_MARK, loses: false } : null;
+}
+
 // The Ship enemy Belfalas Islet holds out of play while it is the active location (12129:A:2) is the same night pill as the cards under The Havens Burn: "1 held", and the reader hears the enemy's name.
 // The Captives of The Uruk-hai lying under To Isengard! or held by Grishnákh are counted the same way (families/captives): "2 held", and the reader hears each hero's name.
 function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): UnderMark | null {
   // The facedown underworld cards under a location of The Steward's Fear: "2 underworld", never which cards (06018:A:1).
   const stack = stackMark(game, cardId);
   if (stack) return stack;
+  // The enemy faceup under Narrow Alleyway in Escape from Umbar: "1 held", the enemy named to the reader (readouts/haradrim/umbar.ts).
+  const alleyway = alleywayMark(game, ctx, cardId);
+  if (alleyway) return alleyway;
   // The cards captured underneath a card in Escape from Mount Gram: "3 captured", with their owners spoken (readouts/gram.ts).
   const owners = game.capture != null ? capturedOwners(game, cardId) : [];
   if (owners.length > 0) return capturedPill(owners);
@@ -381,6 +394,12 @@ function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): Unde
   const allies = alliesUnder(game, cardId);
   // The count lifts the pill clear of the quest points ("0 / 15") like the other held marks (underMarkBox).
   if (allies.length > 0) return { ...heldWords(allies.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name)), count: allies.length };
+  // Gríma lying on The Islet (The Fords of Isen, 07059:A:1): "1 held".
+  const lying = grimaLyingOn(game, cardId);
+  if (lying.length > 0) return heldByName(lying.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
+  // Mugash attached to a hero (To Catch an Orc, 07024:A:2): "1 held" on the hero, wherever it lies.
+  const mugash = mugashLyingOn(game, cardId);
+  if (mugash.length > 0) return heldByName(mugash.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
   const captives = captivesUnder(game, cardId);
   if (captives.length > 0) return heldWords(captives.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
   const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);

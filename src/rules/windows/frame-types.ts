@@ -132,6 +132,8 @@ export type EffectData = {
   // The seat that controlled the ally DestroyHighestCostAlly destroyed, so "that ally's controller" reanimates it (101162:A:2).
   destroyedController?: number;
   hold?: string;
+  // The events the effect queues wait until it has resolved completely (Effect.holdsEvents).
+  holdsEvents?: true;
   // The card DiscardBottom discarded from the bottom of a deck in this effect (the `discardedCost` condition, families/uncharted/cards.ts).
   discarded?: string;
   // Every card the running effect discarded from the top of a deck, over all the players it acted for, oldest first (the amount `discarded`, families/deck/discarded.ts).
@@ -215,9 +217,9 @@ export type BurgleData = {
 // `amount` is the damage a `damaged` event dealt. `attachments` are the cards that left play with the card a
 // `leftPlayWithAttachments` event is about (families/play/zones.ts).
 // `occurrence`: events one game occurrence created share it (each character of one commit), and are announced together in
-// a single response window (rr.triggering-condition). `fromDeck`: a "revealed" card the encounter deck itself revealed. `fromStaging`: an
+// a single response window (rr.triggering-condition). `fromDeck`: a "revealed" card the encounter deck itself revealed. `byPlay`: an "attached" event of an attachment a player played onto its host (not a move, a put into play or a Setup attach). `fromStaging`: an
 // "engaged" enemy that came from the staging area, kept only in a game with ships (Boarding, families/sea/boarding.ts). `exhaustedToDefend`: a "declaredDefender" character the declaration exhausted (not one that stayed ready or was exhausted already).
-export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean; byPlayerCard?: true; amount?: number; attachments?: readonly string[]; occurrence?: string; fromDeck?: boolean; fromDiscard?: true; fromStaging?: boolean; exhaustedToDefend?: true; shadowBlank?: true; uncancelable?: true; at?: number };
+export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean; byPlayerCard?: true; amount?: number; attachments?: readonly string[]; occurrence?: string; fromDeck?: boolean; fromDiscard?: true; byPlay?: true; fromStaging?: boolean; exhaustedToDefend?: true; shadowBlank?: true; uncancelable?: true; at?: number };
 
 // A Response a player may use after an event. It is offered once and may be passed. `event` is the one it answers, when a
 // window answers several events of one occurrence.
@@ -230,8 +232,9 @@ export type FrameData =
   | { kind: "none" }
   // `fromDeck`: the top card of the encounter deck, not a card an effect found. `canceled`: a Response canceled the
   // effects of the card just revealed (Frodo Baggins). `discard`: and the card is discarded, not shuffled back (The Master Ring).
+  // `chainMark`: the table as the reset of an empty deck last found it inside this reveal's surge chain (quest/surge-chain.ts `repeatsChain`).
   // `guards`: the card is revealed as the guard of this objective (rr.guarded): it is attached to it as it is placed in the staging area. `engage`: an enemy found by a search is put into play engaged with the revealing seat instead (SearchReveal `to: engaged`).
-  | { kind: "reveal"; hide: HideResult | null; surge: boolean; extraSurge?: number; extraDoomed?: number; surgeLeft?: number; fromDeck?: boolean; fromDiscard?: true; canceled?: boolean; discard?: boolean; guards?: string; engage?: true }
+  | { kind: "reveal"; hide: HideResult | null; surge: boolean; extraSurge?: number; extraDoomed?: number; surgeLeft?: number; fromDeck?: boolean; fromDiscard?: true; canceled?: boolean; discard?: boolean; guards?: string; engage?: true; chainMark?: string }
   | HideData
   | FortitudeData
   | EscapeData

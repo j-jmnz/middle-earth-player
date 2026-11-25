@@ -63,7 +63,7 @@ export function PickRing({ rect, picked, share, dimmed, fonts, t, s }: { rect: R
     <Group>
       <Circle cx={cx} cy={cy} r={11 * s} color={share === "damage" ? t.threat : t.accent} />
       {share ? (
-        <Text x={cx - fonts.badge.getTextWidth(text) / 2} y={cy + 4 * s} text={text} font={fonts.badge} color={share === "damage" ? t.bone : t.onAccent} />
+        <Text x={cx - fonts.badge.getTextWidth(text) / 2} y={cy + 4 * s} text={text} font={fonts.badge} color={share === "damage" ? t.onThreatPill : t.onAccent} />
       ) : (
         // A check, drawn: the system face may not have the glyph.
         <Group>

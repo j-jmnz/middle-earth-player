@@ -33,14 +33,14 @@ What agents read is held small, single and current (user instruction, 2026-11-22
 ## `docs/phases/STATUS.md`
 
 - The rules header, then one row per phase not yet completed: a completed phase's row is deleted with its file. A note is at most about 200 characters: the date, and only what is still open (`engine done`, a review not run, deferred work).
-- **Open items**: a pointer to the GitHub issue of each area. A thing still to do is one checklist line in its area's issue (or a new issue with an existing label); tick it when the work merges, and never copy the list back into a doc.
+- **Open items**: a pointer to each open GitHub issue that users filed. An agent creates no issue and adds no line to one for an item it finds: it fixes the item before its pull request (user instruction, 2026-11-25).
 - **Standing decisions**: one line per user decision that still constrains later work, with its date. Delete it when the work it constrained is finished and nothing later depends on it.
 - No dated sections, no "Built / Decided / Checked" blocks, no fixed review findings, test counts, timings or commit hashes. Those go in the commit message and the final report to the user.
 
 ## Plans, phases and handovers
 
 - A plan under `docs/plans/` is live while its work is open. When the work is done, delete it; git keeps it. A citation of it in code or a live doc points to the doc that owns the behaviour instead.
-- A phase file is its spec and exit. When the phase is completed, delete the file; git keeps it. Its open items go to their area's issue (`docs/phases/STATUS.md`, Open items), and a citation of it points to the doc that owns the behaviour instead.
+- A phase file is its spec and exit. When the phase is completed, delete the file; git keeps it. Its open items are fixed in the phase before it is completed, and a citation of it points to the doc that owns the behaviour instead.
 - A handover in `docs/handover/` exists while work is in flight or open. The final commit of that work deletes it, or cuts it to the points still open.
 - `docs/agents/` holds the standing procedures agents follow on every run of a kind of task (the scenario procedure, the effect-authoring cookbook). They are not plans or handovers: they stay, and say what is true now.
 - A paste-once prompt for a new session is not committed. Give it to the user in the report, or put it in the scratchpad.

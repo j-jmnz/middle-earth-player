@@ -47,7 +47,7 @@ The statuses are those of the Readings bullet of `docs/scenarios/against-the-sha
 - `06014:A:2` (recommended; community discussion only). Shadow, undefended: the first player removes 1 token from the current quest, a progress token or a resource token when the card holds both (the choice is not a target, which `rr.first-player` gives to the first player, so the group decides with the first player's final say; a card that names no player does not give it to the defender). Not taken: the defending player chooses; only progress, or only resource tokens. Basis: `rr.first-player` (the group, the first player's final say), the printed text ("token"). URLs read: https://ffg-forum-archive.entropicdreams.com/topic/289093-underworld-dissident-specification (three posts, no official answer: one says the first player chooses, one agrees the player can choose and thinks resource was meant), https://ffg-forum-archive.entropicdreams.com/topic/230355-selecting-from-or-option-that-does-nothing-once-youve-tried-it (no answer on who chooses). No official source names the chooser.
 - `06015:A:1` (span-settled). Daughter of Berúthiel is skipped in the optional engagement step and is engaged only by an effect. Basis: rr.optional-engagement.
 - `06015:A:2` (span-settled). After her attack she returns to the staging area unless the engaged player raises his own threat by 4 (which can eliminate him). Not taken: the first player decides. Basis: rr.forced, rr.player-elimination.
-- `06016:A:1` (span-settled for the surge, recommended for the rest). The revealed card resolves its Doomed, its When Revealed effects and its Surge as a reveal does (rr.reveal, rr.surge), then it is discarded; it never enters play (so a location's Underworld takes nothing, and no card of it joins the staging area). A Surge reveals one more card in the normal way, which is staged. Not taken: no surge; the card staged first and discarded after. Basis: rr.reveal, rr.surge; no source names this card (FFG, the forum archive, rulespal, visionofthepalantir, Hall of Beorn searched). Under Readings to confirm.
+- `06016:A:1` (span-settled for the surge, recommended for the rest). The revealed card resolves its Doomed, its When Revealed effects and its Surge as a reveal does (rr.reveal, rr.surge), then it is discarded; it never enters play (so a location's Underworld takes nothing, and no card of it joins the staging area). A Surge reveals one more card in the normal way, which is staged. Not taken: no surge; the card staged first and discarded after. Basis: rr.reveal, rr.surge; no source names this card (FFG, the forum archive, rulespal, visionofthepalantir, Hall of Beorn searched).
 - `06016:A:2` (recommended for the trigger; the attack is the card's text). Fires for each treachery revealed from the encounter deck, whatever revealed it (the staging step, a Surge, Unholy Alliance's extra card, its own `06016:A:1`); not for a shadow card turned over and not for a canceled card. The immediate attack is against the first player, from the staging area or from where the enemy is engaged (even with another player): the card names the first player. Not taken: a shadow card counts; the attack against the player the enemy is engaged with. Basis: rr.attacks-outside-the-combat-phase, faq.cancel-encounter-card.
 - `06017:A:1` (span-settled). Forced at the start of each attack (not after): the top 3 cards of every player's deck are discarded. Basis: rr.step-6-4b.
 - `06017:A:2` (recommended for the timing; the attack is the card's text). After any player's event is played (not canceled) Bane makes an immediate attack against the first player, wherever it is (staging area or engaged with any player). Not taken: it waits for the combat phase. Basis: rr.forced; docs/brief.md (Core round).
@@ -75,26 +75,6 @@ The statuses are those of the Readings bullet of `docs/scenarios/against-the-sha
 - `06031:A:1` (span-settled). Each living player raises his threat by 2 at the end of each round. Basis: the printed text.
 - `05037` to `05045` (span-settled). The readings of Peril in Pelargir apply unchanged. The enemies reach the staging area from a stack, from Unwelcome Discovery or from the encounter deck after `06013:B:1`; the lines are the same.
 - Errata (researched). None for `06011` to `06031`; the FAQ spans held name none of them (the FFG FAQ PDF URL returned HTML and was not read).
-
-## Readings to confirm
-
-- `06011:B:3`, `06012:B:3` (timing): recommended. The stage advances at once on the 4th token, in any phase. See Readings.
-- `06012:A:1` (timing): recommended. The Plot's staging-step line first acts in the next step. See Readings.
-- `06012:B:3` (count): recommended. The tokens of stage 1 do not carry over. See Readings.
-- `06014:A:2`: recommended, community discussion only. A progress or a resource token, the first player's choice. See Readings.
-- `06016:A:1` (never enters play): recommended. See Readings.
-- `06016:A:2`: recommended. Every treachery revealed from the encounter deck counts. See Readings.
-- `06017:A:2`: recommended. The attack follows the event at once. See Readings.
-- `06024:A:1`: recommended. X is the ally's Attack now. See Readings.
-- `06025:A:1`: recommended. The staging step ends. See Readings.
-- `06025:A:2`: recommended. All tokens, progress and resource. See Readings.
-- `06027:A:2`: recommended. Excess progress is lost. See Readings.
-- A Clue left in the staging area (tokens): recommended. The tokens stay on the quest card that was current. See Readings.
-- `06029:A:1`: recommended. One extra card. See Readings.
-- `06030:A:2`: recommended. A constant check. See Readings.
-- Underworld X (order, fewer cards than X): recommended. See Readings.
-- `06023:A:2`: researched (FFG forum thread only). A Clue is placed in the encounter discard pile. See Readings.
-- `06014:A:1`: span-settled against the filed reading. The Trait Underworld counts, not the keyword. See Readings.
 
 ## Engine notes
 

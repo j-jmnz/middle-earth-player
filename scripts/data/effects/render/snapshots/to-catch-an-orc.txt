@@ -1,0 +1,284 @@
+Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc; quest: 07063 Searching for Mugash; quest: 07064 The Wizard's Prize; setAside: 07024 Mugash; setAside: 07025 Mugash's Guard)
+
+## 07024 Mugash
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+07024:A:1 (front): Cannot have attachments.
+  07024:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+07024:A:2 (front): Forced: After Mugash is defeated, the first player attaches him to a hero he controls and exhausts that hero. (Counts as a Captive attachment with the text: 'Attached hero cannot ready. If attached hero leaves play, the players lose the game.')
+  07024:forced:1: Forced after an enemy is destroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the rest of the effect is carried out by the first player
+    - choose hero (you control)
+    - this enemy, out of play, attaches to the picked card as an attachment: it has no enemy text there and returns to the staging area as an enemy when that card leaves play
+    - exhaust the picked card
+  07024:constant:2: Constant
+    - this card counts as a Captive attachment while it is attached
+  07024:constant:3: Constant
+    only if all of: (this card is attached to a card) and (its host is a hero (any player controls))
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat cannotReady 1, while this card is in play
+    - its host: stat lossOnLeavingPlay 1, while this card is in play
+
+## 07025 Mugash's Guard
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+07025:A:1 (front): While a player controls a hero with Mugash attached, Mugash's Guard engages that player.
+  07025:constant:1: Constant
+    only if any of: (this card is in the staging area) or (this card is engaged with a player (that player is who "you" means in this record))
+    - (constant, does nothing when run) while this enemy is in the staging area or engaged with another player it engages the player who controls a hero with Mugash attached, at once and whatever its engagement cost
+
+07025:A:2 (front): Forced: After Mugash's Guard destroys a character, if Mugash is attached to a hero, return Mugash to the staging area.
+  07025:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if all of: (the event's other card is a enemy (any player controls) that is this card itself) and (there is a hero (any player controls) with an attachment named "Mugash" to choose)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - each enemy named Mugash lying attached to a card goes back to the staging area as an enemy (one anywhere else stays)
+
+## 07026 Methedras Orc
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07026:A:1 (front): Forced: When Methedras Orc attacks, the defending player shuffles 1 random card from his hand into his out-of-play deck.
+  07026:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player puts 1 random card of his hand, not one that cannot leave it, facedown into his out-of-play deck and shuffles the deck (nothing with an empty hand)
+
+07026:A:2 (shadow): Shadow: If this attack destroys a character, remove 1 time counter from the current quest.
+  07026:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+
+## 07027 Methedras
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07027:A:1 (front): While Methedras is the active location, each location in the staging area gets +1 Threat.
+  07027:constant:1: Constant
+    only if this card is the active location
+    - each location (any player controls) in the staging area only: stat threat 1, while this card is in play
+
+07027:A:2 (front): Forced: When Methedras leaves play as an explored location, each player Searches 3.
+  07027:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - for each player, first player first:
+      - the acting player reveals the top 3 card(s) of his out-of-play deck (all it holds; none reveals nothing): each enemy is added to the staging area, not revealed; he chooses 1 of the other cards for his hand; every other card is discarded to its owner's discard pile; the deck is not shuffled
+
+## 07028 Orc Cave
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07028:A:1 (front): Forced: After Orc Cave leaves play as an explored location, the first player Searches 5.
+  07028:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the rest of the effect is carried out by the first player
+    - the acting player reveals the top 5 card(s) of his out-of-play deck (all it holds; none reveals nothing): each enemy is added to the staging area, not revealed; he chooses 1 of the other cards for his hand; every other card is discarded to its owner's discard pile; the deck is not shuffled
+
+07028:A:2 (front): Travel: Discard the top X cards of the encounter deck to travel here. X is the number of players in the game. Add each Orc enemy discarded this way to the staging area.
+  07028:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard the number of players card(s) from the top of the encounter deck
+    - add the discarded Orc enemies to the staging area
+
+## 07029 Mugash's Lair
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07029:A:1 (front): Forced: At the beginning of the encounter phase, reveal the top card of each player's out-of-play deck. Add each revealed enemy to the staging area and discard the rest.
+  07029:forced:1: Forced when a phase begins
+    only if it is the Encounter phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - for each player, first player first:
+      - the acting player reveals the top 1 card(s) of his out-of-play deck (all it holds; none reveals nothing): each enemy is added to the staging area, not revealed; every other card is discarded to its owner's discard pile; the deck is not shuffled
+
+07029:A:2 (shadow): Shadow: Defending player discards an attachment he controls.
+  07029:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control) that a player controls (not an encounter attachment)
+    - discard the picked card
+
+## 07030 Orc Territory
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07030:A:1 (front): When Revealed: Each player searches the encounter deck and discard pile for a location and adds it to the staging area. If the total Threat in the staging area is less than the total Willpower of all characters committed to the quest, each Orc enemy engaged with a player makes an immediate attack.
+  07030:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+    - then, if the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area (checked when this step runs, after the steps above; not tied to whether they did anything): each enemy engaged with a player (not one in the staging area) with the trait Orc makes an immediate attack, each dealt a shadow card of its own
+
+## 07038 Orc Skirmisher
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07038:A:1 (front): Forced: After Orc Skirmisher engages a player, that player must either deal 3 damage to a character he controls, or remove 1 time counter from the current quest.
+  07038:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    - the acting player chooses one of:
+      * option "damage":
+        - choose character (you control)
+        - deal 3 damage to the picked card
+      * option "time" (only if 0 is less than resources of the current quest stage):
+        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+
+07038:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack.
+  07038:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack 1, until the end of the attack
+
+## 07039 Orc Hunter
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07039:A:1 (front): When Revealed: Either reveal an additional encounter card, or remove 1 time counter from the current quest.
+  07039:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    - the first player chooses one of:
+      * option "reveal":
+        - the acting player reveals an encounter card
+      * option "time" (only if 0 is less than resources of the current quest stage):
+        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+
+07039:A:2 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
+  07039:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
+
+## 07040 Orc Hound
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07040:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+07040:A:2 (front): Forced: After Orc Hound engages a player, that player must exhaust a character he controls.
+  07040:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 07041 Orc Hunting Party
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07041:A:1 (front): When Revealed: Deal each Orc enemy in play a shadow card. Each Orc enemy gets -15 engagement cost until the end of the round. If there are no Orc enemies in the staging area, Orc Hunting Party gains surge.
+  07041:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Orc enemy in play (in the staging area or engaged) is dealt 1 shadow card from the encounter deck (in a Travel line this is a cost: the players cannot travel unless the encounter deck holds a card for each of them)
+    - for each Orc enemy (any player controls) or in the staging area:
+      - the picked card: stat engagementCost -15, until the end of the round
+    - then, if not (there is a Orc enemy (any player controls) in the staging area only to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+## 07053 Prowling Wolf
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07053:A:1 (front): While engaged with a player, Prowling Wolf gets +1 Attack for each location in the staging area.
+  07053:constant:1: Constant
+    only if this card is engaged with a player (that player is who "you" means in this record)
+    - this card: stat attack the number of location (any player controls) in the staging area only, while this card is in play
+
+07053:A:2 (shadow): Shadow: Defending player exhausts a character he controls.
+  07053:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 07054 Broken Lands
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07054:A:1 (front): While Broken Lands is in the staging area, progress cannot be placed on locations in the staging area.
+  07054:constant:1: Constant
+    only if this card is in the staging area
+    - each location (any player controls) in the staging area only: stat noProgressPlaced 1, while this card is in play
+
+07054:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each location in the staging area.
+  07054:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack the number of location (any player controls) in the staging area only, until the end of the attack
+
+## 07055 Take Cover!
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07055:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+07055:A:2 (front): When Revealed: Either deal 1 damage to each exhausted character, or remove 1 time counter from the current quest.
+  07055:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    - the first player chooses one of:
+      * option "damage" (only if there is a exhausted character (any player controls) to choose):
+        - deal 1 damage to each exhausted character (any player controls)
+      * option "time" (only if 0 is less than resources of the current quest stage):
+        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+
+## 07062 Orders from Orthanc
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+07062:A:1 (front): Setup: Each player removes the top 20 cards of his deck and places them aside, as an out-of-play deck. The first player takes Mugash plus 1 Mugash's Guard for each other player in the game and randomly shuffles one facedown into each player's out-of-play deck. Place any remaining copies of Mugash's Guard aside, out of play.
+  07062:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each player moves the top 20 cards of his deck (all of it when fewer) into his out-of-play deck, a facedown stack of his own: out of play, owned by him, no draw and no discard
+    - the set-aside 07024 and one set-aside 07025 for each other player are dealt one to each player at random and shuffled facedown into that player's out-of-play deck (the copies left stay set aside)
+
+07062:B:1 (back): When Revealed: Each player searches the encounter deck for a Mountain location and adds it to the staging area. Shuffle the encounter deck. Then, advance to stage 2.
+  07062:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one Mountain location in the encounter deck and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+    - advance to the next quest stage
+
+## 07063 Searching for Mugash
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+07063:B:1 (back): Time 2.
+  07063:constant:1: Constant
+    - Time 2: when this card is revealed, 2 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+  07063:constant:2: Constant
+    - the table: stat trackQuestProgress (the engine notes the progress placed on the current quest card until the end of the phase, so a later effect can take it off again; it is not a win condition: the last stage's win is the engine's own rule) 1, while this card is in play
+
+07063:B:2 (back): Forced: After the last time counter is removed from this stage, shuffle the discard pile into the encounter deck and reveal 2 encounter cards per player. Place 2 time counters on this stage.
+  07063:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - the acting player reveals the number of players x 2 encounter cards, one after the other, each in a staging of its own
+    - place 2 resource tokens on this card
+
+07063:B:3 (back): Response: After questing successfully, cancel all progress that would be placed on this stage. Then, place 1 time counter on this stage. Or, if Mugash is in play, advance to stage 3.
+  07063:response:1: Response after the players quest successfully (event happened to the controller)
+    - the acting player chooses one of:
+      * option "time" (only if progress was placed on the current quest card this quest phase (the quest card itself, the overflow of an explored active location included)):
+        - the progress placed on the current quest card since the phase began, the overflow of an explored active location included, is taken off it and forgotten
+        - place 1 resource tokens on this card
+      * option "advance" (only if there is a card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose):
+        - advance to the next quest stage
+
+## 07064 The Wizard's Prize
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+07064:B:1 (back): Time 3.
+  07064:constant:1: Constant
+    - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+07064:B:2 (back): Forced: After the last time counter is removed from this stage, return Mugash to the staging area and reveal X encounter cards. X is the number of players in the game minus 1. Place 3 time counters on this stage.
+  07064:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy named Mugash lying attached to a card goes back to the staging area as an enemy (one anywhere else stays)
+    - the acting player reveals the number of players - 1 encounter cards, one after the other, each in a staging of its own
+    - place 3 resource tokens on this card
+
+07064:B:3 (back): Progress cannot be placed on this stage unless Mugash is attached to a hero.
+  07064:constant:2: Constant
+    only if not (there is a hero (any player controls) with an attachment named "Mugash" to choose)
+    - this card: stat noProgressPlaced 1, while this card is in play
+
+07064:B:4 (back): If the players defeat this stage, they win the game.
+  07064:questResolution:1: Quest resolution
+    - the players win the game
+
+(rendered pieces: 171 by template, 0 as JSON)

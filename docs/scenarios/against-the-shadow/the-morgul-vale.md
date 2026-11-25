@@ -106,39 +106,6 @@ Against the Shadow part 9 (pack `TMV`, MEC23), standalone only, on Easy and Norm
 - `05061:A:2` (Power of Mordor and the Captains) (researched). The count includes To the Tower and the Captain in the staging area; those two are not shuffled into the deck (they cannot leave play or the staging area) and the reveals equal the count; set-aside cards are not counted. Not taken: the count leaves them out. Basis: `rr.cannot`; thread 126185 (jjeagle quoting Caleb) and the blog. Sources: https://ffg-forum-archive.entropicdreams.com/topic/126185-question-about-murzag https://visionofthepalantir.com/2018/05/07/the-morgul-vale/.
 - Mordor Elite (05056 to 05061) and Creatures of the Forest (05049 to 05051) (span-settled). Their rows are in `the-siege-of-cair-andros.md` and `into-ithilien.md`.
 
-## Readings to confirm
-
-Each is a `recommended` reading, or one settled only by community discussion or relayed second-hand. Full rows under Readings.
-
-- `06144:B:1` (defeated): a defeated Captain goes to the encounter discard pile and can come back after a reshuffle (community only).
-- `06144:B:1` (advance): the stage advances before the Responses to the destruction (two community posts).
-- `06144:B:1` (no quest points): progress never advances a stage with no quest points.
-- `06147:A:1`: To the Tower counts in The Power of Mordor's count and is not shuffled (blog ruling).
-- `06147:A:2` (threat): a removed Faramir hero keeps its threat on the dial.
-- `06156:A:1` (no token): with no token The White Bridge has 0 quest points and stays active until a token is placed.
-- `06148:A:1` (redirect first): the Bodyguard takes the damage before the Nazgûl's reduction (community, not unanimous).
-- `06148:A:1` (which Bodyguard, spill): the engine picks the Bodyguard with the most damage and excess damage is lost.
-- `06148:A:1` (moved and placed damage): moved or placed damage counts as dealt and goes to a Bodyguard (the designer's answer, relayed second-hand by one forum poster).
-- `06148:A:2` (two or more players): the current attack ends and a new one starts (official answer relayed second-hand; later posters disagree).
-- `06148:A:2` (Forced "after attacks"): the Forced effects of Murzag and Lord Alcaron hear both attacks.
-- `06149:A:1` (its own shadow): a card dealt in the middle of an attack stays facedown for the next one.
-- `06149:A:2` (already undefended): no token is asked for.
-- `06151:A:1` (defending player): the player attacked, also when a Sentinel defended (single community answer).
-- `06151:A:1` (reveal): a full reveal, a treachery resolves and a location is staged (the designer's answer, relayed second-hand twice on the FFG forum archive).
-- `06151:A:1` (shadow card): the enemy Murzag reveals is dealt no shadow card (the designer's answer, relayed second-hand).
-- `06151:A:1` (attacked player eliminated): the card is still revealed, an enemy is staged, a treachery resolves, and its Surge resolves (agent recommendation; no source).
-- `06157:A:1` (reveal with no card): the reveal is not offered when no card can be revealed (agent recommendation; no source).
-- `06152:A:1` (Feint, canceled): a token placed at the start of an attack stays if the attack stops.
-- `06152:A:2` (trigger, Feint): the condition is checked at the flip, and a Feinted Alcaron does not trigger (community only).
-- `06152:A:2` (several shadow cards): each blank card is its own trigger, and the additional attacks follow one another.
-- `06155:A:1` (order): the player who holds the first player token after Refresh chooses first.
-- `06153:A:2` (per instance): each damage instance is cut to 1, with no limit per round (community).
-- `06153:A:2` (moved and placed): damage moved or placed on the Nazgûl is dealt and is cut to 1 (the designer's answer, relayed second-hand by one forum poster).
-- `06155:A:2`: one token for the attack, however many characters it destroys.
-- `06158:A:2`: each player chooses for himself; a player with fewer than 3 cards may choose the discard.
-- `06160:A:1` (surge chain): a repeated pass that changes nothing ends the chain.
-- `05061:A:2`: the Captain and To the Tower count and stay.
-
 ## Engine notes
 
 The new verbs and flags are in the family `pelargir` (`src/catalog/families/pelargir.ts`, `src/rules/families/pelargir/vale/` and the files of the family named below; the render templates are in `scripts/data/effects/render/families/pelargir.ts`).

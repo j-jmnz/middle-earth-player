@@ -133,6 +133,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142047:A:1 (front): When Revealed: Uruk from Mordor makes an attack against the first player.
   142047:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - this card attacks the first player now, from the staging area, dealt a shadow card
 
 142047:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, attacking enemy makes an additional attack.

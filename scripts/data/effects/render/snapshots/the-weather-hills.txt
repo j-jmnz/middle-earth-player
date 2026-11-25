@@ -117,7 +117,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
     - Time 4: when this card is revealed, 4 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
 
 09032:A:2 (front): Forced: After the last time counter is removed from this quest card, each player deals 4 damage to a hero he controls. Then, place 4 time counters on this quest card.
-  09032:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card)
+  09032:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:

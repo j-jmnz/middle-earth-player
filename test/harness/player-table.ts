@@ -103,9 +103,10 @@ export function atDefense(tab: Table, state: ScenarioState = tab.state): Run {
 export const attacking = (state: ScenarioState): ScenarioState => ({ ...withMode(state, "playerAttacks"), window: { kind: "playerAttack" }, activeSeat: 0 });
 
 /**
- * The harness's send (scene.ts), save one cause problem it skips: a step whose cause names a printed line "which is not in the ledger". The packs
- * these tests cover (Over Hill and Under Hill, The Wilds of Rhovanion, The Treason of Saruman) have no entry in data/printed yet, so the check
- * cannot verify that line. Every other cause problem still fails the intent, and a refusal throws IntentRefused.
+ * The harness's send (scene.ts), save one cause problem it skips: a step whose cause names a printed line "which is not in the ledger". The
+ * player cards of many packs (A Shadow in the East, A Storm on Cobas Haven, Across the Ettenmoors, Escape from Mount Gram and others) have no
+ * entry in data/printed, so the check cannot verify their lines; with the check on, over a hundred of these tests fail. Every other cause problem
+ * still fails the intent, and a refusal throws IntentRefused. A pack gets its ledger entry, and its test moves to `send`, once its cards are read from the scans.
  */
 export function sendUnledgered(run: Run, intent: PlayerIntent, ctx: ReduceContext): Run {
   const result = accepted(run.state, intent, ctx);

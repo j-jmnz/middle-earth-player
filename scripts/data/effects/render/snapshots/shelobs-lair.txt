@@ -261,7 +261,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144060:A:1 (front): When Revealed: Attach to a hero you control and exhaust that hero. (Counts as a Condition attachment with the text: "Limit 1 per hero. Treat attached hero's text box as blank, except for Traits. Attached hero cannot ready.").
   144060:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - attach this card to a hero the acting player controls that carries no copy of this card (the acting player, the first player in a When Revealed, chooses it; with none this card stays where it is)
+    - attach this card to a hero the acting player controls that carries no copy of this card (the acting player chooses it; in a When Revealed, that is the player who revealed it; with none this card stays where it is)
     - exhaust its host
   144060:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
@@ -390,6 +390,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144072:B:3 (back): The players cannot defeat this stage unless both Shelob and Gollum are in the victory display. If the players defeat this stage, they win the game.
   144072:constant:2: Constant
     only if any of: (the card with code 144040 is not in the victory display) or (the card with code 144075 is not in the victory display)
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
     - the players cannot defeat this stage while this holds
 
 (rendered pieces: 254 by template, 0 as JSON)

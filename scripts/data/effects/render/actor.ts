@@ -13,11 +13,18 @@ const ATTACK_EVENTS: ReadonlySet<string> = new Set(["attacks", "attackResolved"]
 // Keyed to the card itself (the condition names an ally the actor controls with the card's own name), so a quest card or a location whose condition reads another ally keeps the shared reading.
 const controllerOnly = (effect: Obj, ctx: Ctx): boolean => ctx.cardName !== undefined && JSON.stringify(effect.condition ?? null).includes(`"type":"ally","control":"you","names":[${JSON.stringify(ctx.cardName)}]`);
 
+const makesFirstPlayerAct = (step: unknown): boolean => {
+  const ins = step as Obj | null;
+  return ins !== null && typeof ins === "object" && (ins.who === "firstPlayer" || (ins.verb === "ForEachPlayer" && ins.order === "firstFirst" && ins.limit === 1 && ins.seats === undefined));
+};
+
 // A line saying who the acting player is, or "" when the record's fields do not decide it.
 export function actorNote(effect: Obj, ctx: Ctx): string {
   const timing = effect.timing;
   const trigger = typeof effect.trigger === "string" ? effect.trigger : "";
   const encounterCard = ctx.cardType !== undefined && !PLAYER_TYPES.has(ctx.cardType);
+  // A When Revealed record that itself makes the first player act: `who: firstPlayer` on a step, or a ForEachPlayer with no seats filter (a filter such as engaged or guardian does not start at the first player) that starts with the first player and stops after one.
+  if (timing === "whenRevealed" && encounterCard && Array.isArray(effect.instructions) && effect.instructions.some(makesFirstPlayerAct)) return "the acting player is the first player (the record names the first player, not the player who revealed the card)";
   if (timing === "shadow") return "the acting player is the defending player (the player the attack is against)";
   if ((timing === "forced" || timing === "triggered") && encounterCard) {
     if (ATTACK_EVENTS.has(trigger)) return "the acting player is the defending player (the player the attack is against)";
@@ -25,6 +32,8 @@ export function actorNote(effect: Obj, ctx: Ctx): string {
     if (PHASE_EVENTS.has(trigger)) return "the acting player is the first player (a phase has no player of its own)";
     if (trigger !== "") return "the acting player is the player the event happened to (the first player when the event names no player)";
   }
+  // A quest stage belongs to no player: what its Constant reads of "the actor" is the first player (the player whose stage it is while the stages are split).
+  if (timing === "constant" && ctx.cardType === "quest" && /"kind":"(controls|handSize|anyHand)"|"hand":true/.test(JSON.stringify(effect))) return "the acting player is the first player (a quest stage belongs to no player; while the stages are split between the players, the player whose stage it is)";
   if (timing === "action" && ctx.cardType !== undefined && SHARED_TYPES.has(ctx.cardType)) return controllerOnly(effect, ctx) ? "only the player who controls it may trigger it, as for any ally; the acting player is that player" : "any player may trigger it; the acting player is the one who does";
   return "";
 }

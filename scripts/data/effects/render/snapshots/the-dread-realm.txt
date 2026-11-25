@@ -131,6 +131,7 @@ Scenario piles that place cards with no record (quest: 10150 The Catacombs of Ca
 
 101164:A:1 (front): When Revealed: Attach Death and Calamity to the current quest. Then, the first player reanimates the top X cards of his deck, where X is the number of copies of Death and Calamity in play.
   101164:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card is attached to the current quest card (the side quest that is the current quest, else the main quest card) and leaves with it
     - then, if this card is attached to a card (checked when this step runs, after the steps above; not tied to whether they did anything): the first player reanimates the top X card(s) of their deck, X being the number of card (any player controls) or in the staging area or the active location, named "Death and Calamity", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not: each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward

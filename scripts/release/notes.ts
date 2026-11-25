@@ -1,6 +1,6 @@
 import { BUNDLE_ID, sourceUrl } from "./sideload-source.ts";
 import { joinNames } from "./reach.ts";
-import type { Change, CommitType } from "./version.ts";
+import { plainMarkdown, type Change, type CommitType } from "./version.ts";
 
 // The release notes, written from the commits since the last release (docs/agents/release-standards.md, Release notes).
 // Pure: plan.ts gathers the commits, the versions and the APK's checksums.
@@ -37,16 +37,16 @@ const SECTIONS: readonly { types: readonly (CommitType | undefined)[]; title: st
   { types: ["repo", undefined], title: "Project (docs, tests, tooling, data refreshes)" },
 ];
 
-/** The link that adds the app to Obtainium, which then installs each release from the Releases page (README, Install). The
+/** The link that adds the app to Obtainium, which then installs each release from the Releases page (guide/install.md, Install). The
  * Android package is the iOS bundle id. */
 export function obtainiumUrl(repository: string): string {
   const app = { id: BUNDLE_ID, url: `https://github.com/${repository}`, author: repository.split("/")[0], name: "Middle-Earth Player" };
   return `https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/${encodeURIComponent(JSON.stringify(app))}`;
 }
 
-/** A change's line in its section: its summary, then the issues it closes and the ones it refers to (GitHub links each `#n`). */
+/** A change's line in its section: its summary as plain text (plainMarkdown), then the issues it closes and the ones it refers to (GitHub links each `#n`). */
 function changeLine(change: Change): string {
-  const parts = [change.summary];
+  const parts = [plainMarkdown(change.summary)];
   if (change.closes.length > 0) parts.push(`closes ${change.closes.map((n) => `#${n}`).join(", ")}`);
   if (change.refs.length > 0) parts.push(`see ${change.refs.map((n) => `#${n}`).join(", ")}`);
   return `- ${parts.join(" · ")}`;
@@ -54,7 +54,7 @@ function changeLine(change: Change): string {
 
 export function renderNotes(input: NotesInput): string {
   const out: string[] = [];
-  const warnings = input.changes.flatMap((change) => change.breaking);
+  const warnings = input.changes.flatMap((change) => change.breaking.map(plainMarkdown));
   if (input.previousTag && input.reach?.all) warnings.push("Open games of any scenario may ask you to continue or restart; the campaign log is kept.");
   else if (input.previousTag && input.reach && input.reach.names.length > 0) warnings.push(`Open games of ${joinNames(input.reach.names)} may ask you to continue or restart; the campaign log is kept.`);
   if (!input.previousTag) out.push("The first release.", "");
@@ -68,7 +68,7 @@ export function renderNotes(input: NotesInput): string {
     "",
     "- Android: download the `.apk` below and open it. Allow your browser or file manager to install unknown apps when it asks. It installs over an earlier release and keeps your campaigns.",
     `- Android, with automatic updates: install [Obtainium](https://obtainium.imranr.dev), then tap [Add to Obtainium](${obtainiumUrl(input.repository)}) on your phone, or add \`https://github.com/${input.repository}\` in Obtainium yourself. It installs each new release over the last and keeps your campaigns.`,
-    `- iPhone and iPad: in SideStore or AltStore, add the source \`${sourceUrl(input.repository)}\` and install Middle-Earth Player from it, or install the \`.ipa\` below. It is signed with your own Apple ID, updates over an earlier release and keeps your campaigns. The README (Install) has the steps.`,
+    `- iPhone and iPad: in SideStore or AltStore, add the source \`${sourceUrl(input.repository)}\` and install Middle-Earth Player from it, or install the \`.ipa\` below. It is signed with your own Apple ID, updates over an earlier release and keeps your campaigns. The [install guide](https://github.com/${input.repository}/blob/main/guide/install.md) has the steps.`,
     ...(input.desktopMissing
       ? ["- Windows, Mac and Linux: the desktop app is not part of this release, because its build did not finish. The next release brings it."]
       : [

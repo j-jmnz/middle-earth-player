@@ -118,29 +118,6 @@ Statuses are those of `docs/scenarios/against-the-shadow.md` (Readings). Format:
 
 - `easy` (researched). Easy mode removes 2 Conflict at the Crossroads, 2 Orc Ambusher, 2 Brutal Uruk and 3 Orc Rabble. Basis: QC; the Easy Mode sheet in `data/rules/` is checked in Build against the scenario's `easy` counts. Source: QC.
 
-## Readings to confirm
-
-Each is a `recommended` reading, or one settled only by community discussion. Full rows under Readings.
-
-- `hidden.take-empty-both`: with both piles empty no hidden card is taken, and a travel cost of one cannot be paid.
-- `hidden.shadow-vs-arsonist`: Orc Arsonist engaged by a hidden turn deals its shadow cards at once.
-- `06117:A:1` (reveal): a treachery revealed by the Setup resolves its When Revealed.
-- `06117:B:2` (no hidden card): a player with none may choose either option.
-- `06118:A:1` (control lines): Captured! keeps control from returning to the first player.
-- `06118:A:1` (hidden): the players turn in player order, one card at a time.
-- `06118:B:3` and its two-card cost: the turn at 5 hidden cards happens as soon as the fifth is held, after a whole instruction.
-- `06121:A:1` (resolve), `06130:A:3` (attack): a newly engaged enemy joins this phase's unresolved attackers.
-- `06129:A:1` (enemy), (treachery), (Scourge of Mordor and Conflict): When Revealed resolves for a turned card, surge does not.
-- `06131:A:1` (second copy): two copies in one phase add the engaged Orcs' Threat once, not twice.
-- `06130:A:1` (empty deck), this deck only: a surge card revealed when the deck and the discard pile hold nothing else finds no card, and the chain ends.
-- `06132:A:3`, `06133:A:3` (controller eliminated): the ally is discarded with the eliminated player's cards and the players lose.
-- `06123:A:1`: The Cross-roads gives Siege in the staging area too.
-- `06123:A:3`: a Travel that needs a hidden card cannot be paid with both piles empty.
-- `06128:A:3`: the discarded hidden card is chosen at random and not resolved.
-- `06132:A:1`, `06133:A:1`: control lines wait while Captured! holds the allies.
-- `06132:A:2` (card), (none): Faramir turns any player's hidden card, and is not offered with none.
-- `hidden.order-vs-shadow`: the engine turns before it deals shadow cards.
-
 ## Engine notes
 
 The hidden cards are in the family `pelargir` (`src/catalog/families/pelargir.ts`, `src/rules/families/pelargir/hidden.ts`, `hidden-turn.ts`, `hidden-sweep.ts`; the render templates are in `scripts/data/effects/render/families/pelargir.ts`).

@@ -1,0 +1,187 @@
+{
+  "id": "the-antlered-crown",
+  "name": "The Antlered Crown",
+  "number": 6,
+  "stages": [
+    "08147",
+    "08148",
+    "08149"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Antlered Crown",
+      "count": 24
+    },
+    {
+      "name": "Dunland Warriors",
+      "count": 2
+    },
+    {
+      "name": "Dunland Raiders",
+      "count": 2
+    }
+  ],
+  "cards": [
+    {
+      "code": "08153",
+      "normal": 4,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "08154",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "08155",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "08156",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "08157",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "08158",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "08159",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "08160",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "08161",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "07049",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "07045",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "08147",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "08148",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "08149",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "08155",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "08157",
+      "normal": 1,
+      "easy": 1,
+      "pile": "activeLocation"
+    },
+    {
+      "code": "08150",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "08151",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "08152",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "07046",
+      "normal": 2,
+      "easy": 2,
+      "pile": "setAside"
+    },
+    {
+      "code": "07047",
+      "normal": 2,
+      "easy": 0,
+      "pile": "setAside"
+    },
+    {
+      "code": "07048",
+      "normal": 3,
+      "easy": 3,
+      "pile": "setAside"
+    },
+    {
+      "code": "07042",
+      "normal": 3,
+      "easy": 3,
+      "pile": "setAside"
+    },
+    {
+      "code": "07043",
+      "normal": 2,
+      "easy": 2,
+      "pile": "setAside"
+    },
+    {
+      "code": "07044",
+      "normal": 2,
+      "easy": 0,
+      "pile": "setAside"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q04.9",
+    "dragnEasy": "E04.9",
+    "hobSlug": "The-Antlered-Crown"
+  }
+}

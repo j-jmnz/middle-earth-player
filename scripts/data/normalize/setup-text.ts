@@ -166,6 +166,24 @@ export type SetupStep =
   | "buildUnderworldDeck" // The Steward's Fear, "Create the underworld deck": `codes` the Streets of Gondor and Brigands enemies and the three Clue objectives (ats.setup-the-stewards-fear-underworld-deck)
   | "hideOneAside" // The Steward's Fear, "Shuffle all Villain cards and randomly set one aside, out of play, without looking at it. Remove the others from the game" (and the Plot cards): `codes` the cards it chooses from, `count` the ones removed
   | "eachPlayerChoosesEnemyAndLocation" // Assault on Osgiliath, "Each player chooses 1 enemy and 1 unique location and add them to the staging area"
+  // The Ring-maker (scripts/data/normalize/setup-the-ring-maker.ts).
+  | "eachPlayerAddsTraitEnemy" // The Fords of Isen, "Each player searches the encounter deck for 1 different Dunland enemy and adds it to the staging area": `trait` the enemies' trait
+  | "eachPlayerEngagesTraitEnemy" // The Dunland Trap, "Each player searches the encounter deck for a Boar Clan enemy and puts it into play engaged with him": `trait` the enemies' trait
+  | "createOutOfPlayDecks" // To Catch an Orc, "Each player removes the top 20 cards of his deck and places them aside, as an out-of-play deck": `count` the cards (rm.out-of-play-deck)
+  | "shuffleIntoOutOfPlayDecks" // To Catch an Orc, "The first player takes Mugash plus 1 Mugash's Guard for each other player ... and randomly shuffles one facedown into each player's out-of-play deck": `codes` Mugash and his Guard (rm.mugash-player-card-backs)
+  | "revealPlayersLessOne" // Into Fangorn, "Reveal X encounter cards where X equals the number of players in the game minus 1"
+  | "buildRavenDeck" // The Antlered Crown, "Create the Raven deck (see insert) and set it next to the quest deck": `codes` the enemies of Dunland Warriors and Dunland Raiders (rm.raven-deck)
+  | "eachPlayerChoosesRavenEnemy" // The Antlered Crown, "Each player chooses 1 different enemy from the Raven deck and adds it to the staging area"
+  | "shuffleRavenDeck" // The Antlered Crown, "Shuffle the encounter deck and Raven deck"
+  // The Haradrim cycle (scripts/data/normalize/setup-haradrim.ts).
+  | "putCopyEngagedEachPlayer" // Escape from Umbar, "Each player adds 1 different location ... and puts 1 copy of Umbar Sentry into play engaged with him": `codes` the enemy, `count` the copies
+  | "setTemperature" // Desert Crossing, "Place the heat tracker next to the quest deck and set the temperature to 10": `count` the temperature (hrd.heat-tracker)
+  | "moveHeroesToStaging" // The Long Arm of Mordor, "Move each hero to the staging area"
+  | "takeObjectiveHero" // The Long Arm of Mordor, "Each player takes control of an objective-hero and adds 2 resources to its resource pool": `codes` the four objective-heroes, `resources` the resources (hrd.objective-heroes)
+  | "heroesInStagingAreaBlank" // The Long Arm of Mordor, the lasting effect on heroes in the staging area (hrd.heroes-in-the-staging-area)
+  | "createOrcsArea" // Race Across Harad, "Create the Orc's area with a second quest deck consisting of stage 1C, 2C, 3C, and 4C as well as Uruk Chieftain": `codes` the four stages and the Chieftain (hrd.prepare-the-orcs-area)
+  | "revealRandomAsideObjective" // The Black Serpent, "The first player randomly selects 1 set aside Harad objective, reveals it, and adds it to the staging area": `codes` the three Harad objectives (hrd.guarded-x)
+  | "captureAllyFromDeck" // The Dungeons of Cirith Gurat, "each player discards cards from the top of his deck until an ally that is not in play is discarded and attaches that ally to an unattached enemy in the staging area" (hrd.captives-of-cirith-gurat)
   | "shuffleAsideBack"; // "Then shuffle 1 'Sacked!' card per player back into the encounter deck" (Shadows of Mirkwood), "... 1 copy of A Foe Beyond per player ..." (Dwarrowdelf): `count` cards, `players` for each player
 
 export type ParsedSetup = { clauses: SetupClause[]; unread: string[] };
@@ -305,7 +323,8 @@ function readDreamChaser(sentence: string, names: NameIndex): SetupClause[] | nu
     const codes = [...named(match[1]), ...named(match[2])];
     return codes.length < 2 ? null : [step("takeControl", { codes })];
   }
-  if ((match = /^The first player takes control of (.+)$/i.exec(sentence))) {
+  // Trouble in Tharbad prints "The first player takes control of Nalir, as an ally."; The Nîn-in-Eilph and The Antlered Crown print the name alone.
+  if ((match = /^The first player takes control of (.+?)(?:, as an ally)?$/i.exec(sentence))) {
     const codes = named(match[1]);
     return codes.length === 0 ? null : [step("takeControl", { codes })];
   }

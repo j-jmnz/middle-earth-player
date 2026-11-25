@@ -73,7 +73,7 @@ export function groups(): Group[] {
     { title: "Phases", note: "STATUS.md, then the active phase file.", files: ["docs/phases/STATUS.md", ...markdownIn("docs/phases", (name) => name === "STATUS.md")] },
     { title: "Live plans", note: "Read when a task names the plan.", files: markdownIn("docs/plans") },
     { title: "Handovers", note: "Open work; read when a task names it.", files: markdownIn("docs/handover") },
-    { title: "For players", note: "Written for players, not agents: read it only when the task changes it.", files: ["README.md"] },
+    { title: "For players", note: "Written for players, not agents: read it only when the task changes it.", files: ["README.md", ...markdownIn("guide")] },
   ];
 }
 

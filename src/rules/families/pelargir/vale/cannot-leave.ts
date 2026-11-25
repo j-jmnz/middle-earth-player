@@ -1,5 +1,5 @@
 // Rules: rr.cannot, rr.destroy, rr.in-play-and-out-of-play, ats.captain-enemies (data/rules/entries.json); ledger lines 06144:B:1, 06145:B:1, 06146:B:2.
-// "Murzag cannot leave play unless destroyed": while its stage is current a Captain holds `cannotLeavePlay` (the stage's constant, with the Captain as holder). The rule that no player is offered a target whose effect cannot happen holds it in three places:
+// "Murzag cannot leave play unless destroyed": while its stage is current a Captain holds `cannotLeavePlay` (the stage's constant, with the Captain as holder). The rule that no player is offered a target whose effect cannot happen holds it in three places (a card held in a hand is kept by families/ring-maker/hand.ts):
 // 1. A Pick that feeds a verb taking the card out of play any way but destruction (a discard, a shuffle or a return to a deck or hand, the victory display, a removal from the game, a placing under another card) leaves the Captain out (`leavesPlayPicked`, read by interpret/pick.ts), so an ability with no other
 //    target is not offered. Returning it to the staging area, or engaging it, is not leaving play.
 // 2. The staging area shuffled into the encounter deck leaves it where it is, though it still counts (families/pelargir/staging.ts).
@@ -13,6 +13,7 @@ import { printedOf } from "../../../core/printed.ts";
 import type { ScenarioState } from "../../../core/state.ts";
 import { flagged, inPlay, updateCard } from "../../../core/state.ts";
 import { moveCard } from "../../../core/zones.ts";
+import { heldInHand, leavesHandPicked } from "../../ring-maker/hand.ts";
 import type { ReduceContext } from "../../../interpret/interpret.ts";
 import { effectsOf } from "../../../windows/listen.ts";
 
@@ -46,18 +47,35 @@ function takesPickedOut(instruction: Instruction): boolean {
   }
 }
 
-/** Whether the instructions that follow a Pick (up to the next Pick) take the card it chose out of play without destroying it: the pick then leaves out a card that holds `cannotLeavePlay`. */
-export function leavesPlayPicked(following: readonly (Instruction | undefined)[]): boolean {
+// The walk behind both readers: `eachBody` reads the body of an Each, where a Pick chooses another card (a player to give to), so only the hand moves count after it.
+function followingLeaves(following: readonly (Instruction | undefined)[], eachBody: boolean): boolean {
+  let past = false;
   for (const instruction of following) {
-    if (instruction == null || instruction.verb === "Pick") return false;
-    if (takesPickedOut(instruction)) return true;
+    if (instruction == null) return false;
+    if (instruction.verb === "Pick") {
+      if (!eachBody) return false;
+      past = true;
+      continue;
+    }
+    if (leavesHandPicked(instruction)) return true;
+    if (!past && takesPickedOut(instruction)) return true;
   }
   return false;
 }
 
-/** Whether a Pick that feeds such a verb may not choose this card: it holds `cannotLeavePlay`. False in every game without the flag. */
+/** Whether the instructions that follow a Pick (up to the next Pick) take the card it chose out of play, or out of a hand, without destroying it: the pick then leaves out a card that holds `cannotLeavePlay` or `cannotLeaveHand`. */
+export function leavesPlayPicked(following: readonly (Instruction | undefined)[]): boolean {
+  return followingLeaves(following, false);
+}
+
+/** The same for the body of an Each: a Pick inside it chooses another card, so only the hand moves count after it. */
+export function leavesPlayPickedInEach(body: readonly (Instruction | undefined)[]): boolean {
+  return followingLeaves(body, true);
+}
+
+/** Whether a Pick that feeds such a verb may not choose this card: it holds `cannotLeavePlay`, or it lies in a hand and holds `cannotLeaveHand`. False in every game without the flags. */
 export function pickKeepsInPlay(state: ScenarioState, id: string): boolean {
-  return state.modifiers.length > 0 && flagged(state, id, "cannotLeavePlay");
+  return state.modifiers.length > 0 && (flagged(state, id, "cannotLeavePlay") || heldInHand(state, id));
 }
 
 // The title the current stage's records hold in play ("Murzag cannot leave play unless destroyed"): the holder named by its `cannotLeavePlay` constant.

@@ -1,7 +1,7 @@
 // Rules: rr.attachment-cards, rr.limits, rr.response, rr.explored, rr.ready, rr.action, rr.cost, rr.engaged, rr.ranged, rr.hit-points,
 // rr.sentinel, rr.engagement-check, rr.then, rr.event-cards, rr.triggered-ability, rr.play-and-put-into-play (data/rules/entries.json).
-// The Three Trials player cards, written from their card text (data/cards/TTT.json; data/printed holds no ledger for this pack, so every
-// intent goes through sendUnledgered): Idraen 08025:A:1, Feigned Voices 08027:A:1, Rúmil 08028:A:2, Elven Mail 08029:A:2 and A:3,
+// The Three Trials player cards, written from their card text (data/printed/the-ring-maker.json, read against the scans; every
+// intent goes through the ledger-checked send): Idraen 08025:A:1, Feigned Voices 08027:A:1, Rúmil 08028:A:2, Elven Mail 08029:A:1 and A:2,
 // Warden of Arnor 08031:A:1, Message from Elrond 08032:A:1, Noiseless Movement 08033:A:1, Leaf Brooch 08034:A:1.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -13,8 +13,8 @@ import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, endRound, enter, fillers, hosts, passAll, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, type Table } from "../../../test/harness/scene.ts";
+import { choices, combat, endRound, enter, fillers, hosts, passAll, play, playerTableFor, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const IDRAEN = "08025";
 const FEIGNED = "08027";
@@ -82,8 +82,8 @@ describe("Idraen (08025:A:1)", () => {
   // Idraen quests (and is exhausted) with the active location of 1 quest point (`small`) or of 9 (`loc`).
   function quested(effects: readonly Effect[], active: string) {
     const tab = table(effects, { start: "quest", heroes: [{ code: IDRAEN, seat: 0 }, { code: ARAGORN, seat: 0 }], active, deck: ["f0", "f0"] });
-    const committed = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, IDRAEN)] }, tab.ctx);
-    const run = passAll(sendUnledgered(committed, { type: "Pass" }, tab.ctx), tab.ctx);
+    const committed = send(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, IDRAEN)] }, tab.ctx);
+    const run = passAll(send(committed, { type: "Pass" }, tab.ctx), tab.ctx);
     return { tab, run, idraen: idsOf(tab, IDRAEN), location: idsOf(tab, active) };
   }
 
@@ -94,7 +94,7 @@ describe("Idraen (08025:A:1)", () => {
     expect(quest.state.cards[location]?.zone).toBe("encounterDiscard");
     expect(quest.state.cards[idraen]?.exhausted).toBe(true);
     expect(triggers(quest.state, tab)).toContain("08025:response:1");
-    const run = sendUnledgered(quest, { type: "Trigger", cardId: idraen, effectId: "08025:response:1" }, tab.ctx);
+    const run = send(quest, { type: "Trigger", cardId: idraen, effectId: "08025:response:1" }, tab.ctx);
     expect(run.state.cards[idraen]?.exhausted).toBe(false);
   });
 
@@ -108,8 +108,8 @@ describe("Idraen (08025:A:1)", () => {
   // Éowyn quests and Idraen stays ready: the location is explored, but readying a ready Idraen changes nothing, so it is not offered.
   it("08025:A:1 Idraen: not offered while she is ready", () => {
     const tab = table(EFFECTS, { start: "quest", heroes: [{ code: IDRAEN, seat: 0 }, { code: EOWYN, seat: 0 }], active: SMALL, deck: ["f0", "f0"] });
-    const committed = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, EOWYN)] }, tab.ctx);
-    const run = passAll(sendUnledgered(committed, { type: "Pass" }, tab.ctx), tab.ctx);
+    const committed = send(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, EOWYN)] }, tab.ctx);
+    const run = passAll(send(committed, { type: "Pass" }, tab.ctx), tab.ctx);
     expect(run.state.cards[idsOf(tab, SMALL)]?.zone).toBe("encounterDiscard");
     expect(run.state.cards[idsOf(tab, IDRAEN)]?.exhausted).toBe(false);
     expect(triggers(run.state, tab)).not.toContain("08025:response:1");
@@ -134,12 +134,12 @@ describe("Feigned Voices (08027:A:1)", () => {
     expect(run.state.cards[rumil]?.zone).toBe("hand");
     expect(run.state.cards[idsOf(tab, ALLY)]?.zone).toBe("play");
     expect(choices(run.state, tab).sort()).toEqual([cheap, wall].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: wall }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: wall }, tab.ctx);
     const before = run.steps.length;
     run = passAll(run, tab.ctx);
     // Only the Cheap enemy attacks: the game asks for a defender against it, not against the Wall.
     expect(run.state.window).toMatchObject({ kind: "defense", enemyId: cheap });
-    run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, ARAGORN) }, tab.ctx), tab.ctx);
+    run = passAll(send(run, { type: "DeclareDefender", defenderId: idsOf(tab, ARAGORN) }, tab.ctx), tab.ctx);
     const attackers = run.steps.slice(before).flatMap((step) => (step.kind === "strike" && step.side === "enemy" ? [step.enemyId] : []));
     expect(attackers).toEqual([cheap]);
     expect(run.state.window).not.toMatchObject({ kind: "defense" });
@@ -184,10 +184,10 @@ describe("Rúmil (08028:A:2)", () => {
     const { tab, engaged, staged, cheap, card } = rumil(effects);
     let run = play(begin(tab.state), tab, card);
     expect(triggers(run.state, tab)).toContain("08028:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: card, effectId: "08028:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: card, effectId: "08028:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([cheap, engaged].sort());
     expect(choices(run.state, tab)).not.toContain(staged);
-    run = sendUnledgered(run, { type: "Choose", optionId: engaged }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: engaged }, tab.ctx);
     expect(run.state.cards[engaged]?.damage).toBe(2);
     expect(run.state.cards[staged]?.damage ?? 0).toBe(0);
   });
@@ -199,10 +199,10 @@ describe("Rúmil (08028:A:2)", () => {
   });
 });
 
-describe("Elven Mail (08029:A:2, A:3)", () => {
+describe("Elven Mail (08029:A:1, A:2)", () => {
   // "Attach to a Noldor or Silvan character.": Legolas (Silvan hero), Erestor (Noldor hero) and Rúmil (Silvan ally) are offered; Aragorn
   // and the plain ally are not. Legolas (Tactics) pays.
-  it("08029:A:2 Elven Mail: Attach to a Noldor or Silvan character", () => {
+  it("08029:A:1 Elven Mail: Attach to a Noldor or Silvan character", () => {
     const tab = table(EFFECTS, { heroes: [{ code: LEGOLAS, seat: 0 }, { code: ERESTOR, seat: 0 }, { code: ARAGORN, seat: 0 }], allies: [{ code: RUMIL, seat: 0 }, { code: ALLY, seat: 0 }], hand: [{ code: MAIL, seat: 0 }] });
     const mail = idsOf(tab, MAIL);
     expect(hosts(tab, mail)).toEqual([idsOf(tab, LEGOLAS), idsOf(tab, ERESTOR), idsOf(tab, RUMIL)].sort());
@@ -211,7 +211,7 @@ describe("Elven Mail (08029:A:2, A:3)", () => {
 
   // "Attached character gets +2 hit points and gains sentinel.": two players; the Mail is played on Legolas (no sentinel of his own), who
   // then has 2 more hit points and may defend the attack of the enemy engaged with the other player.
-  lineSpec("08029:A:3", "Elven Mail: +2 hit points and sentinel", (effects) => {
+  lineSpec("08029:A:2", "Elven Mail: +2 hit points and sentinel", (effects) => {
     const tab = table(effects, { seats: 2, heroes: [{ code: LEGOLAS, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: MAIL, seat: 0 }], engaged: [{ code: WALL, seat: 1 }] });
     const legolas = idsOf(tab, LEGOLAS);
     const health = tab.ctx.cards.get(LEGOLAS)?.health ?? 0;
@@ -219,7 +219,7 @@ describe("Elven Mail (08029:A:2, A:3)", () => {
     expect(stat(run.state, tab, legolas, "hitPoints")).toBe(health + 2);
     run = passAll(combat(run.state, tab), tab.ctx);
     expect(run.state.window).toMatchObject({ kind: "defense", seat: 1 });
-    run = sendUnledgered({ ...run, state: { ...run.state, activeSeat: 1 } }, { type: "DeclareDefender", defenderId: legolas }, tab.ctx);
+    run = send({ ...run, state: { ...run.state, activeSeat: 1 } }, { type: "DeclareDefender", defenderId: legolas }, tab.ctx);
     expect(run.state.cards[legolas]?.exhausted).toBe(true);
   });
 });
@@ -232,7 +232,7 @@ describe("Noiseless Movement (08033:A:1)", () => {
     const [staged = "", engaged = ""] = tab.ids[WALL] ?? [];
     return { tab, cheap: idsOf(tab, CHEAP), staged, engaged, cards: tab.ids[NOISELESS] ?? [] };
   }
-  const cast = (tab: Table, card: string, enemy: string, run = begin(tab.state)) => sendUnledgered(play(run, tab, card), { type: "Choose", optionId: enemy }, tab.ctx);
+  const cast = (tab: Table, card: string, enemy: string, run = begin(tab.state)) => send(play(run, tab, card), { type: "Choose", optionId: enemy }, tab.ctx);
 
   // "Action: Choose an enemy in the staging area. That enemy does not make engagement checks this round. Then, if your threat is 20 or
   // less and this is the first time you played a copy of Noiseless Movement this round, return this card to your hand instead of
@@ -243,7 +243,7 @@ describe("Noiseless Movement (08033:A:1)", () => {
     let run = play(begin(tab.state), tab, card);
     expect(choices(run.state, tab).sort()).toEqual([cheap, staged].sort());
     expect(choices(run.state, tab)).not.toContain(engaged);
-    run = sendUnledgered(run, { type: "Choose", optionId: cheap }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: cheap }, tab.ctx);
     expect(run.state.cards[card]?.zone).toBe("hand");
     const checked = passAll(enter(run.state, tab, "engagement"), tab.ctx, { engage: true });
     expect(checked.state.cards[cheap]?.zone).toBe("staging");
@@ -300,9 +300,9 @@ describe("Message from Elrond (08032:A:1)", () => {
     let run = play(begin(tab.state), tab, card);
     expect(run.state.window?.kind).toBe("choose");
     expect(choices(run.state, tab)).toContain("seat:1");
-    run = sendUnledgered(run, { type: "Choose", optionId: "seat:1" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "seat:1" }, tab.ctx);
     expect(choices(run.state, tab)).toContain(given);
-    run = sendUnledgered(run, { type: "Choose", optionId: given }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: given }, tab.ctx);
     // The first player is the only other player: the engine takes him.
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.seats[0]?.hand).toContain(given);
@@ -324,7 +324,7 @@ describe("Message from Elrond (08032:A:1)", () => {
     const tab = { ...scene, state: withThreat(scene.state, 0, 30) };
     const given = idsOf(tab, NOISELESS);
     let run = play(begin(tab.state), tab, idsOf(tab, ELROND));
-    run = sendUnledgered(sendUnledgered(run, { type: "Choose", optionId: "seat:1" }, tab.ctx), { type: "Choose", optionId: given }, tab.ctx);
+    run = send(send(run, { type: "Choose", optionId: "seat:1" }, tab.ctx), { type: "Choose", optionId: given }, tab.ctx);
     expect(run.state.seats[0]?.hand).toContain(given);
     run = play(run, tab, given);
     expect(run.state.cards[given]?.zone).toBe("discard");

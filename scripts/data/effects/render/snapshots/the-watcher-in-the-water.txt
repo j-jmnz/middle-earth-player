@@ -5,7 +5,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 
 040076:A:1 (front): When Revealed: The first player attaches Wrapped! to a hero he controls. (Counts as a Tentacle attachment with the text: "Limit 1 per hero. Attached hero cannot exhaust or ready. At the end of the round, discard attached hero from play. Combat Action: Exhaust a hero you control without a Tentacle attachment to discard Wrapped!.")
   040076:whenRevealed:1: When revealed
-    - attach this card to a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card is discarded)
+    - attach this card to a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card stays where it is)
   040076:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Tentacle attachment while it is attached
@@ -86,7 +86,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 04066:A:2 (shadow): Shadow: Remove 1 progress token from the current quest.
   04066:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - remove 1 progress from the current quest card (all of it when it holds less)
+    - remove 1 progress from the main quest (all of it when it holds less)
 
 ## 04067 Perilous Swamp
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -98,7 +98,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 04067:A:2 (shadow): Shadow: Remove 1 progress token from the current quest.
   04067:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - remove 1 progress from the current quest card (all of it when it holds less)
+    - remove 1 progress from the main quest (all of it when it holds less)
 
 ## 04068 Makeshift Passage
 (the scenario deals it into the encounter pile; the piles place it, no record does)

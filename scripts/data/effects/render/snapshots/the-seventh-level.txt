@@ -43,7 +43,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
     - exhaust the picked card
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
   03024:constant:2: Constant
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
 
 03024:A:3 (front): Attached hero cannot attack and does not exhaust to commit to a quest.
   03024:constant:1: Constant

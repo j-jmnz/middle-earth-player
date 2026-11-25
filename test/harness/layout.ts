@@ -2,7 +2,8 @@ import type { Effect, ScenarioDefinition } from "../../src/catalog/boundary.ts";
 import { campaignScenario, scenarioDefinition, stageOf, type AnyScenarioData, type CampaignData } from "../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import { isCharacterType, printedFromCard, type PrintedCard } from "../../src/rules/core/printed.ts";
-import { blankScenario, updateCard, withThreat } from "../../src/rules/core/state.ts";
+import { blankScenario, updateCard, withThreat, type Modifier } from "../../src/rules/core/state.ts";
+import { addModifier } from "../../src/rules/core/modified-stat.ts";
 import { attachTo, moveCard, spawn, type Destination } from "../../src/rules/core/zones.ts";
 import type { ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";
 import { attachmentTargets } from "../../src/rules/player/planning.ts";
@@ -75,7 +76,7 @@ export type Layout = {
   // `"easy"`: the scenario's Easy Mode card instead (The Hunt for the Dreadnaught, 40001:B:1).
   modeCard?: true | "easy";
   // Cards attached to the first card of `to`, wherever it lies (an attachment is spawned in play and attached).
-  // `encounter`: an encounter card attached the way its own effect attaches it (zone attached, controlled by no one, not claimed): the Sack cards, the Troll Key and the Troll Purse.
+  // `encounter`: an encounter card attached the way its own effect attaches it (zone attached, controlled by no one, not claimed): the Sack cards, the Troll Key and the Troll Purse; an enemy lies as an attachment (Mugash, 07024:A:2).
   attached?: readonly { code: string; to: string; encounter?: true }[];
   // The codes of the cards committed to the quest (a hero stand-in, an ally of `play`).
   committed?: readonly string[];
@@ -83,10 +84,16 @@ export type Layout = {
   pursuit?: number;
   // A hero stand-in lies faceup as a Captive under the card with the code `under` (The Uruk-hai, 143069:A:1).
   captive?: { hero: string; under: string };
-  // Cards lying facedown under the first card with the code `to` (the enemies under The Black Gate, 144027:A:2).
-  under?: readonly { code: string; to: string }[];
+  // Cards lying facedown under the first card with the code `to` (the enemies under The Black Gate, 144027:A:2); `up` lays one faceup (the enemy under Narrow Alleyway, 16016:A:1).
+  under?: readonly { code: string; to: string; up?: true }[];
+  // Modifiers a card of the table holds from another, as its When Revealed record leaves them (the +2 and the immunity Southron Champion gives its enemy, 16040:A:1): the first card with `code` holds each from the first card with `from`, for as long as that card is in play.
+  modified?: readonly { code: string; from: string; stats: readonly (readonly [Modifier["stat"], number])[] }[];
   // The Night objective in play beside the current quest (The Stone of Erech, 50301:A:1): a code, or a code with its progress.
   night?: Entry;
+  // The time counters on the current quest stage (a Time X stage after some refresh phases: The Fords of Isen).
+  timeCounters?: number;
+  // The codes of the cards in a hand that cannot leave it, as the card's own effect leaves them (Ill Tidings, 07023:A:1).
+  heldInHand?: readonly string[];
   // The scenario's saga hero (Bilbo Baggins in The Hobbit, the loadout deals him) is a hero of the first seat, with this many resources in his pool.
   sagaHero?: { resources?: number };
   // The table notes the cards placed in the encounter discard pile, as a Setup that sets `noteEncounterDiscards` leaves it (We Must Away, Ere Break of Day: the Key and the Purse hear their own discard).
@@ -95,7 +102,7 @@ export type Layout = {
   hidden?: readonly Dealt[];
   // The locations of Assault on Osgiliath the first player controls: each is added to the staging area and taken by the family's own verb (families/pelargir/location-control.ts), so it lies in his play area, faceup and noted as controlled.
   controlled?: readonly string[];
-  // Other zones that hold a list of cards (a second deck, a named pile).
+  // Other zones that hold a list of cards (a second deck, a named pile); a seat's out-of-play deck (To Catch an Orc) lies facedown.
   piles?: Partial<Record<PileZone, readonly Entry[]>>;
 };
 
@@ -219,13 +226,13 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     const spawned = spawn(state, modeCode, { zone: "modeCard" });
     state = updateCard(spawned.state, spawned.id, { face: "B" });
   }
-  for (const [zone, items] of Object.entries(layout.piles ?? {}) as [PileZone, readonly Entry[]][]) for (const item of items) put(entry(item).code, { zone }, item);
+  for (const [zone, items] of Object.entries(layout.piles ?? {}) as [PileZone, readonly Entry[]][]) for (const item of items) put(entry(item).code, { zone }, item, zone === "outOfPlay0" || zone === "outOfPlay1" ? "down" : undefined);
   for (const attachment of layout.attached ?? []) {
     const host = idOf(state, attachment.to);
     if (attachment.encounter) {
       const spawned = spawn(state, attachment.code, { zone: "play", seat: 0 });
       state = attachTo(moveCard(spawned.state, spawned.id, { zone: "attached" }), spawned.id, host);
-      state = updateCard(state, spawned.id, { controller: null });
+      state = updateCard(state, spawned.id, { controller: null, ...(cards.get(attachment.code)?.type === "enemy" ? { asAttachment: true } : {}) });
       continue;
     }
     const spawned = spawn(state, attachment.code, { zone: "play", seat: 0 });
@@ -237,10 +244,16 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   }
   for (const hidden of layout.under ?? []) {
     const spawned = spawn(state, hidden.code, { zone: "under", locationId: idOf(state, hidden.to) }, "down");
-    state = spawned.state;
+    state = hidden.up ? updateCard(spawned.state, spawned.id, { face: "up" }) : spawned.state;
+  }
+  for (const held of layout.modified ?? []) {
+    const [holder, source] = [idOf(state, held.code), idOf(state, held.from)];
+    state = { ...state, modifiers: [...state.modifiers, ...held.stats.map(([stat, amount]): Modifier => ({ instanceId: holder, sourceId: source, stat, amount, until: "whileSourceInPlay" }))] };
   }
   if (layout.captive) state = holdCaptive(state, idOf(state, layout.captive.hero), idOf(state, layout.captive.under));
   if (layout.pursuit != null) state = { ...state, pursuit: layout.pursuit };
+  if (layout.timeCounters != null && state.questStage) state = updateCard(state, state.questStage, { resources: layout.timeCounters });
+  for (const code of layout.heldInHand ?? []) for (const id of idsOf(state, code)) state = addModifier(state, id, id, "cannotLeaveHand", 1, "endOfGame");
   for (const code of layout.committed ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { committed: true });
   // A game that deals encounter side quests in its encounter deck reads the side quest rules, as its start notes (families/wilderland/night-quest.ts markSideQuests).
   state = markSideQuests(state, cards);

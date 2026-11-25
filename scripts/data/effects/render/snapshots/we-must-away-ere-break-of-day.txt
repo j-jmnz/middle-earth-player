@@ -163,7 +163,7 @@ Scenario piles that place cards with no record (quest: 131023 An Unexpected Part
 
 131042:A:1 (front): If Troll Purse is discarded, add it to the staging area. If Troll Purse is unattached and in the staging area, attach it to a Troll enemy, if able.
   131042:constant:1: Constant
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
   131042:forced:1: Forced after a card leaves play (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card goes to the staging area (it is not revealed)
@@ -195,7 +195,7 @@ Scenario piles that place cards with no record (quest: 131023 An Unexpected Part
 
 131043:A:1 (front): If Troll Key is discarded, add it to the staging area. If Troll Key is unattached and in the staging area, attach it to a Troll enemy, if able.
   131043:constant:1: Constant
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
   131043:forced:1: Forced after a card leaves play (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card goes to the staging area (it is not revealed)

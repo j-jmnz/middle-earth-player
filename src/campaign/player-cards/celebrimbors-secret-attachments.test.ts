@@ -1,8 +1,8 @@
 // Rules: rr.action, rr.limits, rr.then, rr.search, rr.triggered-ability, rr.attachment-cards, rr.resource-match, rr.lasting-effects
 // (data/rules/entries.json).
-// Celebrimbor's Secret attachments, each printed line tested from the words on the card (data/cards/CS.json: data/printed holds no
-// ledger for this pack, so the lines are the text of data/cards): Heir of Mardil 08113:A:1, Mirror of Galadriel 08118:A:1 and A:2,
-// Cloak of Lórien 08120:A:1 to A:3, Nenya 08121:A:1 and A:2.
+// Celebrimbor's Secret attachments, each printed line tested from the words on the card (data/printed/the-ring-maker.json, read against
+// its scans, and every intent checked against that ledger): Heir of Mardil 08113:A:1, Mirror of Galadriel 08118:A:1 and A:2,
+// Cloak of Lórien 08120:A:1 and A:2, Nenya 08121:A:1 and A:2.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../effects/index.ts";
@@ -11,8 +11,8 @@ import { reduce } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { attach, choices, hosts, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, type Table } from "../../../test/harness/scene.ts";
+import { attach, choices, hosts, play, playerTableFor, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ARAGORN = "01001";
 const THEODRED = "01002";
@@ -77,11 +77,11 @@ describe("Mirror of Galadriel (08118)", () => {
     const tab = table(effects, { heroes: [{ code: GALADRIEL, seat: 0 }], attached: [{ code: MIRROR, host: GALADRIEL }], hand: [{ code: ALLY, seat: 0 }], playerDeck: deck });
     const [mirror, axe, courage, ally] = [idsOf(tab, MIRROR), idsOf(tab, AXE), idsOf(tab, "01057"), idsOf(tab, ALLY)];
     const cursor = tab.state.seedCursor;
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: mirror, effectId: "08118:action:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: mirror, effectId: "08118:action:1" }, tab.ctx);
     expect(run.state.cards[mirror]?.exhausted).toBe(true);
     expect(choices(run.state, tab)).toContain(axe);
     expect(choices(run.state, tab)).not.toContain(courage);
-    run = sendUnledgered(run, { type: "Choose", optionId: axe }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: axe }, tab.ctx);
     expect(run.state.seats[0]?.deck).toHaveLength(10);
     expect(run.state.seats[0]?.hand).toHaveLength(1);
     expect(run.state.seats[0]?.discard).toHaveLength(1);
@@ -116,8 +116,8 @@ describe("Cloak of Lórien (08120)", () => {
     expect(hosts(tab, idsOf(tab, CLOAK))).toEqual([GALADRIEL, HANDMAIDEN, OROPHIN].map((code) => idsOf(tab, code)).sort());
   });
 
-  // "Limit 1 per character.": the Handmaiden, who already wears a Cloak, is not offered a second.
-  lineSpec("08120:A:2", "Cloak of Lórien: Limit 1 per character", (effects) => {
+  // "Limit 1 per character." (the same printed paragraph): the Handmaiden, who already wears a Cloak, is not offered a second.
+  lineSpec("08120:A:1", "Cloak of Lórien: Limit 1 per character", (effects) => {
     const scene = table(effects, { heroes: [{ code: GALADRIEL, seat: 0 }], allies: [{ code: HANDMAIDEN, seat: 0 }, { code: CLOAK, seat: 0 }], hand: [{ code: CLOAK, seat: 0 }] });
     const [worn, held] = scene.ids[CLOAK] ?? [];
     const tab = attach(scene, [[worn ?? "", idsOf(scene, HANDMAIDEN)]]);
@@ -126,7 +126,7 @@ describe("Cloak of Lórien (08120)", () => {
 
   // "Attached character gets +1 Defense (+2 Defense instead if the active location has the Forest trait).": +1 with no active location
   // and with Bag End (Shire), +2 (not +3) with Old Forest Road (Forest).
-  lineSpec("08120:A:3", "Cloak of Lórien: +1 Defense, +2 instead while the active location is a Forest", (effects) => {
+  lineSpec("08120:A:2", "Cloak of Lórien: +1 Defense, +2 instead while the active location is a Forest", (effects) => {
     const defense = (active?: string): number => {
       const tab = table(effects, { heroes: [{ code: GALADRIEL, seat: 0 }], attached: [{ code: CLOAK, host: GALADRIEL }], ...(active ? { active } : {}) });
       return stat(tab.state, tab, idsOf(tab, GALADRIEL), "defense");
@@ -146,7 +146,7 @@ describe("Nenya (08121)", () => {
     expect(hosts(held, idsOf(held, NENYA))).toEqual([idsOf(held, GALADRIEL)]);
     const tab = table(effects, { heroes: [{ code: GALADRIEL, seat: 0 }], attached: [{ code: NENYA, host: GALADRIEL }], hand: [{ code: ENT, seat: 0 }] });
     const ent = idsOf(tab, ENT);
-    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: ent, payments: [{ heroId: idsOf(tab, GALADRIEL), amount: 2 }] }, tab.ctx);
+    const run = send(begin(tab.state), { type: "PlayCard", cardId: ent, payments: [{ heroId: idsOf(tab, GALADRIEL), amount: 2 }] }, tab.ctx);
     expect(run.state.cards[ent]?.zone).toBe("play");
   });
 
@@ -155,10 +155,10 @@ describe("Nenya (08121)", () => {
   lineSpec("08121:A:2", "Nenya: exhaust Nenya and Galadriel to add her Willpower to another character's", (effects) => {
     const tab = table(effects, { start: "quest", heroes: [{ code: GALADRIEL, seat: 0 }, { code: EOWYN, seat: 0 }], attached: [{ code: NENYA, host: GALADRIEL }], allies: [{ code: ALLY, seat: 0 }] });
     const [nenya, galadriel, eowyn] = [idsOf(tab, NENYA), idsOf(tab, GALADRIEL), idsOf(tab, EOWYN)];
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: nenya, effectId: "08121:action:1" }, tab.ctx);
-    for (let guard = 0; guard < 3 && run.state.window?.kind === "choose" && choices(run.state, tab).includes(galadriel) && !choices(run.state, tab).includes(eowyn); guard += 1) run = sendUnledgered(run, { type: "Choose", optionId: galadriel }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: nenya, effectId: "08121:action:1" }, tab.ctx);
+    for (let guard = 0; guard < 3 && run.state.window?.kind === "choose" && choices(run.state, tab).includes(galadriel) && !choices(run.state, tab).includes(eowyn); guard += 1) run = send(run, { type: "Choose", optionId: galadriel }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([eowyn, idsOf(tab, ALLY)].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: eowyn }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: eowyn }, tab.ctx);
     expect(stat(run.state, tab, eowyn, "willpower")).toBe(printed(tab, EOWYN, "willpower") + printed(tab, GALADRIEL, "willpower"));
     expect(run.state.cards[nenya]?.exhausted).toBe(true);
     expect(run.state.cards[galadriel]?.exhausted).toBe(true);

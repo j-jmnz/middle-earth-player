@@ -3,7 +3,7 @@
 // the music before the loop's start, the next copy is loaded a few seconds early, and as one copy reaches its last MUSIC_LEAD_SECONDS
 // the next starts at the matching point and the two crossfade, landing on the loop's start (a platform's own repeat can leave a gap).
 // A new loop crossfades in over the same time; a loop left mid-piece is paused where it was and goes on from there when it comes back.
-// The fades are equal-power. The music does not start while another app's audio plays (other-audio.native.ts), and pauses while the app is not in
+// The fades are equal-power. With Stop other audio off, the music does not start while another app's audio plays (other-audio.native.ts); it pauses while the app is not in
 // front. The Music setting and its volume apply at once; a screen reader halves the volume. A bundle packed without the loops plays
 // none; the web and the desktop play the same loops (bundled.canvaskit.ts), and the desktop app starts them before a click (desktop/main.ts).
 import { createAudioPlayer, type AudioPlayer } from "./audio-player";
@@ -15,7 +15,7 @@ import { bundledMusic } from "./bundled";
 import { MUSIC_LEAD_SECONDS } from "./music-lead.ts";
 import type { MusicLoop } from "./music-map.ts";
 import { otherAudioPlaying } from "./other-audio";
-import { audioFailed, startAudioSession } from "./session.ts";
+import { audioFailed, startAudioSession, stopsOtherAudio } from "./session.ts";
 
 /** Whether this bundle carries any music and can play it: the Music rows show only then. Fixed when the bundle loads. */
 export const MUSIC_BUNDLED = Object.keys(bundledMusic).length > 0;
@@ -42,6 +42,12 @@ let quietUntil = 0;
 let foreground = true;
 let otherAudio = false;
 let started = false;
+
+// Whether another app's audio keeps the music silent. With Stop other audio on, the app stops that audio (other-apps.ts), so the
+// music does not wait for it: the phone can still say it plays for a moment after it was told to stop.
+function otherAudioNow(): boolean {
+  return !stopsOtherAudio() && otherAudioPlaying();
+}
 
 // The loop that should be heard now, or null for silence.
 function wanted(): MusicLoop | null {
@@ -223,7 +229,7 @@ function onAppState(state: string): void {
     return;
   }
   // Back in front: another app's audio that started meanwhile keeps the music silent; the app's own players are paused, so the answer is the other app's.
-  otherAudio = otherAudioPlaying();
+  otherAudio = otherAudioNow();
   for (const voice of voices) play(voice.player);
   sync();
 }
@@ -236,9 +242,10 @@ export function startMusic(): () => void {
   if (started || !MUSIC_BUNDLED) return () => undefined;
   started = true;
   foreground = AppState.currentState == null || AppState.currentState === "active";
-  otherAudio = otherAudioPlaying();
+  otherAudio = otherAudioNow();
   const settings = tableSettings.subscribe((state, before) => {
-    if (state.settings.music !== before.settings.music || (state.settings.musicVolume > 0) !== (before.settings.musicVolume > 0)) sync();
+    if (state.settings.stopOtherAudio !== before.settings.stopOtherAudio) otherAudio = otherAudioNow();
+    if (state.settings.stopOtherAudio !== before.settings.stopOtherAudio || state.settings.music !== before.settings.music || (state.settings.musicVolume > 0) !== (before.settings.musicVolume > 0)) sync();
     else if (state.settings.musicVolume !== before.settings.musicVolume) startClock();
   });
   const appState = AppState.addEventListener("change", onAppState);

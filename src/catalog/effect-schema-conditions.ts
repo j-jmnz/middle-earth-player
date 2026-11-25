@@ -423,6 +423,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("encounterPlacedOnStage") }),
   // Some living player has no enemy engaged with them ("if any player is not engaged with an enemy", 143041:A:1). Read by the fortress family.
   z.strictObject({ kind: z.literal("playerUnengaged") }),
+  // The main quest card has been in play for the whole of the current round: it was in play from Setup or from an earlier round, not revealed in this one ("if the main quest has been in play the entire round", 16014:A:2). Read by the haradrim family.
+  z.strictObject({ kind: z.literal("stageInPlayWholeRound") }),
   // The active location prints a Wizardry line ("If no Wizardry effect is triggered this way", 143062:A:1, read with `not`; false with no active location). Read by the wizardry family.
   z.strictObject({ kind: z.literal("hasWizardry") }),
   // The player guarding Gollum may choose a new player now: no card says the guard cannot change and another player is still in the game ("must choose a new player to guard Gollum, if able", 02135:A:1; the option is offered only then, rr.effects). Read by the guardian family.

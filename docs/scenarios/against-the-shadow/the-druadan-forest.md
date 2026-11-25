@@ -82,24 +82,6 @@ The statuses are those of the Readings bullet of `docs/scenarios/against-the-sha
 - `05046:A:1` (span-settled). The Action to exhaust a Ranger is unchanged; it is not a played card, so Ancestral Clearing adds no cost.
 - `05047:A:1` (span-settled). Immune to player card effects is unchanged.
 
-## Readings to confirm
-
-- `06043:B:1`: recommended. The archery is checked point by point. See Readings; the engine checks it once (Engine notes, Limits).
-- `06044:B:2`, Willpower: recommended. Attack modifiers do not add. See Readings.
-- `06044:B:2`, the victory display: recommended. All the enemy's progress goes on the quest. See Readings.
-- `06044:B:3`, a destroyed Drû-buri-Drû: recommended. He goes to the discard pile and the players cannot win. See Readings.
-- Stage bar: recommended. The stage holds the bar on winning with his card. See Readings.
-- `06047:A:3`, `06049:A:2`: recommended. The defending player decides, the payment may come from any player's pool. See Readings.
-- Prowl against When Revealed: recommended. Prowl after the When Revealed of Stars in Sky; a cancel does not stop it. See Readings.
-- `06046:A:2`: recommended. The bonus lasts until the end of the attack; community discussion splits and no official source says. See Readings.
-- `06044:B:2` threshold: researched from a relayed designer clarification in a forum thread (the thread's page names the answerer as Caleb and does not state his role). See Readings.
-- `06053:A:1`: recommended. Each hero pays from its own pool. See Readings.
-- `06054:A:2`: recommended. Each questing hero pays from its own pool. See Readings.
-- `06054:A:3`: recommended. Nothing for an ally or an undefended attack. See Readings.
-- `06055:A:2`: recommended. All or nothing. See Readings.
-- `06055:A:3`: recommended. The defending player chooses. See Readings.
-- Nightmare: recommended, only if Nightmare is built. See Readings.
-
 ## Engine notes
 
 The flags, the verb and the amount are in the family `pelargir` (`src/catalog/families/pelargir.ts`, `src/rules/families/pelargir/`). Three shared lines: the optional amount field `archeryOf` in `src/catalog/effect-schema-amount.ts`, and two calls in `src/rules/combat/combat.ts` (`attackStrength` reads the attack stat through `attackStatOf`, `strikeEnemy` places the attack damage through `placeAttackDamage`), which do what they did before in a game whose table holds no flag.

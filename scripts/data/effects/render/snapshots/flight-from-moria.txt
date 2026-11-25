@@ -38,7 +38,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
 
 03027:A:1 (front): When Revealed: The first player attaches Shadow of Fear to one of his heroes. (Counts as a Condition attachment with the text: "Limit 1 per hero. Attached hero cannot exhaust or ready and its text box is treated as if it were blank. Action: Pay 3 resources from attached hero's pool to discard this card.")
   03027:whenRevealed:1: When revealed
-    - attach this card to a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card is discarded)
+    - attach this card to a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card stays where it is)
   03027:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Condition attachment while it is attached
@@ -117,6 +117,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
 
 03045:A:1 (front): When Revealed: Put the top enemy in the encounter discard pile into play, engaged with the first player. If this effect put no enemies into play, Chance Encounter gains surge.
   03045:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if not (the encounter discard pile holds a enemy): this card gains surge (one more encounter card is revealed when it has been resolved)
     - the rest of the effect is carried out by the first player
@@ -303,6 +304,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
 
 03075:B:1 (back): When Revealed: The first player chooses 1 of the following:
   03075:whenRevealed:1: When revealed (record also names 03075:B:2, 03075:B:3)
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "discard":
         - each living player in turn order discards the top card of the encounter deck (not revealed; a deck that ran out is reset); a treachery eliminates the player who discarded it from the game before the next player discards
@@ -311,6 +313,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
 
 03075:B:2 (back): • Each player discards 1 card from the top of the encounter deck. If the card is a treachery card, the discarding player is eliminated from the game.
   03075:whenRevealed:1: When revealed (record also names 03075:B:1, 03075:B:3)
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "discard":
         - each living player in turn order discards the top card of the encounter deck (not revealed; a deck that ran out is reset); a treachery eliminates the player who discarded it from the game before the next player discards
@@ -319,6 +322,7 @@ Scenario piles that place cards with no record (quest: 03069 A Presence in the D
 
 03075:B:3 (back): • Reveals the next quest card, putting Blocked by Shadow on the bottom of the quest deck.
   03075:whenRevealed:1: When revealed (record also names 03075:B:1, 03075:B:2)
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "discard":
         - each living player in turn order discards the top card of the encounter deck (not revealed; a deck that ran out is reset); a treachery eliminates the player who discarded it from the game before the next player discards

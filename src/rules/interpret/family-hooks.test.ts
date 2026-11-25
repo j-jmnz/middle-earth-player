@@ -49,7 +49,7 @@ describe("settle hooks", () => {
       expect(settleHooks(phase)).toHaveLength(SETTLE_ORDER[phase].length);
     }
     expect(SETTLE_ORDER.before).toEqual(["burden", "island", "south", "quest", "sack"]);
-    expect(SETTLE_ORDER.after).toEqual(["sea", "stormcaller", "island", "wilderland", "captives"]);
+    expect(SETTLE_ORDER.after).toEqual(["sea", "stormcaller", "island", "wilderland", "captives", "haradrim"]);
   });
 });
 

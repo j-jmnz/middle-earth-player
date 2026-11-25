@@ -14,7 +14,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     - place 1 resource tokens on this card
     - choose objective (any player controls) named "Power of Lórien"
     - place progress of the current quest stage progress on the picked card
-    - remove progress of the current quest stage progress from the current quest card (all of it when it holds less)
+    - remove progress of the current quest stage progress from the main quest (all of it when it holds less)
     - then, if the card with code 50901 in play holds at least 3 resource token(s) (checked when this step runs, after the steps above; not tied to whether they did anything): advance to the next quest stage
 
 50901:B:2 (back): Response: At the end of the round, raise each player's threat by 1 to choose a stage. Each player at that stage draws 1 card and adds 1 resource to a hero's resource pool.
@@ -31,6 +31,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50902:A:1 (front): When Revealed: The first player may remove 10 progress from Power of Lórien to take control of the set-aside Host of Lórien. Then, he may remove an additional 20 progress from Power of Lórien to place it in his play area under his control, otherwise discard it.
   50902:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "host" (only if there is a objective (any player controls) named "Power of Lórien", with at least 10 progress on it to choose):
         - remove 10 progress from "Power of Lórien"
@@ -48,6 +49,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50902:B:1 (back): When Revealed: Each player searches the encounter deck and discard pile for a Dol Guldur location and adds it to the staging area. Shuffle the encounter deck. Advance to a stage 3 of your choice. If you are playing epic multiplayer mode, each team must choose a different stage.
   50902:whenRevealed:2: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the acting player finds one Dol Guldur location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
@@ -86,10 +88,10 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player chooses (each option once) one of:
       * option "progress" (only if the current quest stage holds at least 5 progress):
-        - remove 5 progress from the current quest card (all of it when it holds less)
+        - remove 5 progress from the main quest (all of it when it holds less)
         - the first player chooses one of:
           * option "extra" (only if the current quest stage holds at least 5 progress):
-            - remove 5 progress from the current quest card (all of it when it holds less)
+            - remove 5 progress from the main quest (all of it when it holds less)
             - up to 3 resource token(s) come off the card with code 50907 in play
           * option "decline":
       * option "penalty":
@@ -119,10 +121,10 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player chooses (each option once) one of:
       * option "progress" (only if the current quest stage holds at least 5 progress):
-        - remove 5 progress from the current quest card (all of it when it holds less)
+        - remove 5 progress from the main quest (all of it when it holds less)
         - the first player chooses one of:
           * option "extra" (only if the current quest stage holds at least 5 progress):
-            - remove 5 progress from the current quest card (all of it when it holds less)
+            - remove 5 progress from the main quest (all of it when it holds less)
             - choose player (any player controls) chosen by the first player
             - the rest of the effect is carried out by the last player picked
             - choose card (you control) in the deck
@@ -158,10 +160,10 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player chooses (each option once) one of:
       * option "progress" (only if the current quest stage holds at least 5 progress):
-        - remove 5 progress from the current quest card (all of it when it holds less)
+        - remove 5 progress from the main quest (all of it when it holds less)
         - the first player chooses one of:
           * option "extra" (only if all of: (the current quest stage holds at least 5 progress) and (there is a non-unique enemy (any player controls) or in the staging area, chosen by the first player to choose)):
-            - remove 5 progress from the current quest card (all of it when it holds less)
+            - remove 5 progress from the main quest (all of it when it holds less)
             - choose non-unique enemy (any player controls) or in the staging area, chosen by the first player
             - the picked card is destroyed (not discarded: rr.destroy)
           * option "decline":
@@ -194,10 +196,10 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player chooses (each option once) one of:
       * option "progress" (only if the current quest stage holds at least 5 progress):
-        - remove 5 progress from the current quest card (all of it when it holds less)
+        - remove 5 progress from the main quest (all of it when it holds less)
         - the first player chooses one of:
           * option "extra" (only if the current quest stage holds at least 5 progress):
-            - remove 5 progress from the current quest card (all of it when it holds less)
+            - remove 5 progress from the main quest (all of it when it holds less)
             - choose player (any player controls) chosen by the first player
             - the rest of the effect is carried out by the last player picked
             - choose card (you control) in the deck, among the top 10, of card type ally, that can be put into play (a unique card with a copy in play, or one a play restriction bars, cannot be chosen)
@@ -322,7 +324,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
   50914:forced:1: Forced at the end of the phase
     only if all of: (it is the Encounter phase) and (this card is in the staging area)
     who acts: the acting player is the first player (a phase has no player of its own)
-    - remove the number of players progress from the current quest card (all of it when it holds less)
+    - remove the number of players progress from the main quest (all of it when it holds less)
 
 ## 50915 Mirkwood Olog-hai
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -331,14 +333,14 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
   50915:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - remove the damage on the card the event is about beyond its printed hit points progress from the current quest card (all of it when it holds less)
+    - remove the damage on the card the event is about beyond its printed hit points progress from the main quest (all of it when it holds less)
 
 50915:A:2 (shadow): Shadow: Either remove 2 progress from the main quest, or return attacking enemy to the staging area.
   50915:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
-        - remove 2 progress from the current quest card (all of it when it holds less)
+        - remove 2 progress from the main quest (all of it when it holds less)
       * option "staging":
         - when the attack in progress ends:
           - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
@@ -357,7 +359,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     who acts: the acting player is the defending player (the player the attack is against)
     - the first player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
-        - remove 2 progress from the current quest card (all of it when it holds less)
+        - remove 2 progress from the main quest (all of it when it holds less)
       * option "shadow":
         - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
 
@@ -372,7 +374,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
-        - remove 2 progress from the current quest card (all of it when it holds less)
+        - remove 2 progress from the main quest (all of it when it holds less)
       * option "damage" (only if there is a ally (you control) to choose):
         - choose ally (you control)
         - deal 2 damage to the picked card
@@ -398,7 +400,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     who acts: the acting player is the defending player (the player the attack is against)
     - the first player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
-        - remove 1 progress from the current quest card (all of it when it holds less)
+        - remove 1 progress from the main quest (all of it when it holds less)
       * option "resource":
         - place 1 resource tokens on this card
 
@@ -413,7 +415,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
-        - remove 1 progress from the current quest card (all of it when it holds less)
+        - remove 1 progress from the main quest (all of it when it holds less)
       * option "attachment" (only if there is a attachment (you control) to choose):
         - choose attachment (you control)
         - discard the picked card
@@ -514,7 +516,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
-      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): remove 3 progress from the current quest card (all of it when it holds less)
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): remove 3 progress from the main quest (all of it when it holds less)
 
 ## 50926 Servant of Sauron
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -524,6 +526,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50926:A:2 (front): When Revealed: The enemy in the staging area with the highest engagement cost makes an immediate attack against the first player.
   50926:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, with the highest current engagement cost of those (ties: the chooser decides), chosen by the first player
     - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area, dealt a shadow card

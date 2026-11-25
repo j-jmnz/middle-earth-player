@@ -161,6 +161,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 
 145050:A:2 (front): When Revealed: The Black Serpent makes an immediate attack against the first player.
   145050:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - this card attacks the first player now, from the staging area, dealt a shadow card
 
 ## 145051 War Mûmak
@@ -541,6 +542,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 145077:B:3 (back): This stage cannot be defeated unless Aragorn is in play and The Witch-king is in the victory display. If the players defeat this stage, they win the game.
   145077:constant:2: Constant
     only if any of: (the card with code 145001 is not in play) or (the card with code 145080 is not in the victory display)
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
     - the players cannot defeat this stage while this holds
 
 ## 145078 The Battle of the Pelennor Fields

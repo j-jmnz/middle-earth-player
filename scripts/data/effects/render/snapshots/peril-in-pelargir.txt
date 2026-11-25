@@ -6,7 +6,7 @@ Scenario piles that place cards with no record (quest: 05065 The Leaping Fish; q
 05019:A:1 (front): If unattached, return Alcaron's Scroll to the staging area and it gains: 'Action: Exhaust a hero to attach Alcaron's Scroll to that hero.'
   05019:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
     - this card: stat takesAttackDamage (the hero it is attached to takes the damage of an attack whose enemy holds damageToScroll) 1, while this card is in play
     - this card counts as an attachment while it is attached
   05019:action:1: Action

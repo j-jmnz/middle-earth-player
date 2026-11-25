@@ -21,6 +21,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51101:B:2 (back): This stage cannot be defeated unless the first player controls Mendor.
   51101:constant:1: Constant
     only if not (the actor controls the card with code 51111)
+    who acts: the acting player is the first player (a quest stage belongs to no player; while the stages are split between the players, the player whose stage it is)
     - the players cannot defeat this stage while this holds
 
 ## 51103 A Chosen Path
@@ -653,7 +654,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51144:A:1 (front): When Revealed: Remove 5 progress tokens from the main quest and attach Turned Around to it. (Counts as a Condition attachment with the text: 'Attached quest gets +5 quest points.')
   51144:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - remove 5 progress from the current quest card (all of it when it holds less)
+    - remove 5 progress from the main quest (all of it when it holds less)
     - this card is attached to the main quest card (never a side quest) and leaves with it
   51144:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
@@ -762,6 +763,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 
 51151:A:1 (front): When Revealed: Ambushing Orcs makes an immediate attack against the first player.
   51151:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, that is this card itself
     - the picked enemy attacks the first player now, from the staging area, dealt a shadow card

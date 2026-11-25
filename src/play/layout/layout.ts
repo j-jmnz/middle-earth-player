@@ -164,6 +164,11 @@ const FAN_DROP = 2;
 // How far the victory pile's fan reaches left of the pile, as a share of the pile's height (canvas/pieces.native.tsx turns the cards behind it up to 14 degrees).
 export const VICTORY_FAN = 0.25;
 
+/** How much of a hand card shows above the bottom edge at rest: what a mark on a hand card must stay inside (canvas/under-mark.ts, handUnder). */
+export function handShown(cardH: number, scale = 1): number {
+  return Math.max(touch(scale, MIN_TARGET) + (HAND_MIN - MIN_TARGET) * scale, Math.round(cardH * HAND_SHOW));
+}
+
 function metricsOf(scale: number): Metrics {
   return { scale, gutter: GUTTER * scale, gap: GAP * scale, peek: PEEK * scale, handMin: touch(scale, MIN_TARGET) + (HAND_MIN - MIN_TARGET) * scale, mark: MARK * scale };
 }

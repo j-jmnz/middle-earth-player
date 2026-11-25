@@ -228,6 +228,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146061:A:1 (front): When Revealed: The first player must choose: either exhaust The One Ring and reveal an encounter card, or discard cards from the top of the encounter deck until an enemy is discarded and put it into play engaged with him.
   146061:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "ring" (only if the card with code 146065 in play is ready):
         - exhaust the card with code 146065

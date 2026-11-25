@@ -180,6 +180,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
 
 00015:A:1 (front): When Revealed: The first player takes control of Ranger of Ithilien, exhausted and committed to the quest. Then, Ranger of Ithilien gains surge.
   00015:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player takes control of this card (it enters play under that player, ready; a shadow card stops being its enemy's shadow card)
     - exhaust this card

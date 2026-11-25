@@ -7,6 +7,9 @@ export const FLAG_NOTES: Readonly<Record<string, string>> = {
   questProgressCap: " (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count)",
   noEffectProgress: " (card effects cannot place progress on this stage or on an active location; the progress a successful quest places is not an effect)",
   noQuestProgress: " (no progress can be placed on the current quest while it lasts; the active location still takes its share first)",
+  stageCapped: " (the stage takes no more progress than its quest points even while it cannot advance; the rest is not placed)",
+  handLimit: " (no player holds more cards in hand than this; a hand over it discards down to it at the next settle, the player choosing which cards)",
+  stageEntered: " (the round the current main quest card was first seen in play, noted by the engine; round 0 is Setup)",
   progressToQuest: " (progress that a card effect would place on this location goes on the current quest instead, and it is never explored)",
   advancesWhenFreed: " (a stage with no progress and no quest points advances at once when nothing holds it back, with no progress needed)",
   assault: " (Assault: questing and player cards place no progress on this stage; a failed quest raises no threat and deals the shortfall as damage to Minas Tirith; a destroyed enemy's total Threat is kept for the progress its destruction places)",
@@ -41,6 +44,7 @@ export const FLAG_NOTES: Readonly<Record<string, string>> = {
   archeryBonus: " (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends)",
   archeryToAllies: " (archery damage must be assigned to allies, if able)",
   // Cards that return, leave or are kept.
+  returnsToStagingArea: " (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile)",
   returnsToEncounterDeck: " (a claimed objective: when its hero leaves play it goes to the top of the encounter deck instead of the staging area)",
   returnsWithoutActive: " (while no location is the active location an engaged holder goes back to the staging area at once, whatever engaged it)",
   noPlayerAttachments: " (no player card can be attached to it)",

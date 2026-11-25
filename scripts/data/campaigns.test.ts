@@ -16,19 +16,17 @@ const index = campaignIndexSchema.parse(JSON.parse(readFileSync(path.join(DATA_D
 
 describe("data/campaigns/index.json", () => {
   it("lists the built campaigns playable and the later campaigns and cycles locked, with the scenario counts Hall of Beorn lists", () => {
-    expect(index.filter((entry) => entry.playable).map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "angmar-awakened", "the-two-towers", "the-return-of-the-king", "shadows-of-mirkwood", "dwarrowdelf", "the-hobbit", "against-the-shadow", "standalone-scenarios"]);
+    expect(index.filter((entry) => entry.playable).map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "angmar-awakened", "the-two-towers", "the-return-of-the-king", "shadows-of-mirkwood", "dwarrowdelf", "the-hobbit", "against-the-shadow", "the-ring-maker", "haradrim", "standalone-scenarios"]);
     expect(index.find((entry) => entry.id === "fellowship-of-the-ring")?.scenarioCount).toBe(loadCampaign().scenarios.length);
     // A campaign is playable once one of its scenarios is in PLAYABLE_SCENARIOS. The Return of the King is built (scripts/data/return-of-the-king.test.ts) and playable from its first scenario, its box named by no override. Angmar Awakened is built (scripts/data/angmar-awakened.test.ts) and playable from its first scenario. The other locked entries have no scenario files: the
     // campaigns played in Campaign Mode, under their RCO boxes, then the cycles: scenarios that are part of no campaign (data/overrides.json, campaigns).
     const locked = index.filter((entry) => !entry.playable).map((entry) => [entry.name, entry.kind, entry.scenarioCount]);
     // The Standalone scenarios cycle is built one scenario at a time and playable from its first (The Massing at Osgiliath): its count is the scenarios built.
     expect(locked).toEqual([
-      ["The Ring-maker", "cycle", 9],
-      ["Haradrim", "cycle", 9],
       ["Vengeance of Mordor", "cycle", 9],
     ]);
-    // The Shadows of Mirkwood cycle is playable from its first scenario (The Hunt for Gollum), Dwarrowdelf from its first (Into the Pit), The Hobbit from a playable scenario, Against the Shadow from its first (Peril in Pelargir) and the Standalone scenarios cycle from The Massing at Osgiliath; the other cycles are locked.
-    expect(index.filter((entry) => entry.playable && entry.kind !== "campaign").map((entry) => entry.id)).toEqual(["shadows-of-mirkwood", "dwarrowdelf", "the-hobbit", "against-the-shadow", "standalone-scenarios"]);
+    // The Shadows of Mirkwood cycle is playable from its first scenario (The Hunt for Gollum), Dwarrowdelf from its first (Into the Pit), The Hobbit from a playable scenario, Against the Shadow from its first (Peril in Pelargir), The Ring-maker from its first (The Fords of Isen), Haradrim from its first (Escape from Umbar) and the Standalone scenarios cycle from The Massing at Osgiliath; the other cycles are locked.
+    expect(index.filter((entry) => entry.playable && entry.kind !== "campaign").map((entry) => entry.id)).toEqual(["shadows-of-mirkwood", "dwarrowdelf", "the-hobbit", "against-the-shadow", "the-ring-maker", "haradrim", "standalone-scenarios"]);
     expect(index.filter((entry) => entry.kind === "cycle").every((entry) => entry.box === null)).toBe(true);
     // Every campaign is built, so none is locked.
     expect(index.filter((entry) => !entry.playable && entry.kind === "campaign")).toEqual([]);
@@ -65,7 +63,7 @@ describe("data/campaigns/index.json", () => {
     // The 2011 Core Set and the Two-Player Limited Edition Starter print the scenarios the Revised Core Set and The Dark of Mirkwood reprint.
     const reprinted = ["Core Set", "Two-Player Limited Edition Starter"];
     // Fan-made: A Long-extended Party's packs (RingsDB names them "ALeP - ..."), then First Age with its Doom Mastered cycle and
-    // Legacy of Fëanor, which RingsDB lists no pack for. The roadmap takes them after the official content (README.md, Roadmap).
+    // Legacy of Fëanor, which RingsDB lists no pack for. The roadmap takes them after the official content (guide/roadmap.md, Roadmap).
     const fanMade = [
       "Children of Eorl", "The Aldburg Plot", "Fire on the Eastemnet", "The Gap of Rohan", "The Glittering Caves", "Mustering of the Rohirrim", "Blood in the Isen",
       "The Scouring of the Shire", "The Nine are Abroad", "The Siege of Erebor", "The Shire's Reckoning", "The Hobbit", "Strange News in Bree", "Fangs in the Dark",

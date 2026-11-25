@@ -24,6 +24,8 @@ const ENEMY_ZONE: Readonly<Record<string, string>> = {
   "146026:constant:1": "The line adds the Threat of \"each engaged enemy\": the staging area's enemies are not counted.",
   "50608:forced:1": "Naurlhûg is added from the set-aside pile or returned from an engagement; one already in the staging area has nothing to do (docs/scenarios/standalone-scenarios/the-ruins-of-belegost.md, The Ruins of Belegost, reading 11).",
   "51339:forced:1": "The line says \"each engaged enemy\": a shadow card is dealt only to an enemy engaged with a player.",
+  "16019:constant:1": "The line (16019:A:1) says \"X is the number of engaged enemies\": the staging area's enemies are not counted.",
+  "16019:travel:1": "The travel (16019:A:2) assigns X damage, X the number of engaged enemies (16019:A:1): the staging area's enemies are not counted.",
   "12185:whenRevealed:1": "The enemies counted are the cards this effect discarded from the encounter deck, not cards in play.",
 };
 

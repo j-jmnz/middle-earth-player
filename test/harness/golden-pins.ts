@@ -246,6 +246,12 @@ export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
     "two-handed, won, after the earlier parts, Misplaced Trust",
     "two-handed, won, after the earlier parts, Urdug's Cunning, the last option of every Choose window",
   ],
+  "the-fords-of-isen": [
+    "Easy solo win",
+    "Easy two-handed win",
+    "solo win",
+    "two-handed win",
+  ],
   "the-ghost-of-framsburg": [
     "true solo, Easy, won, Melanwar's and Isolde's lines, a burden of the two Hazard cards for the pool",
     "true solo, brittle, lost with every hero dead",
@@ -370,6 +376,12 @@ export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
     "true solo, won, after the earlier parts, Dragon-slayer, 4 Dragon Signs, a treasure chosen",
     "two-handed, Easy, won, Melanwar's and Isolde's lines, 4 Dragon Signs",
     "two-handed, won, after the earlier parts, an Accolade boon for each player, 4 Dragon Signs",
+  ],
+  "to-catch-an-orc": [
+    "Easy solo win",
+    "Easy two-handed win",
+    "solo win",
+    "two-handed win",
   ],
   "we-must-away-ere-break-of-day": [
     "two-handed win, the Sack cards are drawn and the encounter deck runs out",

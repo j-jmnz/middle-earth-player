@@ -44,7 +44,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   19036:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
 
 19036:A:2 (front): Action: Exhaust Durin's Key to give each location -1 Threat until the end of the phase.
   19036:action:1: Action (cost: exhaust this card)
@@ -68,7 +68,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   19037:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the card in play titled "Urdug" is its host; the claim is announced
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
 
 19037:A:2 (front): Forced: When Urdug attacks, discard the top card of the encounter deck and add its Threat to his Attack until the end of the phase.
   19037:forced:1: Forced after a character is declared as an attacker (heard about the host)
@@ -124,6 +124,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19040:A:1 (front): When Revealed: The first player must choose: either Wilderland Bear makes an immediate attack against him, or each player discards 1 random card from his hand.
   19040:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "attack":
         - this card attacks the first player now, from the staging area, dealt a shadow card
@@ -387,7 +388,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19052:A:2 (front): While Urdug is free of encounters, the first player gains control of Urdug.
   19052:constant:1: Constant
-    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them; gaining control is a claim, announced
+    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them, and from then on it follows the first player token: it passes to the new first player each time the token moves, while it stays free of encounters; gaining control is a claim, announced
 
 19052:A:3 (front): If Urdug is destroyed, the players lose the game.
   19052:forced:1: Forced on the event characterDestroyed (heard about this card)
@@ -411,13 +412,6 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
     - choose enemy (any player controls) or in the staging area, named "Tiny"
     - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Tiny" (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
     - return this card to the staging area
-  19053:forced:3: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
-    only if all of: (it is the Quest phase) and (this card is engaged with a player (that player is who "you" means in this record)) and (the event's other card is a enemy (any player controls) named "Urdug")
-    who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose enemy (any player controls) or in the staging area, named "Tiny"
-    - then, if the picked card is a card (any player controls) or in the staging area or the active location, named "Tiny" (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
-    - return this card to the staging area
 
 ## 19054 Tiny
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -427,7 +421,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19054:A:2 (front): While Tiny is free of encounters, the first player gains control of Tiny.
   19054:constant:1: Constant
-    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them; gaining control is a claim, announced
+    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them, and from then on it follows the first player token: it passes to the new first player each time the token moves, while it stays free of encounters; gaining control is a claim, announced
 
 19054:A:3 (front): Forced: After Tiny exhausts, raise your threat by 2.
   19054:forced:1: Forced on the event exhausted (heard about this card)
@@ -453,4 +447,4 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
     who acts: the acting player is the player the enemy engaged
     - engage this card
 
-(rendered pieces: 359 by template, 0 as JSON)
+(rendered pieces: 346 by template, 0 as JSON)

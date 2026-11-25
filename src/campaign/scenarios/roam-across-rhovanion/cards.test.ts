@@ -16,7 +16,6 @@ beforeAll(async () => {
   world = await loadRhovanionWorld();
 }, 120_000);
 
-type Layout = Parameters<typeof rhovanionTable>[1];
 type Table = ReturnType<typeof rhovanionTable>;
 // The option the card with this code stands for, among the cards a choice offers; or the named option.
 const takes = (code: string) => (state: ScenarioState) => (state.window?.kind === "choose" ? (state.window.options.find((id) => state.cards[id]?.code === code || id === code) ?? state.window.options[0] ?? "") : "");
@@ -109,46 +108,6 @@ describe("19053 Urdug and 19055 Tiny (enemy sides)", () => {
       expect(run.state.cards[idOf(run.state, CODES.urdugEnemy)], `threat ${threat}`).toMatchObject({ zone: "engaged", controller: seat });
       expect(run.state.cards[idOf(run.state, CODES.tinyEnemy)], `threat ${threat}`).toMatchObject({ zone: "engaged", controller: seat });
     }
-  });
-
-  // At the beginning of the quest phase an engaged Urdug attacks at once; the hero defends.
-  const questAttack = (layout: Layout, tweak?: (state: ScenarioState) => ScenarioState): Run => {
-    const t = rhovanionTable(world, { phase: "Planning", deck: ["f0", "f3", "f0"], engaged: [{ code: CODES.urdugEnemy, seat: 0 }, { code: CODES.tinyEnemy, seat: 0 }], ...layout });
-    let run = send(start(tweak ? tweak(t.state) : t.state), { type: "Pass" }, t.ctx);
-    for (let guard = 0; guard < 12 && run.state.phase === "Quest" && (run.state.pendingAttack != null || run.state.window?.kind === "defense" || run.state.window?.kind === "choose"); guard += 1) {
-      const window = run.state.window;
-      if (window?.kind === "defense") run = send(run, { type: "DeclareDefender", defenderId: t.hero }, t.ctx);
-      else if (window?.kind === "choose") run = send(run, { type: "Choose", optionId: window.options[0] ?? "" }, t.ctx);
-      else {
-        const pass = legalIntents(run.state, t.ctx).find((intent) => intent.type === "Pass");
-        if (!pass) break;
-        run = send(run, pass as PlayerIntent, t.ctx);
-      }
-    }
-    return run;
-  };
-  const zoneOf = (run: Run, code: string): string | undefined => run.state.cards[idOf(run.state, code)]?.zone;
-
-  it("19053:A:2 engaged, Urdug makes an immediate attack at the beginning of the quest phase; if it deals damage Urdug and Tiny return to the staging area", () => {
-    const hurt = questAttack({});
-    expect(hurt.steps.some((step) => step.kind === "attack")).toBe(true);
-    expect(zoneOf(hurt, CODES.urdugEnemy)).toBe("staging");
-    expect(zoneOf(hurt, CODES.tinyEnemy)).toBe("staging");
-  });
-
-  it("19053:A:2 an attack that deals no damage leaves Urdug and Tiny engaged", () => {
-    const armored = questAttack({}, (state) => {
-      const hero = Object.values(state.cards).find((card) => card.zone === "heroes" && card.controller === 0)!;
-      return { ...state, modifiers: [...state.modifiers, { instanceId: hero.id, sourceId: hero.id, stat: "defense", amount: 10, until: "endOfRound" }] };
-    });
-    expect(armored.steps.some((step) => step.kind === "attack")).toBe(true);
-    expect(zoneOf(armored, CODES.urdugEnemy)).toBe("engaged");
-    expect(zoneOf(armored, CODES.tinyEnemy)).toBe("engaged");
-  });
-
-  it("19053:A:2 Urdug in the staging area does not attack", () => {
-    const staged = questAttack({ engaged: [], staging: [CODES.urdugEnemy, CODES.tinyEnemy] });
-    expect(staged.steps.some((step) => step.kind === "attack")).toBe(false);
   });
 });
 

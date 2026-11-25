@@ -100,7 +100,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     who acts: the acting player is the defending player (the player the attack is against)
     - the first player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
-        - remove the stage number of the quest progress from the current quest card (all of it when it holds less)
+        - remove the stage number of the quest progress from the main quest (all of it when it holds less)
       * option "staging":
         - return this card to the staging area
 
@@ -178,7 +178,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
   41032:forced:1: Forced after a card is revealed (heard about Goblin enemy (any player controls); only when the encounter deck revealed it)
     only if this card is in the staging area
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - remove 1 progress from the current quest card (all of it when it holds less)
+    - remove 1 progress from the main quest (all of it when it holds less)
 
 41032:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if attacking enemy is a Goblin.)
   41032:shadow:1: Shadow
@@ -297,7 +297,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 
 41040:A:1 (front): When Revealed: The first player attaches Watchful Eyes to one of his heroes. (Counts as a Condition attachment with the text: "Limit 1 per hero. Forced: If attached hero is exhausted at the end of the combat phase, reveal 1 card from the encounter deck and add it to the staging area.")
   41040:whenRevealed:1: When revealed
-    - attach this card to a hero the acting player controls that carries no copy of this card (the acting player, the first player in a When Revealed, chooses it; with none this card stays where it is)
+    - attach this card to a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card stays where it is)
   41040:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
   41040:forced:1: Forced at the end of the phase

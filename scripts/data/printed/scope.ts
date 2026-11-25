@@ -65,6 +65,9 @@ const SCAN_URL_FIXES: Readonly<Record<string, readonly string[]>> = {
   "11208": [`${DREAM_CHASER_SCANS}/Cirdan's-Blessing-Lore.jpg`],
   // Hall of Beorn's Dwarves of Durin picture of Ered Luin Miner is 299 px wide; DragnCards' picture is the same card at full size.
   "12066": ["https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/c2c8d69a-6639-49af-89ed-86f2ffc8c096.jpg"],
+  // Hall of Beorn's image paths of The Spider's Hive (Beneath the Sands) drop the apostrophe of the title, which 403s.
+  "17078": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/The-Spider's-Hive-3A.jpg"],
+  "17078.B": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/The-Spider's-Hive-3B.jpg"],
   "142075": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Argonath.jpg"],
   "141064": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Stricken-Dumb.jpg"],
   // Hall of Beorn's SetupB image of The Siege of Gondor's campaign card is a blank parchment, and The Battle of the Pelennor Fields' shows only the flavor quotation; DragnCards' pictures of the
@@ -92,7 +95,7 @@ export const PLAYER_REQUESTS = [
 
 // The packs whose deck-legal player cards the ledger holds (the pilot of reading every player card from its scan). A pack is added here when
 // `pnpm data sync scans --pack <id>` and `pnpm data ledger-seed --pack <id>` have run for it; the ledger file is data/printed/player-cards.json.
-export const PLAYER_PACKS: readonly string[] = ["OHaUH", "HoN", "TSF", "TDF", "EaAD", "AoO", "BoG", "TMV"];
+export const PLAYER_PACKS: readonly string[] = ["OHaUH", "HoN", "TSF", "TDF", "EaAD", "AoO", "BoG", "TMV", "VoI", "TDT", "TTT", "TiT", "NiE", "CS", "TAC", "TSoH", "M", "RAH", "BtS", "TBS", "DoCG", "CoP"];
 // Single deck-legal player cards the ledger holds beside the packs (`--codes <code,...>` on the same two commands): the cards with errata, where the source text and
 // the printed card most often differ. A code is added here when `pnpm data sync scans --codes` and `pnpm data ledger-seed --codes` have run for it.
 export const PLAYER_CODES: readonly string[] = [
