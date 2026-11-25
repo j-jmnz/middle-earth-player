@@ -147,7 +147,8 @@ export function CurrentQuestMark({ rect, clear, fonts, t, s }: { rect: Rect; cle
 }
 
 // The round glyph a word falls back to where it does not fit: "Determined" is a "D", the Champion of Escape from Umbar a "C", Desert Crossing's "Blank" a "B"; "Determination" has none (the plain dot).
-const shortGlyph = (word: string): string | undefined => (word === DETERMINED_WORD ? "D" : word === CHAMPION_WORD ? "C" : word === BLANK_WORD ? "B" : undefined);
+const SHORT_GLYPHS: ReadonlyMap<string, string> = new Map([[DETERMINED_WORD, "D"], [CHAMPION_WORD, "C"], [BLANK_WORD, "B"]]);
+const shortGlyph = (word: string): string | undefined => SHORT_GLYPHS.get(word);
 
 /** A hero or ally the Campaign Log marks determined ("Determined"), or that carries a Determination ("Determination"): the same pill as the current quest's, a character wearing neither of the other marks (mec108.campaign-log, ledger line 10172:A:1). */
 export function DeterminedMarkView({ rect, word, clear, fonts, t, s }: { rect: Rect; word: string; clear: number; fonts: Fonts; t: TableTokens; s: number }) {
