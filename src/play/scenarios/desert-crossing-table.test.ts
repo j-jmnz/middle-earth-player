@@ -56,7 +56,7 @@ describe("a damaged character under Craft Remedy", () => {
   it("16053:A:1 wears the pill \"Blank\" and says in its preview that its text box is blank", () => {
     const { t, state } = damaged();
     expect(slotNumbers(state, t.ctx, idOf(state, "ally")).determined?.word).toBe("Blank");
-    expect(lines(t, state, "ally")).toContain("Its text box is blank while it has damage");
+    expect(lines(t, state, "ally")).toContain("Its text box is blank (");
   });
 
   it("16053:A:1 wears no pill with no damage on it, and none without Craft Remedy", () => {
@@ -75,5 +75,13 @@ describe("a character under Find Water", () => {
     expect(lines(withIt, state, "ally")).toContain("Player card effects cannot ready it");
     const without = at({ play: ["ally"] });
     expect(lines(without, without.state, "ally")).not.toContain("cannot ready it");
+  });
+
+  it("51225:A:1 reads the modifier, not the scenario: the same line names Fouled Well in The Mines of Moria", () => {
+    const moria = tableFromLayout("the-mines-of-moria", { stage: "51223", phase: "Travel", staging: ["51225"], play: ["ally"] });
+    const state = syncConstants(moria.state, moria.ctx);
+    const name = (id: string) => moria.state.cards[id]?.code ?? id;
+    const line = JSON.stringify(previewCards(state, moria.ctx, idOf(state, "ally"), (key) => ({ name: name(idOf(state, key)), source: null, text: "" }), name));
+    expect(line).toContain("Player card effects cannot ready it (");
   });
 });

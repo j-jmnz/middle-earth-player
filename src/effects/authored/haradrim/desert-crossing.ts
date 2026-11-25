@@ -18,7 +18,7 @@ const IN_STAGING: Cond = { kind: "sourceIn", zone: "staging" };
 // "Each player assigns X damage among characters he controls, where X is the tens digit of the temperature" (16029:A:1, 16069:B:1).
 const EACH_PLAYER_ASSIGNS_TENS: Instruction = { verb: "AssignDamage", amount: TENS, pick: { type: "character", control: "you" }, who: "eachSeat" };
 // "If the temperature is 60 or higher, the players lose the game": the stage's loss answers every change of the temperature, as soon as it is 60.
-const LOSE_AT_60: Instruction = { verb: "LoseGame", reason: "The temperature reached 60", when: { kind: "temperature", min: 60 } };
+export const LOSE_AT_60 = { verb: "LoseGame", reason: "The temperature reached 60", when: { kind: "temperature", min: 60 } } as const satisfies Instruction;
 const EXHAUST_A_CHARACTER: Instruction = { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Pick", pick: { type: "character", control: "you", state: "ready" } }, { verb: "Exhaust", target: { kind: "picked" } }] };
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(

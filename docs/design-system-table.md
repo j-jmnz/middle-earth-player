@@ -100,8 +100,8 @@ Code: `src/screens/table/top-bar.tsx`, `src/play/chrome/top-bar-layout.ts`.
 
 - **Desert Crossing** (`hrd.heat-tracker`, `rr.blank`, `rr.cannot`; ledger lines 16068:A:1, 16068:B:3, 16069:B:2, 16070:B:3, 16053:A:1, 16048:A:1; code: `readouts/haradrim/heat.ts`, `words/scenarios/haradrim/heat-table.ts`, `cards/card-effects.ts`, `cards/table-preview.ts`, `canvas/mark-pieces.native.tsx`; test `scenarios/desert-crossing-table.test.ts`; `docs/scenarios/haradrim/desert-crossing.md`, Table). Three pieces, each read from the records' own facts, none typing a number:
   - **Heat**: a top-bar dial, the temperature against the limit 60, in the form of the pursuit dial (a ring that fills toward the limit). It warms to near at 48 and to critical from 54, as the other dials; its note says the tens digit the cards read as X, and a screen reader hears "the players lose at 60". It shows once Setup has set the tracker.
-  - **Blank**: a damaged character under Craft Remedy wears the accent pill "Blank" inside its top edge (the word pill of a determined character); where the word does not fit it falls back to a round "B". Its preview says its text box is blank while it has damage.
-  - **No ready by player cards**: under Find Water the preview of each character says that player card effects cannot ready it and that the refresh phase still does; no pill, since every character holds the bar.
+  - **Blank**: a card that a `blankText` modifier reaches (Craft Remedy's, on a damaged character) wears the accent pill "Blank" inside its top edge (the word pill of a determined character); where the word does not fit it falls back to a round "B". Its preview says its text box is blank and names the card that blanks it.
+  - **No ready by player cards**: the preview of each card a `cannotReadyByPlayerCard` modifier reaches (Find Water's, and the same bar on any other scenario's card) says that player card effects cannot ready it, names the card, and says that the refresh phase still does; no pill.
 
 ### Standalone scenario dials
 
