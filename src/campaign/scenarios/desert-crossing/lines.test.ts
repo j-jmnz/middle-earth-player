@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { encounterCodes, setupInstructions } from "../../../catalog/scenario-data.ts";
 import { flaggedByClass } from "../../../rules/core/holder-classes.ts";
 import { printedOf } from "../../../rules/core/printed.ts";
-import { updateCard } from "../../../rules/core/state.ts";
+import { flagged, updateCard } from "../../../rules/core/state.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { legalTargets, reduce, startScenario } from "../../../rules/engine/reduce.ts";
@@ -13,7 +13,7 @@ import type { ScenarioState } from "../../../rules/engine/reduce.ts";
 import { temperatureOf } from "../../../rules/families/haradrim/heat.ts";
 import { stagingThreat } from "../../../rules/quest/quest.ts";
 import { loadAnyScenario } from "../../../../scripts/data/load-scenarios.ts";
-import { announce, attack, endPhase, resolve, respond, travel } from "../../../../test/harness/card-spec.ts";
+import { announce, attack, endPhase, endRound, resolve, respond, travel } from "../../../../test/harness/card-spec.ts";
 import { playedLayout } from "../../../../test/harness/card-spec-play.ts";
 import { idOf, idsOf, opened, run as runInstruction, statOf, tableFromLayout, zoneOf, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { crossingStart, crossingWorld } from "../../../../test/scenarios/desert-crossing/game.ts";
@@ -126,9 +126,12 @@ describe("the Forced effects that find nothing, or move a card", () => {
 });
 
 describe("the effects that last through the refresh phase", () => {
-  it("16055:A:1 a character the Giant Scorpion damaged stays exhausted through the refresh phase, one a filler enemy left undamaged does not", () => {
+  it("16055:A:1 a character the Giant Scorpion damaged cannot ready until the end of the round: it stays exhausted through the refresh phase and the lock ends with the round", () => {
     const scorpion = played({ engaged: ["16055"] }, attack("16055"), endPhase);
     expect(scorpion.cards[idOf(scorpion, "dh1")]?.exhausted).toBe(true);
+    expect(flagged(scorpion, idOf(scorpion, "dh1"), "cannotReady")).toBe(true);
+    const next = played({ engaged: ["16055"] }, attack("16055"), endRound);
+    expect(flagged(next, idOf(next, "dh1"), "cannotReady")).toBe(false);
     const filler = played({ engaged: ["f0"] }, attack("f0"), endPhase);
     expect(filler.cards[idOf(filler, "dh1")]?.exhausted).toBe(false);
   });
