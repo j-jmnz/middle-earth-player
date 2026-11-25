@@ -3820,6 +3820,27 @@
       "source": "scan 19134.A; dragncards preBuiltDecks.json (Q08.8, E08.8); Ered Mithrin Campaign Expansion rulebook MEC115 p20 (emce.setup-mount-gundabad)"
     },
     {
+      "scenario": "the-fords-of-isen",
+      "code": "07016",
+      "pile": "setAside",
+      "reason": "DragnCards loads Gríma (objective-ally) in the staging area (Q04.1, E04.1). The quest card (07059) prints \"Setup: Add The Islet to the staging area and attach Gríma to that location.\", so he starts attached to The Islet, not staged.",
+      "source": "scan 07059.A; dragncards preBuiltDecks.json (Q04.1, E04.1)"
+    },
+    {
+      "scenario": "into-fangorn",
+      "code": "07031",
+      "pile": "setAside",
+      "reason": "DragnCards loads Mugash (objective) in the staging area (Q04.3, E04.3). The quest card prints \"Setup: Add Edge of Fangorn to the staging area and attach Mugash to that location.\", so he starts attached to Edge of Fangorn, not staged.",
+      "source": "scan 07065.A; dragncards preBuiltDecks.json (Q04.3, E04.3)"
+    },
+    {
+      "scenario": "celebrimbors-secret",
+      "code": "08127",
+      "pile": "setAside",
+      "reason": "DragnCards loads Celebrimbor's Mould in the staging area (Q04.8, E04.8). The quest card (08122) prints \"Setup: ... Attach Celebrimbor's Mould to The Secret Chamber.\", so it starts attached to that location, not staged.",
+      "source": "scan 08122.A; dragncards preBuiltDecks.json (Q04.8, E04.8)"
+    },
+    {
       "scenario": "a-shadow-of-the-past",
       "code": "141017",
       "pile": "campaign",
@@ -4596,6 +4617,15 @@
   ],
   "scenarioCounts": [
     {
+      "scenario": "the-antlered-crown",
+      "code": "08155",
+      "pile": "encounter",
+      "normal": 3,
+      "easy": 1,
+      "reason": "Hall of Beorn lists Raven War-camp with 4 copies at Normal and 2 at Easy (the set's cards are numbered 11 to 14 of 29, and an Easy deck leaves out the copies that carry the difficulty indicator). DragnCards' Q04.9 stages 1 copy and leaves 3 in the encounter deck, which agrees; its E04.9 stages 1 and leaves 2, 3 in all, which no other source supports. The Easy deck holds 2 copies: the staged one and 1 in the encounter deck.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Antlered-Crown (Raven War-camp NormalQuantity 4, EasyQuantity 2); dragncards preBuiltDecks.json (Q04.9, E04.9); scan 08155.A (11/29)"
+    },
+    {
       "scenario": "flies-and-spiders",
       "code": "132019",
       "pile": "setAside",
@@ -4763,23 +4793,6 @@
     }
   ],
   "campaigns": [
-    {
-      "id": "the-ring-maker",
-      "name": "The Ring-maker",
-      "kind": "cycle",
-      "products": [
-        "The Voice of Isengard",
-        "The Dunland Trap",
-        "The Three Trials",
-        "Trouble in Tharbad",
-        "The Nîn-in-Eilph",
-        "Celebrimbor's Secret",
-        "The Antlered Crown"
-      ],
-      "released": "2014-02-21",
-      "reason": "No source names a cycle. Hall of Beorn lists the scenarios of The Voice of Isengard and of its six Adventure Packs under each product; RingsDB numbers the deluxe expansion and the six packs as cycles 15 and 16. The cycle has no Campaign Mode, so it is a cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 15 and 16; hallofgondor.com/release-dates (released: US release of the first product)"
-    },
     {
       "id": "haradrim",
       "name": "Haradrim",
@@ -4955,6 +4968,12 @@
     }
   ],
   "dragnPackAliases": [
+    {
+      "dragncards": "The Nin-in-Eilph",
+      "pack": "NiE",
+      "reason": "DragnCards spells the pack's name without the circumflex (\"The Nin-in-Eilph\"), so the row's pack does not name the product. Its collector numbers (94 to 101) and names are Hall of Beorn's own, so the row's number and name find the cards of NiE (the stage 2 and 3 cards have no OCTGN guid in Hall of Beorn).",
+      "source": "DragnCards preBuiltDecks.json (Q04.7) and cardDb.tsv (packName The Nin-in-Eilph, numberInPack); hallofbeorn.com/Export/QuestCards (CardSet The Nîn-in-Eilph, Number)"
+    },
     {
       "dragncards": "The Siege of Annuminas",
       "pack": "TSoA",
@@ -5181,6 +5200,30 @@
     }
   ],
   "encounterSetAliases": [
+    {
+      "booklet": "Dunlending Warriors",
+      "set": "Dunland Warriors",
+      "reason": "The Ring-maker rulesheets spell the Dunland encounter sets \"Dunlending\". The cards' set icon and Hall of Beorn print \"Dunland Warriors\". The card wins (authority order); the booklet's spelling is an alias.",
+      "source": "rulesheets rm.setup-the-dunland-trap, rm.setup-the-antlered-crown; hallofbeorn.com/Export/Cards (EncounterSet Dunland Warriors)"
+    },
+    {
+      "booklet": "Dunlending Raiders",
+      "set": "Dunland Raiders",
+      "reason": "The Antlered Crown rulesheet spells the set \"Dunlending Raiders\". The cards and Hall of Beorn print \"Dunland Raiders\". The card wins; the booklet's spelling is an alias.",
+      "source": "rulesheet rm.setup-the-antlered-crown; hallofbeorn.com/Export/Cards (EncounterSet Dunland Raiders)"
+    },
+    {
+      "booklet": "Weary Travellers",
+      "set": "Weary Travelers",
+      "reason": "The Into Fangorn rulesheet uses the British spelling. The cards and Hall of Beorn print \"Weary Travelers\". The card wins; the booklet's spelling is an alias.",
+      "source": "rulesheet rm.setup-into-fangorn; hallofbeorn.com/Export/Cards (EncounterSet Weary Travelers)"
+    },
+    {
+      "booklet": "TM The Antlered Crown",
+      "set": "The Antlered Crown",
+      "reason": "The Antlered Crown rulesheet's text layer carries the trademark sign of the set name as the letters \"TM\". The cards print \"The Antlered Crown\".",
+      "source": "rulesheet rm.setup-the-antlered-crown; scan 08155.A"
+    },
     {
       "booklet": "Journey Down the Anduin",
       "set": "Journey Along the Anduin",

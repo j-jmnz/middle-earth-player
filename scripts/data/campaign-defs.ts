@@ -145,6 +145,14 @@ export const PRODUCTS: readonly ProductDef[] = [
   { name: "Assault on Osgiliath", packs: ["AoO"], home: "against-the-shadow", load: "dragncards", easySheet: false, twinPack: null },
   { name: "The Blood of Gondor", packs: ["BoG"], home: "against-the-shadow", load: "dragncards", easySheet: false, twinPack: null },
   { name: "The Morgul Vale", packs: ["TMV"], home: "against-the-shadow", load: "dragncards", easySheet: false, twinPack: null },
+  // The Ring-maker: the Voice of Isengard deluxe expansion (three scenarios) and the six Adventure Packs, whose scenario and encounter cards are Hall of Beorn's like the earlier cycles'.
+  { name: "The Voice of Isengard", packs: ["VoI"], home: "the-ring-maker", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Dunland Trap", packs: ["TDT"], home: "the-ring-maker", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Three Trials", packs: ["TTT"], home: "the-ring-maker", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Trouble in Tharbad", packs: ["TiT"], home: "the-ring-maker", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Nîn-in-Eilph", packs: ["NiE"], home: "the-ring-maker", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Celebrimbor's Secret", packs: ["CS"], home: "the-ring-maker", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Antlered Crown", packs: ["TAC"], home: "the-ring-maker", load: "dragncards", easySheet: false, twinPack: null },
   // Standalone scenarios: each official scenario printed on its own, Hall of Beorn's cards of it alone. Hall of Beorn lists the event scenarios of 2011 to 2017 under the year (`scenarioProduct`).
   { name: "The Massing at Osgiliath", packs: ["TMaO"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2011" },
   { name: "The Battle of Lake-town", packs: ["TBoLT"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2012" },

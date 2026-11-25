@@ -16,6 +16,7 @@ const TROLL_TREASURE = ["131020", "131021", "131022"];
 const WEB_TREASURE = ["132019"];
 const DRAGON_TREASURE = ["132020", "132021", "132022", "132023", "132024"];
 const againstTheShadow = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("03", n, id, product, extra);
+const ringMaker = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("04", n, id, product, extra);
 const hobbit = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("0A", n, id, product, extra);
 
 export const CYCLE_DEFS: readonly CampaignDef[] = [
@@ -102,6 +103,30 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
     saga: false,
     ledger: "against-the-shadow",
   },
+  // No source names a cycle: Hall of Beorn lists the scenarios of The Voice of Isengard and of its six Adventure Packs under each product, and RingsDB numbers the deluxe expansion and the six packs as cycles 15 and 16.
+  // The cycle has no Campaign Mode, so the Scenarios tab lists it; released is the US release of its first product (hallofgondor.com/release-dates).
+  {
+    id: "the-ring-maker",
+    name: "The Ring-maker",
+    kind: "cycle",
+    released: "2014-02-21",
+    products: ["The Voice of Isengard", "The Dunland Trap", "The Three Trials", "Trouble in Tharbad", "The Nîn-in-Eilph", "Celebrimbor's Secret", "The Antlered Crown"],
+    scenarios: [
+      ringMaker(1, "the-fords-of-isen", "The Voice of Isengard", { setupSpan: "rm.setup-the-fords-of-isen", deck: { normal: "Q04.1", easy: "E04.1", label: "Fords of Isen" } }),
+      ringMaker(2, "to-catch-an-orc", "The Voice of Isengard", { setupSpan: "rm.setup-to-catch-an-orc" }),
+      ringMaker(3, "into-fangorn", "The Voice of Isengard", { setupSpan: "rm.setup-into-fangorn" }),
+      ringMaker(4, "the-dunland-trap", "The Dunland Trap", { setupSpan: "rm.setup-the-dunland-trap" }),
+      ringMaker(5, "the-three-trials", "The Three Trials", { setupSpan: "rm.setup-the-three-trials" }),
+      // DragnCards loads the objective-ally Nalir in player 1's play area; the printed Setup has the first player take control of him.
+      ringMaker(6, "trouble-in-tharbad", "Trouble in Tharbad", { setupSpan: "rm.setup-trouble-in-tharbad", groups: { player1Play1: "setAside" } }),
+      ringMaker(7, "the-nin-in-eilph", "The Nîn-in-Eilph", { setupSpan: "rm.setup-the-nin-in-eilph", groups: { player1Play1: "setAside" } }),
+      ringMaker(8, "celebrimbors-secret", "Celebrimbor's Secret", { setupSpan: "rm.setup-celebrimbors-secret" }),
+      // DragnCards loads Chief Turch in player 1's play area and the Raven deck as the second shared deck; the Setup builds that deck from the encounter deck's sets (rm.raven-deck).
+      ringMaker(9, "the-antlered-crown", "The Antlered Crown", { setupSpan: "rm.setup-the-antlered-crown", groups: { player1Play1: "setAside", sharedEncounterDeck2: "setAside" } }),
+    ],
+    saga: false,
+    ledger: "the-ring-maker",
+  },
   {
     // The scenarios printed on their own (RingsDB's cycle 50 packs that are not A Long-extended Party's): one product line each as it is built. The index counts the built ones.
     id: "standalone-scenarios",
@@ -139,7 +164,7 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
       // DragnCards' deck Q99.15 has no Easy twin: the Easy Mode card (not the deck) sets two Black Sails and a Corsair Warship aside. Its sharedEncounterDeck2 is the Corsair deck; Standard Mode is the mode card the scenario deals.
       { id: "the-hunt-for-the-dreadnaught", product: "The Hunt for the Dreadnaught", deck: { normal: "Q99.15", easy: "Q99.15" }, modeCard: "Standard Mode", easyModeCard: "Easy Mode", groups: { sharedEncounterDeck2: "corsairDeck" } },
     ],
-    // The other products of the cycle, in release order (README.md, Roadmap): the file's `later` lists them. An entry may name one title of a product that holds several (Hall of Beorn's scenarios under that product), so it is not always a whole product's name.
+    // The other products of the cycle, in release order (guide/roadmap.md, Roadmap): the file's `later` lists them. An entry may name one title of a product that holds several (Hall of Beorn's scenarios under that product), so it is not always a whole product's name.
     later: [],
     saga: false,
     ledger: "standalone-scenarios",

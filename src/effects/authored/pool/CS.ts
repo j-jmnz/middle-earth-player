@@ -21,9 +21,9 @@ export const RECORDS: readonly Effect[] = [
   // 08119 Wandering Ent
   {"id":"08119:constant:1","cardCode":"08119","lines":["08119:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveRestricted","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"08119:constant:2","cardCode":"08119","lines":["08119:A:2"],"timing":"constant","instructions":[{"verb":"EntersPlayExhausted"}]},
-  // 08120 Cloak of Lórien: lines 1 and 2 are the one attachment rule.
-  {"id":"08120:constant:1","cardCode":"08120","lines":["08120:A:1","08120:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character"},"hosts":[{"type":"character","control":"any","traits":["Noldor","Silvan"]}],"limitPerHost":true}]},
-  {"id":"08120:constant:2","cardCode":"08120","lines":["08120:A:3"],"timing":"constant","instructions":[
+  // 08120 Cloak of Lórien: line 1 prints the attach line and the limit as one paragraph.
+  {"id":"08120:constant:1","cardCode":"08120","lines":["08120:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character"},"hosts":[{"type":"character","control":"any","traits":["Noldor","Silvan"]}],"limitPerHost":true}]},
+  {"id":"08120:constant:2","cardCode":"08120","lines":["08120:A:2"],"timing":"constant","instructions":[
     {"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay","target":"host","when":{"kind":"not","condition":{"kind":"matches","card":"activeLocation","pick":{"type":"location","control":"any","trait":"Forest"}}}},
     {"verb":"ModifyStat","stat":"defense","amount":2,"until":"whileSourceInPlay","target":"host","when":{"kind":"matches","card":"activeLocation","pick":{"type":"location","control":"any","trait":"Forest"}}}]},
   // 08121 Nenya

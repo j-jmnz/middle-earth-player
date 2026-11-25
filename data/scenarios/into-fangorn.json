@@ -1,0 +1,133 @@
+{
+  "id": "into-fangorn",
+  "name": "Into Fangorn",
+  "number": 3,
+  "stages": [
+    "07065",
+    "07066",
+    "07067"
+  ],
+  "encounterSets": [
+    {
+      "name": "Into Fangorn",
+      "count": 17
+    },
+    {
+      "name": "Ancient Forest",
+      "count": 9
+    },
+    {
+      "name": "Weary Travelers",
+      "count": 7
+    }
+  ],
+  "cards": [
+    {
+      "code": "07033",
+      "normal": 4,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "07034",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "07035",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "07036",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "07037",
+      "normal": 4,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "07050",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "07051",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "07052",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "07056",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "07057",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "07058",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "07065",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "07066",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "07067",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "07032",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "07031",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q04.3",
+    "dragnEasy": "E04.3",
+    "hobSlug": "Into-Fangorn"
+  }
+}

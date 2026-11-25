@@ -1,0 +1,18 @@
+{
+  "id": "the-ring-maker",
+  "name": "The Ring-maker",
+  "scenarios": [
+    "the-fords-of-isen",
+    "to-catch-an-orc",
+    "into-fangorn",
+    "the-dunland-trap",
+    "the-three-trials",
+    "trouble-in-tharbad",
+    "the-nin-in-eilph",
+    "celebrimbors-secret",
+    "the-antlered-crown"
+  ],
+  "kind": "cycle",
+  "starterDecks": [],
+  "saga": false
+}

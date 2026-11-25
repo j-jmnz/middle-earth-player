@@ -86,6 +86,16 @@ export const RULE_PDFS = [
     ["bog", "rulesheet-the-blood-of-gondor.pdf"],
     ["tmv", "rulesheet-the-morgul-vale.pdf"],
   ].map(([doc, file]) => ({ doc: doc as string, file: file as string, url: `${FFG}/${file as string}` })),
+  // The Ring-maker's rules insert (The Voice of Isengard, three scenarios) and the six Adventure Pack rulesheets: the scenario's encounter sets, its setup paragraph and the keywords it introduces (FFG host, text layer).
+  ...[
+    ["voi", "the-voice-of-isengard-rulesheet.pdf"],
+    ["tdt", "the-dunland-trap-rulesheet.pdf"],
+    ["ttt", "the-three-trials-rulesheet.pdf"],
+    ["tit", "trouble-in-tharbad-rulesheet.pdf"],
+    ["nie", "mec29-the-nin-in-eilph-rulesheet.pdf"],
+    ["cs", "celebrimbors-secret-rulesheet.pdf"],
+    ["tac", "mec31-the-antlered-crown-rulesheet.pdf"],
+  ].map(([doc, file]) => ({ doc: doc as string, file: file as string, url: `${FFG}/${file as string}` })),
 ] as const;
 
 // PDFs stay out of git. They are fetched into .cache/pdf and pinned by sha256 in data/sources.json.
