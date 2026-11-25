@@ -298,6 +298,16 @@ export const AUTHORED_REPLACES: readonly string[] = [];
 `;
 }
 
+/** test/scenarios/<id>/screens.ts */
+export function screensFile(facts: Facts): string {
+  return `import type { ScreenMoment } from "../../harness/screens.ts";
+
+// The table moments the screen review shoots (\`pnpm browser shot --moment ${facts.id} --landscape\`; test/harness/screens.ts): one for each new widget of ${facts.name}'s table, a layout (the same JSON \`pnpm game scene\` takes) and a note that says
+// which printed line or widget it shows. TODO: write them while the scenario is built, and name them in the \`ux\` brief. \`scripts/browser/scene.test.ts\` builds each one in Node and fails when a layout no longer builds.
+export const screens: ScreenMoment[] = [];
+`;
+}
+
 /**
  * src/play/words/asks/<id>.ts the scenario's choice words as data (src/play/words/asks.ts). pnpm data build adds it to the barrel. A scenario of The Hobbit spreads the shared words of the cards it deals that ask
  * (src/play/words/hobbit-asks.ts): the On the Doorstep Bilbo Baggins, and the dragon treasure set where its Setup lists it (`ScenarioData.sagaStart`, `ScenarioData.treasures`).

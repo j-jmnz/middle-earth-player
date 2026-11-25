@@ -5,7 +5,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
-import { printedIn, tableFromLayout, type Layout } from "../../test/harness/layout.ts";
+import { printedIn, tableFromLayout, type Layout, type LayoutTable } from "../../test/harness/layout.ts";
 import type { GameSource } from "./source.ts";
 
 /** The layout an argument gives: JSON, or `@<file>` holding JSON, read from the folder pnpm was started in. */
@@ -27,8 +27,13 @@ function codesOf(value: unknown, out: Set<string>): Set<string> {
   return out;
 }
 
-export function sceneSource(scenarioId: string, layout: Layout): GameSource {
+/** The table of a layout, with the cards of data/cards that the layout names and the scenario does not deal. */
+export function sceneTable(scenarioId: string, layout: Layout): LayoutTable {
   const extra = [...codesOf(layout, new Set())].filter((code) => printedIn(scenarioId, code) === undefined);
-  const table = tableFromLayout(scenarioId, layout, { extra });
+  return tableFromLayout(scenarioId, layout, { extra });
+}
+
+export function sceneSource(scenarioId: string, layout: Layout): GameSource {
+  const table = sceneTable(scenarioId, layout);
   return { label: `scene of ${scenarioId} ${JSON.stringify(layout)} (stand-in heroes ${table.hero}${table.hero2 ? `, ${table.hero2}` : ""})`, ctx: table.ctx, opening: table.state, intents: [] };
 }
