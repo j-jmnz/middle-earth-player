@@ -32,7 +32,9 @@ public class BookletPdfModule: Module {
 }
 
 // PDFKit's own view: continuous vertical pages, scaled to the width. It reports the page that is showing.
-class BookletPdfView: ExpoView {
+// As the view's delegate it takes every tap on a link to a URL and does nothing with it: a booklet the player added
+// opens no page in the browser. Links inside the document (a contents entry) still move the reader.
+class BookletPdfView: ExpoView, PDFViewDelegate {
   let onPageChange = EventDispatcher()
   private let pdfView = PDFView()
   private var loadedUri: String?
@@ -48,6 +50,7 @@ class BookletPdfView: ExpoView {
     pdfView.displayMode = .singlePageContinuous
     pdfView.displayDirection = .vertical
     pdfView.backgroundColor = .clear
+    pdfView.delegate = self
     addSubview(pdfView)
     NotificationCenter.default.addObserver(
       self,
@@ -60,6 +63,8 @@ class BookletPdfView: ExpoView {
   deinit {
     NotificationCenter.default.removeObserver(self)
   }
+
+  func pdfViewWillClick(onLink sender: PDFView, with url: URL) {}
 
   override func layoutSubviews() {
     pdfView.frame = bounds
