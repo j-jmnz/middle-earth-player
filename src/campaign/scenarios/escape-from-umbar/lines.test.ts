@@ -1,7 +1,9 @@
 // Rules: rr.forced, rr.travel, rr.then, rr.cannot, rr.engaged, hrd.side-quests, hrd.current-quest (data/rules/entries.json); ledger lines of Escape from Umbar (data/printed/haradrim.json).
 import { describe, expect, it } from "vitest";
 
-import { flagged, type ScenarioState } from "../../../rules/core/state.ts";
+import { expireModifiers, flagged, type ScenarioState } from "../../../rules/core/state.ts";
+import { flaggedByClass } from "../../../rules/core/holder-classes.ts";
+import { printedOf } from "../../../rules/core/printed.ts";
 import { queueEvent } from "../../../rules/windows/queue.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { asCurrentQuest } from "../../../rules/families/sidequests/fixture.ts";
@@ -177,6 +179,28 @@ describe("16044 Nowhere to Hide", () => {
       },
     });
     expect(marked.run.state.cards[idOf(marked.run.state, "dh1")]?.damage).toBe(5);
+  });
+});
+
+describe("16047 Enfeebled", () => {
+  const hero = (state: ScenarioState) => state.cards[idOf(state, "dh1")]!;
+  const bar = (made: ReturnType<typeof table>, state: ScenarioState, stat: "cannotReady" | "cannotReadyByPlayerCard"): boolean =>
+    flagged(state, hero(state).id, stat) || flaggedByClass(state, hero(state), printedOf(made.ctx.cards, hero(state).code), stat);
+
+  it("16047:A:1 the bar on readying lasts until the end of the phase: it holds through the combat phase and lapses when the combat phase ends", () => {
+    const made = table({ play: ["ally"] });
+    const done = resolveRecords(opened(made).state, made.ctx, "16047", "whenRevealed");
+    expect(bar(made, done.state, "cannotReadyByPlayerCard")).toBe(true);
+    expect(bar(made, expireModifiers(done.state, ["endOfRound"]), "cannotReadyByPlayerCard")).toBe(true);
+    expect(bar(made, expireModifiers(done.state, ["endOfCombat"]), "cannotReadyByPlayerCard")).toBe(false);
+  });
+
+  it("16047:A:2 the defender cannot ready until the end of the round: the bar holds at the end of the combat phase and lapses at the end of the round", () => {
+    const fight = fightEnemy((layout: Layout) => table(layout), "16047", "16042", { stage: MAIN });
+    const made = fight.made;
+    expect(bar(made, fight.during, "cannotReady")).toBe(true);
+    expect(bar(made, expireModifiers(fight.during, ["endOfCombat"]), "cannotReady")).toBe(true);
+    expect(bar(made, expireModifiers(fight.during, ["endOfRound"]), "cannotReady")).toBe(false);
   });
 });
 
