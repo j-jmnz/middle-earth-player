@@ -124,7 +124,7 @@ const FLAGS = [
   // test", 906106:A:1). The smallest amount held applies. Read by hideCommitReason (rules/quest/hide.ts) through families/nightmare.ts.
   "hideCommitLimit",
   // On a card: it is immune to player card effects while the flag holds ("While Bill Ferny is in the staging area, he gains: Immune to player
-  // card effects", 906201:A:2; mec109.immune-to-player-card-effects). Read with the printed keyword (rules/core/keywords.ts playerCardEffectCanChoose).
+  // card effects", 906201:A:2; mec109.immune-to-player-card-effects). Read with the printed keyword (rules/core/keyword-flags.ts playerCardEffectCanChoose).
   "immuneToPlayerCards",
   // On a card: it cannot ready, by a card effect or in the refresh phase, while the flag holds ("your cards cannot ready for the remainder
   // of the round", 900103:A:1). Read wherever a card readies (player-verbs.ts readyCard, refresh.ts, effect-verbs.ts ReadyHero).

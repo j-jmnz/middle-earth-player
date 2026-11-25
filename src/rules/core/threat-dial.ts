@@ -1,4 +1,4 @@
-// Rules: rr.damage (data/rules/entries.json). Raising and lowering a threat dial.
+// Rules: rr.threat-threat-dial (data/rules/entries.json). Raising and lowering a threat dial.
 import type { Cause } from "./cause.ts";
 import type { EngineStep } from "./intents.ts";
 import { queueEvent } from "../windows/queue.ts";

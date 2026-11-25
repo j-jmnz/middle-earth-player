@@ -30,11 +30,11 @@ export const scenarioHandlers = {
   tokens: (state, condition) => tokensOn(state, condition.code) >= condition.min * (condition.perPlayer ? livingSeats(state).length : 1),
   heading: (state, condition) => headingIs(state, condition.is),
   stormcaller: (state, condition) => stormcallerHolds(state, condition),
-  // The burden deck, Campaign Mode and the effect's X (families/burden.ts).
+  // The burden deck and Campaign Mode (families/burden.ts).
   burdenDeck: (state, condition) => (state.burdenDeck?.length ?? 0) >= (condition.min ?? 1),
   campaign: (state) => Object.values(state.cards).some((card) => card.zone === "campaign"),
   upgraded: (state, condition) => state.campaignFacts?.upgraded?.includes(condition.code) === true,
-  // The aflame family's: the cards underneath The Havens Burn (families/aflame/values.ts). `revealing`: the source's own When Revealed is on the stack.
+  // The aflame family's: the cards underneath The Havens Burn (families/aflame/values.ts).
   encounterHas: (state, condition, _scope, ctx) => encounterHolds(state, condition, ctx),
   underBurn: (state, condition, _scope, ctx) => underBurnHolds(state, condition, ctx),
   corsairHas: (state) => corsairHolds(state),

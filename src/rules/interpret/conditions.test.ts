@@ -1,6 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import { holds } from "./conditions.ts";
+import type { Condition } from "../../catalog/boundary.ts";
+import { holds, traitHandlers } from "./conditions.ts";
+import { cardHandlers } from "./condition-kinds/cards.ts";
+import { combatHandlers } from "./condition-kinds/combat.ts";
+import { eventHandlers } from "./condition-kinds/event.ts";
+import { familyOnlyHandlers } from "./condition-kinds/family-only.ts";
+import { playerHandlers } from "./condition-kinds/players.ts";
+import { questHandlers } from "./condition-kinds/quest.ts";
+import { scenarioHandlers } from "./condition-kinds/scenario.ts";
 import { cardMap, hero, idleScenario } from "../core/test-fixture.ts";
 import { definePrinted } from "../core/printed.ts";
 import { updateCard } from "../core/state.ts";
@@ -64,5 +72,26 @@ describe("conditions", () => {
     expect(holds({ ...state, pendingAttack: attack }, { kind: "undefended" }, scope, ctx)).toBe(true);
     expect(holds({ ...state, pendingAttack: { ...attack, defenderId: "h1" } }, { kind: "undefended" }, scope, ctx)).toBe(false);
     expect(holds({ ...state, pendingAttack: { ...attack, defenderId: "h1", undefended: true } }, { kind: "undefended" }, scope, ctx)).toBe(true);
+  });
+});
+
+describe("condition handler tables", () => {
+  it("holds no kind in two tables (the later spread in HANDLERS would win silently)", () => {
+    const tables = { "family-only.ts": familyOnlyHandlers, "cards.ts": cardHandlers, "combat.ts": combatHandlers, "event.ts": eventHandlers, "players.ts": playerHandlers, "quest.ts": questHandlers, "scenario.ts": scenarioHandlers, "conditions.ts (traits)": traitHandlers };
+    const owner = new Map<string, string>();
+    const repeated: string[] = [];
+    for (const [file, table] of Object.entries(tables)) {
+      for (const kind of Object.keys(table)) {
+        const first = owner.get(kind);
+        if (first !== undefined) repeated.push(`${kind}: ${first} and ${file}`);
+        else owner.set(kind, file);
+      }
+    }
+    expect(repeated).toEqual([]);
+  });
+
+  it("answers undefined, read as false, for a kind no handler lists", () => {
+    const unknown = { kind: "noSuchKind" } as unknown as Condition;
+    expect(holds(idleScenario(1, "Quest"), unknown, scope, { effects: [], cards: cardMap([]) })).toBeUndefined();
   });
 });

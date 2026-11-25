@@ -1,4 +1,4 @@
-// Rules: rr.lasting-effects, faq.lasting-effects (data/rules/entries.json); ledger lines 146023:A:1, 146022:A:3, 146014:A:2. The numbers The Tower of Cirith Ungol's lasting effects add to a stat where it is read (modifiedStat in core/keywords.ts): held per damage on the card or per Willpower of the hero its source lies on,
+// Rules: rr.lasting-effects, faq.lasting-effects (data/rules/entries.json); ledger lines 146023:A:1, 146022:A:3, 146014:A:2. The numbers The Tower of Cirith Ungol's lasting effects add to a stat where it is read (modifiedStat in core/modified-stat.ts): held per damage on the card or per Willpower of the hero its source lies on,
 // recalculated as the damage and the Willpower change.
 import type { ModifierStat } from "../../../catalog/boundary.ts";
 

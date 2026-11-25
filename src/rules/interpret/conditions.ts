@@ -23,7 +23,7 @@ export type { Scope };
 export { shadowBlankOf };
 
 // The kinds that read a card's Traits or evaluate another condition.
-const traitHandlers = {
+export const traitHandlers = {
   hasEngaged: (state, condition, scope, ctx) => {
     const trait = condition.trait;
     return (state.seats[scope.actor]?.engaged ?? []).some((id) => trait == null || hasTrait(state, id, trait, ctx));
@@ -49,7 +49,7 @@ const traitHandlers = {
   any: (state, condition, scope, ctx) => condition.conditions.some((inner) => holds(state, inner, scope, ctx)),
 } satisfies Partial<ConditionHandlers>;
 
-// Every condition kind has exactly one handler (a missing or a repeated kind fails the type check).
+// Every condition kind needs a handler: a missing kind fails the type check, and a kind two tables hold fails conditions.test.ts (the later spread would win silently).
 const HANDLERS: ConditionHandlers = {
   ...familyOnlyHandlers,
   ...cardHandlers,
@@ -68,7 +68,9 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
   const familial = familyCondition(state, condition, scope, ctx);
   if (familial !== null) return familial;
   // The handler of this kind takes this kind's condition: the table is keyed by `kind`, which the type system cannot correlate with the union.
-  const handler = HANDLERS[condition.kind as ConditionKind] as (state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext) => boolean;
+  const handler = HANDLERS[condition.kind as ConditionKind] as ((state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext) => boolean) | undefined;
+  // A kind no handler lists answers undefined (read as false), as the old switch without a default did.
+  if (handler === undefined) return undefined as unknown as boolean;
   return handler(state, condition, scope, ctx);
 }
 
