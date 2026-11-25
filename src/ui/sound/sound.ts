@@ -9,13 +9,15 @@
 // A sound starts with no wait when its player is loaded and stands at its start, so both are done ahead of the moment: a slot whose
 // moment is known to come is loaded before it (primeSounds), and a player that has sounded is put back to its start once it ends (rewind).
 //
-// On Android a player that waits at its start cannot be trusted (STARTS_BY_SEEK, starts-by-seek.native.ts): there every play is a seek to
-// the start with the play sent right behind it, and no player is put back.
+// On Android the sounds are samples of the phone's SoundPool and use none of these players (pool-samples.ts): a player that waits
+// at its start cannot be trusted there, and a seek before each play is heard as a late sound. An Android build without that module
+// plays through the players, every play a seek to the start with the play sent right behind it (STARTS_BY_SEEK, starts-by-seek.native.ts).
 import { createAudioPlayer, type AudioPlayer } from "./audio-player";
 
 import { accessibility } from "../accessibility.ts";
 import { tableSettings } from "../table-settings.ts";
 import { bundledSounds } from "./bundled";
+import { pool } from "./pool";
 import { audioFailed, startAudioSession } from "./session.ts";
 import { SCREEN_SOUNDS, type SoundSlot } from "./slots.ts";
 import { STARTS_BY_SEEK } from "./starts-by-seek";
@@ -192,6 +194,15 @@ function soundsOn(): boolean {
   return SOUNDS_BUNDLED && sounds && soundVolume > 0;
 }
 
+// Loads the slots' samples (pool-samples.ts). A sample holds no decoder once loaded, so PLAYERS_MAX does not count them.
+function primeSamples(slots: readonly SoundSlot[]): void {
+  loaded = true;
+  for (const slot of slots) {
+    const source = bundledSounds[slot];
+    if (source != null) pool?.prime(slot, source);
+  }
+}
+
 /**
  * Loads the slots' players ahead of the moment they play, so each starts with no load: the screens' sounds at launch, the table's as
  * it opens, a state's motion sounds as it is drawn and a spotlight's strikes as it starts. It plays nothing, and loads nothing while
@@ -200,6 +211,7 @@ function soundsOn(): boolean {
 export function primeSounds(slots: readonly SoundSlot[]): void {
   if (slots.length === 0 || !soundsOn()) return;
   try {
+    if (pool) return primeSamples(slots);
     startAudioSession();
     loaded = true;
     load(slots.slice(0, PLAYERS_MAX), Date.now());
@@ -222,6 +234,12 @@ export function playSound(slot: SoundSlot): void {
   if (now - (lastPlayed.get(slot) ?? -Infinity) < (ui ? TAP_REPEAT_MS : REPEAT_MS)) return;
   lastPlayed.set(slot, now);
   try {
+    if (pool) {
+      // The first sound asked for loads the screens' sounds when the launch did not, as startSession does for the players.
+      if (!loaded) primeSamples(SCREEN_SOUNDS);
+      trace(`${slot}: sample`);
+      return pool.play(slot, source, soundVolume);
+    }
     startSession(now);
     const voice = voiceOf(slot, source, now);
     if (!voice) return trace(`${slot}: no player is free`);
