@@ -1,10 +1,13 @@
 // The web app's Worker (docs/plans/pwa-iphone-ipad.md, Cloudflare fit). Cloudflare answers a request that names a file of the export from the static assets, with the
 // headers of `_headers`, and never runs this code. It runs for the rest: a route with a parameter gets its page, and any other path the app's not-found page.
 // A Worker module exports its handlers and nothing else, so the path is in routes.ts.
+import { handleMeter, METER_PATH, type MeterStore } from "./meter.ts";
 import { assetPath, matchRoute, ROUTES_PATH } from "./routes.ts";
 
 export interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
+  /** The test site's store of meter logs (meter.ts); the permanent site has none. */
+  METER?: MeterStore;
 }
 
 // One read for each isolate: a deploy starts new isolates, so the list is never older than the assets beside it.
@@ -18,8 +21,10 @@ async function loadPages(env: Env, origin: string): Promise<string[]> {
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    if (request.method !== "GET" && request.method !== "HEAD") return new Response(null, { status: 405, headers: { allow: "GET, HEAD" } });
     const url = new URL(request.url);
+    // The test meter's logs, where the deploy keeps them.
+    if (url.pathname === METER_PATH && env.METER) return handleMeter(request, env.METER, Date.now(), crypto.randomUUID().slice(0, 8));
+    if (request.method !== "GET" && request.method !== "HEAD") return new Response(null, { status: 405, headers: { allow: "GET, HEAD" } });
     pages ??= loadPages(env, url.origin);
     let list: string[];
     try {

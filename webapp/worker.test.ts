@@ -43,6 +43,22 @@ describe("the web app's Worker", () => {
     expect(env.asked.at(-1)).toEqual({ path: "/%2Bnot-found", conditional: false });
   });
 
+  it("keeps and reads the meter's logs only where the deploy has a store", async () => {
+    const rows = new Map<string, string>();
+    const withStore = {
+      ...assets(),
+      METER: {
+        put: async (key: string, value: string) => void rows.set(key, value),
+        get: async (key: string) => rows.get(key) ?? null,
+        list: async () => ({ keys: [...rows.keys()].map((name) => ({ name })) }),
+      },
+    };
+    expect((await worker.fetch(new Request("https://app.example/_meter", { method: "POST", body: "a log" }), withStore)).status).toBe(204);
+    expect(await (await worker.fetch(new Request("https://app.example/_meter"), withStore)).text()).toBe("a log\n");
+    expect((await worker.fetch(new Request("https://app.example/_meter", { method: "POST", body: "a log" }), assets())).status).toBe(405);
+    expect((await worker.fetch(new Request("https://app.example/_meter"), assets())).status).toBe(404);
+  });
+
   it("refuses a method that changes something", async () => {
     const response = await worker.fetch(new Request("https://app.example/table/abc", { method: "POST" }), assets());
     expect(response.status).toBe(405);

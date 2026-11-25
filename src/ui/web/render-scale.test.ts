@@ -1,7 +1,7 @@
 // The web app's test controls (src/ui/web/render-scale.ts): which drawing scale and whether the frame meter, from the address and the stored choice.
 import { describe, expect, it } from "vitest";
 
-import { chosenScale, errorLine, logText, meterChosen, meterLine, secondOf, summaryLine } from "./render-scale.ts";
+import { chosenScale, errorLine, logText, meterChosen, meterLine, secondLine, secondOf, summaryLine } from "./render-scale.ts";
 
 describe("the web app's drawing scale", () => {
   it("takes the address's scale before the stored one", () => {
@@ -39,19 +39,25 @@ describe("the web app's drawing scale", () => {
     expect(errorLine("plain")).toBe("plain");
   });
 
-  it("keeps a second as its rate, its longest frame and its slow frames", () => {
-    expect(secondOf([16, 16, 18, 50], { raf: 12.4, draw: 3.6, draws: 2, db: 20.2, dbs: 9, save: 140.5, saves: 1, audio: 7.2, audios: 3 })).toEqual({ fps: 40, worst: 50, slow: 1, late: 35, raf: 12, draw: 4, draws: 2, db: 20, dbs: 9, save: 141, saves: 1, audio: 7, audios: 3 });
-    expect(secondOf([])).toEqual({ fps: 0, worst: 0, slow: 0, late: 0, raf: 0, draw: 0, draws: 0, db: 0, dbs: 0, save: 0, saves: 0, audio: 0, audios: 0 });
+  it("keeps a second as its rate, its longest frame, its slow frames, its late time and its rounded work", () => {
+    expect(secondOf([16, 16, 18, 50], { raf: [12.4, 4], tex: [140.5, 6] })).toEqual({ fps: 40, worst: 50, slow: 1, late: 35, work: { raf: [12, 4], tex: [141, 6] } });
+    expect(secondOf([])).toEqual({ fps: 0, worst: 0, slow: 0, late: 0, work: {} });
   });
 
-  it("sums the log up by its slowest second, and lists it to send", () => {
+  it("sums the log up by its slowest second, and lists each second with the work it had, in one order", () => {
     const log = [
-      { fps: 60, worst: 18, slow: 0, late: 2, raf: 40, draw: 0, draws: 0, db: 0, dbs: 0, save: 0, saves: 0, audio: 0, audios: 0 },
-      { fps: 24, worst: 90, slow: 7, late: 610, raf: 300, draw: 480, draws: 6, db: 90, dbs: 30, save: 400, saves: 2, audio: 60, audios: 4 },
-      { fps: 48, worst: 40, slow: 2, late: 200, raf: 120, draw: 90, draws: 2, db: 0, dbs: 0, save: 0, saves: 0, audio: 0, audios: 0 },
+      { fps: 60, worst: 18, slow: 0, late: 2, work: { raf: [40, 60] as const } },
+      { fps: 24, worst: 90, slow: 7, late: 610, work: { shader: [400, 3] as const, raf: [30, 24] as const, tap: [0, 1] as const } },
+      { fps: 48, worst: 40, slow: 2, late: 200, work: {} },
     ];
     expect(summaryLine(log)).toBe("last 3 s: lowest 24 fps  mean 44  worst 90 ms  slow frames 9");
     expect(summaryLine([])).toBe("no log yet");
-    expect(logText(log, 1.5).split("\n")).toEqual(["x1.5  last 3 s: lowest 24 fps  mean 44  worst 90 ms  slow frames 9", " 1  60 fps  worst 18 ms  late 2  raf 40  draw 0/0  db 0/0  save 0/0  audio 0/0", " 2  24 fps  worst 90 ms  late 610  raf 300  draw 480/6  db 90/30  save 400/2  audio 60/4", " 3  48 fps  worst 40 ms  late 200  raf 120  draw 90/2  db 0/0  save 0/0  audio 0/0"]);
+    expect(secondLine(log[1]!)).toBe("24 fps  worst 90 ms  late 610  raf 30/24  tap 0/1  shader 400/3");
+    expect(logText(log, 1.5).split("\n")).toEqual([
+      "x1.5  last 3 s: lowest 24 fps  mean 44  worst 90 ms  slow frames 9",
+      " 1  60 fps  worst 18 ms  late 2  raf 40/60",
+      " 2  24 fps  worst 90 ms  late 610  raf 30/24  tap 0/1  shader 400/3",
+      " 3  48 fps  worst 40 ms  late 200",
+    ]);
   });
 });
