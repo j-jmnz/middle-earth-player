@@ -49,13 +49,13 @@ If a task cannot be done without changing a behaviour the plan keeps, stop and a
 - After the last task, run `reviewer` and `ux` once each, in parallel, on the whole diff from the commit before the first task. Run `ux` only when `src/screens` or `src/play` changed.
 - Brief them with the base commit, the plan, and the areas to look at hardest (caches, behaviour the plan keeps, new lifecycle such as hidden screens, and for an engine or record fix the points of `docs/agents/card-audit.md`, Fix and review). Do not hand them your own conclusions. Tell them the gate is green on the reviewed commit, so they run only the test files a finding needs.
 - Sort the findings. A real one has an input or a path that gives the wrong result, or a visible regression. Fix every real finding in one Sonnet implementer task, which ends on the one full `pnpm test`. A finding you decide not to fix goes into the fix commit's message with the reason.
-- Do not run the reviewers again. One round only. The fix task reports the other cards each general change reaches (`.claude/agents/implementer.md`, Changes): read that list before you commit.
+- Do not run the reviewers again: one round only, except that a fix which changed shared engine code (`scripts/checks/shared-engine.ts`) has that change read once more by a `reviewer`. The fix task reports the other cards each general change reaches (`.claude/agents/implementer.md`, Changes): read that list before you commit.
 
 ## Closing
 
 - Update `docs/phases/STATUS.md` as `.claude/rules/docs-standards.md` says (the phase row, Standing decisions, Open items). What was built, the commands, test counts and measures go in the commit messages and your final report.
 - The plan is done: delete it and any handover the work consumed, and point what cites it at the doc that owns the behaviour (`.claude/rules/docs-standards.md`, Plans, phases and handovers).
-- A scenario phase's last commit carries the measures of `docs/agents/agent-brief.md` (Measure), taken from each task's report: ask every task to report its full test runs, its wait minutes and its writing minutes.
+- A scenario phase's last commit carries the measures of `docs/agents/agent-brief.md` (Measure): each writing task records its times with `pnpm scenario time`, and you add a read-only agent's.
 - Before the last commit, check that `pnpm test`, `pnpm lint`, `pnpm typecheck` and `pnpm data check` are green on the final tree. The fix task's full run, green on that tree, counts; do not repeat it. Then commit and push.
 - After the last commit, open the pull request and update its issues, as `.claude/rules/agent-standards.md` and `docs/agents/issue-standards.md` say.
 - Finish with a short report: what each task changed, the measured numbers, the review findings and what was fixed or kept, and what stays open.
