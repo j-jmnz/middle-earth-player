@@ -19,6 +19,7 @@ import { heldWords } from "../words/scenarios/sea.ts";
 import { ILL_TIDINGS_MARK } from "../words/scenarios/ring-maker/fords-table.ts";
 import { heldInHand } from "../../rules/families/ring-maker/hand.ts";
 import { grimaLyingOn } from "../readouts/ring-maker/fords.ts";
+import { mugashLyingOn } from "../readouts/ring-maker/orc.ts";
 import { lootDeckWords, lootGuardWords } from "../words/loot.ts";
 import { lootUnder } from "../../rules/families/sidequests/loot.ts";
 import { stackMark } from "../readouts/against-the-shadow/stewards-fear.ts";
@@ -392,6 +393,9 @@ function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): Unde
   // Gríma lying on The Islet (The Fords of Isen, 07059:A:1): "1 held".
   const lying = grimaLyingOn(game, cardId);
   if (lying.length > 0) return heldWords(lying.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
+  // Mugash attached to a hero (To Catch an Orc, 07024:A:2): "1 held" on the hero, wherever it lies.
+  const mugash = mugashLyingOn(game, cardId);
+  if (mugash.length > 0) return heldWords(mugash.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
   const captives = captivesUnder(game, cardId);
   if (captives.length > 0) return heldWords(captives.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
   const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);

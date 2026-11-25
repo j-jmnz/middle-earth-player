@@ -9,6 +9,8 @@ const LAST: Record<string, string> = {
   "07059": "With the last gone, Gríma is discarded and the players lose.",
   "07060": "With the last gone, each player assigns damage for each card in his hand, and 2 time counters return.",
   "07061": "With the last gone, cards from the top of the encounter deck are discarded, each enemy among them joins the staging area, and 3 time counters return.",
+  "07063": "With the last gone, the encounter discard pile joins the deck, 2 encounter cards are revealed for each player, and 2 time counters return.",
+  "07064": "With the last gone, Mugash returns to the staging area, 1 encounter card fewer than the players is revealed, and 3 time counters return.",
 };
 
 /** The note of the stage's time dial: the counters left, the refresh phase that takes one and what the last one does. */

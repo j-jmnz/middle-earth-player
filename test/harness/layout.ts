@@ -100,7 +100,7 @@ export type Layout = {
   hidden?: readonly Dealt[];
   // The locations of Assault on Osgiliath the first player controls: each is added to the staging area and taken by the family's own verb (families/pelargir/location-control.ts), so it lies in his play area, faceup and noted as controlled.
   controlled?: readonly string[];
-  // Other zones that hold a list of cards (a second deck, a named pile).
+  // Other zones that hold a list of cards (a second deck, a named pile); a seat's out-of-play deck (To Catch an Orc) lies facedown.
   piles?: Partial<Record<PileZone, readonly Entry[]>>;
 };
 
@@ -224,7 +224,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     const spawned = spawn(state, modeCode, { zone: "modeCard" });
     state = updateCard(spawned.state, spawned.id, { face: "B" });
   }
-  for (const [zone, items] of Object.entries(layout.piles ?? {}) as [PileZone, readonly Entry[]][]) for (const item of items) put(entry(item).code, { zone }, item);
+  for (const [zone, items] of Object.entries(layout.piles ?? {}) as [PileZone, readonly Entry[]][]) for (const item of items) put(entry(item).code, { zone }, item, zone === "outOfPlay0" || zone === "outOfPlay1" ? "down" : undefined);
   for (const attachment of layout.attached ?? []) {
     const host = idOf(state, attachment.to);
     if (attachment.encounter) {
