@@ -18,7 +18,8 @@ export function heroPays(state: ScenarioState, heroId: string, sphere: Sphere | 
   if (forCard != null && cannotPay(state, heroId, forCard, ctx)) return false;
   if (iconLost(state, heroId, sphere)) return false;
   // A neutral cost needs no icon, so a hero that lost its icons still pays it with its resources (Haunted Valley).
-  if ((sphere == null || sphere === "neutral") && spherePays(printedOf(ctx.cards, hero.code).sphere, sphere)) return true;
+  // A hero with no sphere at all (an objective-hero, hrd.objective-heroes) pays a neutral cost the same way.
+  if ((sphere == null || sphere === "neutral") && (spherePays(printedOf(ctx.cards, hero.code).sphere, sphere) || (hero.zone === "heroes" && printedOf(ctx.cards, hero.code).sphere == null))) return true;
   if (spheresOf(state, heroId, printedOf(ctx.cards, hero.code).sphere, ctx).some((icon) => spherePays(icon, sphere))) return true;
   // Oak-wood Grove: the hero's resources may be spent as Leadership resources, with no icon.
   if (sphere === "leadership" && heldAmount(state, heroId, "paysAsLeadership") > 0) return true;
