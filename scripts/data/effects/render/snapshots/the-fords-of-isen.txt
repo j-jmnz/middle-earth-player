@@ -40,7 +40,7 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
     - the table: stat noCardResources (the hero cannot gain resources from card effects; the resources it collects in the resource phase are not one) 1, while this card is in play
 
 07018:A:2 (front): Forced: After Fords of Isen becomes the active location, each player with fewer than 5 cards in his hand draws cards until he has 5 in his hand.
-  07018:forced:1: Forced after this location becomes the active location (heard about this card)
+  07018:forced:1: Forced after this location becomes the active location (heard about this card) [also {"holdsEvents":true}]
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the acting player draws the cards in your hand x -1 + 5 card(s)
@@ -78,7 +78,7 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 07021:A:1 (front): When Revealed: Each player draws a card. Each player raises his threat by 1 for each card in his hand.
-  07021:whenRevealed:1: When revealed
+  07021:whenRevealed:1: When revealed [also {"holdsEvents":true}]
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the acting player draws 1 card(s)
@@ -98,7 +98,7 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 07022:A:1 (front): When Revealed: Each player must choose: Either remove 1 time counter from the current quest, or search the encounter deck and discard pile for a Dunland enemy, reveal it, and add it to the staging area. Shuffle the encounter deck. If any player has 5 or more cards in hand, this effect cannot be canceled.
-  07022:whenRevealed:1: When revealed (cannot be canceled while some living player's hand holds at least 5 cards)
+  07022:whenRevealed:1: When revealed (cannot be canceled while some living player's hand holds at least 5 cards) [also {"holdsEvents":true}]
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the acting player chooses one of:
@@ -180,7 +180,7 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 07046:A:1 (front): When Revealed: Each player draws a card.
-  07046:whenRevealed:1: When revealed
+  07046:whenRevealed:1: When revealed [also {"holdsEvents":true}]
     - for each player, first player first:
       - the acting player draws 1 card(s)
 
@@ -311,4 +311,4 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
   07061:questResolution:1: Quest resolution
     - the players win the game
 
-(rendered pieces: 169 by template, 0 as JSON)
+(rendered pieces: 165 by template, 4 as JSON)
