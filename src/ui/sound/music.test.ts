@@ -6,7 +6,7 @@ import { tableSettings } from "../table-settings.ts";
 
 type FakePlayer = { source: number; volume: number; currentTime: number; duration: number; isLoaded: boolean; playing: boolean; removed: boolean; seeks: number[]; play: () => void; pause: () => void; remove: () => void; seekTo: (at: number) => Promise<void> };
 
-const audio = vi.hoisted(() => ({ players: [] as FakePlayer[], appState: null as ((state: string) => void) | null, other: false, reader: false }));
+const audio = vi.hoisted(() => ({ players: [] as FakePlayer[], appState: null as ((state: string) => void) | null, other: false, reader: false, stops: false }));
 vi.mock("react-native", () => ({
   AppState: {
     currentState: "active",
@@ -19,7 +19,8 @@ vi.mock("react-native", () => ({
 vi.mock("./other-audio", () => ({ otherAudioPlaying: () => audio.other }));
 // Mocked whole: loaded here with the mocked react-native, it would stay in the shared module cache (vitest.config.mts, isolate).
 vi.mock("../accessibility.ts", () => ({ accessibility: () => ({ screenReader: audio.reader }) }));
-vi.mock("./session.ts", () => ({ startAudioSession: () => undefined, audioFailed: () => undefined }));
+// `stops`: the Stop other audio setting as the session reads it. Off here but in its own test, so the music waits for other audio.
+vi.mock("./session.ts", () => ({ startAudioSession: () => undefined, audioFailed: () => undefined, stopsOtherAudio: () => audio.stops }));
 vi.mock("./bundled", () => ({ bundledSounds: {}, bundledMusic: { menu: 1, shire: 2, nazgul: 3 } }));
 vi.mock("./audio-player", () => ({
   createAudioPlayer: (source: number) => {
@@ -58,6 +59,7 @@ beforeEach(() => {
   audio.players.length = 0;
   audio.other = false;
   audio.reader = false;
+  audio.stops = false;
   tableSettings.getState().update({ music: true, musicVolume: 0.5 });
   stop = startMusic();
 });
@@ -149,6 +151,17 @@ describe("music", () => {
     audio.appState?.("background");
     audio.other = false;
     audio.appState?.("active");
+    expect(playing().map((player) => player.source)).toEqual([1]);
+  });
+
+  it("does not wait for another app's audio while Stop other audio is on", () => {
+    setTableMusic(null);
+    stop();
+    audio.players.length = 0;
+    // The phone can still say the other app plays for a moment after it was told to stop.
+    audio.other = true;
+    audio.stops = true;
+    stop = startMusic();
     expect(playing().map((player) => player.source)).toEqual([1]);
   });
 

@@ -27,6 +27,7 @@ import { SplashGlow } from "../kit/splash-glow";
 import { startUpdateChecks } from "../update/check";
 import { setTableMusic, startMusic } from "../../ui/sound/music";
 import { SCREEN_SOUNDS } from "../../ui/sound/slots";
+import { watchOtherAudio } from "../../ui/sound/other-apps";
 import { primeSounds } from "../../ui/sound/sound";
 import { keepsTableMusic } from "../nav/route-music";
 import { hubsWarm, opensOnHubs, subscribeHubsWarm, WARM_CAP_MS } from "../nav/tabs-warm";
@@ -175,6 +176,11 @@ export default function RootLayout() {
     return startUpdateChecks(databases.user, { current: APP_VERSION, warn: (message) => console.warn(message) });
   }, [databases]);
 
+  // The audio of other apps is stopped, on a phone and when the setting says so, once the stored settings are read (src/ui/sound/other-apps.ts).
+  useEffect(() => {
+    if (!databases) return;
+    return watchOtherAudio();
+  }, [databases]);
   // The music (src/ui/sound/music.ts): the menu's loop once the stored settings are read, so a player who turned Music off hears none.
   useEffect(() => {
     if (!databases) return;
