@@ -13,7 +13,7 @@ export type AsideGroup = "public" | "secret" | "notListed";
 export type AsideSite = { readonly functions: readonly string[]; readonly group: AsideGroup; readonly why: string; readonly verbs?: readonly string[] };
 
 export const ASIDE_SITES: Readonly<Record<string, AsideSite>> = {
-  "core/keywords.ts": { functions: ["defeatedDestination"], group: "notListed", why: "A quest card that is discarded or defeated goes set aside; quest cards are never listed." },
+  "core/destroy.ts": { functions: ["defeatedDestination"], group: "notListed", why: "A quest card that is discarded or defeated goes set aside; quest cards are never listed." },
   "setup/setup.ts": { functions: ["mulliganSeat", "shuffleZone", "startScenario"], group: "public", why: "The cards a player's campaign answer sets aside at Setup: the player named them." },
   "setup/search.ts": { functions: ["searchSetup"], group: "public", why: "A card whose Setup effect runs waits set aside while it resolves; the Setup names it." },
   "setup/verbs.ts": { functions: ["runSetupVerb"], group: "public", why: "SetAside: the cards the scenario's Setup names. The engine's facedown default says nothing; a card the Setup hides is declared by the verb that hides it (HideSuspectAndHideout, ShuffleRandomSetAside)." },
