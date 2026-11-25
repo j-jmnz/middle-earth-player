@@ -452,12 +452,15 @@ function commit(state: ScenarioState, cardIds: readonly string[], ctx: ReduceCon
   return committedTo(next, state.activeSeat, cardIds.length);
 }
 
-function undefendedHero(state: ScenarioState, heroId: string | undefined, ctx: ReduceContext): string {
+// The hero the intent names for the undefended attack's damage: the one card that may take it, "" when none may (the attack deals no damage), or undefined
+// while more than one may and the intent names none: the attack is left undefended (6.4.1) and the defending player names the hero at the damage step, once
+// the shadow effect has resolved (rr.step-6-4-3).
+function undefendedHero(state: ScenarioState, heroId: string | undefined, ctx: ReduceContext): string | undefined {
   const heroes = undefendedTargets(state, state.pendingAttack?.seat ?? state.activeSeat, ctx.cards);
   // No hero is left to take the attack (every hero of the seat is held, 18074): nobody does.
   if (heroes.length === 0) return "";
   if (heroes.length === 1) return heroes[0] ?? "";
-  return heroId ?? "";
+  return heroId;
 }
 
 // Whether any card that could answer damage just dealt (a damageDealt Response or Forced effect) is in play or in a hand.

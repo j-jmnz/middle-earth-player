@@ -2,12 +2,11 @@
 // for, nothing reaches the module; quick taps each get a player that is not still playing.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-// `silent`: a player asked to play does not start (it is not playing and stays at its start), as an Android player sometimes does.
-const calls = vi.hoisted(() => ({ created: [] as number[], played: [] as number[], seeks: 0, pauses: 0, playing: false, silent: false }));
+const calls = vi.hoisted(() => ({ created: [] as number[], played: [] as number[], seeks: 0, pauses: 0, playing: false }));
 vi.mock("./session.ts", () => ({ startAudioSession: () => undefined, audioFailed: () => undefined }));
 // The accessibility store is mocked whole: loaded here with the mocked react-native, it would stay in the shared module cache (vitest.config.mts, isolate).
 vi.mock("../accessibility.ts", () => ({ accessibility: () => ({ screenReader: false }) }));
-vi.mock("./bundled", () => ({ bundledSounds: { "ui.confirm": 1, "card.land": 2, "ui.back": 3 } }));
+vi.mock("./bundled", () => ({ bundledSounds: { "ui.confirm": 1, "card.land": 2, "ui.back": 3, "ui.pick": 4 } }));
 vi.mock("./audio-player", () => ({
   createAudioPlayer: (source: number) => {
     calls.created.push(source);
@@ -26,8 +25,8 @@ vi.mock("./audio-player", () => ({
       remove: () => undefined,
       play: () => {
         calls.played.push(source);
-        player.playing = calls.playing && !calls.silent;
-        player.currentTime = calls.silent ? 0 : 0.1;
+        player.playing = calls.playing;
+        player.currentTime = 0.1;
       },
     };
     return player;
@@ -55,7 +54,6 @@ afterEach(() => {
   tableSettings.getState().update({ sounds: true });
   calls.played.length = 0;
   calls.playing = false;
-  calls.silent = false;
   vi.useRealTimers();
 });
 
@@ -64,12 +62,13 @@ describe("sound effects", () => {
     expect(SOUNDS_BUNDLED).toBe(true);
   });
 
-  it("plays a bundled slot, loading every sound once", () => {
+  it("plays a bundled slot, loading the screens' sounds once", () => {
     playSound("ui.confirm");
     vi.advanceTimersByTime(100);
     playSound("card.land");
     expect(calls.played).toEqual([1, 2]);
-    expect(calls.created.sort()).toEqual([1, 2, 3]);
+    // The first sound loads the screens' sounds (ui.confirm, ui.pick); card.land loads as it plays, and ui.back is not asked for.
+    expect(calls.created.sort()).toEqual([1, 2, 4]);
   });
 
   it("plays nothing for a slot without a file", () => {
@@ -129,30 +128,6 @@ describe("sound effects", () => {
     expect(calls.played.filter((source) => source === 3)).toHaveLength(4);
   });
 
-  it("asks a player that did not start to play again, then puts a new player in its place", async () => {
-    vi.advanceTimersByTime(1000);
-    calls.silent = true;
-    const made = calls.created.length;
-    playSound("card.land");
-    await settled();
-    expect(calls.played).toEqual([2]);
-    // The first check: it has not started, so it is put at its start and asked again.
-    const seeks = calls.seeks;
-    vi.advanceTimersByTime(150);
-    await settled();
-    expect(calls.seeks).toBe(seeks + 1);
-    expect(calls.played).toEqual([2, 2]);
-    // The second check: still silent, so a new player takes its place and plays.
-    calls.silent = false;
-    vi.advanceTimersByTime(150);
-    expect(calls.created.length).toBe(made + 1);
-    expect(calls.played).toEqual([2, 2, 2]);
-    // It sounds now: nothing more is asked.
-    vi.advanceTimersByTime(1000);
-    await settled();
-    expect(calls.played).toEqual([2, 2, 2]);
-  });
-
   it("does not stop a sound that started late and still sounds when its rewind is due", async () => {
     vi.advanceTimersByTime(1000);
     calls.playing = true;
@@ -163,15 +138,6 @@ describe("sound effects", () => {
     vi.advanceTimersByTime(600);
     await settled();
     expect(calls.pauses).toBe(pauses);
-    expect(calls.played).toEqual([2]);
-  });
-
-  it("leaves a player that started alone", async () => {
-    vi.advanceTimersByTime(1000);
-    playSound("card.land");
-    await settled();
-    vi.advanceTimersByTime(1000);
-    await settled();
     expect(calls.played).toEqual([2]);
   });
 

@@ -370,8 +370,9 @@ function undefendedReason(state: ScenarioState, intent: Extract<PlayerIntent, { 
     if (intent.heroId != null && intent.heroId !== only) return "Choose a hero";
     return null;
   }
-  if (intent.heroId == null || !heroes.includes(intent.heroId)) return "Choose a hero";
-  return null;
+  // Left undefended with no hero named (rr.step-6-4-1): the damage is assigned at the damage step, after the shadow effect (rr.step-6-4-3).
+  if (intent.heroId == null) return state.pendingAttack.shadowResolved ? "Choose a hero" : null;
+  return heroes.includes(intent.heroId) ? null : "Choose a hero";
 }
 
 function attackReason(

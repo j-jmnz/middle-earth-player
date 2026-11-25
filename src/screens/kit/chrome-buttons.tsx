@@ -57,7 +57,7 @@ export function IconButton({
   tone?: "bone" | "accent";
   // Set for a button that shows and hides something (Manage): a screen reader hears whether it is open.
   expanded?: boolean;
-  // The tap's sound: the click by default, Back's for a chevron, the open sound for Settings.
+  // The tap's sound: the click by default, the card pick's dull click for a chevron (Back), the open sound for Settings.
   sound?: SoundSlot;
 }) {
   const s = useUiScale();
@@ -68,7 +68,7 @@ export function IconButton({
       testID={testID}
       tone={tone}
       expanded={expanded}
-      sound={sound ?? (chevron ? "ui.back" : undefined)}
+      sound={sound ?? (chevron ? "ui.pick" : undefined)}
       slop={4 * s}
       mark={(color) =>
         chevron ? (

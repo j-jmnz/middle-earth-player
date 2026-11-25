@@ -157,7 +157,7 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     // The one hero the damage may go on (Gollum's attack from the riddle area, a shadow effect that names the hero) is named before it is picked.
     const only = attack.onlyHeroes?.length === 1 && !attack.undefended ? attack.onlyHeroes[0] : undefined;
     if (only && game.cards[only]) return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended, ${cardName(only)} takes ${strength}${shadowNote}` };
-    return { kind: "defense", stats: [ATTACK(strength)], result: attack.undefended ? `Undefended: ${strength} damage${shadowNote}` : `Undefended, a hero takes ${strength}${undefendedLocationsReadout(game, ctx)}` };
+    return { kind: "defense", stats: [ATTACK(strength)], result: attack.undefended ? `Undefended: ${strength} damage${shadowNote}${undefendedLocationsReadout(game, ctx)}` : `Undefended, a hero takes ${strength}${undefendedLocationsReadout(game, ctx)}` };
   }
   // The players attack: the attackers picked (or declared) against the enemy's defense.
   const strike = game.pendingStrike;

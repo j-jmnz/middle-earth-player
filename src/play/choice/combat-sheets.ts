@@ -33,10 +33,14 @@ function foreseen(game: ScenarioState, ctx: ReduceContext, names: SheetNames, id
   return { stats, suffix: " · destroyed", mark, ...(caution ? { caution } : {}) };
 }
 
-/** The heroes an undefended attack can land on, when there is more than one to choose from. */
+/**
+ * The heroes an undefended attack can land on, when there is more than one to choose from. The hero is named at the damage step, after the shadow effect
+ * (rr.step-6-4-3): before it, Leave undefended names none (rr.step-6-4-1).
+ */
 function undefendedSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames, title: string, note: string, redirect: string | null): Sheet | PlayerIntent {
   const heroes = legalTargets(game, { type: "Undefended" }, ctx);
   if (heroes.length <= 1) return heroes[0] ? { type: "Undefended", heroId: heroes[0] } : { type: "Undefended" };
+  if (!game.pendingAttack?.shadowResolved) return { type: "Undefended" };
   const enemyId = game.pendingAttack?.enemyId ?? "";
   const damage = undefendedDamage(game, ctx, enemyId);
   return {
@@ -112,6 +116,8 @@ export function defenseSheet(game: ScenarioState, ctx: ReduceContext, legal: rea
   // The attack on Hrogar's Hill (19083:B:1) says where the damage goes, and arms Leave undefended when the Hill would hold as much as it has quest points.
   const onHill = numbers ? nightStageAttack(game, ctx, numbers.enemyId, defenders.length) : null;
   const cautious = onHill ? onHill.caution : loneCaution;
+  // The damage step of an undefended attack with several heroes to take it: the hero pick is the whole sheet.
+  if ("kind" in undefended && game.pendingAttack?.undefended) return undefended;
   const leave: Alternative =
     "kind" in undefended
       ? { label: "Leave undefended", next: undefended }
