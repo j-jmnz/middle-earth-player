@@ -161,16 +161,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "whenRevealed",
     instructions: [
       // The first player acts whoever revealed the card: his hand is the one looked at and the one the hand-size test reads.
-      {
-        verb: "ForEachPlayer",
-        order: "firstFirst",
-        limit: 1,
-        instructions: [
-          { verb: "Pick", pick: { type: "card", control: "you", from: "hand", who: "firstPlayer" } },
-          { verb: "Pick", pick: { type: "card", control: "you", from: "hand", who: "firstPlayer", different: true, highestCost: true, challenge: true }, when: { kind: "not", condition: { kind: "handSize", max: 1, actor: true } } },
-          { verb: "HoldPickedUnder", when: { kind: "not", condition: { kind: "handSize", max: 1, actor: true } } },
-        ],
-      },
+      { verb: "ActAs", who: "firstPlayer" },
+      { verb: "Pick", pick: { type: "card", control: "you", from: "hand", who: "firstPlayer" } },
+      { verb: "Pick", pick: { type: "card", control: "you", from: "hand", who: "firstPlayer", different: true, highestCost: true, challenge: true }, when: { kind: "not", condition: { kind: "handSize", max: 1, actor: true } } },
+      { verb: "HoldPickedUnder", when: { kind: "not", condition: { kind: "handSize", max: 1, actor: true } } },
       { verb: "BarHeldTitles" },
     ],
   },

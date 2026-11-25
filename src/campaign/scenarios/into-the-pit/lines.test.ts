@@ -119,7 +119,7 @@ describe("03062 Watchful Eyes", () => {
     expect(hostOf(revealed(made, "03062"), "03062")).toBe("dh3");
   });
 
-  it("03062:A:1 the first player chooses the host among his heroes when the second seat reveals it", () => {
+  it("03062:A:1 the first player chooses the host among his heroes when the other seat reveals it", () => {
     const made = table({ seats: 2, firstPlayer: 0, deck: ["f0"] });
     const asked: number[] = [];
     const state = finish({ state: revealFromTop(made.state, made.ctx, "03062", [], 1).state, steps: [] }, made.ctx, (now) => {
@@ -140,7 +140,7 @@ describe("03062 Watchful Eyes", () => {
 });
 
 describe("901002 Goblin Ambush", () => {
-  it("901002:A:1 the first player chooses the free Orc enemy when the second seat reveals the stage", () => {
+  it("901002:A:1 the first player chooses the free Orc enemy when the other seat reveals the stage", () => {
     const made = table({ seats: 2, firstPlayer: 0, stage: "901002", deck: ["03060", "03014", "901003", "901004", "901005"] });
     const asked: number[] = [];
     const run = resolveRecords(made.state, made.ctx, "901002", "whenRevealed", undefined, (now) => {

@@ -180,7 +180,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 43, scenarios: "all", note: "An effect that attaches, moves or puts into play an attachment (Command, Long Lake Trader, the Dúnedain attachments, Helm of Secrecy, Galadriel, Open the Armory, Ring of Thrór) can use a character of another player as the host, also for a card that prints no Attach to line, like Spyglass; the other player then controls a moved attachment. Appointed by Fate, Parrying Cutlass, Throwing Axe and the Ship attachments Armor Plating, Ballista, Enlarged Quarters and Extra Sails are offered only the hosts their printed words name. Brand son of Bain draws a card only for an attachment its player plays, not for one an effect moves or puts into play." },
   { version: 44, scenarios: ["foundations-of-stone", "into-the-pit", "shadow-and-flame", "the-seventh-level", "the-caves-of-nibin-dum"], note: "Watchful Eyes is attached to a hero of the first player, who chooses it, also when another player revealed the card." },
   { version: 44, scenarios: ["into-the-pit"], note: "The first player, not the player who revealed Goblin Ambush of the Nightmare deck, searches for its Orc enemies and chooses them." },
-  { version: 44, scenarios: ["the-wizards-quest"], note: "Necromancer's Pass reads the first player's hand, not the hand of the player who revealed it, to keep a card and to see whether a different card is there to hold." },
+  { version: 44, scenarios: ["the-wizards-quest"], note: "Necromancer's Pass reads the first player's hand, not the hand of the player who revealed it, to keep a card and to see whether a second card is there to hold." },
 ];
 
 export const ENGINE_VERSION = 44;
