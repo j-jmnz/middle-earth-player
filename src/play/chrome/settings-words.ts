@@ -43,6 +43,7 @@ export const HAPTICS_LINE = "Vibration at key moments.";
 export const SOUNDS_LINE = "Short sounds at key moments.";
 export const EFFECTS_VOLUME_LINE = "How loud the sound effects play.";
 export const MUSIC_LINE = "The film score: one piece for the menus, and a calm piece and a fight piece for each scenario. It waits while other audio plays.";
+export const STOP_OTHER_AUDIO_LINE = "Stops the music or the podcast of another app when this app opens. Off: the sounds play over it, and the music waits for it.";
 export const MUSIC_VOLUME_LINE = "How loud the music plays.";
 export const GUIDE_LINE = "A hint under the step title, the first two times each step comes up.";
 export const STOPS_LINE = "Pauses where a card can be played. Choose the steps on the table's rail.";

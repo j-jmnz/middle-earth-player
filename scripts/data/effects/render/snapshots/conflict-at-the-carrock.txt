@@ -187,7 +187,7 @@ Scenario piles that place cards with no record (setAside: 02048 Sacked!; quest: 
 
 02048:A:1 (front): When Revealed: Attach to a hero with no "Sacked!" cards attached controlled by the first player. (Cannot be canceled.) Counts as a Condition attachment with the text: "Attached hero cannot attack, defend, commit to a quest, trigger its effect, or collect resources."
   02048:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
-    - attach this card to a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card is discarded)
+    - attach this card to a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card stays where it is)
   02048:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Condition attachment while it is attached
