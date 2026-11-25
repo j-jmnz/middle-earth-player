@@ -6,6 +6,8 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
 07031:A:1 (front): Guarded.
   07031:whenRevealed:1: When revealed
     - the Guarded keyword: this objective in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
+  07031:constant:1: Constant
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
 
 07031:A:2 (front): Action: Exhaust a hero to claim this objective when it is free of encounters. Attach Mugash to that hero.
   07031:action:1: Action (any player may use it)
@@ -15,8 +17,6 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
     - choose ready hero (you control)
     - exhaust the picked card
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
-  07031:constant:1: Constant
-    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
 
 07031:A:3 (front): Forced: After attached hero takes damage, return Mugash to the top of the encounter deck.
   07031:forced:1: Forced after a card takes damage (heard about the host)
