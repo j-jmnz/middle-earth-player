@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "3edd313962ac1573c0b8058a6ffb02da68e201291c4126741d139a36dd193de3"
+        "value": "9911d95ad379b38ff5f608f29d44be3040aa305ad51aace36ea35d0def1ef282"
       },
-      "fetchedAt": "2026-11-25T09:54:01.096Z",
+      "fetchedAt": "2026-11-25T12:22:33.875Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -399,6 +399,60 @@
           "bytes": 13472
         },
         {
+          "path": "raw/hallofbeorn/Scenarios/The-Fords-of-Isen.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Fords-of-Isen",
+          "sha256": "a30ea07c99781d00860d68eaf328e564718428dd087309afb6a575718a733045",
+          "bytes": 12251
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/To-Catch-an-Orc.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/To-Catch-an-Orc",
+          "sha256": "f6dd1d2e147fad4e2493eef5166df869df75853a0cc93c4e93db2855127ba8be",
+          "bytes": 11761
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Into-Fangorn.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Into-Fangorn",
+          "sha256": "adea04a4c359f1f0cd2f814c19ba3fa392658e160d6efa8498bbc76e6064b2e3",
+          "bytes": 11619
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Dunland-Trap.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Dunland-Trap",
+          "sha256": "6fe8bbeae81a3de58694bf38250992ceccafd6cfecc591bcec3a3ab8bb76e5aa",
+          "bytes": 12514
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Three-Trials.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Three-Trials",
+          "sha256": "321fba31ec3250c2c4c30a2cba7da6031d90e5a539d9ef705801aa6cbf1a3462",
+          "bytes": 17894
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Trouble-in-Tharbad.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Trouble-in-Tharbad",
+          "sha256": "fd248cd952674142161549820c9f3524188eca7e1bb5518e88bb9968163ed4e4",
+          "bytes": 10942
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Nîn-in-Eilph.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Nîn-in-Eilph",
+          "sha256": "4addec66bdffeb53733b44cdcbfa0feb6f0301d667d06f821fb00ddf99a660cc",
+          "bytes": 25752
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Celebrimbor's-Secret.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Celebrimbor's-Secret",
+          "sha256": "7567e308a85aeb802612695c0e9c75b799fdb2b0da00500e4f72572bb4598ae5",
+          "bytes": 11218
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Antlered-Crown.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Antlered-Crown",
+          "sha256": "008b5696976016be01096f033bf6224f267bd43c5711e84e8afa7d497f2d1d11",
+          "bytes": 13001
+        },
+        {
           "path": "raw/hallofbeorn/Scenarios/Intruders-in-Chetwood.json",
           "url": "https://hallofbeorn.com/Export/Scenarios/Intruders-in-Chetwood",
           "sha256": "4f70de48d948fc92d1492b59dc3f4b50dde9737c5d0eed0667edf8ea2855ddc6",
@@ -505,6 +559,60 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/The-City-of-Corsairs",
           "sha256": "98fbb755c66532ade717c951175426fa8ee62c4b288a4285d5cbfba124027e4b",
           "bytes": 19064
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Escape-from-Umbar.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Escape-from-Umbar",
+          "sha256": "70eb39ccfc0727166395092e61c0e34c7287077af5865f4fffc00b4169417ea4",
+          "bytes": 8030
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Desert-Crossing.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Desert-Crossing",
+          "sha256": "27927284b633fb42a1b5bc148661e70659d8a95e222cf28fb9dbeb21dff785dd",
+          "bytes": 10307
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Long-Arm-of-Mordor.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Long-Arm-of-Mordor",
+          "sha256": "9790f4fe93302519cd40eabd133f717afd2557abe9cb3dd08d3123f59fc75b92",
+          "bytes": 13026
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Mûmakil.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Mûmakil",
+          "sha256": "f283d89b6fdb07530ba051c73a175fd50380d7e97646df9b9038ded9b4a1254a",
+          "bytes": 8340
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Race-Across-Harad.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Race-Across-Harad",
+          "sha256": "ac93ac5704845590cc14a6c6776e3187df97c800b5ade70348cf5663601a5358",
+          "bytes": 21375
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Beneath-the-Sands.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Beneath-the-Sands",
+          "sha256": "abc8314896d51a743154df976875c6f2da57ce0766490057ebec71e2964be586",
+          "bytes": 10749
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Black-Serpent.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Black-Serpent",
+          "sha256": "658ae7b209455c06ce9134f40aa1241cc03b0812652e7ce47caf9ebbe8fae736",
+          "bytes": 10880
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Dungeons-of-Cirith-Gurat.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Dungeons-of-Cirith-Gurat",
+          "sha256": "8f9450d9d70cbf8aa00830fb7516d6e89e67b7c4f785c4880841d274afb9c51d",
+          "bytes": 12212
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Crossings-of-Poros.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Crossings-of-Poros",
+          "sha256": "e6314f33bd202a447e051e6787b7610c020f6c6369c78d7e92f6b2b81efb04d6",
+          "bytes": 22507
         },
         {
           "path": "raw/hallofbeorn/Scenarios/Journey-Up-the-Anduin.json",
@@ -679,60 +787,6 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/The-Hunt-for-the-Dreadnaught",
           "sha256": "1a236006f608d688dc9d0b683dc1c0e83c749d571ce78ebf54df0bc65910187a",
           "bytes": 16108
-        },
-        {
-          "path": "raw/hallofbeorn/Scenarios/The-Fords-of-Isen.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/The-Fords-of-Isen",
-          "sha256": "a30ea07c99781d00860d68eaf328e564718428dd087309afb6a575718a733045",
-          "bytes": 12251
-        },
-        {
-          "path": "raw/hallofbeorn/Scenarios/To-Catch-an-Orc.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/To-Catch-an-Orc",
-          "sha256": "f6dd1d2e147fad4e2493eef5166df869df75853a0cc93c4e93db2855127ba8be",
-          "bytes": 11761
-        },
-        {
-          "path": "raw/hallofbeorn/Scenarios/Into-Fangorn.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/Into-Fangorn",
-          "sha256": "adea04a4c359f1f0cd2f814c19ba3fa392658e160d6efa8498bbc76e6064b2e3",
-          "bytes": 11619
-        },
-        {
-          "path": "raw/hallofbeorn/Scenarios/The-Dunland-Trap.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/The-Dunland-Trap",
-          "sha256": "6fe8bbeae81a3de58694bf38250992ceccafd6cfecc591bcec3a3ab8bb76e5aa",
-          "bytes": 12514
-        },
-        {
-          "path": "raw/hallofbeorn/Scenarios/The-Three-Trials.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/The-Three-Trials",
-          "sha256": "321fba31ec3250c2c4c30a2cba7da6031d90e5a539d9ef705801aa6cbf1a3462",
-          "bytes": 17894
-        },
-        {
-          "path": "raw/hallofbeorn/Scenarios/Trouble-in-Tharbad.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/Trouble-in-Tharbad",
-          "sha256": "fd248cd952674142161549820c9f3524188eca7e1bb5518e88bb9968163ed4e4",
-          "bytes": 10942
-        },
-        {
-          "path": "raw/hallofbeorn/Scenarios/The-Nîn-in-Eilph.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/The-Nîn-in-Eilph",
-          "sha256": "4addec66bdffeb53733b44cdcbfa0feb6f0301d667d06f821fb00ddf99a660cc",
-          "bytes": 25752
-        },
-        {
-          "path": "raw/hallofbeorn/Scenarios/Celebrimbor's-Secret.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/Celebrimbor's-Secret",
-          "sha256": "7567e308a85aeb802612695c0e9c75b799fdb2b0da00500e4f72572bb4598ae5",
-          "bytes": 11218
-        },
-        {
-          "path": "raw/hallofbeorn/Scenarios/The-Antlered-Crown.json",
-          "url": "https://hallofbeorn.com/Export/Scenarios/The-Antlered-Crown",
-          "sha256": "008b5696976016be01096f033bf6224f267bd43c5711e84e8afa7d497f2d1d11",
-          "bytes": 13001
         }
       ]
     },
@@ -30766,9 +30820,9 @@
       "site": "https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/",
       "pin": {
         "kind": "sha256",
-        "value": "a944c12617051eff3b717ca0cf40fff20a67bfdf05d19c730999c080b5f277ad"
+        "value": "2bf9f0bd09c6f56f08b9e12460083a7922b98b560a51a7c42318ddb95baa195f"
       },
-      "fetchedAt": "2026-11-25T09:46:47.876Z",
+      "fetchedAt": "2026-11-25T12:22:42.979Z",
       "files": [
         {
           "path": "pdf/mec109_rulebook-compressed.pdf",
@@ -31123,6 +31177,42 @@
           "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec31-the-antlered-crown-rulesheet.pdf",
           "sha256": "bf9c40e86d1a7742ff701dca0cb75f28102ef63c3f2bcf20edd061199baeb47b",
           "bytes": 1452206
+        },
+        {
+          "path": "pdf/mec55_rules_webready.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec55_rules_webready.pdf",
+          "sha256": "dda538cf6c73514cdab24f2df02ddfc05e6cd3ee50d9d31f147e6858b84f2ba4",
+          "bytes": 3678999
+        },
+        {
+          "path": "pdf/mec56_rule_set.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec56_rule_set.pdf",
+          "sha256": "6423e20365c78b4fc7443e4ae711dcd6e07fb6591634918ae8d2299bf96f2c32",
+          "bytes": 1355205
+        },
+        {
+          "path": "pdf/mec57_web_race_across_harad-rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec57_web_race_across_harad-rules.pdf",
+          "sha256": "60f47b97c765b9535f65d6b369070d2cf91330ed61729801b58e88c902ff7990",
+          "bytes": 5502300
+        },
+        {
+          "path": "pdf/mec59_web_the_black_serpent-rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec59_web_the_black_serpent-rules.pdf",
+          "sha256": "24c4f78d2eb1e50c0e34c190f0d5061fa76ad24ac1490993d3819d49f911dab1",
+          "bytes": 2861729
+        },
+        {
+          "path": "pdf/mec60_web_the_dungeons_of_cirith-rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec60_web_the_dungeons_of_cirith-rules.pdf",
+          "sha256": "68c7d968c1122f34331e31d97117f3cb99ec20a32ded71991525aaef6c5bd480",
+          "bytes": 3202557
+        },
+        {
+          "path": "pdf/mec61_web_the_crossing_of_poros-rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec61_web_the_crossing_of_poros-rules.pdf",
+          "sha256": "a956ee5ec6b3d9aac87cdcf44a7d79d81327b27398f8bb27a2a47257d5aa3324",
+          "bytes": 3425108
         }
       ]
     },
