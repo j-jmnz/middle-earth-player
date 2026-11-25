@@ -1,5 +1,6 @@
 // Skia on the web needs CanvasKit (a wasm) loaded before any Skia module is evaluated: `Skia.web.ts` builds its API from `global.CanvasKit` when it
-// first runs. One module store holds the load's state. The web's splash starts it after the first paint (`startCanvasKit`, screens/kit/splash-glow.canvaskit.tsx), the table's web entry
+// first runs. One module store holds the load's state. The web's splash starts it on its first frame, or when it unmounts before that frame (`startCanvasKitOnFrame`,
+// screens/kit/splash-glow.canvaskit.tsx), and the web table gate (play/canvas/table-canvas.tsx) also starts it on mount; a second call does nothing. The table's web entry
 // points (play/canvas/table-canvas.tsx, play/spotlight/layer.tsx) read it with `useCanvasKit` and import their `.native.tsx` Skia files only once it is
 // "ready", so no Skia module runs during the static render or before CanvasKit. The wasm is served from the app's own origin
 // (`pnpm assets canvaskit` copies it to public/canvaskit.wasm), so the desktop build loads it offline. The phone has Skia built in: it is always
@@ -34,6 +35,18 @@ export function startCanvasKit(): void {
   if (status !== "idle") return;
   set("loading");
   void load();
+}
+
+/**
+ * Starts the load on the next frame and returns the cleanup. A cleanup that runs before the frame has come (the splash unmounts first when the
+ * window paints late) starts the load at once instead of dropping it. The table gate starts it on mount too; the first start wins.
+ */
+export function startCanvasKitOnFrame(): () => void {
+  const frame = requestAnimationFrame(startCanvasKit);
+  return () => {
+    cancelAnimationFrame(frame);
+    startCanvasKit();
+  };
 }
 
 function subscribe(listener: () => void): () => void {

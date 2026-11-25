@@ -1,6 +1,6 @@
 // Instructions: one small template per verb. A verb with none prints as compact JSON. `src/catalog/effect-schema-verbs.ts`, `effect-schema.ts` and each family's `VERBS` own the shapes.
 // The structural verbs (Choose, Each, Delay, AfterAttack, Repeat, ForEachPlayer) hold instructions of their own and print them indented beneath.
-import { cardRef, renderAmount } from "./amounts.ts";
+import { cardRef, renderAmount, topUpTo } from "./amounts.ts";
 import { renderCondition } from "./conditions.ts";
 import { who } from "./family-kit.ts";
 import { FAMILY_TEMPLATES } from "./families.ts";
@@ -120,7 +120,13 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   Discard: (i) => ({ text: `discard ${target(i.target)}${i.counted === true ? " (a card discarded out of play counts for the effect's noneDiscarded condition: the part after \"then\" resolves only if the discard did)" : ""}`, read: ["target", "counted"] }),
   Destroy: (i) => ({ text: `${target(i.target)} is destroyed (not discarded: rr.destroy)`, read: ["target"] }),
   DiscardFromHand: (i, ctx) => ({ text: `${ctx.engagedSeat === true ? "the player the enemy engaged discards" : "discard"} ${amount(i.amount, ctx)} card${ctx.engagedSeat === true && i.amount === 1 ? "" : "s"} from ${ctx.engagedSeat === true ? "their " : ""}hand${handLeft(i.amount)}`, read: ["amount"] }),
-  Draw: (i, ctx) => ({ text: `${who(i.who ?? "actor")} draws ${i.amount === undefined ? "1" : amount(i.amount, ctx)} card(s)${typeof i.perHero === "string" ? ` for each ${i.perHero} hero` : ""}${i.from === "bottom" ? " from the bottom of the deck" : ""}`, read: ["who", "amount", "perHero", "from"] }),
+  Draw: (i, ctx) => {
+    // "Draws cards until he has N in his hand": the amount is N less the hand, and a hand of N or more draws nothing.
+    const upTo = i.amount === undefined ? null : topUpTo(i.amount);
+    const counted = i.amount === undefined ? "1" : amount(i.amount, ctx);
+    const text = upTo != null ? `${who(i.who ?? "actor")} draws cards until their hand holds ${upTo} (nothing when it already holds ${upTo} or more)` : `${who(i.who ?? "actor")} draws ${counted} card(s)`;
+    return { text: `${text}${typeof i.perHero === "string" ? ` for each ${i.perHero} hero` : ""}${i.from === "bottom" ? " from the bottom of the deck" : ""}`, read: ["who", "amount", "perHero", "from"] };
+  },
   RaiseThreat: (i, ctx) => ({ text: `raise threat by ${i.amount === undefined ? "1" : amount(i.amount, ctx)} (${who(i.who ?? "actor")})${isObj(i.perCommitted) ? ` for each ${typeof i.perCommitted.exceptSphere === "string" ? `non-${i.perCommitted.exceptSphere} ` : ""}${str(i.perCommitted.type)} committed to the quest` : ""}`, read: ["amount", "who", "perCommitted"] }),
   LowerThreat: (i, ctx) => ({ text: `lower threat by ${amount(i.amount, ctx)} (${who(i.who)})`, read: ["amount", "who"] }),
   ReturnToStaging: (i, ctx) => {

@@ -3,6 +3,7 @@ import { campaignScenario, scenarioDefinition, stageOf, type AnyScenarioData, ty
 import { EFFECTS } from "../../src/effects/index.ts";
 import { isCharacterType, printedFromCard, type PrintedCard } from "../../src/rules/core/printed.ts";
 import { blankScenario, updateCard, withThreat, type Modifier } from "../../src/rules/core/state.ts";
+import { addModifier } from "../../src/rules/core/modified-stat.ts";
 import { attachTo, moveCard, spawn, type Destination } from "../../src/rules/core/zones.ts";
 import type { ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";
 import { attachmentTargets } from "../../src/rules/player/planning.ts";
@@ -94,6 +95,10 @@ export type Layout = {
   modified?: readonly { code: string; from: string; stats: readonly (readonly [Modifier["stat"], number])[] }[];
   // The Night objective in play beside the current quest (The Stone of Erech, 50301:A:1): a code, or a code with its progress.
   night?: Entry;
+  // The time counters on the current quest stage (a Time X stage after some refresh phases: The Fords of Isen).
+  timeCounters?: number;
+  // The codes of the cards in a hand that cannot leave it, as the card's own effect leaves them (Ill Tidings, 07023:A:1).
+  heldInHand?: readonly string[];
   // The scenario's saga hero (Bilbo Baggins in The Hobbit, the loadout deals him) is a hero of the first seat, with this many resources in his pool.
   sagaHero?: { resources?: number };
   // The table notes the cards placed in the encounter discard pile, as a Setup that sets `noteEncounterDiscards` leaves it (We Must Away, Ere Break of Day: the Key and the Purse hear their own discard).
@@ -254,6 +259,8 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   if (layout.captive) state = holdCaptive(state, idOf(state, layout.captive.hero), idOf(state, layout.captive.under));
   if (layout.pursuit != null) state = { ...state, pursuit: layout.pursuit };
   for (const code of layout.exhaustedCards ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { exhausted: true });
+  if (layout.timeCounters != null && state.questStage) state = updateCard(state, state.questStage, { resources: layout.timeCounters });
+  for (const code of layout.heldInHand ?? []) for (const id of idsOf(state, code)) state = addModifier(state, id, id, "cannotLeaveHand", 1, "endOfGame");
   for (const code of layout.committed ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { committed: true });
   // A game that deals encounter side quests in its encounter deck reads the side quest rules, as its start notes (families/wilderland/night-quest.ts markSideQuests).
   state = markSideQuests(state, cards);

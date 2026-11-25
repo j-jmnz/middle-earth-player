@@ -55,7 +55,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
   19094:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
 
 19094:A:3 (front): Response: When the players travel to a Discover location, exhaust Crypt Key to either increase or decrease its Discover value by 1 before resolving it.
   19094:response:1: Response after the players travel (heard about location (any player controls); cost: exhaust this card)
@@ -79,7 +79,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
   19095:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
 
 19095:A:3 (front): Action: Exhaust Old Lantern to choose a player to look at the top X cards of his deck, where X is the Discover value of the active location. He adds one of those cards to his hand and places the rest on the bottom of his deck.
   19095:action:1: Action (cost: exhaust this card)
@@ -105,7 +105,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
   19096:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
 
 19096:A:3 (front): Action: Exhaust Scatha's Teeth and attached hero to choose a player. That player reduces his threat by 2.
   19096:action:1: Action (cost: exhaust this card and exhaust the attached card)

@@ -12,7 +12,7 @@ Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur;
     - Time 5: when this card is revealed, 5 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
 
 10094:B:2 (back): Forced: After the last time counter is removed from Secrets of Rhudaur, remove each Treachery of Rhudaur side quest from the game and immediately advance to stage 2.
-  10094:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card)
+  10094:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each card in the staging area titled "Quiet the Spirits" or "Sift through the Debris" or "Decipher Ancient Texts" (an encounter side quest, quest side up) is removed from the game, not added to the victory display; its attachments are discarded

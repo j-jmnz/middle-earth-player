@@ -18,7 +18,7 @@ import { chooseEach } from "../families/deck/each.ts";
 import { lookedDeckSeat } from "../families/deck/rules.ts";
 import { feedsDiscard, pickCandidates } from "./pick.ts";
 import { placesPicked } from "../families/pelargir/progress-bar.ts";
-import { leavesPlayPicked } from "../families/pelargir/vale/cannot-leave.ts";
+import { leavesPlayPicked, leavesPlayPickedInEach } from "../families/pelargir/vale/cannot-leave.ts";
 import { spendsPicked } from "../families/pelargir/spending.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "../core/state.ts";
@@ -72,6 +72,7 @@ export type EffectSpec = {
   destroyedAlly?: string;
   destroyedCharacter?: string;
   hold?: string;
+  holdsEvents?: true;
   // Why the instructions run: the effect record and its printed line. `causes` names one per instruction when several
   // records share a frame.
   cause?: Cause;
@@ -110,6 +111,7 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     ...(spec.destroyedAlly ? { destroyedAlly: spec.destroyedAlly } : {}),
     ...(spec.destroyedCharacter ? { destroyedCharacter: spec.destroyedCharacter } : {}),
     ...(spec.hold ? { hold: spec.hold } : {}),
+    ...(spec.holdsEvents ? { holdsEvents: true as const } : {}),
   };
   return pushFrame(state, { frame: spec.frame, cardId: spec.sourceId, seat: spec.actor, peril: spec.peril, data }, steps);
 }
@@ -141,6 +143,7 @@ export function pushCardEffects(
       causes: running.flatMap((effect) => effect.instructions.map(() => effectCause(effect))),
       cancel: null,
       blockCancel: running.find((effect) => effect.uncancelable)?.uncancelable ?? null,
+      ...(running.some((effect) => effect.holdsEvents) ? { holdsEvents: true as const } : {}),
     },
     steps,
   );
@@ -305,7 +308,7 @@ function expandEach(state: ScenarioState, item: QueueItem, frame: Frame, ctx: Re
   if (instruction.verb !== "Each" || data?.kind !== "effect") return state;
   // "Up to 4 Rohan allies", "any number of Gondor allies": the actor chooses them (families/deck/each.ts).
   if (instruction.upTo != null) return chooseEach(state, item, frame, ctx);
-  const ids = pickCandidates(state, instruction.pick, item.seat, [], frame.cardId, ctx, data.x, data.participants, false, { subject: data.subject ?? null, other: data.other ?? null, discards: feedsDiscard(instruction.instructions), leaves: leavesPlayPicked(instruction.instructions) });
+  const ids = pickCandidates(state, instruction.pick, item.seat, [], frame.cardId, ctx, data.x, data.participants, false, { subject: data.subject ?? null, other: data.other ?? null, discards: feedsDiscard(instruction.instructions), leaves: leavesPlayPickedInEach(instruction.instructions) });
   const cause = item.cause ? { cause: item.cause } : {};
   const expanded = ids.flatMap((id) => [
     { instruction: { verb: "Pick" as const, pick: instruction.pick }, seat: item.seat, chosen: id, ...cause },

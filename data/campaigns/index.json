@@ -123,7 +123,7 @@
     "id": "the-ring-maker",
     "name": "The Ring-maker",
     "scenarioCount": 9,
-    "playable": false,
+    "playable": true,
     "kind": "cycle",
     "box": null,
     "released": "2014-02-21",

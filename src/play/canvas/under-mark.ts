@@ -1,5 +1,6 @@
 // Rules: mec108.captured-cards (data/rules/entries.json). Where the pill of the cards under a card sits on it and what it says (docs/design-system-table.md, Cards, Escape from Mount Gram). Pure, so a test reads it.
 import type { Rect } from "../layout/layout.ts";
+import { handShown } from "../layout/layout.ts";
 import { TOKEN } from "./token-spots.ts";
 
 /** The pill's box: the words ("3 captured") when they fit inside the card, else a bare count with a facedown-card glyph ("count"), and the bare count alone on a card too narrow for both ("number"). */
@@ -30,4 +31,9 @@ export function underMarkBox(rect: Rect, wordWidth: number, countWidth: number, 
   const kind = !atEnd && words <= room ? "words" : glyph <= room ? "count" : "number";
   const width = kind === "words" ? words : kind === "count" ? glyph : Math.min(room, countWidth + 10 * s);
   return { kind, x: atEnd ? rect.x + rect.w - width - 2 * s : rect.x + (rect.w - width) / 2, y: top, width, height: token };
+}
+
+/** The card's box for the pill of a card in the hand: the strip that shows above the bottom edge at rest, so the pill stands at its foot and is not drawn below the screen. Any other zone keeps the whole card. */
+export function underRect(rect: Rect, hand: boolean, s: number): Rect {
+  return hand ? { ...rect, h: Math.min(rect.h, handShown(rect.h, s)) } : rect;
 }

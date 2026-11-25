@@ -3,7 +3,7 @@
 // enemy is engaged with a player it names, or when the amount is 0. MoveProgress from the source changes nothing when it holds no progress, ResetThreat when the threat is at or below the
 // starting threat level.
 import type { IdleHook } from "../../interpret/family-manifest.ts";
-import { amountIdle, candidatesOf } from "../../player/idle-reads.ts";
+import { amountIdle, candidatesOf, seatsOfWho } from "../../player/idle-reads.ts";
 import { startingThreat } from "./threat.ts";
 
 export const questIdle: IdleHook = (state, instruction, sourceId, frame, ctx) => {
@@ -13,6 +13,6 @@ export const questIdle: IdleHook = (state, instruction, sourceId, frame, ctx) =>
   // A damage to every card of a pick changes nothing when no card matches.
   if (instruction.pick != null && instruction.engagedWith == null && candidatesOf(state, instruction.pick, sourceId, frame, ctx, { counting: true, dependent: true }).length === 0) return true;
   // "Each enemy engaged with that player" of each chosen player with no enemy engaged.
-  if (instruction.engagedWith === "picked" && frame.picked != null && frame.picked.every((id) => id.startsWith("seat:") && (state.seats[Number(id.slice(5))]?.engaged.length ?? 0) === 0)) return true;
+  if (instruction.engagedWith === "picked" && seatsOfWho(state, "picked", frame)?.every((seat) => (state.seats[seat]?.engaged.length ?? 0) === 0) === true) return true;
   return amountIdle(state, instruction.amount, frame, ctx);
 };

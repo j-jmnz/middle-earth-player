@@ -79,6 +79,8 @@ export const ENGINE_MADE_EFFECTS: ReadonlySet<ModifierStat> = new Set<ModifierSt
   // A bar on engagement checks or on engaging one seat (families/quest/index.ts).
   "noChecksAgainst",
   "cannotEngageSeat",
+  // Ill Tidings (07023:A:1, DrawSelfIntoHand in families/ring-maker/hand.ts) holds the card in a living player's hand; nothing reads it once the card has left the hand.
+  "cannotLeaveHand",
   // An ally guarded in the staging area (an effect of the guard, until the ally rejoins play): every reader (sweep, pick, moves, zones) reads it while the ally is in the staging area, before it leaves.
   "guardedAlly",
   // Effects held by the table or a seat.

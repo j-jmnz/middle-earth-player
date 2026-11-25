@@ -44,6 +44,8 @@ export function readsTable(condition: Condition): boolean {
     case "threat":
     case "phase":
     case "resources":
+    // Reads only the living seats and the actor.
+    case "otherPlayer":
       return true;
     // A pick that reads the running effect is not settled before the effect runs.
     case "count":

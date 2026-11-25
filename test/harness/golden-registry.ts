@@ -93,6 +93,7 @@ import * as din from "../scenarios/encounter-at-amon-din/game.ts";
 import * as assault from "../scenarios/assault-on-osgiliath/game.ts";
 import * as blood from "../scenarios/the-blood-of-gondor/game.ts";
 import * as vale from "../scenarios/the-morgul-vale/game.ts";
+import * as isen from "../scenarios/the-fords-of-isen/game.ts";
 import * as umbar from "../scenarios/escape-from-umbar/game.ts";
 import * as crossing from "../scenarios/desert-crossing/game.ts";
 
@@ -200,6 +201,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("assault-on-osgiliath", "Assault on Osgiliath", assault.ASSAULT_GOLDENS, assault.assaultWorld, assault.playGolden),
   entry("the-blood-of-gondor", "The Blood of Gondor", blood.BLOOD_GOLDENS, blood.bloodWorld, blood.playGolden),
   entry("the-morgul-vale", "The Morgul Vale", vale.VALE_GOLDENS, vale.valeWorld, vale.playGolden),
+  entry("the-fords-of-isen", "The Fords of Isen", isen.ISEN_GOLDENS, isen.isenWorld, isen.playGolden),
   entry("escape-from-umbar", "Escape from Umbar", umbar.UMBAR_GOLDENS, umbar.umbarWorld, umbar.playGolden),
   entry("desert-crossing", "Desert Crossing", crossing.CROSSING_GOLDENS, crossing.crossingWorld, crossing.playGolden),
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),

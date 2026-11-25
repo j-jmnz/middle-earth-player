@@ -45,6 +45,8 @@ export function mayGainResources(state: ScenarioState, heroId: string, sourceId:
   if (flagged(state, "table", "cannotGainResources")) return false;
   const source = sourceId ? state.cards[sourceId] : undefined;
   if (!source) return true;
+  // "Players cannot gain resources from card effects" (07018:A:1): every hero, whatever the card; the collection in the resource phase has no source card.
+  if (flagged(state, "table", "noCardResources")) return false;
   const printed = printedOf(ctx.cards, source.code);
   if (flagged(state, heroId, "noPlayerCardResources") && isPlayerType(printed)) return false;
   // A card effect (the source is a card) of any kind: "cannot gain resources from card effects" (148013:A:1).

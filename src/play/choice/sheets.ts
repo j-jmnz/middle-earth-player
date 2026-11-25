@@ -59,6 +59,7 @@ import { framsburgActionCaution, framsburgActionNote } from "../words/scenarios/
 import { fatePassCaution } from "../words/scenarios/fate.ts";
 import { gundabadOptionLabel, gundabadPassCaution } from "../words/scenarios/gundabad.ts";
 import { gundabadRow } from "./gundabad-sheets.ts";
+import { fordsTimeCount, withCount } from "./ring-maker-sheets.ts";
 import { TIMING_WORDS, type SheetStat, type PickOption, type Sheet, type SheetNames, type TriggerOption } from "./sheet-types.ts";
 
 function effectOf(ctx: ReduceContext, effectId: string): Effect | undefined {
@@ -301,7 +302,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
             // A branch that deals damage to each of the player's allies warns when it destroys one.
             const said = asksOption(written, id);
             const caution = said?.caution ?? branchCaution(game, ctx, choose, id, window.seat, source, names.card, data?.picked?.at(-1) ?? null);
-            return { id, label: said?.label ?? (torch ? torch.label(id) : (xAsk?.row(id) ?? branchWords(choose, id, game, words, source, now, ctx))), code: null, ...(stats.length > 0 ? { stats } : {}), ...(caution ? { caution } : {}), intent: { type: "Choose", optionId: id } };
+            return { id, label: withCount(said?.label, fordsTimeCount(game, choose, id)) ?? (torch ? torch.label(id) : (xAsk?.row(id) ?? branchWords(choose, id, game, words, source, now, ctx))), code: null, ...(stats.length > 0 ? { stats } : {}), ...(caution ? { caution } : {}), intent: { type: "Choose", optionId: id } };
           }),
         };
       }

@@ -103,6 +103,7 @@ export const FIXTURE_REGISTRY = [
   { scenarioId: "flies-and-spiders", kind: "standalone", names: ["spiders-lost"] },
   { scenarioId: "the-lonely-mountain", kind: "standalone", names: ["mountain-lost"] },
   { scenarioId: "the-battle-of-five-armies", kind: "standalone", names: ["armies-lost"] },
+  { scenarioId: "the-fords-of-isen", kind: "standalone", names: ["isen-lost"] },
   { scenarioId: "escape-from-umbar", kind: "standalone", names: ["umbar-lost"] },
   { scenarioId: "desert-crossing", kind: "standalone", names: ["crossing-lost"] },
 ] as const satisfies readonly { scenarioId: string; file?: string; kind?: "standalone"; names: readonly string[] }[];

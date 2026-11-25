@@ -89,6 +89,7 @@ import { dinFixtures } from "./against-the-shadow/encounter-at-amon-din.ts";
 import { assaultFixtures } from "./against-the-shadow/assault-on-osgiliath.ts";
 import { bloodFixtures } from "./against-the-shadow/the-blood-of-gondor.ts";
 import { valeFixtures } from "./against-the-shadow/the-morgul-vale.ts";
+import { isenFixtures } from "./the-ring-maker/the-fords-of-isen.ts";
 import { umbarFixtures } from "./haradrim/escape-from-umbar.ts";
 import { crossingFixtures } from "./haradrim/desert-crossing.ts";
 
@@ -191,6 +192,7 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "flies-and-spiders": () => spidersFixtures(),
   "the-lonely-mountain": () => mountainFixtures(),
   "the-battle-of-five-armies": () => armiesFixtures(),
+  "the-fords-of-isen": () => isenFixtures(),
   "escape-from-umbar": () => umbarFixtures(),
   "desert-crossing": () => crossingFixtures(),
 };

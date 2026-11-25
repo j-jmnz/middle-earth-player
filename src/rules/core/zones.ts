@@ -2,6 +2,7 @@
 import type { CardFace, CardInstance, ScenarioState, ZoneName } from "./state.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { leaveWith } from "../families/play/zones.ts";
+import { heldInHand } from "../families/ring-maker/hand.ts";
 import { endLastingOn } from "./lasting.ts";
 import { releaseOrcGuard } from "../families/dungeon/guard.ts";
 import { dealtFace } from "../families/dreamchaser/facts.ts";
@@ -363,6 +364,8 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   if (dest.zone === "staging" && flagged(state, id, "cannotEnterStaging")) return state;
   // A card that cannot leave the staging area stays in it, whatever moves it (Uglúk, 143069:B:2).
   if (current.zone === "staging" && dest.zone !== "staging" && flagged(state, id, "cannotLeaveStaging") && !supersedes && !(defeated && flagged(state, id, "leavesStagingWhenDefeated"))) return state;
+  // A card that cannot leave the hand stays in it, whatever moves it (Ill Tidings, 07023:A:1).
+  if (current.zone === "hand" && heldInHand(state, id)) return state;
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";
   let next = detach(state, id);
   if ((leavingPlay || guardLeaves(current, dest)) && current.host) next = unhost(next, id);

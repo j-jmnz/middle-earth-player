@@ -51,7 +51,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
     - exhaust the picked card
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
   110078:constant:1: Constant
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
 
 110078:A:2 (front): Action: Exhaust Gate Key and attached hero and spend 3 resources from attached hero's resource pool to look at the facedown side of a Temple of the Deceived location.
   110078:action:2: Action (cost: exhaust this card and exhaust the attached card and pay 3 resource(s) from the host's pool)
@@ -73,7 +73,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
     - exhaust the picked card
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
   110078:constant:2: Constant
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
 
 110078:B:3 (back): Action: Exhaust Gate Key and attached hero to look at the facedown side of a Temple of the Deceived location or secret.
   110078:action:4: Action (cost: exhaust this card and exhaust the attached card)
@@ -281,7 +281,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
     - exhaust the picked card
     - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
   12071:constant:1: Constant
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
 
 12071:A:2 (front): Action: Exhaust Gate Key and attached hero and spend 3 resources from attached hero's resource pool to look at the facedown side of a Temple of the Deceived.
   12071:action:2: Action (cost: exhaust this card and exhaust the attached card and pay 3 resource(s) from the host's pool)

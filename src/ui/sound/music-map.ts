@@ -153,6 +153,7 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "flies-and-spiders": FOREST,
   "the-lonely-mountain": DRAGONS,
   "the-battle-of-five-armies": { calm: "rohan", combat: "pelennor" },
+  "the-fords-of-isen": { calm: "rohan", combat: "isengard" },
   "escape-from-umbar": { calm: "havens", combat: "chase" },
   "desert-crossing": { calm: "rohan", combat: "chase" },
 };
