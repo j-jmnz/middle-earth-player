@@ -148,7 +148,6 @@ Scenario piles that place cards with no record (activeLocation: 05028 Ithilien R
 
 05050:A:1 (front): When Revealed: The first player deals 2 damage to a questing hero and removes that hero from the quest.
   05050:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (any player controls) committed to the quest, chosen by the first player
     - deal 2 damage to the picked card
@@ -271,7 +270,6 @@ Scenario piles that place cards with no record (activeLocation: 05028 Ithilien R
 
 05070:B:1 (back): When Revealed: The first player takes control of all Ranger objectives in the staging area.
   05070:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     - the first player takes control of each Ranger objective in the staging area: it comes into his play area, faceup and ready, and is no longer committed by its own text; with none there nothing happens
 
 05070:B:2 (back): Enemies do not make engagement checks and cannot be optionally engaged.

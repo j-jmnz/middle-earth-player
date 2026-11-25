@@ -88,6 +88,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11040:A:1 (front): When Revealed: Either deal 2 damage to an Aflame location in play, or search the encounter deck and discard pile for the Aflame location with the highest Aflame value, and add it to the staging area.
   11040:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "damage" (only if there is a location (any player controls) that prints the Aflame keyword to choose):
         - choose location (any player controls) chosen by the first player, that prints the Aflame keyword
@@ -152,6 +153,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11044:A:2 (front): When Revealed: Either deal 3 damage to Pillaged Ship, or add the topmost enemy in the encounter discard pile to the staging area.
   11044:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "damage":
         - deal 3 damage to this card

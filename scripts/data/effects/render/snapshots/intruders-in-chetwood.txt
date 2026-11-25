@@ -147,7 +147,6 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09024:A:2 (front): When Revealed: The first player loses control of Iârion and places him facedown underneath this stage. When this stage is defeated, the first player takes control of Iârion and exhausts him.
   09024:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     - the card with code 09016 that a player controls lies facedown under this card, still in play, controlled by no one, with what is attached to it; when this card is defeated it returns under the first player, exhausted
 
 09024:A:3 (front): Forced: After the last time counter is removed from this stage, discard Iârion.
@@ -160,6 +159,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09043:A:1 (front): When Revealed: Either discard 1 ally from play, or reveal an additional encounter card.
   09043:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "ally" (only if there is a ally (any player controls) to choose):
         - choose ally (any player controls) chosen by the first player
@@ -251,6 +251,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09049:A:2 (front): When Revealed: Either search the encounter deck and discard pile for an encounter side quest and reveal it, or choose a different quest card in play to be the current quest until the end of the phase. Shuffle the encounter deck.
   09049:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player chooses one of:
       * option "search" (only if the encounter deck or its discard pile holds a side quest):

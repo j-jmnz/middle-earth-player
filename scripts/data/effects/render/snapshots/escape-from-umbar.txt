@@ -103,6 +103,7 @@ Scenario piles that place cards with no record (staging: 16016 Narrow Alleyway; 
 
 16021:A:1 (front): When Revealed: Either remove all progress from the main quest, or assign X damage among characters in play. X is the number of progress tokens on the main quest.
   16021:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "remove" (only if the current quest stage holds at least 1 progress):
         - remove all the progress from the current quest stage
@@ -190,10 +191,10 @@ Scenario piles that place cards with no record (staging: 16016 Narrow Alleyway; 
 
 16044:A:1 (front): When Revealed: The first player discards cards from the top of the encounter deck until an enemy is discarded, and puts that enemy into play engaged with him.
   16044:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
-    (steps run in order; a step depends on an earlier one only through its own condition)
-    - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty (a deck that runs out has the encounter discard pile shuffled into it first, when it holds one); that card becomes the picked card
-    - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    - for each player (at most 1 players), first player first:
+      - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty (a deck that runs out has the encounter discard pile shuffled into it first, when it holds one); that card becomes the picked card
+      - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
 
 16044:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it was engaged this round).
   16044:shadow:1: Shadow
@@ -307,4 +308,4 @@ Scenario piles that place cards with no record (staging: 16016 Narrow Alleyway; 
     note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 224 by template, 0 as JSON)
+(rendered pieces: 225 by template, 0 as JSON)

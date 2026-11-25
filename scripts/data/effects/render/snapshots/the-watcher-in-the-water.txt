@@ -5,7 +5,6 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 
 040076:A:1 (front): When Revealed: The first player attaches Wrapped! to a hero he controls. (Counts as a Tentacle attachment with the text: "Limit 1 per hero. Attached hero cannot exhaust or ready. At the end of the round, discard attached hero from play. Combat Action: Exhaust a hero you control without a Tentacle attachment to discard Wrapped!.")
   040076:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     - attach this card to a hero the first player controls that has no copy of this card attached (the first player chooses it; with none this card is discarded)
   040076:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)

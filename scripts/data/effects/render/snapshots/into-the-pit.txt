@@ -237,7 +237,6 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03051:A:1 (front): When Revealed: The first player must discard 1 questing character he controls, if able. This effect cannot be canceled.
   03051:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control) committed to the quest, chosen by the first player
     - discard the picked card
@@ -302,7 +301,6 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 03062:A:1 (front): When Revealed: The first player attaches Watchful Eyes to one of his heroes. (Counts as a Condition attachment with the text: "Limit 1 per hero. Forced: If attached hero is exhausted at the end of the combat phase, reveal 1 card from the encounter deck and add it to the staging area.")
   03062:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     - attach this card to a hero the acting player controls that carries no copy of this card (the acting player, the first player in a When Revealed, chooses it; with none this card stays where it is)
   03062:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
@@ -434,7 +432,6 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 
 901002:A:1 (front): When Revealed: The first player must search the encounter deck and discard pile for X Orc enemies and add them to the staging area, where X is 1 plus the number of players in the game. One of these choices must be Patrol Sentry and one must be Patrol Leader, if able.
   901002:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one Orc enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); while the card with code 901003 is there to be found, the search must take it (the first search of the effect that can)
     - the acting player finds one Orc enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); while the card with code 03014 is there to be found, the search must take it (the first search of the effect that can)

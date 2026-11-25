@@ -373,7 +373,6 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19111:A:1 (front): When Revealed: The first player adds The Cursed Tomb to the staging area. Each other player searches the encounter deck and discard pile for a non-unique Undead enemy and adds it to the staging area. Shuffle the encounter deck.
   19111:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - if the actor holds the first player token: one set-aside card with code 19097 joins the staging area (it is not revealed)

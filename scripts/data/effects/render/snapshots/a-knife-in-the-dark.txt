@@ -410,7 +410,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141076:A:2 (front): When Revealed: The first player must either exhaust The One Ring or raise his threat by 3.
   141076:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "exhaust" (only if the card with code 141085 in play is ready):
         - exhaust the card with code 141085

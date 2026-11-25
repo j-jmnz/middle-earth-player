@@ -178,7 +178,6 @@ Scenario piles that place cards with no record (quest: 131026 A Short Rest; ques
 
 131072:A:1 (front): When Revealed: The first player chooses a questing character. That character takes 3 damage and is removed from the quest.
   131072:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (any player controls) committed to the quest, chosen by the first player
     - deal 3 damage to the picked card
@@ -194,7 +193,6 @@ Scenario piles that place cards with no record (quest: 131026 A Short Rest; ques
 
 131073:A:1 (front): When Revealed: The first player chooses 1 Stone-giant in the staging area. At the end of the quest phase, that Stone-giant engages the player with the highest threat. If there are no Stone-giant cards in the staging area, search the encounter deck for 1 Stone-giant and add it to the staging area.
   131073:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a enemy (any player controls) in the staging area only, named "Stone-Giant" to choose: choose enemy (any player controls) in the staging area only, named "Stone-Giant", chosen by the first player
     - then, if there is a enemy (any player controls) in the staging area only, named "Stone-Giant" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): later, at the end of the quest phase (the next one, when this is not the quest phase), acting on the card last picked:

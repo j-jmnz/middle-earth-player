@@ -252,7 +252,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
 
     // 16044 Nowhere to Hide. When Revealed: the first player discards until an enemy and puts it into play engaged with him (the discard pile is shuffled back into an empty deck).
-    { id: "16044:whenRevealed:1", cardCode: "16044", lines: ["16044:A:1"], timing: "whenRevealed", instructions: DISCARD_AN_ENEMY_AND_ENGAGE },
+    { id: "16044:whenRevealed:1", cardCode: "16044", lines: ["16044:A:1"], timing: "whenRevealed", instructions: [{ verb: "ForEachPlayer", order: "firstFirst", limit: 1, instructions: DISCARD_AN_ENEMY_AND_ENGAGE }] },
     copyLine("142026:A:3", "16044:A:2"),
 
     // 16045 In Enemy Territory (encounter side quest, 8 quest points, Victory 10, Surge). While in the staging area no player holds more than 5 cards: the table holds the limit, and a hand over it discards down to it at once (families/haradrim/hand.ts).

@@ -451,6 +451,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51230:A:1 (front): When Revealed: Either no more than 4 progress can be placed on the current quest this phase, or Web-spinner gains surge.
   51230:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "cap":
         - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 4, until the end of the phase
@@ -481,7 +482,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51232:A:1 (front): When Revealed: The first player must choose: either deal 1 damage to each character committed to the quest, or raise each player's threat by 1 and end the quest phase without resolving the quest.
   51232:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "damage":
         - deal 1 damage to each character (any player controls) committed to the quest

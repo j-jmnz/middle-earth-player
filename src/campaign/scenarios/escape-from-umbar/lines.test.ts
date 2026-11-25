@@ -4,6 +4,9 @@ import { describe, expect, it } from "vitest";
 import { expireModifiers, flagged, type ScenarioState } from "../../../rules/core/state.ts";
 import { flaggedByClass } from "../../../rules/core/holder-classes.ts";
 import { printedOf } from "../../../rules/core/printed.ts";
+import type { EngineStep } from "../../../rules/core/intents.ts";
+import { spawn } from "../../../rules/core/zones.ts";
+import { pushCardEffects } from "../../../rules/interpret/effect-frames.ts";
 import { queueEvent } from "../../../rules/windows/queue.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { asCurrentQuest } from "../../../rules/families/sidequests/fixture.ts";
@@ -159,7 +162,13 @@ describe("The constants that hold only in a zone", () => {
 describe("16044 Nowhere to Hide", () => {
   it("16044:A:1 the first player, not the player who revealed it, takes the enemy engaged", () => {
     const made = table({ seats: 2, firstPlayer: 1, stage: MAIN, deck: ["treachery", "16041"] });
-    const done = resolveRecords(opened(made).state, made.ctx, "16044", "whenRevealed");
+    const opening = opened(made).state;
+    const spawned = spawn(opening, "16044", { zone: "staging" });
+    const effects = made.ctx.effects.filter((effect) => effect.cardCode === "16044" && effect.timing === "whenRevealed");
+    // Seat 0 reveals the card; the first player (seat 1) is the one who discards and is engaged.
+    const steps: EngineStep[] = [];
+    const pushed = pushCardEffects(spawned.state, "whenRevealed", spawned.id, 0, false, effects, made.ctx, steps);
+    const done = finish({ state: settle({ ...pushed, window: null, mode: "stopped" as const }, made.ctx, steps), steps }, made.ctx);
     expect(engagedCodes(done.state, 1)).toEqual(["16041"]);
     expect(engagedCodes(done.state, 0)).toEqual([]);
   });

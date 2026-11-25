@@ -388,7 +388,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50324:A:1 (front): When Revealed: The first player must choose: skip the next travel phase, or each player must pass his hand to the player on his left (discard your hand instead if you are the only player in the game).
   50324:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "skipTravel":
         - skip the travel phase this round: the table holds skipTravel until the end of the round, and the round goes from the quest phase to the encounter phase with no travel window
@@ -405,7 +405,6 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 
 50325:A:1 (front): When Revealed: The first player attaches Driven by Fear to a hero he controls. Counts as a Condition attachment with the text: 'Attached character's Willpower is reduced to 0. Treat attached character's text box as if it was blank (except for Traits.)'
   50325:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     - attach this card to a hero the first player controls, one that carries a copy of this card too (the first player chooses it; with none this card is discarded)
   50325:constant:1: Constant
     - this card counts as a Condition attachment while it is attached

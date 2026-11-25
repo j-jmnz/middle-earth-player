@@ -118,6 +118,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18047:A:1 (front): When Revealed: The highest Attack enemy in the staging area makes an immediate attack against the first player. If no attack is made this way, Denizen of the Deep gains surge.
   18047:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, with the highest Attack of those, as the table shows it (ties: the chooser decides), chosen by the first player
     - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area, dealt a shadow card

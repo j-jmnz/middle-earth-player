@@ -41,6 +41,7 @@ Scenario piles that place cards with no record (staging: 06155 Morgul Vale; ques
 
 06146:B:1 (back): When Revealed: Reveal 1 card per player from the encounter deck and add it to the staging area.
   06146:whenRevealed:2: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player reveals the number of players encounter cards, one after the other, each in a staging of its own
 
 06146:B:2 (back): Nazgûl of Minas Morgul cannot leave play unless destroyed.
@@ -200,7 +201,7 @@ Scenario piles that place cards with no record (staging: 06155 Morgul Vale; ques
 
 06157:A:1 (front): When Revealed: The first player either places 3 progress tokens on To the Tower or reveals X additional cards from the encounter deck and adds them to the staging area. X is the number of players in the game.
   06157:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "tokens":
         - 3 progress token(s) are placed on the card in play with the title To the Tower (the staging area counts as play), in one placement: the cards that hear progress placed hear it once; with no such card in play nothing happens

@@ -40,7 +40,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141023:B:1 (back): When Revealed: The first player searches the encounter deck and discard pile for a Black Rider, reveals it (cannot be canceled), and adds it to the staging area. Shuffle the encounter deck.
   141023:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player searches the encounter deck and discard pile for the card with code 141039, a a card, reveals it and adds it to the staging area
     - shuffle the encounter deck
@@ -63,7 +63,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141024:B:1 (back): When Revealed: The first player searches the encounter deck and discard pile for a Black Rider, reveals it (cannot be canceled), and adds it to the staging area. Shuffle the encounter deck.
   141024:whenRevealed:2: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player searches the encounter deck and discard pile for the card with code 141039, a a card, reveals it and adds it to the staging area
     - shuffle the encounter deck
@@ -343,7 +343,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141076:A:2 (front): When Revealed: The first player must either exhaust The One Ring or raise his threat by 3.
   141076:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "exhaust" (only if the card with code 141085 in play is ready):
         - exhaust the card with code 141085
@@ -361,6 +361,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141077:A:1 (front): The first player gains control of Gildor Inglorion.
   141077:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player takes control of this card (it enters play under that player, ready; a shadow card stops being its enemy's shadow card)
 
 141077:A:2 (front): Forced: At the end of the round, discard Gildor Inglorion. The first player may spend 1 Fellowship resource to cancel this effect.
@@ -568,7 +569,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 906109:A:2 (front): When Revealed: The first player must either exhaust The One Ring and reveal an encounter card, or make a Hide 3 test.
   906109:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "ring" (only if the card with code 141085 in play is ready):
         - exhaust the card with code 141085

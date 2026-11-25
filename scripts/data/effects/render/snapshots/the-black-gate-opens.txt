@@ -286,7 +286,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146041:A:2 (front): When Revealed: The first player must choose: either take control of Gwaihir, or spend 1 Fellowship resource and discard Gwaihir to discard a non-unique enemy in the staging area.
   146041:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "control":
         - the acting player takes control of this card (it enters play under that player, ready; a shadow card stops being its enemy's shadow card)

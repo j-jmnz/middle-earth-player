@@ -132,7 +132,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 04047:A:1 (front): When Revealed: The first player (choose 1): deals 1 damage to all allies in play and Followed by Night gains surge, or all enemies engaged with players make an immediate attack, if able.
   04047:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "damage":
         - deal 1 damage to each ally (any player controls)
@@ -154,6 +154,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 04048:A:2 (front): When Revealed: All Orc enemies in the staging area engage the first player. If there are no Orc enemies in the staging area, return all Orc enemies in the encounter discard pile to the staging area, if able.
   04048:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the effect's X grows by the number of Orc enemy (any player controls) in the staging area only
     - the rest of the effect is carried out by the first player
@@ -285,7 +286,6 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 
 901402:B:1 (back): When Revealed: The first player loses control of Arwen Undómiel and attaches her to Goblin Gate (she is now guarded by Goblin Gate). While she is guarded, the first player cannot gain control of Arwen Undómiel.
   901402:whenRevealed:2: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose location (any player controls) named "Goblin Gate"
     - then, if there is a location (any player controls) named "Goblin Gate" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the card in play with code 04041 goes back to the staging area, controlled by no one, guarded by the last picked card (which may be the active location); it stays in play with its damage, tokens and attachments and rejoins the first player's play area once nothing guards it

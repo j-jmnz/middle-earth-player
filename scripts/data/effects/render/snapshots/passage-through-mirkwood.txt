@@ -102,7 +102,6 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01089:A:1 (front): When Revealed: The first player chooses 1 character currently committed to a quest. Deal 2 damage to that character.
   01089:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (any player controls) committed to the quest, chosen by the first player
     - deal 2 damage to the picked card

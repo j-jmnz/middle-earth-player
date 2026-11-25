@@ -62,6 +62,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01105:A:1 (front): When Revealed: Attach Iron Shackles to the top of the first player's deck. (Counts as a Condition attachment with the text: "The next time a player would draw 1 or more cards from attached deck, discard Iron Shackles instead.")
   01105:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - this treachery, being revealed, is attached to the top of the first player's deck, in play, controlled by nobody; the next draw from that deck is replaced by discarding it (the card's own constant says so)
   01105:constant:1: Constant
     - this card counts as a Condition attachment while it is attached

@@ -13,14 +13,18 @@ const ATTACK_EVENTS: ReadonlySet<string> = new Set(["attacks", "attackResolved"]
 // Keyed to the card itself (the condition names an ally the actor controls with the card's own name), so a quest card or a location whose condition reads another ally keeps the shared reading.
 const controllerOnly = (effect: Obj, ctx: Ctx): boolean => ctx.cardName !== undefined && JSON.stringify(effect.condition ?? null).includes(`"type":"ally","control":"you","names":[${JSON.stringify(ctx.cardName)}]`);
 
+const makesFirstPlayerAct = (step: unknown): boolean => {
+  const ins = step as Obj | null;
+  return ins !== null && typeof ins === "object" && (ins.who === "firstPlayer" || (ins.verb === "ForEachPlayer" && ins.order === "firstFirst" && ins.limit === 1));
+};
+
 // A line saying who the acting player is, or "" when the record's fields do not decide it.
 export function actorNote(effect: Obj, ctx: Ctx): string {
   const timing = effect.timing;
   const trigger = typeof effect.trigger === "string" ? effect.trigger : "";
   const encounterCard = ctx.cardType !== undefined && !PLAYER_TYPES.has(ctx.cardType);
-  // A When Revealed line that opens with "The first player ..." names the acting player itself.
-  const namesFirstPlayer = Array.isArray(effect.lines) && effect.lines.some((id) => typeof id === "string" && /When Revealed: The first player\b/.test(ctx.lineTexts?.get(id) ?? ""));
-  if (timing === "whenRevealed" && encounterCard && namesFirstPlayer) return "the acting player is the first player (the printed line names the first player, not the player who revealed the card)";
+  // A When Revealed record that itself makes the first player act: `who: firstPlayer` on a step, or a ForEachPlayer that starts with the first player and stops after one.
+  if (timing === "whenRevealed" && encounterCard && Array.isArray(effect.instructions) && effect.instructions.some(makesFirstPlayerAct)) return "the acting player is the first player (the record names the first player, not the player who revealed the card)";
   if (timing === "shadow") return "the acting player is the defending player (the player the attack is against)";
   if ((timing === "forced" || timing === "triggered") && encounterCard) {
     if (ATTACK_EVENTS.has(trigger)) return "the acting player is the defending player (the player the attack is against)";

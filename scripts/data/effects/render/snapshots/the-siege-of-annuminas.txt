@@ -219,6 +219,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
 
 50818:A:2 (front): When Revealed: Any player may spend 1 resource to take control of Dúnedain of Annúminas. Otherwise, discard it.
   50818:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "control" (only if there is a player (any player controls) who controls heroes holding 1 resource or more in all to choose):
         - choose player (any player controls) who controls heroes holding 1 resource or more in all

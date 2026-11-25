@@ -569,6 +569,7 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
 
 50628:A:1 (front): When Revealed: If Naurlhûg is in play, it makes an immediate attack against the first player. If Naurlhûg is not in play, place 1 resource on Stalking the Ruins. Then, if there are at least 3 resources on Stalking the Ruins, add Naurlhûg to the staging area.
   50628:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if the card with code 50615 is in play: choose card (any player controls) or in the staging area or the active location, named "Naurlhûg", (enemies engaged with a player included)
     - then, if the card with code 50615 is in play (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area, dealt a shadow card (or engaged)

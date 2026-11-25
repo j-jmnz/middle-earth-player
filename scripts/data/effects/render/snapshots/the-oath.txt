@@ -30,7 +30,6 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41003:A:1 (front): When Revealed: The first player adds the set-aside Goblin Troop to the staging area. Each other player searches the encounter deck and discard pile for a Goblin enemy and adds it to the staging area.
   41003:whenRevealed:1: When revealed
-    who acts: the acting player is the first player (the printed line names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - one set-aside card with code 41019 joins the staging area (it is not revealed)
     - for each player, first player first:
