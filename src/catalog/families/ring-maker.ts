@@ -38,14 +38,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("CapRefresh"), amount: z.number().int().positive(), ...when }),
 ] as const;
 
-const TRIGGERS = [
-  // About the current quest stage: a time counter was just taken off it, one counter at a time, by the refresh phase or a card ("After a time counter is removed from the current quest", 07058:A:1). Raised only in a game whose records hear it (families/angmar/time.ts removeTimeCounterFrom).
-  "timeCounterRemoved",
-] as const;
-
 const FLAGS = [
   // On a card in a hand: it cannot leave that hand ("Ill Tidings cannot leave that player's hand", 07023:A:1). core/zones.ts moveCard refuses the move; a pick that would discard it and a random discard leave it out (families/wilderland/pick.ts barredFromPlayerDiscard).
   "cannotLeaveHand",
 ] as const;
 
-export const manifest = { name: "ring-maker", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;
+export const manifest = { name: "ring-maker", verbs: VERBS, triggers: [], flags: FLAGS } as const satisfies CatalogFamily;

@@ -50,7 +50,7 @@ const RETURN_ACTIVE: Instruction = { verb: "MoveEncounterCard", card: "activeLoc
 // The quest stage's Time X and its reveal count: the angmar family's constant record (07065:B:1 to 07067:B:1).
 const time = (code: string, amount: number, line: string): Effect => ({ id: `${code}:constant:1`, cardCode: code, lines: [line], timing: "constant", instructions: [{ verb: "Time", amount }] });
 
-// Hinder (rm.hinder), the same on the three Huorns: while engaged, in the combat phase only, the enemy makes no attack and is dealt no shadow card (the flags are rebuilt from the phase, so an attack by a card effect or in another phase is made and dealt one); at the beginning of the combat phase it removes 1 progress from
+// Hinder (rm.hinder), the same on the three Huorns: while engaged, in the combat phase only, the enemy makes no attack and is dealt no shadow card (the flags are rebuilt from the phase: in the combat phase they bar every attack, an attack by a card effect included; an attack outside the combat phase is made and dealt a shadow card); at the beginning of the combat phase it removes 1 progress from
 // the current quest, else from the active location, else nothing (the location step is written first: each step's condition is read when it runs, so the quest step cannot empty the quest and send the second one on). "Cannot have attachments" holds always.
 const hinder = (code: string): Effect[] => [
   { id: `${code}:constant:1`, cardCode: code, lines: [`${code}:A:1`], timing: "constant", condition: { kind: "all", conditions: [ENGAGED, COMBAT] }, instructions: [{ verb: "ModifyStat", stat: "cannotAttack", amount: 1, until: "whileSourceInPlay", target: "self" }, { verb: "ModifyStat", stat: "noShadowDealt", amount: 1, until: "whileSourceInPlay", target: "self" }] },
@@ -103,7 +103,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     instructions: [{ verb: "SearchMove", type: "enemy", trait: "Huorn", to: "staging" }, { verb: "SearchMove", type: "enemy", trait: "Huorn", to: "staging", when: THREE_PLAYERS }, SHUFFLED],
   },
 
-  // 07033 Dark-Hearted Huorn, 07034 Angry Huorn, 07035 Deadly Huorn. Hinder, Cannot have attachments; Forced at the beginning of each resource phase: the engaged player raises his threat by 2; the Huorn attacks the engaged player (the attack of a card effect, outside the combat phase: made, and dealt a
+  // 07033 Dark-Hearted Huorn, 07034 Angry Huorn, 07035 Deadly Huorn. Hinder, Cannot have attachments; Forced at the beginning of each resource phase: the engaged player raises his threat by 2; the Huorn attacks the engaged player (outside the combat phase: made, and dealt a
   // shadow card); the engaged player deals 3 damage to a character he controls (one instance).
   ...hinder("07033"),
   resourcePhase("07033", [ENGAGED_PLAYER([{ verb: "RaiseThreat", amount: 2, who: "actor" }])]),

@@ -33,6 +33,10 @@ describe("Into Fangorn in the the-ring-maker cycle", () => {
   });
 
   it("runs the Easy wins through stage 3 and back to stage 2 (the Time ran out on stage 2 and Mugash was shuffled into the encounter deck)", () => {
-    for (const name of WINS.slice(2)) expect(goldenState(fangorn.id, name).stageLeft?.from, name).toBeTruthy();
+    for (const name of WINS.slice(2)) {
+      const state = goldenState(fangorn.id, name);
+      expect(state.cards[state.stageLeft?.from ?? ""]?.code, name).toBe("07067");
+      expect(state.stageLeft?.bypassed, name).toBe(true);
+    }
   });
 });

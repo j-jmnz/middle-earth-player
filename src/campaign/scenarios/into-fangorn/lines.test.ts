@@ -288,6 +288,17 @@ describe("the searches and the refresh cap (07032:A:2, 07036:A:1, 07037:A:1, 070
     expect(done.state.seedCursor).toBe(t.state.seedCursor);
   });
 
+  it("07037:A:1 revealed in the combat phase a Hinder Huorn makes no attack and is dealt no shadow card, so no attack was made and the player searches", () => {
+    const t = table({ stage: STAGE_1, phase: "Combat", engaged: [DARK], deck: [ANGRY, FOREST, WOODS, TURNED, "07056"] });
+    const hindered = opened(t).state;
+    expect(flagged(hindered, idOf(hindered, DARK), "cannotAttack")).toBe(true);
+    const done = resolveRecords(hindered, t.ctx, "07037", "whenRevealed");
+    expect(damageOf(done.state)).toBe(0);
+    expect(done.state.window).toBeFalsy();
+    expect(Object.values(done.state.cards).some((card) => card.zone === "shadow")).toBe(false);
+    expect(zoneOf(done.state, ANGRY)).toBe("engaged");
+  });
+
   it("07037:A:1 with no Huorn engaged each player searches for a Huorn and puts it into play engaged with him, and the deck is shuffled", () => {
     const t = table({ stage: STAGE_1, phase: "Quest", deck: [ANGRY, FOREST, WOODS, TURNED, "07056"], discard: [DARK] });
     const done = resolveRecords(t.state, t.ctx, "07037", "whenRevealed");

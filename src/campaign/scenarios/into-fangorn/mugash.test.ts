@@ -2,6 +2,7 @@
 // Mugash leaving play and the quest stages' shuffles, jumps and restrictions: what a spec row cannot show (spec.test.ts holds the rows). The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; dh1 and dh2 are the first seat's, dh3 the second's.
 import { describe, expect, it } from "vitest";
 
+import { legalIntents } from "../../../rules/engine/reduce.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { ruleCause } from "../../../rules/core/cause.ts";
 import { placeDamage } from "../../../rules/core/damage.ts";
@@ -221,5 +222,10 @@ describe("Mugash as a Guarded objective (07031:A:1 to A:3)", () => {
     expect(zoneOf(state, MUGASH)).toBe("staging");
     expect(zoneOf(state, DARK)).toBe("staging");
     expect(state.cards[idOf(state, DARK)]?.host).toBe(mugash);
+    const claimable = (at: typeof state) => legalIntents({ ...at, window: { kind: "pass" } }, t.ctx).some((intent) => intent.type === "Trigger" && intent.effectId === "07031:action:1");
+    expect(claimable(state)).toBe(false);
+    // With his guard gone (the effect discards it) the same open window offers the Action.
+    const freed = moveEncounter(state, idOf(state, DARK), "discard", 0, t.ctx, []);
+    expect(claimable(freed)).toBe(true);
   });
 });
