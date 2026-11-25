@@ -1,3 +1,4 @@
+import { POLICY_KIT_RULES } from "../../test/harness/policy-kit.ts";
 import { authoredRel } from "../data/effects/authored-paths.ts";
 import { finderImport } from "../data/effects/seed-finder-paths.ts";
 import { loadAnyScenario } from "../data/load-scenarios.ts";
@@ -49,6 +50,10 @@ export const upper = (short: string): string => short.toUpperCase().replace(/-/g
 const dataImport = (depth: string): string => `import { loadCampaign, loadScenario } from "${depth}scripts/data/load-scenarios.ts";`;
 const dataConsts = (facts: Facts, c: string): string => `const campaign = loadCampaign("${facts.campaignId}");\nconst ${c} = loadScenario("${facts.id}");`;
 
+/** The comment over the rules list of a new game.ts: what a policy is and the kit's rules (`POLICY_KIT_RULES`, test/harness/policy-kit.ts). */
+export const policyKitComment = (policyName: string): string =>
+  `// The policy (test/harness/policy-kit.ts): a list of rules tried in order, then the auto-player's answer with ${policyName}. A rule answers its own window and returns null for any other. The kit's rules:\n${POLICY_KIT_RULES.map(([name, says]) => `//   ${name}  ${says}`).join("\n")}\n`;
+
 /** test/scenarios/<id>/game.ts */
 export function gameFile(facts: Facts): string {
   const P = pascal(facts.short);
@@ -60,11 +65,12 @@ export function gameFile(facts: Facts): string {
   return `import { emptyLog, type CampaignLog } from "../../../src/campaign/log.ts";
 import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-state.ts";
-import { legalIntents, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
+import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
 ${dataImport("../../../")}
-import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
+import type { PolicyOptions } from "../../harness/auto-player.ts";
 import { campaignGame, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
+import { chooseFirstOrLast, policyIntent, type Policy } from "../../harness/policy-kit.ts";
 
 ${dataConsts(facts, c)}
 
@@ -87,11 +93,12 @@ export type ${P}Policy = {
 };
 export const DEFAULT_POLICY: ${P}Policy = { choose: "first" };
 
-// The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option, or the last as the policy says. Every intent is one the reducer listed.
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go before the auto-player's.
+${policyKitComment(`${U}_POLICY`)}// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go in the list, before the auto-player's.
+const rules = (policy: ${P}Policy): Policy => [chooseFirstOrLast(policy.choose)];
+
+// Every intent is one the reducer listed.
 export function ${c}Intent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: ${P}Policy = DEFAULT_POLICY): PlayerIntent {
-  if (state.window?.kind === "choose") return { type: "Choose", optionId: (policy.choose === "last" ? state.window.options.at(-1) : state.window.options[0]) ?? "" };
-  return nextIntent(state, ctx, ${U}_POLICY, memory, legalIntents(state, ctx));
+  return policyIntent(rules(policy), ${U}_POLICY, state, ctx, memory);
 }
 
 export type ${P}Game = PlayedGame;
@@ -288,6 +295,16 @@ export function authoredFile(facts: Facts): string {
 export const AUTHORED_EFFECTS: readonly Effect[] = [];
 
 export const AUTHORED_REPLACES: readonly string[] = [];
+`;
+}
+
+/** test/scenarios/<id>/screens.ts */
+export function screensFile(facts: Facts): string {
+  return `import type { ScreenMoment } from "../../harness/screens.ts";
+
+// The table moments the screen review shoots (\`pnpm browser shot --moment ${facts.id} --landscape\`; test/harness/screens.ts): one for each new widget of ${facts.name}'s table, a layout (the same JSON \`pnpm game scene\` takes) and a note that says
+// which printed line or widget it shows. TODO: write them while the scenario is built, and name them in the \`ux\` brief. \`scripts/browser/scene.test.ts\` builds each one in Node and fails when a layout no longer builds.
+export const screens: ScreenMoment[] = [];
 `;
 }
 

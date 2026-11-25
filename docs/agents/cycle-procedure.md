@@ -41,7 +41,7 @@ Beyond what the Scenario procedure says:
 - **Judge.** A CHECK with no row is a defect of the judge's output: it goes back.
 - **Tests.** Each line is tested on its real moment (`docs/agents/card-audit.md`, Tests from the printed line).
 - **Words.** Every choice names its result, from the first scenario on.
-- **Games.** Where the simple test player cannot win, the task writes a policy for the scenario. One lost game, or a saved game opened with `--at`, reaches the scenario's main new table moment, so the screen review sees it with `pnpm browser shot`. The report names each new screen that was checked by tests only.
+- **Games.** Where the simple test player cannot win, the task writes a policy for the scenario. Its moments for the new table widgets follow the Scenario procedure (`docs/agents/agent-brief.md`, Scenario procedure, Games task). A state only a played game reaches is shot with `pnpm browser shot --fixture <name> --at <n>`. The report names each new screen that was checked by tests only.
 - **Review.** One round on the scenario's whole diff from its base. The brief asks the reviewer to look hardest at the cards of other scenarios that a shared change reaches, an offer and a refusal that disagree, an ability that is now withheld wrongly, and the stated cause of each moved saved game.
 - **Fix.** A fix that changes shared engine code gets its second review (`.claude/agents/orchestrator.md`, One review round).
 - **Times.** Every brief of a writing task asks for its times from `pnpm scenario time` (`docs/agents/agent-brief.md`, Measure), not an estimate.

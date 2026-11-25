@@ -99,13 +99,15 @@ export function attackTogether(state: ScenarioState, ctx: ReduceContext, may: (i
 }
 
 /**
- * In the optional engagement step: the seat engages the first enemy it may, one at a time, while it is engaged with fewer
- * enemies than `most` (by default its hero count). Null otherwise, and the auto-player declines.
+ * In the optional engagement step: the seat engages one enemy at a time while it is engaged with fewer enemies than `most`
+ * (by default its hero count): the first it may, or with `allow` and `rank` the first `allow` permits, the lowest `rank` first
+ * (ties keep the engine's order). Null otherwise, and the auto-player declines.
  */
-export function engageOneEach(state: ScenarioState, ctx: ReduceContext, most?: number): PlayerIntent | null {
+export function engageOneEach(state: ScenarioState, ctx: ReduceContext, most?: number, allow?: (enemyId: string) => boolean, rank?: (enemyId: string) => number): PlayerIntent | null {
   if (state.window?.kind !== "optionalEngage") return null;
   const seat = state.seats[state.activeSeat];
-  const enemy = legalTargets(state, { type: "Engage" }, ctx)[0];
+  const targets = legalTargets(state, { type: "Engage" }, ctx).filter((id) => allow?.(id) ?? true);
+  const enemy = rank ? [...targets].sort((left, right) => rank(left) - rank(right))[0] : targets[0];
   return enemy && seat && seat.engaged.length < (most ?? seat.heroes.length) ? { type: "Engage", enemyId: enemy } : null;
 }
 

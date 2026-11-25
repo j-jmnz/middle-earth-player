@@ -5,6 +5,8 @@
 //   pnpm browser shot /settings /decks --dark                   # two screens in the dark theme
 //   pnpm browser shot --fixture duo /table/{save} --landscape   # a fixture save (src/campaign/fixtures/registry.ts) on its table
 //   pnpm browser shot --fixture mirkwood-lost --at 40 /table/{save} --landscape   # the moment `pnpm game show mirkwood-lost --at 40` prints
+//   pnpm browser shot --scene the-morgul-vale '{"play":["143010"]}' --landscape   # a table built from a test layout (`pnpm game scene` prints it as text), read-only
+//   pnpm browser shot --moment the-blood-of-gondor/hidden-cards --landscape   # a moment a scenario committed (test/scenarios/<id>/screens.ts); `--moment <id>` shoots all
 //   pnpm browser shot /settings --tap text=Theme --ids          # tap, shoot again, list the testIDs left to tap
 //   pnpm browser shot /rules --base http://localhost:8081       # a running `pnpm web` (Metro) in place of the export
 //
@@ -16,7 +18,9 @@ import type { Page } from "playwright";
 
 import { runScript, type Log } from "../log.ts";
 import { openApp, slugOf, type App, type Problems } from "./app.ts";
-import { parseShotArgs, routesOf, type ShotArgs } from "./shot-args.ts";
+import { layoutOf } from "../game/scene-source.ts";
+import { momentShots, sceneDump, type SceneShot } from "./scene.ts";
+import { parseShotArgs, routesOf, SCENE_ROUTE, type ShotArgs } from "./shot-args.ts";
 import { ensureExport, serveExport } from "./web-export.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
@@ -34,13 +38,29 @@ async function describe(log: Log, app: App, page: Page, args: ShotArgs): Promise
   if (args.text) log.info(`  text:\n${(await page.locator("body").innerText()).replace(/^/gm, "    ")}`);
 }
 
-async function shoot(log: Log, app: App, args: ShotArgs, routes: readonly string[], suffix: string): Promise<number> {
+// The table (landscape or portrait), or the closed table's sentence when the scene did not open.
+const SCENE_WAIT = '[data-testid="table"], [data-testid="table-portrait"], [data-testid="table-closed"]';
+
+// A shot of a route, or of a scene (the route is the scene's, the PNG is named for the scene).
+type Target = { route: string; label: string; scene?: SceneShot };
+
+function targetsOf(routes: readonly string[], scenes: readonly SceneShot[]): Target[] {
+  if (scenes.length > 0) return scenes.map((scene) => ({ route: SCENE_ROUTE, label: `scene-${scene.name}`, scene }));
+  return routes.map((route) => ({ route, label: slugOf(route) }));
+}
+
+async function shoot(log: Log, app: App, args: ShotArgs, targets: readonly Target[], suffix: string): Promise<number> {
   let failures = 0;
-  for (const [at, route] of routes.entries()) {
-    const name = `${at + 1}-${slugOf(route)}${suffix}`;
+  for (const [at, { route: where, label, scene }] of targets.entries()) {
+    const route = scene ? `${where} (${scene.name})` : where;
+    const name = `${at + 1}-${label}${suffix}`;
     let page: Page | undefined;
     try {
-      page = await app.open(route, { wait: args.wait ?? undefined, settle: args.settle });
+      page = await app.open(where, { wait: args.wait ?? (scene ? SCENE_WAIT : undefined), settle: args.settle, scene: scene?.dump });
+      // The table opens on its quest card, as it does for a game reopened (`Continue`): the shot is of the table behind it.
+      if (scene && (await app.testIds(page)).includes("quest-advance-progress")) await app.tap(page, "quest-advance-progress", args.settle);
+      if (scene && (await app.testIds(page)).includes("table-closed")) throw new Error("the scene route opened no table (is this the e2e-test export, with the scene on the page?)");
+      if (scene?.note) log.info(`  shows: ${scene.note}`);
       log.info(`${route}: ${path.relative(ROOT, await app.shot(page, name, args.fullPage))}`);
       await describe(log, app, page, args);
       for (const [tapAt, target] of args.taps.entries()) {
@@ -62,8 +82,18 @@ async function shoot(log: Log, app: App, args: ShotArgs, routes: readonly string
   return failures;
 }
 
+// The scenes the flags ask for, built in Node once (the page gets each as JSON): `--scene` one layout, `--moment` a scenario's committed moments.
+async function scenesOf(args: ShotArgs): Promise<SceneShot[]> {
+  if (args.moment) return momentShots(args.moment);
+  if (!args.scene) return [];
+  const { scenarioId, layout, file } = args.scene;
+  const cwd = process.env.INIT_CWD ?? process.cwd();
+  return [{ name: scenarioId, dump: sceneDump(scenarioId, layoutOf(file ? `@${file}` : (layout ?? undefined), cwd)) }];
+}
+
 async function main(log: Log): Promise<void> {
   const args = parseShotArgs(process.argv.slice(2), ROOT);
+  const scenes = await scenesOf(args);
   const served = args.base ? null : await serveExport(ensureExport(log, { fresh: args.fresh, reuse: args.reuse }));
   const base = args.base ?? served?.base ?? "";
   let failures = 0;
@@ -74,7 +104,7 @@ async function main(log: Log): Promise<void> {
         // A fixture is written once per context: each scheme's context has its own storage.
         const landed = args.fixture ? await app.seed(args.fixture, args.at) : null;
         const suffix = args.schemes.length > 1 ? `-${scheme}` : "";
-        failures += await shoot(log, app, args, routesOf(args, landed), suffix);
+        failures += await shoot(log, app, args, targetsOf(routesOf(args, landed), scenes), suffix);
       } finally {
         await app.close();
       }
