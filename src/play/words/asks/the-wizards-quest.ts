@@ -8,8 +8,8 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "51004:whenRevealed:2 @0.0 Pick": { owned: true, note: "Carried Away: the ally you control with the highest cost lies under the stage. No copy of it can be played.", verb: "Choose" },
 
   // 51013:A:1 (Necromancer's Pass): the first player keeps a card, and the opposing team lays the highest cost of the others under the Pass.
-  "51013:whenRevealed:1 @0 Pick": { owned: true, note: "Necromancer's Pass: choose a card in your hand to keep. The opposing team lays another one under the Pass.", verb: "Keep" },
-  "51013:whenRevealed:1 @1 Pick": { note: "Necromancer's Pass: the other card of highest cost lies under the Pass. No copy of it can be played until the Pass is explored.", verb: "Choose" },
+  "51013:whenRevealed:1 @1 Pick": { owned: true, note: "Necromancer's Pass: choose a card in your hand to keep. The opposing team lays another one under the Pass.", verb: "Keep" },
+  "51013:whenRevealed:1 @2 Pick": { note: "Necromancer's Pass: the other card of highest cost lies under the Pass. No copy of it can be played until the Pass is explored.", verb: "Choose" },
 
   // 51017:A:1 (Smoking Blood): attached to a Troll enemy.
   "51017:whenRevealed:1 @0 AttachSelf": { note: "Smoking Blood: attach it to the Troll enemy with the most hit points left. A Troll that has it is not chosen again.", verb: "Attach" },
