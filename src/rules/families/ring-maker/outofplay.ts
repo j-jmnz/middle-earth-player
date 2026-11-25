@@ -96,3 +96,20 @@ export function shuffleHandCardIntoOutOfPlay(state: ScenarioState, focus: Focus)
   if (id == null) return state;
   return shufflePile(putIn({ ...state, seedCursor: state.seedCursor + 1 }, id, seat, seat), outOfPlayZone(seat));
 }
+
+/**
+ * The settle sweep for an eliminated seat's out-of-play deck (rr.player-elimination: the eliminated player's deck goes to its owners' discard piles). Each card of the pile turns faceup: a player card goes to the discard pile of its owner, and Mugash or a Guard, which no player owns
+ * (rr.ownership-and-control), to the encounter discard pile, so a later reset of the encounter deck can reveal him: the game stays winnable. Nothing happens in a game with no out-of-play deck, once the game is lost, or for a seat still in the game.
+ */
+export function discardEliminatedDecks(state: ScenarioState): ScenarioState {
+  if (state.lost || !hasOutOfPlayDecks(state)) return state;
+  let next = state;
+  for (let seat = 0; seat < state.seatCount; seat += 1) {
+    if (!state.seats[seat]?.eliminated) continue;
+    for (const id of pileOf(next, outOfPlayZone(seat))) {
+      const owner = next.cards[id]?.owner;
+      next = updateCard(moveCard(next, id, owner == null ? { zone: "encounterDiscard" } : { zone: "discard", seat: owner }), id, { face: "up" });
+    }
+  }
+  return next;
+}

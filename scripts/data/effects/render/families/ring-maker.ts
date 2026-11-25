@@ -13,6 +13,7 @@ export const RING_MAKER_TEMPLATES: Templates = {
     read: ["amount", "chooseForHand", "revealed"],
   }),
   ShuffleHandCardIntoOutOfPlay: (i) => ({ text: `the acting player puts 1 ${i.random ? "random " : ""}card of his hand, not one that cannot leave it, facedown into his out-of-play deck and shuffles the deck (nothing with an empty hand)`, read: ["random"] }),
+  EngageCaptiveHolder: (i) => ({ text: `(constant, does nothing when run) while this enemy is in the staging area it engages the player who controls a hero with ${str(i.captive)} attached, at once and whatever its engagement cost`, read: ["captive"] }),
   ReturnAttachedEnemy: (i) => ({ text: `each enemy named ${str(i.name)} lying attached to a card goes back to the staging area as an enemy (one anywhere else stays)`, read: ["name"] }),
 };
 
@@ -25,4 +26,5 @@ export const RING_MAKER_SAMPLES: Samples = {
   RevealOutOfPlay: [{ verb: "RevealOutOfPlay", amount: 3, chooseForHand: true }],
   ShuffleHandCardIntoOutOfPlay: [{ verb: "ShuffleHandCardIntoOutOfPlay", random: true }],
   ReturnAttachedEnemy: [{ verb: "ReturnAttachedEnemy", name: "Mugash" }],
+  EngageCaptiveHolder: [{ verb: "EngageCaptiveHolder", captive: "Mugash" }],
 };

@@ -29,7 +29,7 @@ Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc
 07025:A:1 (front): While a player controls a hero with Mugash attached, Mugash's Guard engages that player.
   07025:constant:1: Constant
     only if this card is in the staging area
-    - this card: stat engagesCaptiveHolder (while it is in the staging area it engages the player who controls a hero with Mugash attached, at once and whatever its engagement cost) 1, while this card is in play
+    - (constant, does nothing when run) while this enemy is in the staging area it engages the player who controls a hero with Mugash attached, at once and whatever its engagement cost
 
 07025:A:2 (front): Forced: After Mugash's Guard destroys a character, if Mugash is attached to a hero, return Mugash to the staging area.
   07025:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
@@ -109,7 +109,7 @@ Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc
     - for each player, first player first:
       - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
-    - then, if the total Threat of all cards in the staging area now is less than the total Willpower of all characters committed to the quest, every player's (checked when this step runs, after the steps above; not tied to whether they did anything): each enemy engaged with a player (not one in the staging area) with the trait Orc makes an immediate attack, each dealt a shadow card of its own
+    - then, if the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area (checked when this step runs, after the steps above; not tied to whether they did anything): each enemy engaged with a player (not one in the staging area) with the trait Orc makes an immediate attack, each dealt a shadow card of its own
 
 ## 07038 Orc Skirmisher
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -279,4 +279,4 @@ Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc
   07064:questResolution:1: Quest resolution
     - the players win the game
 
-(rendered pieces: 171 by template, 0 as JSON)
+(rendered pieces: 169 by template, 0 as JSON)

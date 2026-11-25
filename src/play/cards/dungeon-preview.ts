@@ -72,7 +72,7 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   const angmar = angmarDetail(game, ctx, cardId, name);
   if (angmar) return angmar;
   // Gríma on The Islet or in a play area and Ill Tidings in a hand (The Fords of Isen).
-  const ringMaker = ringMakerDetail(game, cardId, name);
+  const ringMaker = ringMakerDetail(game, ctx, cardId, name);
   if (ringMaker) return ringMaker;
   // The Ring-bearer under Topmost Chamber, the boons on Shagrat and Last of the Company are told before the held-hero words of Lost in Mirkwood, which would call the Chamber an enemy that holds a hero facedown.
   const ungol = ungolDetail(game, card, name);

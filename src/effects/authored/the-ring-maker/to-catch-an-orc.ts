@@ -48,7 +48,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   },
 
   // 07025 Mugash's Guard. While a player controls a hero with Mugash attached the Guard engages him (the settle sweep, families/ring-maker/captor.ts). Forced: after it destroys a character, Mugash goes back to the staging area if he is attached to a hero.
-  { id: "07025:constant:1", cardCode: GUARD, lines: ["07025:A:1"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "ModifyStat", stat: "engagesCaptiveHolder", amount: 1, until: "whileSourceInPlay", target: "self" }] },
+  { id: "07025:constant:1", cardCode: GUARD, lines: ["07025:A:1"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "EngageCaptiveHolder", captive: MUGASH_NAME }] },
   {
     id: "07025:forced:1",
     cardCode: GUARD,
@@ -85,7 +85,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [
       EACH_PLAYER([{ verb: "SearchMove", type: "location", to: "staging" }]),
       SHUFFLED,
-      { verb: "ImmediateAttackEach", trait: "Orc", notStaging: true, when: { kind: "less", left: { stagingThreat: true }, right: { committedWillpower: true } } },
+      { verb: "ImmediateAttackEach", trait: "Orc", notStaging: true, when: { kind: "questLeads" } },
     ],
   },
 

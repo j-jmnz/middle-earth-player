@@ -8,6 +8,7 @@ import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard, attachTo } from "../../core/zones.ts";
 import { settle } from "../../engine/machine.ts";
 import { idOf, idsOf, run, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { captorSeat } from "./captor.ts";
 
 const SCENARIO = "to-catch-an-orc";
 const MUGASH = "07024";
@@ -173,10 +174,43 @@ describe("Mugash held by a hero (07025:A:1, 07025:A:2)", () => {
     const mugash = idOf(t.state, MUGASH);
     const hero = t.state.seats[1]?.heroes[0] ?? "";
     const lying = updateCard(attachTo(moveCard(t.state, mugash, { zone: "attached" }), mugash, hero), mugash, { asAttachment: true });
-    const flagged: ScenarioState = { ...lying, modifiers: [...lying.modifiers, { instanceId: idOf(lying, GUARD), sourceId: idOf(lying, GUARD), stat: "engagesCaptiveHolder", amount: 1, until: "endOfGame" }] };
-    const settled = settle(flagged, t.ctx, []);
+    const settled = settle(lying, t.ctx, []);
     const guard = settled.cards[idOf(settled, GUARD)];
     expect(guard?.zone).toBe("engaged");
     expect(guard?.controller).toBe(1);
+    expect(captorSeat(lying, t.ctx, idOf(lying, GUARD))).toBe(1);
+  });
+
+  it("07025:A:1 a seat that is eliminated while it holds Mugash is no captor: nothing is engaged and the preview names nobody", () => {
+    const t = table({ seats: 2, staging: [GUARD, MUGASH] });
+    const mugash = idOf(t.state, MUGASH);
+    const hero = t.state.seats[1]?.heroes[0] ?? "";
+    const lying = updateCard(attachTo(moveCard(t.state, mugash, { zone: "attached" }), mugash, hero), mugash, { asAttachment: true });
+    const gone: ScenarioState = { ...lying, seats: [lying.seats[0], { ...lying.seats[1], eliminated: true }] };
+    expect(captorSeat(gone, t.ctx, idOf(gone, GUARD))).toBeNull();
+    expect(settle(gone, t.ctx, []).cards[idOf(gone, GUARD)]?.zone).toBe("staging");
+  });
+
+  it("07025:A:1 a Guard already engaged with the other player moves to the player who holds Mugash", () => {
+    const t = table({ seats: 2, engaged: [{ code: GUARD, seat: 1 }], staging: [MUGASH] });
+    const mugash = idOf(t.state, MUGASH);
+    const hero = t.state.seats[0]?.heroes[0] ?? "";
+    const lying = updateCard(attachTo(moveCard(t.state, mugash, { zone: "attached" }), mugash, hero), mugash, { asAttachment: true });
+    const guard = settle(lying, t.ctx, []).cards[idOf(lying, GUARD)];
+    expect(guard).toMatchObject({ zone: "engaged", controller: 0 });
+  });
+});
+
+describe("an eliminated seat's out-of-play deck (rr.player-elimination)", () => {
+  it("player cards go faceup to their owner's discard pile, Mugash to the encounter discard pile, and the pile is empty", () => {
+    const t = table({ seats: 2, setAside: [MUGASH, GUARD], deckOf: DECK.flatMap((code) => [code, { code, seat: 1 }]) });
+    const dealt = run(t, run(t, t.state, CREATE), SHUFFLE_IN);
+    const home = [0, 1].find((seat) => pileOf(dealt, seat === 0 ? "outOfPlay0" : "outOfPlay1").some((id) => dealt.cards[id]?.code === MUGASH)) ?? 0;
+    const gone: ScenarioState = { ...dealt, seats: home === 0 ? [{ ...dealt.seats[0], eliminated: true }, dealt.seats[1]] : [dealt.seats[0], { ...dealt.seats[1], eliminated: true }] };
+    const settled = settle(gone, t.ctx, []);
+    expect(pileOf(settled, home === 0 ? "outOfPlay0" : "outOfPlay1")).toEqual([]);
+    expect(settled.cards[idOf(settled, MUGASH)]).toMatchObject({ zone: "encounterDiscard", face: "up" });
+    const mine = Object.values(settled.cards).filter((card) => card.owner === home && card.zone === "discard");
+    expect(mine.length).toBeGreaterThan(0);
   });
 });

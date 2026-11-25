@@ -64,7 +64,6 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (expr.discardedThreat === true) return { text: "the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0)", read: ["discardedThreat"] };
   if (isObj(expr.discardedMatching)) return { text: `the number of cards this effect discarded from the top of the encounter deck, still in the discard pile, that are ${pick(expr.discardedMatching, ctx)}`, read: ["discardedMatching"] };
   if (expr.destroyedWillpower === true) return { text: "the Willpower the destroyed character had in play (last known)", read: ["destroyedWillpower"] };
-  if (expr.committedWillpower === true) return { text: "the total Willpower of all characters committed to the quest, every player's", read: ["committedWillpower"] };
   if (expr.facedown === true) return { text: "the number of cards attached facedown to this card", read: ["facedown"] };
   if (expr.firstPlayerTens === true) return { text: "the tens digit of the first player's threat, whoever the actor is", read: ["firstPlayerTens"] };
   if (isObj(expr.mostPerPlayer)) return { text: `the most ${pick(expr.mostPerPlayer, ctx)} any one player controls, each player counted from their own side`, read: ["mostPerPlayer"] };

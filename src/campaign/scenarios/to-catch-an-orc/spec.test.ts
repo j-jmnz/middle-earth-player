@@ -93,9 +93,9 @@ const ROWS: readonly Row[] = [
   { line: "07053:A:2", name: "Shadow: the defending player exhausts a character he controls", layout: { engaged: ["f0"] }, act: [attack("f0", { shadow: WOLF, undefended: true }), answer("dh2")], expect: exhausted("dh2") },
   { line: "07054:A:1", name: "While Broken Lands is in the staging area progress cannot be placed on locations in the staging area", layout: { staging: [LANDS, METHEDRAS] }, act: [], expect: [flag(METHEDRAS, "noProgressPlaced"), flag(LANDS, "noProgressPlaced")] },
   { line: "07054:A:2", name: "Shadow: the attacking enemy gets +1 Attack for each location in the staging area", layout: { staging: [ORC_CAVE, METHEDRAS], engaged: ["f0"] }, act: attack("f0", { shadow: LANDS, undefended: true }), expect: damageOn("dh1", 3) },
-  { line: "07055:A:2", name: "When Revealed: the first player has 1 damage dealt to each exhausted character", layout: { engaged: [HOUND], stage: STAGE_2, timeCounters: 2 }, act: [announce("engaged", HOUND), answer("dh1"), reveal(COVER), answer("damage")], expect: [damageOn("dh1", 1), damageOn("dh2", 0), resourcesOn(STAGE_2, 2)] },
-  { line: "07055:A:2", name: "When Revealed: or a time counter comes off the current quest", layout: { engaged: [HOUND], stage: STAGE_2, timeCounters: 2 }, act: [announce("engaged", HOUND), answer("dh1"), reveal(COVER), answer("time")], expect: [damageOn("dh1", 0), resourcesOn(STAGE_2, 1)] },
-  { line: "07055:A:2", name: "When Revealed: with no exhausted character only the time counter is offered", layout: { stage: STAGE_2, timeCounters: 2 }, act: reveal(COVER), expect: resourcesOn(STAGE_2, 1) },
+  { line: "07055:A:2", name: "When Revealed: the first player has 1 damage dealt to each exhausted character", layout: { engaged: [HOUND], stage: STAGE_2, timeCounters: 2, deck: ["f0"] }, act: [announce("engaged", HOUND), answer("dh1"), reveal(COVER), answer("damage")], expect: [damageOn("dh1", 1), damageOn("dh2", 0), resourcesOn(STAGE_2, 2)] },
+  { line: "07055:A:2", name: "When Revealed: or a time counter comes off the current quest", layout: { engaged: [HOUND], stage: STAGE_2, timeCounters: 2, deck: ["f0"] }, act: [announce("engaged", HOUND), answer("dh1"), reveal(COVER), answer("time")], expect: [damageOn("dh1", 0), resourcesOn(STAGE_2, 1)] },
+  { line: "07055:A:2", name: "When Revealed: with no exhausted character only the time counter is offered", layout: { stage: STAGE_2, timeCounters: 2, deck: ["f0"] }, act: reveal(COVER), expect: resourcesOn(STAGE_2, 1) },
 ];
 
 if (ROWS.length > 0) cardSpecs("to-catch-an-orc", ROWS);

@@ -44,7 +44,6 @@ export const FLAG_NOTES: Readonly<Record<string, string>> = {
   returnsToStagingArea: " (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile)",
   returnsToEncounterDeck: " (a claimed objective: when its hero leaves play it goes to the top of the encounter deck instead of the staging area)",
   returnsWithoutActive: " (while no location is the active location an engaged holder goes back to the staging area at once, whatever engaged it)",
-  engagesCaptiveHolder: " (while it is in the staging area it engages the player who controls a hero with Mugash attached, at once and whatever its engagement cost)",
   noPlayerAttachments: " (no player card can be attached to it)",
   noAttachmentPlays: " (no player plays an attachment card onto it)",
   // Rules the player's table obeys.

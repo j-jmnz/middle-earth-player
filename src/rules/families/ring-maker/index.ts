@@ -7,11 +7,10 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
-import { committedWillpowerAmount } from "./amounts.ts";
 import { engageCaptiveHolders, returnAttachedByName } from "./captor.ts";
 import { engageTopDiscarded } from "./engage.ts";
 import { drawSelfIntoHand } from "./hand.ts";
-import { createOutOfPlayDecks, revealOutOfPlay, shuffleHandCardIntoOutOfPlay, shuffleIntoOutOfPlayDecks } from "./outofplay.ts";
+import { createOutOfPlayDecks, discardEliminatedDecks, revealOutOfPlay, shuffleHandCardIntoOutOfPlay, shuffleIntoOutOfPlayDecks } from "./outofplay.ts";
 import { inOwnSurgeChain } from "./surge-chain.ts";
 import { removeTimeFromQuest } from "./time.ts";
 
@@ -33,9 +32,11 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return returnAttachedByName(state, instruction, ctx);
     case "ShuffleHandCardIntoOutOfPlay":
       return shuffleHandCardIntoOutOfPlay(state, focus);
+    case "EngageCaptiveHolder":
+      return state;
     default:
       return null;
   }
 }
 
-export const manifest: RulesFamily = { name: "ring-maker", verbs: ["RemoveTimeFromQuest", "DrawSelfIntoHand", "EngageTopDiscarded", "CreateOutOfPlayDecks", "ShuffleIntoOutOfPlayDecks", "RevealOutOfPlay", "ShuffleHandCardIntoOutOfPlay", "ReturnAttachedEnemy"], run, amount: (state, found, _scope, ctx) => committedWillpowerAmount(state, found, ctx), settle: { sweep: engageCaptiveHolders }, deckReset: { hold: inOwnSurgeChain } };
+export const manifest: RulesFamily = { name: "ring-maker", verbs: ["RemoveTimeFromQuest", "DrawSelfIntoHand", "EngageTopDiscarded", "CreateOutOfPlayDecks", "ShuffleIntoOutOfPlayDecks", "RevealOutOfPlay", "ShuffleHandCardIntoOutOfPlay", "ReturnAttachedEnemy", "EngageCaptiveHolder"], run, settle: { sweep: (state, ctx, steps) => discardEliminatedDecks(engageCaptiveHolders(state, ctx, steps)) }, deckReset: { hold: inOwnSurgeChain } };

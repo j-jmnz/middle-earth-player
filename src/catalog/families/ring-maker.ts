@@ -27,13 +27,14 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ReturnAttachedEnemy"), name: z.string().min(1), ...when }),
   // "The defending player shuffles 1 random card from his hand into his out-of-play deck" (07026:A:1): the actor puts one random card of its hand, not one that cannot leave the hand, facedown into its out-of-play deck, which is shuffled. An empty hand does nothing.
   z.strictObject({ verb: z.literal("ShuffleHandCardIntoOutOfPlay"), random: z.literal(true), ...when }),
+  // "While a player controls a hero with Mugash attached, Mugash's Guard engages that player" (07025:A:1), a constant marker on the Guard: in the staging area it engages the seat that controls a hero with the enemy of this title attached, at once and whatever its engagement cost. The settle sweep is
+  // families/ring-maker/captor.ts; the run does nothing.
+  z.strictObject({ verb: z.literal("EngageCaptiveHolder"), captive: z.string().min(1) }),
 ] as const;
 
 const FLAGS = [
   // On a card in a hand: it cannot leave that hand ("Ill Tidings cannot leave that player's hand", 07023:A:1). core/zones.ts moveCard refuses the move; a pick that would discard it and a random discard leave it out (families/wilderland/pick.ts barredFromPlayerDiscard).
   "cannotLeaveHand",
-  // On an enemy in the staging area: it engages the player who controls a hero with Mugash attached, at once and whatever its engagement cost ("Mugash's Guard engages that player", 07025:A:1). The settle sweep is families/ring-maker/captor.ts.
-  "engagesCaptiveHolder",
 ] as const;
 
 export const manifest = { name: "ring-maker", verbs: VERBS, triggers: [], flags: FLAGS } as const satisfies CatalogFamily;
