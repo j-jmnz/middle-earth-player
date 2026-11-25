@@ -1,7 +1,7 @@
 // Rules: rr.first-player, rr.engaged, rr.response, rr.explored, rr.shadow-effects, rr.attacks-outside-the-combat-phase (data/rules/entries.json); ledger lines 19155:A:1, 19156:A:1, 19156:A:2, 19157:A:1, 19157:A:2, 19158:A:1, 19159:A:1, 19160:A:1, 19163:A:2, 19164:A:1, 19167:A:1, 19168:B:1, 19169:B:2, 19170:B:1.
 // The choices, Responses and attacks of The Fate of Wilderland on the live sheet (docs/design-system-table.md, Choice tray): the fight on The Goblins' Assault. Each note says why the window opened and where the objective stands (what it holds, and what advances the quest or loses the game),
 // each row what the branch does, and a branch that pushes the progress to the number that loses the game arms the confirm. One player's own choice leads with "Player N, Card:" two-handed (`owned`) and has no lead solo; the first player's choice for the group is not owned, so the sheet
-// adds who chooses. The words read the shape of a record's instructions and the numbers the table holds, never a card code, an effect id or a title, and they are told only in a game that deals one of the scenario's own verbs (`inFate`): a lookalike record in another scenario keeps the
+// adds who chooses. The words read the shape of a record's instructions and the numbers the table holds, never a card code, an effect id or a title, and they are told only in this scenario's own game, and only while a record holds one of its verbs (`inFate`: the scenario id plus the verb): a lookalike record in another scenario keeps the
 // ordinary words. Pure.
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 import { gameReads } from "../../../rules/core/game-reads.ts";
@@ -19,9 +19,9 @@ import { seatSays } from "../seat.ts";
 
 type Choose = Extract<Instruction, { verb: "Choose" }>;
 
-/** Whether the game is The Fate of Wilderland's: a card in it has a record that takes progress off a card by its title (RemoveProgressFrom), a verb only this scenario's records use. */
+/** Whether the game is The Fate of Wilderland's: its scenario, with a record that takes progress off a card by its title (RemoveProgressFrom). Other scenarios use that verb too (The Morgul Vale's Morgul Road), so the verb alone is no mark of it. */
 export function inFate(game: ScenarioState, ctx: ReduceContext): boolean {
-  return gameReads(game, ctx, '"verb":"RemoveProgressFrom"');
+  return game.scenarioId === "the-fate-of-wilderland" && gameReads(game, ctx, '"verb":"RemoveProgressFrom"');
 }
 
 const within = (steps: readonly Instruction[], test: (step: Instruction) => boolean): boolean => steps.some(test);

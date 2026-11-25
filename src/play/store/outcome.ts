@@ -30,6 +30,7 @@ import { controlChanges, changeWords } from "../readouts/against-the-shadow/osgi
 import { deadVillagers, heldBeat, onVillagers, villagerLines } from "../readouts/against-the-shadow/amon-din.ts";
 import { stackTakes, underHost } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { hiddenChanges, hiddenLines } from "../readouts/against-the-shadow/blood-steps.ts";
+import { valeFrom, valeOf, valeQuiet, valeStepWords } from "../readouts/against-the-shadow/vale-steps.ts";
 import { HIDDEN_TITLE } from "../words/scenarios/against-the-shadow/blood.ts";
 import { NO_HERO_DAMAGE, VILLAGERS_TITLE } from "../words/scenarios/against-the-shadow/amon-din.ts";
 import { releasedWords, UNDERWORLD_TITLE } from "../words/scenarios/against-the-shadow/stewards-fear.ts";
@@ -132,7 +133,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         return;
       }
       case "progress":
-        line(step.amount < 0 ? `${-step.amount} progress removed from ${stageNamed(step.targetId)}` : `${step.amount} progress on ${stageNamed(step.targetId)}`, "progress");
+        line(valeStepWords(step, names.card, valeFrom(after, step.cause, names.card)) ?? (step.amount < 0 ? `${-step.amount} progress removed from ${stageNamed(step.targetId)}` : `${step.amount} progress on ${stageNamed(step.targetId)}`), "progress");
         return;
       case "advance": {
         // The Stormcaller's stage advance (dcce.stormcallers-area-stages): its C side's When Revealed is the beat's second line.
@@ -203,7 +204,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         const rest = steps.slice(index + 1);
         const end = rest.findIndex((later) => later.kind === "strike" || later.kind === "attack");
         // Progress the attack placed on the enemy (stage 3 of The Drúadan Forest) is what it dealt: no "No damage" line after it.
-        const placed = (end < 0 ? rest : rest.slice(0, end)).some((later) => (later.kind === "damage" || (later.kind === "progress" && progressAttack(before))) && later.amount > 0 && later.targetId === step.targetId);
+        const placed = (end < 0 ? rest : rest.slice(0, end)).some((later) => (later.kind === "damage" || (later.kind === "progress" && progressAttack(before))) && later.amount > 0 && (later.targetId === step.targetId || valeOf(later)?.for === step.targetId));
         // An undefended attack on Rescued Villagers (06067:B:1) damages no hero: the villager tokens it discards come in their own beat below.
         if (!placed) line(onVillagers(before, step.targetId) ? NO_HERO_DAMAGE : "No damage");
         // The enemy that takes no damage until he has attacked says why (The Fate of Wilderland).
@@ -213,9 +214,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
       }
       case "damage":
         // The damage tokens put on Dead Villagers (06069:A:1) are told once, with the villager tokens that caused them (villagerLines).
-        if (deadVillagers(after, step.targetId)) return;
+        if (deadVillagers(after, step.targetId) || valeQuiet(step)) return;
         // A heal is a damage step with a negative amount (rr.damage).
-        line(step.amount < 0 ? `${-step.amount} damage healed on ${names.card(step.targetId)}` : `${step.amount} damage on ${names.card(step.targetId)}`, "damage", [step.targetId]);
+        line(valeStepWords(step, names.card) ?? (step.amount < 0 ? `${-step.amount} damage healed on ${names.card(step.targetId)}` : `${step.amount} damage on ${names.card(step.targetId)}`), "damage", [step.targetId]);
         return;
       case "destroy": {
         // A location placed facedown underneath The Havens Burn is hidden from now on: the line does not name it and rings no card (dcce.aflame).
@@ -231,7 +232,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
       }
       case "reveal":
         // The Hazard a Discover revealed is told in Discover's own lines.
-        if (steps.slice(0, index).some((earlier) => earlier.kind === "discover" && earlier.hazard === step.cardId)) return;
+        if (steps.slice(0, index).some((earlier) => earlier.kind === "discover" && earlier.hazard === step.cardId) || valeQuiet(step)) return;
         // A card of the side quest deck (emce.side-quests) is revealed at the end of the planning phase, not by the staging step: it joins the staging area, and nothing cancels its When Revealed effect.
         if (before.cards[step.cardId]?.zone === "sideQuestDeck") {
           if (!current || current.title !== SIDE_QUEST_TITLE) open(3, SIDE_QUEST_TITLE, "plain");
@@ -247,7 +248,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
           return;
         }
         if (!current || current.rank !== 3 || current.whole) open(3, "Staging", "plain");
-        line(`Revealed ${names.card(step.cardId)}`);
+        line(valeStepWords(step, names.card) ?? `Revealed ${names.card(step.cardId)}`);
         // The first treachery of a round, while a stage bars canceling its When Revealed effect (19137:B:1).
         const first = firstTreacheryNote(after, step.cardId, names.card(step.cardId));
         if (first) line(first, null, [step.cardId]);
@@ -270,8 +271,8 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         return;
       case "engage": {
         if (joined.has(index) || turnedEngaged.has(step.enemyId)) return;
-        open(4, `${names.card(step.enemyId)} engages`, "bad");
-        line(after.seatCount > 1 ? `${names.card(step.enemyId)} engages Player ${step.seat + 1}` : `${names.card(step.enemyId)} engages you`);
+        open(4, valeOf(step)?.by != null ? "" : `${names.card(step.enemyId)} engages`, "bad");
+        line(valeStepWords(step, names.card, null, { count: after.seatCount }) ?? (after.seatCount > 1 ? `${names.card(step.enemyId)} engages Player ${step.seat + 1}` : `${names.card(step.enemyId)} engages you`));
         const count = boarded.get(index);
         // The ship's ring follows this beat.
         if (count) line(boardingWords({ ship: names.card(step.enemyId), count, seat: step.seat, seats: after.seatCount }), null, [step.enemyId]);

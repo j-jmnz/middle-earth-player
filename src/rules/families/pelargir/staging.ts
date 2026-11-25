@@ -5,6 +5,7 @@ import type { Condition, Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { flagged } from "../../core/state.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { patchTop } from "../../windows/windows.ts";
@@ -28,8 +29,10 @@ export function shuffleStagingIntoEncounterDeck(state: ScenarioState, focus: Foc
   // A card that is being revealed is in the staging area while its When Revealed effect resolves, but it is not counted or shuffled: not the card itself, not the Lieutenant of Mordor that copies this effect (rr.step-3-3), and no card whose frame is open on the stack. Nor is any treachery.
   const open = new Set(state.stack.map((frame) => frame.cardId));
   const ids = state.staging.filter((id) => id !== focus.sourceId && !open.has(id) && printedOf(ctx.cards, state.cards[id]?.code ?? "").type !== "treachery");
+  // A card that cannot leave the staging area (To the Tower) or play (a Captain) is counted and stays, with its damage and tokens (rr.cannot; families/pelargir/vale/cannot-leave.ts).
+  const stays = (id: string): boolean => state.modifiers.length > 0 && (flagged(state, id, "cannotLeaveStaging") || flagged(state, id, "cannotLeavePlay"));
   let next = state;
-  for (const id of ids) next = moveEncounter(next, id, "shuffle", focus.seat, ctx, steps);
+  for (const id of ids) if (!stays(id)) next = moveEncounter(next, id, "shuffle", focus.seat, ctx, steps);
   const data = effectData(next);
   return data ? patchTop(next, { data: { ...data, x: ids.length } }) : next;
 }

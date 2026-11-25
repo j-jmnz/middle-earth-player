@@ -19,6 +19,7 @@ import { patchTop, topFrame } from "../../windows/windows.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { defendingAgainst } from "../angmar/combat.ts";
 import { scrollDamageTarget } from "../pelargir/scroll.ts";
+import { bodyguardTarget } from "../pelargir/vale/bodyguard.ts";
 import { listened, queueHeard, trimFollowUps } from "./listen.ts";
 import { bilboDamageBarred } from "../riddles/gollum.ts";
 
@@ -71,7 +72,8 @@ export function damageGoesTo(state: ScenarioState, id: string, source?: DamageSo
     if (host && host !== id && inPlay(state.cards[host]?.zone ?? "removed")) return host;
   }
   // "Any damage dealt by this attack is dealt to the hero with Alcaron's Scroll attached, if able" (05020:A:2): the pelargir family names the hero, or none.
-  return scrollDamageTarget(state, id, source) ?? id;
+  // "Any damage that would be dealt to a Captain enemy is dealt to 1 Morgul Bodyguard instead" (06148:A:1): the Captain holds the flag while a Bodyguard is in play.
+  return scrollDamageTarget(state, id, source) ?? bodyguardTarget(state, id) ?? id;
 }
 
 // Damage a card does not take from this source: Bilbo Baggins in the riddle area takes it only from Gollum (families/riddles/gollum.ts).

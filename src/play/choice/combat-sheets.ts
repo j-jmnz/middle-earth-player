@@ -11,6 +11,7 @@ import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, 
 import { undefendedVillagersLine } from "../readouts/against-the-shadow/amon-din.ts";
 import { undefendedLocationsLine } from "../readouts/against-the-shadow/osgiliath.ts";
 import { bloodAttackLine } from "../readouts/against-the-shadow/blood.ts";
+import { valeAttackNote, valeAttackSource } from "../readouts/against-the-shadow/vale.ts";
 import { undefendedRedirectWords } from "../readouts/against-the-shadow/cair-andros.ts";
 import { alliesArchery, willpowerAttack } from "../readouts/against-the-shadow/druadan.ts";
 import { ALLIES_ARCHERY_WORDS, willpowerAttackWords } from "../words/scenarios/against-the-shadow/druadan.ts";
@@ -83,7 +84,7 @@ function attackersSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNam
     key: `attackers:${enemyId}`,
     step: "Combat",
     title: `Attack ${names.card(enemyId)}`,
-    note: fateTargetNote(game, ctx, enemyId, defense, names.card(enemyId)) ?? (willpowerAttack(game) ? `${willpowerAttackWords(defense)} Choose the characters that attack it.` : `Defense ${defense}. Choose the characters that attack it.`),
+    note: fateTargetNote(game, ctx, enemyId, defense, names.card(enemyId)) ?? (willpowerAttack(game) ? `${willpowerAttackWords(defense)} Choose the characters that attack it.` : `Defense ${defense}.${valeAttackNote(game, ctx, enemyId)} Choose the characters that attack it.`),
     verb: "Attack",
     stats: statOf(game, ctx, enemyId, "defense"),
     options: characters.map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, read) })),
@@ -101,7 +102,7 @@ export function defenseSheet(game: ScenarioState, ctx: ReduceContext, legal: rea
   // An attack a shadow card makes says where it comes from, as a pick says its card's line (sheets.ts).
   const shadowSource = numbers && game.pendingAttack?.shadowAttack ? ` ${names.card(numbers.enemyId)}'s shadow effect: it attacks you now, and goes back to the top of the encounter deck after combat.` : "";
   // An attack the Thing makes from the staging area while Eye of the Beast is engaged with the defender, or a detached arm's (dcce.grapple, 12050:A:3, 12052:A:3).
-  const source = shadowSource || attackSource(game, ctx, names.card) || fateAttackNote(game, ctx, names.card);
+  const source = shadowSource || attackSource(game, ctx, names.card) || fateAttackNote(game, ctx, names.card) || valeAttackSource(game, ctx);
   const note = numbers ? `Attack ${numbers.attack}.${source}` : "";
   const defenders = has(legal, "DeclareDefender") ? legalTargets(game, { type: "DeclareDefender" }, ctx) : [];
   // While stage 1B of The Siege of Cair Andros is current the damage of an undefended attack goes to a Battleground location, not a hero (05072:B:2).

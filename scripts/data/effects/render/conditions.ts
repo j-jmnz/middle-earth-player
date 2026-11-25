@@ -117,6 +117,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   firstEnemy: () => ({ text: "the card the event is about is the first enemy the encounter deck revealed this round (not one a search, a shadow card or a discard added)", read: [] }),
   underworldReleased: () => ({ text: "no facedown card lies under a location that is out of play (every stack of a location that left play is revealed)", read: [] }),
   deckEmpty: () => ({ text: "a player still in the game has no cards in his deck", read: [] }),
+  encounterCanReveal: () => ({ text: "an encounter card can be revealed: the encounter deck holds one, or it is the quest phase and the discard pile can reset an empty deck", read: [] }),
   firstTreachery: () => ({ text: "the card the event is about is the first treachery the encounter deck revealed this quest phase", read: [] }),
   victoryPoints: (c) => ({ text: `the victory display holds at least ${str(c.min)} Victory points`, read: ["min"] }),
   stageProgress: (c) => ({ text: `the current quest stage holds at least ${str(c.min)} progress${c.perStartedPlayer === true ? " for each player who started the game" : ""}`, read: ["min", "perStartedPlayer"] }),

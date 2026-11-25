@@ -96,6 +96,7 @@ export const FIXTURE_REGISTRY = [
   { scenarioId: "encounter-at-amon-din", kind: "standalone", names: ["din-lost"] },
   { scenarioId: "assault-on-osgiliath", kind: "standalone", names: ["assault-lost"] },
   { scenarioId: "the-blood-of-gondor", kind: "standalone", names: ["blood-lost"] },
+  { scenarioId: "the-morgul-vale", kind: "standalone", names: ["vale-lost"] },
   { scenarioId: "we-must-away-ere-break-of-day", kind: "standalone", names: ["day-lost"] },
   { scenarioId: "over-the-misty-mountains-grim", kind: "standalone", names: ["grim-lost"] },
   { scenarioId: "dungeons-deep-and-caverns-dim", kind: "standalone", names: ["dim-lost"] },

@@ -18,6 +18,7 @@ import { chooseEach } from "../families/deck/each.ts";
 import { lookedDeckSeat } from "../families/deck/rules.ts";
 import { feedsDiscard, pickCandidates } from "./pick.ts";
 import { placesPicked } from "../families/pelargir/progress-bar.ts";
+import { leavesPlayPicked } from "../families/pelargir/vale/cannot-leave.ts";
 import { spendsPicked } from "../families/pelargir/spending.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "../core/state.ts";
@@ -304,7 +305,7 @@ function expandEach(state: ScenarioState, item: QueueItem, frame: Frame, ctx: Re
   if (instruction.verb !== "Each" || data?.kind !== "effect") return state;
   // "Up to 4 Rohan allies", "any number of Gondor allies": the actor chooses them (families/deck/each.ts).
   if (instruction.upTo != null) return chooseEach(state, item, frame, ctx);
-  const ids = pickCandidates(state, instruction.pick, item.seat, [], frame.cardId, ctx, data.x, data.participants, false, { subject: data.subject ?? null, other: data.other ?? null, discards: feedsDiscard(instruction.instructions) });
+  const ids = pickCandidates(state, instruction.pick, item.seat, [], frame.cardId, ctx, data.x, data.participants, false, { subject: data.subject ?? null, other: data.other ?? null, discards: feedsDiscard(instruction.instructions), leaves: leavesPlayPicked(instruction.instructions) });
   const cause = item.cause ? { cause: item.cause } : {};
   const expanded = ids.flatMap((id) => [
     { instruction: { verb: "Pick" as const, pick: instruction.pick }, seat: item.seat, chosen: id, ...cause },
@@ -354,7 +355,7 @@ function attackAfterThis(state: ScenarioState, sourceId: string | null, steps: E
 }
 
 // The enemy attacks the player it is engaged with, and the frame waits for the defense window. `shadow`: a shadow card is dealt for the attack (the default); `keep`: with none dealt, the shadow cards the enemy holds stay.
-function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[], options: { readonly shadow?: boolean; readonly keep?: boolean; readonly blankBonus?: number } = {}): ScenarioState {
+export function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[], options: { readonly shadow?: boolean; readonly keep?: boolean; readonly blankBonus?: number } = {}): ScenarioState {
   const { shadow = true, keep = false, blankBonus } = options;
   const enemy = sourceId ? state.cards[sourceId] : undefined;
   // An enemy that attacked from the staging area (the Balrog, the Watcher in the Water, Uruk from Mordor, a Storm of Howls attacker) makes the
@@ -382,7 +383,7 @@ function pick(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceCo
   if (instruction.verb !== "Pick" || data?.kind !== "effect") return state;
   // The actor chooses, unless the card says the first player does.
   const chooser = instruction.pick.who === "firstPlayer" ? firstPlayerFor(state, item.seat) : item.seat;
-  const found = pickCandidates(state, instruction.pick, chooser, data.picked ?? [], frame.cardId, ctx, data.x, data.participants, false, { discards: data.queue[0]?.instruction.verb === "DiscardPicked", spends: spendsPicked(data.queue[0]?.instruction), places: placesPicked(data.queue[0]?.instruction) });
+  const found = pickCandidates(state, instruction.pick, chooser, data.picked ?? [], frame.cardId, ctx, data.x, data.participants, false, { discards: data.queue[0]?.instruction.verb === "DiscardPicked", spends: spendsPicked(data.queue[0]?.instruction), places: placesPicked(data.queue[0]?.instruction), leaves: leavesPlayPicked(data.queue.map((entry) => entry.instruction)) });
   const options = (instruction.pick.from ?? "play") === "play" ? found : distinctChoices(state, found);
   // The further defenders of Stand Together (families/defense/defenders.ts): the pick may be stopped, and then no more are declared.
   const stoppable = data.effectId === DEFENDERS_FRAME;

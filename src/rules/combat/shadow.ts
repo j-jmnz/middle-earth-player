@@ -23,6 +23,7 @@ import { announceHurt } from "../families/angmar/damage.ts";
 import { discardableShadow } from "../families/angmar/shadows.ts";
 import { combatDamage, excessDamageAfter } from "../families/defense/excess.ts";
 import { attackCanceled, defendersDeclared, holdAttackEnd, specialStrike } from "../families/defense/defenders.ts";
+import { attackSwitched } from "../families/pelargir/vale/switch.ts";
 import { holdAttack } from "../families/defense/listen.ts";
 import { startShadowAttack } from "../families/defense/shadow-attack.ts";
 import { announceShadowRaise, noteShadowStart } from "../families/defense/shadow.ts";
@@ -213,6 +214,8 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
     const { shadowFrame: _frame, ...rest } = next.pendingAttack;
     next = { ...next, pendingAttack: rest };
   }
+  // A shadow effect ended this attack ("engages the next player and makes an immediate attack", 06148:A:2): nothing of it is left to resolve (families/pelargir/vale/switch.ts).
+  if (attackSwitched(next)) return finishAttack(next, ctx, steps);
   if (nextExtraShadow(next, begun.enemyId) != null) {
     const extra = resolveExtraShadows(next, ctx, steps);
     if (extra.waits) return extra.state;

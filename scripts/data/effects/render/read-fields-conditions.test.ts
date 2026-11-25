@@ -61,6 +61,7 @@ describe("effects render read fields, conditions", () => {
     firstEnemy: [{ kind: "firstEnemy" }],
     underworldReleased: [{ kind: "underworldReleased" }],
     deckEmpty: [{ kind: "deckEmpty" }],
+    encounterCanReveal: [{ kind: "encounterCanReveal" }],
     attachedToHero: [{ kind: "attachedToHero", code: "05019", is: true }, { kind: "attachedToHero", code: "05019", is: false }],
     hitPointsLeft: [{ kind: "hitPointsLeft", code: "09033" }],
     committedThisRound: [{ kind: "committedThisRound" }],

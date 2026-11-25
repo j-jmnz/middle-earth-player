@@ -1,4 +1,4 @@
-// Rules: ats.hidden-cards, ats.hidden-cards-turn-faceup, ats.villagers, ats.cair-andros-location-damage, ats.cair-andros-remove-stage, rr.attachment-cards, rr.objective-cards, rr.first-player, rr.damage, rr.reveal, rr.optional-engagement, rr.running-out-of-cards, rr.quest-advancement, ats.ally-objectives (data/rules/entries.json); the cards of Peril in Pelargir (05019 to 05024, 05037 to 05045, 05065 to 05067) and Into Ithilien (05025 to 05029, 05046 to 05055, 05068 to 05071; committed.ts, stage-skip.ts and control.ts), The Siege of Cair Andros (05030 to 05036, 05056 to 05064, 05072 to 05076; siege.ts, stage-remove.ts, staging.ts, spending.ts, stage-keyword.ts).
+// Rules: ats.hidden-cards, ats.captain-enemies, ats.setup-the-morgul-vale-to-the-tower, ats.hidden-cards-turn-faceup, ats.villagers, ats.cair-andros-location-damage, ats.cair-andros-remove-stage, rr.attachment-cards, rr.objective-cards, rr.first-player, rr.damage, rr.reveal, rr.optional-engagement, rr.running-out-of-cards, rr.quest-advancement, ats.ally-objectives (data/rules/entries.json); the cards of Peril in Pelargir (05019 to 05024, 05037 to 05045, 05065 to 05067) and Into Ithilien (05025 to 05029, 05046 to 05055, 05068 to 05071; committed.ts, stage-skip.ts and control.ts), The Siege of Cair Andros (05030 to 05036, 05056 to 05064, 05072 to 05076; siege.ts, stage-remove.ts, staging.ts, spending.ts, stage-keyword.ts), The Morgul Vale (06144 to 06160; tower.ts, cannot-leave.ts, bodyguard.ts, switch.ts, reveal-engaged.ts).
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 
@@ -16,7 +16,8 @@ import { inOwnSurgeChain } from "./surge-chain.ts";
 import { undefendedAnnounced } from "./undefended.ts";
 import { archeryOfAmount } from "./archery-of.ts";
 import { discardEncounterTopMore, raiseThreatPerDiscarded } from "./discard.ts";
-import { noteFirstEnemy, pelargirCondition } from "./first-enemy.ts";
+import { pelargirCondition } from "./conditions.ts";
+import { noteFirstEnemy } from "./first-enemy.ts";
 import { damageCardThenSetX } from "./damage-noted.ts";
 import { groupDiscardResources } from "./group-discard.ts";
 import { eachPlayerSpends, eachPlayerSpendsUnpayable } from "./group-spend.ts";
@@ -24,6 +25,10 @@ import { attachToHighestThreatCost } from "./host.ts";
 import { pickFewestHitPointsLeft } from "./fewest.ts";
 import { noResourcesMatches } from "./no-resources.ts";
 import { attachObjectiveTo, attackScrollHolder } from "./scroll.ts";
+import { captainKept } from "./vale/cannot-leave.ts";
+import { attackPerBlankShadow } from "./vale/additional.ts";
+import { revealTopEngaging } from "./vale/reveal-engaged.ts";
+import { placeProgressOnNamed, removeAllNamedFromGame } from "./vale/tower.ts";
 import { pickRandom } from "./pick-random.ts";
 import { removeQuestTokens } from "./quest-tokens.ts";
 import { revealTopThenDiscard } from "./reveal-discard.ts";
@@ -107,6 +112,14 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return gainControlOfSelf(state, focus);
     case "DiscardResolved":
       return discardResolved(state, focus);
+    case "PlaceProgressOnNamed":
+      return placeProgressOnNamed(state, instruction, focus, ctx, steps);
+    case "RemoveAllNamedFromGame":
+      return removeAllNamedFromGame(state, instruction, ctx);
+    case "RevealTopEngaging":
+      return revealTopEngaging(state, instruction, focus, ctx, steps);
+    case "AttackPerBlankShadow":
+      return attackPerBlankShadow(state, instruction, focus, ctx, steps);
     default:
       return null;
   }
@@ -114,12 +127,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "pelargir",
-  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives", "RemoveStage", "ResolveTopmostTreachery", "ShuffleStagingIntoEncounterDeck", "BuildUnderworldDeck", "HideOneAside", "TakeUnderworld", "RevealSetAside", "RevealUnderworld", "ShuffleUnderworldIntoEncounterDeck", "RevealTopThenDiscard", "PickRandom", "RemoveQuestTokens", "EachPlayerSpends", "GroupDiscardResources", "DamageCardThenSetX", "DiscardVillagerTokens", "MoveVillagerTokens", "PickFewestHitPointsLeft", "TakeControlOfLocation", "LoseControlOfLocation", "AnnounceAddedToStaging", "ActForDestroyedController", "TakeHiddenCard", "TurnHiddenCards", "TurnHiddenCard", "DiscardHiddenCard", "HoldUnderStage", "GainControlOfSelf", "DiscardResolved"],
+  verbs: ["AttachObjectiveTo", "AttachToHighestThreatCost", "AttackScrollHolder", "DiscardEncounterTopMore", "RaiseThreatPerDiscarded", "TakeControlOfStagedObjectives", "RemoveStage", "ResolveTopmostTreachery", "ShuffleStagingIntoEncounterDeck", "BuildUnderworldDeck", "HideOneAside", "TakeUnderworld", "RevealSetAside", "RevealUnderworld", "ShuffleUnderworldIntoEncounterDeck", "RevealTopThenDiscard", "PickRandom", "RemoveQuestTokens", "EachPlayerSpends", "GroupDiscardResources", "DamageCardThenSetX", "DiscardVillagerTokens", "MoveVillagerTokens", "PickFewestHitPointsLeft", "TakeControlOfLocation", "LoseControlOfLocation", "AnnounceAddedToStaging", "ActForDestroyedController", "TakeHiddenCard", "TurnHiddenCards", "TurnHiddenCard", "DiscardHiddenCard", "HoldUnderStage", "GainControlOfSelf", "DiscardResolved", "PlaceProgressOnNamed", "RemoveAllNamedFromGame", "RevealTopEngaging", "AttackPerBlankShadow"],
   run,
   condition: (state, condition, scope) => pelargirCondition(state, condition, scope),
   revealed: noteFirstEnemy,
   deckReset: { hold: inOwnSurgeChain },
-  settle: { sweep: (state, ctx, steps) => hiddenSweep(alcaronLoss(advanceWithoutVillagers(progressesToVictory(releaseUnderworldStacks(controlSweep(sieges(state, ctx, steps), ctx, steps), ctx, steps), ctx, steps), ctx, steps), ctx), ctx, steps) },
+  settle: { sweep: (state, ctx, steps) => captainKept(hiddenSweep(alcaronLoss(advanceWithoutVillagers(progressesToVictory(releaseUnderworldStacks(controlSweep(sieges(state, ctx, steps), ctx, steps), ctx, steps), ctx, steps), ctx, steps), ctx), ctx, steps), ctx, steps) },
   travel: { unpayable: (state, instruction, ctx, locationId) => eachPlayerSpendsUnpayable(state, instruction, ctx, locationId) || takeHiddenUnpayable(state, instruction), reach: controlledTravelReach, cost: controlledTravelCost, second: towerSecond },
   pick: (state, id, spec) => noResourcesMatches(state, id, spec),
   amount: (state, amount, scope, ctx) => archeryOfAmount(state, amount, scope, ctx) ?? hiddenAmount(state, amount, scope),
