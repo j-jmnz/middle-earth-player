@@ -39,4 +39,10 @@ describe("The Long Arm of Mordor in the haradrim cycle", () => {
       }
     }
   });
+
+  it("16035:A:1 deals all four Sauron's Enforcers on Easy (researched), so Easy has 26 encounter cards against Normal's 33 before the Setup stages two", async () => {
+    const count = (state: Awaited<ReturnType<typeof opened>>) => Object.values(state.cards).filter((card) => card.zone === "encounterDeck" || (card.zone === "staging" && card.code === "16035")).length;
+    expect(count(await opened(2, "Normal"))).toBe(33);
+    expect(count(await opened(2, "Easy"))).toBe(26);
+  });
 });

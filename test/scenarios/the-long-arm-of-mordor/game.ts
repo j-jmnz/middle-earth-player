@@ -71,7 +71,7 @@ export type MordorGame = PlayedGame;
 // The goldens (src/campaign/scenarios/the-long-arm-of-mordor/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type MordorGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: MordorDecks; outcome: "won" | "lost"; policy?: Partial<MordorPolicy>; lossReason?: string };
 
-// The games to pin (.claude/rules/code-standards.md, Test cost): wins true solo and two-handed (the players free the staged heroes, kill the guards and defeat the Uruk Chieftain; Easy does not change a standalone game, and the scenario has no Nightmare deck, so
+// The games to pin (.claude/rules/code-standards.md, Test cost): wins true solo and two-handed (the players free the staged heroes, kill the guards and defeat the Uruk Chieftain; Easy deals a smaller encounter deck but the same Setup (standalone.test.ts), and the scenario has no Nightmare deck, so
 // neither has a golden of its own) and each way to lose: every player's threat at 50 (heroes that start at a threat of 14) and every player eliminated by heroes destroyed (heroes too brittle for the attacks, the objective-heroes among them).
 export const MORDOR_GOLDENS: readonly MordorGolden[] = [
   { name: "true solo, won, Normal", seatCount: 1, seed: 7, difficulty: "Normal", decks: "strong", outcome: "won" },
