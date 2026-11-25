@@ -1,0 +1,32 @@
+# The Crossings of Poros
+
+Haradrim part 9 (The Crossings of Poros, `CoP`), standalone only, on Easy and Normal (Q07.9, E07.9). Encounter sets The Crossings of Poros, Mountains of Shadow, Desert Sands, Desert Creatures, Harad Soldiers and Mordor Orcs (`hrd.setup-the-crossings-of-poros`). The scenario adds set-aside encounter sets (`hrd.multiple-encounter-sets`, `hrd.removed-from-the-game`), the Encounter keyword on player cards (`hrd.encounter-keyword`), Poros Garrison, branching stages 2A and 3A and the encounter side quest Find a Way Down (17156).
+
+- **Setup.** Stage 1A prints "Set Poros Garrison and each of the following encounter sets aside, out of play: Mountains of Shadow, Desert Sands, Desert Creatures, Harad Soldiers, and Mordor Orcs. The first player adds The Black Serpent to the staging area and shuffles the encounter deck. Each other player reveals an encounter card." (`17157:A:1`). The reader gives an aside of Poros Garrison, the shared step `setSetsAside` with the five sets, a staging clause, a shuffle and the shared step `eachOtherPlayerReveals`.
+- **Piles.** The encounter pile holds the Crossings of Poros set only (15 cards at Normal, 12 at Easy). The set-aside pile holds Poros Garrison (17145) and the five sets, 23 card titles, among them the encounter side quests Find Water, Find a Way Down, Craft Remedy, Southron Champion and Uruks of the Eye. The staging pile holds The Black Serpent (17146). DragnCards' Normal deck shuffles Poros Garrison into the encounter deck and its Easy deck leaves The Black Serpent in it; two overrides give both decks the printed piles.
+- **Branching stages (what the engine needs).** Stage 1B advances to a random stage 2; stage 2A shuffles Desert Sands or Mountains of Shadow in and removes the other set and the other stage 2A from the game; stage 3A sets the other stage 3A aside and shuffles one set in; each stage 2B and 3B advances to a random stage 3 or 4A. Stage 4A takes control of Poros Garrison and stages the enemies of the sets denoted by the first icon on each set aside stage 3. A set that is set aside, revealed, discarded or shuffled in is part of the encounter deck from then on; a set removed from the game cannot be targeted. The quest pile holds the seven stages.
+- **Poros Garrison.** The first player gains control; "If Poros Garrison leaves play, the players lose the game" (`17145:A:4`).
+- **Encounter keyword.** A player card with an encounter card back (Wind from the Sea 17144) is set aside by a player at Setup (up to 3, not counted in the 50 cards) and shuffled into the encounter deck by an effect; it leaves play by removal from the game.
+- **Errata.** None.
+
+## Data
+
+- Danger Close Behind, Desolate Land and Harondor Waste choose a random card from the set aside set with the most cards remaining and reveal or place it.
+- Southron Outrider, Uruk Prowler and Desert Warg place a random enemy of a set aside set into the encounter discard pile.
+
+## Readings
+
+The statuses are those of the Readings bullet of `docs/scenarios/haradrim.md`. Each key is the scan-read ledger line (`data/printed/haradrim.json`), `<code>:<side>:<n>`. Sources read: `hrd.multiple-encounter-sets`, `hrd.removed-from-the-game`, `hrd.encounter-keyword`; no forum thread settles the points below.
+
+- Set aside sets (span-settled). A card of a set aside set becomes part of the encounter deck for the rest of the game once it is revealed, put into play, placed in the encounter discard pile or shuffled in. Basis: `hrd.multiple-encounter-sets`.
+- Removed sets (span-settled). An encounter set removed from the game goes back to the box; an effect that targets a "set aside" set cannot target it. Basis: `hrd.removed-from-the-game`.
+- Random stage (recommended). "Advance to a random stage 2" is chosen among the stage 2A cards still in the quest deck, with equal chance; stage 3 likewise among the stage 3A cards not set aside. Not taken: the first player chooses. Basis: the printed line. Sources read: https://visionofthepalantir.com/2019/11/26/the-crossings-of-poros/ (calls the stage 2 advance random and the set "with the most cards remaining"; gives no tie rule and no mechanism), https://hallofbeorn.com/LotR/Details/Harondor-Waste-CoP, https://rulespal.com/the-lord-of-the-rings-the-card-game-the-crossings-of-poros/rulebook, https://www.fantasyflightgames.com/media/ffg_content/lotr-lcg/support/LotR-FAQ.pdf (search result only). No source settles it, so the status stays recommended.
+- Printed set name (span-settled). Orc Patrols (`17162:A:1`) prints "Mordor Uruks" for the set the rulesheet and the cards call "Mordor Orcs"; the ledger corrects it and keeps the printed words under `misprints`. Basis: the scan.
+- Set with the most cards (recommended). On a tie the first player chooses among the tied sets (`17150:A:2`). Not taken: a random choice. Basis: the printed line says "the set aside encounter set with the most cards remaining". Sources read: https://visionofthepalantir.com/2019/11/26/the-crossings-of-poros/ (calls the stage 2 advance random and the set "with the most cards remaining"; gives no tie rule and no mechanism), https://hallofbeorn.com/LotR/Details/Harondor-Waste-CoP, https://rulespal.com/the-lord-of-the-rings-the-card-game-the-crossings-of-poros/rulebook, https://www.fantasyflightgames.com/media/ffg_content/lotr-lcg/support/LotR-FAQ.pdf (search result only). No source settles it, so the status stays recommended.
+- Encounter keyword (span-settled). `hrd.encounter-keyword`: a "when revealed" effect of such a card cannot be canceled; as a shadow card it goes to the encounter discard pile.
+- Stage 4A (`17163:A:1`) (span-settled). "Each enemy that belongs to an encounter set denoted by the first icon on each set aside stage 3": the three stage 3A cards set aside name three sets; the enemies come from the deck and the discard pile. Basis: the printed line.
+
+## Readings to confirm
+
+- Random stage: recommended. See Readings.
+- Set with the most cards: recommended. See Readings.

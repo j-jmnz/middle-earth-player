@@ -17,6 +17,7 @@ const WEB_TREASURE = ["132019"];
 const DRAGON_TREASURE = ["132020", "132021", "132022", "132023", "132024"];
 const againstTheShadow = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("03", n, id, product, extra);
 const ringMaker = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("04", n, id, product, extra);
+const haradrim = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("07", n, id, product, extra);
 const hobbit = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("0A", n, id, product, extra);
 
 export const CYCLE_DEFS: readonly CampaignDef[] = [
@@ -126,6 +127,29 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
     ],
     saga: false,
     ledger: "the-ring-maker",
+  },
+  // No source names a cycle: Hall of Beorn lists the scenarios of The Sands of Harad and of its six Adventure Packs under each product, and RingsDB numbers the deluxe expansion and the six packs as cycles 23 and 24.
+  // The cycle has no Campaign Mode, so the Scenarios tab lists it; released is the US release of its first product (hallofgondor.com/release-dates).
+  {
+    id: "haradrim",
+    name: "Haradrim",
+    kind: "cycle",
+    released: "2016-11-23",
+    products: ["The Sands of Harad", "The Mûmakil", "Race Across Harad", "Beneath the Sands", "The Black Serpent", "The Dungeons of Cirith Gurat", "The Crossings of Poros"],
+    scenarios: [
+      haradrim(1, "escape-from-umbar", "The Sands of Harad", { setupSpan: "hrd.setup-escape-from-umbar" }),
+      haradrim(2, "desert-crossing", "The Sands of Harad", { setupSpan: "hrd.setup-desert-crossing" }),
+      haradrim(3, "the-long-arm-of-mordor", "The Sands of Harad", { setupSpan: "hrd.setup-the-long-arm-of-mordor" }),
+      haradrim(4, "the-mumakil", "The Mûmakil", { setupSpan: "hrd.setup-the-mumakil" }),
+      // DragnCards loads the Orc's quest deck (stages 1C to 4C; 1C comes through the 1A row, `dealtSide`) as a second shared quest deck; the Setup creates it (hrd.prepare-the-orcs-area), so it waits set aside.
+      haradrim(5, "race-across-harad", "Race Across Harad", { setupSpan: "hrd.setup-race-across-harad", groups: { sharedQuestDeck2: "setAside" } }),
+      haradrim(6, "beneath-the-sands", "Beneath the Sands", { setupSpan: "hrd.setup-beneath-the-sands" }),
+      haradrim(7, "the-black-serpent", "The Black Serpent", { setupSpan: "hrd.setup-the-black-serpent" }),
+      haradrim(8, "the-dungeons-of-cirith-gurat", "The Dungeons of Cirith Gurat", { setupSpan: "hrd.setup-the-dungeons-of-cirith-gurat" }),
+      haradrim(9, "the-crossings-of-poros", "The Crossings of Poros", { setupSpan: "hrd.setup-the-crossings-of-poros" }),
+    ],
+    saga: false,
+    ledger: "haradrim",
   },
   {
     // The scenarios printed on their own (RingsDB's cycle 50 packs that are not A Long-extended Party's): one product line each as it is built. The index counts the built ones.

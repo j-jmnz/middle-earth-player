@@ -52,7 +52,7 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
   const fleet = stepExists("prepareFleet") && (/Fleet/.test(printed?.encounterSet ?? "") || printed?.type === "ship-objective");
   switch (pile) {
     case "setAside":
-      return said(["aside", "putIntoPlay"]) || putEngaged || steps("takeControl", "attach", "prepareStormcallerArea", "attachToDifferentHeroes", "attachToThreatDial", "secrets", "shuffleIntoDecks", "buildUnderworldDeck", "hideOneAside", "shuffleIntoOutOfPlayDecks", "buildRavenDeck") || setAsideBySet || loggedHarad(quest, printed) || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective") || steps("hideLoot", "hideSuspectAndHideout", "buildInvestigationDeck");
+      return said(["aside", "putIntoPlay"]) || putEngaged || steps("takeControl", "attach", "prepareStormcallerArea", "attachToDifferentHeroes", "attachToThreatDial", "secrets", "shuffleIntoDecks", "buildUnderworldDeck", "hideOneAside", "shuffleIntoOutOfPlayDecks", "buildRavenDeck", "takeObjectiveHero", "createOrcsArea", "revealRandomAsideObjective") || setAsideBySet || loggedHarad(quest, printed) || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective") || steps("hideLoot", "hideSuspectAndHideout", "buildInvestigationDeck");
     case "activeLocation":
       return said(["active"]);
     case "attachedChosen":
@@ -100,4 +100,16 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
     default:
       return true;
   }
+}
+
+// The side of a two-sided load-list row that is dealt. A two-sided card the Setup adds to the staging area is dealt on the side it names (Beneath the Sands' Search objective, "Off Track face up";
+// DragnCards files On Track as side A). The Orcs' quest deck of Race Across Harad (stages 1C to 4C, hrd.prepare-the-orcs-area) is set aside: DragnCards' rows carry the guid of the players' stage of the
+// same title, so the C stage is the card dealt, and a quest card set aside is no stage of the players' deck (scenarios.ts). With `takeControlFaceup`, a two-sided card the Setup has the first player
+// take control of is dealt on the side it names (Haldan, not Woodmen Village).
+export function dealtSide(card: Card, other: Card | null, pile: string, quest: ParsedSetup, takeControlFaceup: boolean): { card: Card; other: Card | null } {
+  if (other === null) return { card, other };
+  if (takeControlFaceup && clausesOf(quest, "step").some((clause) => clause.step === "takeControl" && clause.codes.includes(other.code) && !clause.codes.includes(card.code))) return { card: other, other: card };
+  if (pile === "setAside" && card.type === "quest" && other.type === "quest" && /C$/.test(other.stage ?? "") && !/C$/.test(card.stage ?? "")) return { card: other, other: null };
+  const names = (code: string) => clausesOf(quest, "stage").some((clause) => clause.codes.includes(code));
+  return pile === "staging" && names(other.code) && !names(card.code) ? { card: other, other: card } : { card, other };
 }

@@ -9,7 +9,7 @@ import type { RuleEntry } from "../../../src/catalog/rule-entry.ts";
 // verbatim, in order, fails the build.
 export const spanSchema = z.strictObject({
   // A card erratum of the FAQ is `faq.errata.<card code or slug>`.
-  id: z.string().regex(/^(?:(?:rr|ltp|mec108|mec109|mec112|mec113|tdom|dcce|emce|faq|campaign-log|easy-mode|decklist|hon|wor|trg|bts|sotm|dwd|hob|ats|rm)|faq\.errata)\.[a-z0-9][a-z0-9-]*$/),
+  id: z.string().regex(/^(?:(?:rr|ltp|mec108|mec109|mec112|mec113|tdom|dcce|emce|faq|campaign-log|easy-mode|decklist|hon|wor|trg|bts|sotm|dwd|hob|ats|rm|hrd)|faq\.errata)\.[a-z0-9][a-z0-9-]*$/),
   doc: z.string().min(1),
   page: z.number().int().positive(),
   column: z.number().int().positive(),

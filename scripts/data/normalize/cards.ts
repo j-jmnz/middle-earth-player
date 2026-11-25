@@ -32,7 +32,7 @@ const TYPE_BY_HOB: Readonly<Record<string, { type: string; typeName: string }>> 
   Quest: { type: "quest", typeName: "Quest" },
   Objective: { type: "objective", typeName: "Objective" },
   Objective_Ally: { type: "objective", typeName: "Objective Ally" },
-  // The Sands of Harad's objective heroes (Kahliel, Firyal, Yazan, Jubayr): listed in the Cards tab, not dealt.
+  // The Sands of Harad's objective heroes (Kahliel, Firyal, Yazan, Jubayr): The Long Arm of Mordor deals them, and its Setup lets each player take control of one.
   Objective_Hero: { type: "objective", typeName: "Objective Hero" },
   Campaign: { type: "campaign", typeName: "Campaign" },
   // The mode cards of the standalone scenarios (The Siege of Annúminas' Standard Game Mode and Epic Multiplayer Mode, The Hunt for the Dreadnaught's Easy, Standard and Hard Mode): DragnCards types them Campaign.

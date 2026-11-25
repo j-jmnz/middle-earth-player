@@ -13,6 +13,7 @@ import { GENERATED_EFFECTS as SHADOWS_OF_MIRKWOOD_GENERATED } from "./generated/
 import { GENERATED_EFFECTS as STANDALONE_SCENARIOS_GENERATED } from "./generated/standalone-scenarios.ts";
 import { GENERATED_EFFECTS as TDOM_GENERATED } from "./generated/the-dark-of-mirkwood.ts";
 import { GENERATED_EFFECTS as RETURN_OF_THE_KING_GENERATED } from "./generated/the-return-of-the-king.ts";
+import { GENERATED_EFFECTS as HARADRIM_GENERATED } from "./generated/haradrim.ts";
 import { GENERATED_EFFECTS as THE_RING_MAKER_GENERATED } from "./generated/the-ring-maker.ts";
 import { GENERATED_EFFECTS as TWO_TOWERS_GENERATED } from "./generated/the-two-towers.ts";
 import { POOL_GENERATED_EFFECTS } from "./generated/player-pool.ts";
@@ -24,9 +25,9 @@ export function mergeEffects(generated: readonly Effect[], authored: readonly Ef
   return [...generated.filter((effect) => !replaced.has(effect.id)), ...authored];
 }
 
-// The records of each box (scenario cards and the starter lists: the Fellowship's, the Revised Core Set's, Shadows of Mirkwood's, The Dark of Mirkwood's, Dream-chaser's, Ered Mithrin's, Angmar Awakened's, The Two Towers', The Return of the King's, Dwarrowdelf's, The Hobbit's, Against the Shadow's, The Ring-maker's and the standalone scenarios')
+// The records of each box (scenario cards and the starter lists: the Fellowship's, the Revised Core Set's, Shadows of Mirkwood's, The Dark of Mirkwood's, Dream-chaser's, Ered Mithrin's, Angmar Awakened's, The Two Towers', The Return of the King's, Dwarrowdelf's, The Hobbit's, Against the Shadow's, The Ring-maker's, Haradrim's and the standalone scenarios')
 // and the rest of the player pool's, one file per pack or per mechanic family.
-export const GENERATED_EFFECTS: readonly Effect[] = [...BOX_GENERATED, ...MIRKWOOD_GENERATED, ...TDOM_GENERATED, ...DREAM_CHASER_GENERATED, ...ERED_MITHRIN_GENERATED, ...ANGMAR_AWAKENED_GENERATED, ...TWO_TOWERS_GENERATED, ...RETURN_OF_THE_KING_GENERATED, ...SHADOWS_OF_MIRKWOOD_GENERATED, ...DWARROWDELF_GENERATED, ...THE_HOBBIT_GENERATED, ...AGAINST_THE_SHADOW_GENERATED, ...THE_RING_MAKER_GENERATED, ...STANDALONE_SCENARIOS_GENERATED, ...POOL_GENERATED_EFFECTS];
+export const GENERATED_EFFECTS: readonly Effect[] = [...BOX_GENERATED, ...MIRKWOOD_GENERATED, ...TDOM_GENERATED, ...DREAM_CHASER_GENERATED, ...ERED_MITHRIN_GENERATED, ...ANGMAR_AWAKENED_GENERATED, ...TWO_TOWERS_GENERATED, ...RETURN_OF_THE_KING_GENERATED, ...SHADOWS_OF_MIRKWOOD_GENERATED, ...DWARROWDELF_GENERATED, ...THE_HOBBIT_GENERATED, ...AGAINST_THE_SHADOW_GENERATED, ...THE_RING_MAKER_GENERATED, ...HARADRIM_GENERATED, ...STANDALONE_SCENARIOS_GENERATED, ...POOL_GENERATED_EFFECTS];
 
 // The authored files, in the order pnpm data build writes them (src/effects/generated/authored.ts, scripts/data/effects/barrel.ts):
 // a scenario's records are src/effects/authored/<scenario-id>.ts, and a new file there needs only that build.
