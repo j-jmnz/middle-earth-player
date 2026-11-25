@@ -36,6 +36,18 @@ export function startCanvasKit(): void {
   void load();
 }
 
+/**
+ * Starts the load on the next frame and returns the cleanup. A cleanup that runs before the frame has come (the splash unmounts first when the
+ * window paints late) starts the load at once instead of dropping it: the table's canvas waits on this load and nothing else starts it.
+ */
+export function startCanvasKitOnFrame(): () => void {
+  const frame = requestAnimationFrame(startCanvasKit);
+  return () => {
+    cancelAnimationFrame(frame);
+    startCanvasKit();
+  };
+}
+
 function subscribe(listener: () => void): () => void {
   listeners.add(listener);
   return () => {
