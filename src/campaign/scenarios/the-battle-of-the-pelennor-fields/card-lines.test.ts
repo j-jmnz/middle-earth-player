@@ -26,6 +26,19 @@ function setUp(code: string, effects: readonly Effect[]) {
 }
 
 describe("the Esquires", () => {
+  // 145073:A:1 "The players may attach Esquire of Rohan and Esquire of Gondor to different heroes": with 2 players the first player's pick offers the heroes of both seats (rr.attachment-cards).
+  it("145073:A:1 Setup: the hero for Esquire of Rohan is chosen among the heroes of every seat", () => {
+    const t = tableFromLayout(ID, { seats: 2, setAside: [ROHAN, GONDOR], stage: "145073", side: "A" }, { effects: EFFECTS });
+    const offered: number[] = [];
+    resolveRecords(t.state, t.ctx, "145073", "setup", idOf(t.state, "145073"), (state) => {
+      if (state.window?.kind !== "choose") return "";
+      if (state.window.options.includes("rohan")) return "rohan";
+      offered.push(state.window.options.length);
+      return state.window.options.includes("none") ? "none" : (state.window.options[0] ?? "");
+    });
+    expect(offered[0], "hero, second hero and the second seat's hero").toBe(3);
+  });
+
   it("145014:A:3 Setup: Esquire of Rohan is attached to the hero chosen", () => {
     const made = setUp(ROHAN, EFFECTS);
     expect(made.state.cards[idOf(made.state, ROHAN)]?.host).toBe(made.t.hero2);

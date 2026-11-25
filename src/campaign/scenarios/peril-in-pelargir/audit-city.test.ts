@@ -1,6 +1,6 @@
 // Rules: rr.forced, rr.reveal, rr.shadow-effects, rr.then, rr.in-play-and-out-of-play, rr.attachment-cards, rr.optional-engagement, rr.travel, rr.search, rr.running-out-of-cards (data/rules/entries.json).
 // An independent audit of Peril in Pelargir (card-audit): each test is written from the printed line and the rule spans, never from the record or the scenario's own tests, on the smallest table the scene kit builds, and each runs again
-// without its line's records (`lineSpec`). A test that shows the engine not doing what the card prints is an `it.fails` under a `// FAULT:` comment; a reading no document settles is marked `// OPEN:`.
+// without its line's records (`lineSpec`). A test that shows the engine not doing what the card prints is an `it.fails` under a `// FAULT:` comment; a reading no document settles is marked `// OPEN:`; a gap no play reaches is marked `// KNOWN:`.
 import { expect, it } from "vitest";
 
 import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
@@ -71,7 +71,7 @@ lineSpec("05040:A:1", "When Revealed: a card with no City trait is not found", (
   const found = cityRun(effects, { deck: ["place", "05023"] });
   expect(codesIn(found, "staging"), "the City location is found past the other").toEqual(["05023"]);
 });
-// FAULT: a unique location already in play cannot be put into play (rr.unique-cards, scenario file: "cannot be found"); the engine adds a second copy of The Leaping Fish to the staging area. Only one Fish exists in a real game, so no play reaches it.
+// KNOWN: the engine adds a second copy of a unique location that is in play; rr.unique-cards speaks of a player who plays or puts a card into play and names no encounter search, so the span does not settle it for this verb, and only one Leaping Fish exists in a real game, so no play reaches it.
 it.fails("05040:A:1 When Revealed: a unique location already in play (The Leaping Fish active) is not found and added to the staging area", () => {
   const out = cityRun(EFFECTS, { active: "05021", deck: ["05021"] });
   expect(codesIn(out, "staging")).toEqual([]);
@@ -208,12 +208,17 @@ lineSpec("05065:A:1", "Setup: the Scroll is attached to a hero, not an ally, and
   const done = resolveRecords(alone.state, alone.ctx, "05065", "setup", questId(alone.state), (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : ""));
   expect([hasScroll(done.state, alone.hero), hasScroll(done.state, alone.hero2)].filter(Boolean), "on one of the 2 heroes").toHaveLength(1);
 });
-// FAULT: the first player chooses the hero for the Scroll among every player's heroes (rr.first-player, the scenario file: "the first player chooses the hero"); with 2 players the engine offers only the first player's own heroes (2 options, not 3).
-it.fails("05065:A:1 Setup: with 2 players the first player may choose any player's hero for the Scroll", () => {
+it("05065:A:1 Setup: with 2 players the first player may choose any player's hero for the Scroll", () => {
   asked.length = 0;
   const t = tbl(EFFECTS, { seats: 2, firstPlayer: 0, stage: "05065", side: "A" });
   resolveRecords(t.state, t.ctx, "05065", "setup", questId(t.state), noting((state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "")));
   expect(asked, "the first player is asked among the 3 heroes").toEqual([{ seat: 0, options: 3 }]);
+});
+it("05065:A:1 Setup: with the second seat as first player that player is asked among every hero too", () => {
+  asked.length = 0;
+  const t = tbl(EFFECTS, { seats: 2, firstPlayer: 1, stage: "05065", side: "A" });
+  resolveRecords(t.state, t.ctx, "05065", "setup", questId(t.state), noting((state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "")));
+  expect(asked, "seat 1 is asked among the 3 heroes").toEqual([{ seat: 1, options: 3 }]);
 });
 it("05065:B:1 Battle: characters use their Attack instead of Willpower when questing", () => {
   const t = tbl(EFFECTS, { stage: "05065", heroes: [{ code: "01005", seat: 0 }] }, ["01005"]);
