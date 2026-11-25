@@ -4,16 +4,19 @@ import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/ru
 import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenarios.ts";
 import type { PolicyOptions } from "../../harness/auto-player.ts";
 import { fillerLoadout, HERO_STATS, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
-import { chooseFirstOrLast, policyIntent, type Policy } from "../../harness/policy-kit.ts";
+import { archeryLeastDamaged, attackAllTogether, chooseFirstOrLast, commitAllBut, engageUpTo, policyIntent, undefendedLeastDamaged, type Policy } from "../../harness/policy-kit.ts";
 
 const cycle = loadCampaign("haradrim");
 const crossing = loadAnyScenario("desert-crossing");
 
 // Test helper. A whole standalone game of Desert Crossing played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. TODO: say how the players travel, engage and answer the choices this scenario asks.
+// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. The players commit every hero but one to the quest (the one that stays home attacks), nobody defends (the hero with the least damage takes an attack), the first Distribute puts all the archery damage on the least damaged character, the heroes attack together every enemy they reach and every choice takes its first option.
 export const CROSSING_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
-// "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
-export type CrossingDecks = "strong" | "weak" | "brittle";
+// "strong": big-number heroes that win; "weak": heroes too small to quest, so the temperature climbs unanswered; "brittle": strong questers that die to an attack; "tense": strong heroes that start at a threat of 14 each, so the threat reaches 50.
+export type CrossingDecks = "strong" | "weak" | "brittle" | "tense";
+
+// The heroes start at a threat of 8 (24 in all), so the players can engage a Were-worm (engagement cost 22), which stage 3B needs defeated; "tense" starts at 16 each, so the threat reaches 50.
+export const CROSSING_STATS = { ...HERO_STATS, strong: { ...HERO_STATS.strong, threat: 8 }, brittle: { ...HERO_STATS.brittle, threat: 8 }, tense: { ...HERO_STATS.tense, threat: 16 } } as const;
 
 export const crossingLoadout = fillerLoadout;
 
@@ -42,8 +45,7 @@ export const DEFAULT_POLICY: CrossingPolicy = { choose: "first" };
 //   engageUpTo(most, options)  the optional engagement step: engage the enemy of the lowest `rank` (`allow` permits) while engaged with fewer than `most`
 //   triggerActions(effectIds, oncePerRound)  an Action or Response of the records named, each time (or once a round) the engine offers it and the seat can pay
 //   passCommitWhile(when)  the quest commit: pass without committing while `when` holds
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go in the list, before the auto-player's.
-const rules = (policy: CrossingPolicy): Policy => [chooseFirstOrLast(policy.choose)];
+const rules = (policy: CrossingPolicy): Policy => [chooseFirstOrLast(policy.choose), commitAllBut(1), archeryLeastDamaged(), undefendedLeastDamaged(), engageUpTo(), attackAllTogether()];
 
 // Every intent is one the reducer listed.
 export function crossingIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: CrossingPolicy = DEFAULT_POLICY): PlayerIntent {
@@ -55,14 +57,26 @@ export type CrossingGame = PlayedGame;
 // The goldens (src/campaign/scenarios/desert-crossing/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type CrossingGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: CrossingDecks; outcome: "won" | "lost"; policy?: Partial<CrossingPolicy>; lossReason?: string };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Nightmare) and a few losses (each way the scenario can be lost), each on a fixed seed.
-export const CROSSING_GOLDENS: readonly CrossingGolden[] = [];
+// The games to pin (.claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and Easy (the players engage and defeat the Were-worms of stage 3B before the temperature reaches 60), and each way to lose: the temperature
+// at 60 (a long game of strong heroes the stages' +4 and the cards' +2 outrun), every player's threat at 50 (heroes that start at a threat of 16) and every hero destroyed (heroes too brittle for the attacks).
+export const CROSSING_GOLDENS: readonly CrossingGolden[] = [
+  { name: "true solo, won, Normal", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed, won, Normal", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, won, Easy", seatCount: 1, seed: 4, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "two-handed, won, Easy", seatCount: 2, seed: 9, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "true solo, lost, temperature reaches 60", seatCount: 1, seed: 9, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "The temperature reached 60" },
+  { name: "two-handed, lost, temperature reaches 60", seatCount: 2, seed: 4, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "The temperature reached 60" },
+  { name: "two-handed, lost, temperature reaches 60, Easy", seatCount: 2, seed: 5, difficulty: "Easy", decks: "strong", outcome: "lost", lossReason: "The temperature reached 60" },
+  { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "tense", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed, lost, threat reaches 50", seatCount: 2, seed: 1, difficulty: "Normal", decks: "tense", outcome: "lost", lossReason: "No seats remain" },
+  { name: "true solo, lost, every hero destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed, lost, every hero destroyed", seatCount: 2, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+];
 
 const game = standaloneGame<CrossingDecks, CrossingPolicy>({
   campaign: cycle,
   scenario: crossing,
-  stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles and its Nightmare deck.
+  stats: CROSSING_STATS,
   codes: [...crossing.cards.map((card) => card.code)],
   intent: crossingIntent,
   policy: DEFAULT_POLICY,
