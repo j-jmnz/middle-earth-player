@@ -12,7 +12,7 @@ export const RING_MAKER_TEMPLATES: Templates = {
     text: `the acting player reveals the top ${amt(i.amount, ctx)} card(s) of his out-of-play deck (all it holds; none reveals nothing): each enemy is added to the staging area, not revealed${i.chooseForHand ? "; he chooses 1 of the other cards for his hand" : ""}; every other card is discarded to its owner's discard pile; the deck is not shuffled`,
     read: ["amount", "chooseForHand", "revealed"],
   }),
-  ShuffleHandCardIntoOutOfPlay: () => ({ text: "the acting player puts 1 random card of his hand, not one that cannot leave it, facedown into his out-of-play deck and shuffles the deck (nothing with an empty hand)", read: ["random"] }),
+  ShuffleHandCardIntoOutOfPlay: (i) => ({ text: `the acting player puts 1 ${i.random ? "random " : ""}card of his hand, not one that cannot leave it, facedown into his out-of-play deck and shuffles the deck (nothing with an empty hand)`, read: ["random"] }),
   ReturnAttachedEnemy: (i) => ({ text: `each enemy named ${str(i.name)} lying attached to a card goes back to the staging area as an enemy (one anywhere else stays)`, read: ["name"] }),
 };
 
@@ -22,7 +22,7 @@ export const RING_MAKER_SAMPLES: Samples = {
   EngageTopDiscarded: [{ verb: "EngageTopDiscarded", trait: "Dunland" }],
   CreateOutOfPlayDecks: [{ verb: "CreateOutOfPlayDecks", count: 20 }],
   ShuffleIntoOutOfPlayDecks: [{ verb: "ShuffleIntoOutOfPlayDecks", once: "07024", perOtherPlayer: "07025" }],
-  RevealOutOfPlay: [{ verb: "RevealOutOfPlay", amount: 3, chooseForHand: true, revealed: ["a"] }],
+  RevealOutOfPlay: [{ verb: "RevealOutOfPlay", amount: 3, chooseForHand: true }],
   ShuffleHandCardIntoOutOfPlay: [{ verb: "ShuffleHandCardIntoOutOfPlay", random: true }],
   ReturnAttachedEnemy: [{ verb: "ReturnAttachedEnemy", name: "Mugash" }],
 };
