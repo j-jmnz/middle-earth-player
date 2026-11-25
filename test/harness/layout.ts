@@ -89,6 +89,8 @@ export type Layout = {
   pursuit?: number;
   // A hero stand-in lies faceup as a Captive under the card with the code `under` (The Uruk-hai, 143069:A:1).
   captive?: { hero: string; under: string };
+  // Hero stand-ins held as The Long Arm of Mordor leaves them (16071:A:1, 16073:A:1): with no `under`, a hero in the staging area (a Captive no card holds); with `under`, a hero the enemy with that code guards.
+  staged?: readonly { hero: string; under?: string }[];
   // Cards lying facedown under the first card with the code `to` (the enemies under The Black Gate, 144027:A:2); `up` lays one faceup (the enemy under Narrow Alleyway, 16016:A:1).
   under?: readonly { code: string; to: string; up?: true }[];
   // Modifiers a card of the table holds from another, as its When Revealed record leaves them (the +2 and the immunity Southron Champion gives its enemy, 16040:A:1): the first card with `code` holds each from the first card with `from`, for as long as that card is in play.
@@ -255,6 +257,10 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   for (const held of layout.modified ?? []) {
     const [holder, source] = [idOf(state, held.code), idOf(state, held.from)];
     state = { ...state, modifiers: [...state.modifiers, ...held.stats.map(([stat, amount]): Modifier => ({ instanceId: holder, sourceId: source, stat, amount, until: "whileSourceInPlay" }))] };
+  }
+  for (const held of layout.staged ?? []) {
+    const placed = holdCaptive(state, idOf(state, held.hero), held.under ? idOf(state, held.under) : null);
+    state = held.under ? updateCard(placed, idOf(placed, held.hero), { guardedHero: true }) : placed;
   }
   if (layout.captive) state = holdCaptive(state, idOf(state, layout.captive.hero), idOf(state, layout.captive.under));
   if (layout.pursuit != null) state = { ...state, pursuit: layout.pursuit };

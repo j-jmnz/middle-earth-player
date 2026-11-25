@@ -21,6 +21,7 @@ import { keptDetail } from "../readouts/standalone-scenarios/wizards-quest.ts";
 import { angmarDetail } from "./angmar-preview.ts";
 import { ringMakerDetail } from "./ring-maker/preview.ts";
 import { barrowDetail } from "../readouts/standalone-scenarios/barrow-downs.ts";
+import { objectiveDetail, stageXDetail, stagedDetail } from "../readouts/haradrim/staged.ts";
 import { ungolDetail } from "./ungol-preview.ts";
 import { stoneDetail } from "./stone-preview.ts";
 import { flameDetail } from "./flame-preview.ts";
@@ -83,6 +84,9 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   if (flame) return flame;
   const kept = keptDetail(game, cardId, name);
   if (kept) return kept;
+  // The heroes in the staging area, the heroes an Orc guards and the objective-heroes (The Long Arm of Mordor) are told before the Captives' words, which would call them Captives of The Uruk-hai.
+  const staged = stagedDetail(game, cardId, name) ?? objectiveDetail(game, ctx, cardId) ?? stageXDetail(game, ctx, cardId);
+  if (staged) return staged;
   const captive = captiveDetail(game, ctx, card, name);
   if (captive) return captive;
   // Poison under a character is a facedown player card too: told before the hands of Lost in Mirkwood, which would call it a hand under a location.
