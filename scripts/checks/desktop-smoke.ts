@@ -242,7 +242,7 @@ async function main(log: Log): Promise<void> {
     await check(results, log, "isolation and preload", () => isolation(first));
     if (expectVersion !== null) {
       if (packed === null) skip(results, log, "reports the tag's version", "the checkout's shell carries no stamped version");
-      else if (packedVersion(packed) === null) skip(results, log, "reports the tag's version", "an AppImage's app.asar is inside it; its file name carries the version (pnpm desktop stage)");
+      else if (packedVersion(packed) === null) skip(results, log, "reports the tag's version", "an AppImage's app.asar is inside it; the release tag carries its version");
       else {
         await check(results, log, "reports the tag's version", async () => {
           const version = packedVersion(packed);

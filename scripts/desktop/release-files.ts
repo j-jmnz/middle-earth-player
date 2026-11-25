@@ -1,5 +1,5 @@
 // What a release's desktop job takes from desktop/out: the installers each OS builds (desktop/electron-builder.yml names them
-// `middle-earth-player-v<version>-<os>-<arch>.<ext>`) and the unpacked app the launch check opens. Pure over a folder listing, so a test can feed it one.
+// `middle-earth-player-<os>-<arch>.<ext>`, with no version, so the README's buttons can link the latest release's file) and the unpacked app the launch check opens. Pure over a folder listing, so a test can feed it one.
 import { existsSync, readdirSync } from "node:fs";
 import path from "node:path";
 
@@ -21,24 +21,24 @@ const INSTALLERS: Readonly<Record<DesktopOs, { target: string; extensions: reado
 };
 
 /** The installers one OS's build must have made. */
-export function installerNames(os: DesktopOs, version: string): string[] {
+export function installerNames(os: DesktopOs): string[] {
   const { target, extensions } = INSTALLERS[os];
-  return extensions.map((extension) => `middle-earth-player-v${version}-${target}.${extension}`);
+  return extensions.map((extension) => `middle-earth-player-${target}.${extension}`);
 }
 
-/** The name a release carries for a built installer: a dry run's artifacts say so, as the APK's and the IPA's do (`-dry-run` after the version). */
-export function stagedName(name: string, version: string, suffix: string): string {
-  return suffix === "" ? name : name.replace(`-v${version}-`, `-v${version}${suffix}-`);
+/** The name a release carries for a built installer: a dry run's artifacts say so, as the APK's and the IPA's do (`-dry-run` after the app's name). */
+export function stagedName(name: string, suffix: string): string {
+  return name.replace(/^middle-earth-player/, `middle-earth-player${suffix}`);
 }
 
 /** The installers this OS makes that `files` lacks. */
-export function missingInstallers(os: DesktopOs, version: string, files: readonly string[]): string[] {
-  return installerNames(os, version).filter((name) => !files.includes(name));
+export function missingInstallers(os: DesktopOs, files: readonly string[]): string[] {
+  return installerNames(os).filter((name) => !files.includes(name));
 }
 
 /** The executable the launch check opens: the AppImage on Linux, the unpacked app next to the installers on Windows and macOS. */
-export function packedApp(os: DesktopOs, version: string, outDir: string): string {
-  if (os === "linux") return path.join(outDir, installerNames(os, version).find((name) => name.endsWith(".AppImage")) ?? "");
+export function packedApp(os: DesktopOs, outDir: string): string {
+  if (os === "linux") return path.join(outDir, installerNames(os).find((name) => name.endsWith(".AppImage")) ?? "");
   if (os === "win") return path.join(outDir, "win-unpacked", `${APP_NAME}.exe`);
   const folder = readdirSync(outDir).find((name) => /^mac/.test(name) && existsSync(path.join(outDir, name, `${APP_NAME}.app`)));
   if (!folder) throw new Error(`no ${APP_NAME}.app in a mac* folder of ${outDir}`);

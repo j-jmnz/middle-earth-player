@@ -41,7 +41,7 @@ mac:
   identity: "-"
   hardenedRuntime: false
   gatekeeperAssess: false
-  artifactName: middle-earth-player-v${version}-mac-universal.${ext}
+  artifactName: middle-earth-player-mac-universal.${ext}
 win:
   target:
     - target: nsis
@@ -49,9 +49,9 @@ win:
     - target: zip
       arch: x64
   icon: assets/images/icon.png
-  artifactName: middle-earth-player-v${version}-win-x64.${ext}
+  artifactName: middle-earth-player-win-x64.${ext}
 nsis:
-  artifactName: middle-earth-player-v${version}-win-x64.${ext}
+  artifactName: middle-earth-player-win-x64.${ext}
   oneClick: false
   perMachine: false
   allowToChangeInstallationDirectory: true
@@ -65,4 +65,4 @@ linux:
   icon: assets/images/icon.png
   synopsis: "Play The Lord of the Rings: The Card Game solo, offline"
   maintainer: Middle-Earth Player <noreply@users.noreply.github.com>
-  artifactName: middle-earth-player-v${version}-linux-x64.${ext}
+  artifactName: middle-earth-player-linux-x64.${ext}
