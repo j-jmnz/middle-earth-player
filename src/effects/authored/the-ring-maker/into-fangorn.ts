@@ -85,7 +85,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     condition: { kind: "all", conditions: [IN_STAGING, { kind: "freeOfEncounters" }, { kind: "canPick", pick: READY_HERO }] },
     instructions: [{ verb: "Pick", pick: READY_HERO }, { verb: "Exhaust", target: { kind: "picked" } }, { verb: "ClaimObjective" }],
   },
-  { id: "07031:constant:1", cardCode: MUGASH, lines: ["07031:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "returnsToStagingArea", amount: 1, until: "whileSourceInPlay", target: "self" }] },
+  { id: "07031:constant:1", cardCode: MUGASH, lines: ["07031:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "returnsToStagingArea", amount: 1, until: "whileSourceInPlay", target: "self" }] },
   { id: "07031:forced:1", cardCode: MUGASH, lines: ["07031:A:3"], timing: "forced", trigger: "damaged", subject: "host", instructions: [{ verb: "MoveEncounterCard", card: "self", to: "deckTop" }] },
   // A hero destroyed by damage leaves play with the damage that destroyed it, so the cards on it are released (to the staging area) before any "after damage" Forced effect is heard: the card hears the destruction instead, from wherever it went, and
   // returns to the top of the deck when the hero held damage. A hero discarded with none leaves him in the staging area.
