@@ -72,7 +72,8 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
   const forest = forestScore(game, ctx);
   // Stages 1 and 2 of The Steward's Fear have no quest points either: their tokens against the 4 that advance them follow (06011:B:3, 06012:B:3).
   const own = amonDinWin(game) ?? osgiliathWin(game, ctx, stage.code) ?? valeWin(game, ctx) ?? (objective ? `To win: ${objective}` : forest ? forestStageWords(forest) : "No quest points");
-  return { title: name, detail: [own, ...stewardsFearStageLines(game, ctx, stage.code), ...amonDinStageLines(game, stage.code), ...osgiliathStageLines(game, stage.code), ...valeStageLines(game, ctx, stage.code)].join(". ") };
+  const lines = [own, ...stewardsFearStageLines(game, ctx, stage.code), ...amonDinStageLines(game, stage.code), ...osgiliathStageLines(game, stage.code), ...valeStageLines(game, ctx, stage.code)].join(". ");
+  return { title: name, detail: near ? `${near} ${lines}` : lines };
 }
 
 // What a card lying on another card is called in the host's preview: its own printed type for an objective (Mugash on Edge of Fangorn, Gríma on The Islet), "Attachment" for the rest.

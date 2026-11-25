@@ -20,8 +20,9 @@ describe("hiddenBadges", () => {
   });
 
   it("the first row stands below the title band, and the room counts only the rows under it", () => {
-    expect(BADGE_TOP).toBeGreaterThanOrEqual(18);
-    // A card 84 pt tall: the band and the resource token leave 44 pt, two rows of 17.
+    expect(BADGE_TOP).toBeGreaterThanOrEqual(16);
+    // A card 84 pt tall: the band and the resource token leave 48 pt, two rows of 17 (the gap after the last row is not needed); one that is 70 pt tall still holds two.
+    expect(badgeRoom(70, 1, PILL)).toBe(2);
     expect(badgeRoom(84, 1, PILL)).toBe(2);
     expect(badgeRoom(84 + 17, 1, PILL)).toBe(3);
   });

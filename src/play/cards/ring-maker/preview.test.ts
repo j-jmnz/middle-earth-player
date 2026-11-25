@@ -45,4 +45,9 @@ describe("the dial's warning in the stage's sheet (rm.time-x)", () => {
     expect(detail({ stage: "07066", timeCounters: 3 })).not.toMatch(/time counter/);
     expect(detail({ stage: "07065", side: "A" })).not.toMatch(/time counter/);
   });
+
+  it("a time stage with no quest points (To Catch an Orc's stage 2B) says it too, before how it is won", () => {
+    const t = tableFromLayout("to-catch-an-orc", { stage: "07063", timeCounters: 1 });
+    expect(questTitle(t.state, t.ctx, t.state.questStage ?? "", "Stage", ledger)?.detail).toMatch(/^The next refresh phase takes the last time counter\. With the last gone, the encounter discard pile joins the deck/);
+  });
 });
