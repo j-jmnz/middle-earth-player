@@ -55,6 +55,7 @@ export const CORE_TEMPLATES: Templates = {
   SetAsideInPlay: (i) => ({ text: `the card in play with code ${str(i.code)} (an enemy in the staging area or engaged with a player) is set aside, out of play: it loses its attachments and ${i.keepDamage === true ? "its other tokens (the damage tokens stay on it)" : "its tokens"}; a later step can bring it back (nothing when no card with the code is in play)`, read: ["code", "keepDamage"] }),
   BottomOtherLooked: () => ({ text: "the cards the look showed that are still on top of the encounter deck, except the picked one, go to the bottom of the deck in the order they were in; the picked card is then the top card, and the reveal after it reveals it", read: [] }),
   ControlWhenFree: () => ({ text: "(constant, does nothing when run) this objective in the staging area is controlled by the players as soon as it is free of encounters and no effect is resolving: it is marked claimed, with no controller, so it stays in the staging area", read: [] }),
+  HealAmong: (i, ctx) => ({ text: `the acting player heals up to ${amt(i.amount, ctx)} damage from among ${pck(i.pick, ctx)}, one damage at a time on a damaged card they choose each time, and may stop`, read: ["amount", "pick"] }),
   DrawEach: (i, ctx) => ({ text: `every living player draws ${i.amount === undefined ? "1" : amt(i.amount, ctx)} card(s), the first player first (unlike ForEachPlayer it can be one branch of a Choose)`, read: ["amount"] }),
   GainXp: (i) => ({
     text: `Resolution: ${typeof i.amount === "number" && i.amount < 0 ? `lose ${-i.amount}` : `gain ${str(i.amount)}`} XP${isObj(i.each) ? ` for ${(XP_EACH[str(i.each.kind)] ?? (() => str(i.each)))(i.each)}` : ""}${typeof i.max === "number" ? `, at most ${i.max} XP from the line` : ""} (the scenario's lines add up in the Resolution's log; the Campaign Log keeps the total, never below 0; nothing is spent here)`,
@@ -126,6 +127,7 @@ export const CORE_SAMPLES: Samples = {
   BottomOtherLooked: [{ verb: "BottomOtherLooked" }],
   ControlWhenFree: [{ verb: "ControlWhenFree" }],
   DrawEach: [{ verb: "DrawEach", amount: 2 }],
+  HealAmong: [{ verb: "HealAmong", amount: 5, pick: { type: "character", control: "you" } }],
   GainXp: [{ verb: "GainXp", amount: 1, each: { kind: "survivingPlayer" }, max: 3 }, { verb: "GainXp", amount: -1 }, { verb: "GainXp", amount: 1, each: { kind: "inVictory", codes: ["11178"] } }, { verb: "GainXp", amount: 1, each: { kind: "tokens", code: "11181" } }, { verb: "GainXp", amount: 1, each: { kind: "islandFaceup", code: "11197" } }],
   SpendResources: [{ verb: "SpendResources", amount: 2, sphere: "leadership", group: true }, { verb: "SpendResources", amount: 1, target: "picked" }],
   Earn: [{ verb: "Earn", codes: ["100158"], eachPlayer: true, afterHand: true, forFirstPlayer: true }],

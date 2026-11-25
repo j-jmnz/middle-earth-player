@@ -154,6 +154,7 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "the-lonely-mountain": DRAGONS,
   "the-battle-of-five-armies": { calm: "rohan", combat: "pelennor" },
   "escape-from-umbar": { calm: "havens", combat: "chase" },
+  "desert-crossing": { calm: "rohan", combat: "chase" },
 };
 
 /** The loop a table plays: its scenario's combat loop during the Combat phase, its calm loop otherwise, and the menu's for a scenario with no pair. */

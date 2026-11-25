@@ -23,6 +23,8 @@ export function familyAmount(expr: Obj): Made | null {
   if (typeof expr.recorded === "string") return { text: `the count the earlier Resolution recorded in the Campaign Log's notes as "${expr.recorded}" (0 when none is recorded or the game has no log)`, read: ["recorded"] };
   if (typeof expr.poison === "string") return { text: `the number of poison on ${cardRef(expr.poison)}`, read: ["poison"] };
   if (typeof expr.hidden === "string") return { text: expr.hidden === "own" ? "the number of hidden cards in the acting player's play area" : "the total number of hidden cards in every player's play area", read: ["hidden"] };
+  if (expr.temperature === "value") return { text: "the temperature of the heat tracker (0 while none is set)", read: ["temperature"] };
+  if (expr.temperature === "tens") return { text: "the tens digit of the temperature of the heat tracker (0 while none is set)", read: ["temperature"] };
   if (expr.part === true) return { text: "the part number of the campaign card of the scenario being played: its place in its campaign, counting from 1", read: ["part"] };
   return null;
 }
@@ -40,6 +42,8 @@ export const FAMILY_AMOUNT_SAMPLES: readonly Obj[] = [
   { stagedAlliesCost: true },
   { recorded: "corsairFleet" },
   { part: true },
+  { temperature: "value" },
+  { temperature: "tens" },
   { poison: "picked" },
   { hidden: "own" },
   { hidden: "all" },

@@ -1,0 +1,349 @@
+Scenario piles that place cards with no record (quest: 16068 The Desert of Harad; quest: 16069 Under the Merciless Sun; quest: 16070 Beasts of Legend; staging: 16025 Burnt Sands)
+
+## 16022 Mirage
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16022:A:1 (front): When Revealed: Discard the active location. Shuffle the encounter discard pile into the encounter deck and discard cards from the top until a location is discarded. Make that location the active location.
+  16022:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard the active location
+    - shuffle the encounter discard pile into the encounter deck
+    - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
+    - then, if the picked card is a location (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card becomes the active location
+
+## 16023 Seek Shade
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16023:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+16023:A:2 (front): Forced: At the end of the round, remove X progress from the main quest. X is the tens digit of the temperature.
+  16023:forced:1: Forced at the end of the round
+    only if this card is in the staging area
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - remove the tens digit of the temperature of the heat tracker (0 while none is set) progress from the main quest (all of it when it holds less)
+
+16023:A:3 (front): Response: When Seek Shade is defeated, reduce the temperature by 10.
+  16023:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card)
+    - reduce the temperature by 10, never below 0 (nothing before the tracker is set; a change queues the "temperature changed" event)
+
+## 16024 Carrion Bird
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16024:A:1 (front): Carrion Bird gets -1 engagement cost for each damaged character in play.
+  16024:constant:1: Constant
+    - this card: stat engagementCost minus (the number of damaged character (any player controls)), while this card is in play
+
+16024:A:2 (front): Forced: After Carrion Bird engages you, discard a damaged character you control.
+  16024:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose damaged character (you control)
+    - discard the picked card
+
+## 16025 Burnt Sands
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+16025:A:1 (front): While the temperature is 40 or higher, Burnt Sands gets +2 Threat.
+  16025:constant:1: Constant
+    only if all of: (this card is in the staging area) and (the temperature is at least 40 (false while no heat tracker is set))
+    - this card: stat threat 2, while this card is in play
+
+16025:A:2 (front): Forced: After Burnt Sands becomes the active location, increase the temperature by 2.
+  16025:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - increase the temperature by 2 (nothing before the tracker is set; a change queues the "temperature changed" event the stages' loss answers)
+
+## 16026 Scorched Hamada
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16026:A:1 (front): X is the tens digit of the temperature.
+  16026:constant:1: Constant
+    - this card: stat threat the tens digit of the temperature of the heat tracker (0 while none is set), while this card is in play
+
+16026:A:2 (front): Forced: After Scorched Hamada becomes the active location, assign X damage among characters in play.
+  16026:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the acting player assigns the tens digit of the temperature of the heat tracker (0 while none is set) damage among the character (any player controls), one at a time
+
+16026:A:3 (shadow): Shadow: Raise your threat by X, where X is the tens digit of the temperature.
+  16026:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - raise threat by the tens digit of the temperature of the heat tracker (0 while none is set) (the acting player)
+
+## 16027 Parched Wadi
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16027:A:1 (front): While Parched Wadi is in the staging area, each Creature enemy gets +1 Threat and +1 Attack.
+  16027:constant:1: Constant
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Creature enemy (any player controls) or in the staging area: stat threat 1, while this card is in play
+    - each Creature enemy (any player controls) or in the staging area: stat attack 1, while this card is in play
+
+16027:A:2 (front): Forced: After Parched Wadi becomes the active location, shuffle the encounter discard pile into the encounter deck and discard cards from the top until a Creature enemy is discarded. Add that enemy to the staging area.
+  16027:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - cards are discarded from the top of the encounter deck until an enemy with the trait Creature is discarded, or the deck is empty; that card becomes the picked card
+    - then, if the picked card is a Creature enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+
+## 16028 Were-worm
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16028:A:1 (front): X is the tens digit of the temperature.
+  16028:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat the tens digit of the temperature of the heat tracker (0 while none is set), while this card is in play
+    - this card: stat attack the tens digit of the temperature of the heat tracker (0 while none is set), while this card is in play
+    - this card: stat defense the tens digit of the temperature of the heat tracker (0 while none is set), while this card is in play
+
+16028:A:2 (front): Forced: After Were-worm engages you, it makes an immediate attack. (Do not deal it a shadow card.)
+  16028:forced:1: Forced after an enemy engages a player (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+16028:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the temperature is 40 or higher).
+  16028:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the temperature is at least 40 (false while no heat tracker is set): the attacking enemy: stat attack 2, until the end of the attack
+    - then, if not (the temperature is at least 40 (false while no heat tracker is set)) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 16029 Unbearable Heat
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16029:A:1 (front): When Revealed: Each player assigns X damage among characters he controls, where X is the tens digit of the temperature.
+  16029:whenRevealed:1: When revealed
+    - each player assigns the tens digit of the temperature of the heat tracker (0 while none is set) damage among the character (you control), one at a time
+
+16029:A:2 (shadow): Shadow: Attacking enemy gets +X Attack, where X is the tens digit of the temperature.
+  16029:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack the tens digit of the temperature of the heat tracker (0 while none is set), until the end of the attack
+
+## 16030 Scorching Sun
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16030:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+16030:A:2 (front): When Revealed: Increase the temperature by 4.
+  16030:whenRevealed:1: When revealed
+    - increase the temperature by 4 (nothing before the tracker is set; a change queues the "temperature changed" event the stages' loss answers)
+
+16030:A:3 (shadow): Shadow: Either increase the temperature by 2, or return attacking enemy to the staging area after this attack.
+  16030:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player chooses one of:
+      * option "temperature":
+        - increase the temperature by 2 (nothing before the tracker is set; a change queues the "temperature changed" event the stages' loss answers)
+      * option "return":
+        - when the attack in progress ends:
+          - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 16048 Find Water
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16048:A:1 (front): Characters cannot be readied by player card effects.
+  16048:constant:1: Constant
+    - each character (any player controls): stat cannotReadyByPlayerCard 1, while this card is in play
+
+16048:A:2 (front): Response: When this stage is defeated, each player readies 1 hero he controls.
+  16048:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card)
+    - for each player, first player first:
+      - choose exhausted hero (you control)
+      - ready the picked card
+
+## 16049 Towering Dunes
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16049:A:1 (front): While Towering Dunes is in the staging area, progress cannot be placed on locations in the staging area not named Towering Dunes.
+  16049:constant:1: Constant
+    only if this card is in the staging area
+    - each location (any player controls) in the staging area only, not named "Towering Dunes": stat noProgressPlaced 1, while this card is in play
+
+16049:A:2 (front): Forced: After Towering Dunes becomes the active location, reveal the top card of the encounter deck.
+  16049:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the acting player reveals an encounter card
+
+## 16050 Desert Oasis
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16050:A:1 (front): While Desert Oasis is the active location, it gains: "Response: When Desert Oasis is explored, heal 4 damage from among characters in play."
+  16050:response:1: Response on the event activeExplored (heard about this card)
+    - the acting player heals up to 4 damage from among character (any player controls), one damage at a time on a damaged card they choose each time, and may stop
+
+16050:A:2 (front): Forced: After Desert Oasis becomes the active location, each player exhausts a character he controls.
+  16050:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - for each player, first player first:
+      - choose ready character (you control)
+      - exhaust the picked card
+
+## 16051 Sandstorm
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16051:A:1 (front): When Revealed: Each player either discards his hand, or assigns X damage among characters he controls. X is the number of cards in his hand.
+  16051:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "discard":
+          - the acting player discards all the cards in their hand
+        * option "damage":
+          - the acting player assigns the cards in your hand damage among the character (you control), one at a time
+
+16051:A:2 (shadow): Shadow: Either discard the highest cost attachment you control, or assign X damage among characters you control where X is the number of attachments you control.
+  16051:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player chooses one of:
+      * option "discard" (only if there is a attachment (you control) to choose):
+        - choose attachment (you control) with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides)
+        - discard the picked card
+      * option "damage":
+        - the acting player assigns the number of attachment (you control) damage among the character (you control), one at a time
+
+## 16052 Heat Exhaustion
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16052:A:1 (front): When Revealed: Each player exhausts a character he controls and deals 1 damage to that character.
+  16052:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - choose ready character (you control)
+      - exhaust the picked card
+      - then, if the picked card is a exhausted character (you control) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to the picked card
+
+16052:A:2 (shadow): Shadow: Exhaust a character you control.
+  16052:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 16053 Craft Remedy
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16053:A:1 (front): Treat the printed text box of each damaged character as if it were blank (except for Traits).
+  16053:constant:1: Constant
+    - each damaged character (any player controls): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
+
+16053:A:2 (front): Response: When this stage is defeated, heal 1 damage from each character in play.
+  16053:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card)
+    - for each character (any player controls):
+      - heal 1 damage from the picked card
+
+## 16054 Sand Viper
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16054:A:1 (front): Players cannot declare defenders against Sand Viper.
+  16054:constant:1: Constant
+    - no character can be declared as a defender against this card's attacks (only this card's, not another enemy's)
+
+16054:A:2 (front): Forced: After the players travel to a location, Sand Viper engages the first player.
+  16054:forced:1: Forced after the players travel (heard about location (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this enemy, in the staging area or engaged with another player (it moves), engages the first player
+
+## 16055 Giant Scorpion
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16055:A:1 (front): Forced: After Giant Scorpion damages a character, that character cannot ready until the end of the round.
+  16055:forced:1: Forced on the event damagedByAttack (heard about character (any player controls))
+    only if the attacking enemy is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the card the event is about: stat cannotReady 1, until the end of the round
+
+16055:A:2 (shadow): Shadow: If this attack deals damage, the defending character cannot ready until the end of the round.
+  16055:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if the attack that left this effect for its end, or the damage the answered event placed, dealt at least 1 damage: the event's other card: stat cannotReady 1, until the end of the round
+
+## 16068 The Desert of Harad
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+16068:A:1 (front): Setup: Each player searches the encounter deck for a copy of Burnt Sands and adds it to the staging area. Shuffle the encounter deck. Place the heat tracker next to the quest deck and set the temperature to 10.
+  16068:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one card with code 16025 in the encounter deck and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+    - place the heat tracker next to the quest deck and set the temperature to 10 (no "temperature changed" event)
+
+16068:B:1 (back): Forced: After an ally enters play, either exhaust it, or deal 1 damage to it.
+  16068:forced:1: Forced after a card enters play (heard about ally (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the acting player chooses one of:
+      * option "exhaust" (only if the card the event is about is a ready ally (any player controls)):
+        - exhaust the card the event is about
+      * option "damage":
+        - deal 1 damage to the card the event is about
+
+16068:B:2 (back): Forced: At the end of the round, increase the temperature by 4.
+  16068:forced:2: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - increase the temperature by 4 (nothing before the tracker is set; a change queues the "temperature changed" event the stages' loss answers)
+
+16068:B:3 (back): If the temperature is 60 or higher, the players lose the game.
+  16068:forced:3: Forced on the event temperatureChanged
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - if the temperature is at least 60 (false while no heat tracker is set): the players lose the game (The temperature reached 60)
+
+## 16069 Under the Merciless Sun
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+16069:A:1 (front): When Revealed: Increase the temperature by 2. Shuffle the encounter discard pile into the encounter deck and reveal 1 encounter card per player.
+  16069:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - increase the temperature by 2 (nothing before the tracker is set; a change queues the "temperature changed" event the stages' loss answers)
+    - shuffle the encounter discard pile into the encounter deck
+    - repeat the number of players times:
+      - the acting player reveals an encounter card
+
+16069:B:1 (back): Forced: At the end of the round, increase the temperature by 4. Then, each player assigns X damage among characters he controls, where X is the tens digit of the temperature.
+  16069:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - increase the temperature by 4 (nothing before the tracker is set; a change queues the "temperature changed" event the stages' loss answers)
+    - each player assigns the tens digit of the temperature of the heat tracker (0 while none is set) damage among the character (you control), one at a time
+
+16069:B:2 (back): If the temperature is 60 or higher, the players lose the game.
+  16069:forced:2: Forced on the event temperatureChanged
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - if the temperature is at least 60 (false while no heat tracker is set): the players lose the game (The temperature reached 60)
+
+## 16070 Beasts of Legend
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+16070:A:1 (front): When Revealed: Increase the temperature by 2. Each player searches the encounter deck, discard pile, and victory display for a Were-worm and adds it to the staging area, if able. Shuffle the encounter deck.
+  16070:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - increase the temperature by 2 (nothing before the tracker is set; a change queues the "temperature changed" event the stages' loss answers)
+    - for each player, first player first:
+      - the acting player finds one card with code 16028 in the encounter deck or its discard pile or the victory display and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+16070:B:1 (back): During the quest phase, add X Threat to the total Threat in the staging area, where X is the tens digit of the temperature.
+  16070:constant:1: Constant
+    only if it is the Quest phase
+    - the table: stat moreStagingThreat the tens digit of the temperature of the heat tracker (0 while none is set), while this card is in play
+
+16070:B:2 (back): Forced: At the end of the round, increase the temperature by 4.
+  16070:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - increase the temperature by 4 (nothing before the tracker is set; a change queues the "temperature changed" event the stages' loss answers)
+
+16070:B:3 (back): While at least 1 Were-worm is in play, the players cannot defeat this stage. If the players defeat this stage, they win the game. If the temperature is 60 or higher, the players lose the game.
+  16070:constant:2: Constant
+    only if there is a enemy (any player controls) or in the staging area, named "Were-worm" to choose
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
+    - the players cannot defeat this stage while this holds
+  16070:questResolution:1: Quest resolution
+    - the players win the game
+  16070:forced:2: Forced on the event temperatureChanged
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - if the temperature is at least 60 (false while no heat tracker is set): the players lose the game (The temperature reached 60)
+
+(rendered pieces: 211 by template, 0 as JSON)
