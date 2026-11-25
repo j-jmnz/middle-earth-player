@@ -18,19 +18,24 @@ const EDGE = "07032";
 const OFF_TRACK = "07057";
 const IN_NEED_OF_REST = "07058";
 
+// The line of Mugash (the objective) on a host: Edge of Fangorn or a hero, by the host's code (`hostId` names it).
+function mugashOnHostWords(game: ScenarioState, hostId: string, name: (id: string) => string): string {
+  return game.cards[hostId]?.code === EDGE ? mugashOnEdgeWords(name(hostId)) : mugashOnHeroWords(name(hostId));
+}
+
 // What Into Fangorn's cards say about themselves: Mugash (the objective) on Edge, on a hero or free, a Huorn, and the line of each attachment on its host; one line for each piece a card holds.
 function fangornDetail(game: ScenarioState, cardId: string, name: (id: string) => string): string | null {
   const card = game.cards[cardId];
   if (!card) return null;
   if (card.code === MUGASH_OBJECTIVE) {
     const host = card.zone === "attached" && card.host != null ? game.cards[card.host] : undefined;
-    if (host) return host.code === EDGE ? mugashOnEdgeWords(name(host.id)) : mugashOnHeroWords(name(host.id));
+    if (host) return mugashOnHostWords(game, host.id, name);
     return card.zone === "staging" ? mugashFreeWords(card.attachments.length > 0) : null;
   }
   if (HUORNS.includes(card.code)) return hinderWords(card.zone === "engaged");
   const lines = card.attachments.flatMap((id) => {
     const code = game.cards[id]?.code;
-    if (code === MUGASH_OBJECTIVE) return [card.code === EDGE ? mugashOnEdgeWords(name(cardId)) : mugashOnHeroWords(name(cardId))];
+    if (code === MUGASH_OBJECTIVE) return [mugashOnHostWords(game, cardId, name)];
     if (code === OFF_TRACK) return [offTrackHostWords()];
     return code === IN_NEED_OF_REST ? [needOfRestHostWords(name(cardId))] : [];
   });

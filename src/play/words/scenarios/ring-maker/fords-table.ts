@@ -4,23 +4,29 @@
 import type { Instruction } from "../../../../catalog/boundary.ts";
 import { plural } from "../../list.ts";
 
-/** What the last time counter does on each stage, said after the count. */
-const LAST: Record<string, string> = {
-  "07059": "With the last gone, Gríma is discarded and the players lose.",
-  "07060": "With the last gone, each player assigns damage for each card in his hand, and 2 time counters return.",
-  "07061": "With the last gone, cards from the top of the encounter deck are discarded, each enemy among them joins the staging area, and 3 time counters return.",
-  "07063": "With the last gone, the encounter discard pile joins the deck, 2 encounter cards are revealed for each player, and 2 time counters return.",
-  "07064": "With the last gone, Mugash returns to the staging area, the players reveal 1 encounter card for each player after the first, and 3 time counters return.",
-  "07065": "With the last gone, Mugash is shuffled into the encounter deck, even from a hero, and the quest advances to stage 3.",
-  "07066": "With the last gone, Mugash is shuffled into the encounter deck, even from a hero, and the quest advances to stage 3.",
-  "07067": "With the last gone, 5 cards from the top of the encounter deck are discarded, each player adds an enemy or objective from the discard pile to the staging area, and 3 time counters return.",
+/** What the last time counter does on each stage, as a clause with no lead: the dial's notes and the Choose's caution put their own words before it. */
+const LAST_COUNTER: Readonly<Record<string, string>> = {
+  "07059": "Gríma is discarded and the players lose.",
+  "07060": "each player assigns damage for each card in his hand, and 2 time counters return.",
+  "07061": "cards from the top of the encounter deck are discarded, each enemy among them joins the staging area, and 3 time counters return.",
+  "07063": "the encounter discard pile joins the deck, 2 encounter cards are revealed for each player, and 2 time counters return.",
+  "07064": "Mugash returns to the staging area, the players reveal 1 encounter card for each player after the first, and 3 time counters return.",
+  "07065": "Mugash is shuffled into the encounter deck, even from a hero, and the quest advances to stage 3.",
+  "07066": "Mugash is shuffled into the encounter deck, even from a hero, and the quest advances to stage 3.",
+  "07067": "5 cards from the top of the encounter deck are discarded, each player adds an enemy or objective from the discard pile to the staging area, and 3 time counters return.",
 };
 
+/** What the last counter does on the stage, or null for a card with no time dial. */
+export const lastCounterWords = (code: string): string | null => LAST_COUNTER[code] ?? null;
+
+/** The sentence under the count on the dial: "With the last gone, ...". */
+const withLastGone = (code: string): string => (LAST_COUNTER[code] != null ? `With the last gone, ${LAST_COUNTER[code]}` : "");
+
 /** The note of the stage's time dial: the counters left, the refresh phase that takes one and what the last one does. */
-export const stageTimeWords = (code: string, left: number): string => `${plural(left, "time counter")} left. One comes off at the end of each refresh phase. ${LAST[code] ?? ""}`.trim();
+export const stageTimeWords = (code: string, left: number): string => `${plural(left, "time counter")} left. One comes off at the end of each refresh phase. ${withLastGone(code)}`.trim();
 
 /** The warning once two counters are left: the refresh phase that takes the last, and what it does. */
-export const stageTimeNearWords = (code: string, left: number): string => (left <= 0 ? `No time counters are left. ${LAST[code] ?? ""}` : left === 1 ? `The next refresh phase takes the last time counter. ${LAST[code] ?? ""}` : `${left} time counters are left.`).trim();
+export const stageTimeNearWords = (code: string, left: number): string => (left <= 0 ? `No time counters are left. ${withLastGone(code)}` : left === 1 ? `The next refresh phase takes the last time counter. ${withLastGone(code)}` : `${left} time counters are left.`).trim();
 
 /** What the limit of the dial says: the Time X the stage printed. */
 export const stageTimeLimitWords = (limit: number): string => `Time ${limit}: it starts with ${limit} time counters`;

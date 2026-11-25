@@ -3,20 +3,9 @@
 // The engine decided every number (the counters on the quest, the Choose still to come in the effect's queue); nothing here changes one.
 import type { Instruction } from "../../catalog/boundary.ts";
 import type { ScenarioState } from "../../rules/engine/reduce.ts";
+import { lastCounterWords } from "../words/scenarios/ring-maker/fords-table.ts";
 
 type Choose = Extract<Instruction, { verb: "Choose" }>;
-
-/** What the last time counter does, said after "the last time counter comes off" (the stage's own line, ring-maker/fords-table.ts words it for the dial). */
-const LAST_COUNTER: Record<string, string> = {
-  "07059": "Gríma is discarded and the players lose.",
-  "07060": "each player assigns damage for each card in his hand, and 2 time counters return.",
-  "07061": "cards from the top of the encounter deck are discarded, each enemy among them joins the staging area, and 3 time counters return.",
-  "07063": "the encounter discard pile joins the deck, 2 encounter cards are revealed for each player, and 2 time counters return.",
-  "07064": "Mugash returns to the staging area, the players reveal 1 encounter card for each player after the first, and 3 time counters return.",
-  "07065": "Mugash is shuffled into the encounter deck, even from a hero, and the quest advances to stage 3.",
-  "07066": "Mugash is shuffled into the encounter deck, even from a hero, and the quest advances to stage 3.",
-  "07067": "5 cards from the top of the encounter deck are discarded, each player adds an enemy or objective from the discard pile to the staging area, and 3 time counters return.",
-};
 
 // Whether this Choose has the row that takes a time counter off the current quest.
 const takesTime = (choose: Choose, optionId: string): boolean => choose.options.find((option) => option.id === optionId)?.instructions.some((step) => step.verb === "RemoveTimeFromQuest") === true;
@@ -32,7 +21,7 @@ function choosersLeft(game: ScenarioState): number {
 
 function stageOf(game: ScenarioState): { code: string; left: number } | null {
   const stage = game.questStage ? game.cards[game.questStage] : undefined;
-  return stage && LAST_COUNTER[stage.code] != null ? { code: stage.code, left: stage.resources } : null;
+  return stage && lastCounterWords(stage.code) != null ? { code: stage.code, left: stage.resources } : null;
 }
 
 /** The count on the time row: "2 left, 1 after" (null for another row or when the stage holds no counter). */
@@ -45,7 +34,7 @@ export function fordsTimeCount(game: ScenarioState, choose: Choose, optionId: st
 export function fordsTimeCaution(game: ScenarioState, choose: Choose, optionId: string): string | null {
   const stage = takesTime(choose, optionId) ? stageOf(game) : null;
   if (!stage || stage.left <= 0 || stage.left > choosersLeft(game)) return null;
-  const last = LAST_COUNTER[stage.code] ?? "";
+  const last = lastCounterWords(stage.code) ?? "";
   return stage.left === 1 ? `Tap again: the last time counter comes off, ${last}` : `Tap again: ${stage.left} counters are left, and the players still to choose can take them all. With the last counter gone, ${last}`;
 }
 
