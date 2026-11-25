@@ -2,7 +2,7 @@
 // attaches to the hero with the highest threat cost that has none; the discards from the top of the encounter deck that Collateral Damage counts in two steps; and the first enemy revealed each round. Into Ithilien (part 2) adds the ally objectives that are
 // committed to the quest from the staging area, the stage that bypasses the next one, and the first player's taking of every Ranger objective in the staging area. Simple verbs and stat flags; effect-schema-verbs.ts,
 // effect-schema.ts and effect-schema-stats.ts compose them. Encounter at Amon Dîn (part 6) adds the villager tokens (their discard and their move, the trigger that hears a discard), the character with the fewest hit points left, and the flags that end the game or hold it. Assault on Osgiliath (part 7) adds the
-// control of locations (a location lies in the first player's play area; the verbs that take and lose control, the two triggers that hear an undefended attack and a loss of control, the table's bar on a player card's progress in the staging area). src/rules/families/pelargir/ runs them. The Blood of Gondor (part 8) adds the hidden cards: taking, turning and discarding them, the two objective allies under Captured! and the first player's control of them, the amount of hidden cards and the flags of its stages.
+// control of locations (a location lies in the first player's play area; the verbs that take and lose control, the two triggers that hear an undefended attack and a loss of control, the table's bar on a player card's progress in the staging area). src/rules/families/pelargir/ runs them. The Blood of Gondor (part 8) adds the hidden cards: taking, turning and discarding them, the two objective allies under Captured! and the first player's control of them, the amount of hidden cards and the flags of its stages. The Morgul Vale (part 9) adds the progress tokens placed on a card by its title (To the Tower), the removal of every copy of a title from the game, the card revealed from the encounter deck and put into play engaged with a player, and the flags of the Captains (an enemy that cannot leave play, the damage a Morgul Bodyguard takes for it, an attack a shadow effect ended).
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
@@ -111,6 +111,14 @@ const VERBS = [
   z.strictObject({ verb: z.literal("GainControlOfSelf"), ...when }),
   // The engine's own, last in the frame of a treachery that Lying in Wait turned faceup: the treachery lies in the staging area while its When Revealed effect resolves and goes to the encounter discard pile after it, as a revealed treachery does (rr.step-3-3). No record names it.
   z.strictObject({ verb: z.literal("DiscardResolved"), ...when }),
+  // The Morgul Vale (ats.captain-enemies, ats.setup-the-morgul-vale-to-the-tower): "place 1 progress token on To the Tower" (06149:A:2, 06150:A:2, 06152:A:1, 06155:A:2, 06157:A:1, 06158:A:2, 06159:A:2): `amount` progress tokens go on the card in play with this title (the staging area counts as play) as the engine places progress on a card, one placement, so a card that hears
+  // "progress placed" hears it once. With no such card in play nothing happens. src/rules/families/pelargir/tower.ts.
+  z.strictObject({ verb: z.literal("PlaceProgressOnNamed"), name: z.string().min(1), amount: positiveAmountSchema, ...when }),
+  // "Remove Faramir from the game" (06147:A:2, ats.setup-the-morgul-vale-to-the-tower): every card a player owns with this title, in a deck, a hand, a discard pile or play (a hero or an ally, its attachments with it), goes out of the game, and nothing is announced as leaving play.
+  z.strictObject({ verb: z.literal("RemoveAllNamedFromGame"), name: z.string().min(1), ...when }),
+  // "Reveal the top card of the encounter deck. If that card is an enemy, put it into play engaged with the defending player" (06151:A:1): the top card is revealed in full for the acting player (the player the attack was against): its Doomed, When Revealed effects and Surge resolve, an enemy is put into play engaged with him, never staged,
+  // and dealt no shadow card, a location or an objective goes to the staging area and a treachery to the discard pile. An empty deck is reset from the discard pile only in the quest phase (rr.running-out-of-cards): in any other phase, Murzag's attack in the combat phase, nothing is revealed. src/rules/families/pelargir/reveal-engaged.ts.
+  z.strictObject({ verb: z.literal("RevealTopEngaging"), ...when }),
 ] as const;
 
 const TRIGGERS = [
@@ -191,6 +199,13 @@ const FLAGS = [
   "turnsAtFiveHidden",
   // On a location a player controls: the seat that took control, plus 1 (no record sets it; TakeControlOfLocation writes it and a settle sweep reads it to see the control lost). Held until the control is lost.
   "controlSeat",
+  // On a Captain enemy while its stage is current: it cannot leave play unless it is destroyed ("Murzag cannot leave play unless destroyed", 06144:B:1, 06145:B:1, 06146:B:2). A Pick that feeds a verb taking the card out of play any other way leaves it out, so no player is offered a target whose effect cannot happen (rr.cannot; src/rules/families/pelargir/cannot-leave.ts);
+  // a shuffle of the staging area leaves it where it is, and a settle sweep puts it back in the staging area when an effect with no pick moved it out of play anyway. Returning it to the staging area is not leaving play.
+  "cannotLeavePlay",
+  // On each Captain enemy while a Morgul Bodyguard is in play: damage that would be dealt to it is dealt to one Bodyguard instead ("Any damage that would be dealt to a Captain enemy is dealt to 1 Morgul Bodyguard instead", 06148:A:1; src/rules/families/defense/damage.ts damageGoesTo asks families/pelargir/bodyguard.ts).
+  "shieldedByBodyguard",
+  // On an enemy until the end of the attack: a shadow effect ended this attack ("Attacking enemy engages the next player and makes an immediate attack", 06148:A:2), so no damage is dealt and no shadow card that is left resolves (src/rules/combat/shadow.ts resolveAttack asks families/pelargir/switch.ts).
+  "attackSwitched",
 ] as const;
 
 // The underworld deck lies set aside facedown, and the Villain and the Plot the Setup hides stay set aside facedown (06011:A:1): the table lists them as facedown cards without a name.

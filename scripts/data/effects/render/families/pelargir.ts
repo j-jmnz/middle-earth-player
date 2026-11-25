@@ -116,6 +116,18 @@ export const PELARGIR_TEMPLATES: Templates = {
   HoldUnderStage: (i) => ({ text: `each card in play with code ${codeList(i.codes)} is placed under this stage: still in play, controlled by no player, committed to nothing; its text cannot be used and its leaving play is not announced`, read: ["codes"] }),
   DiscardResolved: () => ({ text: "this card, a treachery turned faceup, goes to the encounter discard pile once its When Revealed effect is done (the engine's own last step of that frame)", read: [] }),
   GainControlOfSelf: () => ({ text: "this card passes to the first player's play area (each time the first player token passes); a card under a stage is not moved", read: [] }),
+  PlaceProgressOnNamed: (i, ctx) => ({
+    text: `${amt(i.amount, ctx)} progress token(s) are placed on the card in play with the title ${str(i.name)} (the staging area counts as play), in one placement: the cards that hear progress placed hear it once; with no such card in play nothing happens`,
+    read: ["name", "amount"],
+  }),
+  RemoveAllNamedFromGame: (i) => ({
+    text: `every player card with the title ${str(i.name)}, in a deck, a hand, a discard pile or play (a hero or an ally, the cards attached to it with it), goes out of the game; nothing is announced as leaving play`,
+    read: ["name"],
+  }),
+  RevealTopEngaging: () => ({
+    text: "the top card of the encounter deck (an empty deck is refilled from the discard pile in the quest phase only; otherwise nothing is revealed) is revealed in full for the acting player: its Doomed, When Revealed effects and Surge resolve; an enemy is put into play engaged with him, never staged, and is dealt no shadow card; a location or an objective goes to the staging area and a treachery to the discard pile",
+    read: [],
+  }),
   GroupDiscardResources: (i, ctx) => ({
     text: `the players as a group discard ${amt(i.amount, ctx)} resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)`,
     read: ["amount", "rest", "turns"],
@@ -158,6 +170,9 @@ export const PELARGIR_SAMPLES: Samples = {
   LoseControlOfLocation: [{ verb: "LoseControlOfLocation", card: "self" }, { verb: "LoseControlOfLocation" }],
   ActForDestroyedController: [{ verb: "ActForDestroyedController" }],
   AnnounceAddedToStaging: [{ verb: "AnnounceAddedToStaging" }, { verb: "AnnounceAddedToStaging", card: "previous" }],
+  PlaceProgressOnNamed: [{ verb: "PlaceProgressOnNamed", name: "To the Tower", amount: 1 }, { verb: "PlaceProgressOnNamed", name: "To the Tower", amount: 3 }],
+  RemoveAllNamedFromGame: [{ verb: "RemoveAllNamedFromGame", name: "Faramir" }],
+  RevealTopEngaging: [{ verb: "RevealTopEngaging" }],
 };
 
 export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {
@@ -186,5 +201,8 @@ export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {
   losesBattle: " (held by the current quest stage: it does not have the Battle keyword it prints)",
   turnsAtFiveHidden: " (held by the current quest stage: a player who holds 5 hidden cards turns them faceup, one at a time, once the instruction that gave him the fifth is done; checked at every settle)",
   controlSeat: " (held by a location a player controls, the amount is the seat plus 1: written by TakeControlOfLocation and read by a settle sweep that sees the control lost; not set by a record)",
+  cannotLeavePlay: " (held by a Captain enemy while its stage is current: it cannot leave play unless destroyed; a pick that feeds a discard, a shuffle, a return to a hand or deck, the victory display or a removal from the game does not offer it, the staging area shuffled into the encounter deck leaves it where it is, and a settle sweep puts it back in the staging area if an effect with no pick moved it out of play)",
+  shieldedByBodyguard: " (held by each Captain enemy while a Morgul Bodyguard is in play: damage assigned to it, however it comes, is placed on the Bodyguard in play with the most damage, the first in play on a tie, before the Captain's own limits apply)",
+  attackSwitched: " (held by the attacking enemy until the end of the attack: the attack deals no damage and no shadow card still facedown resolves; the attack's end engages the next player and starts an immediate attack)",
   firstEnemyNoted: " (held by the table until the end of the round: an enemy was already marked firstEnemy this round)",
 };
