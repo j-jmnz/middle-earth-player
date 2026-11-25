@@ -18,6 +18,7 @@ import { touchableStagingLocations } from "../interpret/immune-targets.ts";
 import { mayGainResources } from "../families/misc/guards.ts";
 import { characters } from "../combat/combat.ts";
 import type { AmountScope } from "../interpret/amounts.ts";
+import { leavesPlayPickedInEach } from "../families/pelargir/vale/cannot-leave.ts";
 import { deckPool } from "../families/uncharted/pick.ts";
 import { amountIdle, candidatesOf, conditionScope, namedCards, readCandidates, readsTable, seatsOfWho, xUnchoosable } from "./idle-reads.ts";
 
@@ -64,8 +65,12 @@ function idleStep(state: ScenarioState, instruction: Instruction, sourceId: stri
       return frame.picked.every((id) => !holds(state, instruction.when!, { ...scope, picked: [id] }, ctx));
     }
     // A step whose condition reads only the table and fails does not happen.
-    if (!readsTable(instruction.when) || holds(state, instruction.when, conditionScope(frame, sourceId), ctx)) return false;
-    return true;
+    // An "up to" Each may also be conditional on another player being in the game (Message from Elrond, 08032:A:1): the table settles that too.
+    const upTo = instruction.verb === "Each" && instruction.upTo != null;
+    if (!readsTable(instruction.when) && !(upTo && instruction.when.kind === "otherPlayer")) return false;
+    if (!holds(state, instruction.when, conditionScope(frame, sourceId), ctx)) return true;
+    // An "up to" Each whose condition holds is read like one with none: it does nothing when no card matches.
+    if (!upTo) return false;
   }
   if (own != null) return own;
   switch (instruction.verb) {
@@ -130,7 +135,8 @@ function idleStep(state: ScenarioState, instruction: Instruction, sourceId: stri
       // "Heal 1 damage on up to 2 damaged characters" with no damaged character: an upTo that finds no card does nothing.
       // A pick from a deck with cards in it reads cards the player cannot see (rr.search): the deck's contents are not read, so the effect is not told idle.
       if (readsHiddenDeck(state, instruction.pick, frame)) return false;
-      if (instruction.upTo != null) return frame.picked == null && eachCandidates(state, instruction.pick, [], sourceId, frame, ctx).length === 0;
+      // The steps after an ActAs are read in `idleList`, once for each player the Pick may have chosen; the event card itself has left the hand by the time the effect resolves.
+      if (instruction.upTo != null) return frame.picked == null && eachCandidates(state, instruction.pick, [], sourceId, frame, ctx, instruction.instructions).filter((id) => !(mark.event && id === sourceId)).length === 0;
       // The cards the Each reads may depend on the card an earlier Pick chose ("each hero the chosen player controls"): read for each candidate of that choice.
       return (frame.picked ?? [null]).every((from) => {
         const found = eachCandidates(state, instruction.pick, from == null ? [] : [from], sourceId, frame, ctx);
@@ -160,8 +166,9 @@ function idleStep(state: ScenarioState, instruction: Instruction, sourceId: stri
 }
 
 // The cards an Each reads: the pick's candidates for the cards an earlier Pick chose (`from`), with the event's subject and other card.
-function eachCandidates(state: ScenarioState, pick: PickSpec, from: readonly string[], sourceId: string, frame: IdleFrame, ctx: ReduceContext): string[] {
-  return pickCandidates(state, pick, frame.seat, from, sourceId, ctx, frame.scope.x, frame.scope.participants, false, { subject: frame.scope.subject ?? null, other: frame.scope.other ?? null });
+// `body` is the Each's own steps: a card they take out of play or out of a hand (a card held in the hand, 07023:A:1) is no candidate, as in the running effect (interpret/effect-frames.ts).
+function eachCandidates(state: ScenarioState, pick: PickSpec, from: readonly string[], sourceId: string, frame: IdleFrame, ctx: ReduceContext, body: readonly Instruction[] = []): string[] {
+  return pickCandidates(state, pick, frame.seat, from, sourceId, ctx, frame.scope.x, frame.scope.participants, false, { subject: frame.scope.subject ?? null, other: frame.scope.other ?? null, leaves: leavesPlayPickedInEach(body) });
 }
 
 // A step that pays for the rest of the effect ("discard a card to draw 1", "give it Doomed 1 to draw a card", "exhaust Gandalf to search"): it is idle when the rest is.
@@ -170,6 +177,13 @@ function paysForRest(step: Instruction, last: boolean): boolean {
   if (last && step.verb === "Discard" && step.when == null && typeof step.target === "object" && step.target.kind === "self") return true;
   if (step.verb === "SpendResources" || step.verb === "DiscardFromHand" || step.verb === "RaiseThreat" || step.verb === "Doomed") return true;
   return (step.verb === "Discard" || step.verb === "Exhaust") && step.when == null && typeof step.target === "object" && step.target.kind === "picked";
+}
+
+// The seats an ActAs hands the rest of the effect to, when an earlier Pick chose only players (`seat:N`) and there is at least one; null for any other step.
+function actingPlayers(instruction: Instruction, at: IdleFrame): number[] | null {
+  if (instruction.verb !== "ActAs" || instruction.who !== "pickedPlayer" || instruction.when != null || at.picked == null || at.picked.length === 0) return null;
+  if (!at.picked.every((id) => id.startsWith("seat:"))) return null;
+  return at.picked.map((id) => Number(id.slice(5)));
 }
 
 // A Pick of the host an attachment moves to: with no host but the one it is on, the rest does nothing.
@@ -210,7 +224,11 @@ export function idleList(state: ScenarioState, instructions: readonly Instructio
   // After a ChooseX that finds no number, a step whose amount is X changes nothing.
   let noX = false;
   const rest = instructions.filter((step, at) => !paysForRest(step, at === instructions.length - 1));
-  for (const instruction of rest.length > 0 ? rest : instructions) {
+  const steps = rest.length > 0 ? rest : instructions;
+  for (const [index, instruction] of steps.entries()) {
+    // "Choose a player. That player may ...": the steps after the ActAs resolve for the chosen player, so they are idle when they are for each player the Pick may have chosen.
+    const players = actingPlayers(instruction, at);
+    if (players != null) return players.every((seat) => idleList(state, steps.slice(index + 1), sourceId, { ...at, seat, scope: { ...at.scope, actor: seat }, picked: null }, ctx, inBranch(mark)));
     const stays = pickedAttachmentStays(state, instruction, sourceId, at, ctx);
     if (stays === false) return false;
     if (stays === true) {
