@@ -48,6 +48,12 @@ lineSpec("05019:A:2", "Forced: damage that is not dealt to the Scroll hero (defe
   const hit = damaged(effects, { undefended: true });
   expect(hasScroll(hit.run.state, idOf(hit.run.state, "05043")), "the Scroll hero took damage: it moves").toBe(true);
 });
+lineSpec("05019:A:2", "Forced: damage that destroys the Scroll hero is heard first (recommended reading, docs/scenarios/against-the-shadow/peril-in-pelargir.md): the Scroll attaches to the enemy, then the hero is destroyed", (effects) => {
+  const killed = fightEnemy((layout) => scrolled(effects, layout), "f0", "05043", { seats: 1 as const }, { undefended: true, tweak: (state, made) => updateCard(state, made.hero, { damage: 5 }) });
+  expect(killed.run.state.cards[killed.made.hero]?.zone, "the hero (6 hit points, 5 damage) took 3 and is destroyed").toBe("discard");
+  expect(hasScroll(killed.run.state, idOf(killed.run.state, "05043")), "the Scroll moved to the attacker").toBe(true);
+  expect(zoneOf(killed.run.state, "05019"), "the Scroll is not in the staging area").not.toBe("staging");
+});
 lineSpec("05019:A:2", "Forced: damage that is not dealt by an enemy attack (archery) leaves the Scroll on its hero, damage of an attack moves it", (effects) => {
   const archery = fightEnemy((layout) => scrolled(effects, layout, "dh2"), "f0", "05044", { seats: 1 as const });
   expect(archery.run.state.cards[archery.made.hero2]?.damage, "the 2 archery damage was dealt to the Scroll hero").toBe(2);

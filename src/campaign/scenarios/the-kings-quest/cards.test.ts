@@ -301,6 +301,13 @@ describe("18049 Stone-troll, 18050 Hobgoblin, 18051 Werewolf, 18052 Giant Spider
     expect(flagged(other.run.state, other.made.hero, "cannotReady")).toBe(false);
   });
 
+  it("18052:A:1 a character the damage of Giant Spider destroys is still a character it damaged: the Forced effect is heard for it", () => {
+    const killed = kingsquestFight(world, "f0", CODES.giantSpider, { play: ["ally"] }, { defender: (made) => idOf(made.state, "ally") });
+    const ally = killed.run.state.cards[idOf(killed.run.state, "ally")];
+    expect(ally?.zone).toBe("discard");
+    expect(flagged(killed.run.state, ally!.id, "cannotReady")).toBe(true);
+  });
+
   it("18053:A:2 Black Bats cannot take damage while the active location has the Dark trait", () => {
     const dark = kingsquestTable(world, { active: CODES.undergroundLake, engaged: [CODES.blackBats] });
     expect(flagged(dark.state, idOf(dark.state, CODES.blackBats), "cannotTakeDamage")).toBe(true);

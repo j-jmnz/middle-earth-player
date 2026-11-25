@@ -157,6 +157,8 @@ const ROWS: readonly Row[] = [
   { line: "51045:A:2", name: "Forced: during the refresh phase its player raises threat by 1 more", layout: { threat: [30, 30], play: ["51045"] }, act: endRound, expect: [threat(32)] },
   // 51046 Venomous Spider.
   { line: "51046:A:1", name: "Forced: the character it damages cannot ready until the end of the round", layout: { engaged: ["51046"], deck: F0 }, act: [attack("51046"), defend("dh1")], expect: [flag("dh1", "cannotReady")] },
+  // The damage that destroys the defender is still damage the spider dealt: the Forced effect is heard for the dead character (rr.damage), which no longer readies.
+  { line: "51046:A:1", name: "a defender the damage destroys is still a character it damaged: the Forced effect is heard for it", layout: { engaged: ["51046"], play: ["ally"], deck: F0 }, act: [attack("51046"), defend("ally")], expect: [zone("ally", "discard"), flag("ally", "cannotReady")] },
   { line: "51046:A:2", name: "Shadow: the defending character cannot ready until the end of the round", layout: { engaged: ["f3"], deck: F0 }, act: [attack("f3", { shadow: "51046" }), defend("dh1")], expect: [flag("dh1", "cannotReady")] },
   // 51047 Pitch-dark Thicket.
   { line: "51047:A:1", name: "enemies in the staging area cannot take damage", layout: { staging: ["51047", "f3"] }, act: [], expect: [flag("f3", "cannotTakeDamage")] },
@@ -165,6 +167,9 @@ const ROWS: readonly Row[] = [
   { line: "51048:A:2", name: "Shadow: a destroyed character sends the active location back to the staging area", layout: { active: "51044", engaged: ["51015"], play: ["ally"], deck: F0 }, act: [attack("51015", { shadow: "51048" }), defend("ally")], expect: [zone("51044", "staging")] },
   // 51049 Dark Bats.
   { line: "51049:A:1", name: "Forced: after it damages a character the top card of the encounter deck is revealed and it is discarded", layout: { engaged: ["51049"], deck: F0 }, act: [attack("51049"), defend("dh1")], expect: [zone("51049", "encounterDiscard"), count("f0", "staging", 1)] },
+  // The damage that destroys the defender is still damage Dark Bats dealt: it reveals a card and is discarded, whether the character survives (the row above) or not.
+  { line: "51049:A:1", name: "a defender the damage destroys: the top card is revealed and it is discarded all the same", layout: { engaged: ["51049"], play: ["ally"], deck: F0 }, act: [attack("51049"), defend("ally")], expect: [zone("ally", "discard"), zone("51049", "encounterDiscard"), count("f0", "staging", 1)] },
+  { line: "51049:A:1", name: "with two players, the second player's defender is destroyed: the same", layout: { seats: 2, engaged: [{ code: "51049", seat: 1 }], play: [{ code: "ally", seat: 1 }], deck: F0 }, act: [attack("51049"), defend("ally")], expect: [zone("ally", "discard"), zone("51049", "encounterDiscard"), count("f0", "staging", 1)] },
   { line: "51049:A:2", name: "Shadow: +1 Attack and an additional shadow card", layout: { engaged: ["f3"], deck: F0 }, act: attack("f3", { shadow: "51049", undefended: true }), expect: [damageOn("dh1", 2), deckCount(5)] },
   // 51050 Forest Stream.
   { line: "51050:A:1", name: "Forced: at the end of the round it removes 2 progress from the main quest", layout: { staging: ["51050"], progress: 3 }, act: endRound, expect: [progressOn("51001", 1)] },

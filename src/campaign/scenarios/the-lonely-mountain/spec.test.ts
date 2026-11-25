@@ -13,6 +13,8 @@ const END_OF_ROUND = { seat: null, phase: "End of round" } as const;
 const stacked = (count: number) => TREASURES.slice(0, count).map((code) => ({ code, to: "132043" }));
 
 const ROWS: readonly Row[] = [
+  // 132036 Dark Bats. "Forced: After Dark Bats damages a character, attach it to that character." Dark Bats (2 Attack) against an undefended hero.
+  { line: "132036:A:1", name: "after it damages a character it attaches to that character", layout: { stages: STAGES, engaged: ["132036"], deck: ["f0", "f0", "f0"] }, act: attack("132036", { undefended: true }), expect: [damageOn("dh1", 2), zone("132036", "attached")] },
   // 132039 A Bare Patch (its Response is a burgle attempt: burgle.test.ts).
   { line: "132039:A:1", name: "attached, Smaug the Magnificent has -3 Defense", layout: { stages: STAGES, staging: ["132041"], attached: [{ code: "132039", to: "132041" }] }, act: [], expect: [stat("132041", "defense", 5)] },
   // 132040 Smaug the Golden.

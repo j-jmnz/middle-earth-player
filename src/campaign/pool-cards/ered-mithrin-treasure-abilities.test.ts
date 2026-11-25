@@ -246,6 +246,20 @@ describe("Helm of Heroes (12202:A:3)", () => {
   });
 });
 
+// Reading (recommended, docs/brief.md, Player card readings): damage that destroys the character destroys it at once and the Helm is discarded with it
+// (rr.damage, rr.attachment-cards), so there is no Response left to use. The case holds with and without the line's records (nothing is offered either way).
+describe("Helm of Heroes (12202:A:3), damage that destroys its character", () => {
+  it("12202:A:3 is not offered after the attack's damage destroyed the attached character, and the Helm is discarded with it", () => {
+    const tab = table(EFFECTS, { seats: 2, heroes: [{ code: GIMLI, seat: 0 }, { code: LEGOLAS, seat: 0 }, { code: PAL, seat: 1 }], attached: [{ code: HELM, host: GIMLI }], engaged: [{ code: STRONG, seat: 0 }] });
+    const dying = updateCard(tab.state, idsOf(tab, GIMLI), { damage: 4 });
+    let run = passAll(combat(dying, tab), tab.ctx);
+    run = passAll(send(run, { type: "DeclareDefender", defenderId: idsOf(tab, GIMLI) }, tab.ctx), tab.ctx);
+    expect(run.state.cards[idsOf(tab, GIMLI)]?.zone).toBe("discard");
+    expect(run.state.cards[idsOf(tab, HELM)]?.zone).toBe("discard");
+    expect(triggers(run.state, tab)).not.toContain("12202:response:1");
+  });
+});
+
 describe("Jewels of Wilderland (12203:A:3)", () => {
   // "Action: Exhaust Jewels of Wilderland and discard a card from your hand to draw a card.": with the Card and the Snowbourn Scout in hand
   // the player discards the Card and draws Blade of Gondolin; the Jewels are exhausted.
