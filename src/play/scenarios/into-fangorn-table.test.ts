@@ -138,11 +138,12 @@ describe("the commit tray with a Hinder Huorn engaged", () => {
 });
 
 describe("the claim of Mugash", () => {
-  it("07031:A:2 leads with a sentence short enough for one line of the tray, and leaves the damage rule to the second", () => {
+  it("07031:A:2 is one sentence short enough for the one line of the tray, with the damage rule left to the hero's preview", () => {
     const made = built({ staging: [MUGASH] });
     const sheet = sheetsOf(made, MUGASH, "action", (_n, ids) => ids[0] ?? "", idOf(made.state, MUGASH))[0];
-    expect(sheet?.note).toBe("Exhaust a ready hero to claim him. If it takes damage, Mugash returns to the top of the encounter deck.");
-    expect(sheet?.note.split(". ")[0]?.length).toBeLessThanOrEqual(36);
+    expect(sheet?.prompt).toBe("");
+    expect(sheet?.note).toBe("Exhaust a ready hero to claim him.");
+    expect(sheet?.note.length).toBeLessThanOrEqual(36);
   });
 });
 

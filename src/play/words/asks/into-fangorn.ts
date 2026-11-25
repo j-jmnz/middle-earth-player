@@ -5,8 +5,8 @@ import type { Ask } from "../asks.ts";
 // The first player answers for the group at the Travel of Edge of Fangorn, Turned Around, Off Track and In Need of Rest, so those sentences are not owned; every other choice is the asked player's own, so two-handed it leads with the player.
 // No choice here can lose the game by itself: the last time counter shuffles Mugash back into the deck or refills the stage, and a hero destroyed by damage only returns Mugash to the deck. The time row of Turned Around takes its count and its last-counter caution from ring-maker-sheets.ts.
 export const ASKS: Readonly<Record<string, Ask>> = {
-  // 07031:A:2 (Action, any player): exhaust a ready hero to claim Mugash when he is free of encounters; he attaches to it, and returns to the top of the encounter deck if it takes damage (07031:A:3).
-  "07031:action:1 @0 Pick": { owned: true, note: "Exhaust a ready hero to claim him. If it takes damage, Mugash returns to the top of the encounter deck.", verb: "Exhaust" },
+  // 07031:A:2 (Action, any player): exhaust a ready hero to claim Mugash when he is free of encounters; he attaches to it, and returns to the top of the encounter deck if it takes damage (07031:A:3: the hero's preview says it). The tray shows one line of the note, so it is one short sentence.
+  "07031:action:1 @0 Pick": { owned: true, note: "Exhaust a ready hero to claim him.", verb: "Exhaust" },
 
   // 07032:A:2 (Travel): the first player searches the encounter deck and discard pile for a Huorn enemy and adds it to the staging area, two with 3 or more players. The travel completes with none found.
   "07032:travel:1 @0 SearchMove": { note: "Edge of Fangorn: search the encounter deck and discard pile for a Huorn enemy. Add it to the staging area.", verb: "Add" },
