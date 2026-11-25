@@ -2,6 +2,7 @@
 // the same objects, so a Zustand subscriber of one zone does not render when another zone changes: a threat change leaves
 // the hand slice alone (docs/architecture.md, State). The reducer keeps the references of the zones it did not touch;
 // these selectors only keep that property through the join of ids and instances.
+import { underAlleyway } from "../readouts/haradrim/umbar.ts";
 import { BLACK_GATE } from "../../rules/families/harad/under.ts";
 import { live as stewardsFear, stackUnder } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { isReanimatedCode } from "../../rules/core/printed.ts";
@@ -240,9 +241,11 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     // The enemies grappled with a location are drawn facedown under it, as its attachments are (dcce.grapple).
     // The enemies facedown under The Black Gate lie under it, one counted peek (144027:A:2); the facedown underworld cards under a location of The Steward's Fear the same way (06018:A:1).
     const gated = card.code === BLACK_GATE ? cardsUnder(game, id) : stackUnder(game, id);
+    // The enemy faceup under Narrow Alleyway (16016:A:1) lies under it in every zone it can be in, drawn as an attachment is; none in any other game.
+    const alleyway = underAlleyway(game, id);
     // The loot a location guards lies faceup under it, drawn as its attachments are (The Burglar's Turn, 22024:B:2); none in a game that dealt no loot deck.
     const loot = game.lootDecks ? lootUnder(game, id) : NONE;
-    const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...loot, ...shadowCards(card), ...under, ...gated, ...(card.zone === "staging" ? grappledWith(game, id) : []), ...(card.zone === "activeLocation" ? guardedAllyOf(game, card) : [])]);
+    const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...loot, ...shadowCards(card), ...under, ...gated, ...alleyway, ...(card.zone === "staging" ? grappledWith(game, id) : []), ...(card.zone === "activeLocation" ? guardedAllyOf(game, card) : [])]);
     const pair = pairs.get(id);
     const rank = facts?.shipRank(card.code) ?? null;
     const area = game.sea?.stormcaller ? areaRoleOf(game, id) : null;
@@ -385,9 +388,9 @@ export function inspectTargets(game: ScenarioState, cardId: string): readonly st
   const card = game.cards[cardId];
   if (!card) return [];
   const host = (card.host ? game.cards[card.host] : undefined) ?? card;
-  // The loot a location guards is faceup (22024:B:2): a card to read with the location's attachments.
+  // The loot a location guards is faceup (22024:B:2): a card to read with the location's attachments; so is the enemy under Narrow Alleyway (16016:A:1).
   const loot = game.lootDecks ? lootUnder(game, host.id) : NONE;
-  const under = [...host.attachments, ...loot, ...shadowCards(host)].filter((id) => game.cards[id] != null && game.cards[id]?.face !== "down");
+  const under = [...host.attachments, ...loot, ...underAlleyway(game, host.id), ...shadowCards(host)].filter((id) => game.cards[id] != null && game.cards[id]?.face !== "down");
   return [host.id, ...under];
 }
 

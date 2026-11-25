@@ -60,7 +60,7 @@ Scenario piles that place cards with no record (quest: 132075 The Gathering of t
 132055:A:1 (front): Forced: When this enemy attacks, remove 1 progress from the current quest.
   132055:forced:1: Forced when this enemy attacks, before the defender is declared
     who acts: the acting player is the defending player (the player the attack is against)
-    - remove 1 progress from the current quest card (all of it when it holds less)
+    - remove 1 progress from the main quest (all of it when it holds less)
 
 132055:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each quest stage in play with no progress on it.
   132055:shadow:1: Shadow
@@ -133,7 +133,7 @@ Scenario piles that place cards with no record (quest: 132075 The Gathering of t
   132060:forced:1: Forced after a card leaves play (heard about character (any player controls))
     only if this card is the active location
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - remove 1 progress from the current quest card (all of it when it holds less)
+    - remove 1 progress from the main quest (all of it when it holds less)
 
 ## 132061 Ruins of Dale
 (the scenario deals it into the encounter pile; the piles place it, no record does)

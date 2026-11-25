@@ -154,7 +154,7 @@ Scenario piles that place cards with no record (quest: 131026 A Short Rest; ques
 131069:A:2 (front): Forced: At the end of the round, remove X progress tokens from the current quest.
   131069:forced:1: Forced at the end of the round
     who acts: the acting player is the first player (a phase has no player of its own)
-    - remove the number of players progress from the current quest card (all of it when it holds less)
+    - remove the number of players progress from the main quest (all of it when it holds less)
 
 ## 131071 Chaos in the Cavern
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)

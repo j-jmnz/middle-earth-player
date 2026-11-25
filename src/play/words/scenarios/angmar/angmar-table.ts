@@ -8,7 +8,7 @@ import type { ScenarioState } from "../../../../rules/core/state.ts";
 
 import type { ChoiceNames, PickWords } from "../../choice.ts";
 import { seatSays } from "../../seat.ts";
-import { plural } from "../../list.ts";
+import { FIGURE_SPACE, plural } from "../../list.ts";
 
 
 /** The note of Hunting the Orcs' dial: the resource tokens it holds against the number at which it flips (09071:A:1). */
@@ -63,8 +63,6 @@ export const thaurdirLimitWords = (limit: number, points: number | null): string
 export const thaurdirPreviewWords = (damage: number, limit: number, points: number | null, burden: string | null): string =>
   `${damage} of ${limit} damage on him. Indestructible, but he heals 3 on each Sorcery treachery revealed. ${damage >= limit ? `He has no hit points left${points == null ? "" : `: ${points} progress wins`}.` : `Stage 2 needs ${stageNeeds(limit, points)}.`}${burden ? ` He carries ${burden}.` : ""}`;
 
-// A digit-wide space: a count under 10 keeps the width of one over it.
-const FIGURE_SPACE = "\u2007";
 /** The mark of a seat's deck while a stage eliminates a player with no cards in his deck (09073:B:3, 09074:B:2): the cards left, padded to two digits so the mark keeps its width from 10 to 9; it warms at 5 and is critical at 2. The last player eliminated loses the game. */
 export const deckLabel = (seat: number | null, cards: number): string => `${seat == null ? "Deck" : `P${seat + 1} · Deck`} ${String(cards).padStart(2, FIGURE_SPACE)}`;
 export const deckWords = (cards: number): string => `${plural(cards, "card", "cards")} left in this player's deck. A player with no cards in his deck is eliminated. If you are the last player, the game is lost.`;

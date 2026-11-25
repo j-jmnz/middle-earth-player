@@ -1,5 +1,6 @@
 // What a long press on a table card shows (card-preview.tsx): the card, the cards attached to it and its face-up shadow cards,
 // each with the effects on it now, opened on the card that was pressed. Pure: the screen hands over how a code is pictured.
+import { umbarDetail, underAlleywayRole } from "../readouts/haradrim/umbar.ts";
 import { stageSeat, viewOf } from "../../rules/families/breaking/areas.ts";
 import { isLostIsland } from "../../rules/families/uncharted/pick.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
@@ -13,7 +14,7 @@ import { deadPreview } from "./realm-preview.ts";
 import { earlierStages, heldStage } from "./earlier-stages.ts";
 import { grappleDetail, shipLoss } from "../words/scenarios/grapple.ts";
 import { oathDetail } from "./oath-preview.ts";
-import { delayedLines, effectLines } from "./card-effects.ts";
+import { blankMark, delayedLines, effectLines, noReadyLine } from "./card-effects.ts";
 import type { PreviewCard } from "./card-preview.tsx";
 import { stageDetail } from "../readouts/fortress.ts";
 import { removalLimit } from "../readouts/against-the-shadow/cair-andros.ts";
@@ -43,6 +44,13 @@ export type Describe = (code: string, picture?: string) => Omit<PreviewCard, "co
  * any card that is not the quest stage. Once stages are separate every seat's stage is one, read as that seat sees it (its stage, its
  * staging area).
  */
+// A location's grapple and ship-loss lines, then the sentences of the shared bars (a blank text box, no readying by player card effects): all of them show, none hides another.
+function barLines(game: ScenarioState, ctx: ReduceContext, id: string): string | null {
+  const plain = [grappleDetail(game, id), shipLoss(game, ctx, id)?.speech].filter((part) => part != null).join(". ");
+  const bars = [blankMark(game, ctx, id)?.speech, noReadyLine(game, ctx, id)].filter((part) => part != null);
+  return (plain && bars.length > 0 ? `${plain}. ${bars.join(" ")}` : plain || bars.join(" ")) || null;
+}
+
 export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: string, name: string, line: (id: string) => string | null): Pick<PreviewCard, "title" | "detail"> | null {
   const owner = stageSeat(whole, cardId);
   const game = viewOf(whole, owner ?? undefined);
@@ -114,7 +122,7 @@ export function previewCards(
     if (earlier.includes(id)) return [earlierStage(game, ctx, card.code, describe)];
     // The loot a location guards is under it, out of play, and still its player's (22024:B:2).
     const loot = game.lootDecks != null && card.zone === "under" && card.controller != null;
-    const role = index === 0 ? null : card.zone === "shadow" ? "Shadow card" : loot ? LOOT_ROLE : card.host ? "Attachment" : null;
+    const role = index === 0 ? null : card.zone === "shadow" ? "Shadow card" : loot ? LOOT_ROLE : (underAlleywayRole(game, id) ?? (card.host ? "Attachment" : null));
     // The effects on it, then what a delayed effect will do to it (Sneak Attack's return); for the pressed hand card, why it
     // does not glow.
     const effects = [...effectLines(game, ctx, id, cardName), ...delayedLines(game, id, cardName)];
@@ -127,7 +135,7 @@ export function previewCards(
     const looked = game.window?.kind === "look" && game.window.side === "A" && game.window.cardIds.includes(id);
     const described = describe(card.code, looked ? card.code : pictureKey(card));
     const lostIsland = !looked && isLostIsland(card, ctx);
-    const detail = dungeonDetail(game, ctx, id, cardName) ?? oathDetail(game, ctx, id) ?? ([grappleDetail(game, id), shipLoss(game, ctx, id)?.speech].filter((part) => part != null).join(". ") || null);
+    const detail = dungeonDetail(game, ctx, id, cardName) ?? oathDetail(game, ctx, id) ?? umbarDetail(game, ctx, id, cardName) ?? barLines(game, ctx, id);
     // The Heading card: titled by its step and its course, listing the four steps with the current one marked, and drawn turned a quarter turn per step (dcce.heading). A peek never changes the dial.
     const heading = game.sea?.headingCard === id ? headingStepOf(game.sea?.heading) : null;
     const turned = heading ? { title: headingPreviewTitle(heading), turn: headingLook(heading).turn } : {};

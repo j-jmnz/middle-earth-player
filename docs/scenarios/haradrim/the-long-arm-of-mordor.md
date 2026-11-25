@@ -25,7 +25,3 @@ The statuses are those of the Readings bullet of `docs/scenarios/haradrim.md`. E
 - Attachments on a moved hero (recommended). "Move each hero to the staging area" leaves the attachments of the hero attached; they stay in play with it, and a blank text box leaves their own text active. Not taken: the attachments are discarded. Basis: the printed line. Sources read: https://visionofthepalantir.com/2019/07/10/the-long-arm-of-mordor (heroes stay in play, text boxes blank; says nothing of attachments), https://ffg-forum-archive.entropicdreams.com/topic/301588-the-long-arm-of-mordor-and-setup-effects-and-mulligan (Setup effects only), https://www.fantasyflightgames.com/media/ffg_content/lotr-lcg/support/LotR-FAQ.pdf (search result only). The Rules Reference discards an attachment only when its host leaves play; the hero does not. No source settles it, so the status stays recommended.
 - Boma shadow (`16036:A:3`) (span-settled). "If the defending character is an objective-hero, ready it and cancel all damage from this attack." Basis: the printed line.
 - Sauron's Enforcers (span-settled). Each player adds 1 copy to the staging area; with fewer than 4 players the other copies are shuffled into the encounter deck, as the per-player Setup cards of other scenarios are. Basis: `16071:A:1`.
-
-## Readings to confirm
-
-- Attachments on a moved hero: recommended. See Readings.

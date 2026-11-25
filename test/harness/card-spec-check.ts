@@ -1,4 +1,5 @@
 import { flaggedByClass } from "../../src/rules/core/holder-classes.ts";
+import { temperatureOf } from "../../src/rules/families/haradrim/heat.ts";
 import { printedOf } from "../../src/rules/core/printed.ts";
 import { flagged, type ScenarioState } from "../../src/rules/core/state.ts";
 import { declaredDefenders } from "../../src/rules/families/defense/defenders.ts";
@@ -11,10 +12,11 @@ import { idOf, idsOf, legalIntents } from "./scene-kit.ts";
 // Test helper. What each expectation of a card-spec row (card-spec-types.ts, Expect) reads off the state the actions left, and the steps they took. Rules: rr.multiple-defenders, rr.cancel, mec112.pursuit,
 // mec109.ringbearers-life (data/rules/entries.json).
 
-// The scenario values `counter` reads, each through a named reader: the pursuit value (absent until the quest card's Setup sets it) and the Ring-bearer's life.
+// The scenario values `counter` reads, each through a named reader: the pursuit value (absent until the quest card's Setup sets it), the Ring-bearer's life and the heat tracker of Desert Crossing.
 export const COUNTERS: Readonly<Record<CounterName, (state: ScenarioState) => number | undefined>> = {
   pursuit: (state) => state.pursuit,
   life: (state) => state.life,
+  temperature: (state) => temperatureOf(state) ?? undefined,
 };
 
 // The codes of the cards that attacked the card: the enemies whose attack struck it, and the characters declared to attack it.

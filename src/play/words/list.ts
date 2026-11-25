@@ -5,6 +5,9 @@ import type { PrintedCard } from "../../rules/core/printed.ts";
 /** The text with its first letter capitalized. */
 export const capital = (text: string): string => `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
 
+/** A digit-wide space: a count under 10 padded with it keeps the width of one over it. */
+export const FIGURE_SPACE = "\u2007";
+
 /** "1 stage", "3 stages"; `many` when the plural is not the word with an s ("1 ally", "2 allies"). */
 export const plural = (count: number, one: string, many = `${one}s`): string => `${count} ${count === 1 ? one : many}`;
 

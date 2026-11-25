@@ -118,6 +118,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18047:A:1 (front): When Revealed: The highest Attack enemy in the staging area makes an immediate attack against the first player. If no attack is made this way, Denizen of the Deep gains surge.
   18047:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, with the highest Attack of those, as the table shows it (ties: the chooser decides), chosen by the first player
     - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area, dealt a shadow card
@@ -454,7 +455,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
   18079:response:1: Response on the event progressPlaced (heard about this card)
     only if all of: (it is the Quest phase) and (the quest succeeded) and (the current quest stage holds at least 5 progress) and (the Caves deck holds at least 1 card(s) (a game with no Caves deck holds none))
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - remove 5 progress from the current quest card (all of it when it holds less)
+    - remove 5 progress from the main quest (all of it when it holds less)
     - the first player looks at the top 2 cards of the Caves deck and chooses the one that stays on top; the rest go to the bottom of the deck, in their order (nothing changes with fewer in the deck)
 
 18079:B:3 (back): After Dragon Hoard becomes the active location, advance to stage 3A.
@@ -480,7 +481,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player chooses one of:
       * option "remove" (only if not (progress of this card is less than the number of character (any player controls) that took part in the attack this effect answers)):
-        - remove the number of character (any player controls) that took part in the attack this effect answers progress from the current quest card (all of it when it holds less)
+        - remove the number of character (any player controls) that took part in the attack this effect answers progress from the main quest (all of it when it holds less)
       * option "cancel":
         - the player attack in progress deals no damage; its attackers stay exhausted
 

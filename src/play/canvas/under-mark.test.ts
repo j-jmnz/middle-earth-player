@@ -74,6 +74,15 @@ describe("the pill of a poisoned character turned sideways (hob.venom-poison)", 
       expect(box.width, `w ${w}`).toBeGreaterThanOrEqual(width("Out"));
     }
   });
+
+  it("lifts a pill with no count one row when the card wears the progress strip, and no other", () => {
+    const rect = card(70);
+    const flat = underMarkBox(rect, width("1 held"), 0, 1, false);
+    const lifted = underMarkBox(rect, width("1 held"), 0, 1, false, false, true);
+    expect(flat.y).toBe(footRow(rect).top);
+    expect(lifted.y).toBe(flat.y - (TOKEN + 2));
+    expect(lifted.x).toBe(flat.x);
+  });
 });
 
 describe("the pill of a card in the hand", () => {

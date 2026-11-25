@@ -1,8 +1,12 @@
 // The tokens the table canvas draws with, copied from src/screens/kit/palette.js (docs/design-system.md: src/play cannot import
 // src/screens): Ringwraiths (Dark) and Rivendell (Light; the Carved Stone handoff, 2026-10-29). src/screens/kit/play-tokens.test.ts fails when a value
 // here drifts from its palette. `tableTokens` is Dark, for the code that is not theme-aware yet; useTableTokens picks the theme's.
+// Shared with onThreatPill below, so a change to night (Dark) or onThreat (Light) moves the text on a red pill with it.
+const DARK_NIGHT = "#030405";
+const LIGHT_ON_THREAT = "#FFF4EC";
+
 export const tableTokens = {
-  night: "#030405",
+  night: DARK_NIGHT,
   dusk: "#0C0E11",
   raised: "#111417",
   hairline: "#2A3036",
@@ -55,6 +59,8 @@ export const tableTokens = {
   // Not a palette key: the victory pile's gold coin, under ink numbers (canvas/pieces.native.tsx). Light's is paler than its bronze
   // fellowship, so the ink number keeps 4.5:1 (5.9:1 here, 7.4:1 on Dark).
   coin: "#C9A961",
+  // Not a palette key: the text on a red pill (the engagement cost, the Lose at 0 pill, an attack number, a danger stage pill): bone on the red fill is 3.6:1 on Dark, so Dark reads night on it (5.0:1) and Light the pale onThreat (5.0:1).
+  onThreatPill: DARK_NIGHT,
   // Not a palette key: "solid" while the phone's Reduce Transparency is on, so surfaces.ts draws every translucent fill opaque (solidTokens).
   veil: "clear",
 } as const;
@@ -87,7 +93,7 @@ const lightTableTokens: TableTokens = {
   feltLight: "#F2EBDC",
   threat: "#B8432C",
   danger: "#9A3220",
-  onThreat: "#FFF4EC",
+  onThreat: LIGHT_ON_THREAT,
   threatEdge: "#8F2A17",
   glow: "#FFFFFF",
   leadership: "#9A4A82",
@@ -109,6 +115,7 @@ const lightTableTokens: TableTokens = {
   phaseDeep: "#4A3A14",
   onPhase: "#FBF5E6",
   coin: "#B8964E",
+  onThreatPill: LIGHT_ON_THREAT,
   veil: "clear",
 };
 

@@ -100,6 +100,8 @@ import valeFixtures from "./fixtures/the-morgul-vale.json";
 import isenFixtures from "./fixtures/the-fords-of-isen.json";
 import orcFixtures from "./fixtures/to-catch-an-orc.json";
 import fangornFixtures from "./fixtures/into-fangorn.json";
+import umbarFixtures from "./fixtures/escape-from-umbar.json";
+import crossingFixtures from "./fixtures/desert-crossing.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -218,6 +220,8 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-fords-of-isen": isenFixtures,
   "to-catch-an-orc": orcFixtures,
   "into-fangorn": fangornFixtures,
+  "escape-from-umbar": umbarFixtures,
+  "desert-crossing": crossingFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

@@ -49,7 +49,7 @@ function reason(step: Obj, steps: readonly Obj[]): string | null {
     case "MoveProgressToStormcaller":
       return "the current quest card holds less progress than must be moved";
     case "RemoveProgressFromQuest":
-      return "the current quest card holds less progress than must be removed (read by the quest family)";
+      return "the main quest holds less progress than must be removed (read by the quest family)";
     case "AddFromPile":
       return "the pile and its discard pile are empty (read by the wilderland family)";
     default:

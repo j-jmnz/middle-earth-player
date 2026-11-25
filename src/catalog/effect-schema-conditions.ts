@@ -407,6 +407,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("exploredPending"), code: z.string().min(1), effect: z.string().min(1) }),
   // The pursuit value (mec112.pursuit, the pursuit tracker beside the quest deck) is at most `max` and at least `min`: "If the pursuit value is 25 or lower" (143071:B:1), "30 or greater" (143022:A:2). False while no tracker is set (ScenarioState.pursuit).
   z.strictObject({ kind: z.literal("pursuit"), max: z.number().int().min(0).optional(), min: z.number().int().min(0).optional() }),
+  // The temperature of the heat tracker is at most `max` and at least `min`: "If the temperature is 60 or higher" (16068:B:3), "40 or higher" (16025:A:1). False while no tracker is set. Read by the haradrim family.
+  z.strictObject({ kind: z.literal("temperature"), max: z.number().int().min(0).optional(), min: z.number().int().min(0).optional() }),
   // Captured cards (Escape from Mount Gram, read by the captured family): `noneUnderAttacker` no card is captured underneath the attacking enemy ("+2 Attack instead if it has no captured cards underneath it", 10045:A:3), `noneUnderSelf` no card is captured underneath the source ("If there are no captured cards underneath Gornákh's Dungeons", 10039:B:2), `someoneEmpty` the Interrogation that is
   // resolving found a captured deck with no card to discard ("If at least 1 player discarded no cards from this effect", 10052:A:1).
   z.strictObject({ kind: z.literal("captured"), is: z.enum(["noneUnderSelf", "someoneEmpty", "noneUnderAttacker"]) }),
@@ -423,6 +425,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("encounterPlacedOnStage") }),
   // Some living player has no enemy engaged with them ("if any player is not engaged with an enemy", 143041:A:1). Read by the fortress family.
   z.strictObject({ kind: z.literal("playerUnengaged") }),
+  // The main quest card has been in play for the whole of the current round: it was in play from Setup or from an earlier round, not revealed in this one ("if the main quest has been in play the entire round", 16014:A:2). Read by the haradrim family.
+  z.strictObject({ kind: z.literal("stageInPlayWholeRound") }),
   // The active location prints a Wizardry line ("If no Wizardry effect is triggered this way", 143062:A:1, read with `not`; false with no active location). Read by the wizardry family.
   z.strictObject({ kind: z.literal("hasWizardry") }),
   // The player guarding Gollum may choose a new player now: no card says the guard cannot change and another player is still in the game ("must choose a new player to guard Gollum, if able", 02135:A:1; the option is offered only then, rr.effects). Read by the guardian family.

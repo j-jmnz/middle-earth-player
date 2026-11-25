@@ -70,6 +70,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 
 02109:A:1 (front): When Revealed: The first player makes an escape test, dealing 2 cards from the encounter deck. If this test is failed, place 1 resource token on Gollum and raise each player's threat by 2.
   02109:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then 2 cards are dealt from the encounter deck, each counting its Escape value; the committed Willpower must be higher than the Escape counted (a tie fails)
     - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on the card in play with code 02107 (when it is not in play, on the card that holds redirectResources, else nowhere)
@@ -84,6 +85,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 
 02110:A:1 (front): When Revealed: The first player makes an escape test counting Attack instead of Willpower, dealing 2 cards from the encounter deck. If this test is failed, place 1 resource token on Gollum and raise each player's threat by 1.
   02110:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then 2 cards are dealt from the encounter deck, each counting its Escape value; the committed Attack must be higher than the Escape counted (a tie fails)
     - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on the card in play with code 02107 (when it is not in play, on the card that holds redirectResources, else nowhere)
@@ -338,6 +340,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 
 900809:A:1 (front): When Revealed: The first player makes an escape test counting Defense instead of Willpower, dealing 2 cards from the encounter deck. If this test is failed, place 1 resource token on Gollum and deal 1 damage to each character in play.
   900809:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then 2 cards are dealt from the encounter deck, each counting its Escape value; the committed Defense must be higher than the Escape counted (a tie fails)
     - then, if the last escape test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on the card in play with code 02107 (when it is not in play, on the card that holds redirectResources, else nowhere)

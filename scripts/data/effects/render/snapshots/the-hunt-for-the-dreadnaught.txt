@@ -886,6 +886,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40043:A:1 (front): When Revealed: The enemy with the highest engagement cost engages the first player and attacks them. If no attack is made this way, Out of the Mist gains surge.
   40043:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, in the staging area only, with the highest current engagement cost of those (ties: the chooser decides), chosen by the first player
     - the picked enemy, in the staging area, engages the first player

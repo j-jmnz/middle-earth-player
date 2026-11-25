@@ -2,7 +2,7 @@ import type { Effect, ScenarioDefinition } from "../../src/catalog/boundary.ts";
 import { campaignScenario, scenarioDefinition, stageOf, type AnyScenarioData, type CampaignData } from "../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import { isCharacterType, printedFromCard, type PrintedCard } from "../../src/rules/core/printed.ts";
-import { blankScenario, updateCard, withThreat } from "../../src/rules/core/state.ts";
+import { blankScenario, updateCard, withThreat, type Modifier } from "../../src/rules/core/state.ts";
 import { addModifier } from "../../src/rules/core/modified-stat.ts";
 import { attachTo, moveCard, spawn, type Destination } from "../../src/rules/core/zones.ts";
 import type { ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";
@@ -16,6 +16,7 @@ import { markCapture } from "../../src/rules/families/captured/entry.ts";
 import { markEnemyDamage } from "../../src/rules/families/encounter/patrol.ts";
 import { takeHidden } from "../../src/rules/families/pelargir/hidden.ts";
 import { takeControlOfLocation } from "../../src/rules/families/pelargir/location-control.ts";
+import { withTemperature } from "../../src/rules/families/haradrim/heat.ts";
 import { markSeatedRows } from "../../src/rules/families/encounter/seated.ts";
 
 import { gameCodes, loadAnyScenario, loadCampaigns } from "../../scripts/data/load-scenarios.ts";
@@ -51,6 +52,8 @@ export type Layout = {
   progress?: number;
   // The side the current quest stage shows (B by default; A for a stage 2 of a quest deck that has not flipped yet, 03070:A:1).
   side?: "A" | "B";
+  // The heat tracker of Desert Crossing, as its Setup left it (16068:A:1): one table modifier with this value.
+  temperature?: number;
   // A code, or a code with its tokens.
   active?: Entry;
   // The Nightmare setup card, side A faceup next to the quest deck, with its tokens (901001:A:2 counts on it).
@@ -80,12 +83,16 @@ export type Layout = {
   attached?: readonly { code: string; to: string; encounter?: true }[];
   // The codes of the cards committed to the quest (a hero stand-in, an ally of `play`).
   committed?: readonly string[];
+  // The codes of the cards that lie exhausted (every card of the code: a hero stand-in, an ally of `play`).
+  exhaustedCards?: readonly string[];
   // The pursuit value of The Uruk-hai, as its quest card's Setup set it (mec112.pursuit); absent: no tracker.
   pursuit?: number;
   // A hero stand-in lies faceup as a Captive under the card with the code `under` (The Uruk-hai, 143069:A:1).
   captive?: { hero: string; under: string };
-  // Cards lying facedown under the first card with the code `to` (the enemies under The Black Gate, 144027:A:2).
-  under?: readonly { code: string; to: string }[];
+  // Cards lying facedown under the first card with the code `to` (the enemies under The Black Gate, 144027:A:2); `up` lays one faceup (the enemy under Narrow Alleyway, 16016:A:1).
+  under?: readonly { code: string; to: string; up?: true }[];
+  // Modifiers a card of the table holds from another, as its When Revealed record leaves them (the +2 and the immunity Southron Champion gives its enemy, 16040:A:1): the first card with `code` holds each from the first card with `from`, for as long as that card is in play.
+  modified?: readonly { code: string; from: string; stats: readonly (readonly [Modifier["stat"], number])[] }[];
   // The Night objective in play beside the current quest (The Stone of Erech, 50301:A:1): a code, or a code with its progress.
   night?: Entry;
   // The time counters on the current quest stage (a Time X stage after some refresh phases: The Fords of Isen).
@@ -197,6 +204,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     for (const item of layout.deckOf ?? []) if (dealtTo(item, seat)) state = spawn(state, dealtCode(item), { zone: "deck", seat }, "down").state;
   }
   if (layout.heroResources) for (const id of Object.keys(state.cards)) if (state.cards[id]?.zone === "heroes") state = updateCard(state, id, { resources: layout.heroResources });
+  if (layout.temperature != null) state = withTemperature(state, layout.temperature);
   if (layout.noteEncounterDiscards) state = { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "table", stat: "noteEncounterDiscards", amount: 1, until: "endOfGame" }] };
   if (layout.sagaHero && "hero" in (world.data.sagaStart ?? {})) {
     const saga = spawn(state, (world.data.sagaStart as { hero: string }).hero, { zone: "heroes", seat: 0 });
@@ -242,10 +250,15 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   }
   for (const hidden of layout.under ?? []) {
     const spawned = spawn(state, hidden.code, { zone: "under", locationId: idOf(state, hidden.to) }, "down");
-    state = spawned.state;
+    state = hidden.up ? updateCard(spawned.state, spawned.id, { face: "up" }) : spawned.state;
+  }
+  for (const held of layout.modified ?? []) {
+    const [holder, source] = [idOf(state, held.code), idOf(state, held.from)];
+    state = { ...state, modifiers: [...state.modifiers, ...held.stats.map(([stat, amount]): Modifier => ({ instanceId: holder, sourceId: source, stat, amount, until: "whileSourceInPlay" }))] };
   }
   if (layout.captive) state = holdCaptive(state, idOf(state, layout.captive.hero), idOf(state, layout.captive.under));
   if (layout.pursuit != null) state = { ...state, pursuit: layout.pursuit };
+  for (const code of layout.exhaustedCards ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { exhausted: true });
   if (layout.timeCounters != null && state.questStage) state = updateCard(state, state.questStage, { resources: layout.timeCounters });
   for (const code of layout.heldInHand ?? []) for (const id of idsOf(state, code)) state = addModifier(state, id, id, "cannotLeaveHand", 1, "endOfGame");
   for (const code of layout.committed ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { committed: true });

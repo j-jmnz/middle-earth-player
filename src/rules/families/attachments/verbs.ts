@@ -32,7 +32,7 @@ function again(state: ScenarioState, instruction: Instruction, seat: number): Sc
   return data ? patchTop(state, { data: { ...data, queue: [{ instruction, seat, chosen: null }, ...data.queue] } }) : state;
 }
 
-// HealAmong: one damage at a time on a damaged card that matches, chosen by the actor, until `amount` is healed or they stop.
+// HealAmong: one damage at a time on a damaged card that matches, chosen by the actor, until `amount` is healed or they stop (`exact`: they cannot stop while a card can still be healed).
 export function healAmong(state: ScenarioState, instruction: Extract<Instruction, { verb: "HealAmong" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const total = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
   const healed = instruction.healed ?? 0;
@@ -41,7 +41,7 @@ export function healAmong(state: ScenarioState, instruction: Extract<Instruction
   const options = pickCandidates(state, { ...instruction.pick, damaged: true }, focus.seat, [], focus.sourceId, ctx).filter((id) => !capped.includes(id) && !healBlocked(state, id) && healAllowed(state, id, 1, ctx) > 0);
   if (options.length === 0) return state;
   const chosen = focus.chosen && options.includes(focus.chosen) ? focus.chosen : undefined;
-  if (!chosen) return effectData(state) ? askTarget(state, { instruction, seat: focus.seat, chosen: null }, [...options, DONE]) : state;
+  if (!chosen) return effectData(state) ? askTarget(state, { instruction, seat: focus.seat, chosen: null }, instruction.exact ? options : [...options, DONE]) : state;
   const card = state.cards[chosen];
   if (!card) return state;
   const healedBy = healDamage(state, chosen, 1, ctx, { sourceId: focus.sourceId });

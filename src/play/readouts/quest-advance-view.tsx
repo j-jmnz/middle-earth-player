@@ -26,6 +26,7 @@ import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
 
 const SCRIM = 0.9;
+
 // A screen this many points tall or less, at Medium, is short for the question's column.
 const SHORT = 440;
 
