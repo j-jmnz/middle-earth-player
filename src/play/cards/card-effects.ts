@@ -323,7 +323,7 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     // An Aflame location in play: its damage against the value that destroys it.
     fire: card != null && inPlay(card.zone) ? fireMark(aflameTally(game, cardId, ctx)) : null,
     // A Ship location while the stage that loses at a total Threat of 9 is in play: its Threat against that total (12041:B:2).
-    loss: card != null && inPlay(card.zone) ? (shipLoss(game, ctx, cardId) ?? seizeMark(game, cardId)) : null,
+    loss: card != null && inPlay(card.zone) ? (shipLoss(game, ctx, cardId) ?? seizeMark(game, ctx, cardId)) : null,
     place: card?.zone === "staging" ? stagingPlace(game, cardId) : null,
     side: sideQuestMark(game, ctx, cardId),
     determined: determinedMark(game, ctx, cardId) ?? championMark(game, ctx, cardId),

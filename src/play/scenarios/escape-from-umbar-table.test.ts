@@ -18,6 +18,8 @@ const ALLEYWAY = "16016";
 const SOLDIER = "16042";
 const CAPTAIN = "16041";
 const at = (layout: Layout = {}) => tableFromLayout("escape-from-umbar", { phase: "Quest", ...layout });
+// What Southron Champion's When Revealed record leaves on its enemy (16040:A:1): +2 Threat, Attack and Defense and the immunity.
+const CHAMPION_STATS = [["threat", 2], ["attack", 2], ["defense", 2], ["immuneToPlayerCards", 1]] as const;
 const under = { code: SOLDIER, to: ALLEYWAY, up: true } as const;
 
 describe("the enemy faceup under Narrow Alleyway", () => {
@@ -50,8 +52,8 @@ describe("the enemy faceup under Narrow Alleyway", () => {
 });
 
 describe("the Champion", () => {
-  it("16040:A:1 marks the enemy that holds the resource token while Southron Champion is in the staging area, and no other enemy", () => {
-    const t = at({ staging: ["16040", { code: CAPTAIN, resources: 1 }, "16042"] });
+  it("16040:A:1 marks the enemy Southron Champion modified while Southron Champion is in the staging area, and no other enemy", () => {
+    const t = at({ staging: ["16040", { code: CAPTAIN, resources: 1 }, "16042"], modified: [{ code: CAPTAIN, from: "16040", stats: CHAMPION_STATS }] });
     expect(slotNumbers(t.state, t.ctx, idOf(t.state, CAPTAIN)).determined?.word).toBe("Champion");
     expect(slotNumbers(t.state, t.ctx, idOf(t.state, CAPTAIN)).determined?.speech).toContain("immune to player card effects");
     expect(slotNumbers(t.state, t.ctx, idOf(t.state, SOLDIER)).determined).toBeNull();
@@ -59,9 +61,10 @@ describe("the Champion", () => {
   });
 
   it("16040:A:1 marks it engaged too, and marks no enemy once Southron Champion has gone", () => {
-    const engaged = at({ staging: ["16040"], engaged: [{ code: CAPTAIN, resources: 1 }] });
+    const engaged = at({ staging: ["16040"], engaged: [{ code: CAPTAIN, resources: 1 }], modified: [{ code: CAPTAIN, from: "16040", stats: CHAMPION_STATS }] });
     expect(slotNumbers(engaged.state, engaged.ctx, idOf(engaged.state, CAPTAIN)).determined?.word).toBe("Champion");
     const gone = at({ staging: [{ code: CAPTAIN, resources: 1 }] });
+    // A token without the card's modifiers is no Champion: the pill reads what the records did.
     expect(slotNumbers(gone.state, gone.ctx, idOf(gone.state, CAPTAIN)).determined).toBeNull();
   });
 });
@@ -75,7 +78,8 @@ describe("the hand limit of In Enemy Territory", () => {
     expect(marks(hand(2))[0]?.warn).toBeUndefined();
     expect(marks(hand(3))[0]?.warn).toBeUndefined();
     expect(marks(hand(4))[0]?.warn).toEqual({ level: "near", words: "One card from the hand limit of 5" });
-    expect(marks(hand(5))[0]?.warn).toEqual({ level: "near", words: "At the hand limit of 5: a drawn card is discarded at once" });
+    expect(marks(hand(5))[0]?.warn).toEqual({ level: "near", words: "At the hand limit of 5: a card drawn over it is discarded, the player's choice" });
+    expect(umbarHands(hand(7).state)[0]?.warn).toEqual({ level: "critical", words: "Over the hand limit of 5: discard down to 5, the player's choice" });
     expect(marks(hand(4))[0]?.note).toBe("Your hand holds 4 cards. In Enemy Territory allows 5: a hand over 5 discards down to 5 at once, the player's choice.");
   });
 

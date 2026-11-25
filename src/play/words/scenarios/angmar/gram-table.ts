@@ -2,11 +2,9 @@
 // What the table says of Escape from Mount Gram's pieces (src/play/readouts/gram.ts, src/play/cards/gram-preview.ts): each seat's captured deck, the cards captured under a card, a seat joined to another player's area, the starting threat the quest card sets, Loot the Dungeons in every area and
 // Stop the Executioners' time. The engine decided every number; these only say it. Each sentence stays at about 25 words (docs/design-system-table.md, Choice tray, Plain words).
 
-import { plural } from "../../list.ts";
+import { FIGURE_SPACE, plural } from "../../list.ts";
 
 const sentence = (words: string): string => `${words.charAt(0).toUpperCase()}${words.slice(1)}`;
-
-const FIGURE_SPACE = "\u2007";
 
 /** The seat mark: "P1 · Captured 12" (the count is the captured deck, which a screen reader hears), padded to two digits so the mark keeps its width from 10 to 9. The area a seat joined is in its note (`joinedWords`). */
 export const capturedLabel = (seat: number | null, count: number): string => `${seat == null ? "" : `P${seat + 1} · `}Captured ${String(count).padStart(2, FIGURE_SPACE)}`;

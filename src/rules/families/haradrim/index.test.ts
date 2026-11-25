@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import type { EngineStep } from "../../core/intents.ts";
 import { ruleCause } from "../../core/cause.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import { finish, idOf, opened, resolveRecords, run as runInstruction, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { settle } from "../../engine/machine.ts";
 import { holds } from "../../interpret/conditions.ts";
@@ -84,6 +85,15 @@ describe("16045:A:2 handLimit and handOverLimit", () => {
   it("queues nothing without the flag or while an effect is resolving", () => {
     const made = table({ hand: hand(7) });
     expect(announceOverLimit(opened(made).state, []).pendingEvents).toBeUndefined();
+  });
+
+  it("queues nothing while an effect is open on the stack or an attack is pending, and queues once both are done", () => {
+    const synced = opened(sideQuest(7)).state;
+    const frame = { id: "open" } as unknown as ScenarioState["stack"][number];
+    expect(announceOverLimit({ ...synced, stack: [frame] }, []).pendingEvents).toBeUndefined();
+    const attack = { enemyId: idOf(synced, "16045"), seat: 0, defenderId: idOf(synced, "16045") } as NonNullable<ScenarioState["pendingAttack"]>;
+    expect(announceOverLimit({ ...synced, pendingAttack: attack }, []).pendingEvents).toBeUndefined();
+    expect(announceOverLimit(synced, []).pendingEvents).toEqual([{ trigger: "handOverLimit", seat: 0 }]);
   });
 
   it("the card's record discards the player's choice of cards down to 5, at the next settle", () => {

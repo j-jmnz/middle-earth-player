@@ -2,7 +2,7 @@ import type { Effect, ScenarioDefinition } from "../../src/catalog/boundary.ts";
 import { campaignScenario, scenarioDefinition, stageOf, type AnyScenarioData, type CampaignData } from "../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import { isCharacterType, printedFromCard, type PrintedCard } from "../../src/rules/core/printed.ts";
-import { blankScenario, updateCard, withThreat } from "../../src/rules/core/state.ts";
+import { blankScenario, updateCard, withThreat, type Modifier } from "../../src/rules/core/state.ts";
 import { attachTo, moveCard, spawn, type Destination } from "../../src/rules/core/zones.ts";
 import type { ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";
 import { attachmentTargets } from "../../src/rules/player/planning.ts";
@@ -85,6 +85,8 @@ export type Layout = {
   captive?: { hero: string; under: string };
   // Cards lying facedown under the first card with the code `to` (the enemies under The Black Gate, 144027:A:2); `up` lays one faceup (the enemy under Narrow Alleyway, 16016:A:1).
   under?: readonly { code: string; to: string; up?: true }[];
+  // Modifiers a card of the table holds from another, as its When Revealed record leaves them (the +2 and the immunity Southron Champion gives its enemy, 16040:A:1): the first card with `code` holds each from the first card with `from`, for as long as that card is in play.
+  modified?: readonly { code: string; from: string; stats: readonly (readonly [Modifier["stat"], number])[] }[];
   // The Night objective in play beside the current quest (The Stone of Erech, 50301:A:1): a code, or a code with its progress.
   night?: Entry;
   // The scenario's saga hero (Bilbo Baggins in The Hobbit, the loadout deals him) is a hero of the first seat, with this many resources in his pool.
@@ -238,6 +240,10 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   for (const hidden of layout.under ?? []) {
     const spawned = spawn(state, hidden.code, { zone: "under", locationId: idOf(state, hidden.to) }, "down");
     state = hidden.up ? updateCard(spawned.state, spawned.id, { face: "up" }) : spawned.state;
+  }
+  for (const held of layout.modified ?? []) {
+    const [holder, source] = [idOf(state, held.code), idOf(state, held.from)];
+    state = { ...state, modifiers: [...state.modifiers, ...held.stats.map(([stat, amount]): Modifier => ({ instanceId: holder, sourceId: source, stat, amount, until: "whileSourceInPlay" }))] };
   }
   if (layout.captive) state = holdCaptive(state, idOf(state, layout.captive.hero), idOf(state, layout.captive.under));
   if (layout.pursuit != null) state = { ...state, pursuit: layout.pursuit };

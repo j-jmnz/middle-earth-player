@@ -40,7 +40,7 @@ export function placeOnSideQuest(from: ScenarioState, questId: string, wanted: n
 export function defeatSideQuest(state: ScenarioState, questId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const quest = state.cards[questId];
   if (!quest) return state;
-  // "This stage cannot be defeated while the Champion is in play" (16040:A:2): a side quest whose own record bars advancing stays where it is, full, until the bar lifts (rr.cannot).
+  // "This stage cannot be defeated while the Champion is in play" (16040:A:2): a side quest whose own record bars advancing stays where it is, full, until the bar lifts (rr.cannot). The check reads any Restrict on advancing whose source is the side quest itself; today only 16040 has one, and a side quest whose own Restrict on advancing names only the main quest would hold itself here too.
   if (restricted(state, ctx, "advance").some((rule) => rule.sourceId === questId)) return state;
   // A card the side quest holds under it in play comes back to its players (Rescue Iârion, families/angmar/hold.ts).
   const into = flipsInto(ctx, quest.code);

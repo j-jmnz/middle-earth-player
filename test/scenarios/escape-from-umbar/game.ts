@@ -60,7 +60,7 @@ export type UmbarGame = PlayedGame;
 // The goldens (src/campaign/scenarios/escape-from-umbar/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type UmbarGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: UmbarDecks; outcome: "won" | "lost"; policy?: Partial<UmbarPolicy>; lossReason?: string };
 
-// The games to pin (about 1000 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and Easy, and each way to lose: "Seize Them!" (no progress on the main quest at the end of a round it was in play for the whole of: round 1 with
+// The games to pin (.claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and Easy, and each way to lose: "Seize Them!" (no progress on the main quest at the end of a round it was in play for the whole of: round 1 with
 // heroes too weak to quest, or a long game in which the enemies' attacks take every progress off), every player's threat at 50 (heroes that start at a threat of 14) and every hero destroyed (heroes too brittle for the Sentries).
 export const UMBAR_GOLDENS: readonly UmbarGolden[] = [
   { name: "true solo, won, Normal", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won" },

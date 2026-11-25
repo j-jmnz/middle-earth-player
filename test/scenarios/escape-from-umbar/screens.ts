@@ -1,7 +1,7 @@
 import type { ScreenMoment } from "../../harness/screens.ts";
 
 // The table moments the screen review shoots (`pnpm browser shot --moment escape-from-umbar --landscape`; test/harness/screens.ts): one for each new widget of Escape from Umbar's table (docs/scenarios/haradrim/escape-from-umbar.md, Table).
-// A state only a played game reaches is not here: the "danger" colour of the "Lose at 0" pill needs a stage that has been in play a whole round, which the layout cannot set; the test src/play/scenarios/escape-from-umbar-table.test.ts checks it.
+// A state only a played game reaches is not here: the "danger" colour of the "Lose at 0" pill needs a stage that has been in play a whole round, which the layout cannot set (`pnpm browser shot --fixture umbar-lost --at 79` shows it); the test src/play/scenarios/escape-from-umbar-table.test.ts checks it.
 export const screens: ScreenMoment[] = [
   {
     name: "under-narrow-alleyway",
@@ -10,8 +10,8 @@ export const screens: ScreenMoment[] = [
   },
   {
     name: "champion",
-    note: "Southron Champion (16040:A:1) is in the staging area and the Southron Captain holding its resource token wears the \"Champion\" pill; an engaged Umbar Sentry wears none.",
-    layout: { stage: "16066", staging: ["16040", { code: "16041", resources: 1 }], engaged: ["16015"] },
+    note: "Southron Champion (16040:A:1) is in the staging area and the Southron Captain holding its resource token wears the \"Champion\" pill with the +2 badges and the immunity its When Revealed record leaves on it; an engaged Umbar Sentry wears none.",
+    layout: { stage: "16066", staging: ["16040", { code: "16041", resources: 1 }], engaged: ["16015"], modified: [{ code: "16041", from: "16040", stats: [["threat", 2], ["attack", 2], ["defense", 2], ["immuneToPlayerCards", 1]] }] },
   },
   {
     name: "hand-limit",
@@ -20,7 +20,7 @@ export const screens: ScreenMoment[] = [
   },
   {
     name: "seize-them",
-    note: "\"Seize Them!\" (16014:A:2) is in the staging area with no progress on the main quest: the card wears the \"Lose at 0\" pill (red once the stage has been in play a whole round, which only a played game reaches).",
+    note: "\"Seize Them!\" (16014:A:2) is in the staging area with no progress on the main quest: the card wears the \"Lose at 0\" pill (red once the stage has been in play a whole round, which only a played game reaches: `pnpm browser shot --fixture umbar-lost --at 79` shows it).",
     layout: { stage: "16066", progress: 0, staging: ["16014"] },
   },
 ];

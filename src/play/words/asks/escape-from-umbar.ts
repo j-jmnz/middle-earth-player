@@ -12,7 +12,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // The main quest is the one that loses progress (16015:A:2, 16021:A:1, 16042:A:1, 16043:A:2), though a side quest may be the current quest.
   "16015:forced:1 @0 progress": { label: "Remove 1 progress token from the main quest" },
   "16021:whenRevealed:1 @0 remove": { label: "Remove all progress tokens from the main quest" },
-  "16021:whenRevealed:1 @0 damage": { label: "Assign {x} damage among characters in play ({x}, the progress tokens on the main quest)", bind: { x: { stat: "progress", of: "questStage" } } },
+  "16021:whenRevealed:1 @0 damage": { label: "Assign {x} damage among characters in play", bind: { x: { stat: "progress", of: "questStage" } } },
   // 16046:A:1 (Injured Companion): each player raises his own threat by 1 for each character he controls.
   "16046:whenRevealed:1 @0.0 threat": { label: "Raise your threat by {x} (1 for each character you control)", bind: { x: { count: { type: "character", control: "you" } } } },
   "16042:forced:1 @0 progress": { label: "Remove 2 progress tokens from the main quest" },
