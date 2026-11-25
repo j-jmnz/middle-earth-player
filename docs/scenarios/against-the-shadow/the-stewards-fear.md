@@ -98,7 +98,7 @@ The statuses are those of the Readings bullet of `docs/scenarios/against-the-sha
 
 ## Engine notes
 
-The conditions and verbs are in the family `pelargir` (`src/catalog/families/pelargir.ts`, `src/rules/families/pelargir/`). The one shared line is the case list of `src/rules/interpret/conditions.ts`, which names the two conditions.
+The conditions and verbs are in the family `pelargir` (`src/catalog/families/pelargir.ts`, `src/rules/families/pelargir/`). The one shared line is the family-only list of `src/rules/interpret/condition-kinds/family-only.ts`, which names the two conditions.
 
 - The Underworld deck is the cards of `state.setAside` that hold `stackedAt` (0 for the top); no zone and no pile. `BuildUnderworldDeck` and `HideOneAside` (Setup, `underworld.ts`) use the game's seed; the table lists their cards as facedown set-aside cards (`asideSecrets` of the family manifest). A card that leaves the deck loses `stackedAt`. `TakeUnderworld` moves cards to the zone `under` with the host; `RevealUnderworld` starts a normal reveal frame; `ShuffleUnderworldIntoEncounterDeck` ends the deck.
 - Underworld X is written as records on each Underworld location, not as a parsed keyword: a Forced `encounterEnteredPlay` (reveal, a location made active) and a Forced `searchedIntoPlay` (a search) with `TakeUnderworld`. The cards under a location that leaves play are revealed by a settle sweep of the family (`releaseUnderworldStacks`), which holds for any location (a stack can lie under a City Street) and needs no record. `RevealSetAside` reveals the hidden Plot and Villain. The keyword chip of the card preview is read from the card's own `TakeUnderworld` record (Table).

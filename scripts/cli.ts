@@ -63,6 +63,8 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     tests: { steps: [{ script: "tools/scenario-tests.ts" }], about: "after Build, writes a failing row stub in the scenario's spec.test.ts for each record no test names (<scenario-id> --dry-run first)" },
     words: { steps: [{ script: "tools/scenario-words.ts", node: GAME_NODE }], about: "after Tests, lists what the Words task owes a scenario (each Pick and Choose with its asks entry and the rule it breaks, the Table step rows); --write stubs the missing entries (<scenario-id> --dry-run first)" },
     fixtures: { steps: [{ script: "e2e/fixtures.ts" }], about: "rewrites the save fixtures in src/campaign/fixtures" },
+    time: { steps: [{ script: "tools/scenario-time.ts" }], about: "<scenario-id> <task> start|wait|resume|end records a task's time in .agent/handoff/<id>.times.json; <scenario-id> alone prints the Measure line's minutes" },
+    measures: { steps: [{ script: "tools/scenario-measures.ts" }], about: "<scenario-id...> reads each scenario's `Pipeline measure:` line from the history and prints the tasks' wait/writing minutes side by side" },
   },
   test: {
     all: { steps: [{ script: VITEST, args: ["run"] }], about: "vitest run (any arguments go to vitest)" },

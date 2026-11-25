@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { SHARED_ENGINE_LIMIT } from "../checks/shared-engine.ts";
 import { rangeProblems, reviewedFiles } from "./range-rules.ts";
 
 // What a whole branch's commits must hold (scripts/git/range-rules.ts): a `Reviewed:` line when engine or record code changed (docs/agents/card-audit.md, Fix and review) and a
@@ -33,5 +34,13 @@ describe("what a branch's commits must hold", () => {
     const playable = { base: LIST(["a"]), head: LIST(["a", "b"]) };
     expect(rangeProblems({ changed: [], bodies: ["feat: Add b"], playable })).toHaveLength(1);
     expect(rangeProblems({ changed: [], bodies: ["feat: Add b\n\nPipeline measure: open lines 40"], playable })).toEqual([]);
+  });
+
+  it("asks for a Shared engine line when the branch adds more than the limit to shared engine code, and reads nothing without numstat rows", () => {
+    const numstat = [{ added: SHARED_ENGINE_LIMIT + 1, file: "src/catalog/boundary.ts" }];
+    expect(rangeProblems({ changed: [], bodies: ["feat: One"], playable: SAME, numstat })).toHaveLength(1);
+    expect(rangeProblems({ changed: [], bodies: ["feat: One\n\nShared engine: the cycle's first hook"], playable: SAME, numstat })).toEqual([]);
+    expect(rangeProblems({ changed: [], bodies: ["feat: One"], playable: SAME, numstat: [{ added: 900, file: "src/rules/families/x/index.ts" }] })).toEqual([]);
+    expect(rangeProblems({ changed: [], bodies: ["feat: One"], playable: SAME })).toEqual([]);
   });
 });

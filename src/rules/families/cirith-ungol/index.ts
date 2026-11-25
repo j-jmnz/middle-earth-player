@@ -1,4 +1,4 @@
-// Rules: mec113.setup-the-tower-of-cirith-ungol, rr.lasting-effects, rr.discard-pile-and-victory-display, faq.lasting-effects (data/rules/entries.json); ledger lines 146068:A:1, 146023:A:1, 146023:A:2. The verbs src/catalog/families/cirith-ungol.ts adds. The numbers its lasting effects add to a stat (Threat or Attack per damage, Threat per Willpower of the host) are read in values.ts, which modifiedStat (core/keywords.ts) calls.
+// Rules: mec113.setup-the-tower-of-cirith-ungol, rr.lasting-effects, rr.discard-pile-and-victory-display, faq.lasting-effects (data/rules/entries.json); ledger lines 146068:A:1, 146023:A:1, 146023:A:2. The verbs src/catalog/families/cirith-ungol.ts adds. The numbers its lasting effects add to a stat (Threat or Attack per damage, Threat per Willpower of the host) are read in values.ts, which modifiedStat (core/modified-stat.ts) calls.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { RulesFamily } from "../../interpret/family-manifest.ts";

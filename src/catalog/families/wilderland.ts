@@ -323,9 +323,9 @@ const FLAGS = [
   "damageShield",
   // On an enemy: the damage it would be dealt is canceled and the card that granted the flag (Dragon Scales, 18059:A:2) is discarded. Set by a constant ModifyStat of the attachment; src/rules/families/wilderland/shield.ts cancelAllDamage takes it as damage is placed.
   "cancelsDamage",
-  // On an enemy: it has at most this many damage tokens ("it cannot have more than 18 damage", 19023:B:3); damage past the amount is not placed. Read where damage is placed (rules/core/keywords.ts placeDamage).
+  // On an enemy: it has at most this many damage tokens ("it cannot have more than 18 damage", 19023:B:3); damage past the amount is not placed. Read where damage is placed (rules/core/damage.ts placeDamage).
   "damageCeiling",
-  // On a card that holds damageCap: the damage a quest card or a side quest deals is not counted against the cap or held to it ("takes at most X damage each round from effects other than a quest card's", 19074:A:2). Read where damage is placed (rules/core/keywords.ts placeDamage).
+  // On a card that holds damageCap: the damage a quest card or a side quest deals is not counted against the cap or held to it ("takes at most X damage each round from effects other than a quest card's", 19074:A:2). Read where damage is placed (rules/core/damage.ts placeDamage).
   "damageCapSparesQuest",
   // On a character, or on every character ModifyStat target "characters" holds now and later: player card effects cannot ready it ("characters cannot be readied by player card effects", 19020:A:2). Read by readyBarred (rules/core/holder-classes.ts).
   "cannotReadyByPlayerCard",
@@ -335,7 +335,7 @@ const FLAGS = [
   "progressPlacedShared",
   // On a side quest in the staging area: it is the current quest until the end of the phase (emce.side-quests-in-play). Set by MakeCurrentQuest; a record reads it with the `flag` condition ("While Defend the Town is the current quest", 19071:A:1).
   "currentQuest",
-  // On an enemy: the characters defending against it do not count their Defense ("Characters do not count their Defense when defending against Dagnir", 19067:A:1). Read by defenseAsDefender (rules/core/keywords.ts).
+  // On an enemy: the characters defending against it do not count their Defense ("Characters do not count their Defense when defending against Dagnir", 19067:A:1). Read by defenseAsDefender (rules/core/modified-stat.ts).
   "defenseIgnored",
   // On an enemy: allies cannot be declared as attackers against it ("Allies cannot be declared as attackers against Dagnir", 19068:A:1). Read by canAttack (rules/combat/combat.ts).
   "alliesCannotAttack",
@@ -350,11 +350,11 @@ const FLAGS = [
   "optionalEngageUnique",
   // On a seat (target eachSeat): the most its threat can be reduced by player card effects each round ("each player's threat cannot be reduced by more than 1 via player card effects each round", 19104:A:2). Read by lowerThreatByEffect (families/quest/threat.ts).
   "playerThreatReductionCap",
-  // On a card: damage that comes from an effect other than a quest card's is not placed on it ("Dagnir cannot take damage from non-quest effects", 19127:A:1). Combat damage is not an effect of a card and still counts. Read where damage is placed (rules/core/keywords.ts placeDamage).
+  // On a card: damage that comes from an effect other than a quest card's is not placed on it ("Dagnir cannot take damage from non-quest effects", 19127:A:1). Combat damage is not an effect of a card and still counts. Read where damage is placed (rules/core/damage.ts placeDamage).
   "cannotTakeNonQuestDamage",
   // On a card in play: an encounter card's effect cannot discard it ("Unique locations cannot be discarded from play by encounter card effects", 12193:B:1). Read by the Discard verb (rules/interpret/verbs.ts).
   "cannotBeDiscardedByEncounter",
-  // On a hero (set by a constant ModifyStat of an attachment on its host): the players lose the game when it leaves play ("If attached hero leaves play, the players lose the game", 19143:A:3). Read where a card is destroyed (rules/core/keywords.ts destroyCard).
+  // On a hero (set by a constant ModifyStat of an attachment on its host): the players lose the game when it leaves play ("If attached hero leaves play, the players lose the game", 19143:A:3). Read where a card is destroyed (rules/core/destroy.ts destroyCard).
   "lossOnLeavingPlay",
   // Engine use, on a card or the table: the first treachery revealed this round, noted as it is revealed in a game that reads firstRevealedEachRound (families/wilderland/reveals.ts), and that a treachery was revealed this round.
   "firstTreachery",
@@ -377,7 +377,7 @@ const FLAGS = [
   // On the table: the Refresh Action of Abandoned Tools can be used once each round while Escape from Darkness is the current quest (901201:A:3), and the use made this round (engine use).
   "refreshOnce",
   "refreshUsed",
-  // On an enemy: it has no Indestructible, whatever it prints ("While Dol Guldur's city strength is 0, each Lieutenant enemy loses indestructible", 50931:B:1; docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 18). Its other keywords stay. Read by indestructible (rules/core/keywords.ts).
+  // On an enemy: it has no Indestructible, whatever it prints ("While Dol Guldur's city strength is 0, each Lieutenant enemy loses indestructible", 50931:B:1; docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 18). Its other keywords stay. Read by indestructible (rules/core/keyword-flags.ts).
   "losesIndestructible",
   // On an enemy: no Response cancels a Shadow effect the enemy attacks with ("its shadow cards cannot be canceled", 50916:A:1). Read by cancelBarred (rules/families/encounter/cancel.ts).
   "shadowsUncancelable",
