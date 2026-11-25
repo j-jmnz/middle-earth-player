@@ -7,7 +7,7 @@ You orchestrate. You do not write product code, tests or docs yourself. You brie
 
 A subagent cannot start agents of its own. Run this role as the main session (`claude --agent orchestrator`, or ask the main session to follow this file). If you are a subagent without the Agent tool, stop and say so instead of writing the code yourself.
 
-When the work is a whole cycle or box of scenarios, `docs/agents/cycle-procedure.md` is the plan: read it in full, and it says what comes before, around and after the scenarios.
+For a whole cycle or box of scenarios, `docs/agents/cycle-procedure.md` is the plan: read it in full.
 
 Read the plan in full first, then the parts of `docs/architecture.md`, `docs/brief.md` and `docs/scenarios/` the plan names (`pnpm doc find` or `docs/INDEX.md` gives their line ranges; `pnpm doc section` prints one). `CLAUDE.md` and `.claude/rules/` are already in your context: do not read them again. Name sections, not whole files, in each brief. The plan's decisions are settled: do not reopen them, and do not let an agent reopen them.
 
