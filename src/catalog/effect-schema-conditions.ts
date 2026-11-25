@@ -407,6 +407,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("exploredPending"), code: z.string().min(1), effect: z.string().min(1) }),
   // The pursuit value (mec112.pursuit, the pursuit tracker beside the quest deck) is at most `max` and at least `min`: "If the pursuit value is 25 or lower" (143071:B:1), "30 or greater" (143022:A:2). False while no tracker is set (ScenarioState.pursuit).
   z.strictObject({ kind: z.literal("pursuit"), max: z.number().int().min(0).optional(), min: z.number().int().min(0).optional() }),
+  // The temperature of the heat tracker is at most `max` and at least `min`: "If the temperature is 60 or higher" (16068:B:3), "40 or higher" (16025:A:1). False while no tracker is set. Read by the haradrim family.
+  z.strictObject({ kind: z.literal("temperature"), max: z.number().int().min(0).optional(), min: z.number().int().min(0).optional() }),
   // Captured cards (Escape from Mount Gram, read by the captured family): `noneUnderAttacker` no card is captured underneath the attacking enemy ("+2 Attack instead if it has no captured cards underneath it", 10045:A:3), `noneUnderSelf` no card is captured underneath the source ("If there are no captured cards underneath Gornákh's Dungeons", 10039:B:2), `someoneEmpty` the Interrogation that is
   // resolving found a captured deck with no card to discard ("If at least 1 player discarded no cards from this effect", 10052:A:1).
   z.strictObject({ kind: z.literal("captured"), is: z.enum(["noneUnderSelf", "someoneEmpty", "noneUnderAttacker"]) }),
