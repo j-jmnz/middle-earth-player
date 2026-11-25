@@ -115,10 +115,12 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
       ringMaker(3, "into-fangorn", "The Voice of Isengard"),
       ringMaker(4, "the-dunland-trap", "The Dunland Trap"),
       ringMaker(5, "the-three-trials", "The Three Trials"),
-      ringMaker(6, "trouble-in-tharbad", "Trouble in Tharbad"),
-      ringMaker(7, "the-nin-in-eilph", "The Nîn-in-Eilph"),
+      // DragnCards loads the objective-ally Nalir in player 1's play area; the printed Setup has the first player take control of him.
+      ringMaker(6, "trouble-in-tharbad", "Trouble in Tharbad", { groups: { player1Play1: "setAside" } }),
+      ringMaker(7, "the-nin-in-eilph", "The Nîn-in-Eilph", { groups: { player1Play1: "setAside" } }),
       ringMaker(8, "celebrimbors-secret", "Celebrimbor's Secret"),
-      ringMaker(9, "the-antlered-crown", "The Antlered Crown"),
+      // DragnCards loads Chief Turch in player 1's play area and the Raven deck as the second shared deck; the Setup builds that deck from the encounter deck's sets (rm.raven-deck).
+      ringMaker(9, "the-antlered-crown", "The Antlered Crown", { groups: { player1Play1: "setAside", sharedEncounterDeck2: "setAside" } }),
     ],
     saga: false,
     ledger: "the-ring-maker",

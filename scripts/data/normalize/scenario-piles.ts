@@ -52,7 +52,7 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
   const fleet = stepExists("prepareFleet") && (/Fleet/.test(printed?.encounterSet ?? "") || printed?.type === "ship-objective");
   switch (pile) {
     case "setAside":
-      return said(["aside", "putIntoPlay"]) || putEngaged || steps("takeControl", "attach", "prepareStormcallerArea", "attachToDifferentHeroes", "attachToThreatDial", "secrets", "shuffleIntoDecks", "buildUnderworldDeck", "hideOneAside") || setAsideBySet || loggedHarad(quest, printed) || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective") || steps("hideLoot", "hideSuspectAndHideout", "buildInvestigationDeck");
+      return said(["aside", "putIntoPlay"]) || putEngaged || steps("takeControl", "attach", "prepareStormcallerArea", "attachToDifferentHeroes", "attachToThreatDial", "secrets", "shuffleIntoDecks", "buildUnderworldDeck", "hideOneAside", "shuffleIntoOutOfPlayDecks", "buildRavenDeck") || setAsideBySet || loggedHarad(quest, printed) || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective") || steps("hideLoot", "hideSuspectAndHideout", "buildInvestigationDeck");
     case "activeLocation":
       return said(["active"]);
     case "attachedChosen":
@@ -63,7 +63,7 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
       const eachPlayer = clausesOf(quest, "stage").some((clause) => clause.perPlayer != null && clause.codes.includes(code));
       const explorers = clausesOf(quest, "eachPlayerAddsLocation").length > 0 && printed?.type === "location";
       const searched = clausesOf(quest, "searchObjectives").length > 0 && printed?.type === "objective";
-      return said(["stage"]) || eachPlayer || explorers || searched || fleet || /Setup: Add .* to the staging area/.test(own);
+      return said(["stage"]) || steps("attach") || eachPlayer || explorers || searched || fleet || /Setup: Add .* to the staging area/.test(own);
     }
     case "burden":
       return true;

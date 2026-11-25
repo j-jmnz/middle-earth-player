@@ -4596,6 +4596,15 @@
   ],
   "scenarioCounts": [
     {
+      "scenario": "the-antlered-crown",
+      "code": "08155",
+      "pile": "encounter",
+      "normal": 3,
+      "easy": 1,
+      "reason": "Hall of Beorn lists Raven War-camp with 4 copies at Normal and 2 at Easy (the set's cards are numbered 11 to 14 of 29, and an Easy deck leaves out the copies that carry the difficulty indicator). DragnCards' Q04.9 stages 1 copy and leaves 3 in the encounter deck, which agrees; its E04.9 stages 1 and leaves 2, 3 in all, which no other source supports. The Easy deck holds 2 copies: the staged one and 1 in the encounter deck.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Antlered-Crown (Raven War-camp NormalQuantity 4, EasyQuantity 2); dragncards preBuiltDecks.json (Q04.9, E04.9); scan 08155.A (11/29)"
+    },
+    {
       "scenario": "flies-and-spiders",
       "code": "132019",
       "pile": "setAside",
@@ -4763,24 +4772,7 @@
     }
   ],
   "campaigns": [
-    {
-      "id": "the-ring-maker",
-      "name": "The Ring-maker",
-      "kind": "cycle",
-      "products": [
-        "The Voice of Isengard",
-        "The Dunland Trap",
-        "The Three Trials",
-        "Trouble in Tharbad",
-        "The Nîn-in-Eilph",
-        "Celebrimbor's Secret",
-        "The Antlered Crown"
-      ],
-      "released": "2014-02-21",
-      "reason": "No source names a cycle. Hall of Beorn lists the scenarios of The Voice of Isengard and of its six Adventure Packs under each product; RingsDB numbers the deluxe expansion and the six packs as cycles 15 and 16. The cycle has no Campaign Mode, so it is a cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 15 and 16; hallofgondor.com/release-dates (released: US release of the first product)"
-    },
-    {
+{
       "id": "haradrim",
       "name": "Haradrim",
       "kind": "cycle",

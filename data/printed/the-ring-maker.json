@@ -1,0 +1,156 @@
+{
+  "campaign": "the-ring-maker",
+  "conventions": [
+    "One entry per code and side. Side A is the front, side B the back of a double-sided card; a shadow effect is a line of side A.",
+    "lines are the ability text of the text box in print order, one ability per line: no title, traits, stats, flavor text, or Victory line. Keyword lines (Surge., Hide 2.) stay.",
+    "Icons are written as the words Hall of Beorn uses (Willpower, Attack, Defense, Threat, Lore, Fellowship). Apostrophes are straight.",
+    "A printed typo is written corrected in lines, and the printed wording is kept under misprints.",
+    "inert lists line numbers that need no effect record, with the reason. A line that is only keywords the engine reads is owned by the keyword."
+  ],
+  "entries": [
+    {
+      "code": "07059",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Fight-at-the-Fords-1A.jpg",
+        "sha256": "4efc95606a85450396fad7092e0bfeb92ccb9ffd18b800e63f5a40fe91fbdb07"
+      },
+      "lines": [
+        "Setup: Add The Islet to the staging area and attach Gríma to that location. Each player searches the encounter deck for 1 different Dunland enemy and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "07062",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Orders-from-Orthanc-1A.jpg",
+        "sha256": "8ca8caa0f0ac07fb35e00d73688fcd6a39566524069ff266ecd2de3690921061"
+      },
+      "lines": [
+        "Setup: Each player removes the top 20 cards of his deck and places them aside, as an out-of-play deck. The first player takes Mugash plus 1 Mugash's Guard for each other player in the game and randomly shuffles one facedown into each player's out-of-play deck. Place any remaining copies of Mugash's Guard aside, out of play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "07065",
+      "side": "A",
+      "printing": "VoI",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Voice-of-Isengard/Into-the-Woods-1A.jpg",
+        "sha256": "b87c5510fce1df325dfbb48595f9e6cf1f391eb5d03b148f5db9f5b035266cb9"
+      },
+      "lines": [
+        "Setup: Add Edge of Fangorn to the staging area and attach Mugash to that location. Shuffle the encounter deck. Reveal X additional encounter cards where X equals the number of players in the game minus 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "08011",
+      "side": "A",
+      "printing": "TDT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dunland-Trap/The-Road-to-Tharbad-1A.jpg",
+        "sha256": "9b0cc210aa6104d3a76054a4e7af12ebd9abfa239aea4fe6c20acd963a057046"
+      },
+      "lines": [
+        "Setup: Set Chief Turch and Munuv Dûv Ravine aside, out of play. Make Old South Road the active location. Each player searches the encounter deck for a Boar Clan enemy and puts it into play engaged with him. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "08035",
+      "side": "A",
+      "printing": "TTT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Three-Trials/The-Trials-Begin-1A.jpg",
+        "sha256": "077fcd39871226ecc1b4880ef32584bba9009b776c934bce63a1c569975238d3"
+      },
+      "lines": [
+        "Setup: Set aside all 3 Guardian enemies, all 3 Key objectives, all 3 Barrow locations, and Hallowed Circle."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "08066",
+      "side": "A",
+      "printing": "TiT",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Trouble-in-Tharbad/Double-Dealings-1A.jpg",
+        "sha256": "863c0e48badb6608820f0335624e6e0d6511e07ec82ba64cf8c41a4188555265"
+      },
+      "lines": [
+        "Setup: Set Bellach and The Crossing at Tharbad aside, out of play. Search the encounter deck for 1 copy of Spy From Mordor per player, and add them to the staging area. Make The Empty Mug the active location. The first player takes control of Nalir, as an ally. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "08094",
+      "side": "A",
+      "printing": "NiE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Nin-in-Eilph/Fleeing-from-Tharbad-1A.jpg",
+        "sha256": "71c0434e94a14cda762387dba90845a5d48969a9d1332b326ae90cbcdb073c22"
+      },
+      "lines": [
+        "Setup: The first player takes control of Nalir. Set the Ancient Marsh-dweller aside, out of play. Each player searches the encounter deck for a different location and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "08122",
+      "side": "A",
+      "printing": "CS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Celebrimbor's-Secret/The-Ruins-of-Ost-in-Edhil-1A.jpg",
+        "sha256": "c8ad360784ba4cc19123e3624208ce2840b5e172ace008551936ac9d4d1a87d4"
+      },
+      "lines": [
+        "Setup: Add Bellach, The Orcs' Search, and The Secret Chamber to the staging area. Attach Celebrimbor's Mould to The Secret Chamber. Each player adds a different Ost-in-Edhil location to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    },
+    {
+      "code": "08147",
+      "side": "A",
+      "printing": "TAC",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Antlered-Crown/Battle-for-Dunland-1A.jpg",
+        "sha256": "3563d554818b18c5b38f68fbf8f72e7a298992027331f013fe02c7a30549b19e"
+      },
+      "lines": [
+        "Setup: The first player takes control of Chief Turch. Set Raven Chief and Raven Chief's Camp aside, out of play. Reveal 1 copy of Dunland Battlefield and make it the active location. Reveal 1 copy of Raven War-camp and add it to the staging area. Create the Raven deck (see insert) and set it next to the quest deck. Each player chooses 1 different enemy from the Raven deck and adds it to the staging area. Shuffle the encounter deck and Raven deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "",
+      "confirmedBy": null
+    }
+  ]
+}
