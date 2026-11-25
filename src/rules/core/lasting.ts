@@ -1,4 +1,4 @@
-// Rules: rr.in-play-and-out-of-play, rr.lasting-effects (data/rules/entries.json).
+// Rules: rr.in-play-and-out-of-play, rr.lasting-effects (data/rules/entries.json). That a lasting effect on a card ends when the card leaves play is a reading no span states: docs/brief.md, Core round (`recommended`).
 import type { ModifierStat } from "../../catalog/boundary.ts";
 import type { ScenarioState } from "./state.ts";
 
@@ -7,7 +7,7 @@ import type { ScenarioState } from "./state.ts";
 // rule of the round reads it after the card has left play, so it stays until its own `until` ends it.
 // The creating path decides. The verbs of an effect record (ModifyStat, SetStatUntil, ModifyStatVersus) always make effects, whatever stat the record
 // names (lasting.test.ts checks that no record names a mark). Engine code makes a mark under a name of the first group below and an effect under a
-// name of the second. A name the engine makes that is in neither group fails lasting.test.ts, so a new flag is classified when it is added.
+// name of the second. A name the engine makes that is in neither group fails lasting.test.ts when its scan finds it, so a new flag is classified when it is added. A name the scan misses (lasting.test.ts lists the files it does not read) is in neither group and ENDS with the card: right for an effect, wrong for a mark, so a rule that reads a flag after the card left play puts it in ENGINE_MARKS.
 
 // Marks kept when the holder leaves play. Each says which rule or card reads it, and when.
 export const ENGINE_MARKS: ReadonlySet<ModifierStat> = new Set<ModifierStat>([
@@ -88,9 +88,14 @@ export const ENGINE_MADE_EFFECTS: ReadonlySet<ModifierStat> = new Set<ModifierSt
   "doomedReduction",
   "revealDoomed",
   "engagedThreatSeat",
+  // What WatchReveals (families/encounter) makes: held by the table, so no card ends it.
+  "watchThreatZero",
+  "watchDamage",
+  "watchDiscard",
+  "watchReadyHost",
 ]);
 
-// A modifier a record's verb made ends; a mark of the engine stays; so does every constant effect's modifier (`origin`, rebuilt from the effect list)
+// A modifier a record's verb made ends; so does one whose stat is in neither list; a mark of the engine stays; so does every constant effect's modifier (`origin`, rebuilt from the effect list)
 // and every one whose holder is not this card (a player, a seat, the table or a class of cards). A modifier put on a card out of play (a cost change in
 // a hand) is made after the card has left, so this step never sees it.
 export function endLastingOn(state: ScenarioState, id: string): ScenarioState {

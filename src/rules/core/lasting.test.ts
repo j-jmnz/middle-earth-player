@@ -13,7 +13,7 @@ import { moveCard } from "./zones.ts";
 import { ENGINE_MADE_EFFECTS, ENGINE_MARKS, endLastingOn } from "./lasting.ts";
 
 // Rules: rr.in-play-and-out-of-play, rr.lasting-effects (data/rules/entries.json).
-// A card that leaves play loses the lasting effects of abilities it held, not what the engine remembers about the round under its id.
+// A card that leaves play loses the lasting effects of abilities it held, not what the engine remembers about the round under its id (the reading is docs/brief.md, Core round: `recommended`, no span states it).
 
 const NAMES: ReadonlySet<string> = new Set(modifierStatSchema.options);
 
@@ -25,17 +25,41 @@ function sources(dir: string): string[] {
   });
 }
 
-// The stat names engine code writes into a modifier: a line that makes one (`sourceId:` of an object literal, `addModifier(`, `addClassModifier(`, `mark(`, `withModifier(`) and names a stat.
+// The stat names engine code writes into a modifier. Forms read, per file:
+// - an object literal with a `sourceId:` key, over one line or several (a modifier written by hand), and a line that calls a modifier maker (`addModifier(`, `addClassModifier(`, `mark(`, `withModifier(`) with the name as a literal;
+// - a stat held in a constant (`const X = "name"`, `export const`, indented) or in an object map (`const WATCH_STATS = { a: "watchA" }`) in a file that makes modifiers;
+// - a literal at a call site of a function that takes a `stat: ModifierStat` parameter and builds a modifier from it.
+// A name written any other way is not found, ENDS with its card (src/rules/core/lasting.ts), and must be a rule's own check: NOT_SCANNED lists the files that build a stat name at run time.
+const NOT_SCANNED: Readonly<Record<string, string>> = {};
+const MAKES = /(sourceId:|addModifier\(|addClassModifier\(|\bmark\(|withModifier\()/;
+const READS = /(\.stat ===|\.stat !==|flagged\(|heldAmount\(|modifiedStat\(|gameReads\()/;
+
+function literals(text: string): string[] {
+  return [...text.matchAll(/"([A-Za-z]+)"/g)].map((match) => match[1]!).filter((name) => NAMES.has(name));
+}
+
 function madeByEngine(): Set<string> {
   const found = new Set<string>();
-  for (const file of sources("src/rules")) {
-    for (const line of readFileSync(file, "utf8").split("\n")) {
-      if (!/(sourceId:|addModifier\(|addClassModifier\(|\bmark\(|withModifier\()/.test(line)) continue;
-      if (/(\.stat ===|\.stat !==|flagged\(|heldAmount\(|modifiedStat\(|gameReads\()/.test(line)) continue;
-      for (const match of line.matchAll(/"([A-Za-z]+)"/g)) if (NAMES.has(match[1]!)) found.add(match[1]!);
+  const files = sources("src/rules").filter((file) => !(file in NOT_SCANNED));
+  const texts = files.map((file) => readFileSync(file, "utf8"));
+  // Functions that take a stat and build a modifier from it: `function f(..., stat: ModifierStat, ...) {` whose body names `sourceId`.
+  const takers = new Set<string>();
+  for (const text of texts) {
+    for (const match of text.matchAll(/function (\w+)\([^)]*\bstat: ModifierStat[^)]*\)[^{]*\{([\s\S]*?)\n\}/g)) if (/sourceId|addModifier\(|withModifier\(/.test(match[2]!)) takers.add(match[1]!);
+  }
+  for (const text of texts) {
+    for (const line of text.split("\n")) {
+      if (!MAKES.test(line) || READS.test(line)) continue;
+      literals(line).forEach((name) => found.add(name));
     }
-    // A stat held in a constant (`const CONTROLLED_BY = "controlSeat" as const`) that a modifier is then made with.
-    for (const match of readFileSync(file, "utf8").matchAll(/^const [A-Z_]+ = "([A-Za-z]+)" as const;/gm)) if (NAMES.has(match[1]!)) found.add(match[1]!);
+    // An object literal with a `sourceId:` key, whatever its line breaks (no nested braces).
+    for (const block of text.matchAll(/\{[^{}]*\bsourceId:[^{}]*\}/g)) literals(block[0]).forEach((name) => found.add(name));
+    // A stat held in a constant or an object map, in a file that makes modifiers.
+    if (MAKES.test(text)) {
+      for (const match of text.matchAll(/^\s*(?:export )?const [A-Za-z_]+(?::[^=\n]+)? = ("[A-Za-z]+")(?: as const)?;/gm)) literals(match[1]!).forEach((name) => found.add(name));
+      for (const match of text.matchAll(/^\s*(?:export )?const [A-Z_]+(?::[^=\n]+)? = \{([^{}]*)\}/gm)) literals(match[1]!).forEach((name) => found.add(name));
+    }
+    for (const fn of takers) for (const call of text.matchAll(new RegExp(`\\b${fn}\\(([^()]*)\\)`, "g"))) literals(call[1]!).forEach((name) => found.add(name));
   }
   return found;
 }
@@ -56,7 +80,9 @@ function namedByRecords(): Set<string> {
 
 describe("the modifiers that end when a card leaves play", () => {
   it("classifies every stat engine code writes into a modifier: a mark that stays or an effect that ends", () => {
-    const unclassified = [...madeByEngine()].filter((name) => !ENGINE_MARKS.has(name as ModifierStat) && !ENGINE_MADE_EFFECTS.has(name as ModifierStat));
+    // A name an effect record makes is an effect by its verb (the third test below), so it needs no entry.
+    const byRecords = namedByRecords();
+    const unclassified = [...madeByEngine()].filter((name) => !ENGINE_MARKS.has(name as ModifierStat) && !ENGINE_MADE_EFFECTS.has(name as ModifierStat) && !byRecords.has(name));
     expect(unclassified, "add each to ENGINE_MARKS (a rule reads it after the card left play) or ENGINE_MADE_EFFECTS (src/rules/core/lasting.ts)").toEqual([]);
   });
 
