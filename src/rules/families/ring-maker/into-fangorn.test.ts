@@ -3,9 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { EngineStep } from "../../core/intents.ts";
-import type { ScenarioState } from "../../core/state.ts";
 import { settle } from "../../engine/machine.ts";
-import { flagged } from "../../core/state.ts";
 import { ruleCause } from "../../core/cause.ts";
 import { placeDamage } from "../../core/damage.ts";
 import { destroyCard } from "../../core/keywords.ts";
