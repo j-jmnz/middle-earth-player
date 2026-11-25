@@ -6,7 +6,7 @@ import { printedOf, type PrintedCard } from "../../../rules/core/printed.ts";
 import type { EngineStep, ScenarioState } from "../../../rules/engine/reduce.ts";
 import { hiddenIds } from "../../../rules/families/pelargir/hidden.ts";
 
-import { controlWords, discardedWords, fiveWords, heldUnderWords, takenWords, turnedWords } from "../../words/scenarios/against-the-shadow/blood.ts";
+import { controlWords, discardedWords, fiveWords, heldUnderWords, takenWords, turnFateWords, turnedWords } from "../../words/scenarios/against-the-shadow/blood.ts";
 import { live } from "./blood.ts";
 
 // What each card's effects do with hidden cards, so a change is credited to the card that did it: a take to a card that takes, a turn to a card that turns (one intent can hold both, and a card that only takes never turned the cards the stage's sweep turned at 5).
@@ -43,8 +43,8 @@ const ALLIES: ReadonlySet<string> = new Set(["06132", "06133"]);
 /** Where a turned card went: engaged with a seat, destroyed, added to the staging area, discarded or shuffled back into the encounter deck. */
 export type Fate = { kind: "engaged"; seat: number } | { kind: "destroyed" } | { kind: "staging" } | { kind: "discarded" } | { kind: "deck" } | { kind: "elsewhere" };
 
-/** One seat's change in an intent. `taken`: cards added to its list. `turned`: the cards that were in it and are faceup now, each with its fate. `unseen`: cards taken and turned in the same move (a fifth card), never named. `discarded`: cards discarded unseen. `takeSource`, `turnSource`, `discardSource`: the card whose effect did each (a turn with none is the stage's sweep at 5). */
-export type SeatChange = { seat: number; taken: number; now: number; turned: readonly { id: string; fate: Fate; type: string | null }[]; unseen: boolean; discarded: number; takeSource: string | null; turnSource: string | null; discardSource: string | null; travel: boolean };
+/** One seat's change in an intent. `taken`: cards added to its list. `turned`: the cards that were in it and are faceup now, each with its fate. `unseen`: cards taken and turned in the same move (a fifth card), named only when it is an enemy that engaged (`joined`: how many of those `turned` holds, as the engine tells its engagement). `discarded`: cards discarded unseen. `takeSource`, `turnSource`, `discardSource`: the card whose effect did each (a turn with none is the stage's sweep at 5). */
+export type SeatChange = { seat: number; taken: number; now: number; turned: readonly { id: string; fate: Fate; type: string | null }[]; unseen: boolean; joined: number; discarded: number; takeSource: string | null; turnSource: string | null; discardSource: string | null; travel: boolean };
 
 /** What the allies did: placed under Captured!, or passed to a seat. */
 export type AllyChange = { id: string; kind: "held" } | { id: string; kind: "control"; seat: number };
@@ -89,8 +89,11 @@ export function hiddenChanges(before: ScenarioState, after: ScenarioState, steps
     const added = now.filter((id) => !was.includes(id)).length;
     // Taken cards are the new ones in the list. A seat that held 4 and none now, with Captured!'s limit, took a fifth and turned it with the others.
     const unseen = limit && was.length >= 1 && turned.length >= was.length && turnSource == null && !quiet;
+    // The fifth card is faceup once the turn is done, and an enemy among them engages: its engagement is told with the others.
+    const engaged = unseen ? steps.filter((step) => step.kind === "engage" && step.seat === seat && !left.some((card) => card.id === step.enemyId) && !before.seats[seat]?.engaged.includes(step.enemyId)) : [];
+    const joined = engaged.length === 0 ? [] : [{ id: (engaged[0] as { enemyId: string }).enemyId, fate: { kind: "engaged", seat } as Fate, type: "enemy" }];
     if (added === 0 && turned.length === 0 && discarded === 0) continue;
-    seats.push({ seat, taken: added, now: now.length, turned, unseen, discarded, takeSource, turnSource, discardSource, travel });
+    seats.push({ seat, taken: added, now: now.length, turned: [...turned, ...joined], unseen, joined: joined.length, discarded, takeSource, turnSource, discardSource, travel });
   }
   const allies: AllyChange[] = [];
   for (const id of Object.keys(after.cards)) {
@@ -121,6 +124,25 @@ const fateWords = (fate: Fate, combat: boolean, seatCount: number): string => {
   }
 };
 
+// The one clause the banner says for the cards a turn turned (turnFateWords): the enemies that engaged by name and seat, the others by count.
+function turnFates(turned: SeatChange["turned"], name: (id: string) => string, change: HiddenChange): string {
+  const target = (seat: number): string => (change.seatCount > 1 ? `Player ${seat + 1}` : "you");
+  const engaged = new Map<number, string[]>();
+  for (const card of turned) if (card.fate.kind === "engaged") engaged.set(card.fate.seat, [...(engaged.get(card.fate.seat) ?? []), name(card.id)]);
+  const of = (kind: Fate["kind"]) => turned.filter((card) => card.fate.kind === kind);
+  const named = engaged.size > 0 || of("destroyed").length > 0 || of("staging").length > 0;
+  return turnFateWords({
+    engaged: [...engaged].map(([seat, names]) => ({ target: target(seat), names })),
+    destroyed: of("destroyed").map((card) => name(card.id)),
+    staging: of("staging").map((card) => name(card.id)),
+    discarded: of("discarded").map((card) => name(card.id)),
+    deck: of("deck").length,
+    elsewhere: of("elsewhere").length,
+    combat: change.combat,
+    named,
+  });
+}
+
 /** The lines of a change, each with the name of the cards it names (`name` reads a card's name by id; `log`: the lines of the log, which tells an engagement from the engine's own step). The turns come first, each card under its seat's turn line, then the cards taken and discarded. Never names a card that is facedown. */
 export function hiddenLines(change: HiddenChange, name: (id: string) => string, log = false): string[] {
   const lines: string[] = [];
@@ -129,9 +151,16 @@ export function hiddenLines(change: HiddenChange, name: (id: string) => string, 
   for (const entry of change.seats) {
     if (entry.turned.length === 0) continue;
     if (entry.unseen) lines.push(fiveWords(who(entry.seat)));
-    lines.push(turnedWords(who(entry.seat), entry.turned.length + (entry.unseen ? 1 : 0), entry.unseen ? null : by(entry.turnSource)));
-    // The log keeps the engine's own engage line for an enemy that engages.
-    for (const turned of entry.turned) if (!(log && turned.fate.kind === "engaged")) lines.push(`${name(turned.id)}${turned.type ? ` (${turned.type})` : ""} ${fateWords(turned.fate, change.combat, change.seatCount)}`);
+    const turn = turnedWords(who(entry.seat), entry.turned.length + (entry.unseen ? 1 - entry.joined : 0), entry.unseen ? null : by(entry.turnSource));
+    if (log) {
+      lines.push(turn);
+      // The log keeps the engine's own engage line for an enemy that engages.
+      for (const turned of entry.turned) if (turned.fate.kind !== "engaged") lines.push(`${name(turned.id)}${turned.type ? ` (${turned.type})` : ""} ${fateWords(turned.fate, change.combat, change.seatCount)}`);
+      continue;
+    }
+    // The banner is one line for the turn, so an enemy that engages is never cut behind "more in the log": the engaged enemies by name, the other cards by count.
+    const fates = turnFates(entry.turned, name, change);
+    lines.push(fates ? `${turn}: ${fates}` : turn);
   }
   for (const entry of change.seats) if (entry.taken > 0) lines.push(takenWords(who(entry.seat), entry.taken, entry.now, by(entry.takeSource) ?? (entry.travel ? "Travel cost" : null)));
   for (const entry of change.seats) if (entry.discarded > 0) lines.push(discardedWords(who(entry.seat), by(entry.discardSource)));

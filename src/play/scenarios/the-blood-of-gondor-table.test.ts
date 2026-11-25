@@ -313,7 +313,7 @@ describe("the choice at the beginning of the combat phase (06117:B:2)", () => {
     const at = drive(made, opened(made, held), (state) => state.window?.kind === "choose");
     const turned = send(at, { type: "Choose", optionId: "turn" }, made.ctx);
     const lines = moment(made, at.state, turned.state, turned.steps as never[])?.lines.map((line) => line.text);
-    expect(lines).toEqual(["Player 2 turns 2 hidden cards faceup (The Ambush)", "Orc Rabble (enemy) engages Player 2 and attacks this phase", "Mordor Looms (treachery) is discarded"]);
+    expect(lines).toEqual(["Player 2 turns 2 hidden cards faceup (The Ambush): Orc Rabble engages Player 2 and attacks this phase; 1 other card is discarded"]);
     const log = logLines(nextRoundSteps([], at.state, turned.state, turned.steps, made.ctx), logNames(made, turned.state)).map((line) => line.text);
     expect(log).toEqual(["Orc Rabble engages Player 2", "Player 2 turns 2 hidden cards faceup (The Ambush)", "Mordor Looms (treachery) is discarded"]);
   });
@@ -324,10 +324,25 @@ describe("the choice at the beginning of the combat phase (06117:B:2)", () => {
     const steps: never[] = [];
     const after = run(made, four, { verb: "TakeHiddenCard" }, { seat: 0, steps });
     const lines = moment(made, four, after, steps)?.lines.map((line) => line.text) ?? [];
-    expect(lines).toEqual(["You hold 5 hidden cards: Captured! turns them all faceup at once", "You turn 5 hidden cards faceup", "Orc Rabble (enemy) engages you", "Mordor Looms (treachery) is discarded", "f0 (enemy) engages you", "And 3 more in the log"]);
+    expect(lines).toEqual(["You hold 5 hidden cards: Captured! turns them all faceup at once", "You turn 5 hidden cards faceup: Orc Rabble, f0, f0 and f0 engage you; 1 other card is discarded"]);
     const log = logLines(nextRoundSteps([], four, after, steps, made.ctx), logNames(made, after)).map((line) => line.text);
     expect(log).toContain("You turn 5 hidden cards faceup");
     expect(log).toContain("Mordor Looms (treachery) is discarded");
+  });
+});
+
+describe("the banner of the turn at 5 (06118:B:3)", () => {
+  it("names every enemy the turn engaged on the banner, in one line, whatever else the turn did", () => {
+    const made = table({ seats: 2, phase: "Quest", stage: captured, deck: [rabble, ambusher, looms, "f0", "f0", "f0", "f0"] });
+    const four = takes(made, made.state, 0, 4);
+    const steps: never[] = [];
+    const after = run(made, four, { verb: "TakeHiddenCard" }, { seat: 0, steps });
+    const lines = moment(made, four, after, steps)?.lines.map((line) => line.text) ?? [];
+    expect(lines[0]).toBe("Player 1 holds 5 hidden cards: Captured! turns them all faceup at once");
+    expect(lines[1]).toMatch(/^Player 1 turns 5 hidden cards faceup: Orc Rabble, Orc Ambusher,? .*engage Player 1; 1 other card is discarded$/);
+    expect(lines.join(" | ")).not.toContain("more in the log");
+    for (const code of ["Orc Rabble", "Orc Ambusher"]) expect(lines.join(" | ")).toContain(code);
+    expect(lines.every((line) => !/hidden card.*\(facedown\)/.test(line))).toBe(true);
   });
 });
 
@@ -338,7 +353,7 @@ describe("what the banner credits and the order of its lines (06118:B:3, 06132:A
     const at = opened(made, four);
     const engaged = send(at, { type: "Engage", enemyId: idOf(four, CODES.crow) }, made.ctx);
     const lines = moment(made, four, engaged.state, engaged.steps as never[])?.lines.map((line) => line.text) ?? [];
-    expect(lines.slice(0, 2)).toEqual(["You hold 5 hidden cards: Captured! turns them all faceup at once", "You turn 5 hidden cards faceup"]);
+    expect(lines.slice(0, 2)).toEqual(["You hold 5 hidden cards: Captured! turns them all faceup at once", "You turn 5 hidden cards faceup: f0, f0, f0, f0 and Evil Crow engage you and attack this phase"]);
     expect(lines.join(" | ")).not.toContain("(Evil Crow)");
   });
 
@@ -356,10 +371,9 @@ describe("what the banner credits and the order of its lines (06118:B:3, 06132:A
     const held = takes(made, made.state, 0);
     const done = send(opened(made, held), { type: "Trigger", cardId: idOf(held, faramir), effectId: "06132:action:1" }, made.ctx);
     const lines = moment(made, held, done.state, done.steps as never[])?.lines.map((line) => line.text) ?? [];
-    expect(lines[0]).toBe("You turn 1 hidden card faceup (Faramir)");
-    expect(lines[1]).toBe("Orc Ambusher (enemy) never engages");
+    expect(lines[0]).toBe("You turn 1 hidden card faceup (Faramir): Orc Ambusher never engages");
     expect(lines.filter((line) => /destroyed|defeated/.test(line))).toHaveLength(1);
-    expect(lines.findIndex((line) => /damage/.test(line))).toBeGreaterThan(1);
+    expect(lines.findIndex((line) => /damage/.test(line))).toBeGreaterThan(0);
   });
 
   it("a turn that answers a Choose is credited to the stage that asked, not to a stage that pushed nothing", () => {
@@ -367,7 +381,7 @@ describe("what the banner credits and the order of its lines (06118:B:3, 06132:A
     const held = takes(made, made.state, 1, 1);
     const at = drive(made, opened(made, held), (state) => state.window?.kind === "choose");
     const turned = send(at, { type: "Choose", optionId: "turn" }, made.ctx);
-    expect(moment(made, at.state, turned.state, turned.steps as never[])?.lines.map((line) => line.text)[0]).toBe("Player 2 turns 1 hidden card faceup (The Ambush)");
+    expect(moment(made, at.state, turned.state, turned.steps as never[])?.lines.map((line) => line.text)[0]).toBe("Player 2 turns 1 hidden card faceup (The Ambush): Orc Rabble engages Player 2 and attacks this phase");
   });
 });
 
@@ -387,7 +401,7 @@ describe("a combat choice that returns no engine step still reaches the banner a
     it(`seat ${first + 1} turns a treachery: the banner and the log say it (nothing but the card is discarded)`, () => {
       const turn = chosen("turn", [looms, "f0", "f0", "f0"]);
       expect(turn.hidden).toBe(0);
-      expect(turn.banner?.join(" | ")).toContain("Mordor Looms (treachery)");
+      expect(turn.banner?.join(" | ")).toContain("Mordor Looms is discarded");
       expect(turn.log.join(" | ")).toContain("Mordor Looms (treachery)");
     });
     it(`seat ${first + 1} takes a card: the banner and the log say who took how many, never which card`, () => {
