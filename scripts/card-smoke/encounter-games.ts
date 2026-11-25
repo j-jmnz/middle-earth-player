@@ -39,7 +39,7 @@ const HASH = 1;
 const PROFILES: readonly Profile[] = ["strong", "weak", "brittle", "tense", "steady"];
 
 export type GameProblem = { game: number; seed: number; profile: Profile; seats: 1 | 2; step: number; round: number; window: string | null; intent: PlayerIntent | null; message: string };
-export type GameSummary = { game: number; seed: number; profile: Profile; seats: 1 | 2; steps: number; rounds: number; ended: "lost" | "won" | "problem"; problem: GameProblem | null; idle: readonly IdleHit[] };
+export type GameSummary = { game: number; seed: number; profile: Profile; seats: 1 | 2; steps: number; rounds: number; ended: "lost" | "won" | "problem"; lossReason: string | null; problem: GameProblem | null; idle: readonly IdleHit[] };
 
 type Offered<T extends LegalIntent["type"]> = Extract<LegalIntent, { type: T }>;
 
@@ -176,7 +176,7 @@ export type GameRecord = { summary: GameSummary; start: StartScenario | null; ct
 export function recordGame(world: EncounterWorld, number: number): GameRecord {
   const { profile, seats, seed } = gameOf(number);
   const ctx = world.contexts[profile];
-  const record: GameRecord = { summary: { game: number, seed, profile, seats, steps: 0, rounds: 0, ended: "problem", problem: null, idle: [] }, start: null, ctx, intents: [], failing: null };
+  const record: GameRecord = { summary: { game: number, seed, profile, seats, steps: 0, rounds: 0, ended: "problem", lossReason: null, problem: null, idle: [] }, start: null, ctx, intents: [], failing: null };
   record.summary = runGame(world, number, record);
   return record;
 }
@@ -224,6 +224,7 @@ function runGame(world: EncounterWorld, number: number, record: GameRecord): Gam
     summary.steps = intents.length;
     summary.rounds = state.round;
     summary.ended = state.lost ? "lost" : "won";
+    summary.lossReason = state.lost ? (state.lossReason ?? "no reason recorded") : null;
     let active = beginActive(start, HASH);
     for (const sent of intents) active = recordIntent(active, sent);
     const replayed = replay(JSON.parse(JSON.stringify(active)), start, HASH, ctx);

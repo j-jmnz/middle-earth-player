@@ -1,4 +1,4 @@
-import { camel, pascal, upper, type Facts } from "./scenario-new-files.ts";
+import { camel, pascal, policyKitComment, upper, type Facts } from "./scenario-new-files.ts";
 
 // The skeleton files of `pnpm scenario new` for a scenario of a cycle (scripts/tools/scenario-new.ts).
 // A scenario of a cycle (Shadows of Mirkwood) has no Campaign Mode: its game is the standalone game (test/harness/game-kit.ts, standaloneGame), its golden suite the standalone
@@ -14,11 +14,12 @@ export function cycleGameFile(facts: Facts): string {
   const c = camel(facts.short);
   const U = upper(facts.short);
   return `import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
-import { legalIntents, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
+import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
 ${cycleImport("../../../")}
-import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
+import type { PolicyOptions } from "../../harness/auto-player.ts";
 import { fillerLoadout, HERO_STATS, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
+import { chooseFirstOrLast, policyIntent, type Policy } from "../../harness/policy-kit.ts";
 
 ${cycleConsts(facts, c)}
 
@@ -40,11 +41,12 @@ export type ${P}Policy = {
 };
 export const DEFAULT_POLICY: ${P}Policy = { choose: "first" };
 
-// The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option, or the last as the policy says. Every intent is one the reducer listed.
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go before the auto-player's.
+${policyKitComment(`${U}_POLICY`)}// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go in the list, before the auto-player's.
+const rules = (policy: ${P}Policy): Policy => [chooseFirstOrLast(policy.choose)];
+
+// Every intent is one the reducer listed.
 export function ${c}Intent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: ${P}Policy = DEFAULT_POLICY): PlayerIntent {
-  if (state.window?.kind === "choose") return { type: "Choose", optionId: (policy.choose === "last" ? state.window.options.at(-1) : state.window.options[0]) ?? "" };
-  return nextIntent(state, ctx, ${U}_POLICY, memory, legalIntents(state, ctx));
+  return policyIntent(rules(policy), ${U}_POLICY, state, ctx, memory);
 }
 
 export type ${P}Game = PlayedGame;

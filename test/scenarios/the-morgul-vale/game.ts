@@ -1,10 +1,10 @@
 import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
-import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
+import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
 import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenarios.ts";
-import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
-import { characters, legalAttackEnemies } from "../../../src/rules/combat/combat.ts";
-import { attackTogether, fillerLoadout, HERO_STATS, playToEnd, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
+import type { PolicyOptions } from "../../harness/auto-player.ts";
+import { fillerLoadout, HERO_STATS, playToEnd, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
+import { attackAllTogether, chooseOption, commitAllBut, declineAttack, defendFirst, engageUpTo, policyIntent, travelFewestQuestPoints, triggerActions, type Policy } from "../../harness/policy-kit.ts";
 
 const cycle = loadCampaign("against-the-shadow");
 const vale = loadAnyScenario("the-morgul-vale");
@@ -69,96 +69,26 @@ export const DEAD_CITY = "06160";
 export const CAPTAINS: readonly string[] = [MURZAG, ALCARON, NAZGUL];
 const codeOf = (state: ScenarioState, id: string | null | undefined): string => state.cards[id ?? ""]?.code ?? "";
 
-/** A Choose window: the option each card's policy names (the options tell the card), any other choice the first or last. */
-function chooseAnswer(state: ScenarioState, policy: ValePolicy): PlayerIntent | null {
-  if (state.window?.kind !== "choose") return null;
-  const options = state.window.options;
-  const wanted = options.includes("place") ? policy.sorcerer : options.includes("tokens") ? policy.fog : options.includes("discard") ? policy.malice : options.includes("remove") ? policy.road || undefined : undefined;
-  return { type: "Choose", optionId: (wanted && options.includes(wanted) ? wanted : policy.choose === "last" ? options.at(-1) : options[0]) ?? "" };
-}
-
-const POINTS = new Map<string, number>();
-/** In a travel window: the location with the fewest quest points (The White Bridge has none printed: it comes last), else no travel. */
-function travelAnswer(state: ScenarioState, ctx: ReduceContext): PlayerIntent | null {
-  if (state.window?.kind !== "travel") return null;
-  const points = (id: string): number => {
-    const code = codeOf(state, id);
-    if (!POINTS.has(code)) POINTS.set(code, ctx.cards.get(code)?.questPoints ?? 99);
-    return POINTS.get(code) ?? 99;
-  };
-  const best = [...legalTargets(state, { type: "Travel" }, ctx)].sort((left, right) => points(left) - points(right))[0];
-  return best ? { type: "Travel", locationId: best } : { type: "DeclineTravel" };
-}
-
-/** In a quest commit: every character but the last `reserve` heroes. */
-function commitAnswer(state: ScenarioState, ctx: ReduceContext, policy: ValePolicy): PlayerIntent | null {
-  if (state.mode !== "questCommit" || state.window?.kind !== "pass") return null;
-  if (Object.values(state.cards).some((card) => card.committed && card.controller === state.activeSeat)) return null;
-  const home = new Set((state.seats[state.activeSeat]?.heroes ?? []).slice(-policy.reserve));
-  const ids = legalTargets(state, { type: "Commit" }, ctx).filter((id) => !home.has(id));
-  return ids.length > 0 ? { type: "Commit", cardIds: ids } : null;
-}
-
-/** In a defense window: the first character who may defends while the seat has defended fewer than `defend` attacks this round, else the first hero is undefended. */
-function defenseAnswer(state: ScenarioState, ctx: ReduceContext, policy: ValePolicy, memory: Set<string>): PlayerIntent | null {
-  if (state.window?.kind !== "defense") return null;
-  const key = `defended:${state.round}:${state.activeSeat}`;
-  const used = [...memory].filter((entry) => entry.startsWith(key)).length;
-  const defender = used < policy.defend && legalIntents(state, ctx).some((intent) => intent.type === "DeclareDefender") ? legalTargets(state, { type: "DeclareDefender" }, ctx)[0] : undefined;
-  if (defender) {
-    memory.add(`${key}:${used}`);
-    return { type: "DeclareDefender", defenderId: defender };
-  }
-  const heroes = legalTargets(state, { type: "Undefended" }, ctx);
-  return heroes[0] ? { type: "Undefended", heroId: heroes[0] } : null;
-}
-
 /** The rank of an enemy for the attack and the engagement: the Captains first, the Bodyguards (they take the Captains' damage) next. */
 const rank = (state: ScenarioState, id: string): number => (CAPTAINS.includes(codeOf(state, id)) ? 0 : codeOf(state, id) === BODYGUARD ? 1 : 2);
 
-/** In the player attack window: every ready character attacks the Captain, else the first enemy they reach, together. */
-function attackAnswer(state: ScenarioState, ctx: ReduceContext): PlayerIntent | null {
-  if (state.window?.kind !== "playerAttack") return null;
-  const ready = characters(state, state.activeSeat, ctx.cards).filter((id) => legalTargets(state, { type: "DeclareAttackers", cardId: id }, ctx).length > 0);
-  if (ready.length === 0 || !ready.some((id) => legalAttackEnemies(state, state.activeSeat, id, ctx.cards).length > 0)) return null;
-  return attackTogether(state, ctx, undefined, (enemyId) => rank(state, enemyId));
-}
+// The policy (test/harness/policy-kit.ts; POLICY_KIT_RULES lists the rules), in the order they are tried: the choices (the options tell the card, any other choice the first or last), Morgul Road's Response (the first
+// player's, each time the engine offers it, after the location was explored), the travel (the fewest quest points; The White Bridge has none printed, so it comes last), the defense, the quest commit (every character
+// but the last `reserve` heroes), the attack (every ready character together, the Captain first), the engagement (the best rank the seat may take while it is engaged with fewer than `engage` enemies), no attack.
+const rules = (policy: ValePolicy): Policy => [
+  chooseOption((_state, options) => (options.includes("place") ? policy.sorcerer : options.includes("tokens") ? policy.fog : options.includes("discard") ? policy.malice : options.includes("remove") ? policy.road || undefined : undefined), policy.choose),
+  ...(policy.road ? [triggerActions([`${ROAD}:response:1`])] : []),
+  travelFewestQuestPoints(),
+  defendFirst(policy.defend),
+  commitAllBut(policy.reserve),
+  attackAllTogether(rank),
+  engageUpTo(policy.engage, { allow: (state, id) => policy.captain || !CAPTAINS.includes(codeOf(state, id)), rank }),
+  declineAttack(),
+];
 
-/** In the optional engagement step: the enemy of the best rank the seat may engage while it is engaged with fewer than `engage` enemies. */
-function engageAnswer(state: ScenarioState, ctx: ReduceContext, policy: ValePolicy): PlayerIntent | null {
-  if (state.window?.kind !== "optionalEngage") return null;
-  const seat = state.seats[state.activeSeat];
-  if (!seat || seat.engaged.length >= policy.engage) return null;
-  const targets = legalTargets(state, { type: "Engage" }, ctx).filter((id) => policy.captain || !CAPTAINS.includes(codeOf(state, id)));
-  const enemy = [...targets].sort((left, right) => rank(state, left) - rank(state, right))[0];
-  return enemy ? { type: "Engage", enemyId: enemy } : null;
-}
-
-/** Morgul Road's Response, each time the engine offers it (the first player's, after the location was explored). */
-function responseAnswer(state: ScenarioState, ctx: ReduceContext, policy: ValePolicy): PlayerIntent | null {
-  if (!policy.road || state.window?.kind === "choose" || state.window?.kind === "chooseEnemy") return null;
-  for (const intent of legalIntents(state, ctx)) if (intent.type === "Trigger" && intent.effectId === `${ROAD}:response:1`) return { type: "Trigger", cardId: intent.cardId, effectId: intent.effectId };
-  return null;
-}
-
-// The auto-player's answer (test/harness/auto-player.ts), except: the choices, the travel, the commit, the defense, the attack and the engagement above. Every intent is one the reducer listed.
+// The auto-player's answer (test/harness/auto-player.ts) for a window no rule owns. Every intent is one the reducer listed.
 export function valeIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: ValePolicy = DEFAULT_POLICY): PlayerIntent {
-  const choice = chooseAnswer(state, policy);
-  if (choice) return choice;
-  const response = responseAnswer(state, ctx, policy);
-  if (response) return response;
-  const travel = travelAnswer(state, ctx);
-  if (travel) return travel;
-  const defense = defenseAnswer(state, ctx, policy, memory);
-  if (defense) return defense;
-  const commit = commitAnswer(state, ctx, policy);
-  if (commit) return commit;
-  const attack = attackAnswer(state, ctx);
-  if (attack) return attack;
-  const engage = engageAnswer(state, ctx, policy);
-  if (engage) return engage;
-  if (state.window?.kind === "playerAttack") return { type: "DeclineAttack" };
-  return nextIntent(state, ctx, { ...VALE_POLICY, play: policy.play, act: policy.act }, memory, legalIntents(state, ctx));
+  return policyIntent(rules(policy), { ...VALE_POLICY, play: policy.play, act: policy.act }, state, ctx, memory);
 }
 
 export type ValeGame = PlayedGame;
