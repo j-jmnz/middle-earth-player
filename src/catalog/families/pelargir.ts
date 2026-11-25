@@ -119,6 +119,9 @@ const VERBS = [
   // "Reveal the top card of the encounter deck. If that card is an enemy, put it into play engaged with the defending player" (06151:A:1): the top card is revealed in full for the acting player (the player the attack was against): its Doomed, When Revealed effects and Surge resolve, an enemy is put into play engaged with him, never staged,
   // and dealt no shadow card, a location or an objective goes to the staging area and a treachery to the discard pile. An empty deck is reset from the discard pile only in the quest phase (rr.running-out-of-cards): in any other phase, Murzag's attack in the combat phase, nothing is revealed. src/rules/families/pelargir/vale/reveal-engaged.ts.
   z.strictObject({ verb: z.literal("RevealTopEngaging"), ...when }),
+  // "he makes an additional attack after this one" for each shadow card with no shadow effect he was dealt for the attack that has ended (06152:A:2, several shadow cards): the source enemy makes one immediate attack, dealt a shadow card of its own, and leaves the rest for the end of that attack, one after another (an attack is in progress at a time). `left`: the engine's own, the attacks still to come when the verb runs again at the end of
+  // an attack; no record names it. src/rules/families/pelargir/vale/additional.ts.
+  z.strictObject({ verb: z.literal("AttackPerBlankShadow"), left: z.number().int().positive().optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [

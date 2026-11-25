@@ -128,6 +128,10 @@ export const PELARGIR_TEMPLATES: Templates = {
     text: "the top card of the encounter deck (an empty deck is refilled from the discard pile in the quest phase only; otherwise nothing is revealed) is revealed in full for the acting player: its Doomed, When Revealed effects and Surge resolve; an enemy is put into play engaged with him, never staged, and is dealt no shadow card; a location or an objective goes to the staging area and a treachery to the discard pile",
     read: [],
   }),
+  AttackPerBlankShadow: (i) => ({
+    text: `${i.left != null ? `the engine's own, run again at the end of an attack: ${String(i.left)} more` : "for each shadow card with no shadow effect dealt to this enemy for the attack that has ended, one additional attack"}; the enemy makes one immediate attack now against the player it is engaged with, dealt a shadow card of its own (the old shadow cards are discarded), and the others follow one after another, each at the end of the one before; none when it is not engaged`,
+    read: ["left"],
+  }),
   GroupDiscardResources: (i, ctx) => ({
     text: `the players as a group discard ${amt(i.amount, ctx)} resource(s) from their heroes' pools, or as many as they can: each player in turn decides for his own heroes, one resource at a time, and may stop unless the players after him cannot discard the rest (a discard, not a spend)`,
     read: ["amount", "rest", "turns"],
@@ -173,6 +177,7 @@ export const PELARGIR_SAMPLES: Samples = {
   PlaceProgressOnNamed: [{ verb: "PlaceProgressOnNamed", name: "To the Tower", amount: 1 }, { verb: "PlaceProgressOnNamed", name: "To the Tower", amount: 3 }],
   RemoveAllNamedFromGame: [{ verb: "RemoveAllNamedFromGame", name: "Faramir" }],
   RevealTopEngaging: [{ verb: "RevealTopEngaging" }],
+  AttackPerBlankShadow: [{ verb: "AttackPerBlankShadow" }, { verb: "AttackPerBlankShadow", left: 2 }],
 };
 
 export const PELARGIR_STAT_NOTES: Readonly<Record<string, string>> = {

@@ -96,9 +96,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     // 06151 Murzag. A:1: after he attacks, the top card of the encounter deck is revealed in full for the defending player; an enemy is put into play engaged with that player and is dealt no shadow card.
     { id: "06151:forced:1", cardCode: "06151", lines: ["06151:A:1"], timing: "forced", trigger: "attackResolved", subject: "self", instructions: [{ verb: "RevealTopEngaging" }] },
 
-    // 06152 Lord Alcaron. A:1: when he attacks, 1 token goes on To the Tower (each attack he begins). A:2: when he is dealt a shadow card with no shadow effect, he makes an additional attack after this one, dealt a shadow card of its own.
+    // 06152 Lord Alcaron. A:1: when he attacks, 1 token goes on To the Tower (each attack he begins). A:2: when he is dealt a shadow card with no shadow effect, he makes an additional attack after this one, dealt a shadow card of its own, for each such card he was dealt for the attack (AttackPerBlankShadow, families/pelargir/vale/additional.ts).
     { id: "06152:forced:1", cardCode: "06152", lines: ["06152:A:1"], timing: "forced", trigger: "attacks", subject: "self", instructions: [PLACE(1)] },
-    { id: "06152:forced:2", cardCode: "06152", lines: ["06152:A:2"], timing: "forced", trigger: "attackResolved", subject: "self", condition: { kind: "shadowBlank" }, instructions: [{ verb: "ImmediateAttack" }] },
+    { id: "06152:forced:2", cardCode: "06152", lines: ["06152:A:2"], timing: "forced", trigger: "attackResolved", subject: "self", condition: { kind: "shadowBlank" }, instructions: [{ verb: "AttackPerBlankShadow" }] },
 
     // 06153 Nazgûl of Minas Morgul. A:1: no attachment can attach to him. A:2: each amount of damage dealt to him is reduced to 1 (the damage a Bodyguard takes for him is not reduced: it is never dealt to him).
     { id: "06153:constant:1", cardCode: "06153", lines: ["06153:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotHaveAttachments", amount: 1, until: "whileSourceInPlay", target: "self" }] },

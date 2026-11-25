@@ -355,7 +355,7 @@ function attackAfterThis(state: ScenarioState, sourceId: string | null, steps: E
 }
 
 // The enemy attacks the player it is engaged with, and the frame waits for the defense window. `shadow`: a shadow card is dealt for the attack (the default); `keep`: with none dealt, the shadow cards the enemy holds stay.
-function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[], options: { readonly shadow?: boolean; readonly keep?: boolean; readonly blankBonus?: number } = {}): ScenarioState {
+export function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[], options: { readonly shadow?: boolean; readonly keep?: boolean; readonly blankBonus?: number } = {}): ScenarioState {
   const { shadow = true, keep = false, blankBonus } = options;
   const enemy = sourceId ? state.cards[sourceId] : undefined;
   // An enemy that attacked from the staging area (the Balrog, the Watcher in the Water, Uruk from Mordor, a Storm of Howls attacker) makes the

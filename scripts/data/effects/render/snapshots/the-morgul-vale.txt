@@ -138,7 +138,7 @@ Scenario piles that place cards with no record (staging: 06155 Morgul Vale; ques
   06152:forced:2: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
     who acts: the acting player is the defending player (the player the attack is against)
-    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+    - for each shadow card with no shadow effect dealt to this enemy for the attack that has ended, one additional attack; the enemy makes one immediate attack now against the player it is engaged with, dealt a shadow card of its own (the old shadow cards are discarded), and the others follow one after another, each at the end of the one before; none when it is not engaged
 
 ## 06153 Nazgûl of Minas Morgul
 (the scenario deals it into the setAside pile; the piles place it, no record does)
