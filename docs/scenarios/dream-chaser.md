@@ -79,4 +79,4 @@ Readings not yet confirmed by the user (`.claude/rules/authority.md`, Open point
 
 - Drowned Cave (12104:A:2) and Sunken Temple (12103:A:2): a discard that finds fewer cards or tokens than it names does not resolve in full, so the "Then, you may ..." part is not offered (agent recommendation; no ruling found; https://ffg-forum-archive.entropicdreams.com/topic/137865-ready-and-exhaust read).
 - Command 11203:A:5 and 11204:A:5: the host may be any player's character, and a moved attachment is controlled by its new host's controller (`recommended`, `rr.attachment-cards`, `rr.ownership-and-control` by analogy; docs/brief.md, Player card readings).
-- Spyglass (11180) prints no host, so it may attach to any character of any player (`recommended`, `rr.attachment-cards`; no ruling names the card).
+- Spyglass (11180) prints no host, so an effect that attaches it (Command 11203, 11204) may use any character of any player (`recommended`, `rr.attachment-cards`; no ruling names the card). Open item: a hand play still offers only the playing seat's characters; whether a player may play it on another player's character is not settled.
