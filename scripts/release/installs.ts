@@ -33,7 +33,7 @@ export function fullCount(count: number): string {
 
 /** The shields.io endpoint file (https://shields.io/badges/endpoint-badge). */
 export function badgeOf(count: number): Record<string, unknown> {
-  return { schemaVersion: 1, label: "installs", message: fullCount(count), color: "3E5A48" };
+  return { schemaVersion: 1, label: "installs", message: fullCount(count), color: "8957E5" };
 }
 
 function main(log: Log): void {
