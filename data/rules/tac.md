@@ -1,109 +1,58 @@
 # tac
 
 sha256: bf9c40e86d1a7742ff701dca0cb75f28102ef63c3f2bcf20edd061199baeb47b
-columns: dd0c1fb25ea08f3cd7907f80b978d75bb937af54a0a8f3d9eefb054918088849
+columns: be601bf52a000dab2d9d26e4ec39fff21cd68ba069a4e4744e70481472e7cee4
 
 ## p1
 
 ### p1 c1
 
 Difﬁculty Level = 7
-
-The signs of war littered the hills of Dunland. Everywhere th
-heroes looked there was smoke and blood and ﬁre. Across a w
-valley, the bodies of Dunlending warriors lay slain in the dir
-Some wore the trappings of the Boar tribe, others were dress
+The signs of war littered the hills of Dunland. Everywhere the
+heroes looked there was smoke and blood and ﬁre. Across a wide
+valley, the bodies of Dunlending warriors lay slain in the dirt.
+Some wore the trappings of the Boar tribe, others were dressed
 with Raven feathers.
-
-As the heroes searched the battleﬁeld for survivors, they wer
-alerted to an approaching troop by the tromp of marching fe
-Looking in the direction of the sound, they descried the bann
+As the heroes searched the battleﬁeld for survivors, they were
+alerted to an approaching troop by the tromp of marching feet.
+Looking in the direction of the sound, they descried the banners
 of the Boar Clan ﬂying above an army of Wild Men. Striding
 proudly at the front was chieftain Turch wearing the Antlered
 Crown. He halted when he saw the heroes.
-
 “Well met,” said the chief with a smile. “I am glad to see you
-again, but you cannot travel any further; our country is at w
+again, but you cannot travel any further; our country is at war.”
 His face was stern, but his eyes were weary.
-
 He removed the Antlered Crown and wiped his brow, then
 regarded the thing in his hand and frowned. “The Antlered
-Crown has not united the Dunlending clans as I had hoped. T
+Crown has not united the Dunlending clans as I had hoped. The
 leader of the Raven Clan has rejected my leadership and laid
-claim to the crown for himself, instigating this ﬁght.” The lar
+claim to the crown for himself, instigating this ﬁght.” The large
 chieftain spat in the dirt to show his disdain.
-
-“The cowards of the Wolf Clan have reserved their allegianc
-for the moment, but if they should ally with the Raven, I fear
-will be overmatched,” he explained. Then, looking at the her
+“The cowards of the Wolf Clan have reserved their allegiance
+for the moment, but if they should ally with the Raven, I fear we
+will be overmatched,” he explained. Then, looking at the heroes
 he continued, “Yet, if the emissaries of Saruman were to ally
-themselves with us, the Boar Clan would surely be victorious
-And you would return to Isengard with the friendship of a un
+themselves with us, the Boar Clan would surely be victorious!
+And you would return to Isengard with the friendship of a united
 Dunland. What say you?”
-
-The heroes were reluctant to ﬁght in the Dunlendings’ war. Y
+The heroes were reluctant to ﬁght in the Dunlendings’ war. Yet,
 even if they refused, it seemed unlikely that they could escape
-Dunland unscathed. Better to ﬁght alongside the Boar Clan t
-to ﬂee into danger, they decided, especially if it meant they m
-earn friendship of the Wild Men for Saruman. Surely the thre
+Dunland unscathed. Better to ﬁght alongside the Boar Clan than
+to ﬂee into danger, they decided, especially if it meant they might
+earn friendship of the Wild Men for Saruman. Surely the threat of
 Mordor demanded that all free peoples unite together?
-
-Seeing an opportunity to strengthen the West, the heroes agre
+Seeing an opportunity to strengthen the West, the heroes agreed
 to march with Turch and his clan.
-
 “Excellent!” bellowed the Boar chieftain. “Come, the Raven
-Clan is still scattered among the hills. We must ﬁnd their chie
-before he gathers the rest of his clan to him. If we defeat the
+Clan is still scattered among the hills. We must ﬁnd their chief
+before he gathers the rest of his clan to him. If we defeat the chief
 of Ravens, the rest of his clan will submit.”
-
-Chieftain Turch placed the Antlered Crown back on his head
+Chieftain Turch placed the Antlered Crown back on his head and
 signaled to his men, “We march!”
-
-“The Antlered Crown” is played with an encounter deck buil
+“The Antlered Crown” is played with an encounter deck built
 with all the cards from the following encounter sets:
 
 ### p1 c2
-
-he
-wide
-rt.
-sed
-
-re
-eet.
-ners
-g
-d
-
-u
-war.”
-
-The
-d
-rge
-
-ce
-we
-roes
-y
-s!
-nited
-
-Yet,
-e
-than
-might
-eat of
-
-eed
-
-n
-ef
-chief
-
-d and
-
-lt
 
 TM
 
