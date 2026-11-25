@@ -171,7 +171,7 @@ export type SetupStep =
   | "eachPlayerEngagesTraitEnemy" // The Dunland Trap, "Each player searches the encounter deck for a Boar Clan enemy and puts it into play engaged with him": `trait` the enemies' trait
   | "createOutOfPlayDecks" // To Catch an Orc, "Each player removes the top 20 cards of his deck and places them aside, as an out-of-play deck": `count` the cards (rm.out-of-play-deck)
   | "shuffleIntoOutOfPlayDecks" // To Catch an Orc, "The first player takes Mugash plus 1 Mugash's Guard for each other player ... and randomly shuffles one facedown into each player's out-of-play deck": `codes` Mugash and his Guard (rm.mugash-player-card-backs)
-  | "revealPlayersLessOne" // Into Fangorn, "Reveal X additional encounter cards where X equals the number of players in the game minus 1"
+  | "revealPlayersLessOne" // Into Fangorn, "Reveal X encounter cards where X equals the number of players in the game minus 1"
   | "buildRavenDeck" // The Antlered Crown, "Create the Raven deck (see insert) and set it next to the quest deck": `codes` the enemies of Dunland Warriors and Dunland Raiders (rm.raven-deck)
   | "eachPlayerChoosesRavenEnemy" // The Antlered Crown, "Each player chooses 1 different enemy from the Raven deck and adds it to the staging area"
   | "shuffleRavenDeck" // The Antlered Crown, "Shuffle the encounter deck and Raven deck"
@@ -314,7 +314,8 @@ function readDreamChaser(sentence: string, names: NameIndex): SetupClause[] | nu
     const codes = [...named(match[1]), ...named(match[2])];
     return codes.length < 2 ? null : [step("takeControl", { codes })];
   }
-  if ((match = /^The first player takes control of (.+)$/i.exec(sentence))) {
+  // Trouble in Tharbad prints "The first player takes control of Nalir, as an ally."; The Nîn-in-Eilph and The Antlered Crown print the name alone.
+  if ((match = /^The first player takes control of (.+?)(?:, as an ally)?$/i.exec(sentence))) {
     const codes = named(match[1]);
     return codes.length === 0 ? null : [step("takeControl", { codes })];
   }

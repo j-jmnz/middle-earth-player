@@ -1,13 +1,11 @@
-import { isNameList, namedBy, stepWith } from "./setup-names.ts";
+import { namedBy, stepWith } from "./setup-names.ts";
 import type { NameIndex, SetupClause } from "./setup-text.ts";
 
 // Rules: rm.setup-the-fords-of-isen, rm.out-of-play-deck, rm.mugash-player-card-backs, rm.setup-into-fangorn, rm.current-trial, rm.raven-deck (data/rules/entries.json).
 // The sentences of the nine stage 1A cards of the Ring-maker cycle that the other readers do not read. Each pattern is quoted from a Setup line, names the cards it moves, and returns null for a
 // sentence it does not read (or whose card names find no card), so the scenario stays unbuilt and a name is never dropped silently.
 export function readTheRingMaker(sentence: string, names: NameIndex): SetupClause[] | null {
-  // A card name that starts with "The" (The Empty Mug) is found as it is printed.
-  const withoutThe = namedBy(names);
-  const named = (phrase: string | undefined): string[] => (isNameList(names.without(phrase ?? "")) && names.codesOf(phrase ?? "").length > 0 ? names.codesOf(phrase ?? "") : withoutThe(phrase));
+  const named = namedBy(names);
   const count = (word: string | undefined): number => (/^\d+$/.test(word ?? "") ? Number(word) : 1);
   const step = stepWith([]);
   // The cards of one encounter set with a trait and a type: "all 3 Guardian enemies" of The Three Trials.
@@ -18,11 +16,6 @@ export function readTheRingMaker(sentence: string, names: NameIndex): SetupClaus
   if ((match = /^Add (.+?) to the staging area and attach (.+?) to that location$/i.exec(sentence))) {
     const [location, attached] = [named(match[1]), named(match[2])];
     return location.length === 0 || attached.length === 0 ? null : [{ kind: "stage", codes: location, perPlayer: null, count: 1 }, stepWith(attached)("attach", { to: location })];
-  }
-  // Celebrimbor's Secret: "Attach Celebrimbor's Mould to The Secret Chamber." (the Chamber is staged by the sentence before)
-  if ((match = /^Attach (.+?) to (.+)$/i.exec(sentence))) {
-    const [attached, to] = [named(match[1]), named(match[2])];
-    return attached.length === 0 || to.length === 0 ? null : [stepWith(attached)("attach", { to })];
   }
   // The Fords of Isen: "Each player searches the encounter deck for 1 different Dunland enemy and adds it to the staging area."
   if ((match = /^Each player searches the encounter deck for (?:1|an?|one) different ([A-Z][A-Za-z-]+) enemy and adds it to the staging area$/.exec(sentence))) return [step("eachPlayerAddsTraitEnemy", { trait: match[1] ?? "" })];
@@ -47,23 +40,6 @@ export function readTheRingMaker(sentence: string, names: NameIndex): SetupClaus
     const codes = [...ofSet("The Three Trials", "Guardian", "enemy"), ...ofSet("The Three Trials", "Key", "objective"), ...ofSet("The Three Trials", "Barrow", "location"), ...named("Hallowed Circle")];
     return codes.length !== 10 ? null : [{ kind: "aside", codes, allCopies: false }];
   }
-  // Trouble in Tharbad, The Antlered Crown: "Make The Empty Mug the active location."
-  if ((match = /^Make (.+?) the active location$/i.exec(sentence))) {
-    const codes = named(match[1]);
-    return codes.length === 0 ? null : [{ kind: "active", codes }];
-  }
-  // Trouble in Tharbad: "Search the encounter deck for 1 copy of Spy From Mordor per player, and add them to the staging area." One copy for each player.
-  if ((match = /^Search the encounter deck for (\d+|an?|one) cop(?:y|ies) of (.+?) per player,? and add them to the staging area$/i.exec(sentence))) {
-    const codes = named(match[2]);
-    return codes.length === 0 ? null : [{ kind: "search", codes }, { kind: "stage", codes, perPlayer: count(match[1]), count: 0 }];
-  }
-  // Trouble in Tharbad: "The first player takes control of Nalir, as an ally." The Nîn-in-Eilph and The Antlered Crown print it without the ally clause.
-  if ((match = /^The first player takes control of (.+?)(?:, as an ally)?$/i.exec(sentence))) {
-    const codes = named(match[1]);
-    return codes.length === 0 ? null : [stepWith(codes)("takeControl")];
-  }
-  // The Nîn-in-Eilph: "Each player searches the encounter deck for a different location and adds it to the staging area."
-  if (/^Each player searches the encounter deck for (?:1|an?|one) different location and adds it to the staging area$/i.test(sentence)) return [{ kind: "eachPlayerAddsLocation", count: 1 }];
   // Celebrimbor's Secret: "Each player adds a different Ost-in-Edhil location to the staging area."
   if ((match = /^Each player adds (?:1|an?|one) different ([A-Z][A-Za-z-]+) location to the staging area$/.exec(sentence))) return [{ kind: "eachPlayerAddsLocation", count: 1 }, step("eachPlayerAddsTraitLocation", { trait: match[1] ?? "" })];
   // The Antlered Crown: "Reveal 1 copy of Dunland Battlefield and make it the active location." / "Reveal 1 copy of Raven War-camp and add it to the staging area."
