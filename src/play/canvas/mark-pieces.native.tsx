@@ -6,6 +6,7 @@ import { Circle, Group, Image, Line, RoundedRect, Text, type SkFont, type SkImag
 import { cardCorner } from "../../ui/card-corner.ts";
 import { chipText, moreText, MUST_COMMIT_WORD, type CardEffects, type CombatNumber } from "../cards/card-effects.ts";
 import { DETERMINED_WORD } from "../words/scenarios/angmar/wastes-table.ts";
+import { BLANK_WORD } from "../words/scenarios/haradrim/heat-table.ts";
 import { CHAMPION_WORD } from "../words/scenarios/haradrim/umbar-table.ts";
 import { type IconName } from "../../ui/icon-map.ts";
 import { glyphCells, type PlaceMark } from "../store/island-place.ts";
@@ -145,8 +146,8 @@ export function CurrentQuestMark({ rect, clear, fonts, t, s }: { rect: Rect; cle
   return <WordPill rect={rect} text="Current" clear={clear} fonts={fonts} t={t} s={s} />;
 }
 
-// The round glyph a word falls back to where it does not fit: "Determined" is a "D", the Champion of Escape from Umbar a "C"; "Determination" has none (the plain dot).
-const shortGlyph = (word: string): string | undefined => (word === DETERMINED_WORD ? "D" : word === CHAMPION_WORD ? "C" : undefined);
+// The round glyph a word falls back to where it does not fit: "Determined" is a "D", the Champion of Escape from Umbar a "C", Desert Crossing's "Blank" a "B"; "Determination" has none (the plain dot).
+const shortGlyph = (word: string): string | undefined => (word === DETERMINED_WORD ? "D" : word === CHAMPION_WORD ? "C" : word === BLANK_WORD ? "B" : undefined);
 
 /** A hero or ally the Campaign Log marks determined ("Determined"), or that carries a Determination ("Determination"): the same pill as the current quest's, a character wearing neither of the other marks (mec108.campaign-log, ledger line 10172:A:1). */
 export function DeterminedMarkView({ rect, word, clear, fonts, t, s }: { rect: Rect; word: string; clear: number; fonts: Fonts; t: TableTokens; s: number }) {

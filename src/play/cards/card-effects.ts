@@ -18,6 +18,7 @@ import { shipLoss, type ShipLoss } from "../words/scenarios/grapple.ts";
 import { heldWords } from "../words/scenarios/sea.ts";
 import { lootDeckWords, lootGuardWords } from "../words/loot.ts";
 import { lootUnder } from "../../rules/families/sidequests/loot.ts";
+import { blankMark } from "../readouts/haradrim/heat.ts";
 import { alleywayMark, championMark, seizeMark } from "../readouts/haradrim/umbar.ts";
 import { stackMark } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { capturedPill } from "../words/scenarios/angmar/gram-table.ts";
@@ -326,7 +327,7 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     loss: card != null && inPlay(card.zone) ? (shipLoss(game, ctx, cardId) ?? seizeMark(game, ctx, cardId)) : null,
     place: card?.zone === "staging" ? stagingPlace(game, cardId) : null,
     side: sideQuestMark(game, ctx, cardId),
-    determined: determinedMark(game, ctx, cardId) ?? championMark(game, ctx, cardId),
+    determined: determinedMark(game, ctx, cardId) ?? championMark(game, ctx, cardId) ?? blankMark(game, ctx, cardId),
     dead: deadSpeech(game, ctx.cards, cardId),
     combat: card != null ? combatNumber(game, ctx, card) : null,
   };
