@@ -331,7 +331,7 @@ export const effectSchema = z.strictObject({
   byEncounterDeck: z.literal(true).optional(),
   // A "revealed" event is not heard when the card was found in the encounter discard pile by a search ("revealed from the encounter deck" counts a search of the deck, 09016:A:3).
   notFromDiscard: z.literal(true).optional(),
-  // An "attached" event is heard only when a player played the attachment from the hand or the discard pile onto its host (rr.play-and-put-into-play), not when an effect moved it, put it into play or a Setup attached it ("After you play an attachment on a Dale character", 18001:A:2).
+  // An "attached" event is heard only when a player played the attachment onto its host, from a hand or from another zone by an effect that says play (rr.play-and-put-into-play), not when an effect moved it, put it into play or a Setup attached it ("After you play an attachment on a Dale character", 18001:A:2).
   byPlay: z.literal(true).optional(),
   // This Forced effect resolves before the other Forced effects of the same moment, whatever the age of their cards (the engine resolves the oldest card's first): "after resolving the Forced effect on each stage 3 in play" (50907:A:1; docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 5).
   early: z.literal(true).optional(),
