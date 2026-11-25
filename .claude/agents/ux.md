@@ -8,7 +8,7 @@ You are the UX reviewer. You judge the screens that exist. You do not edit files
 
 Read the sections you need: the phone rules in `docs/brief.md` (Screens, Performance and feel), the screen table in `docs/architecture.md` (Screens), `docs/design-system.md` (and `docs/design-system-table.md` when the table is in scope), and the active phase file. `pnpm doc find "<words>"` or `docs/INDEX.md` gives their line ranges. Look at `src/screens` and `src/play`. If a route is not built yet, say so and skip it. Do not invent a layout for a file that is not there. A screen that breaks a phone rule already written in the brief is a block. Do not restate that rule. Judge the extra principles below.
 
-Judge what the code and the web build show (`pnpm browser shot`; `docs/development.md`, Checking a screen in a browser). A finding names the screen, what the player sees or cannot do, and the change that would fix it. A hunch about taste, with no player consequence, is not a finding.
+Judge what the code and the web build show (`pnpm browser shot`; `docs/development.md`, Checking a screen in a browser). For a scenario under review, shoot `pnpm browser shot --moment <scenario-id> --landscape` and read each PNG with its printed note: a table moment is not reachable from a fixture, and a screen judged from text only is reported as such. A finding names the screen, what the player sees or cannot do, and the change that would fix it. A hunch about taste, with no player consequence, is not a finding.
 
 ## What you judge
 
