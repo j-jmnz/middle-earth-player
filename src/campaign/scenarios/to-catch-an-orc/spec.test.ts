@@ -1,7 +1,7 @@
 // Rules: rm.out-of-play-deck, rm.searches-x, rm.time-x, rr.forced, rr.constant-ability, rr.the-word-choose, rr.effects, rr.then, rr.explored, rr.attachment-cards, rr.setup (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, cardSpecs, count, damageOn, defend, exhausted, flag, handCount, lost, progressOn, quest, resourcesOn, respond, reveal, resolve, stat, travel, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, count, damageOn, defend, exhausted, flag, handCount, lost, progressOn, quest, resourcesOn, respond, reveal, resolve, stat, travel, window,  zone, type Row } from "../../../../test/harness/card-spec.ts";
 import type { Dealt } from "../../../../test/harness/layout.ts";
 
 // Card specs for To Catch an Orc (the-ring-maker part 2): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
@@ -45,6 +45,7 @@ const ROWS: readonly Row[] = [
   { line: "07063:B:3", name: "Response: when the active location took all the progress nothing is cancelled and no counter is placed", layout: { stage: STAGE_2, timeCounters: 1, active: LANDS, attached: [MUGASH_ON_DH2], deck: ["f0"] }, act: [quest("success"), respond(STAGE_2)], expect: [zone(STAGE_3, "questStage"), resourcesOn(STAGE_2, 1), progressOn(LANDS, 4)] },
 
   // 07064 The Wizard's Prize: Time 3, the Forced effect of the last counter, no progress without Mugash on a hero, and the win.
+  { line: "07064:B:1", name: "Time 3: the stage the players advance to holds 3 time counters", layout: { stage: STAGE_2, timeCounters: 1, attached: [MUGASH_ON_DH2], deck: ["f0"] }, act: [quest("success"), respond(STAGE_2)], expect: resourcesOn(STAGE_3, 3) },
   { line: "07064:B:2", name: "Forced: after the last counter Mugash goes back to the staging area, 1 card is revealed per other player and 3 counters go on the stage", layout: { seats: 2, stage: STAGE_3, attached: [MUGASH_ON_DH3], deck: [WOLF, "f0"] }, act: announce("lastTimeCounterRemoved", STAGE_3), expect: [zone(MUGASH, "staging"), zone(WOLF, "staging"), resourcesOn(STAGE_3, 3)] },
   { line: "07064:B:2", name: "Forced: a solo game reveals no card, and Mugash in the staging area stays there", layout: { stage: STAGE_3, staging: [MUGASH], deck: [WOLF, "f0"] }, act: announce("lastTimeCounterRemoved", STAGE_3), expect: [zone(MUGASH, "staging"), zone(WOLF, "encounterDeck"), resourcesOn(STAGE_3, 3)] },
   { line: "07064:B:3", name: "No progress is placed on the stage while Mugash is not attached to a hero", layout: { stage: STAGE_3 }, act: quest("success"), expect: progressOn(STAGE_3, 0) },
