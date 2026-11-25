@@ -23,7 +23,7 @@ import { dialProps, type TableDial } from "../../play/readouts/dials";
 import { defenseLimitWords } from "../../play/words/scenarios/fortress";
 import { useTableTokens } from "../../ui/use-table-tokens";
 import { withAlphaHex } from "../../ui/tokens";
-import { BAR_PAD, chipCompact, dialZones, DIAL_GAP, dialScale, EDGE_FADE, HEADING_BADGE_OVER, headingCompact, headingOffset, railWide, TOP_BAR } from "../../play/chrome/top-bar-layout";
+import { BAR_PAD, chipCompact, dialZones, DIAL_GAP, keepWidest, dialScale, EDGE_FADE, HEADING_BADGE_OVER, headingCompact, headingOffset, railWide, TOP_BAR } from "../../play/chrome/top-bar-layout";
 import { UiScaleContext, useUiScale } from "../../ui/ui-scale";
 
 export { TOP_BAR };
@@ -118,12 +118,12 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
   const center = screen.width / 2 - bar.x - BAR_PAD;
   // The scenario dials drop their words while the row with them would scroll (dialZones). The row's width with the words is measured while they show and kept until the row's makeup changes.
   const scenario = scenarioDials ?? NO_DIALS;
-  const rowKey = [s, threats.length, life, burdenDeck, tokens?.name, pursuit != null, defense != null, island != null, heading != null, onNightmare != null, held?.length, hands?.map((mark) => mark.label).join(","), scenario.map((dial) => dial.id).join(",")].join("|");
+  const rowKey = [s, threats.length, life, burdenDeck, tokens?.name, pursuit != null, defense != null, island != null, heading != null, onNightmare != null, held?.length, hands?.map((mark) => mark.label).join(","), scenario.map((dial) => `${dial.id}:${dial.label}`).join(",")].join("|");
   const [labelled, setLabelled] = useState({ key: "", width: 0 });
   const withWords = scenario.length > 0 && labelled.key === rowKey ? labelled.width : 0;
   const zones = bar.width > 0 && (dials > 0 || waited) ? dialZones(bar.width - 2 * BAR_PAD, dials, withWords, s, center) : null;
   const wordless = zones?.wordless === true;
-  // The row's width with the words is kept from the layout event, while the words show.
+  // The row's width with the words is kept from the layout event, while the words show; within one makeup the widest width is kept, never a narrower one (keepWidest).
   // A layout event can reach the handler of the render before the one that dropped the words or changed the row (the web build does), so the handler reads the row's key and its words' state through a ref that a layout effect keeps current: the key travels with the value, so a width measured on one row is never kept for another.
   const latest = useRef({ key: rowKey, wordless });
   useLayoutEffect(() => {
@@ -133,7 +133,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
     const width = Math.round(event.nativeEvent.layout.width);
     setDials(width);
     const now = latest.current;
-    if (!now.wordless && width > 0 && scenario.length > 0) setLabelled((was) => (was.key === now.key && was.width === width ? was : { key: now.key, width }));
+    if (!now.wordless && width > 0 && scenario.length > 0) setLabelled((was) => keepWidest(was, now.key, width));
   };
   // The Heading dial drops its word and lays its badge under the disc when the dial at its full width would make the dials scroll; that is told from the other dials' width, not the dial's own.
   const others = heading ? dials - headingBox.w - DIAL_GAP * s : dials;

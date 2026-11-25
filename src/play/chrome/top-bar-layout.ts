@@ -121,6 +121,11 @@ export function dialZones(bar: number, dials: number, labelled: number, scale = 
   return { ...held, scroll: Math.ceil(dials / scale) + GAP > held.left / scale, wordless: true };
 }
 
+/** The row's width with its words, kept while the words show. Within one makeup (`key`) the widest width is kept, never a narrower one: a layout event of the wordless row can reach the handler before the render that made it wordless. A new key takes the new width. */
+export function keepWidest(was: { key: string; width: number }, key: string, width: number): { key: string; width: number } {
+  return was.key === key && was.width >= width ? was : { key, width };
+}
+
 // ---- The dials row: the Heading dial (phase 39b, docs/design-system-table.md, Top bar). All sizes are logical points at Medium, as the zones above. ----
 
 /** A dial's disc, the padding either side of a dial, the gap between a disc and its label, and the gap between two dials (table-chrome.tsx, table/top-bar.tsx). */

@@ -104,7 +104,7 @@ describe("surge", () => {
     expect(revealed.state.encounterDiscard).toEqual([]);
   });
 
-  // The reset is the rules' (rr.running-out-of-cards): no family of these scenes holds it back, so a surging card that is the only card of the game is shuffled back and revealed inside its own surge. Only a family hook can stop that (families/pelargir/surge-chain.ts), and only in its own game.
+  // The reset is the rules' (rr.running-out-of-cards): a surging card that is the only card of the game is shuffled back and revealed inside its own surge, for as long as a pass changes the game. A pass that finds the table of an earlier pass ends the chain (quest/surge-chain.ts repeatsChain).
   function surgeScene(keywords: { surge: true; doomed?: number }, threat: number) {
     const loom = definePrinted({ code: "loom", name: "Loom", type: "treachery", threat: 0, keywords });
     const cards = cardMap([loom, hero("aragorn", "leadership")]);
@@ -124,9 +124,12 @@ describe("surge", () => {
     expect(revealed.state.lost).toBe(true);
   });
 
-  it("does not guard a surging card with nothing else in the game: the reveal loop runs into the round engine's step limit", () => {
+  it("ends a surge chain whose pass changes nothing: the second reveal finds the table of the first and the reset is held (rr.surge)", () => {
     const { state, cards } = surgeScene({ surge: true }, 0);
-    expect(() => reduce(state, { type: "Pass" }, { effects: [], cards })).toThrow(/step limit/);
+    const done = expectOk(reduce(state, { type: "Pass" }, { effects: [], cards }));
+    expect(done.steps.filter((step) => step.kind === "reveal")).toHaveLength(2);
+    expect(done.state.stack).toEqual([]);
+    expect(done.state.lost).toBe(false);
   });
 
   it("shuffles the discard pile back in the middle of a surge chain when a Hide card follows the surging one (rr.running-out-of-cards)", () => {
