@@ -102,7 +102,7 @@ Scenario piles that place cards with no record (quest: 16068 The Desert of Harad
 16028:A:2 (front): Forced: After Were-worm engages you, it makes an immediate attack. (Do not deal it a shadow card.)
   16028:forced:1: Forced after an enemy engages a player (heard about this card)
     who acts: the acting player is the player the enemy engaged
-    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+    - this enemy attacks now, dealt no shadow card
 
 16028:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the temperature is 40 or higher).
   16028:shadow:1: Shadow

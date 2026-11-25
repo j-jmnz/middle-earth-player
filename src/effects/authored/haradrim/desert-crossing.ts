@@ -184,7 +184,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         { verb: "ModifyStat", stat: "defense", amount: TENS, until: "whileSourceInPlay", target: "self" },
       ],
     },
-    { id: "16028:forced:1", cardCode: "16028", lines: ["16028:A:2"], timing: "forced", trigger: "engaged", subject: "self", instructions: [{ verb: "ImmediateAttack" }] },
+    { id: "16028:forced:1", cardCode: "16028", lines: ["16028:A:2"], timing: "forced", trigger: "engaged", subject: "self", instructions: [{ verb: "ImmediateAttack", shadow: false }] },
     {
       id: "16028:shadow:1",
       cardCode: "16028",
