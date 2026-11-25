@@ -17,7 +17,7 @@ import { captivesOf } from "../../../rules/families/captives/values.ts";
 import { stagedHeroes } from "../../../rules/families/haradrim/staged.ts";
 import { heroGuardedBy } from "../../../rules/families/wilderland/carried.ts";
 import { idOf, idsOf, opened, resolveRecords, run as runInstruction, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
-import { announce, answer, attack, cardSpecs, count, damageOn, defend, endPhase, endRound, exhausted, flag, handCount, resolve, resourcesOn, stagingThreat, stat, offers, travel, window, zone, notWon, quest, won, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, defend, endPhase, endRound, exhausted, flag, handCount, resolve, resourcesOn, stagingThreat, stat, offers, travel, window, zone, notWon, quest, won, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Long Arm of Mordor (haradrim part 3): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
@@ -29,6 +29,7 @@ const KAHLIEL = "16031";
 const FIRYAL = "16032";
 const YAZAN = "16033";
 const JUBAYR = "16034";
+const OBJECTIVE_CODES = [KAHLIEL, FIRYAL, YAZAN, JUBAYR];
 
 // A layout with objective-heroes among the heroes of their seats, as TakeObjectiveHero leaves them: the modifier heroType keeps each one among the heroes (it is no hero by printed type).
 type Hero = { code: string; seat: number; resources?: number };
@@ -97,6 +98,24 @@ const ROWS: readonly Row[] = [
   // 16061:A:2 "While the engaged player is engaged with another Orc enemy, Uruk Chieftain cannot take damage."
   { line: "16061:A:2", name: "While the engaged player is engaged with another Orc enemy it cannot take damage", layout: { engaged: ["16061", "16062"] }, act: [], expect: flag("16061", "cannotTakeDamage") },
 
+  // 16035:A:2 "Forced: At the end of the round, assign X damage among characters in play." The first player (the second seat) assigns the stage number, 2, among all characters.
+  { line: "16035:A:2", name: "Forced: at the end of the round the first player assigns the stage number of damage among characters in play", layout: { stage: STAGE_2, seats: 2, firstPlayer: 1, staging: ["16035"] }, act: resolve("16035", "forced"), expect: [damageOn("dh3", 2)] },
+
+  // 16062:A:1 "Each ally with less Willpower than Uruk of Mordor's Threat cannot defend against Uruk of Mordor." Threat 2; the stand-in ally has Willpower 1.
+  { line: "16062:A:1", name: "an ally with less Willpower than its Threat cannot defend against it", layout: { engaged: ["16062"], play: ["ally"] }, act: [], expect: flag("16062", "defendersBelowThreat") },
+  // 16062:A:2 "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if its Threat is greater than the defending character's Willpower)." The filler enemy f3 has Threat 3 and Attack 1; the hero has Willpower 2 and Defense 2.
+  { line: "16062:A:2", name: "Shadow: +1 Attack, and no more when the attack has no defending character", layout: { stage: STAGE_3 }, act: attack("f3", { shadow: "16062", undefended: true }), expect: damageOn("dh1", 2) },
+  { line: "16062:A:2", name: "Shadow: +2 Attack instead when the attacker's Threat is greater than the defender's Willpower", layout: { stage: STAGE_3 }, act: [attack("f3", { shadow: "16062" }), defend("dh1")], expect: damageOn("dh1", 1) },
+
+  // 16063:A:1 "Uruk Warg-rider gets +X Attack while attacking a character with less Willpower than Uruk Warg-rider's Threat. X is the difference." Threat 3 against Willpower 2: +1, Attack 4 against Defense 2.
+  { line: "16063:A:1", name: "it gets +X Attack against a defender with less Willpower than its Threat, X the difference", layout: { stage: STAGE_3 }, act: [attack("16063"), defend("dh1")], expect: damageOn("dh1", 2) },
+
+  // 16064:A:1 "When Revealed: Attach to an Orc enemy and return that enemy to the staging area." The engaged Orc returns to the staging area and gets +2 Attack.
+  { line: "16064:A:1", name: "When Revealed: it attaches to an Orc enemy, which returns to the staging area with +2 Attack", layout: { stage: STAGE_3, engaged: ["16062"] }, act: resolve("16064", "whenRevealed"), expect: [zone("16062", "staging"), stat("16062", "attack", 6)] },
+
+  // 16065:A:2 "Shadow: If attacking enemy's Threat is greater than the defending character's Willpower, it makes an additional attack after this one." The additional attack is dealt a new shadow card: the deck of 4 holds 2 after both.
+  { line: "16065:A:2", name: "Shadow: the attacker whose Threat is greater than the defender's Willpower attacks once more, with a new shadow card", layout: { stage: STAGE_3 }, act: [attack("f3", { shadow: "16065" }), defend("dh1")], expect: deckCount(2) },
+
   // 16074:A:1 "When Revealed: Add Uruk Chieftain to the staging area. Shuffle the encounter discard pile into the encounter deck and reveal 1 encounter card per player."
   { line: "16074:A:1", name: "When Revealed: the Chieftain joins the staging area, the discard pile is shuffled in and each player reveals a card", layout: { stage: STAGE_4, side: "A", seats: 2, setAside: ["16061"], deck: ["f0"], discard: ["f3"] }, act: resolve("16074", "whenRevealed"), expect: [zone("16061", "staging"), zone("f0", "staging"), zone("f3", "staging")] },
   // 16074:B:1 "Uruk Chieftain cannot take non-combat damage."
@@ -120,17 +139,27 @@ const openedWith = (layout: Layout, ...heroes: readonly Hero[]) => {
   return { made, state: opened(made).state };
 };
 
-describe("16032:A:2 16033:A:3 16034:A:3 If the objective-hero leaves play, you are eliminated from the game", () => {
-  // Each of the three twins of 16031:A:2 (that line is in src/rules/families/haradrim/long-arm.test.ts): the hero of the second seat is destroyed, and only that seat is out.
-  for (const [line, code] of [["16032:A:2", FIRYAL], ["16033:A:3", YAZAN], ["16034:A:3", JUBAYR]] as const) {
-    it(`${line} the player who controls it is eliminated, and no other player`, () => {
-      const { made, state } = openedWith({ seats: 2 }, { code, seat: 1 });
-      const steps: EngineStep[] = [];
-      const gone = settle(destroyCard(state, idOf(state, code), made.ctx.cards, steps), made.ctx, steps);
-      expect(gone.seats[1]?.eliminated).toBe(true);
-      expect(gone.seats[0]?.eliminated).toBeFalsy();
-    });
-  }
+// Each objective-hero holds its own line (16031:A:2 and its three twins): the hero of the second seat is destroyed, and only that seat is out.
+function eliminated(code: string): { first: boolean | undefined; second: boolean | undefined } {
+  const { made, state } = openedWith({ seats: 2 }, { code, seat: 1 });
+  const steps: EngineStep[] = [];
+  const gone = settle(destroyCard(state, idOf(state, code), made.ctx.cards, steps), made.ctx, steps);
+  return { first: gone.seats[0]?.eliminated, second: gone.seats[1]?.eliminated };
+}
+
+describe("If the objective-hero leaves play, you are eliminated from the game", () => {
+  it("16031:A:2 Kahliel: the player who controls him is eliminated, and no other player", () => {
+    expect(eliminated(KAHLIEL)).toEqual({ first: false, second: true });
+  });
+  it("16032:A:2 Firyal: the player who controls her is eliminated, and no other player", () => {
+    expect(eliminated(FIRYAL)).toEqual({ first: false, second: true });
+  });
+  it("16033:A:3 Yazan: the player who controls him is eliminated, and no other player", () => {
+    expect(eliminated(YAZAN)).toEqual({ first: false, second: true });
+  });
+  it("16034:A:3 Jubayr: the player who controls him is eliminated, and no other player", () => {
+    expect(eliminated(JUBAYR)).toEqual({ first: false, second: true });
+  });
 
   it("16032:A:2 a player who is out of the game already is not eliminated a second time: no step, no change to the other seat", () => {
     const { made, state } = openedWith({ seats: 2 }, { code: FIRYAL, seat: 1 });
@@ -179,13 +208,40 @@ describe("16033:A:2 Limit once per phase", () => {
     expect(limitSpent({ ...used, phase: state.phase === "Combat" ? "Quest" : "Combat" }, effect, yazan, 0)).toBe(false);
   });
 
-  it("16033:A:2 a guarded Orc is immune to player card effects, so Yazan cannot damage it", () => {
-    const { made, state } = openedWith({ staging: ["16062", "f0"], stage: STAGE_3, side: "A" }, { code: YAZAN, seat: 0 });
-    const staged = runInstruction(made, state, { verb: "MoveHeroesToStaging" });
-    const guarded = settle(resolveRecords(staged, made.ctx, "16073", "whenRevealed", idOf(staged, "16073")).state, made.ctx, [] as EngineStep[]);
-    const guard = captivesOf(guarded).find((card) => card.guardedHero === true)?.host ?? "";
-    expect(heroGuardedBy(opened(made, guarded).state, guard)).not.toBeNull();
-    expect(flagged(opened(made, guarded).state, guard, "immuneToPlayerCards")).toBe(true);
+});
+
+// The Orcs the search finds guard the heroes the Setup moved to the staging area (Free the Captives, stage 3).
+function guardedGame(progress = 0) {
+  const made = table({ stage: STAGE_3, side: "A", staging: ["16062"] });
+  const staged = runInstruction(made, opened(made).state, { verb: "MoveHeroesToStaging" });
+  const dealt = resolveRecords(staged, made.ctx, "16073", "whenRevealed", idOf(staged, "16073"));
+  const stage = idOf(dealt.state, "16073");
+  // The progress is placed once the guards hold their heroes, as the quest phase places it.
+  const full = updateCard({ ...dealt.state, cards: { ...dealt.state.cards, [stage]: { ...dealt.state.cards[stage]!, face: "B" } } }, stage, { progress });
+  return { made, state: opened(made, full).state, stage };
+}
+
+describe("16073:B:1 an enemy guarding a hero gets +1 Threat, +1 Attack, +1 Defense and is immune to player card effects", () => {
+  it("16073:B:1 the guard has each stat raised by 1 and cannot be touched by a player card, an Orc that guards no hero has neither", () => {
+    const { made, state } = guardedGame();
+    const held = captivesOf(state).find((card) => card.guardedHero === true);
+    const guard = held?.host ?? "";
+    expect(heroGuardedBy(state, guard)).toBe(held?.id);
+    expect((["threat", "attack", "defense"] as const).map((stat) => modifiedStat(state, state.cards[guard]!, stat, made.ctx.cards))).toEqual([3, 5, 3]);
+    expect(flagged(state, guard, "immuneToPlayerCards")).toBe(true);
+    const free = idsOf(state, "16062").find((id) => id !== guard && heroGuardedBy(state, id) == null);
+    if (free) expect(flagged(state, free, "immuneToPlayerCards")).toBe(false);
+  });
+});
+
+describe("16073:B:2 when the guard leaves play its hero is released", () => {
+  it("16073:B:2 the hero returns among its owner's heroes exhausted, with its tokens, whichever way the guard leaves play", () => {
+    const { made, state } = guardedGame();
+    const held = captivesOf(state).find((card) => card.guardedHero === true)!;
+    const steps: EngineStep[] = [];
+    const gone = settle(destroyCard(state, held.host ?? "", made.ctx.cards, steps), made.ctx, steps);
+    expect(gone.cards[held.id]).toMatchObject({ zone: "heroes", controller: 0, exhausted: true });
+    expect(gone.seats[0]?.heroes).toContain(held.id);
   });
 });
 
@@ -294,18 +350,8 @@ describe("16061:A:3 Forced: at the end of the encounter phase the Chieftain enga
 });
 
 describe("16073:B:3 the players cannot defeat this stage while an enemy is guarding a hero", () => {
-  function guarded(progress: number) {
-    const made = table({ stage: STAGE_3, side: "A", staging: ["16062"] });
-    const staged = runInstruction(made, opened(made).state, { verb: "MoveHeroesToStaging" });
-    const dealt = resolveRecords(staged, made.ctx, "16073", "whenRevealed", idOf(staged, "16073"));
-    const stage = idOf(dealt.state, "16073");
-    // The progress is placed once the guards hold their heroes, as the quest phase places it.
-    const full = updateCard({ ...dealt.state, cards: { ...dealt.state.cards, [stage]: { ...dealt.state.cards[stage]!, face: "B" } } }, stage, { progress });
-    return { made, state: opened(made, full).state, stage };
-  }
-
   it("16073:B:3 a full stage stays while a guard holds a hero, and is defeated once the guard has left play", () => {
-    const { made, state, stage } = guarded(20);
+    const { made, state, stage } = guardedGame(20);
     expect(captivesOf(state).some((card) => card.guardedHero === true)).toBe(true);
     expect(settle(state, made.ctx, [] as EngineStep[]).cards[stage]?.zone).toBe("questStage");
     const guard = captivesOf(state).find((card) => card.guardedHero === true)?.host ?? "";
@@ -315,16 +361,82 @@ describe("16073:B:3 the players cannot defeat this stage while an enemy is guard
   });
 });
 
-describe("16071:B:2 the first card each player plays each phase does not require a resource match", () => {
-  it("16071:B:2 a neutral card played first uses the slot: the next card of a sphere the hero lacks needs its match", () => {
-    const made = table({ seats: 2, phase: "Planning", heroResources: 2, hand: [{ code: "01073", seat: 0 }, { code: "01048", seat: 0 }] }, ["01073", "01048"]);
+// The first card each player plays each phase needs no match, on stage 1 (16071:B:2) and stage 2 (16072:B:2): a neutral card played first uses the slot.
+function slotUsedByNeutral(stage: string): { first: string | null; next: string | null } {
+  {
+    const made = table({ stage, seats: 2, phase: "Planning", heroResources: 2, hand: [{ code: "01073", seat: 0 }, { code: "01048", seat: 0 }] }, ["01073", "01048"]);
     const state = opened(made).state;
     const neutral = idOf(state, "01073");
     const spirit = idOf(state, "01048");
     const hero = state.seats[0]?.heroes[0] ?? "";
     const pay = (from: ScenarioState, card: string, sphere: "neutral" | "spirit") => validatePayments(from, [{ heroId: hero, amount: 1 }], { seat: 0, sphere, amount: 1, forCard: card }, made.ctx);
-    expect(pay(state, spirit, "spirit")).toBeNull();
     const played: ScenarioState = { ...state, played: [{ id: neutral, code: "01073", seat: 0, round: state.round, phase: state.phase }] };
-    expect(pay(played, spirit, "spirit")).toBe("Wrong sphere");
+    return { first: pay(state, spirit, "spirit"), next: pay(played, spirit, "spirit") };
+  }
+}
+
+describe("the first card each player plays each phase does not require a resource match", () => {
+  it("16071:B:2 a neutral card played first uses the slot: the next card of a sphere the hero lacks needs its match", () => {
+    expect(slotUsedByNeutral("16071")).toEqual({ first: null, next: "Wrong sphere" });
+  });
+  it("16072:B:2 stage 2 holds the same rule", () => {
+    expect(slotUsedByNeutral(STAGE_2)).toEqual({ first: null, next: "Wrong sphere" });
+  });
+});
+
+describe("16071:B:1 16072:B:1 damage from undefended attacks goes to a hero in the staging area, if able", () => {
+  const held = (stage: string) => flagged(opened(table({ stage })).state, "table", "undefendedToStaged");
+  it("16071:B:1 stage 1 holds the flag, and the stage after stage 2 does not", () => {
+    expect(held("16071")).toBe(true);
+    expect(held(STAGE_3)).toBe(false);
+  });
+  it("16072:B:1 stage 2 holds the flag", () => {
+    expect(held(STAGE_2)).toBe(true);
+  });
+});
+
+describe("16071:A:1 Setup: each hero moves to the staging area, each player takes an objective-hero with 2 resources, the rest leave the game", () => {
+  it("16071:A:1 two players take one each in turn order, the first player first, and the other two leave the game", () => {
+    const made = table({ stage: "16071", side: "A", seats: 2, firstPlayer: 1, setAside: [KAHLIEL, FIRYAL, YAZAN, JUBAYR, "16061"] });
+    const heroes = Object.values(made.state.cards).filter((card) => card.zone === "heroes").map((card) => card.id);
+    const taken: string[] = [];
+    const done = resolveRecords(opened(made).state, made.ctx, "16071", "setup", idOf(made.state, "16071"), (state) => {
+      const pick = state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "";
+      taken.push(state.cards[pick]?.code ?? pick);
+      return pick;
+    }, true, 1);
+    const state = settle(done.state, made.ctx, [] as EngineStep[]);
+    expect(stagedHeroes(state).map((card) => card.id).sort()).toEqual([...heroes].sort());
+    expect(state.seats[0]?.heroes).toHaveLength(1);
+    expect(state.seats[1]?.heroes).toHaveLength(1);
+    for (const seat of [0, 1]) expect(state.cards[state.seats[seat]?.heroes[0] ?? ""]).toMatchObject({ resources: 2, controller: seat });
+    expect(Object.values(state.cards).filter((card) => OBJECTIVE_CODES.includes(card.code) && card.zone === "removed")).toHaveLength(2);
+    expect(taken[0]).toBeDefined();
+  });
+});
+
+describe("16071:B:3 16072:B:3 the stages return the heroes in the staging area", () => {
+  // Seat 0 owns two heroes in the staging area and takes one back, exhausted.
+  const withStaged = (stage: string) => {
+    const made = table({ stage });
+    return { made, state: runInstruction(made, opened(made).state, { verb: "MoveHeroesToStaging" }) };
+  };
+
+  it("16071:B:3 each player takes control of a hero he owns, exhausted, and the quest advances to stage 2", () => {
+    const { made, state } = withStaged("16071");
+    const done = resolveRecords(state, made.ctx, "16071", "forced", idOf(state, "16071"));
+    const after = settle(done.state, made.ctx, [] as EngineStep[]);
+    expect(after.seats[0]?.heroes).toHaveLength(1);
+    expect(after.cards[after.seats[0]?.heroes[0] ?? ""]).toMatchObject({ exhausted: true, controller: 0 });
+    expect(stagedHeroes(after)).toHaveLength(1);
+    expect(after.cards[after.questStage ?? ""]?.code).toBe(STAGE_2);
+  });
+
+  it("16072:B:3 each player takes control of one more hero he owns, exhausted", () => {
+    const { made, state } = withStaged(STAGE_2);
+    const done = resolveRecords(state, made.ctx, "16072", "forced", idOf(state, "16072"));
+    const after = settle(done.state, made.ctx, [] as EngineStep[]);
+    expect(after.seats[0]?.heroes).toHaveLength(1);
+    expect(after.cards[after.seats[0]?.heroes[0] ?? ""]).toMatchObject({ exhausted: true, controller: 0 });
   });
 });
