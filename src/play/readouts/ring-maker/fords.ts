@@ -13,8 +13,8 @@ export function ringMakerDials(game: ScenarioState, ctx: ReduceContext, nameOf: 
   const dials: TableDial[] = [];
   for (const code of FORDS_STAGES) {
     const limit = timeOf(ctx, code);
+    if (limit == null) continue;
     for (const card of cardsOf(game, code)) {
-      if (limit == null) continue;
       // Only stage 1B's last counter is a loss; the other two return counters, so their dials warm near and are never critical.
       const level = card.resources <= 1 && code === "07059" ? ("critical" as const) : ("near" as const);
       dials.push({
@@ -23,6 +23,7 @@ export function ringMakerDials(game: ScenarioState, ctx: ReduceContext, nameOf: 
         label: "Time",
         name: `Time counters left on ${nameOf(card.code)}:`,
         value: card.resources,
+        cardId: card.id,
         limit,
         limitWords: stageTimeLimitWords(limit),
         ...(card.resources <= 2 ? { warn: { level, words: stageTimeNearWords(code, card.resources) } } : {}),
@@ -31,4 +32,13 @@ export function ringMakerDials(game: ScenarioState, ctx: ReduceContext, nameOf: 
     }
   }
   return dials;
+}
+
+/** Gríma's code. */
+export const GRIMA = "07016";
+
+/** The ids of Gríma lying on this card (The Islet, 07059:A:1): attached to it and controlled by no player. The card's pill says "1 held". Empty for any other card and in every other game. */
+export function grimaLyingOn(game: ScenarioState, hostId: string): readonly string[] {
+  const host = game.cards[hostId];
+  return host == null || host.attachments.length === 0 ? [] : host.attachments.filter((id) => game.cards[id]?.code === GRIMA && game.cards[id]?.controller == null);
 }

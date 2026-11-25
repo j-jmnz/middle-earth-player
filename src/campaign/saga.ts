@@ -49,8 +49,8 @@ export const RETURN_OF_THE_KING_CAMPAIGN = "the-return-of-the-king";
 const NO_RING_BEARER: TitleBan = { title: "Frodo Baggins", types: null, rule: "mec113.campaign-mode-ring-bearer" };
 
 /** The titles the players cannot use in this scenario of this campaign. */
-export function titleBansOf(campaign: Pick<CampaignData, "id">, scenario: Pick<ScenarioData, "sagaStart"> & { readonly id?: string }): readonly TitleBan[] {
-  if (campaign.id === RING_MAKER_CAMPAIGN) return ringMakerTitleBans(scenario.id ?? "");
+export function titleBansOf(campaign: Pick<CampaignData, "id">, scenario: Pick<ScenarioData, "sagaStart" | "id">): readonly TitleBan[] {
+  if (campaign.id === RING_MAKER_CAMPAIGN) return ringMakerTitleBans(scenario.id);
   const grantsHero = scenario.sagaStart != null && "hero" in scenario.sagaStart;
   if (campaign.id === RETURN_OF_THE_KING_CAMPAIGN) return grantsHero ? [NO_RING_BEARER] : [];
   if (campaign.id !== TWO_TOWERS_CAMPAIGN) return [];

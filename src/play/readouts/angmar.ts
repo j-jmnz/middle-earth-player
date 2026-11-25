@@ -18,7 +18,6 @@ import { captiveUnder } from "../../rules/families/south/captive.ts";
 import { battlementsTimeNearWords, battlementsTimeWords, deckLabel, deckNearWords, deckWords, thaurdirLimitWords, thaurdirWords, handUnderLabel, handUnderWords, huntWords, iarionLabel, iarionWords, protectNearWords, protectWords, savageNearWords, savageWords, rearguardLimitWords, rearguardWords, shelterTimeNearWords, shelterTimeWords, timeNearWords, timeWords } from "../words/scenarios/angmar/angmar-table.ts";
 import { executionersNearWords, executionersTimeWords } from "../words/scenarios/angmar/gram-table.ts";
 import { secretsTimeNearWords, secretsTimeWords } from "../words/scenarios/angmar/rhudaur-table.ts";
-import { FORDS_STAGES } from "./ring-maker/fords.ts";
 import { SECRETS_OF_RHUDAUR, sideQuestsInPlay } from "./rhudaur.ts";
 import { cardsOf, type TableDial } from "./dials.ts";
 import { EXECUTIONERS, executionersRaises } from "./gram.ts";
@@ -65,8 +64,11 @@ function battlementsDoomed(game: ScenarioState): { seat: number; cards: number }
   });
 }
 
+// The scenarios whose cards these dials word (a scenario with Time X of its own, The Fords of Isen, words its dial in ring-maker/fords.ts).
+const ANGMAR_SCENARIOS: ReadonlySet<string> = new Set(["intruders-in-chetwood", "the-weather-hills", "deadmens-dike", "the-wastes-of-eriador", "escape-from-mount-gram", "the-treachery-of-rhudaur"]);
+
 export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
-  if (game.sideQuests !== true) return [];
+  if (game.sideQuests !== true || !ANGMAR_SCENARIOS.has(game.scenarioId)) return [];
   const dials: TableDial[] = [];
   // Protect the Innocent: a side quest that holds `loseAtDamage` damage tokens loses the game (10158:A:3), 10 with one or two players.
   for (const card of Object.values(game.cards)) {
@@ -133,8 +135,7 @@ export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
   // each dial is its card's (id and test id) and says where its copy lies.
   for (const card of Object.values(game.cards)) {
     const total = inPlay(card.zone) ? timeOf(ctx, card.code) : null;
-    // The Fords of Isen's stages print Time X too: readouts/ring-maker/fords.ts words their dial.
-    if (total == null || FORDS_STAGES.includes(card.code)) continue;
+    if (total == null) continue;
     const held = captiveUnder(game, card.id);
     const heldName = held ? nameOf(game.cards[held]?.code ?? "") : null;
     // Find Shelter's last counter costs damage and returns 4 counters (09032:A:2), not the game: its dial warns near and never critical.
