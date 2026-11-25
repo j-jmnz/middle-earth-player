@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { measureTable, measureText, parseMeasure } from "./scenario-measures.ts";
+import { measureOf, measureTable, measureText, parseMeasure, totalWriting } from "./scenario-measures.ts";
 
 // The two lines are the bodies of the squash commits of The Morgul Vale (one line) and The Steward's Fear (wrapped), as `git log origin/main --grep "Pipeline measure"` prints them.
 
@@ -78,5 +78,42 @@ describe("scenario measures: the table", () => {
     expect(lines).toContain("none-found: no Review findings sentence");
     expect(lines).toContain("- the-morgul-vale: Research, Judge, Review");
     expect(lines).toContain("- none-found: Read, Research, Build, Judge, Tests, Words, Games, Review, Fix");
+  });
+});
+
+describe("scenario measures: several blocks, list blocks, totals and the commit", () => {
+  it("takes the last of several Pipeline measure blocks", () => {
+    const body = "Pipeline measure: Read: 1 wait minutes, 5 writing minutes.\n\nText.\n\nPipeline measure: Read: 2 wait minutes, 9 writing minutes.\n\n## End";
+    expect(measureText(body)).toBe("Read: 2 wait minutes, 9 writing minutes.");
+  });
+
+  it("reads a block written as a list item, and per-task list lines under a bare label", () => {
+    expect(measureText("Intro\n\n- Pipeline measure: Read: 1 wait minutes, 5 writing minutes.\n  Build: 2 wait minutes, 6 writing minutes.\n\n## End")).toBe("Read: 1 wait minutes, 5 writing minutes. Build: 2 wait minutes, 6 writing minutes.");
+    const body = "Pipeline measure:\n- Read: 1 wait minutes, 5 writing minutes.\n- Build: 2 wait minutes,\n  6 writing minutes.\n\n- Fix: 3 wait minutes, 7 writing minutes.\n\nOther paragraph.\n\n### repo: Next";
+    const text = measureText(body) ?? "";
+    expect(text).toContain("Build: 2 wait minutes, 6 writing minutes.");
+    expect(text).toContain("Fix: 3 wait minutes");
+    expect(text).not.toContain("Other paragraph");
+    expect(parseMeasure(text).tasks.Fix).toEqual({ wait: 3, writing: 7 });
+    expect(parseMeasure("Review findings: 1 block.\nReadings: 2 recommended.").findings).toBe("Review findings: 1 block.");
+  });
+
+  it("gives a total of ? or a sum followed by +? when a required task has no writing minutes", () => {
+    expect(totalWriting(parseMeasure("Read: 1 wait minutes, 5 writing minutes. Build: 2 wait minutes, 6 writing minutes."))).toBe("11+?");
+    expect(totalWriting(parseMeasure("Judge: not recorded."))).toBe("?");
+    expect(totalWriting(parseMeasure(measureText(MORGUL) ?? ""))).toBe("550");
+  });
+
+  it("searches the id as playable.ts writes it, and takes only the first commit", () => {
+    const calls: string[][] = [];
+    const run = (args: readonly string[]): string | null => {
+      calls.push([...args]);
+      if (args[0] === "log") return "aaa\nbbb\n";
+      return args[args.length - 1] === "aaa" ? "feat: Add it\n\nNo measure here." : "feat: Later\n\nPipeline measure: Read: 1 wait minutes, 2 writing minutes.";
+    };
+    const found = measureOf("the-oath", "origin/main", run);
+    expect(calls[0]).toContain('-S"the-oath"');
+    expect(found).toEqual({ text: undefined, note: "made playable before measures" });
+    expect(calls.some((call) => call.includes("bbb"))).toBe(false);
   });
 });

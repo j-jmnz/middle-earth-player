@@ -1,12 +1,12 @@
 # Cycle procedure
 
-How an orchestrator builds a whole cycle or box of scenarios (user instruction, 2026-11-25). It runs the Scenario procedure of `docs/agents/agent-brief.md` once for each scenario and adds what a cycle needs around it. The orchestrator writes no product code, tests or docs: it briefs agents, checks what they hand back, commits, pushes and reports. Code is written by Sonnet; `reviewer`, `reading-judge` and scan reading run on Opus. Name the model on every Agent call.
+How an orchestrator builds a whole cycle or box of scenarios (user instruction, 2026-11-25). It runs the Scenario procedure of `docs/agents/agent-brief.md` once for each scenario and adds what a cycle needs around it. The orchestrator's own rules, with the model of each agent, are in `.claude/agents/orchestrator.md`.
 
 ## Plan the cycle
 
 Before any scenario, the orchestrator writes `.agent/handoff/cycle-plan.md` (not committed) and gives it to the user in its first report. It does not wait for an answer.
 
-- **What exists.** Which of the cycle's scenarios, encounter sets, player cards and campaign cards are in `data/`, from `pnpm test scenario --list`, `src/campaign/playable.ts` and `scripts/data/cycle-defs.ts`.
+- **What exists.** Which of the cycle's scenarios, encounter sets, player cards and campaign cards are in `data/`, from `data/scenarios/`, `src/campaign/playable.ts` and `scripts/data/cycle-defs.ts`.
 - **The order.** The cycle's own order. A later part reads the earlier part's final state.
 - **One family for the cycle.** The cycle's verbs, triggers and flags go in one mechanic family of its own. For each scenario the plan names its new system (hidden cards, a controlled location, a second active location) and the hook that the system needs in shared engine code. A shared mechanic is built once, in the first scenario that needs it.
 - **Shared reading changes.** A reading that changes what the cards of other scenarios do is not part of a scenario. It lands as its own pull request, with its own review, before the scenario that needs it.
@@ -25,28 +25,28 @@ One `implementer` task on `repo/<cycle-slug>-data`, with its own pull request, m
 - `pnpm data ledger-seed <scenario-id>` for each scenario and for the cycle's player cards, then each line read against its scan with `readBy` set.
 - Exit: `pnpm data check`, `pnpm test fast`, `pnpm lint`, `pnpm typecheck`.
 
-## Design note for a new system
+## Design of a new system
 
-Before the Build task of a scenario whose plan names a new system, a `scenario-author` writes `.agent/handoff/<id>.design.md` and a `reviewer` reads it. No code exists yet, so a wrong design costs minutes.
+The Read task of a scenario whose plan names a new system hands back the system's design with its mechanics, and the orchestrator checks it before it briefs the Build. No code exists yet, so a wrong design costs minutes.
 
-The note names: the verbs, triggers and flags, each in the cycle's family; every line that the system adds to shared engine code (`src/rules` and `src/catalog` outside the family's own files), as one call into a family hook that does nothing unless a flag of the cycle is held; the cards of other scenarios that the hook can reach; and the files at the file-size limit that it must not grow (`scripts/checks/file-size.test.ts`). A general guard in shared code, or a condition on a fact that only one scenario has, is a block.
+The design names: the verbs, triggers and flags, each in the cycle's family; every line that the system adds to shared engine code (`src/rules` and `src/catalog` outside the family folders), as one call into a family hook that does nothing unless a flag of the cycle is held; the cards of other scenarios that the hook can reach; and the files at the file-size limit that it must not grow (`scripts/checks/file-size.test.ts`). A general guard in shared code, or a condition on a fact that only one scenario has, goes back to the Read task.
 
-`scripts/checks/shared-engine.test.ts` holds the same rule on the finished branch: the lines a branch adds to shared engine code stay under its limit unless a commit body gives the reason after `Shared engine:`.
+`scripts/checks/shared-engine.test.ts` holds the same rule on the finished branch: the lines a branch adds to shared engine code stay at or under its limit unless a commit that adds them gives the reason after `Shared engine:`.
 
 ## What each task is held to
 
 Beyond what the Scenario procedure says:
 
-- **Build.** Its check is `pnpm test scenario <id> --quick --no-records`. A change to `src/rules` is soaked as `.claude/agents/orchestrator.md` (Implementer tasks) says. A verb that sets a card aside is listed in `scripts/checks/set-aside-sites.ts`.
+- **Build.** A function that sets a card aside is listed in `scripts/checks/set-aside-sites.ts`.
 - **Judge.** A CHECK with no row is a defect of the judge's output: it goes back.
-- **Tests.** Each line is tested on its real moment (`docs/agents/card-audit.md`, Tests from the printed line). The Tests task fixes a record only for a row the judge called wrong.
+- **Tests.** Each line is tested on its real moment (`docs/agents/card-audit.md`, Tests from the printed line).
 - **Words.** Every choice names its result, from the first scenario on.
-- **Games.** The saved games hold at least one win; where the simple test player cannot win, the task writes a policy for the scenario. One lost game, or a saved game opened with `--at`, reaches the scenario's main new table moment, so the screen review sees it with `pnpm browser shot`. The report names each new screen that was checked by tests only.
+- **Games.** Where the simple test player cannot win, the task writes a policy for the scenario. One lost game, or a saved game opened with `--at`, reaches the scenario's main new table moment, so the screen review sees it with `pnpm browser shot`. The report names each new screen that was checked by tests only.
 - **Review.** One round on the scenario's whole diff from its base. The brief asks the reviewer to look hardest at the cards of other scenarios that a shared change reaches, an offer and a refusal that disagree, an ability that is now withheld wrongly, and the stated cause of each moved saved game.
-- **Fix.** A fix that changes shared engine code gets a second, short review of that change. It is required.
-- **Times.** Every task brief asks for the task's times from `pnpm scenario time` (`docs/agents/agent-brief.md`, Measure), not an estimate.
+- **Fix.** A fix that changes shared engine code gets its second review (`.claude/agents/orchestrator.md`, One review round).
+- **Times.** Every brief of a writing task asks for its times from `pnpm scenario time` (`docs/agents/agent-brief.md`, Measure), not an estimate.
 
-At most three writing agents work on one machine, one in each tree. A container restart loses a run that is not pushed: each agent pushes after each green step and writes its hand-off note before a long run.
+How many agents work at one time is in `docs/agents/card-audit.md` (Running it). A container restart loses a run that is not pushed, so each agent writes its hand-off note before a long run.
 
 ## Land each scenario
 
@@ -64,9 +64,9 @@ The orchestrator opens the pull request, subscribes to it and fixes a failed che
 The orchestrator does not wait for the user's merge. When the pull request of scenario N is open and green, scenario N+1 starts on a branch that starts from the branch of N.
 
 - At most two scenarios ahead of `main`, and one when another cycle runs. The data pull request is never stacked.
-- The stacked pull request has `main` as its base. Its description says first which pull request it starts from, and lists only its own commit messages.
+- The stacked pull request has `main` as its base. Its description says first which pull request it starts from. Until that one merges, the description holds its commit messages too, under its number; after the merge of `main` below, only its own.
 - A change to scenario N after N+1 started is made on the branch of N and merged into the branch of N+1, never rebased. If it moved a saved game of N, the Games exit of N+1 runs again.
-- When the pull request of N merges, `main` holds its files in one new commit. If `git diff --quiet origin/main <branch of N>` exits 0, merge with `git merge -s ours origin/main`: the branch of N+1 already holds everything, so its tree must be the same before and after (`git rev-parse HEAD^{tree}`). If it differs, merge normally; for a file in conflict keep the copy of N+1 where `main`'s copy equals the copy of N, and merge both sides by hand where it does not. A saved-game file always takes the game of `main`.
+- When the pull request of N merges, `main` holds its files in one new commit. If `git diff --quiet origin/main <branch of N>` exits 0, merge with `git merge -s ours origin/main`: the branch of N+1 already holds everything. If it differs, merge normally; for a file in conflict keep the copy of N+1 where `main`'s copy equals the copy of N, and merge both sides by hand where it does not. A saved-game file always takes the game of `main`.
 - `-s ours` discards the other side. It is never used without that check.
 
 ## Two cycles at one time

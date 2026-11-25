@@ -1,5 +1,5 @@
 import { addedScenarios, hasPipelineMeasure } from "../checks/pipeline-measure.ts";
-import { sharedEngineProblems, type NumstatRow } from "../checks/shared-engine.ts";
+import { sharedEngineProblems, type BranchCommit, type NumstatRow } from "../checks/shared-engine.ts";
 
 // What the commits of a whole branch must hold, beyond what each message is held to (scripts/git/commit-message.ts reads a range with these). The CI job that checks a pull
 // request's commits has the full history, so these run there, where the shard jobs' shallow checkout skips scripts/checks/pipeline-measure.test.ts.
@@ -24,6 +24,8 @@ export type Range = {
   playable: { base: string; head: string };
   /** The `git diff --numstat` rows between the merge base and the head; left out, the shared engine rule is not read. */
   numstat?: readonly NumstatRow[];
+  /** Each commit's message with its own numstat rows: the `Shared engine:` reason counts only from a commit that touches shared engine code. Left out, every body counts as such a commit. */
+  commits?: readonly BranchCommit[];
 };
 
 /** What a branch's commits lack: a `Reviewed:` line when engine or record code changed, a `Pipeline measure:` line when a scenario became playable, a `Shared engine:` line when the branch adds more than the limit to shared engine code (scripts/checks/shared-engine.ts). */
@@ -37,6 +39,6 @@ export function rangeProblems(range: Range): string[] {
   const added = addedScenarios(range.playable.base, range.playable.head);
   if (added.length > 0 && !hasPipelineMeasure(range.bodies))
     problems.push(`${added.join(", ")} added to PLAYABLE_SCENARIOS and no commit body has a "Pipeline measure:" line (docs/agents/agent-brief.md, Measure)`);
-  if (range.numstat) problems.push(...sharedEngineProblems({ rows: range.numstat, bodies: range.bodies }));
+  if (range.numstat) problems.push(...sharedEngineProblems({ rows: range.numstat, commits: range.commits ?? range.bodies.map((body) => ({ body, rows: range.numstat ?? [] })) }));
   return problems;
 }
