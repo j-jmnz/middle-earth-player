@@ -277,6 +277,10 @@ export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
     "Nightmare solo win",
     "solo win",
   ],
+  "the-morgul-vale": [
+    "Easy solo win",
+    "two-handed win",
+  ],
   "the-oath": [
     "true solo, the Fervor of Lore already used, won",
     "two-handed, steady heroes, 6 tokens placed, won with Guilty Conscience",
