@@ -247,7 +247,7 @@ describe("Helm of Heroes (12202:A:3)", () => {
 });
 
 // Reading (recommended, docs/brief.md, Player card readings): damage that destroys the character destroys it at once and the Helm is discarded with it
-// (rr.damage, rr.attachment-cards), so there is no Response left to use. The case holds with and without the line's records (nothing is offered either way).
+// (rr.attachment-cards); a Response is used only after its trigger has been resolved (rr.response), so no Response is left to use. The case holds with and without the line's records (nothing is offered either way).
 describe("Helm of Heroes (12202:A:3), damage that destroys its character", () => {
   it("12202:A:3 is not offered after the attack's damage destroyed the attached character, and the Helm is discarded with it", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: GIMLI, seat: 0 }, { code: LEGOLAS, seat: 0 }, { code: PAL, seat: 1 }], attached: [{ code: HELM, host: GIMLI }], engaged: [{ code: STRONG, seat: 0 }] });

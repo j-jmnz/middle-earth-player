@@ -1,7 +1,9 @@
 // Rules: rr.setup, rr.forced, rr.response, rr.action, rr.travel, rr.first-player, rr.modifiers, rr.immune, rr.active-location, rr.winning-the-game, rr.quest-advancement, rr.attachment-cards, rr.effects, hob.burgle, hob.indestructible, faq.additional-attacks, faq.enemy-attacks-outside-combat, faq.progress-without-advancing (data/rules/entries.json); docs/scenarios/the-hobbit/the-lonely-mountain.md (The Lonely Mountain).
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, drew, endPhase, flag, handCount, notWon, progressOn, quest, resolve, respond, resourcesOn, reveal, stat, travel, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { EFFECTS } from "../../../effects/index.ts";
+
+import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, defend, drew, endPhase, flag, handCount, notWon, progressOn, quest, resolve, respond, resourcesOn, reveal, rowProblems, stat, travel, window, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Lonely Mountain (the-hobbit part 5): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Finish). The quest deck is the real one (`stages`). What a row cannot say (a burgle attempt, which
@@ -77,3 +79,12 @@ const ROWS: readonly Row[] = [
 
 if (ROWS.length > 0) cardSpecs("the-lonely-mountain", ROWS);
 else describe("the-lonely-mountain card specs", () => it.todo("a row for each record whose behaviour needs a game moment"));
+
+// The damage that destroys the defender is still damage Dark Bats dealt, and the character is no longer in play to attach to (rr.damage, rr.in-play-and-out-of-play).
+// The row also holds without the records, so it is not a card spec row: it runs on the records only.
+describe("132036:A:1 Dark Bats and a character the damage destroys", () => {
+  it("stays an enemy and attaches to nothing", () => {
+    const row: Row = { line: "132036:A:1", layout: { stages: STAGES, engaged: ["132036"], play: [{ code: "ally", seat: 0, damage: 1 }], deck: ["f0", "f0", "f0"] }, act: [attack("132036"), defend("ally")], expect: [zone("ally", "discard"), zone("132036", "engaged"), count("132036", "attached", 0)] };
+    expect(rowProblems("the-lonely-mountain", row, EFFECTS)).toEqual([]);
+  });
+});
