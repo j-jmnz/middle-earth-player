@@ -12,6 +12,7 @@ import { discardShadowOf } from "../../combat/shadow.ts";
 import type { CardInstance, GameEvent, PendingAttack, ScenarioState } from "../../core/state.ts";
 import { isCharacterType, printedOf } from "../../core/printed.ts";
 import { inPlay } from "../../core/state.ts";
+import { holdsEvents } from "../ring-maker/events.ts";
 
 // Some card in play or in a hand has a Response, Forced or triggered effect on one of these triggers.
 export function listened(state: ScenarioState, ctx: ReduceContext, triggers: readonly Trigger[]): boolean {
@@ -57,10 +58,11 @@ export function holdAttack(state: ScenarioState, ctx: ReduceContext, then: NonNu
 }
 
 // The follow-ups of damage ("After ~ takes damage") wait while the damage they follow is still being answered: its
-// `damageDealt` Responses are offered or one of them is resolving (rr.cancel). The queue waits behind them, in order.
+// `damageDealt` Responses are offered or one of them is resolving (rr.cancel). The queue waits behind them, in order. It also waits while a When Revealed that holds back its events resolves (families/ring-maker/events.ts).
 const FOLLOW_UPS: ReadonlySet<Trigger> = new Set<Trigger>(["damaged", "damagedByAttack"]);
 
 export function eventWaits(state: ScenarioState): boolean {
+  if (state.pendingEvents?.length && holdsEvents(state)) return true;
   const first = state.pendingEvents?.[0];
   if (!first || !FOLLOW_UPS.has(first.trigger) || !first.cardId) return false;
   const id = first.cardId;

@@ -27,6 +27,19 @@ describe("effects render templates", () => {
     expect(renderAmount(3, ctx, renderPick)).toBe("3");
   });
 
+  it("renders a draw up to N in hand as a top-up that draws nothing from a full hand, and a record's wording for the places that need it", () => {
+    const ctx = newCtx();
+    expect(renderInstruction({ verb: "Draw", amount: { hand: true, times: -1, plus: 5 } }, ctx, 0, false).join(" ")).toContain("draws cards until their hand holds 5 (nothing when it already holds 5 or more)");
+    expect(renderInstruction({ verb: "Draw", amount: { hand: true } }, ctx, 0, false).join(" ")).toContain("the cards in your hand");
+    // A quest Setup says "Setup", a Campaign Setup says so; the last-counter trigger names a card effect; a quest stage's Constant names the first player as the actor.
+    const attach = { verb: "AttachSetAsideTo", code: "07016", to: "The Islet" };
+    expect(renderRecord({ id: "a", cardCode: "1", lines: [], timing: "setup", instructions: [attach] }, newCtx())[1]).toContain("Setup: the set-aside");
+    expect(renderRecord({ id: "a", cardCode: "1", lines: [], timing: "forced", instructions: [attach] }, newCtx()).join(" ")).toContain("Campaign Setup: the set-aside");
+    expect(renderRecord({ id: "a", cardCode: "1", lines: [], timing: "forced", trigger: "lastTimeCounterRemoved", subject: "self", instructions: [] }, newCtx())[0]).toContain("by a card effect");
+    const stage = newCtx({ cardType: "quest" });
+    expect(renderRecord({ id: "a", cardCode: "1", lines: [], timing: "constant", condition: { kind: "controls", code: "07016" }, instructions: [{ verb: "Restrict", what: "advance" }] }, stage).join(" ")).toContain("the acting player is the first player");
+  });
+
   it("renders a condition and its negation", () => {
     const ctx = newCtx();
     expect(renderCondition({ kind: "not", condition: { kind: "namedFlag", name: "The Heroes' Defense", stat: "noResourcesPlaced" } }, ctx)).toBe(

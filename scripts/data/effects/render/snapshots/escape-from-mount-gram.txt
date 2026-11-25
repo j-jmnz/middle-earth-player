@@ -262,7 +262,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
     - Time 4: when this card is revealed, 4 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
 
 10053:A:3 (front): Forced: When the last time counter is removed from this quest, discard its captured cards and remove this quest from the game. Then, raise each player's threat by 3 for each of his characters that was discarded by this effect.
-  10053:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card)
+  10053:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card discards each card captured underneath it, each to its owner's discard pile (a hero there is dead), and each player raises their threat by 3 for each of their own characters (heroes and allies) so discarded

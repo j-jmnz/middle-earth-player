@@ -19,6 +19,7 @@ import { prisonerWords } from "../readouts/widgets.ts";
 import { pelennorDetail } from "./pelennor-preview.ts";
 import { keptDetail } from "../readouts/standalone-scenarios/wizards-quest.ts";
 import { angmarDetail } from "./angmar-preview.ts";
+import { ringMakerDetail } from "./ring-maker/preview.ts";
 import { barrowDetail } from "../readouts/standalone-scenarios/barrow-downs.ts";
 import { ungolDetail } from "./ungol-preview.ts";
 import { stoneDetail } from "./stone-preview.ts";
@@ -70,6 +71,9 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   // Iârion under Rescue Iârion, the hands under Lost in the Wilderness, Protect the Innocent and the current quest are told before the Captives' words, which would call a card held under a side quest a hero's Captive.
   const angmar = angmarDetail(game, ctx, cardId, name);
   if (angmar) return angmar;
+  // Gríma on The Islet or in a play area and Ill Tidings in a hand (The Fords of Isen).
+  const ringMaker = ringMakerDetail(game, cardId, name);
+  if (ringMaker) return ringMaker;
   // The Ring-bearer under Topmost Chamber, the boons on Shagrat and Last of the Company are told before the held-hero words of Lost in Mirkwood, which would call the Chamber an enemy that holds a hero facedown.
   const ungol = ungolDetail(game, card, name);
   if (ungol) return ungol;

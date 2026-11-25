@@ -64,8 +64,11 @@ function battlementsDoomed(game: ScenarioState): { seat: number; cards: number }
   });
 }
 
+// The scenarios whose cards these dials word (a scenario with Time X of its own, The Fords of Isen, words its dial in ring-maker/fords.ts).
+const ANGMAR_SCENARIOS: ReadonlySet<string> = new Set(["intruders-in-chetwood", "the-weather-hills", "deadmens-dike", "the-wastes-of-eriador", "escape-from-mount-gram", "the-treachery-of-rhudaur"]);
+
 export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
-  if (game.sideQuests !== true) return [];
+  if (game.sideQuests !== true || !ANGMAR_SCENARIOS.has(game.scenarioId)) return [];
   const dials: TableDial[] = [];
   // Protect the Innocent: a side quest that holds `loseAtDamage` damage tokens loses the game (10158:A:3), 10 with one or two players.
   for (const card of Object.values(game.cards)) {

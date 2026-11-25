@@ -89,6 +89,7 @@ function pushFound(state: ScenarioState, found: readonly Found[], event: GameEve
         peril: state.perilSeat != null,
         effectId: effect.id,
         cause: effectCause(effect),
+        ...(effect.holdsEvents ? { holdsEvents: true as const } : {}),
         instructions: effect.instructions,
         cancel: effect.cancel
           ? { amount: effect.cancel.cost, sphere: effect.cancel.sphere ?? null, unless: effect.cancel.unless ?? null }

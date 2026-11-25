@@ -4,7 +4,7 @@
 // loading ends the breath holds its frame, a second halo flares over it and the black fades; a timer as long as the fade unmounts the splash.
 // The exported page already holds the splash, drawn with no motion (the server cannot know the reader's Reduce motion); the breath starts once the page's
 // script has taken the page over and read it, as the phone's still splash gives way to the breathing one.
-// After the first paint it also starts loading CanvasKit (ui/skia/skia-web.ts), so the table's Skia files are imported once it has. The splash mounts with the
+// After the first paint (or when the splash goes, if no frame came first) it also starts loading CanvasKit (ui/skia/skia-web.ts), so the table's Skia files are imported once it has. The splash mounts with the
 // root layout and stays through the first screen, so the frame it waits for is the first one. The phone has Skia built in and loads nothing. It also starts the
 // page stylesheet (the focus ring, the dock "i" hit area: ui/web/page-styles.ts) and the watch that makes the table inert behind a full-screen layer (ui/web/modal-layers.ts).
 import { useEffect, useEffectEvent, useSyncExternalStore } from "react";
@@ -12,7 +12,7 @@ import { Image, StyleSheet, View, type ViewStyle } from "react-native";
 
 import { MOTION, ms, type EasingName } from "../../ui/motion-tokens";
 import { useMotionScale } from "../../ui/motion-run";
-import { startCanvasKit } from "../../ui/skia/skia-web";
+import { startCanvasKitOnFrame } from "../../ui/skia/skia-web";
 import { startModalLayers } from "../../ui/web/modal-layers";
 import { startPageStyles } from "../../ui/web/page-styles";
 import { FLARE_GROW, HALO_BLUR, HALO_GROW, HALO_HIGH, HALO_LOW, RING, RING_WIDTH, SPLASH_BLACK, type SplashProps } from "./splash-glow";
@@ -56,8 +56,7 @@ export function SplashGlow({ loading, onShown, onDone }: SplashProps) {
   useEffect(() => {
     startPageStyles();
     startModalLayers();
-    const frame = requestAnimationFrame(startCanvasKit);
-    return () => cancelAnimationFrame(frame);
+    return startCanvasKitOnFrame();
   }, []);
 
   // The black has faded (or, under reduced motion, went in one step): unmount.

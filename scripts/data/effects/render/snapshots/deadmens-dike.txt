@@ -52,7 +52,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
     - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
 
 09036:A:2 (front): Forced: After the last time counter is removed from Broken Battlements, each player discards the top 5 cards of his deck and places 1 time counter here.
-  09036:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card)
+  09036:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
       - the top 5 card(s) of the acting player's deck go to their discard pile

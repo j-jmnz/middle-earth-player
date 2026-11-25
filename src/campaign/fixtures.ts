@@ -97,6 +97,7 @@ import dinFixtures from "./fixtures/encounter-at-amon-din.json";
 import assaultFixtures from "./fixtures/assault-on-osgiliath.json";
 import bloodFixtures from "./fixtures/the-blood-of-gondor.json";
 import valeFixtures from "./fixtures/the-morgul-vale.json";
+import isenFixtures from "./fixtures/the-fords-of-isen.json";
 import umbarFixtures from "./fixtures/escape-from-umbar.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
@@ -213,6 +214,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "flies-and-spiders": spidersFixtures,
   "the-lonely-mountain": mountainFixtures,
   "the-battle-of-five-armies": armiesFixtures,
+  "the-fords-of-isen": isenFixtures,
   "escape-from-umbar": umbarFixtures,
 };
 

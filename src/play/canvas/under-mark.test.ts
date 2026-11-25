@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 
 import { TOKEN } from "./token-spots.ts";
-import { FOOT_ROW, STRIP, underMarkBox } from "./under-mark.ts";
+import { FOOT_ROW, STRIP, underMarkBox, underRect } from "./under-mark.ts";
 
 const card = (w: number) => ({ x: 100, y: 50, w, h: w * 1.4 });
 // The badge font's width: about 5.5 pt a character at Medium.
@@ -82,5 +82,21 @@ describe("the pill of a poisoned character turned sideways (hob.venom-poison)", 
     expect(flat.y).toBe(footRow(rect).top);
     expect(lifted.y).toBe(flat.y - (TOKEN + 2));
     expect(lifted.x).toBe(flat.x);
+  });
+});
+
+describe("the pill of a card in the hand", () => {
+  it("stands inside the strip of the card that shows above the bottom edge, at every UI scale, and leaves another zone's card whole", () => {
+    for (const s of [0.85, 1, 1.25, 1.5]) {
+      for (const w of [34, 56, 90, 120]) {
+        const rect = card(w * s);
+        const box = underMarkBox(underRect(rect, true, s), width("held", s), width("", s), s, false);
+        // The strip is no more than 0.56 of the card or the 52 pt target, and the pill is clear of its lower edge.
+        expect(box.y + box.height, `w ${w} s ${s}`).toBeLessThanOrEqual(rect.y + underRect(rect, true, s).h);
+        expect(box.y + box.height, `w ${w} s ${s}`).toBeLessThan(rect.y + rect.h);
+        expect(box.y, `w ${w} s ${s}`).toBeGreaterThanOrEqual(rect.y);
+        expect(underRect(rect, false, s)).toBe(rect);
+      }
+    }
   });
 });

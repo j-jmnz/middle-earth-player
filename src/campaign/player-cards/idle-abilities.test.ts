@@ -7,6 +7,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
+import { addModifier } from "../../rules/core/modified-stat.ts";
 import { updateCard, withThreat } from "../../rules/core/state.ts";
 import { attachTo, moveCard, spawn } from "../../rules/core/zones.ts";
 import { settle } from "../../rules/engine/machine.ts";
@@ -206,6 +207,27 @@ describe("Message from Elrond 08032:A:1 with no other player", () => {
 
   it("is offered when there is another player to give a card to", () => {
     expect(offeredPlay(message(2), ELROND)).toBe(true);
+  });
+});
+
+describe("Message from Elrond 08032:A:1 when no player has a card to give", () => {
+  // The Action chooses a player, who may choose 1 card from his hand: with Elrond the only card in any hand (it is played first), or only a card that cannot leave the hand, it does nothing.
+  const hands = (rows: readonly { code: string; seat: number }[]): Table => table({ seats: 2, heroes: [{ code: BERAVOR, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: ELROND, seat: 0 }, ...rows] });
+
+  it("is not offered when Elrond is the only card in the hands", () => {
+    expect(offeredPlay(hands([]), ELROND)).toBe(false);
+  });
+
+  it("is offered when the player who plays it holds another card, or the other player holds one", () => {
+    expect(offeredPlay(hands([{ code: MEN_OF_THE_WEST, seat: 0 }]), ELROND)).toBe(true);
+    expect(offeredPlay(hands([{ code: MEN_OF_THE_WEST, seat: 1 }]), ELROND)).toBe(true);
+  });
+
+  it("is not offered when the only other card cannot leave the hand (Ill Tidings, 07023:A:1)", () => {
+    const tab = hands([{ code: HELPER, seat: 0 }]);
+    const held = { ...tab, state: addModifier(tab.state, idsOf(tab, HELPER), idsOf(tab, HELPER), "cannotLeaveHand", 1, "endOfGame") };
+    expect(offeredPlay(tab, ELROND)).toBe(true);
+    expect(offeredPlay(held, ELROND)).toBe(false);
   });
 });
 
