@@ -40,8 +40,8 @@ export function readTheRingMaker(sentence: string, names: NameIndex): SetupClaus
     const codes = named(match[1]);
     return codes.length === 0 ? null : [{ kind: "aside", codes, allCopies: true }];
   }
-  // Into Fangorn: "Reveal X additional encounter cards where X equals the number of players in the game minus 1."
-  if (/^Reveal X additional encounter cards where X equals the number of players in the game minus 1$/i.test(sentence)) return [step("revealPlayersLessOne")];
+  // Into Fangorn: "Reveal X encounter cards where X equals the number of players in the game minus 1."
+  if (/^Reveal X (?:additional )?encounter cards where X equals the number of players in the game minus 1$/i.test(sentence)) return [step("revealPlayersLessOne")];
   // The Three Trials: "Set aside all 3 Guardian enemies, all 3 Key objectives, all 3 Barrow locations, and Hallowed Circle." (rm.current-trial)
   if (/^Set aside all 3 Guardian enemies, all 3 Key objectives, all 3 Barrow locations, and Hallowed Circle$/i.test(sentence)) {
     const codes = [...ofSet("The Three Trials", "Guardian", "enemy"), ...ofSet("The Three Trials", "Key", "objective"), ...ofSet("The Three Trials", "Barrow", "location"), ...named("Hallowed Circle")];
