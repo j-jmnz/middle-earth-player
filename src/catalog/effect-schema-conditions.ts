@@ -232,10 +232,10 @@ const atomSchema = z.discriminatedUnion("kind", [
   // and the attacking enemy's engagement cost is higher than its controller's threat. `attacking`: the holder is
   // attacking an enemy whose engagement cost is higher than the holder's controller's threat.
   z.strictObject({ kind: z.literal("versusHighEngagement"), role: z.enum(["defending", "attacking"]) }),
-  // The holder is the declared defender of the attack in progress and the attacking enemy has this Trait ("+1 Defense while defending against an Undead enemy", 10114:A:2, 10187:A:2). Read while a stat is read, like versusDefender (src/rules/core/keywords.ts).
+  // The holder is the declared defender of the attack in progress and the attacking enemy has this Trait ("+1 Defense while defending against an Undead enemy", 10114:A:2, 10187:A:2). Read while a stat is read, like versusDefender (src/rules/core/modified-stat.ts).
   z.strictObject({ kind: z.literal("defendingAgainst"), trait: z.string().min(1) }),
   // The holder is an enemy attacking a defender (declared, not undefended) whose printed hit points are at most `maxHitPoints` ("gets +2 Attack against
-  // characters with 2 or fewer printed hit points", 142071:A:2). Read while a stat is read, like versusHighEngagement (src/rules/core/keywords.ts).
+  // characters with 2 or fewer printed hit points", 142071:A:2). Read while a stat is read, like versusHighEngagement (src/rules/core/modified-stat.ts).
   // `ally`: the defender is an ally ("gets +2 Attack when attacking allies", 12054:A:2). `maxWillpower`: its current Willpower is at most this ("if the defending character has less than 2 Willpower", 901303:A:1).
   z.strictObject({ kind: z.literal("versusDefender"), maxHitPoints: z.number().int().min(0).optional(), maxWillpower: z.number().int().min(0).optional(), ally: z.literal(true).optional() }),
   // The source card is attached to a card with this name.
@@ -410,10 +410,10 @@ const atomSchema = z.discriminatedUnion("kind", [
   // Captured cards (Escape from Mount Gram, read by the captured family): `noneUnderAttacker` no card is captured underneath the attacking enemy ("+2 Attack instead if it has no captured cards underneath it", 10045:A:3), `noneUnderSelf` no card is captured underneath the source ("If there are no captured cards underneath Gornákh's Dungeons", 10039:B:2), `someoneEmpty` the Interrogation that is
   // resolving found a captured deck with no card to discard ("If at least 1 player discarded no cards from this effect", 10052:A:1).
   z.strictObject({ kind: z.literal("captured"), is: z.enum(["noneUnderSelf", "someoneEmpty", "noneUnderAttacker"]) }),
-  // The holder attacks, or defends against, an enemy that shares a Trait with an enemy in the victory display ("+1 Attack and +1 Defense if that enemy shares a Trait with an enemy in the victory display", 10181:A:2). Read while a stat is read (src/rules/core/keywords.ts).
+  // The holder attacks, or defends against, an enemy that shares a Trait with an enemy in the victory display ("+1 Attack and +1 Defense if that enemy shares a Trait with an enemy in the victory display", 10181:A:2). Read while a stat is read (src/rules/core/modified-stat.ts).
   z.strictObject({ kind: z.literal("versusVictoryTrait") }),
   // The holder is in the staging area of the player `seat` or engaged with a player who shares it (mec108.create-staging-area): an encounter card's lasting effect on "each enemy" reaches the enemies of its own staging area only while the staging areas are separate. Engine use: the stat modifier
-  // an encounter card's effect makes carries it; read while a stat is read (src/rules/core/keywords.ts).
+  // an encounter card's effect makes carries it; read while a stat is read (src/rules/core/modified-stat.ts).
   z.strictObject({ kind: z.literal("inArea"), seat: z.number().int().min(0) }),
   // A stat modifier's: the holder is exhausted now, read each time the stat is read ("exhausted characters get -1 Willpower, -1 Attack, and -1 Defense", 132038:A:1; faq.lasting-effects).
   z.strictObject({ kind: z.literal("holderExhausted") }),

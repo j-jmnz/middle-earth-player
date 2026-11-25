@@ -62,6 +62,8 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     pack: { steps: [{ script: "tools/author-pack.ts" }], about: "writes .agent/pack/<id>.md, the scenario author's context" },
     tests: { steps: [{ script: "tools/scenario-tests.ts" }], about: "after Build, writes a failing row stub in the scenario's spec.test.ts for each record no test names (<scenario-id> --dry-run first)" },
     fixtures: { steps: [{ script: "e2e/fixtures.ts" }], about: "rewrites the save fixtures in src/campaign/fixtures" },
+    time: { steps: [{ script: "tools/scenario-time.ts" }], about: "<scenario-id> <task> start|wait|resume|end records a task's time in .agent/handoff/<id>.times.json; <scenario-id> alone prints the Measure line's minutes" },
+    measures: { steps: [{ script: "tools/scenario-measures.ts" }], about: "<scenario-id...> reads each scenario's `Pipeline measure:` line from the history and prints the tasks' wait/writing minutes side by side" },
   },
   test: {
     all: { steps: [{ script: VITEST, args: ["run"] }], about: "vitest run (any arguments go to vitest)" },

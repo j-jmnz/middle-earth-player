@@ -27,7 +27,7 @@ const VERBS = [
 const FLAGS = ["noAttachmentPlays"] as const;
 
 // "hostDestroyed": about an attachment (an objective attached to an enemy): the enemy it was attached to is destroyed, announced as the destruction begins, so the attachment hears it from wherever the release put it ("After attached Troll enemy is destroyed", 131042:A:2; rr.timing-of-ability-resolution).
-// A Response to it is offered before the Forced effects the release raised (the attachment's own return to the staging area). Announced by destroyCard (src/rules/core/keywords.ts) for a destroyed enemy.
+// A Response to it is offered before the Forced effects the release raised (the attachment's own return to the staging area). Announced by destroyCard (src/rules/core/destroy.ts) for a destroyed enemy.
 // "enemyDamagedByAttack": about an enemy a player attack damaged (or destroyed), with the damage dealt as the event's amount: "After attached Troll enemy takes damage as the result of an attack" (131043:A:2). Announced by strike.ts only in a game with a card that hears it.
 // "encounterDeckEmpty": about no card, announced as soon as the encounter deck has no card and no effect is resolving, before the quest phase reset of the deck (131024:B:1; src/rules/families/sack/empty-deck.ts); only a game with a card that hears it announces it.
 // "sacked": the event a Sack card's When Sacked record answers (src/rules/families/sack/deck.ts reads the record when the card is drawn; no card listens for it).

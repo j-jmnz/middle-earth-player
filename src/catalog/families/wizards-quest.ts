@@ -51,7 +51,7 @@ const TRIGGERS = [] as const;
 const FLAGS = [
   // On an encounter card revealed by SearchTopReveal: its When Revealed effects cannot be canceled ("Its 'when revealed' effects cannot be canceled", 51003:A:1). Read by cancelBarred (rules/families/encounter/cancel.ts).
   "revealUncancelable",
-  // On an enemy a constant ModifyStat of its attachment names (51017:A:1, "When attached enemy is dealt enough damage to destroy it, cancel the damage and discard Smoking Blood instead"): damage that would destroy the card is canceled, and the card that granted the flag is discarded. Read by placeDamage (rules/core/keywords.ts).
+  // On an enemy a constant ModifyStat of its attachment names (51017:A:1, "When attached enemy is dealt enough damage to destroy it, cancel the damage and discard Smoking Blood instead"): damage that would destroy the card is canceled, and the card that granted the flag is discarded. Read by placeDamage (rules/core/damage.ts).
   "cancelsLethalDamage",
   // On the table, while a card in play says so ("Shadow effects cannot be canceled", 51348:A:2): no Response is offered to cancel a shadow effect, whoever's enemy it is on. Read by cancelBarred (rules/families/encounter/cancel.ts).
   "allShadowsUncancelable",
