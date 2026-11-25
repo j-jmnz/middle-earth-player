@@ -440,3 +440,23 @@ describe("16071:B:3 16072:B:3 the stages return the heroes in the staging area",
     expect(after.cards[after.seats[0]?.heroes[0] ?? ""]).toMatchObject({ exhausted: true, controller: 0 });
   });
 });
+
+describe("16064:A:1 Mordor Warg: Limit 1 per enemy", () => {
+  const wargsOn = (state: ScenarioState, orc: string) => state.cards[orc]?.attachments.filter((id) => state.cards[id]?.code === "16064").length ?? 0;
+
+  it("16064:A:1 a second Warg does not attach to an Orc that carries one: it goes to another Orc", () => {
+    const made = table({ stage: STAGE_3, staging: ["16062", "16063"] });
+    const first = resolveRecords(opened(made).state, made.ctx, "16064", "whenRevealed").state;
+    const again = resolveRecords(first, made.ctx, "16064", "whenRevealed").state;
+    const orcs = [...idsOf(again, "16062"), ...idsOf(again, "16063")];
+    expect(orcs.map((id) => wargsOn(again, id))).toEqual([1, 1]);
+  });
+
+  it("16064:A:1 with one Orc only, a second Warg finds no enemy to carry it and is discarded", () => {
+    const made = table({ stage: STAGE_3, staging: ["16062"] });
+    const first = resolveRecords(opened(made).state, made.ctx, "16064", "whenRevealed").state;
+    const again = resolveRecords(first, made.ctx, "16064", "whenRevealed").state;
+    expect(wargsOn(again, idsOf(again, "16062")[0] ?? "")).toBe(1);
+    expect(idsOf(again, "16064").filter((id) => again.cards[id]?.zone === "encounterDiscard")).toHaveLength(1);
+  });
+});
