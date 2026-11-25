@@ -1,27 +1,36 @@
 // Rules: dcce.scalable-upgradable, dcce.campaign-setup-the-drowned-ruins, rr.the-word-choose, rr.play-and-put-into-play, rr.in-play-and-out-of-play, rr.victory (data/rules/entries.json).
-// The Command events of The Drowned Ruins, read from the printed lines (data/printed/dream-chaser.json): 11201:A:1 to 11201:A:5, 11202:A:1 to 11202:A:5, 11203:A:1 to 11203:A:5. "Action: Add Command to the victory
+// The Command events of The Drowned Ruins, read from the printed lines (data/printed/dream-chaser.json): 11201:A:1 to 11201:A:5, 11202:A:1 to 11202:A:5, 11203:A:1 to 11203:A:5, 11204:A:5 (the host of an attachment Command moves, with two seats). "Action: Add Command to the victory
 // display to choose up to X options, where X is its level", and "For this game, X is plus 1 for each of those copies" (11200:A:2). One record holds all five lines of a card, so `lineSpec` runs each check again without it,
 // where Command cannot be played at all. The table is `tableFromLayout` in the combat phase's action window, Command in the first seat's hand.
-import { describe, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
+import { EFFECTS } from "../../../effects/index.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
+import { legalIntents, legalTargets } from "../../../rules/engine/reduce.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
+import { sendUnledgered } from "../../../../test/harness/player-table.ts";
 import { idOf, idsOf, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
 import { payFor } from "../../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 
 const SCENARIO = "the-drowned-ruins";
 const BLESSING = "11205";
-const SPYGLASS = "11180";
+const SPYGLASS = "11180"; // an Item that prints no "Attach to" line
+const FATE = "01134"; // a boon: "Attached hero collects 1 additional resource during each resource phase."
+const BARD = "18002"; // a Dale hero
+const ELF_FRIEND = "10093"; // "Attach to a character.": any seat's character, cost 1 in no sphere, no Response when played
+const ARMOR = "11172"; // "Attached Ship gets +1 Defense"
+const WARSHIP = "110137"; // Dawn Star, a Ship objective
+const BRAND = "18001"; // a Dale hero: "After you play an attachment on a Dale character without an attachment, draw a card."
 const SEA_SCORPION = "12096";
 const REVENANT = "11181"; // a unique enemy
 
 // Command `code` in hand, its level in the Campaign Log `level`, and the codes the campaign card's Setup let the players choose.
 function commandTable(code: string, effects: readonly Effect[], level: number, layout: Layout = {}, chosen: readonly string[] = []) {
-  const made = tableFromLayout(SCENARIO, { phase: "Combat", hand: [code], heroResources: 2, ...layout }, { effects, extra: [SPYGLASS] });
+  const made = tableFromLayout(SCENARIO, { phase: "Combat", hand: [code], heroResources: 2, ...layout }, { effects, extra: [SPYGLASS, ELF_FRIEND, BRAND, BARD, ARMOR, WARSHIP, FATE] });
   const state: ScenarioState = { ...made.state, campaignFacts: { prisoner: null, usedOnce: [], counters: {}, levels: { [code]: level } }, ...(chosen.length > 0 ? { chosenAtSetup: chosen.map((one) => ({ code: one, seat: 0 })) } : {}) };
   return { ...made, state: syncConstants(state, made.ctx), card: idOf(state, code) };
 }
@@ -179,5 +188,108 @@ describe("a non-unique enemy (11202:A:2)", () => {
     const asked = play(made);
     expect(options(asked)).toContain("bottom");
     expect(options(asked)).not.toContain("resources");
+  });
+});
+
+describe("an attachment Command puts into play or moves is offered to a character of any player (11203:A:5, 11204:A:5)", () => {
+  // "Put Spyglass into play attached to a hero": the line names no player, and Spyglass prints no "Attach to" line: each hero of both seats is offered, an ally is not.
+  // Put on the other player's hero, it is controlled by that player (rr.attachment-cards).
+  lineSpec("11203:A:5", "with two seats Spyglass may go on a hero of the other player, not on an ally", (effects) => {
+    const made = withState(commandTable("11203", effects, 1, { seats: 2, play: ["ally"] }), (state) => spawn(state, SPYGLASS, { zone: "hand", seat: 0 }).state);
+    const asked = answer(made, play(made), "spyglass");
+    expect([...options(asked)].sort()).toEqual([made.hero, made.hero2, made.seat1Hero ?? ""].sort());
+    const done = send(asked, { type: "Choose", optionId: made.seat1Hero ?? "" }, made.ctx);
+    expect(done.state.cards[idOf(done.state, SPYGLASS)]).toMatchObject({ zone: "play", host: made.seat1Hero, controller: 1 });
+  });
+
+  // "Ready an attachment. You may move it to an eligible character.": Spyglass on the first hero may go to the other hero, the other player's hero or an ally, not stay on its own host.
+  lineSpec("11204:A:5", "with two seats a moved Spyglass may go to a character of another player, which then controls it", (effects) => {
+    const made = commandTable("11204", effects, 1, { seats: 2, play: ["ally"], attached: [{ code: SPYGLASS, to: "dh1" }] });
+    const asked = answer(made, play(made), "attachment", "moveIt");
+    expect([...options(asked)].sort()).toEqual([made.hero2, made.seat1Hero ?? "", idOf(made.state, "ally")].sort());
+    const done = send(asked, { type: "Choose", optionId: made.seat1Hero ?? "" }, made.ctx);
+    expect(done.state.cards[idOf(done.state, SPYGLASS)]).toMatchObject({ host: made.seat1Hero, controller: 1 });
+  });
+
+  // "After you play an attachment on a Dale character without an attachment": Command moves the Spyglass onto Brand, which is no play (rr.play-and-put-into-play: playing is from the hand with the cost paid), so Brand's Response is not offered.
+  it("18001:A:2 Brand draws nothing when Command moves an attachment onto a Dale character", () => {
+    const made = commandTable("11204", EFFECTS, 1, { seats: 2, heroes: [{ code: BRAND, seat: 1 }], attached: [{ code: SPYGLASS, to: "dh1" }], deckOf: [{ code: "f0", seat: 1 }] });
+    const brand = idOf(made.state, BRAND);
+    const moved = send(answer(made, play(made), "attachment", "moveIt"), { type: "Choose", optionId: brand }, made.ctx);
+    expect(moved.state.cards[idOf(moved.state, SPYGLASS)]).toMatchObject({ host: brand, controller: 1 });
+    expect(legalIntents(moved.state, made.ctx)).not.toContainEqual({ type: "Trigger", cardId: brand, effectId: "18001:response:1" });
+  });
+});
+
+describe("Brand's Response hears an attachment played from the hand (18001:A:2)", () => {
+  // The table has Elf-friend (cost 1, "Attach to a character") in the hand of `seat` in the Planning phase; `host` is the Dale character it is played on.
+  function played(effects: readonly Effect[], layout: Layout, seat: number, host: string) {
+    const made = withState(commandTable("11203", effects, 1, { phase: "Planning", ...layout }), (state) => ({ ...spawn(state, ELF_FRIEND, { zone: "hand", seat }).state, activeSeat: seat, planningSeat: seat }));
+    const elf = idOf(made.state, ELF_FRIEND);
+    const run = send(start(made.state), { type: "PlayCard", cardId: elf, hostId: idOf(made.state, host), payments: payFor(made.state, made.ctx, elf, seat) }, made.ctx);
+    return { made, run, brand: idOf(made.state, BRAND) };
+  }
+  const offered = (made: Made, run: Run, brand: string) => legalIntents(run.state, made.ctx).some((intent) => intent.type === "Trigger" && intent.cardId === brand && intent.effectId === "18001:response:1");
+
+  // "you" is the player who plays the attachment: Brand's controller playing it on Brand, alone.
+  lineSpec("18001:A:2", "Brand draws a card when his player plays an attachment on him", (effects) => {
+    const { made, run, brand } = played(effects, { heroes: [{ code: BRAND, seat: 0 }], deckOf: [{ code: "f0", seat: 0 }] }, 0, BRAND);
+    const before = made.state.seats[0]?.hand.length ?? 0;
+    expect(offered(made, run, brand)).toBe(true);
+    const drawn = sendUnledgered(run, { type: "Trigger", cardId: brand, effectId: "18001:response:1" }, made.ctx);
+    // The Elf-friend left the hand, the drawn card joined it.
+    expect(drawn.state.seats[0]?.hand.length).toBe(before);
+    expect(drawn.state.seats[0]?.deck.length).toBe(0);
+  });
+
+  // Another player plays the attachment on Brand's character: that player is "you", not Brand's controller.
+  it("18001:A:2 Brand does not draw when another player plays an attachment on him", () => {
+    const { made, run, brand } = played(EFFECTS, { seats: 2, heroes: [{ code: BRAND, seat: 0 }], deckOf: [{ code: "f0", seat: 0 }] }, 1, BRAND);
+    expect(run.state.cards[idOf(run.state, ELF_FRIEND)]).toMatchObject({ host: brand, controller: 0 });
+    expect(offered(made, run, brand)).toBe(false);
+  });
+
+  // The attachment goes on a Dale character of another player: Brand's player played it, so Brand's Response is offered, though the host's player controls the attachment.
+  it("18001:A:2 Brand draws when his player plays an attachment on another player's Dale character", () => {
+    const { made, run, brand } = played(EFFECTS, { seats: 2, heroes: [{ code: BRAND, seat: 0 }, { code: BARD, seat: 1 }], deckOf: [{ code: "f0", seat: 0 }] }, 0, BARD);
+    expect(run.state.cards[idOf(run.state, ELF_FRIEND)]).toMatchObject({ controller: 1 });
+    expect(offered(made, run, brand)).toBe(true);
+  });
+
+  // An attachment put into play (Galadriel, Open the Armory) is no play either.
+  it("18001:A:2 Brand draws nothing when an effect puts an attachment into play on a Dale character", () => {
+    const made = commandTable("11203", EFFECTS, 1, { seats: 1, heroes: [{ code: BRAND, seat: 0 }], deckOf: [{ code: "f0", seat: 0 }] });
+    const brand = idOf(made.state, BRAND);
+    const withSpyglass = withState(made, (state) => spawn(state, SPYGLASS, { zone: "hand", seat: 0 }).state);
+    const asked = answer(withSpyglass, play(withSpyglass), "spyglass");
+    const done = send(asked, { type: "Choose", optionId: brand }, made.ctx);
+    expect(done.state.cards[idOf(done.state, SPYGLASS)]).toMatchObject({ zone: "play", host: brand });
+    expect(offered(made, done, brand)).toBe(false);
+  });
+});
+
+describe("Spyglass played from the hand (11203:A:5)", () => {
+  // A hand play is the player's own: Spyglass, which prints no "Attach to" line, goes on a character of the playing seat with two seats, before and after the host of an effect's attachment was opened to every seat.
+  it("11203:A:5 with two seats Spyglass played from the hand is offered the playing seat's characters only", () => {
+    const made = withState(commandTable("11203", EFFECTS, 1, { seats: 2, phase: "Planning", play: ["ally"] }), (state) => spawn(state, SPYGLASS, { zone: "hand", seat: 0 }).state);
+    const hosts = [...legalTargets(made.state, { type: "PlayCard", cardId: idOf(made.state, SPYGLASS) }, made.ctx)].sort();
+    expect(hosts).toEqual([made.hero, made.hero2, idOf(made.state, "ally")].sort());
+  });
+});
+
+describe("an attachment that prints its host stays on it when Command moves it (11204:A:5)", () => {
+  // "Attached hero ...": Appointed by Fate (a record) may go to another hero, of either player, and not to an ally.
+  lineSpec("01134:A:1", "a boon that names a hero moved by Command goes to a hero of any player, not to an ally", (effects) => {
+    const made = commandTable("11204", effects, 1, { seats: 2, play: ["ally"], attached: [{ code: FATE, to: "dh1" }] });
+    expect([...options(answer(made, play(made), "attachment", "moveIt"))].sort()).toEqual([made.hero2, made.seat1Hero ?? ""].sort());
+  });
+
+  // "Attached Ship gets ...": the Modification boons go on a Ship. A ship-objective is immune to player card effects, so Command has no eligible host for Armor Plating and leaves it where it is, never on a hero or an ally.
+  // Both sides of the card carry the host, so this is not a lineSpec check (it passes without one side's record).
+  it("11172:A:2 Armor Plating moved by Command does not go to a hero or an ally", () => {
+    const made = commandTable("11204", EFFECTS, 1, { seats: 2, play: ["ally", WARSHIP], attached: [{ code: ARMOR, to: WARSHIP }] });
+    const done = answer(made, play(made), "attachment", "moveIt");
+    expect(done.state.window?.kind).not.toBe("choose");
+    expect(done.state.cards[idOf(done.state, ARMOR)]?.host).toBe(idOf(made.state, WARSHIP));
   });
 });
