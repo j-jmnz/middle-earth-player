@@ -10,7 +10,7 @@ export type Tally = { template: number; json: number };
 // `finalStage`: the card is the last stage of a quest deck (the record that wins on its defeat has nothing to run).
 // `cardType`: the printed type of the card being rendered (who the acting player is depends on it, actor.ts).
 // `reads`: set by read-fields.test.ts to collect the keys each finished template claimed (the last entry is the outermost piece), so the test can check each one shows in the English.
-export type Ctx = { tally: Tally; effects?: readonly Obj[]; cardName?: string; attacker?: boolean; engagedNext?: boolean; engagedSeat?: boolean; finalStage?: boolean; cardType?: string; reads?: (readonly string[])[]; lineTexts?: ReadonlyMap<string, string> };
+export type Ctx = { tally: Tally; effects?: readonly Obj[]; cardName?: string; attacker?: boolean; engagedNext?: boolean; engagedSeat?: boolean; finalStage?: boolean; cardType?: string; timing?: string; reads?: (readonly string[])[]; lineTexts?: ReadonlyMap<string, string> };
 export type Obj = Readonly<Record<string, unknown>>;
 
 export const newCtx = (extra: { effects?: readonly Obj[]; cardName?: string; finalStage?: boolean; cardType?: string; lineTexts?: ReadonlyMap<string, string> } = {}): Ctx => ({ tally: { template: 0, json: 0 }, ...extra });

@@ -36,7 +36,7 @@ const ABOUT_ONE_CARD: ReadonlySet<string> = new Set(["questDefeated", "lastTimeC
 const TRIGGER: Readonly<Record<string, string>> = {
   questFailed: "after the players quest unsuccessfully",
   questDefeated: "after a side quest is defeated (its progress reached its quest points)",
-  lastTimeCounterRemoved: "after the last time counter is removed from a card at the end of the refresh phase",
+  lastTimeCounterRemoved: "after the last time counter is removed from a card, at the end of the refresh phase or by a card effect",
   flipped: "after a card is flipped over (the FlipCard verb)",
   questSucceeded: "after the players quest successfully",
   enemyDestroyed: "after an enemy is destroyed",
@@ -148,7 +148,7 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   if (instructions.length === 0 && keywordReminder) lines.push("  (no instructions: the record only names the printed keyword reminder; the keyword is the card's own and the engine reads it from the card)");
   else if (instructions.length === 0) lines.push(winsOnDefeat ? "  (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)" : "  (no instructions: the record only names the printed line, and the engine runs no step for it)");
   if (instructions.length > 1) lines.push("  (steps run in order; a step depends on an earlier one only through its own condition)");
-  const inner = effect.trigger === "engaged" ? { ...ctx, engagedSeat: true } : ctx;
+  const inner = { ...ctx, timing: typeof effect.timing === "string" ? effect.timing : undefined, ...(effect.trigger === "engaged" ? { engagedSeat: true } : {}) };
   instructions.forEach((instruction, at) => lines.push(...renderInstruction(instruction, inner, 1, at > 0)));
   return lines;
 }

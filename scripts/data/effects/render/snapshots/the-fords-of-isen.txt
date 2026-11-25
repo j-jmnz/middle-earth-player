@@ -6,8 +6,8 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
 07016:A:1 (front): If free of encounters, the first player gains control of Gríma.
   07016:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them, and from then on it follows the first player token: it passes to the new first player each time the token moves, while it stays free of encounters
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
 
 07016:A:2 (front): Action: Exhaust Gríma to draw a card.
   07016:action:1: Action (cost: exhaust this card)
@@ -43,7 +43,7 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
   07018:forced:1: Forced after this location becomes the active location (heard about this card) [also {"holdsEvents":true}]
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
-      - the acting player draws the cards in your hand x -1 + 5 card(s)
+      - the acting player draws cards until their hand holds 5 (nothing when it already holds 5 or more)
 
 ## 07019 The King's Road
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -240,7 +240,7 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
 07059:A:1 (front): Setup: Add The Islet to the staging area and attach Gríma to that location. Each player searches the encounter deck for 1 different Dunland enemy and adds it to the staging area. Shuffle the encounter deck.
   07059:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - Campaign Setup: the set-aside copy of the card with code 07016 is attached to the card in play named "The Islet" (a card dealt on its Upgraded side stays so); it lies attached, controlled by nobody, not revealed, wherever its host lies, and in no play area; it is a claimed objective, so a host that leaves play lets it go back to the staging area when its text says so
+    - Setup: the set-aside copy of the card with code 07016 is attached to the card in play named "The Islet" (a card dealt on its Upgraded side stays so); it lies attached, controlled by nobody, not revealed, wherever its host lies, and in no play area; it is a claimed objective, so a host that leaves play lets it go back to the staging area when its text says so
     - for each player, first player first:
       - the acting player finds one Dunland enemy in the encounter deck and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
     - shuffle the encounter deck
@@ -250,13 +250,14 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
     - Time 5: when this card is revealed, 5 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
 
 07059:B:2 (back): Forced: After the last time counter is removed from this stage, discard Gríma from play.
-  07059:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card)
+  07059:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card in play titled "Gríma" is discarded from play, although it cannot leave the staging area (the discard supersedes that text)
 
 07059:B:3 (back): The players cannot advance unless the first player controls Gríma.
   07059:constant:2: Constant
     only if not (the actor controls the card with code 07016)
+    who acts: the acting player is the first player (a quest stage belongs to no player; while the stages are split between the players, the player whose stage it is)
     - the players cannot defeat this stage while this holds
 
 ## 07060 Dunlending Attack
@@ -274,7 +275,7 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
     - Time 2: when this card is revealed, 2 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
 
 07060:B:3 (back): Forced: After the last time counter is removed from this stage, each player assigns X damage among characters he controls where X is the number of cards in his hand. Place 2 time counters on this stage.
-  07060:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card)
+  07060:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
@@ -296,7 +297,7 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
     - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
 
 07061:B:2 (back): Forced: After the last time counter is removed from this stage, discard the top X cards of the encounter deck. X is the number of cards in the first player's hand. Add each enemy discarded this way to the staging area. Put 3 time counters on this stage.
-  07061:forced:1: Forced after the last time counter is removed from a card at the end of the refresh phase (heard about this card)
+  07061:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the rest of the effect is carried out by the first player

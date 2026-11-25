@@ -25,6 +25,8 @@ export function actorNote(effect: Obj, ctx: Ctx): string {
     if (PHASE_EVENTS.has(trigger)) return "the acting player is the first player (a phase has no player of its own)";
     if (trigger !== "") return "the acting player is the player the event happened to (the first player when the event names no player)";
   }
+  // A quest stage belongs to no player: what its Constant reads of "the actor" is the first player (the player whose stage it is while the stages are split).
+  if (timing === "constant" && ctx.cardType === "quest" && /"kind":"(controls|handSize|anyHand)"|"hand":true/.test(JSON.stringify(effect))) return "the acting player is the first player (a quest stage belongs to no player; while the stages are split between the players, the player whose stage it is)";
   if (timing === "action" && ctx.cardType !== undefined && SHARED_TYPES.has(ctx.cardType)) return controllerOnly(effect, ctx) ? "only the player who controls it may trigger it, as for any ally; the acting player is that player" : "any player may trigger it; the acting player is the one who does";
   return "";
 }

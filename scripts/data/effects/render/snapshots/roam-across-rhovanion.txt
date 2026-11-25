@@ -44,7 +44,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   19036:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
 
 19036:A:2 (front): Action: Exhaust Durin's Key to give each location -1 Threat until the end of the phase.
   19036:action:1: Action (cost: exhaust this card)
@@ -68,7 +68,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   19037:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the card in play titled "Urdug" is its host; the claim is announced
-    - this card: stat returnsToStagingArea 1, while this card is in play
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
 
 19037:A:2 (front): Forced: When Urdug attacks, discard the top card of the encounter deck and add its Threat to his Attack until the end of the phase.
   19037:forced:1: Forced after a character is declared as an attacker (heard about the host)
@@ -387,7 +387,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19052:A:2 (front): While Urdug is free of encounters, the first player gains control of Urdug.
   19052:constant:1: Constant
-    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them; gaining control is a claim, announced
+    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them, and from then on it follows the first player token: it passes to the new first player each time the token moves, while it stays free of encounters; gaining control is a claim, announced
 
 19052:A:3 (front): If Urdug is destroyed, the players lose the game.
   19052:forced:1: Forced on the event characterDestroyed (heard about this card)
@@ -420,7 +420,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19054:A:2 (front): While Tiny is free of encounters, the first player gains control of Tiny.
   19054:constant:1: Constant
-    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them; gaining control is a claim, announced
+    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them, and from then on it follows the first player token: it passes to the new first player each time the token moves, while it stays free of encounters; gaining control is a claim, announced
 
 19054:A:3 (front): Forced: After Tiny exhausts, raise your threat by 2.
   19054:forced:1: Forced on the event exhausted (heard about this card)
