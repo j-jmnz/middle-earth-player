@@ -2,20 +2,23 @@ import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
 import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenarios.ts";
+import type { LoadoutSeat } from "../../../src/campaign/loadout.ts";
+import { legalTargets } from "../../../src/rules/engine/reduce.ts";
 import type { PolicyOptions } from "../../harness/auto-player.ts";
 import { fillerLoadout, HERO_STATS, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
-import { chooseFirstOrLast, policyIntent, type Policy } from "../../harness/policy-kit.ts";
+import { attackEach, chooseFirstOrLast, commitAllBut, engageUpTo, policyIntent, undefendedLeastDamaged, type Policy, type Rule } from "../../harness/policy-kit.ts";
 
 const cycle = loadCampaign("the-ring-maker");
 const isen = loadAnyScenario("the-fords-of-isen");
 
 // Test helper. A whole standalone game of The Fords of Isen played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. TODO: say how the players travel, engage and answer the choices this scenario asks.
-export const ISEN_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
-// "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
-export type IsenDecks = "strong" | "weak" | "brittle";
+// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. The decks are six filler events: the Fords' cards count the cards in hand, so a long deck only grows X. Each seat quests with one hero and keeps two home to attack (a defender is exhausted, so nobody defends: the damage of an attack goes to the least damaged hero), travels to The Islet first (exploring it frees Gríma, and stage 1B waits until the first player controls him), engages every enemy and attacks one each, so stage 3B (which waits until no enemy is in play) ends. Gríma never quests, attacks or takes damage (one damage destroys him and the players lose).
+export const ISEN_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: true, act: false };
+// "strong": big-number heroes that win; "steady": strong attackers with a willpower of 6, so the quest never explores The Islet in time; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
+export type IsenDecks = "strong" | "weak" | "brittle" | "steady";
 
-export const isenLoadout = fillerLoadout;
+// The decks are short (six filler events, the opening hand): the Fords' cards count the cards in hand (threat, damage, attacks), and a thirty-card deck that nobody plays grows the hand past what the heroes survive.
+export const isenLoadout = (seatCount: 1 | 2): LoadoutSeat[] => fillerLoadout(seatCount).map((seat) => ({ ...seat, deck: seat.deck.slice(0, 6) }));
 
 // The goldens' world and the start of a game: the seeded game's parts every scenario shares (test/harness/game-kit.ts).
 export const isenWorld = (decks: IsenDecks = "strong") => game.world(decks);
@@ -42,8 +45,19 @@ export const DEFAULT_POLICY: IsenPolicy = { choose: "first" };
 //   engageUpTo(most, options)  the optional engagement step: engage the enemy of the lowest `rank` (`allow` permits) while engaged with fewer than `most`
 //   triggerActions(effectIds, oncePerRound)  an Action or Response of the records named, each time (or once a round) the engine offers it and the seat can pay
 //   passCommitWhile(when)  the quest commit: pass without committing while `when` holds
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go in the list, before the auto-player's.
-const rules = (policy: IsenPolicy): Policy => [chooseFirstOrLast(policy.choose)];
+// The scenario's own answers are the Islet travel rule below, before the kit's.
+const ISLET = "07017";
+// A travel window: The Islet when it is offered, else the location with the fewest printed quest points, else no travel.
+const travelToIslet: Rule = (state, ctx) => {
+  if (state.window?.kind !== "travel") return null;
+  const options = legalTargets(state, { type: "Travel" }, ctx);
+  const points = (id: string): number => ctx.cards.get(state.cards[id]?.code ?? "")?.questPoints ?? 99;
+  const best = options.find((id) => state.cards[id]?.code === ISLET) ?? [...options].sort((left, right) => points(left) - points(right))[0];
+  return best ? { type: "Travel", locationId: best } : { type: "DeclineTravel" };
+};
+const GRIMA = "07016";
+const isGrima = (state: ScenarioState, id: string): boolean => state.cards[id]?.code === GRIMA;
+const rules = (policy: IsenPolicy): Policy => [chooseFirstOrLast(policy.choose), travelToIslet, commitAllBut(2, isGrima), undefendedLeastDamaged((state, id) => isGrima(state, id)), attackEach({ once: true, may: (state, id) => !isGrima(state, id) }), engageUpTo(99)];
 
 // Every intent is one the reducer listed.
 export function isenIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: IsenPolicy = DEFAULT_POLICY): PlayerIntent {
@@ -55,15 +69,25 @@ export type IsenGame = PlayedGame;
 // The goldens (src/campaign/scenarios/the-fords-of-isen/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type IsenGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: IsenDecks; outcome: "won" | "lost"; policy?: Partial<IsenPolicy>; lossReason?: string };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Nightmare) and a few losses (each way the scenario can be lost), each on a fixed seed.
-export const ISEN_GOLDENS: readonly IsenGolden[] = [];
+// The games to pin (about 940 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and Easy, and a loss for each way to lose: Gríma leaves play (solo: heroes too weak to quest; two-handed: heroes that quest too slowly to explore The Islet; either way stage 1B's last time counter goes)
+// and no seats remain (heroes too brittle), each solo and two-handed.
+export const ISEN_GOLDENS: readonly IsenGolden[] = [
+  { name: "solo win", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed win", seatCount: 2, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "Easy solo win", seatCount: 1, seed: 5, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "Easy two-handed win", seatCount: 2, seed: 5, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "solo loss: Gríma leaves play", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "Gríma left play" },
+  { name: "two-handed loss: Gríma leaves play", seatCount: 2, seed: 7, difficulty: "Normal", decks: "steady", outcome: "lost", lossReason: "Gríma left play" },
+  { name: "solo loss: every hero destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed loss: every hero destroyed", seatCount: 2, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+];
 
 const game = standaloneGame<IsenDecks, IsenPolicy>({
   campaign: cycle,
   scenario: isen,
-  stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles and its Nightmare deck.
+  stats: { strong: HERO_STATS.strong, weak: HERO_STATS.weak, brittle: HERO_STATS.brittle, steady: HERO_STATS.steady },
   codes: [...isen.cards.map((card) => card.code)],
+  loadout: isenLoadout,
   intent: isenIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,
