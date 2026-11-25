@@ -178,9 +178,11 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 42, scenarios: "all", note: "An effect that lasts on a card, like \"cannot ready until the end of the round\" or +2 Defense, ends when that card leaves play, whether it is a character, an enemy or a location: a character brought back the same round, with Stand and Fight for example, is a new card that no earlier effect holds." },
   { version: 42, scenarios: ["lost-in-mirkwood"], note: "At stage 2C of Lost in Mirkwood, the player whose character an Orc enemy damages discards the card, not the first player." },
   { version: 43, scenarios: "all", note: "An effect that attaches, moves or puts into play an attachment (Command, Long Lake Trader, the Dúnedain attachments, Helm of Secrecy, Galadriel, Open the Armory, Ring of Thrór) can use a character of another player as the host, also for a card that prints no Attach to line, like Spyglass; the other player then controls a moved attachment. Appointed by Fate, Parrying Cutlass, Throwing Axe and the Ship attachments Armor Plating, Ballista, Enlarged Quarters and Extra Sails are offered only the hosts their printed words name. Brand son of Bain draws a card only for an attachment its player plays, not for one an effect moves or puts into play." },
+  { version: 44, scenarios: ["foundations-of-stone", "into-the-pit", "shadow-and-flame", "the-seventh-level", "the-caves-of-nibin-dum"], note: "Watchful Eyes is attached to a hero of the first player, who chooses it, also when another player revealed the card." },
+  { version: 44, scenarios: ["into-the-pit"], note: "The first player, not the player who revealed Goblin Ambush of the Nightmare deck, searches for its Orc enemies and chooses them." },
 ];
 
-export const ENGINE_VERSION = 43;
+export const ENGINE_VERSION = 44;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

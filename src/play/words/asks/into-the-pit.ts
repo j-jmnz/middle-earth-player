@@ -44,9 +44,9 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "03065:whenRevealed:1 @1.0 SearchMove": { owned: true, note: "{card}: search the encounter deck and discard pile for 1 enemy to add to the staging area. If Patrol Leader is there, you must take it.", verb: "Add" },
 
   // 901002:A:1 (When Revealed, Nightmare): the first player searches for 1 plus the number of players Orc enemies: Patrol Sentry, Patrol Leader, if able, and Orcs of his choice.
-  "901002:whenRevealed:1 @0 SearchMove": { note: "{card}: search the encounter deck and discard pile for Patrol Sentry, if able, or another Orc enemy. The enemy is added to the staging area.", verb: "Add" },
-  "901002:whenRevealed:1 @1 SearchMove": { note: "{card}: search the encounter deck and discard pile for Patrol Leader, if able, or another Orc enemy. The enemy is added to the staging area.", verb: "Add" },
-  "901002:whenRevealed:1 @2.0 SearchMove": { note: "{card}: search the encounter deck and discard pile for another Orc enemy to add to the staging area. 1 plus the number of players are found in all.", verb: "Add" },
+  "901002:whenRevealed:1 @2 SearchMove": { note: "{card}: search the encounter deck and discard pile for Patrol Sentry, if able, or another Orc enemy. The enemy is added to the staging area.", verb: "Add" },
+  "901002:whenRevealed:1 @3 SearchMove": { note: "{card}: search the encounter deck and discard pile for Patrol Leader, if able, or another Orc enemy. The enemy is added to the staging area.", verb: "Add" },
+  "901002:whenRevealed:1 @4.0 SearchMove": { note: "{card}: search the encounter deck and discard pile for another Orc enemy to add to the staging area. 1 plus the number of players are found in all.", verb: "Add" },
 
   // 901008:A:2 (When Revealed, Nightmare): the first player attaches Shadow-fall to a non-Dark location, which gains the Dark trait and 3 quest points.
   "901008:whenRevealed:1 @0 Pick": { note: "{card}: choose 1 location that is not Dark, in the staging area or active, to carry it. It gains the Dark trait and 3 quest points.", verb: "Attach" },

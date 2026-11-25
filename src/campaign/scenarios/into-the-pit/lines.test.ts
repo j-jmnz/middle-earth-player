@@ -119,11 +119,37 @@ describe("03062 Watchful Eyes", () => {
     expect(hostOf(revealed(made, "03062"), "03062")).toBe("dh3");
   });
 
+  it("03062:A:1 the first player chooses the host among his heroes when the second seat reveals it", () => {
+    const made = table({ seats: 2, firstPlayer: 0, deck: ["f0"] });
+    const asked: number[] = [];
+    const state = finish({ state: revealFromTop(made.state, made.ctx, "03062", [], 1).state, steps: [] }, made.ctx, (now) => {
+      if (now.window?.kind !== "choose") return "";
+      asked.push(now.window.seat);
+      return now.window.options[0] ?? "";
+    }).state;
+    expect(asked).toEqual([0]);
+    expect(["dh1", "dh2"]).toContain(hostOf(state, "03062"));
+  });
+
   it("03062:A:1 a hero that already carries a copy is not offered: the next hero takes it", () => {
     const made = table({ attached: [{ code: "03062", to: "dh1" }], deck: ["f0"] });
     const state = revealed(made, "03062");
     const hosts = Object.values(state.cards).filter((card) => card.code === "03062").map((card) => codeOf(state, card.host ?? undefined));
     expect(hosts.sort()).toEqual(["dh1", "dh2"]);
+  });
+});
+
+describe("901002 Goblin Ambush", () => {
+  it("901002:A:1 the first player chooses the free Orc enemy when the second seat reveals the stage", () => {
+    const made = table({ seats: 2, firstPlayer: 0, stage: "901002", deck: ["03060", "03014", "901003", "901004", "901005"] });
+    const asked: number[] = [];
+    const run = resolveRecords(made.state, made.ctx, "901002", "whenRevealed", undefined, (now) => {
+      if (now.window?.kind !== "choose") return "";
+      asked.push(now.window.seat);
+      return now.window.options[0] ?? "";
+    }, true, 1);
+    expect(asked).toEqual([0]);
+    expect(Object.values(run.state.cards).filter((card) => card.zone === "staging" && ["03060", "03014", "901003", "901004", "901005"].includes(card.code))).toHaveLength(3);
   });
 });
 

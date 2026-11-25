@@ -40,6 +40,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       lines: ["901002:A:1"],
       timing: "whenRevealed",
       instructions: [
+        // The first player searches whoever revealed the card: he chooses among the Orc enemies.
+        { verb: "Pick", pick: { type: "player", control: "you", who: "firstPlayer" } },
+        { verb: "SwitchActor", to: "picked" },
         { verb: "SearchMove", type: "enemy", trait: "Orc", to: "staging", require: PATROL_SENTRY },
         { verb: "SearchMove", type: "enemy", trait: "Orc", to: "staging", require: PATROL_LEADER },
         { verb: "Repeat", times: { players: true, plus: -1 }, instructions: [{ verb: "SearchMove", type: "enemy", trait: "Orc", to: "staging" }] },
