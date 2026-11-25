@@ -101,3 +101,13 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
       return true;
   }
 }
+
+// The side of a two-sided load-list row that is dealt. A two-sided card the Setup adds to the staging area is dealt on the side it names (Beneath the Sands' Search objective, "Off Track face up";
+// DragnCards files On Track as side A). The Orcs' quest deck of Race Across Harad (stages 1C to 4C, hrd.prepare-the-orcs-area) is set aside: DragnCards' rows carry the guid of the players' stage of the
+// same title, so the C stage is the card dealt, and a quest card set aside is no stage of the players' deck (scenarios.ts).
+export function dealtSide(card: Card, other: Card | null, pile: string, quest: ParsedSetup): { card: Card; other: Card | null } {
+  if (other === null) return { card, other };
+  if (pile === "setAside" && card.type === "quest" && other.type === "quest" && /C$/.test(other.stage ?? "") && !/C$/.test(card.stage ?? "")) return { card: other, other: null };
+  const names = (code: string) => clausesOf(quest, "stage").some((clause) => clause.codes.includes(code));
+  return pile === "staging" && names(other.code) && !names(card.code) ? { card: other, other: card } : { card, other };
+}

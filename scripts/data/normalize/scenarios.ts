@@ -12,7 +12,7 @@ import {
 import { CAMPAIGNS, CAMPAIGN_SUFFIX, productOf, scenarioDefs, scenarioSlug, type CampaignDef } from "../campaign-defs.ts";
 import { PLAYER_TYPES, type Overrides } from "./cards.ts";
 import { clausesOf, codesOf, nameIndex, parseSetup, type ParsedSetup } from "./setup-text.ts";
-import { loggedHarad, pileAccepts, questFacts, stagedPerPlayer } from "./scenario-piles.ts";
+import { dealtSide, loggedHarad, pileAccepts, questFacts, stagedPerPlayer } from "./scenario-piles.ts";
 import { bookletSetsOf, setupOf } from "./scenario-text.ts";
 import { burdenSetProblems, crossCheckProblems, easyRemovals, easySheetProblem, plain, PLAYER_GROUP, type Deck } from "./scenario-checks.ts";
 import { pilesFromSetup, type Loaded } from "./setup-piles.ts";
@@ -219,14 +219,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         // A two-sided card the Setup has the first player take control of is dealt on the side it names (Haldan, not Woodmen Village).
         const controlled = def.takeControlFaceup === true && clausesOf(quest, "step").some((clause) => clause.step === "takeControl" && other != null && clause.codes.includes(other.code) && !clause.codes.includes(card?.code ?? ""));
         if (other && controlled) [card, other] = [other, card];
-        // The Orcs' quest deck (Race Across Harad's stages 1C to 4C, hrd.prepare-the-orcs-area): DragnCards' rows for them carry the guid of the players' stage of the same title, so the load list names the A stage with the C stage as its back; the C stage is the card dealt.
-        if (pile === "setAside" && card.type === "quest" && other?.type === "quest" && /C$/.test(other.stage ?? "") && !/C$/.test(card.stage ?? "")) {
-          card = other;
-          other = null;
-        }
-        // A two-sided card the Setup adds to the staging area is dealt on the side it names (Beneath the Sands' Search objective, "Off Track face up": DragnCards files On Track as side A).
-        const stagedOtherSide = other != null && pile === "staging" && clausesOf(quest, "stage").some((clause) => clause.codes.includes(other.code) && !clause.codes.includes(card?.code ?? ""));
-        if (other && stagedOtherSide) [card, other] = [other, card];
+        ({ card, other } = dealtSide(card, other, pile, quest));
         const was = pile;
         const moved = overrides.scenarioPiles.find((rule) => rule.scenario === id && rule.code === card?.code && (rule.from === undefined || rule.from === was));
         if (moved) pile = moved.pile;
@@ -263,7 +256,6 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
           easy.placements.set(keyOf(ship.code, "setAside"), 1);
         }
       }
-      // A quest card the load list sets aside (Race Across Harad's stages 1C to 4C, the Orcs' quest deck, hrd.prepare-the-orcs-area) is no stage of the players' quest deck either.
       const stormcallerStages = new Set([...normal.placements.keys()].filter((key) => key.endsWith("\u0000stormcallerQuests") || (key.split("\u0000")[1] === "setAside" && byCode.get(key.split("\u0000")[0] ?? "")?.type === "quest")).map((key) => key.split("\u0000")[0] ?? ""));
       stages = questCodes.filter((code) => !stormcallerStages.has(code));
       const deckStages = [...normal.placements.keys()].filter((key) => key.endsWith("\u0000quest")).map((key) => key.split("\u0000")[0] ?? "");

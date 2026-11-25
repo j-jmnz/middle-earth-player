@@ -3940,8 +3940,7 @@
         "sha256": "c3cf5bfc5f38e164511ef7672b2fb61f9117915b55b1d518711ee9d781e4caef"
       },
       "lines": [
-        "Attach to a Hobbit hero. Limit 1 per hero.",
-        "Attached hero gets +1 Willpower for each Song attached to it."
+        "Attach to a Hobbit hero. Limit 1 per hero. Attached hero gets +1 Willpower for each Song attached to it."
       ],
       "inert": [],
       "misprints": [],
@@ -4090,8 +4089,7 @@
         "sha256": "27a8435a4a9d36ae97dde1e83d06e32ae9bf9e65487b716d399d4ce8f4156325"
       },
       "lines": [
-        "Attach to a hero. Limit 1 per hero.",
-        "Attached hero gains the Scout trait.",
+        "Attach to a hero. Limit 1 per hero. Attached hero gains the Scout trait.",
         "Response: After you play Fearless Scout from your hand, draw a card."
       ],
       "inert": [],
@@ -4108,8 +4106,7 @@
         "sha256": "d385698a694cb0e2727ffb7c417a9bdb112fb5619f5a1925389e29d822fd6fc7"
       },
       "lines": [
-        "Limit 1 copy of Rally the West in the victory display.",
-        "While this quest is in the victory display, each hero gets +1 Willpower."
+        "Limit 1 copy of Rally the West in the victory display. While this quest is in the victory display, each hero gets +1 Willpower."
       ],
       "inert": [],
       "misprints": [],
