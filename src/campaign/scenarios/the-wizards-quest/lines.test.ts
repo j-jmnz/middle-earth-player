@@ -42,6 +42,24 @@ describe("held player cards", () => {
   });
 });
 
+describe("Necromancer's Pass revealed by the second seat", () => {
+  it("51013:A:1 the first player's hand is the one kept and searched, whoever reveals it", () => {
+    const made = table({ seats: 2, firstPlayer: 0, staging: ["51013"], hand: [{ code: "c1", seat: 0 }, { code: "c3", seat: 0 }, { code: "c2", seat: 0 }] });
+    const asked: number[] = [];
+    const pass = idOf(made.state, "51013");
+    const held = resolveRecords(made.state, made.ctx, "51013", "whenRevealed", pass, (now) => {
+      if (now.window?.kind !== "choose") return "";
+      asked.push(now.window.seat);
+      return now.window.options[0] ?? "";
+    }, true, 1).state;
+    const under = Object.values(held.cards).filter((card) => card.zone === "under");
+    expect(asked).toEqual([0]);
+    expect(under.map((card) => card.code)).toEqual(["c3"]);
+    expect(held.seats[0]?.hand).toHaveLength(2);
+    expect(held.seats[1]?.hand).toHaveLength(0);
+  });
+});
+
 describe("Dungeons of the Necromancer", () => {
   it("51008:B:2 the stage cannot be defeated while an enemy guards a hero, and the hero returns exhausted when the guard leaves play", () => {
     const made = table({ stage: "51008", deck: ["f3", "f3"] });
