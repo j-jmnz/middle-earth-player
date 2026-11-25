@@ -34,6 +34,8 @@ function madeByEngine(): Set<string> {
       if (/(\.stat ===|\.stat !==|flagged\(|heldAmount\(|modifiedStat\(|gameReads\()/.test(line)) continue;
       for (const match of line.matchAll(/"([A-Za-z]+)"/g)) if (NAMES.has(match[1]!)) found.add(match[1]!);
     }
+    // A stat held in a constant (`const CONTROLLED_BY = "controlSeat" as const`) that a modifier is then made with.
+    for (const match of readFileSync(file, "utf8").matchAll(/^const [A-Z_]+ = "([A-Za-z]+)" as const;/gm)) if (NAMES.has(match[1]!)) found.add(match[1]!);
   }
   return found;
 }

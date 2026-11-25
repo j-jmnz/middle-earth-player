@@ -53,6 +53,8 @@ export const ENGINE_MARKS: ReadonlySet<ModifierStat> = new Set<ModifierStat>([
   "attackedFirst",
   "phaseEnds",
   "handPlays",
+  // The seat that controls a location (families/pelargir/location-control.ts): the settle sweep reads it once the location is in no play area, to announce controlLost for the seat (06103:A:2).
+  "controlSeat",
   // The quest card being attempted. Kept when unsure: the Angmar and night-quest families clear it themselves.
   "currentQuest",
 ]);
