@@ -203,7 +203,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   time(STAGE_2, 4, "07066:B:1"),
   timeOut(STAGE_2),
   { id: "07066:constant:2", cardCode: STAGE_2, lines: ["07066:B:3"], timing: "constant", condition: NO_MUGASH, instructions: [{ verb: "Restrict", what: "advance" }] },
-  { id: "07066:questResolution:1", cardCode: STAGE_2, lines: ["07066:B:4"], timing: "questResolution", instructions: [{ verb: "WinGame" }] },
+  // Stage 3 (07067) comes only by the Time jump, never by progress, so no stage follows this one in the quest's order: it holds the win, and its own Forced effect wins when it is defeated (`holdsWin`, as Fog on the Barrow-downs' 3B).
+  { id: "07066:constant:3", cardCode: STAGE_2, lines: ["07066:B:4"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "holdsWin", amount: 1, until: "whileSourceInPlay", target: "self" }] },
+  { id: "07066:forced:2", cardCode: STAGE_2, lines: ["07066:B:4"], timing: "forced", trigger: "questCardDefeated", subject: "self", instructions: [{ verb: "WinGame" }] },
 
   // 07067 The Angry Forest. Side B: Time 3; after the last counter 5 cards are discarded from the top of the encounter deck, each player chooses an enemy or objective in the discard pile, reveals it and adds it to the staging area, and 3 counters go on the stage. Forced: after progress is placed on it, with 6 or more on it and
   // Mugash attached to a hero, the quest jumps back to stage 2A.

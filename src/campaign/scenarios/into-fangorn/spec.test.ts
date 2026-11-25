@@ -1,7 +1,7 @@
 // Rules: rm.hinder, rm.does-not-stack, rm.time-x, rr.forced, rr.the-word-choose, rr.effects, rr.attachment-cards, rr.setup, rr.search, rr.shadow-cards (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, cardSpecs, committed, count, damageOn, defend, endRound, exhausted, flag, handCount, progressOn, quest, resourcesOn, reveal, resolve, stat, threat, travel, window, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, committed, count, damageOn, defend, endRound, exhausted, flag, handCount, progressOn, quest, resourcesOn, reveal, resolve, side, stat, threat, travel, notWon, won, window, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Into Fangorn (the-ring-maker part 3): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
@@ -59,6 +59,12 @@ const ROWS: readonly Row[] = [
   { line: "07066:B:2", name: "Forced: after the last time counter Mugash is shuffled into the encounter deck and the quest advances to stage 3A", layout: { stage: STAGE_2, staging: [MUGASH], deck: ["f0"] }, act: announce("lastTimeCounterRemoved", STAGE_2), expect: [zone(MUGASH, "encounterDeck"), zone(STAGE_3, "questStage")] },
   { line: "07067:B:2", name: "Forced: 5 cards are discarded, each player chooses an enemy from the discard pile, reveals it and adds it to the staging area, and 3 counters go on the stage", layout: { stage: STAGE_3, deck: ["f0", "f0", "f0", "f0", "f0", "f0"], discard: [ANGRY] }, act: [announce("lastTimeCounterRemoved", STAGE_3), answer(ANGRY)], expect: [zone(ANGRY, "staging"), resourcesOn(STAGE_3, 3)] },
   { line: "07067:B:2", name: "Forced: Mugash chosen from the discard pile is revealed, and Guarded takes the next encounter card as his guard", layout: { stage: STAGE_3, deck: [MUGASH, "f0", "f0", "f0", "f0", DARK], discard: [ANGRY] }, act: [announce("lastTimeCounterRemoved", STAGE_3), answer(MUGASH)], expect: [zone(MUGASH, "staging"), zone(DARK, "staging"), resourcesOn(STAGE_3, 3)] },
+  { line: "07065:B:3", name: "The players cannot advance to stage 2 while Mugash is not attached to a hero: the progress stays on the stage", layout: { stage: STAGE_1, progress: 7 }, act: quest("success"), expect: zone(STAGE_1, "questStage") },
+  { line: "07066:A:1", name: "When Revealed: each player searches the encounter deck for a Huorn and adds it to the staging area", layout: { seats: 2, stage: STAGE_3, progress: 6, attached: [{ code: MUGASH, to: "dh1", encounter: true }], deck: [DARK, ANGRY, "f0"] }, act: announce("progressPlaced", STAGE_3), expect: [zone(DARK, "staging"), zone(ANGRY, "staging")] },
+  { line: "07066:B:1", name: "Time 4: the stage holds 4 time counters when it is revealed again", layout: { stage: STAGE_3, progress: 6, attached: [{ code: MUGASH, to: "dh1", encounter: true }], deck: ["f0"] }, act: announce("progressPlaced", STAGE_3), expect: [zone(STAGE_2, "questStage"), resourcesOn(STAGE_2, 4)] },
+  { line: "07067:B:3", name: "Forced: with more than 5 progress on the stage and Mugash on a hero the quest goes back to stage 2A", layout: { stage: STAGE_3, progress: 6, attached: [{ code: MUGASH, to: "dh1", encounter: true }], deck: ["f0"] }, act: announce("progressPlaced", STAGE_3), expect: zone(STAGE_2, "questStage") },
+  { line: "07066:B:3", name: "The players cannot defeat this stage while Mugash is not attached to a hero", layout: { stage: STAGE_2, progress: 10 }, act: quest("success"), expect: [zone(STAGE_2, "questStage"), notWon] },
+  { line: "07066:B:4", name: "If the players defeat this stage with Mugash on a hero they win the game", layout: { stage: STAGE_2, progress: 10, attached: [{ code: MUGASH, to: "dh1", encounter: true }] }, act: quest("success"), expect: won },
 ];
 
 if (ROWS.length > 0) cardSpecs("into-fangorn", ROWS);
