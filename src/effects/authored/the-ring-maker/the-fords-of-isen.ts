@@ -59,9 +59,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["07021:A:2"],
     timing: "shadow",
     instructions: [
-      { verb: "Pick", pick: { type: "attachment", control: "you" }, when: { kind: "not", condition: { kind: "undefended" } } },
+      { verb: "Pick", pick: { type: "attachment", control: "you", controlled: true }, when: { kind: "not", condition: { kind: "undefended" } } },
       { verb: "DiscardPicked", when: { kind: "not", condition: { kind: "undefended" } } },
-      { verb: "Each", pick: { type: "attachment", control: "you" }, instructions: [{ verb: "DiscardPicked" }], when: { kind: "undefended" } },
+      { verb: "Each", pick: { type: "attachment", control: "you", controlled: true }, instructions: [{ verb: "DiscardPicked" }], when: { kind: "undefended" } },
     ],
   },
 
@@ -116,7 +116,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 07044 Dunland Raider. Forced: when it engages a player, he assigns X damage among his characters, X the cards in his hand. Shadow: the defending player discards an attachment he controls.
   { id: "07044:forced:1", cardCode: "07044", lines: ["07044:A:1"], timing: "forced", trigger: "engaged", subject: "self", instructions: [{ verb: "AssignDamage", amount: HAND, pick: { type: "character", control: "you" } }] },
-  { id: "07044:shadow:1", cardCode: "07044", lines: ["07044:A:2"], timing: "shadow", instructions: [{ verb: "Pick", pick: { type: "attachment", control: "you" } }, { verb: "Discard", target: { kind: "picked" } }] },
+  { id: "07044:shadow:1", cardCode: "07044", lines: ["07044:A:2"], timing: "shadow", instructions: [{ verb: "Pick", pick: { type: "attachment", control: "you", controlled: true } }, { verb: "Discard", target: { kind: "picked" } }] },
 
   // 07045 Old Hatreds and 07049 Wild Men of Dunland. Condition attachments on the current quest; each leaves with the stage it lies on. Forced: after a player draws any number of cards, that player raises his threat by 1 (07045); deals 1 damage to a character he controls (07049).
   ...attachesToQuest("07045", "07045:A:2"),
