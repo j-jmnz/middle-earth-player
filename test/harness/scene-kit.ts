@@ -55,7 +55,6 @@ export function codesIn(state: ScenarioState, zone: string): string[] {
   return Object.values(state.cards).filter((card) => card.zone === zone).map((card) => card.code).sort();
 }
 
-/** A card of the staging area or another zone: a code, or a code with its tokens. */
 /** The zone of the first card with this code (a card the table does not have has none). */
 export const where = (state: ScenarioState, code: string): string | undefined => state.cards[idOf(state, code)]?.zone;
 
@@ -75,6 +74,32 @@ export function run(made: { ctx: ReduceContext }, state: ScenarioState, instruct
 /** The intents that let a window go by without a decision: pass, decline to travel, engage nobody, attack nobody. */
 export const PASSING: readonly PlayerIntent["type"][] = ["Pass", "DeclineTravel", "DeclineEngage", "DeclineAttack"];
 
+/**
+ * An attack is fought out: a defense window names the hero `heroCode` (the first hero of the player attacked by default) as the one that takes an undefended attack, or declares `defender` when given; a choice takes the option `choose` names (the first by default); every
+ * other window is passed. Stops once `stop` holds.
+ */
+export function fight(made: { ctx: ReduceContext }, from: Run, stop: (state: ScenarioState) => boolean, options: { defender?: string; heroCode?: string; choose?: (state: ScenarioState) => string } = {}): Run {
+  let current = from;
+  const answer = (intent: PlayerIntent): void => {
+    current = send(current, intent, made.ctx);
+  };
+  for (let guard = 0; guard < 120 && !stop(current.state) && !current.state.lost && !current.state.stageCleared; guard += 1) {
+    const state = current.state;
+    const intents = legalIntents(state, made.ctx);
+    if (state.window?.kind === "choose") answer({ type: "Choose", optionId: options.choose ? options.choose(state) : (state.window.options[0] ?? "") });
+    else if (state.window?.kind === "chooseEnemy") answer({ type: "ChooseEnemy", enemyId: state.window.options[0] ?? "" });
+    else if (options.defender && intents.some((intent) => intent.type === "DeclareDefender")) answer({ type: "DeclareDefender", defenderId: idOf(state, options.defender) });
+    else if (intents.some((intent) => intent.type === "Undefended")) answer({ type: "Undefended", heroId: options.heroCode ? idOf(state, options.heroCode) : (state.seats[state.window?.kind === "defense" ? state.window.seat : 0]?.heroes[0] ?? "") });
+    else {
+      const pass = PASSING.map((type) => intents.find((intent) => intent.type === type)).find((intent) => intent != null);
+      if (!pass) break;
+      answer(pass as PlayerIntent);
+    }
+  }
+  return current;
+}
+
+/** A card of the staging area or another zone: a code, or a code with its tokens. */
 export type Entry = string | { code: string; damage?: number; resources?: number; progress?: number; upgraded?: true };
 // `upgraded`: a ship-objective shows its Upgraded side, side B (The Hunt for the Dreadnaught's ships).
 export const entry = (item: Entry): { code: string; damage: number; resources: number; progress: number; upgraded: boolean } => (typeof item === "string" ? { code: item, damage: 0, resources: 0, progress: 0, upgraded: false } : { code: item.code, damage: item.damage ?? 0, resources: item.resources ?? 0, progress: item.progress ?? 0, upgraded: item.upgraded === true });

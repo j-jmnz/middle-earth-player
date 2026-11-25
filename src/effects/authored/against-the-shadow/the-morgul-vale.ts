@@ -18,7 +18,7 @@ const KEEP_IN_PLAY = (name: string): Instruction => ({ verb: "ModifyStat", stat:
 const ADVANCE_WHEN_DESTROYED = (code: string, line: string, name: string): Effect => ({ id: `${code}:forced:1`, cardCode: code, lines: [line], timing: "forced", trigger: "enemyDestroyed", subject: CAPTAIN(name), instructions: [{ verb: "AdvanceStage" }] });
 const NO_TOKENS: Condition = { kind: "less", left: TOKENS, right: 1 };
 const A_TOKEN: Condition = { kind: "less", left: 0, right: TOKENS };
-// A card can be revealed: the deck holds one, or it is the quest phase and the discard pile can reset an empty deck (rr.running-out-of-cards). A player may not choose an effect that cannot happen at all (rr.the-word-choose).
+// A card can be revealed: the deck holds one, or it is the quest phase and the discard pile can reset an empty deck (rr.running-out-of-cards). A player may not choose an effect that cannot happen at all (agent recommendation: docs/scenarios/against-the-shadow/the-morgul-vale.md, 06157:A:1).
 const CAN_REVEAL: Condition = { kind: "encounterCanReveal" };
 const NOT_UNDEFENDED: Condition = { kind: "undefended", is: false };
 // Another player is in the game and the attacker is engaged (an enemy that attacks from the staging area has no next player to engage): the Bodyguard's shadow can end the attack.

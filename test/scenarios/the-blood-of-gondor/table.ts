@@ -71,24 +71,6 @@ export function drive(made: LayoutTable, from: Run, stop: (state: ScenarioState)
   return current;
 }
 
-/** An attack is answered at once: the first hero named is undefended (`heroCode`) and the player chooses the first enemy; every other window is passed. Stops when `stop` holds. */
-export function fight(made: LayoutTable, from: Run, stop: (state: ScenarioState) => boolean, heroCode = "dh1"): Run {
-  let current = from;
-  for (let guard = 0; guard < 80 && !stop(current.state) && !current.state.lost && !current.state.stageCleared; guard += 1) {
-    const state = current.state;
-    const intents = legalIntents(state, made.ctx);
-    if (state.window?.kind === "choose") current = send(current, { type: "Choose", optionId: state.window.options[0] ?? "" }, made.ctx);
-    else if (state.window?.kind === "chooseEnemy") current = send(current, { type: "ChooseEnemy", enemyId: state.window.options[0] ?? "" }, made.ctx);
-    else if (intents.some((intent) => intent.type === "Undefended")) current = send(current, { type: "Undefended", heroId: idOf(state, heroCode) }, made.ctx);
-    else {
-      const pass = PASSING.map((type) => intents.find((intent) => intent.type === type)).find((intent) => intent != null);
-      if (!pass) break;
-      current = send(current, pass as PlayerIntent, made.ctx);
-    }
-  }
-  return current;
-}
-
 /** The hero (or any card) of this code takes `amount` damage from the framework, as a heavy attack of an earlier round left it. */
 export const hurt = (made: LayoutTable, state: ScenarioState, code: string, amount: number): ScenarioState => ({ ...placeDamage({ ...state, window: null }, idOf(state, code), amount, made.ctx.cards, [], "framework", UNATTRIBUTED), window: state.window });
 

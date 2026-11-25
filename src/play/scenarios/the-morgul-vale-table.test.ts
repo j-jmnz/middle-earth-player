@@ -3,6 +3,8 @@
 // tokens and additional attack, an enemy sent to the next player), the travel readout of The White Bridge, the refusal reasons, the banner and the log, and the words of the new verbs.
 import { describe, expect, it } from "vitest";
 
+import type { Effect } from "../../catalog/boundary.ts";
+import { EFFECTS } from "../../effects/index.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import { dealAdditionalShadow } from "../../rules/interpret/interpret.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
@@ -16,6 +18,7 @@ import { sheetFor } from "../choice/sheets.ts";
 import type { PickSheet, Sheet, SheetNames } from "../choice/sheet-types.ts";
 import { whyNotPlayable } from "../choice/why.ts";
 import { valeRefusal } from "../readouts/against-the-shadow/vale.ts";
+import { CAPTAIN_REFUSAL } from "../words/scenarios/against-the-shadow/vale.ts";
 import { advanceWords } from "../readouts/quest-advance.ts";
 import { readoutFor } from "../readouts/readout.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
@@ -144,6 +147,24 @@ describe("the three stages and their Captains (06144:B:1, 06145:B:1, 06146:B:2, 
   });
 });
 
+describe("the Captain's refusal on a card that would take him out of play (06144:B:1)", () => {
+  // No printed hand card of the pool has a lone Captain as its only target with a leaving verb, so the card is a test-only record on Infighting's code: it picks an enemy and discards it.
+  const LEAVING: Effect = { id: "test:leave", cardCode: INFIGHTING, lines: ["02058:A:1"], timing: "action", instructions: [{ verb: "Pick", pick: { type: "enemy", control: "any", staging: true } }, { verb: "DiscardPicked" }] };
+  const effects = [...EFFECTS.filter((effect) => effect.cardCode !== INFIGHTING), LEAVING];
+  const scene = (staging: string[], engaged: string[]) => table({ phase: "Planning", engaged, staging: [tower, ...staging], hand: [INFIGHTING], heroes: [{ code: DENETHOR, resources: 3 }] }, effects, [INFIGHTING, DENETHOR]);
+
+  it("a card whose only target is a Captain and that would discard him gets the sentence; with another enemy to take it the card has a target and no sentence", () => {
+    const lone = scene([murzag], []);
+    const state = opened(lone).state;
+    expect(valeRefusal(state, lone.ctx, idOf(state, INFIGHTING), false)).toBe(CAPTAIN_REFUSAL);
+    expect(whyNotPlayable(state, lone.ctx, idOf(state, INFIGHTING), idName(lone, state))).toContain("A Captain cannot leave play unless destroyed");
+    const other = scene([murzag, tracker], []);
+    const both = opened(other).state;
+    // The sentence belongs to a card with no target: with the Tracker to take it, the card has one and no refusal is said.
+    expect(whyNotPlayable(both, other.ctx, idOf(both, INFIGHTING), idName(other, both)) ?? "").not.toContain("Captain");
+  });
+});
+
 describe("the Bodyguard, the Nazgûl and the attack sheets (06148:A:1, 06153:A:2)", () => {
   const attackOn = (code: string, staging: string[], heroes: string[] = [BOROMIR]) => {
     const made = table({ phase: "PlayerAttacks", heroes, engaged: [code], staging: [tower, ...staging], ...(code === nazgul ? { stage: rider } : {}) }, undefined, heroes);
@@ -204,6 +225,20 @@ describe("the Bodyguard, the Nazgûl and the attack sheets (06148:A:1, 06153:A:2
     const before = { ...opened(round).state, phase: "Beginning of round" as const };
     const gone = { ...before, cards: { ...before.cards, [idOf(before, murzag)]: { ...before.cards[idOf(before, murzag)], zone: "staging" as const } } } as ScenarioState;
     expect(told(round, before, gone, [{ kind: "draw", seat: 0, cardId: "x", cause: { rule: "rr.step-1-3" } }] as never[]).log).toContain("Murzag returns to the staging area (Morgul Vale's effect at the end of the round)");
+  });
+
+  it("the return names the shadow card whose record returns the attacker, also when it is not the first one, and cites that record's line", () => {
+    const made = table({ phase: "Combat", staging: [tower], engaged: [sorcerer], deck: [terror, road, bodyguard, bodyguard] }, undefined, [terror, road]);
+    const id = made.state.seats[0]?.engaged[0] ?? "";
+    const dealt = dealAdditionalShadow(dealAdditionalShadow(made.state, id, [], made.ctx), id, [], made.ctx);
+    expect([dealt.cards[id]?.shadowId, ...(dealt.cards[id]?.extraShadowIds ?? [])].map((card) => dealt.cards[card ?? ""]?.code)).toEqual([terror, road]);
+    const first = fight(made, opened(made, dealt), (state) => state.pendingAttack != null && state.window?.kind === "defense", { heroCode: "dh1" });
+    const answered = send(first, { type: "Undefended", heroId: idOf(first.state, "dh1") }, made.ctx);
+    expect(answered.state.cards[id]?.zone).toBe("staging");
+    const kept = nextRoundSteps([], first.state, answered.state, answered.steps.slice(first.steps.length) as never[], made.ctx);
+    const back = kept.find((step) => "vale" in step && (step.vale as { returns?: unknown }).returns != null);
+    expect(back).toMatchObject({ cause: { effect: "06154:shadow:1", line: "06154:A:2" } });
+    expect(told(made, first.state, answered.state, answered.steps.slice(first.steps.length) as never[]).log).toContain("Morgul Sorcerer returns to the staging area (Morgul Road's shadow effect)");
   });
 
   it("an enemy a Bodyguard's shadow sends to the next player is told in the banner and on the new attack's sheet", () => {
@@ -277,6 +312,40 @@ describe("tokens placed and removed on To the Tower (06147:A:3)", () => {
     expect(log).toContain("Player 2 places 1 progress on To the Tower, 1 of 10");
     // Morgul Road removes progress by title like The Fate of Wilderland's records, but that scenario's beats ("holds 2 progress") are not this one's.
     expect(inFate(second.state, two.ctx)).toBe(false);
+  });
+
+  it("only the placement of the record the choice window belongs to names the player, not another card's token in the same intent", () => {
+    const two = table({ seats: 2, staging: [tower, murzag], deck: [malice, bodyguard, bodyguard] }, undefined, [malice]);
+    const revealed = revealFromTop(two.state, two.ctx, malice, []);
+    const first = send({ state: revealed.state, steps: [] }, { type: "Choose", optionId: "discard" }, two.ctx);
+    const second = send(first, { type: "Choose", optionId: "token" }, two.ctx);
+    const own = second.steps.slice(first.steps.length).find((step) => step.kind === "progress");
+    expect(own).toBeDefined();
+    // The same intent goes on to a Terror Drives Them revealed after it: its token is the second placement.
+    const terrorToken = { ...own, cause: { effect: "06159:whenRevealed:1", line: "06159:A:2" } };
+    const { log } = told(two, first.state, second.state, [own, terrorToken] as never[]);
+    expect(log).toEqual(["Player 2 places 1 progress on To the Tower, 1 of 10", "1 progress on To the Tower, 2 of 10"]);
+  });
+
+  it("the choice notes of Sleepless Malice and the Sorcerer's shadow tell of the shadow cards only while a Morgul Sorcerer is in play", () => {
+    const note = (made: Made, state: ScenarioState) => (sheetFor(state, made.ctx, legalIntents(state, made.ctx), namesOf(made, state)) as { note?: string } | null)?.note ?? "";
+    const SAYS = "is dealt a shadow card";
+    const malicePlain = table({ staging: [tower, murzag], deck: [malice, bodyguard, bodyguard] }, undefined, [malice]);
+    const malicePlace = table({ staging: [tower, murzag, sorcerer], deck: [malice, bodyguard, bodyguard] }, undefined, [malice]);
+    const asked = (made: Made) => revealFromTop(made.state, made.ctx, malice, []).state;
+    expect(note(malicePlain, asked(malicePlain))).toContain("Sleepless Malice: discard 3 cards");
+    expect(note(malicePlain, asked(malicePlain))).not.toContain(SAYS);
+    expect(note(malicePlace, asked(malicePlace))).toContain(SAYS);
+    // The Sorcerer's own shadow card, dealt to a Tracker: the note says so only when a Sorcerer stands in play too.
+    const shadowAsk = (staging: string[]) => {
+      const made = table({ phase: "Combat", staging: [tower, ...staging], engaged: [tracker], deck: [sorcerer, bodyguard, bodyguard] }, undefined, [sorcerer]);
+      const id = made.state.seats[0]?.engaged[0] ?? "";
+      const at = fight(made, opened(made, dealAdditionalShadow(made.state, id, [], made.ctx)), (state) => state.window?.kind === "choose", { defender: "dh1", heroCode: "dh1" });
+      return note(made, at.state);
+    };
+    expect(shadowAsk([])).toContain("Morgul Sorcerer, shadow effect");
+    expect(shadowAsk([])).not.toContain(SAYS);
+    expect(shadowAsk([sorcerer])).toContain("is dealt a shadow card after tokens are placed");
   });
 
   it("the store hands the banner the stamped steps, so the banner words them as the log does", () => {
