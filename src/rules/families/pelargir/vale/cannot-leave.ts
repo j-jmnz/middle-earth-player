@@ -83,5 +83,7 @@ export function captainKept(state: ScenarioState, ctx: ReduceContext, steps: Eng
   if (name == null) return state;
   const captain = Object.values(state.cards).find((card) => printedOf(ctx.cards, card.code).type === "enemy" && printedOf(ctx.cards, card.code).name === name);
   if (!captain || inPlay(captain.zone) || captain.zone === "setAside" || destroyedHere(steps, captain.id)) return state;
+  // His destruction is still being announced: the Forced effect that advances the quest has not run yet.
+  if ((state.pendingEvents ?? []).some((event) => event.trigger === "enemyDestroyed" && event.subject === captain.id)) return state;
   return updateCard(moveCard(state, captain.id, { zone: "staging" }), captain.id, { face: "up", controller: null });
 }
