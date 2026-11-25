@@ -123,11 +123,11 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
   const withWords = scenario.length > 0 && labelled.key === rowKey ? labelled.width : 0;
   const zones = bar.width > 0 && (dials > 0 || waited) ? dialZones(bar.width - 2 * BAR_PAD, dials, withWords, s, center) : null;
   const wordless = zones?.wordless === true;
-  // The row's width with the words is kept from the layout event, while the words show.
+  // The row's width with the words is kept from the layout event, while the words show. A layout event of the wordless row can reach this handler before the render that made it wordless, so within one makeup the widest width is kept, never a narrower one.
   const onDials = (event: LayoutChangeEvent) => {
     const width = Math.round(event.nativeEvent.layout.width);
     setDials(width);
-    if (!wordless && width > 0 && scenario.length > 0) setLabelled((was) => (was.key === rowKey && was.width === width ? was : { key: rowKey, width }));
+    if (!wordless && width > 0 && scenario.length > 0) setLabelled((was) => (was.key === rowKey && was.width >= width ? was : { key: rowKey, width }));
   };
   // The Heading dial drops its word and lays its badge under the disc when the dial at its full width would make the dials scroll; that is told from the other dials' width, not the dial's own.
   const others = heading ? dials - headingBox.w - DIAL_GAP * s : dials;
