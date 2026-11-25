@@ -31,7 +31,7 @@
   <a href="https://github.com/j-jmnz/middle-earth-player/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/j-jmnz/middle-earth-player?style=for-the-badge&color=8957E5&labelColor=2D333B&label=release"></a>
 </p>
 
-<p align="center"><strong>The Lord of the Rings: The Card Game, solo, on Android, iPhone, iPad, Windows, macOS or Linux.<br>The app deals the encounter deck, runs every card and keeps your campaign log. You make the choices.</strong></p>
+<p align="center"><strong>Play The Lord of the Rings: The Card Game solo on Android, iPhone, iPad, Windows, macOS or Linux.<br>The app runs the rules, the encounter deck, the quests and the card effects.</strong></p>
 
 > [!IMPORTANT]
 > This is a fan-made project. It is not an official app, and it is not associated with, endorsed by, sponsored by or approved by Fantasy Flight Games (FFG), Asmodee or Middle-earth Enterprises. All game content belongs to its owners.
