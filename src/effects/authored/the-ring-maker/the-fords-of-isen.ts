@@ -1,4 +1,5 @@
 import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
+import { timeOption } from "./time-option.ts";
 
 // Records for The Fords of Isen (The Ring-maker part 1, The Voice of Isengard, no campaign card): Gríma and The Islet, the Fords of Isen locations, the encounter cards no template reads, the Dunland Warriors and Raiders whose lines count cards in hand and the three quest stages.
 // Every line is read from the scan ledger (data/printed/the-ring-maker.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here. Time X is the angmar family's (src/catalog/families/angmar.ts: a constant `Time`, the Forced
@@ -78,7 +79,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
           verb: "Choose",
           who: "actor",
           options: [
-            { id: "time", requires: { kind: "less", left: 0, right: { stat: "resources", of: "questStage" } }, instructions: [{ verb: "RemoveTimeFromQuest", amount: 1 }] },
+            timeOption(),
             { id: "search", instructions: [{ verb: "SearchReveal", trait: "Dunland", type: "enemy", who: "actor", to: "staging" }] },
           ],
         },
