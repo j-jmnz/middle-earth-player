@@ -22,7 +22,7 @@ import { flagged, heldAmount, updateCard } from "../core/state.ts";
 import { raiseFor, refillEncounterDeck, runExtraVerb } from "./verbs.ts";
 import { readyNamedCard, seatBarred } from "./restrictions.ts";
 import { withFrame } from "../windows/windows.ts";
-import { moveCard, turnedUp } from "../core/zones.ts";
+import { moveCard, shadowCards, turnedUp } from "../core/zones.ts";
 import { refillDeck } from "../core/decks.ts";
 import { DECKS } from "../core/piles.ts";
 import { shadowFace } from "../families/defense/shadow.ts";
@@ -233,19 +233,17 @@ function placeOneProgress(state: ScenarioState, sourceId: string | null, steps: 
 // The enemy's shadow card, when it has none yet. `steps` hears the encounter deck being refilled for it.
 export function dealOneShadow(state: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   if (state.cards[enemyId]?.shadowId) return state;
-  return dealShadowCount(state, enemyId, steps, ctx);
+  return dealStepShadow(state, enemyId, steps, ctx);
 }
 
 // Step 6.2 deals one card to each engaged enemy, with no exception for one that already holds a card (rr.step-6-2, ltp.deal-shadow-cards): the card beside the one it has, so it can hold two.
 export function dealStepShadow(state: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
-  return dealShadowCount(state, enemyId, steps, ctx);
-}
-
-function dealShadowCount(state: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
+  const held = shadowCards(state.cards[enemyId]).length;
   const dealt = dealAdditionalShadow(state, enemyId, steps, ctx);
-  // "Deal it a number of shadow cards equal to ..." (the flag dealtShadows, 19098:A:3): the card above is the first, each other an additional one.
+  // "Deal it a number of shadow cards equal to ..." (the flag dealtShadows, 19098:A:3): the card above is the first, each other an additional one. Nothing more is dealt when the first dealt none (an empty deck, noShadowDealt).
+  const first = shadowCards(dealt.cards[enemyId]).length > held;
   let next = dealt;
-  for (let more = heldAmount(dealt, enemyId, "dealtShadows") - 1; more > 0 && dealt.cards[enemyId]?.shadowId != null; more -= 1) next = dealAdditionalShadow(next, enemyId, steps, ctx);
+  for (let more = heldAmount(dealt, enemyId, "dealtShadows") - 1; more > 0 && first; more -= 1) next = dealAdditionalShadow(next, enemyId, steps, ctx);
   return next;
 }
 
