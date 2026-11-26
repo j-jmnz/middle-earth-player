@@ -236,7 +236,7 @@ describe("Gundabad Hunter's choice of a player (12191:A:1)", () => {
 
 describe("the optional engagement of a unique-only enemy (12192:A:1)", () => {
   it("says Gundabad Stalker may be engaged only by a player engaged with a unique enemy, and whether this player is one", () => {
-    for (const [seats, title] of [[1, "Optional engagement"], [2, "Player 1: optional engagement"]] as const) {
+    for (const [seats, title] of [[1, "Optional engagement"], [2, "Optional engagement"]] as const) {
       const without = framsburgTable(world, { seats, phase: "Encounter", staging: [CODES.gundabadStalker, CODES.cryptStalker] });
       const sheet = sheetOf(without, without.state);
       expect(sheet.title).toBe(title);

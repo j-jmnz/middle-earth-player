@@ -11,6 +11,8 @@ import type { ScenarioState } from "./state.ts";
 
 // Marks kept when the holder leaves play. Each says which rule or card reads it, and when.
 export const ENGINE_MARKS: ReadonlySet<ModifierStat> = new Set<ModifierStat>([
+  // The Key a stage 2A marked as the current trial's (08036:A:1, `trialKey`): the Key lies on a Guardian or Barrow, and is read after its host leaves play and the Key goes back to the staging area.
+  "trialKey",
   // "The first treachery revealed each round" (19137:B:1, families/wilderland/rounds.ts) and the Mount Doom condition `firstTreachery` read the mark on a treachery that is already in the discard pile.
   "firstTreachery",
   "treacheryRevealed",
