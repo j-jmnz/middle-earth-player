@@ -1,7 +1,6 @@
 // The web backdrop's fog and grit tiles as pictures (src/screens/art/backdrop.tsx; docs/design-system.md, Backdrops). A texture is an SVG whose filter
-// (feTurbulence) makes fractal noise. Used as a CSS background itself, the browser runs the filter again for each part of a layer it paints, and a fog layer
-// that drifts brings new parts in for as long as it moves: on Safari's engine the filter runs on the page's thread, which held the page for most of each
-// second on every screen with fog, for the half minute a layer takes to pass. So each tile is drawn once into a canvas and kept as a PNG the backgrounds
+// (feTurbulence) makes fractal noise. Used as a CSS background itself, the browser runs the filter again whenever it paints a part of a layer, and a fog
+// layer is up to 2500 x 900 points. So each tile is drawn once into a canvas and kept as a PNG the backgrounds
 // repeat, which costs a paint nothing. No browser in the store: `Bake` is the page (browserBake), so a test runs the rest.
 
 /** Draws `svg` at `width` × `height` pixels and gives the picture's address; rejects when the page cannot. */
