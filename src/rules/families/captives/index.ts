@@ -19,7 +19,7 @@ import type { Focus } from "../index.ts";
 import { captiveHeldBy, captivesOf } from "./values.ts";
 
 /** The hero lies faceup under `hostId` as a Captive: it leaves its seat's list of heroes (remembering where it was), keeps what it has, and nobody controls it (the Setup's choice, a test table's layout). */
-export function holdCaptive(state: ScenarioState, heroId: string, hostId: string): ScenarioState {
+export function holdCaptive(state: ScenarioState, heroId: string, hostId: string | null): ScenarioState {
   const hero = state.cards[heroId];
   if (!hero) return state;
   const held = hero.captive === true ? {} : heldFrom(state, heroId);
@@ -65,18 +65,34 @@ function returnHeld(state: ScenarioState, under: string, focus: Focus): Scenario
 }
 
 /**
+ * A held hero (a Captive, a hero in the staging area, a guarded hero) comes back among its owner's heroes in the place it held, faceup, controlled by its owner again, with its damage, tokens and attachments kept; `exhausted` as the card that
+ * releases it says. One rule for every release (the rescue, a stage, a guard that leaves play): each attachment changes control with the hero, so a card another player played on it goes to the hero's owner's play area
+ * (rr.ownership-and-control, "Attachments on a card that changes control also change control to the same new controller"); a card no player controls (an encounter card's) stays controlled by nobody.
+ */
+export function releaseCaptive(state: ScenarioState, heroId: string, options: { exhausted: boolean }): ScenarioState {
+  const hero = state.cards[heroId];
+  if (!hero || hero.owner == null) return state;
+  const seat = hero.owner;
+  // `owner` on an attachment is what makes the release move it (families/south/captive.ts releaseHero): set it on each card another player controls.
+  let next = state;
+  for (const id of hero.attachments ?? []) {
+    const attached = state.cards[id];
+    if (attached && attached.owner == null && attached.controller != null && attached.controller !== seat) next = updateCard(next, id, { owner: attached.controller });
+  }
+  const patch = { face: "up" as const, captive: undefined, guardedHero: undefined, owner: undefined, heroSlot: undefined, host: null, ...(options.exhausted ? { exhausted: true } : {}) };
+  let released = releaseHero(next, heroId, seat, patch);
+  // Control changed, ownership did not (rr.ownership-and-control): a card another player owns keeps its owner; one the hero's owner owns needs none.
+  for (const id of hero.attachments ?? []) if (released.cards[id]?.owner === seat) released = updateCard(released, id, { owner: undefined });
+  return hero.heroSlot == null ? released : backInPlace(released, seat, heroId, hero.heroSlot);
+}
+
+/**
  * The players win by defeating Rescue the Captives (143070:B:3, "they have rescued each Captive hero"; 143071:B:1 reads the rescued heroes): each Captive returns among its owner's heroes in the place it held, controlled by its owner
  * again, with its damage, tokens and attachments kept. It is no longer a Captive, so To Isengard!'s blank no longer reaches it. No event. The settle loop calls it as soon as the stage is cleared, in a campaign game and in a standalone one alike, before the score or the Resolution reads the heroes.
  */
 export function rescueCaptives(state: ScenarioState): ScenarioState {
   let next = state;
-  for (const held of captivesOf(state)) {
-    const hero = next.cards[held.id];
-    if (!hero || hero.owner == null) continue;
-    const seat = hero.owner;
-    const released = releaseHero(next, hero.id, seat, { face: "up", captive: undefined, owner: undefined, heroSlot: undefined, host: null }, { owner: undefined }, true);
-    next = hero.heroSlot == null ? released : backInPlace(released, seat, hero.id, hero.heroSlot);
-  }
+  for (const held of captivesOf(state)) next = releaseCaptive(next, held.id, { exhausted: false });
   return next;
 }
 

@@ -131,6 +131,8 @@ export const amountExprSchema = z.strictObject({
   pursuit: z.literal(true).optional(),
   // The temperature of the heat tracker (hrd.heat-tracker), 0 while no tracker is set: `value` the temperature, `tens` its tens digit ("X is the tens digit of the temperature", 16026:A:1). Read by the haradrim family.
   temperature: z.enum(["value", "tens"]).optional(),
+  // While the source enemy attacks a defending character with less Willpower than the enemy's Threat: the difference, else 0 ("gets +X Attack while attacking a character with less Willpower than its Threat. X is the difference", 16063:A:1). Read by the haradrim family.
+  willpowerGap: z.literal(true).optional(),
   // The highest threat among the living players ("X is the threat of the player with the highest threat", 145064:B:1), and the number of living players whose threat is at least this ("+1 Threat for each player with a threat of 35 or higher",
   // 145021:A:1). Read by the grey-company family (src/rules/families/grey-company/amounts.ts).
   highestThreat: z.literal(true).optional(),

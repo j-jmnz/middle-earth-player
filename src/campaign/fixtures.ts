@@ -102,6 +102,7 @@ import orcFixtures from "./fixtures/to-catch-an-orc.json";
 import fangornFixtures from "./fixtures/into-fangorn.json";
 import umbarFixtures from "./fixtures/escape-from-umbar.json";
 import crossingFixtures from "./fixtures/desert-crossing.json";
+import mordorFixtures from "./fixtures/the-long-arm-of-mordor.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -222,6 +223,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "into-fangorn": fangornFixtures,
   "escape-from-umbar": umbarFixtures,
   "desert-crossing": crossingFixtures,
+  "the-long-arm-of-mordor": mordorFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

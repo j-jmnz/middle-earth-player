@@ -7,7 +7,8 @@ import { memo } from "react";
 import { Moving } from "../motion/card-motion.native.tsx";
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
 import { Badges, CardBody, HeldMark, NotAppliedMark, StackMark, SuccessMedallion, Tokens } from "./pieces.native.tsx";
-import { badgeReach, CombatPill, CurrentQuestMark, DelayedMark, DeterminedMarkView, EngagementMark, FireMarkView, OptionMarkView, PlaceMarkView, ShipLossView, StageMarks, UnderMarkView } from "./mark-pieces.native.tsx";
+import { BLANK_WORD } from "../words/card-bars.ts";
+import { badgeReach, BlankMarkView, CombatPill, CurrentQuestMark, DelayedMark, DeterminedMarkView, EngagementMark, FireMarkView, OptionMarkView, PlaceMarkView, SeatChipView, ShipLossView, StageMarks, UnderMarkView } from "./mark-pieces.native.tsx";
 import { footStop } from "./badge-room.ts";
 import { underRect } from "./under-mark.ts";
 import { sphereIcon } from "../../ui/icon-map.ts";
@@ -89,7 +90,9 @@ function drawOverlay(p: PieceProps) {
         {info?.fire ? <FireMarkView rect={rect} mark={info.fire} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.side?.loses ? <FireMarkView rect={rect} mark={info.side.loses} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.side?.current ? <CurrentQuestMark rect={rect} clear={badgeReach(info.effects, fonts, s, rect.h, stop)} fonts={fonts} t={t} s={s} /> : null}
-        {info?.determined ? <DeterminedMarkView rect={rect} word={info.determined.word} clear={badgeReach(info.effects, fonts, s, rect.h, stop)} fonts={fonts} t={t} s={s} /> : null}
+        {info?.determined?.word === BLANK_WORD ? <BlankMarkView rect={rect} lifted={info.under != null || info.seat != null || info.engagement != null || info.combat != null || info.fire != null || info.loss != null || info.questPoints != null} fonts={fonts} t={t} s={s} /> : null}
+        {info?.determined && info.determined.word !== BLANK_WORD ? <DeterminedMarkView rect={rect} word={info.determined.word} clear={badgeReach(info.effects, fonts, s, rect.h, stop)} fonts={fonts} t={t} s={s} /> : null}
+        {info?.seat ? <SeatChipView rect={rect} text={info.seat.chip} fonts={fonts} t={t} s={s} /> : null}
         {info?.loss ? <ShipLossView rect={rect} mark={info.loss} fonts={fonts} t={t} s={s} /> : null}
         {info?.place ? <PlaceMarkView rect={rect} mark={info.place} t={t} s={s} /> : null}
         {info?.under ? <UnderMarkView rect={underRect(rect, slot.zone === "hand", s)} mark={info.under} sideways={slot.exhausted} strip={wearsFootNumber(info, slot.resources)} fonts={fonts} t={t} s={s} /> : null}

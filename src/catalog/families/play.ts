@@ -125,7 +125,8 @@ const TRIGGERS = [
 ] as const;
 
 // `heroType`: the holder loses the ally card type and gains the hero card type (Sword-thain): it is among its controller's
-// heroes while it holds the flag. `threatCeiling` (on "seat:N"): while the seat's threat is higher than the amount, it is
+// heroes while it holds the flag. An objective-hero (printed type objective, hrd.objective-heroes) holds it to stay among the heroes: `pick.ts` matches a `type: "objective"` pick on it,
+// and `isAllyLike` is true for it (printed type and hit points), so the one reader that counts allies, `sea/entries.ts` `enteredCards`, leaves a hero of printed type objective out. `threatCeiling` (on "seat:N"): while the seat's threat is higher than the amount, it is
 // treated as the amount ("treat your threat as if it is 20"); the dial does not move.
 // `cannotTriggerEffects`: the holder cannot initiate its own Action and Response abilities ("Attached hero cannot ... trigger its effect", 02048:A:1); its constant and Forced abilities still work. Held by a seat, the player triggers no Action or Response
 // of any card, and plays no event ("Until the end of the round, players cannot trigger Action or Response effects", 148017:A:2).

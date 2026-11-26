@@ -94,6 +94,7 @@ import { orcFixtures } from "./the-ring-maker/to-catch-an-orc.ts";
 import { fangornFixtures } from "./the-ring-maker/into-fangorn.ts";
 import { umbarFixtures } from "./haradrim/escape-from-umbar.ts";
 import { crossingFixtures } from "./haradrim/desert-crossing.ts";
+import { mordorFixtures } from "./haradrim/the-long-arm-of-mordor.ts";
 
 // The scenarios scenario 1's block writes by hand (`won` is the one fixture not committed that the registry names, `knife-lost` starts from its log).
 export const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
@@ -199,4 +200,5 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "into-fangorn": () => fangornFixtures(),
   "escape-from-umbar": () => umbarFixtures(),
   "desert-crossing": () => crossingFixtures(),
+  "the-long-arm-of-mordor": () => mordorFixtures(),
 };

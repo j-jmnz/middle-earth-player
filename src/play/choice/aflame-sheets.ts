@@ -5,7 +5,7 @@ import type { Instruction } from "../../catalog/boundary.ts";
 import { burnOutcome } from "../../rules/families/aflame/values.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
-import { damageOutcome } from "../store/foresight.ts";
+import { damageOutcome, type DamageOutcome } from "../store/foresight.ts";
 import type { OptionMark, SheetNames } from "./sheet-types.ts";
 
 const TORCH = "11048";
@@ -49,9 +49,15 @@ export function fireRow(pick: Instruction, next: Instruction | undefined, id: st
   return null;
 }
 
-/** The row of a character that takes `amount` damage: destroyed in the label, and the game lost in the caution, as a defender's row shows it. */
+/** What the destroyed character costs, said for the second tap: the game lost (`lossWords`), the players eliminated with it ("Firyal falls and Player 2 is eliminated"), or only the character. */
+export function destroyedCaution(outcome: DamageOutcome, name: string): string {
+  if (outcome.loss) return `Tap again: ${name} falls and the game is lost`;
+  if (outcome.eliminated.length > 0) return `Tap again: ${name} falls and ${outcome.eliminated.map((seat) => `Player ${seat + 1}`).join(" and ")} ${outcome.eliminated.length > 1 ? "are" : "is"} eliminated`;
+  return `Tap again: ${name} is destroyed`;
+}
+
+/** The row of a character that takes `amount` damage: destroyed in the label, and the game lost or a player eliminated in the caution, as a defender's row shows it. */
 export function damagedCharacterRow(game: ScenarioState, ctx: ReduceContext, id: string, name: string, amount: number): FireRow {
   const outcome = damageOutcome(game, ctx, id, amount);
-  const caution = outcome.destroyed ? (outcome.loss ? `Tap again: ${name} falls and the game is lost` : `Tap again: ${name} is destroyed`) : undefined;
-  return { label: `${name} · ${amount} damage${outcome.destroyed ? " · destroyed" : ""}`, mark: { icon: "damage", value: amount, danger: outcome.destroyed }, ...(caution ? { caution } : {}) };
+  return { label: `${name} · ${amount} damage${outcome.destroyed ? " · destroyed" : ""}`, mark: { icon: "damage", value: amount, danger: outcome.destroyed }, ...(outcome.destroyed ? { caution: destroyedCaution(outcome, name) } : {}) };
 }

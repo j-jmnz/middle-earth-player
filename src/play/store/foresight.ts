@@ -15,6 +15,7 @@ import type { EngineStep, ReduceContext, ScenarioState } from "../../rules/engin
 import { flagged, inPlay, livingSeats } from "../../rules/core/state.ts";
 import { effectsOf } from "../../rules/windows/listen.ts";
 
+import { eliminatesWhenLeaving } from "../readouts/haradrim/staged.ts";
 import { lossWaits } from "../readouts/against-the-shadow/amon-din.ts";
 import { alcaronHeldWords } from "../words/scenarios/against-the-shadow/amon-din.ts";
 
@@ -66,13 +67,24 @@ export function discardLoss(game: ScenarioState, ctx: ReduceContext, cardId: str
   return left == null || !inPlay(left.zone) ? leavesPlayLoss(game, ctx, cardId) : null;
 }
 
+// "If X leaves play, you are eliminated from the game" (an objective-hero, 16031:A:2): its own record eliminates the seat that controls it once it has left play, which a copy of the state that only destroys the card does not show. The seat, or null for any other card.
+function eliminatedWhenLeaving(game: ScenarioState, ctx: ReduceContext, cardId: string): number | null {
+  const card = game.cards[cardId];
+  if (card?.controller == null) return null;
+  return eliminatesWhenLeaving(ctx, card.code) ? card.controller : null;
+}
+
 /** What placing `damage` combat damage on a card would do now. */
 export function damageOutcome(game: ScenarioState, ctx: ReduceContext, cardId: string, damage: number): DamageOutcome {
   const after = damage > 0 ? place(game, ctx, cardId, damage) : game;
   const card = after.cards[cardId];
   const destroyed = card == null || !inPlay(card.zone);
   const before = new Set(livingSeats(game));
-  const eliminated = after.lost ? [] : [...before].filter((seat) => !livingSeats(after).includes(seat));
+  const gone = destroyed ? eliminatedWhenLeaving(game, ctx, cardId) : null;
+  const fell = after.lost ? [] : [...before].filter((seat) => !livingSeats(after).includes(seat));
+  const eliminated = gone != null && before.has(gone) && !fell.includes(gone) ? [...fell, gone] : fell;
+  // Every seat gone: the scenario ends in defeat (no seats remain), as the engine says it once the record has run.
+  const everyoneOut = gone != null && !after.lost && [...before].every((seat) => eliminated.includes(seat));
   let spare: number | null = null;
   if (!destroyed) {
     for (let extra = 1; extra <= MOST; extra += 1) {
@@ -83,7 +95,7 @@ export function damageOutcome(game: ScenarioState, ctx: ReduceContext, cardId: s
       }
     }
   }
-  const loss = after.lost && !game.lost ? (after.lossReason ?? "The game is lost") : destroyed ? leavesPlayLoss(game, ctx, cardId) : null;
+  const loss = after.lost && !game.lost ? (after.lossReason ?? "The game is lost") : everyoneOut ? "No seats remain" : destroyed ? leavesPlayLoss(game, ctx, cardId) : null;
   return { damage, destroyed, loss, eliminated, spare };
 }
 

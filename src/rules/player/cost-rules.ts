@@ -44,7 +44,7 @@ function rules(state: ScenarioState, verb: CostRule["verb"], cardId: string, sea
   const found: { sourceId: string; rule: CostRule }[] = [];
   for (const { source, instruction } of constantInstructions(state, ctx)) {
     // A rule of a card in the victory display belongs to no player: it applies to every seat (The Storm Comes, 16013:A:2).
-    const anyPlayer = instruction.verb === "ReduceCostOf" && instruction.anyPlayer === true;
+    const anyPlayer = (instruction.verb === "ReduceCostOf" || instruction.verb === "IgnoreResourceMatch") && instruction.anyPlayer === true;
     if (instruction.verb !== verb || (source.zone !== "victory" && !anyPlayer && (source.controller ?? state.firstPlayer) !== seat)) continue;
     const rule = instruction as CostRule;
     if (!fits(state, cardId, rule.pick, seat, ctx)) continue;

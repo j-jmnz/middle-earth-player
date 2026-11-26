@@ -224,7 +224,7 @@ Scenario piles that place cards with no record (quest: 50803 Rebuild the Defense
       * option "control" (only if there is a player (any player controls) who controls heroes holding 1 resource or more in all to choose):
         - choose player (any player controls) who controls heroes holding 1 resource or more in all
         - the effect goes on with the picked player as the acting player
-        - the acting player spend 1 resource(s) from heroes with this card's sphere icon, choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
+        - the acting player spend 1 resource(s) from any hero they control (no resource icon is matched), choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
         - the acting player takes control of this card (it enters play under that player, ready; a shadow card stops being its enemy's shadow card)
       * option "discard":
         - discard this card

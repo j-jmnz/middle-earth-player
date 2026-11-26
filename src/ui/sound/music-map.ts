@@ -158,6 +158,7 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "into-fangorn": { calm: "fangorn", combat: "ents" },
   "escape-from-umbar": { calm: "havens", combat: "chase" },
   "desert-crossing": { calm: "rohan", combat: "chase" },
+  "the-long-arm-of-mordor": { calm: "shadow", combat: "uruk" },
 };
 
 /** The loop a table plays: its scenario's combat loop during the Combat phase, its calm loop otherwise, and the menu's for a scenario with no pair. */
