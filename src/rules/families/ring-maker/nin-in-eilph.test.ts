@@ -4,6 +4,7 @@
 import { describe, expect, it } from "vitest";
 
 import { updateCard, type ScenarioState } from "../../core/state.ts";
+import type { EngineStep } from "../../core/intents.ts";
 import { UNATTRIBUTED } from "../../core/cause.ts";
 import { settle } from "../../engine/machine.ts";
 import { legalTargets } from "../../engine/legal.ts";
@@ -11,7 +12,9 @@ import { reduce } from "../../engine/reduce.ts";
 import { syncConstants } from "../../interpret/constants.ts";
 import { drawMany } from "../../interpret/interpret.ts";
 import { mayGainResources } from "../misc/guards.ts";
-import { codesIn, idOf, resolveRecords, run, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { ruleCause } from "../../core/cause.ts";
+import { placeDamage } from "../../core/keywords.ts";
+import { codesIn, fight, idOf, resolveRecords, run, statOf, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const table = (layout: Layout) => tableFromLayout("the-nin-in-eilph", layout);
 const STAGE_2 = ["08095", "08096", "08097"];
@@ -209,5 +212,78 @@ describe("the stage 2 flags: what player card effects give and what committing c
   it("08097:B:3 a player with no card in hand commits freely under any other stage 2", () => {
     const t = tableFromLayout("the-nin-in-eilph", { stage: "08097", phase: "Quest", play: ["ally"] });
     expect(commits(t.state, t.ctx, [t.hero]).cards[t.hero]?.committed).toBe(true);
+  });
+});
+
+describe("the Ancient Marsh-dweller joins the staging area and attacks (08098:A:1, 08101:A:1, 08101:B:2, 08101:B:3)", () => {
+  const MARSH = "08103";
+  const FILLERS = ["f0", "f0", "f0", "f0"];
+  // The attacks are fought out: every defense window is answered with an undefended hero, every other window passed, until nothing resolves.
+  const fought = (t: ReturnType<typeof table>, from: ReturnType<typeof resolveRecords>) => fight(t, from, (state) => state.pendingAttack == null && state.stack.length === 0 && state.window?.kind !== "defense");
+  const attacked = (steps: readonly { kind: string }[]): number[] => steps.flatMap((step) => (step.kind === "attack" ? [(step as unknown as { seat: number }).seat] : []));
+  const marshOf = (state: ScenarioState) => state.cards[idOf(state, MARSH)];
+
+  it("08098:A:1 the set-aside copy joins the staging area and each player's threat goes up by 1", () => {
+    const t = table({ stage: "08098", side: "A", setAside: [MARSH], threat: [28, 30], seats: 2 });
+    const done = resolveRecords(t.state, t.ctx, "08098", "whenRevealed", t.state.questStage ?? "").state;
+    expect(marshOf(done)?.zone).toBe("staging");
+    expect([done.seats[0]?.threat, done.seats[1]?.threat]).toEqual([29, 31]);
+  });
+
+  it("08099:A:1 a copy engaged with a player returns to the staging area, healed, and keeps its resource tokens", () => {
+    const t = table({ stage: "08099", side: "A", engaged: [{ code: MARSH, seat: 0, damage: 4, resources: 2 }] });
+    const done = resolveRecords(t.state, t.ctx, "08099", "whenRevealed", t.state.questStage ?? "").state;
+    expect(marshOf(done)).toMatchObject({ zone: "staging", damage: 0, resources: 2 });
+    expect(done.seats[0]?.engaged).toEqual([]);
+  });
+
+  it("08100:A:1 a copy already in the staging area is healed", () => {
+    const t = table({ stage: "08100", side: "A", staging: [{ code: MARSH, damage: 5 }] });
+    const done = resolveRecords(t.state, t.ctx, "08100", "whenRevealed", t.state.questStage ?? "").state;
+    expect(marshOf(done)).toMatchObject({ zone: "staging", damage: 0 });
+  });
+
+  it("08101:A:1 it attacks each player once, in player order, and stays in the staging area", () => {
+    const t = table({ stage: "08101", side: "A", setAside: [MARSH], seats: 2, deck: FILLERS, threat: [20, 20] });
+    const done = fought(t, resolveRecords(t.state, t.ctx, "08101", "whenRevealed", t.state.questStage ?? ""));
+    expect(attacked(done.steps)).toEqual([0, 1]);
+    expect(marshOf(done.state)?.zone).toBe("staging");
+  });
+
+  it("08101:A:1 with the first player in the second seat, that seat is attacked first", () => {
+    const t = table({ stage: "08101", side: "A", setAside: [MARSH], seats: 2, firstPlayer: 1, deck: FILLERS, threat: [20, 20] });
+    const done = fought(t, resolveRecords(t.state, t.ctx, "08101", "whenRevealed", t.state.questStage ?? ""));
+    expect(attacked(done.steps)).toEqual([1, 0]);
+  });
+
+  it("08101:B:2 after the last time counter it attacks each player, and only then 2 time counters go on the stage, which does not advance", () => {
+    const t = table({ stage: "08101", phase: "Refresh", staging: [MARSH], deck: FILLERS, threat: [20, 20] });
+    const stage = t.state.questStage ?? "";
+    const steps: EngineStep[] = [];
+    const started = { state: settle(updateCard(t.state, stage, { resources: 1 }), t.ctx, steps), steps };
+    expect(started.state.window?.kind).toBe("defense");
+    expect(started.state.cards[stage]?.resources).toBe(0);
+    const done = fought(t, started);
+    expect(attacked(done.steps)).toEqual([0]);
+    expect(done.state.cards[stage]?.resources).toBe(2);
+    expect(done.state.questStage).toBe(stage);
+  });
+
+  it("08101:B:3 the players win when the Marsh-dweller is destroyed, staged or engaged", () => {
+    for (const layout of [{ staging: [MARSH] }, { engaged: [{ code: MARSH, seat: 0 }] }] as const) {
+      const t = table({ stage: "08101", ...layout });
+      const alive = placeDamage(t.state, idOf(t.state, MARSH), 8, t.ctx.cards, [], "combat", ruleCause("rr.damage"));
+      expect(settle(alive, t.ctx, []).stageCleared).toBeFalsy();
+      const destroyed = placeDamage(t.state, idOf(t.state, MARSH), 9, t.ctx.cards, [], "combat", ruleCause("rr.damage"));
+      expect(settle(destroyed, t.ctx, []).stageCleared).toBe(true);
+    }
+  });
+
+  it("08103:A:2 it gets +1 Threat and +1 Attack for each resource token on it", () => {
+    for (const tokens of [0, 3]) {
+      const t = table({ stage: "08098", staging: [{ code: MARSH, resources: tokens }] });
+      expect(statOf(t.state, t.ctx.cards, MARSH, "attack")).toBe(6 + tokens);
+      expect(statOf(t.state, t.ctx.cards, MARSH, "threat")).toBe(3 + tokens);
+    }
   });
 });
