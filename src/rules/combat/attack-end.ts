@@ -1,6 +1,6 @@
 // Rules: rr.attacks-outside-the-combat-phase, rr.step-6-4-1 (data/rules/entries.json); ledger lines 08067:B:2, 08083:A:1.
 // One attack is in progress at a time, so an attack an effect makes while another is in progress waits for its end. The effect queues its instructions on the attack (`queueAtEnd`) and the end of the attack runs them in a frame of their own (`runAtEnd`),
-// after the attack's own "after" instructions and its shadow attackers. The attack that is waiting is still an effect that resolves, so it happens whatever became of the attack it waited for.
+// after the attack's own "after" instructions and its shadow attackers. The attack that is waiting is still an effect that resolves, so it happens whatever became of the attack it waited for (finishAttack, openDefense and clearEliminated run it).
 import type { Instruction } from "../../catalog/boundary.ts";
 import type { EngineStep } from "../core/intents.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
