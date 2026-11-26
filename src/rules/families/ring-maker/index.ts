@@ -9,6 +9,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { engageCaptiveHolders, returnAttachedByName } from "./captor.ts";
 import { engageTopDiscarded } from "./engage.ts";
+import { announceThreatZero, attackNalir, eliminateAtLevel } from "./nalir.ts";
 import { drawSelfIntoHand } from "./hand.ts";
 import { createOutOfPlayDecks, discardEliminatedDecks, revealOutOfPlay, shuffleHandCardIntoOutOfPlay, shuffleIntoOutOfPlayDecks } from "./outofplay.ts";
 import { capRefresh } from "./refresh-cap.ts";
@@ -56,6 +57,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return addInPlayToVictory(state, instruction, ctx);
     case "NoteEncounterDiscards":
       return { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: focus.sourceId ?? "table", stat: "noteEncounterDiscards", amount: 1, until: "endOfGame" }] };
+    case "AttackNalir":
+      return attackNalir(state, ctx, steps);
+    case "EliminateAtLevel":
+      return eliminateAtLevel(state, steps);
     case "EngageCaptiveHolder":
     case "EngageSeat":
       return state;
@@ -64,4 +69,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "ring-maker", verbs: ["NoteEncounterDiscards", "RemoveTimeFromQuest", "DrawSelfIntoHand", "EngageTopDiscarded", "CreateOutOfPlayDecks", "ShuffleIntoOutOfPlayDecks", "RevealOutOfPlay", "ShuffleHandCardIntoOutOfPlay", "ReturnAttachedEnemy", "RevealChosenFromDiscard", "CapRefresh", "EngageCaptiveHolder", "AdvanceToChosenStage", "PickSetAside", "AttachPickedToPrevious", "AddPickedToStaging", "ShufflePickedIntoBottom", "RevealFromVictory", "AddInPlayToVictory", "EngageSeat"], run, settle: { sweep: (state, ctx, steps) => announceAlliesOverLimit(announceTrialKey(engageSeats(discardEliminatedDecks(engageCaptiveHolders(state, ctx, steps)), ctx, steps), ctx), ctx) }, deckReset: { hold: inOwnSurgeChain } };
+export const manifest: RulesFamily = { name: "ring-maker", verbs: ["NoteEncounterDiscards", "RemoveTimeFromQuest", "DrawSelfIntoHand", "EngageTopDiscarded", "CreateOutOfPlayDecks", "ShuffleIntoOutOfPlayDecks", "RevealOutOfPlay", "ShuffleHandCardIntoOutOfPlay", "ReturnAttachedEnemy", "RevealChosenFromDiscard", "CapRefresh", "EngageCaptiveHolder", "AdvanceToChosenStage", "PickSetAside", "AttachPickedToPrevious", "AddPickedToStaging", "ShufflePickedIntoBottom", "RevealFromVictory", "AddInPlayToVictory", "EngageSeat", "AttackNalir", "EliminateAtLevel"], run, settle: { sweep: (state, ctx, steps) => announceThreatZero(announceAlliesOverLimit(announceTrialKey(engageSeats(discardEliminatedDecks(engageCaptiveHolders(state, ctx, steps)), ctx, steps), ctx), ctx), ctx) }, deckReset: { hold: inOwnSurgeChain } };

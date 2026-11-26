@@ -154,6 +154,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // Each surviving player's threat is at most `max` ("1 XP if each surviving player's threat is 40 or less", dcce.gaining-xp): read at a campaign
   // card's Resolution, true with no surviving player.
   z.strictObject({ kind: z.literal("survivorsThreat"), max: z.number().int().min(0) }),
+  // Some living player's threat is at most `max` ("if any player's threat is 20 or less", 08081:A:1): read in the effect that runs, whichever player it acts for.
+  z.strictObject({ kind: z.literal("anyThreat"), max: z.number().int().min(0) }),
   // The attack that left this effect for its end (AfterAttack), or the damage the answered event placed, dealt at least `min` damage (1 by default):
   // "If this attack deals damage to a Ship objective" (11051:A:2; read with a `matches` condition on the defender).
   // The attack that left this effect for its end sent at least `min` damage on past its defender (excessToShip; 11055:A:2).

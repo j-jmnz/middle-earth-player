@@ -58,6 +58,11 @@ const VERBS = [
   // "Each Guardian enemy engages the first player" (08036:B:1 to 08038:B:1), "Each Guardian enemy engages the player who controls the Key objective with a Trait shared by that enemy" (08039:B:1), a constant marker on the stage: while it is the stage in play, each enemy with this Trait in the staging area or engaged
   // with another player engages that player at once, whatever its engagement cost, and follows the first player token (the settle sweep, families/ring-maker/trial-sweeps.ts; the run does nothing). A Guardian whose Key no player controls stays where it is.
   z.strictObject({ verb: z.literal("EngageSeat"), who: z.enum(["firstPlayer", "keyHolder"]), trait: z.string().min(1) }),
+  // "Bellach makes an immediate attack against Nalir" (08067:B:2, 08083:A:1; rm.attacks-against-nalir): the last picked enemy, in the staging area or engaged with any player, makes an immediate attack, dealt a shadow card of its own, against the player who controls Nalir. That player declares defenders as for any
+  // attack; undefended damage must be assigned to Nalir. Nothing happens when no player controls Nalir or the enemy may not attack.
+  z.strictObject({ verb: z.literal("AttackNalir"), ...when }),
+  // "reduce each player's threat elimination level by 10" (08066:B:2), the engine's check after the level moved: each seat whose threat is at or above its elimination level now is eliminated at once (rm.threat-elimination-level). The record puts the `eliminationReduction` flag first.
+  z.strictObject({ verb: z.literal("EliminateAtLevel"), ...when }),
 ] as const;
 
 const TRIGGERS = [
@@ -65,6 +70,8 @@ const TRIGGERS = [
   "trialKeyControlled",
   // The allies in play, all seats together, are more than the table's `alliesLimit` (08047:A:1): the event is about the first player, who chooses the allies that stay.
   "alliesOverLimit",
+  // Every living player's threat is 0 (08066:B:4), announced at a settle with nothing resolving and only while a record of the current quest stage hears it; the event is about no card (the stage's record answers it).
+  "allThreatZero",
 ] as const;
 
 const FLAGS = [
@@ -76,6 +83,12 @@ const FLAGS = [
   "cannotLeaveHand",
   // On a Hills of Dunland in the staging area: it is the copy whose Forced effect after a draw acts ("this ability does not stack with other copies", 08020:A:1). It is held with `doesNotStack`, so only the oldest copy in the staging area holds it; the Forced effect's condition reads it.
   "huntsOnDraw",
+  // On a quest stage (target `self`): the progress placed on it, by questing or a player card effect, is canceled and its record hears it as `progressReplaced` with the amount (08066:B:3; quest/progress-replaced.ts). The active location took its share first.
+  "progressCanceled",
+  // On a quest stage (target `self`): progress from questing is not placed on it and its record hears `progressReplaced` with the amount, to place it on another card; progress a player card effect places on the stage goes to that card too, which is immune to it, so none is placed (08067:B:3).
+  "progressToCrossing",
+  // On the table: no time counter can be removed from the current quest ("time counters cannot be removed from the current quest", 08075:A:2): the refresh phase, a card effect and a Shadow all leave it as it is (families/angmar/time.ts removeTimeCounterFrom).
+  "timeBarred",
 ] as const;
 
 export const manifest = { name: "ring-maker", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

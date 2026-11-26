@@ -13,6 +13,9 @@ const PROGRESS_REPLACED: readonly { flag: Modifier["stat"]; questingOnly: boolea
   { flag: "progressAsDamage", questingOnly: true },
   { flag: "progressHealsLakeTown", questingOnly: true },
   { flag: "progressToVillagers", questingOnly: false },
+  // Trouble in Tharbad: stage 1B cancels all progress (families/ring-maker, 08066:B:3); stage 2B moves the progress from questing to The Crossing at Tharbad (08067:B:3).
+  { flag: "progressCanceled", questingOnly: false },
+  { flag: "progressToCrossing", questingOnly: true },
 ];
 
 // What is left of `remaining` once the stage's flags have taken their share; the caller has checked that no side quest takes the progress instead (mec108.side-quests-in-play).
@@ -29,6 +32,8 @@ export function replaceStageProgress(state: ScenarioState, remaining: number, qu
     next = rescueRandom(next, stage, remaining);
     remaining = 0;
   }
+  // Stage 2B of Trouble in Tharbad: progress a player card effect places on the stage goes to The Crossing at Tharbad, which is immune to player card effects, so none is placed (08067:B:3). Progress from questing is replaced below.
+  if (remaining > 0 && stage && !questing && flagged(next, stage, "progressToCrossing")) remaining = 0;
   // Progress a stage turns into an event its record hears (progressReplaced, with the amount) instead of progress on it.
   if (remaining > 0 && stage && PROGRESS_REPLACED.some((one) => (!one.questingOnly || questing) && flagged(next, stage, one.flag))) {
     next = queueEvent(next, { trigger: "progressReplaced", seat: null, cardId: stage, amount: remaining });
