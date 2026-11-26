@@ -41,3 +41,5 @@ The statuses are those of the Readings bullet of `docs/scenarios/the-ring-maker.
   - `08131:A:2` (researched): both parts resolve; Collapsed Tower in the discard pile returns to the staging area and takes 2 damage.
   - `08132:A:2` (researched): the travel damage may send the location underneath.
   - `08129:A:1` (researched): Forced after each attack of Prowling Orc, immediate and additional ones too.
+  - `08135:A:1` (`recommended`, no source names it): the surge is the alternative to the damage, so "If there is no active location" is checked on the table as the card resolves, before the 3 damage; a location the damage sends underneath The Orcs' Search does not give surge. Not taken: the check after the damage. Sources read: https://visionofthepalantir.com/2018/06/30/celebrimbors-secret/ and https://ffg-forum-archive.entropicdreams.com/topic/101214-a-few-questions-concerning-certain-cards/ (neither rules on the order); the record checks first, as Trouble in Tharbad's 08083 does.
+  - `08123:A:1` (span-settled): "Then, attach" depends on the attack as `rr.then` says, so the attach runs only when a hero holds the Mould; with none, nothing moves.
