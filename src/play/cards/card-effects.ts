@@ -26,6 +26,7 @@ import { REST_MARK } from "../words/scenarios/ring-maker/fangorn-table.ts";
 import { lootDeckWords, lootGuardWords } from "../words/loot.ts";
 import { lootUnder } from "../../rules/families/sidequests/loot.ts";
 import { alleywayMark, championMark, seizeMark } from "../readouts/haradrim/umbar.ts";
+import { stagedSeatChip } from "../readouts/haradrim/staged.ts";
 import { stackMark } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { capturedPill } from "../words/scenarios/angmar/gram-table.ts";
 import { capturedOwners } from "../readouts/gram.ts";
@@ -368,6 +369,7 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     determined: determinedMark(game, ctx, cardId) ?? championMark(game, ctx, cardId) ?? blankMark(game, ctx, cardId),
     dead: deadSpeech(game, ctx.cards, cardId),
     combat: card != null ? combatNumber(game, ctx, card) : null,
+    seat: stagedSeatChip(game, cardId),
   };
 }
 
@@ -488,4 +490,6 @@ export type SlotNumbers = {
   dead: string | null;
   // In the enemy attacks step: an engaged enemy's attack or a character's defense, drawn at the card's foot (combatNumber).
   combat: CombatNumber | null;
+  // A hero lying in the staging area under no player's control, two-handed: whose it is, as a small chip ("P2") and the words the reader says (readouts/haradrim/staged.ts, stagedSeatChip).
+  seat?: { chip: string; speech: string } | null;
 };

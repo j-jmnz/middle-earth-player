@@ -59,7 +59,7 @@ export function QuestAdvanceView({
   const s = useUiScale();
   const progress = useSharedValue(scale === 0 ? 1 : 0);
   const wide = screen.width > screen.height;
-  // On a short wide screen (a phone on its side) the question's sentence goes below its rows inside the scroll, with the read hint after it and the stage's detail line left to the stage sheet, so every row and the answer show at once and the sentence is read in full by scrolling; nothing lies over it.
+  // On a short wide screen (a phone on its side) the rows are dense (one line each), so four fit with the answer; the question's own sentence stays above them, where the choice is read.
   const short = wide && screen.height < SHORT * s;
   const roomW = screen.width - insets.left - insets.right;
   const roomH = screen.height - insets.top - insets.bottom;
@@ -74,10 +74,15 @@ export function QuestAdvanceView({
   });
   const sheet = choice.sheet;
   const tiles = asks ? trayTiles(sheet) : [];
-  const marks = new Set(choice.choice.ids);
-  const note = choice.header.note;
+  // A bare choice (words/asks.ts `bare`) says its sentence alone and the stage sheet carries the printed paragraph, so a short screen drops the stage detail line.
   const bare = sheet.kind === "pick" && sheet.bare === true;
-  const readHint = tiles.some((tile) => tile.readId);
+  const marks = new Set(choice.choice.ids);
+  const reads = tiles.some((tile) => tile.readId);
+  const note = choice.header.note;
+  // The question's own sentence and the card's printed line it ends with: on a short screen the sentence stands above the rows and the printed line below them.
+  const printed = sheet.kind === "pick" ? (sheet.printed ?? null) : null;
+  const splits = note != null && printed != null && printed !== "" && note.endsWith(printed) && note.length > printed.length;
+  const ask = splits ? note.slice(0, note.length - printed.length).trim() : note;
   return (
     <View testID="quest-advance" accessibilityViewIsModal onAccessibilityEscape={asks ? undefined : onProgress} style={StyleSheet.absoluteFill}>
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: t.night }, scrimStyle]} />
@@ -92,14 +97,17 @@ export function QuestAdvanceView({
           <PreviewPicture card={card} width={size.width} height={size.height} />
         </Animated.View>
         <View style={wide ? { flex: 1, maxWidth: 360 * s, marginLeft: 20 * s, maxHeight: roomH - 16 * s } : { width: size.width, marginTop: 16 * s, flexShrink: 1 }}>
-          {words.eyebrow ? (
-            <Text testID="quest-advance-eyebrow" className="font-display text-eyebrow uppercase text-accent">
-              {words.eyebrow}
+          {/* On a short screen the stage's eyebrow and title share a line, so the rows below keep their room. */}
+          <View style={short && asks ? { flexDirection: "row", flexWrap: "wrap", alignItems: "baseline", columnGap: 8 * s } : undefined}>
+            {words.eyebrow ? (
+              <Text testID="quest-advance-eyebrow" className="font-display text-eyebrow uppercase text-accent">
+                {words.eyebrow}
+              </Text>
+            ) : null}
+            <Text testID="quest-advance-title" accessibilityRole="header" className={`${short && asks ? "" : "mt-1 "}font-display text-title text-bone`}>
+              {words.title}
             </Text>
-          ) : null}
-          <Text testID="quest-advance-title" accessibilityRole="header" className="mt-1 font-display text-title text-bone">
-            {words.title}
-          </Text>
+          </View>
           {words.detail && !(asks && short && bare) ? (
             <Text testID="quest-advance-detail" className="mt-1 text-label text-muted">
               {words.detail}
@@ -113,8 +121,9 @@ export function QuestAdvanceView({
           {asks ? (
             <View testID="quest-advance-asks" className="mt-3" style={{ flexShrink: 1 }}>
               <Text className="font-display text-eyebrow uppercase text-accent">{choice.header.step}</Text>
-              <Text className="mt-1 text-body text-bone">{choice.header.title}</Text>
-              <ScrollView style={{ flexShrink: 1, marginTop: (short || !note ? 8 : 2) * s - ringRoom(s), marginHorizontal: ringScroll(s).style.marginHorizontal }} contentContainerStyle={ringScroll(s).content} showsVerticalScrollIndicator={false}>
+              {choice.header.title !== words.title ? <Text className="mt-1 text-body text-bone">{choice.header.title}</Text> : null}
+              {ask && short ? <Text testID="quest-advance-note" className="mt-1 text-label text-muted">{ask}</Text> : null}
+              <ScrollView style={{ flexShrink: 1, marginTop: (short || !note ? 4 : 2) * s - ringRoom(s), marginHorizontal: ringScroll(s).style.marginHorizontal }} contentContainerStyle={ringScroll(s).content} showsVerticalScrollIndicator={false}>
                 {note && !short ? <Text className="mb-2 text-label text-muted">{note}</Text> : null}
                 {tiles.map((tile) => {
                   const source = tile.code ? picture(tile.code) : null;
@@ -127,6 +136,7 @@ export function QuestAdvanceView({
                       detail={tile.detail}
                       stats={tile.stats}
                       selected={marks.has(tile.id)}
+                      dense={short}
                       testID={`quest-advance-option-${tile.id}`}
                       leading={tile.code && source ? <CardImage source={source} recyclingKey={`${tile.code}:advance`} width={32 * s} height={44 * s} /> : null}
                       onPress={() => choice.onTile(tile.id)}
@@ -134,10 +144,10 @@ export function QuestAdvanceView({
                     />
                   );
                 })}
-                {note && short ? <Text className="mt-1 text-label text-muted">{note}</Text> : null}
-                {readHint && short ? <Text className="mt-1 text-label text-muted">Hold a card to read it.</Text> : null}
+                {splits && short ? <Text testID="quest-advance-printed" className="mt-1 text-label text-muted">{printed}</Text> : null}
+                {short && reads ? <Text className="mt-1 text-label text-muted">Hold a card to read it.</Text> : null}
               </ScrollView>
-              {readHint && !short ? <Text className="mt-1 text-label text-muted">Hold a card to read it.</Text> : null}
+              {!short && reads ? <Text className="mt-1 text-label text-muted">Hold a card to read it.</Text> : null}
               <View className="mt-2">
                 <DockButtons key={choice.resetKey} dock={choice.dock} picked={choice.picked} onButton={choice.onButton} />
               </View>

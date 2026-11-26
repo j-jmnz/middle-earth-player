@@ -59,6 +59,7 @@ import { framsburgActionCaution, framsburgActionNote } from "../words/scenarios/
 import { fatePassCaution } from "../words/scenarios/fate.ts";
 import { gundabadOptionLabel, gundabadPassCaution } from "../words/scenarios/gundabad.ts";
 import { gundabadRow } from "./gundabad-sheets.ts";
+import { mordorRow } from "./mordor-sheets.ts";
 import { fordsTimeCount, withCount } from "./ring-maker-sheets.ts";
 import { TIMING_WORDS, type SheetStat, type PickOption, type Sheet, type SheetNames, type TriggerOption } from "./sheet-types.ts";
 
@@ -290,6 +291,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         return {
           ...base,
           note: [`${ask}${/^Player \d+[:,] /.test(ask) ? "" : who}`, chosen?.bare ? null : lineOf(asker ?? effect, names)].filter((part) => part != null).join(" "),
+          printed: chosen?.bare ? null : lineOf(asker ?? effect, names),
           ...(chosen?.bare ? { bare: true as const } : {}),
           verb: "Choose",
           confirm: "Confirm",
@@ -322,6 +324,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         ...(asked.title ? { title: asked.title } : {}),
         ...(stopsDefenders ? { alternative: { label: "No more defenders", intent: { type: "Choose" as const, optionId: DONE } } } : {}),
         note: [`${asked.prompt}${asked.owned ? "" : who}`, committedNote(game, ctx, effect, window.seat), asked.bare ? null : line].filter((part) => part != null).join(" "),
+        printed: asked.bare ? null : line,
         ...(asked.bare ? { bare: true as const } : {}),
         verb: asked.verb,
         // Which Ringwraith copy goes in: the primary says the action alone, so the pill does not wrap on a long zone name.
@@ -338,7 +341,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? wilderlandOptionLabel(wait.item.instruction, id, words) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words, ctx.cards) ?? gundabadOptionLabel(wait.item.instruction, id, game, ctx, words) ?? (isBoonCode(wait.item.instruction, id) ? words.code(id) : null) ?? armiesOptionLabel(wait.item.instruction, id, game, ctx, words)) : null;
           // Copies of one card in different zones are told apart by where each one is.
           // A pick that puts damage on a location or a character, or takes it off a location: the damage it would stand at, as a mark, with a caution when it burns the location or loses the game.
-          const fire = wait?.kind === "target" ? (fireRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names, amountNow, source) ?? gundabadRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names.card(id))) : null;
+          const fire = wait?.kind === "target" ? (fireRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names, amountNow, source) ?? gundabadRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names.card(id)) ?? mordorRow(wait.item.instruction, id, window.options, game, ctx, names.card)) : null;
           // A Ship objective that is exhausted or attached to: whose it is when the options hold more than one player's, and the damage a card on it would deal.
           const ship = wait?.kind === "target" ? shipRow(wait.item.instruction, data?.queue[0]?.instruction, id, window.options, game, ctx, words) : null;
           const kingsCaution = wait?.kind === "target" ? discardCaution(game, ctx, source, wait.item.instruction, data?.queue[0]?.instruction, id, names.card) : undefined;

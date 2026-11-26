@@ -3,7 +3,7 @@
 import type { LegalIntent, ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
 import { isReanimatedCode, printedOf } from "../../rules/core/printed.ts";
-import { inPlay } from "../../rules/core/state.ts";
+import { inPlay, type CardInstance } from "../../rules/core/state.ts";
 
 import { pictureKey } from "../canvas/picture-key.ts";
 import { islandTell } from "../words/scenarios/uncharted.ts";
@@ -31,17 +31,40 @@ export function cardLabel(game: ScenarioState, names: SheetNames, id: string): s
   return tell ? `${names.card(id)} · ${tell}` : names.card(id);
 }
 
+/** "engaged with Player 2" (a game of several players) or "engaged with you", for an enemy engaged with `seat`. */
+export function engagedWords(game: ScenarioState, seat: number): string {
+  return game.seatCount > 1 && seat >= 0 ? `engaged with Player ${seat + 1}` : "engaged with you";
+}
+
+/** The seat a card belongs to for a row: its owner, or its controller where no owner is set (an attachment's or a card's owner is `owner ?? controller`). Null when it has neither. */
+export function belongsTo(card: CardInstance): number | null {
+  return card.owner ?? card.controller ?? null;
+}
+
+/** "Player 2" for a card of a pick whose options hold the cards of more than one player; null when they hold one player's (or the card has none). */
+export function ownerTag(game: ScenarioState, card: CardInstance, options: readonly string[]): string | null {
+  const seat = belongsTo(card);
+  const seats = new Set(options.map((other) => (game.cards[other] ? belongsTo(game.cards[other]) : null)).filter((one) => one != null));
+  return seat != null && seats.size > 1 ? `Player ${seat + 1}` : null;
+}
+
+/** Where a Captive lies: "guarded by Uruk of Mordor" (a hero an Orc guards), "staging area" (a hero no card holds), "Captive" (a hero a card holds under it). */
+export function captivePlace(game: ScenarioState, card: CardInstance, name: (id: string) => string): string {
+  const guard = card.guardedHero === true && card.host != null ? game.cards[card.host] : undefined;
+  return guard ? `guarded by ${name(guard.id)}` : card.host == null ? "staging area" : "Captive";
+}
+
 /**
- * The row of a Captive of The Uruk-hai in a pick (Grishnákh's, 143024:A:1; Hands of a Healer's, 143016:A:3, which mixes Captives with the heroes the players control): "Legolas · Captive · 2 of 4 damage", with
- * " · Player 2" after it when the options hold the heroes of more than one player. Undefined for any other row.
+ * The row of a Captive in a pick: "Legolas · Captive · 2 of 4 damage" for one The Uruk-hai's enemy or To Isengard! holds (Grishnákh's, 143024:A:1; Hands of a Healer's, 143016:A:3, which mixes Captives with the heroes the players control), "Legolas · staging area · 2 of 4 damage" for a hero
+ * no card holds, "Legolas · guarded by Uruk of Mordor · 2 of 4 damage" for a hero an Orc guards (The Long Arm of Mordor), with " · Player 2" after it when the options hold the heroes of more than one player. Undefined for any other row.
  */
 export function captiveLabel(game: ScenarioState, ctx: ReduceContext, names: SheetNames, id: string, options: readonly string[]): string | undefined {
   const card = game.cards[id];
   if (card?.captive !== true) return undefined;
   const hitPoints = printedOf(ctx.cards, card.code).health;
   const damage = hitPoints == null ? `${card.damage} damage` : `${card.damage} of ${hitPoints} damage`;
-  const owners = new Set(options.map((other) => game.cards[other]?.owner).filter((owner) => owner != null));
-  return `${names.card(id)} · Captive · ${damage}${card.owner != null && owners.size > 1 ? ` · Player ${card.owner + 1}` : ""}`;
+  const tag = ownerTag(game, card, options);
+  return `${names.card(id)} · ${captivePlace(game, card, names.card)} · ${damage}${tag != null ? ` · ${tag}` : ""}`;
 }
 
 /**
@@ -91,7 +114,9 @@ export function seatedLabel(game: ScenarioState, ctx: ReduceContext, names: Shee
     const on = isReanimatedCode(host.code) ? `${hostName}, Player ${seat + 1}'s card` : hostType === "enemy" ? `${hostName}, enemy engaged with Player ${seat + 1}` : `${hostName}, Player ${seat + 1}'s ${hostType}`;
     return `${names.card(id)} \u00b7 on ${on}`;
   }
-  const kind = type === "hero" || type === "attachment" || type === "event" || type === "treasure" ? type : type === "player-side-quest" ? "side quest" : "ally";
+  // An objective-hero (printed type objective) among a seat's heroes is a hero (The Long Arm of Mordor).
+  const amongHeroes = game.cards[id]?.zone === "heroes";
+  const kind = type === "hero" || type === "attachment" || type === "event" || type === "treasure" ? type : type === "player-side-quest" ? "side quest" : amongHeroes ? "hero" : "ally";
   return type === "enemy" ? `${names.card(id)} \u00b7 engaged with Player ${seat + 1}` : `${names.card(id)} \u00b7 Player ${seat + 1}'s ${kind}`;
 }
 
@@ -105,7 +130,7 @@ export function tiedLabel(game: ScenarioState, ctx: ReduceContext, names: SheetN
   const name = names.card(id);
   if (options.filter((other) => other !== id && game.cards[other] != null && names.card(other) === name).length === 0) return undefined;
   const seat = card.zone === "engaged" ? game.seats.findIndex((one) => one.engaged.includes(id)) : -1;
-  const place = card.zone === "activeLocation" ? "active location" : card.zone === "engaged" ? (game.seatCount > 1 && seat >= 0 ? `engaged with Player ${seat + 1}` : "engaged with you") : "staging area";
+  const place = card.zone === "activeLocation" ? "active location" : card.zone === "engaged" ? engagedWords(game, seat) : "staging area";
   const threat = printedOf(ctx.cards, card.code).threat == null ? 0 : modifiedStat(game, card, "threat", ctx.cards);
   return `${name} \u00b7 ${place} \u00b7 ${threat} Threat`;
 }
@@ -120,15 +145,19 @@ export function copyLabel(game: ScenarioState, names: SheetNames, id: string, op
   if (!card || !inPlay(card.zone)) return undefined;
   const name = names.card(id);
   if (!options.some((other) => other !== id && game.cards[other] != null && names.card(other) === name)) return undefined;
-  const seat = game.seats.findIndex((one) => one.engaged.includes(id));
-  const engaged = game.seatCount > 1 && seat >= 0 ? `engaged with Player ${seat + 1}` : "engaged with you";
-  const places: Partial<Record<string, string>> = { engaged, staging: "staging area", activeLocation: "active location" };
+  const places: Partial<Record<string, string>> = { engaged: engagedWords(game, game.seats.findIndex((one) => one.engaged.includes(id))), staging: "staging area", activeLocation: "active location" };
+  // The staging area tells copies apart only when another row lies elsewhere: two Orcs in the staging area differ by nothing the row can say (an engaged place stays, it says whose).
+  const placeOf = (other: string): string | undefined => {
+    const lying = game.cards[other];
+    return lying == null ? undefined : lying.zone === "engaged" ? engagedWords(game, game.seats.findIndex((one) => one.engaged.includes(other))) : places[lying.zone];
+  };
+  const shared = new Set(options.map(placeOf)).size < 2;
   const host = card.zone === "attached" && card.host ? `on ${names.card(card.host)}` : undefined;
   const attachments = card.attachments.map((other) => names.card(other));
   const attacking = game.pendingAttack?.enemyId === id ? "attacking" : undefined;
   const damage = card.damage > 0 ? `${card.damage} damage` : undefined;
   const withAttachments = attachments.length > 0 ? `with ${attachments.join(", ")}` : undefined;
-  const parts = [attacking, places[card.zone] ?? host, damage, withAttachments].filter((part): part is string => part != null);
+  const parts = [attacking, shared && card.zone === "staging" ? host : (places[card.zone] ?? host), damage, withAttachments].filter((part): part is string => part != null);
   return parts.length > 0 ? `${name} \u00b7 ${parts.join(" \u00b7 ")}` : undefined;
 }
 

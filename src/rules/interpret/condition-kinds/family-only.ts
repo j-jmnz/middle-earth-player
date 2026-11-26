@@ -11,6 +11,6 @@ export const familyOnlyHandlers = {
   versusVictoryTrait: no, holderExhausted: no,
   // The armies family's hook answers these.
   stagesComplete: no, stageIsCurrent: no, stageNoProgress: no,
-  // The haradrim family's hook answers these two.
-  stageInPlayWholeRound: no, temperature: no,
+  // The haradrim family's hook answers these.
+  stageInPlayWholeRound: no, temperature: no, threatAboveWillpower: no,
 } satisfies Partial<ConditionHandlers>;

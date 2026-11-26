@@ -94,6 +94,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["engagedEnemies"], pick.engagedEnemies === true ? "(enemies engaged with a player included)" : null);
   note(["isHost"], pick.isHost === true ? "that this card is attached to" : null);
   note(["hasShadow"], pick.hasShadow === true ? "with a shadow card" : null);
+  note(["facedownShadow"], pick.facedownShadow === true ? "holding a facedown shadow card" : null);
   note(["looked"], pick.looked === true ? "among the cards this effect looked at or discarded" : null);
   note(["soleMostDamaged"], pick.soleMostDamaged === true ? "with more damage than each other character in play (a tie for the most matches none)" : null);
   note(["attached"], pick.attached === true ? "that is attached to another card" : pick.attached === false ? "that is attached to no card" : null);

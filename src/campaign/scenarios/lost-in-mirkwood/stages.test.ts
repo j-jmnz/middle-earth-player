@@ -7,7 +7,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { UNATTRIBUTED } from "../../../rules/core/cause.ts";
 import { destroyCard, modifiedStat, placeDamage } from "../../../rules/core/keywords.ts";
 import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
-import { moveCard, spawn } from "../../../rules/core/zones.ts";
+import { attachTo, moveCard, spawn } from "../../../rules/core/zones.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import { settle } from "../../../rules/engine/machine.ts";
@@ -216,6 +216,23 @@ describe("18074 Carried Away", () => {
     expect(back.cards[hero.id]?.guardedHero).toBeUndefined();
     expect(back.seats[0]?.heroes).toContain(hero.id);
     expect(back.seats[0]?.heroes[0]).toBe(hero.id);
+  });
+
+  it("a card another player played on the guarded hero changes control with it and keeps its owner, so it is discarded to its owner's pile (rr.ownership-and-control)", () => {
+    const { t, run } = reveal({ seats: 2, deck: ["f3"] });
+    const hero = Object.values(run.state.cards).find((card) => card.guardedHero === true)!;
+    const guard = cardsOf(run.state, "f3")[0]!;
+    const spawned = spawn(run.state, "filler", { zone: "play", seat: 1 });
+    const attachment = spawned.id;
+    const held = attachTo(updateCard(spawned.state, attachment, { controller: 1 }), attachment, hero.id);
+    const killed = settle(placeDamage(held, guard.id, 3, t.ctx.cards, [], "combat", UNATTRIBUTED), t.ctx, []);
+    const back = finish({ state: killed, steps: [] }, t.ctx).state;
+    expect(back.cards[hero.id]).toMatchObject({ zone: "heroes", controller: 0 });
+    expect(back.cards[attachment]).toMatchObject({ host: hero.id, controller: 0, owner: 1 });
+    const destroyed = destroyCard(back, hero.id, t.ctx.cards, [], false, true);
+    expect(destroyed.cards[attachment]?.zone).toBe("discard");
+    expect(destroyed.seats[1]?.discard).toContain(attachment);
+    expect(destroyed.seats[0]?.discard).not.toContain(attachment);
   });
 
   it("a guard that leaves play in any way, discarded by an effect, returns the hero exhausted too (user ruling, 2026-11-05)", () => {

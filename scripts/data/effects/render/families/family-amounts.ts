@@ -25,6 +25,7 @@ export function familyAmount(expr: Obj): Made | null {
   if (typeof expr.hidden === "string") return { text: expr.hidden === "own" ? "the number of hidden cards in the acting player's play area" : "the total number of hidden cards in every player's play area", read: ["hidden"] };
   if (expr.temperature === "value") return { text: "the temperature of the heat tracker (0 while none is set)", read: ["temperature"] };
   if (expr.temperature === "tens") return { text: "the tens digit of the temperature of the heat tracker (0 while none is set)", read: ["temperature"] };
+  if (expr.willpowerGap === true) return { text: "while this enemy attacks a defending character with less Willpower than its own Threat: its Threat less that Willpower (otherwise 0; an undefended attack has no defending character)", read: ["willpowerGap"] };
   if (expr.part === true) return { text: "the part number of the campaign card of the scenario being played: its place in its campaign, counting from 1", read: ["part"] };
   return null;
 }
@@ -44,6 +45,7 @@ export const FAMILY_AMOUNT_SAMPLES: readonly Obj[] = [
   { part: true },
   { temperature: "value" },
   { temperature: "tens" },
+  { willpowerGap: true },
   { poison: "picked" },
   { hidden: "own" },
   { hidden: "all" },
