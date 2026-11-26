@@ -11,7 +11,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { addWithHostToVictory, attachRandomSetAside } from "./capture.ts";
 import { exploredCondition } from "./explored.ts";
-import { takeObjectiveAlly, undefendedMumak } from "./mumak.ts";
+import { eliminateAfterAttack, takeObjectiveAlly, undefendedMumak } from "./mumak.ts";
 import { moveToOrcsArea, prepareOrcsArea, syncOrcsArea } from "./orcs-area.ts";
 import { addOrcsProgress, orcsProgress } from "./orcs-stage.ts";
 import { orcsCondition } from "./orcs-values.ts";
@@ -52,6 +52,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return addOrcsProgress(state, instruction, focus, ctx, steps);
     case "TakeObjectiveAlly":
       return takeObjectiveAlly(state, instruction, focus, steps);
+    case "EliminateAfterAttack":
+      return eliminateAfterAttack(state, focus, steps);
     default:
       return runHeat(state, instruction, focus, ctx);
   }
@@ -59,7 +61,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "haradrim",
-  verbs: ["PlaceUnderSelfFaceup", "SetTemperature", "RaiseTemperature", "LowerTemperature", "MoveHeroesToStaging", "TakeObjectiveHero", "ReleaseStagedHero", "GuardStagedHeroes", "EngageSeatWithMost", "AttachRandomSetAside", "AddWithHostToVictory", "PrepareOrcsArea", "MoveToOrcsArea", "OrcsProgress", "AddOrcsProgress", "TakeObjectiveAlly"],
+  verbs: ["PlaceUnderSelfFaceup", "SetTemperature", "RaiseTemperature", "LowerTemperature", "MoveHeroesToStaging", "TakeObjectiveHero", "ReleaseStagedHero", "GuardStagedHeroes", "EngageSeatWithMost", "AttachRandomSetAside", "AddWithHostToVictory", "PrepareOrcsArea", "MoveToOrcsArea", "OrcsProgress", "AddOrcsProgress", "TakeObjectiveAlly", "EliminateAfterAttack"],
   run,
   condition: (state, condition, _scope, ctx) => (condition.kind === "threatAboveWillpower" ? threatAboveWillpower(state, ctx.cards) : (haradrimCondition(state, condition) ?? orcsCondition(state, condition) ?? exploredCondition(state, condition) ?? temperatureCondition(state, condition))),
   amount: (state, found, scope, ctx) => (found.willpowerGap ? willpowerGap(state, scope.sourceId ?? null, ctx.cards) : temperatureAmount(state, found)),

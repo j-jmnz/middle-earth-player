@@ -55,9 +55,9 @@ const LOSES = (reason: string, condition?: Cond) => ({ timing: "forced" as const
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   [
-    // 17038 Tamed Mûmak (an objective ally; Immune to player card effects is a keyword). The damage of an undefended attack against its controller goes on it, all of it (the combat.undefended hook reads the flag); when it leaves play its controller is eliminated.
+    // 17038 Tamed Mûmak (an objective ally; Immune to player card effects is a keyword). The damage of an undefended attack against its controller goes on it, all of it (the combat.undefended hook reads the flag); when it leaves play its controller is eliminated once the attack that destroyed it has resolved (reading of 17038:A:3).
     { id: "17038:constant:1", cardCode: MUMAK, lines: ["17038:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "undefendedToMumak", amount: 1, until: "whileSourceInPlay", target: "self" }] },
-    { id: "17038:triggered:1", cardCode: MUMAK, lines: ["17038:A:3"], timing: "triggered", trigger: "leftPlay", subject: "self", instructions: [{ verb: "EliminatePlayer" }] },
+    { id: "17038:triggered:1", cardCode: MUMAK, lines: ["17038:A:3"], timing: "triggered", trigger: "leftPlay", subject: "self", instructions: [{ verb: "EliminateAfterAttack" }] },
 
     // 17039 River Harnen (Immune to player card effects is a keyword). The players cannot travel here unless the stage holds 20 progress; Travel: one encounter card for each player; the stage cannot be defeated while it is in play.
     { id: "17039:constant:1", cardCode: HARNEN, lines: ["17039:A:2"], timing: "constant", condition: { kind: "not", condition: { kind: "stageProgress", min: 20 } }, instructions: [{ verb: "Restrict", what: "travel" }] },

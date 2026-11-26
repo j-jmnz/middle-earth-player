@@ -30,6 +30,7 @@ export const HARADRIM_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => M
   }),
   AddOrcsProgress: (i, ctx) => ({ text: `${amt(i.amount, ctx)} progress goes on the Orcs' current stage, no more than it needs; a full stage is defeated as OrcsProgress says`, read: ["amount"] }),
   TakeObjectiveAlly: (i) => ({ text: `the acting player takes control of one of the set-aside objective allies (${(Array.isArray(i.codes) ? i.codes : []).map(str).join(", ")}) into their play area, ready (asked only when different cards are left, copies of one card are one choice); it is an ally in play`, read: ["codes"] }),
+  EliminateAfterAttack: () => ({ text: "the acting player is eliminated from the game by a card effect; while an enemy attack on that player is in progress the elimination waits until that attack has resolved (its end-of-attack effects and the Forced effects it announces resolve first)", read: [] }),
   EngageSeatWithMost: (i, ctx) => ({ text: `this enemy engages the player engaged with the most ${pck(i.pick, ctx)} (the first player chooses among players that tie, all players at 0; nothing changes when it is already engaged with that player, else it moves to that player)`, read: ["pick"] }),
 };
 
@@ -51,6 +52,7 @@ export const HARADRIM_SAMPLES: Samples = {
   OrcsProgress: [{ verb: "OrcsProgress" }, { verb: "OrcsProgress", engaged: true }],
   AddOrcsProgress: [{ verb: "AddOrcsProgress", amount: 2 }],
   TakeObjectiveAlly: [{ verb: "TakeObjectiveAlly", codes: ["17038"] }],
+  EliminateAfterAttack: [{ verb: "EliminateAfterAttack" }],
   EngageSeatWithMost: [{ verb: "EngageSeatWithMost", pick: { type: "enemy", control: "any", trait: "Orc", nonUnique: true } }],
 };
 

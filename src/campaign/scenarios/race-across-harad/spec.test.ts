@@ -259,6 +259,17 @@ lineSpec("17045:A:3", "Shadow: the attacker gets +1 Attack, and a hero the attac
   expect(destroyed.run.state.cards[destroyed.run.state.orcs?.stage ?? ""]?.progress).toBe(2);
 });
 
+lineSpec("17045:A:3", "Shadow: a Tamed Mûmak the attack destroys still gives the 2 progress, then its controller is eliminated (two-handed and solo)", (effects) => {
+  const mumak = (seats: 1 | 2) => attackWith(effects, "17045", { stage: "17049", seats, play: [{ code: MUMAK, damage: 6, seat: 0 }] }, { undefended: true, lands: { [URUK]: MUMAK } });
+  const solo = mumak(1);
+  expect(solo.run.state.cards[solo.run.state.orcs?.stage ?? ""]?.progress).toBe(2);
+  expect(solo.run.state.lost).toBe(true);
+  const two = mumak(2);
+  expect(two.run.state.cards[two.run.state.orcs?.stage ?? ""]?.progress).toBe(2);
+  expect(two.run.state.seats[0]?.eliminated).toBeTruthy();
+  expect(two.run.state.seats[1]?.eliminated).toBeFalsy();
+});
+
 lineSpec("17046:A:1", "When Revealed: at another stage the Orcs' area Threat joins the staging total, read live, until the end of the phase", (effects) => {
   const { made, state } = prepared({ staging: ["17040"], engaged: [URUK] }, effects);
   expect(withStagingThreat(state, 2, made.cards)).toBe(2);

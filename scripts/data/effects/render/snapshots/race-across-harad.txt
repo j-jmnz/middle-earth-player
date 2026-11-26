@@ -13,7 +13,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
 17038:A:3 (front): If Tamed Mûmak leaves play, the controlling player is eliminated.
   17038:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
     who acts: the acting player is the player who controlled the card when it left play (the leave-play event names that player, the card having no controller afterwards)
-    - the acting player is eliminated from the game by a card effect
+    - the acting player is eliminated from the game by a card effect; while an enemy attack on that player is in progress the elimination waits until that attack has resolved (its end-of-attack effects and the Forced effects it announces resolve first)
 
 ## 17039 River Harnen
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -23,7 +23,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
 
 17039:A:2 (front): The players cannot travel here unless there is at least 20 progress on stage 4B.
   17039:constant:1: Constant
-    only if not (the current quest stage holds at least 20 progress)
+    only if not (the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 20 progress)
     - the players cannot travel to this location while this holds
 
 17039:A:3 (front): Travel: Reveal 1 encounter card per player.
@@ -33,7 +33,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
 
 17039:A:4 (front): Stage 4B cannot be defeated while River Harnen is in play.
   17039:constant:2: Constant
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat the main quest stage while this holds
 
 ## 17040 Expanse of Harad
 (the scenario deals it into the encounter pile; the piles place it, no record does)

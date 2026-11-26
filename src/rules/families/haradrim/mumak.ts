@@ -3,6 +3,7 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
+import { eliminateSeat } from "../../core/eliminate.ts";
 import { flagged, updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
@@ -24,4 +25,11 @@ export function undefendedMumak(state: ScenarioState): readonly string[] {
   if (seat == null || state.modifiers.length === 0) return [];
   const id = (state.seats[seat]?.play ?? []).find((card) => flagged(state, card, "undefendedToMumak"));
   return id ? [id] : [];
+}
+
+/** EliminateAfterAttack (17038:A:3): the acting seat is eliminated; while an enemy attack on that seat is in progress the elimination is left for the attack's end, after the Orcs' progress it gives (the first player takes progress first, reading of 17038:A:3 in docs/scenarios/haradrim/race-across-harad.md). */
+export function eliminateAfterAttack(state: ScenarioState, focus: Focus, steps: EngineStep[]): ScenarioState {
+  const attack = state.pendingAttack;
+  if (attack?.seat !== focus.seat) return eliminateSeat(state, focus.seat, steps);
+  return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), { verb: "EliminatePlayer" }] } };
 }

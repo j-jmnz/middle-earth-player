@@ -127,6 +127,32 @@ describe("17038:A:3 if the Tamed Mûmak leaves play its controller is eliminated
   });
 });
 
+describe("17038:A:3 a destroyed Tamed Mûmak still gives the progress of the attack that destroyed it (17050:B:2, 17045:A:3)", () => {
+  const SETS = ["17051", "17052", "17053", "17054", "16061"];
+  const MUMAK_HURT = { code: MUMAK, damage: 6 };
+  // The Uruk attacks seat 0 undefended: the Mûmak takes all of it and is destroyed.
+  function destroyed(seats: 1 | 2, layout: Layout) {
+    const made = table({ seats, stage: "17050", engaged: [URUK], heroes: [], setAside: SETS, ...layout });
+    const state = runInstruction(made, opened(made).state, { verb: "PrepareOrcsArea", stages: SETS.slice(0, 4), number: 1 });
+    const arrived = fight(made, opened(made, state), (current) => current.window?.kind === "defense");
+    return fight(made, arrived, (current) => current.pendingAttack == null || current.lost === true, { heroCode: MUMAK }).state;
+  }
+
+  it("17050:B:2 two-handed: 1 progress goes on the Orcs' stage, then the Mûmak's controller is eliminated and the other player goes on", () => {
+    const done = destroyed(2, { play: [{ ...MUMAK_HURT, seat: 0 }, { code: MUMAK, seat: 1 }], heroes: [{ code: "dh1", seat: 0 }, { code: "dh1", seat: 1 }] });
+    expect(done.cards[done.orcs?.stage ?? ""]?.progress).toBe(1);
+    expect(done.seats[0]?.eliminated).toBeTruthy();
+    expect(done.seats[1]?.eliminated).toBeFalsy();
+    expect(done.lost).toBeFalsy();
+  });
+
+  it("17050:B:2 solo: the progress is placed, then the elimination loses the game", () => {
+    const done = destroyed(1, { play: [MUMAK_HURT], heroes: ["dh1"] });
+    expect(done.cards[done.orcs?.stage ?? ""]?.progress).toBe(1);
+    expect(done.lost).toBe(true);
+  });
+});
+
 describe("17050:B:2 after an enemy attacks and destroys a character 1 progress goes on the Orcs' stage", () => {
   it("a hero that defends and is destroyed places 1 progress on the Orcs' stage, whatever stage the players are at", () => {
     const made = table({ stage: "17050", engaged: [URUK], heroes: [], setAside: ["17051", "17052", "17053", "17054", "16061"] });
