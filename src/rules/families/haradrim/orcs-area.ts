@@ -5,6 +5,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import { inPlay, updateCard, type ScenarioState } from "../../core/state.ts";
+import { sameMembers, syncMembers } from "../../core/area-members.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { atOrcsStage } from "./orcs-values.ts";
@@ -42,22 +43,10 @@ export function moveToOrcsArea(state: ScenarioState, instruction: Verb<"MoveToOr
 export function syncOrcsArea(state: ScenarioState): ScenarioState {
   const area = orcsOf(state);
   if (!area) return state;
-  const same = atOrcsStage(state);
-  let next = state;
-  const kept: string[] = [];
-  for (const id of area.members) {
-    const zone = next.cards[id]?.zone;
-    if (zone === "orcsArea") {
-      kept.push(id);
-      if (same) next = moveCard(next, id, { zone: "staging" });
-    } else if (zone === "staging") {
-      kept.push(id);
-      if (!same) next = moveCard(next, id, { zone: "orcsArea" });
-    }
-  }
+  const { state: next, kept } = syncMembers(state, area.members, "orcsArea", atOrcsStage(state));
   const now = orcsOf(next);
   if (!now) return next;
-  return kept.length === now.members.length && kept.every((id, at) => id === now.members[at]) ? next : { ...next, orcs: { ...now, members: kept } };
+  return sameMembers(kept, now.members) ? next : { ...next, orcs: { ...now, members: kept } };
 }
 
 /** A scene's Orcs' area as the Setup leaves it (test/harness/layout.ts, `orcs`): the area prepared from the set-aside stages, the cards of `members` moved into it from where they stand, `progress` on the Orcs' stage. */

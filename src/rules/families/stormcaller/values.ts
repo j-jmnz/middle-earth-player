@@ -2,6 +2,7 @@
 // stage number, and whether defeating the current quest stage catches up to it.
 import type { Condition } from "../../../catalog/boundary.ts";
 
+import { memberPlace } from "../../core/area-members.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { stageNumber } from "../caves/progress.ts";
 import { areaOf } from "./zone.ts";
@@ -39,9 +40,7 @@ export function caughtUp(state: ScenarioState, stageCode: string): boolean {
  * a member (or has left the area for another zone). The one owner of a card's place in the area; the table's role reads it. */
 export function areaPlace(game: Pick<ScenarioState, "sea" | "cards">, id: string): "apart" | "together" | null {
   const area = areaOf(game);
-  const card = game.cards[id];
-  if (!area || !card || id === area.stage || !area.members.includes(id)) return null;
-  return card.zone === "stormcallerArea" ? "apart" : card.zone === "staging" ? "together" : null;
+  return !area || id === area.stage ? null : memberPlace(game, area.members, "stormcallerArea", id);
 }
 
 /** Where a card stands in the Stormcaller's area, for its preview: `apart` (a card of the area while the players are at another stage), `together` (a card of the area in the staging area, the players being at the

@@ -2,6 +2,7 @@
 // cards of the area for a pick, and the raise of the staging area's total Threat that Howling at their Heels makes.
 import type { Condition, PickSpec } from "../../../catalog/boundary.ts";
 
+import { membersStanding } from "../../core/area-members.ts";
 import { modifiedStat } from "../../core/modified-stat.ts";
 import type { PrintedCard } from "../../core/printed.ts";
 import { flagged, livingSeats, type ScenarioState } from "../../core/state.ts";
@@ -24,7 +25,7 @@ export function orcsCondition(state: ScenarioState, condition: Condition): boole
 
 /** The cards of the area wherever they stand now: in the area zone while the players are at another stage, in the staging area at the Orcs' stage. */
 export function orcsMembers(state: ScenarioState): readonly string[] {
-  return (orcsOf(state)?.members ?? []).filter((id) => state.cards[id]?.zone === "orcsArea" || state.cards[id]?.zone === "staging");
+  return membersStanding(state, orcsOf(state)?.members ?? [], "orcsArea");
 }
 
 /** The total of the current Threat of the cards in the Orcs' area, the Chieftain included, engaged enemies not (hrd.orcs-area: "the total Threat in the Orcs' area"). */
