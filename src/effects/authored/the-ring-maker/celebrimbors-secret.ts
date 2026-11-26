@@ -4,7 +4,7 @@ import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/
 // locations and the encounter cards no template reads. Every line is read from the scan ledger (data/printed/the-ring-maker.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here.
 // `TriggerScour` and the `scour` trigger (the effect that follows the keyword), `BuryDamagedLocations`, `PlaceRandomHandUnder`, `PlaceDestroyedUnder`, `ExcessToActiveLocation` and the amount `facedownUnder` are the ring-maker family's
 // (src/catalog/families/ring-maker.ts); the scenario's readings are in docs/scenarios/the-ring-maker/celebrimbors-secret.md.
-// Rules: rm.scour, rm.the-orcs-search, rm.time-x, rr.search, rr.in-play-and-out-of-play, rr.immune, rr.forced, rr.engaged, rr.damage, rr.defending-player, rr.shadow-effects, rr.travel, rr.active-location, rr.refresh-phase, rr.does-not-stack (data/rules/entries.json).
+// Rules: rm.scour, rm.the-orcs-search, rm.time-x, rr.search, rr.in-play-and-out-of-play, rr.immune, rr.forced, rr.engaged, rr.damage, rr.defending-player, rr.shadow-effects, rr.travel, rr.active-location, rr.refresh-phase, rm.does-not-stack (data/rules/entries.json).
 const STAGE_1 = "08122";
 const STAGE_2 = "08123";
 const BELLACH = "08124";
