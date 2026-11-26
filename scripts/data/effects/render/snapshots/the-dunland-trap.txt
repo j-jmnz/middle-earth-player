@@ -7,7 +7,7 @@ Scenario piles that place cards with no record (quest: 08011 The Road to Tharbad
   08011:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one Boar Clan enemy in the encounter deck and puts it into play engaged with them (it is not revealed); its title must differ from every card an earlier search of this effect found
+      - the acting player finds one Boar Clan enemy in the encounter deck and puts it into play engaged with them (it is not revealed)
     - shuffle the encounter deck
 
 08011:B:1 (back): Time 2.
@@ -40,7 +40,7 @@ Scenario piles that place cards with no record (quest: 08011 The Road to Tharbad
   08012:whenRevealed:2: When revealed [also {"holdsEvents":true}]
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one Boar Clan enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed); its title must differ from every card an earlier search of this effect found
+      - the acting player finds one Boar Clan enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
     - shuffle the encounter deck
     - for each player, first player first:
       - the acting player shuffles their discard pile into their deck
