@@ -18,6 +18,7 @@ import { dealtCodes, loadAnyScenario, loadCampaigns, loadScenario } from "../../
 import { ROOT } from "../../../scripts/data/paths.ts";
 import { asksPlayer, walk } from "../../../test/harness/record-walk.ts";
 import { judgeBranch, judgePick } from "../../../test/harness/words-judge.ts";
+import { WORDS_OPEN } from "../../../test/harness/words-open.ts";
 import { WORDS_SCENARIOS } from "../../../test/harness/words-scenarios.ts";
 
 import { askWords } from "./ask.ts";
@@ -28,7 +29,9 @@ const asks = asksPlayer;
 
 // A sentence that is allowed to equal the fallback or to be a bare prompt, by `<record id> @<the instruction's path in the record> <verb | option id>`
 // (test/harness/record-walk.ts). Each entry says why it is fine, and the test fails on an entry no sentence needs any more.
-const ALLOWED: Readonly<Record<string, string>> = {};
+const ALLOWED: Readonly<Record<string, string>> = WORDS_OPEN;
+// The allowlist keys some scenario needed: a card is dealt by several scenarios, and one may word a pick that another leaves to the fallback.
+const neededAnywhere = new Set<string>();
 
 const cards = new Map(loadCards().map((card) => [card.code, card]));
 const campaigns = loadCampaigns();
@@ -44,8 +47,6 @@ describe.each(WORDS_SCENARIOS)("the words of %s", (id) => {
   const ctx: ReduceContext = { effects: EFFECTS, cards: new Map() };
   const lines: string[] = [];
   const problems: string[] = [];
-  // The allowlist keys a sentence needed, over both tests.
-  const needed = new Set<string>();
 
   afterAll(() => {
     if (dump === id || dump === "all") process.stdout.write(`\n${id}\n${[...new Set(lines)].join("\n")}\n`);
@@ -53,7 +54,7 @@ describe.each(WORDS_SCENARIOS)("the words of %s", (id) => {
 
   const judge = (key: string, problem: string | null): void => {
     if (problem === null) return;
-    needed.add(key);
+    neededAnywhere.add(key);
     if (ALLOWED[key] === undefined) problems.push(`${key}: ${problem}`);
   };
 
@@ -84,11 +85,12 @@ describe.each(WORDS_SCENARIOS)("the words of %s", (id) => {
     }
     expect(problems).toEqual([]);
   });
+});
 
-  // An entry of a card this scenario deals that no sentence needs any more is removed, so the list holds only what is still open.
-  it("keeps no allowlist entry that no sentence needs", () => {
-    const stale = Object.keys(ALLOWED).filter((key) => codes.has(key.split(":")[0] ?? "") && !needed.has(key));
-    expect(stale).toEqual([]);
+// An entry that no scenario needs any more is removed, so the list holds only what is still open.
+describe("the allowlist of open words", () => {
+  it("keeps no entry that no scenario's sentence needs", () => {
+    expect(Object.keys(ALLOWED).filter((key) => !neededAnywhere.has(key))).toEqual([]);
   });
 });
 
