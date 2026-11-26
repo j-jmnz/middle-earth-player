@@ -13,7 +13,7 @@ import { familyAttackDamaged } from "../../interpret/family-hooks.ts";
 import { modifiedStat, placeDamage, type DamageSource } from "../../core/keywords.ts";
 import { isCharacterType, printedOf, type PrintedCard } from "../../core/printed.ts";
 import { placeQuestProgress, questPointsOf } from "../../quest/quest.ts";
-import type { CardInstance, GameEvent, ScenarioState } from "../../core/state.ts";
+import type { CardInstance, GameEvent, PendingAttack, ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, modifierActive, updateCard } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { queueEvent } from "../../windows/queue.ts";
@@ -21,7 +21,6 @@ import { defendingAgainst } from "../angmar/combat.ts";
 import { scrollDamageTarget } from "../pelargir/scroll.ts";
 import { bodyguardTarget } from "../pelargir/vale/bodyguard.ts";
 import { listened, queueHeard, trimFollowUps } from "./listen.ts";
-import { afterTarget } from "../../combat/shadow.ts";
 import { bilboDamageBarred } from "../riddles/gollum.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
@@ -172,4 +171,9 @@ function queueBeforeDestruction(state: ScenarioState, event: GameEvent): Scenari
   const pending = state.pendingEvents ?? [];
   const at = pending.findIndex((one) => one.trigger === "characterDestroyed" && one.subject === event.subject);
   return at < 0 ? queueEvent(state, event) : { ...state, pendingEvents: [...pending.slice(0, at), event, ...pending.slice(at)] };
+}
+
+/** The card an attack damaged: the undefended hero, or the defender. */
+export function afterTarget(attack: PendingAttack): string | undefined {
+  return attack.undefended || !attack.defenderId ? attack.heroId : attack.defenderId;
 }
