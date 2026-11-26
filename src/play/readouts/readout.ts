@@ -152,7 +152,8 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const tokens = hit ? undefendedVillagersReadout(game, hit, strength, shadowNext) : null;
     if (hit && tokens) return { kind: "defense", stats: [ATTACK(strength)], result: tokens };
     if (hit) {
-      const lost = destroyedWords(game, ctx, hit, strength, cardName, shadowNext);
+      // The line names the hero or ally it lands on once ("3 damage on Tamed Mûmak"), so what follows says "it": the name twice does not fit the dock's three lines on a short phone.
+      const lost = destroyedWords(game, ctx, hit, strength, () => "it", shadowNext);
       return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended: ${strength} damage on ${cardName(hit)}${undefendedRemoves(game, hit, strength)}${shadowNote}${lost}${lost ? bloodDockClause(game, hit) : ""}${undefendedLocationsReadout(game, ctx)}` };
     }
     // The one hero the damage may go on (Gollum's attack from the riddle area, a shadow effect that names the hero) is named before it is picked.

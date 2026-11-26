@@ -7,11 +7,13 @@ import { settle } from "../../rules/engine/machine.ts";
 import { stagingThreat } from "../../rules/quest/quest.ts";
 import { screensOf } from "../../../test/harness/screens.ts";
 import { modifiedStat } from "../../rules/core/modified-stat.ts";
-import { idOf, run as runInstruction, tableFromLayout } from "../../../test/harness/scene-kit.ts";
+import { fight, idOf, opened, run as runInstruction, tableFromLayout } from "../../../test/harness/scene-kit.ts";
+import type { ScenarioState } from "../../rules/core/state.ts";
 import { advancedTo, CHIEFTAIN, prepared, stageId } from "../../rules/families/haradrim/race-kit.ts";
 
 import { effectLines } from "../cards/card-effects.ts";
 import { areaFacts, areaGroup, areaKind, areaRoleOf, areaSpeech, stageFactsOf } from "../store/stormcaller-table.ts";
+import { readoutFor } from "../readouts/readout.ts";
 import { damageOutcome, outcomeWords } from "../store/foresight.ts";
 import { momentOf } from "../store/outcome.ts";
 import { zoneSelector } from "../store/selectors.ts";
@@ -212,6 +214,20 @@ describe("17038:A:1 to 17038:A:3 the Tamed Mûmak says what it takes and what it
 
   it("two-handed it names the player", () => {
     expect(preview(2)).toMatch(/Player \d's Tamed Mûmak/);
+  });
+});
+
+describe("17038:A:2 the undefended readout names the Mûmak once", () => {
+  it("\"3 damage on Tamed Mûmak, shadow card next; 1 more damage destroys it\": the name twice does not fit three lines on a short phone", () => {
+    const made = tableFromLayout("race-across-harad", { seats: 1, phase: "Combat", stage: "17048", engaged: ["16062"], heroes: [], play: [{ code: "17038", damage: 4 }] });
+    const arrived = fight(made, opened(made), (current) => current.window?.kind === "defense");
+    const mumak = idOf(arrived.state, "17038");
+    const uruk = idOf(arrived.state, "16062");
+    const game: ScenarioState = { ...arrived.state, pendingAttack: arrived.state.pendingAttack ? { ...arrived.state.pendingAttack, undefended: true, heroId: mumak } : null, cards: { ...arrived.state.cards, [uruk]: { ...arrived.state.cards[uruk]!, shadowId: "shadow" } } };
+    const result = readoutFor(game, made.ctx, null, null, (id) => made.ctx.cards.get(game.cards[id]?.code ?? "")?.name ?? id)?.result ?? "";
+    expect(result).toBe("Undefended: 4 damage on Tamed Mûmak, shadow card next; it is destroyed: Player 1 is eliminated and the game is lost");
+    const spare = readoutFor({ ...game, cards: { ...game.cards, [mumak]: { ...game.cards[mumak]!, damage: 0 } } }, made.ctx, null, null, (id) => made.ctx.cards.get(game.cards[id]?.code ?? "")?.name ?? id)?.result ?? "";
+    expect(spare).toBe("Undefended: 4 damage on Tamed Mûmak, shadow card next; 4 more damage destroys it");
   });
 });
 
