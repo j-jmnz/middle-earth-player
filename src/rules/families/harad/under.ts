@@ -8,7 +8,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { hostOf, inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { isPlayerType, printedOf } from "../../core/printed.ts";
 import { placeUnderHost } from "../encounter/moves.ts";
 import { facedownCount, facedownWithin } from "../misc/amounts.ts";
@@ -16,11 +16,6 @@ import type { Focus } from "../index.ts";
 
 /** The code of The Black Gate (144027): the card the Harad enemies lie facedown under. */
 export const BLACK_GATE = "144027";
-
-/** The card in play with this code, the host of the facedown cards (null in a game without it). */
-export function hostOf(state: ScenarioState, code: string): string | null {
-  return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id ?? null;
-}
 
 /** PlaceFacedownUnder: the card goes facedown under the host, out of play, and `placedUnder` is queued about it. */
 export function placeFacedownUnder(state: ScenarioState, instruction: Extract<Instruction, { verb: "PlaceFacedownUnder" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {

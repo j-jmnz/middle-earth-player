@@ -237,6 +237,11 @@ export function distinctChoices(state: ScenarioState, ids: readonly string[]): s
   });
 }
 
+/** The id of the card in play with this code, the host of the facedown cards under it; null when none is in play. */
+export function hostOf(state: ScenarioState, code: string): string | null {
+  return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id ?? null;
+}
+
 export function inPlay(zone: ZoneName): boolean {
   return (
     zone === "heroes" ||

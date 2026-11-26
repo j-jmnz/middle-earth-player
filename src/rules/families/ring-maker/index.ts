@@ -2,6 +2,7 @@
 // The verbs src/catalog/families/ring-maker.ts adds: time counters taken off the current quest (time.ts), a treachery that goes into a hand and stays there (hand.ts) and the enemy a discard puts into play engaged (engage.ts).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
@@ -70,7 +71,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "PlaceDestroyedUnder":
       return placeDestroyedUnder(state, instruction, focus);
     case "ExcessToActiveLocation":
-      return state.pendingAttack ? { ...state, pendingAttack: { ...state.pendingAttack, excessToActive: true } } : state;
+      return state.pendingAttack ? { ...state, pendingAttack: { ...state.pendingAttack, excessToActive: currentCause(steps, UNATTRIBUTED) } } : state;
     case "EngageCaptiveHolder":
     case "EngageSeat":
     case "BuryDamagedLocations":

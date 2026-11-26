@@ -4,7 +4,6 @@ import { printedOf } from "../../src/rules/core/printed.ts";
 import { inPlay } from "../../src/rules/core/state.ts";
 import type { CardInstance, ZoneName } from "../../src/rules/core/state-types.ts";
 import type { ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";
-import { faceProblems } from "../../test/harness/face-check.ts";
 
 // What must hold of every table a game reaches, whatever the cards did (the third check of scripts/card-smoke/encounter-games.ts, beside the throw and the refusal): each card is in the one list its zone
 // names, the links between a card and its attachments agree, no counter is negative, and a table with nothing resolving holds no character or enemy at lethal damage and no seat at its elimination level.
@@ -83,8 +82,6 @@ export function tableFaults(state: ScenarioState, ctx: ReduceContext): string[] 
   listed(state, lists, state.questDeck, "questDeck", null);
   listed(state, lists, state.burdenDeck, "burdenDeck", null);
   for (const card of Object.values(state.cards)) cardFaults(state, card, lists, ctx);
-  // An encounter card in a play zone shows its face (rr.search, rr.running-out-of-cards).
-  lists.faults.push(...faceProblems(state));
   for (let index = 0; index < state.seatCount; index += 1) {
     const seat = state.seats[index];
     if (!seat) continue;

@@ -332,7 +332,7 @@ export type PendingAttack = {
   // The damage beyond the remaining hit points of the defending character goes on the card in play with this title (901407:A:2, ExcessToCard).
   excessToCard?: string;
   // The damage beyond the remaining hit points of the defending character goes on the active location, when there is one (08131:A:3, ExcessToActiveLocation).
-  excessToActive?: boolean;
+  excessToActive?: Cause;
   // The attack is Smaug's against Lake-town (Town-Baiting, 50211:A:1): the damage of an undefended attack is placed on Lake-town, and so is the damage beyond a defender's remaining hit points (families/smaug/attack.ts).
   toLakeTown?: boolean;
   // The damage beyond the remaining hit points of the defending character goes on Lake-town (Esgaroth Wharf's Shadow in a Town-Baiting attack; the flag `excessToLakeTown` of Smaug the Magnificent is read for the enemy).

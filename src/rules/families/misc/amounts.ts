@@ -9,8 +9,7 @@ import { modifiedStat } from "../../core/keywords.ts";
 import { printedOf, type PrintedCard } from "../../core/printed.ts";
 import { victoryPointsOf } from "../../core/printed-stat.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { hostOf } from "../harad/under.ts";
-import { inPlay, livingSeats } from "../../core/state.ts";
+import { hostOf, inPlay, livingSeats } from "../../core/state.ts";
 
 // The facedown attachments of a card (AttachFacedown) are out of play under it: zone "under", hosted by the card.
 export function facedownCount(state: ScenarioState, hostId: string | null): number {

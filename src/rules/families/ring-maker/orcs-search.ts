@@ -5,7 +5,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { hostOf, inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { nextUint } from "../../core/seed.ts";
 import { gameReads } from "../../core/game-reads.ts";
@@ -14,7 +14,6 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import { placeUnderHost } from "../encounter/moves.ts";
-import { hostOf } from "../harad/under.ts";
 import { heldInHand } from "./hand.ts";
 import type { Focus } from "../index.ts";
 

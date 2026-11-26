@@ -11,7 +11,7 @@ import { printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { attachBlocked } from "../../interpret/restrictions.ts";
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
-import { flagged, inPlay, updateCard } from "../../core/state.ts";
+import { flagged, hostOf, inPlay, updateCard } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { attackNowFromStaging } from "../south/watcher.ts";
@@ -20,7 +20,7 @@ type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name 
 
 // The card in play with this printed code.
 function inPlayWith(state: ScenarioState, code: string): string | undefined {
-  return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id;
+  return hostOf(state, code) ?? undefined;
 }
 
 // The hero that "has Alcaron's Scroll attached": the hero in play the card `is` picks out (the Scroll, by its code or by the flag it holds) is attached to. Null when no such card is attached to a hero.

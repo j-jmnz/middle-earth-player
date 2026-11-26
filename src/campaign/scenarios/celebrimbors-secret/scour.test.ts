@@ -61,6 +61,23 @@ describe("TriggerScour in play (rm.scour)", () => {
     expect(offered({ staging: [FOUNDATION, { code: FOUNDATION, damage: 1 }, SCOUT] })).toEqual([FOUNDATION, FOUNDATION, SCOUT]);
   });
 
+  it("08129:A:2 two engaged Prowling Orcs are two choices when a lasting effect is aimed at one of them", () => {
+    const offered = (aim: boolean): string[] => {
+      const t = table({ engaged: ["08129", "08129"], staging: [SCOUT] });
+      const [first] = idsOf(t.state, "08129");
+      const state = aim ? { ...t.state, modifiers: [...t.state.modifiers, { instanceId: first ?? "", sourceId: "x", stat: "attack" as const, amount: -2, until: "endOfPhase" as const }] } : t.state;
+      let options: string[] = [];
+      resolveRecords(state, t.ctx, "08122", "forced", state.questStage ?? "", (now) => {
+        const here = now.window?.kind === "choose" ? [...now.window.options] : [];
+        options = options.length === 0 ? here : options;
+        return here[0] ?? "";
+      });
+      return options.map((id) => state.cards[id]?.code ?? "");
+    };
+    expect(offered(false)).toEqual(["08128", "08129"]);
+    expect(offered(true)).toEqual(["08128", "08129", "08129"]);
+  });
+
   it("08124:A:2 fixes the set at the start: a Scour card that enters play during the trigger does not resolve", () => {
     const t = table({ staging: [BELLACH], active: PLAZA, deck: [SCOUT] });
     const picked = resolveRecords(t.state, t.ctx, "08122", "forced", t.state.questStage ?? "");

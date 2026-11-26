@@ -4,6 +4,7 @@ import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import type { CardInstance } from "../../core/state-types.ts";
 import { distinctChoices, inPlay } from "../../core/state.ts";
 import { pushCardEffects, pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -38,16 +39,22 @@ function stillInScope(state: ScenarioState, id: string, scope: Scour["scope"]): 
   return zone != null && (scope === "inPlay" ? inPlay(zone) : zone === "encounterDiscard");
 }
 
-/** The cards the first player picks among: two copies of one title that lie alike (same place, same damage and progress, no attachments, the same holder) are one choice, as two Ancient Foundations in the staging area are; the oldest one stands for both. Copies that differ stay apart. */
+/** Two copies of one title lie alike when nothing on the table tells them apart: the same place, holder, host, damage, progress, resources, face and shadow cards, both ready or both exhausted, no attachments, and no effect of a card (a lasting modifier) aimed at either. A constant effect's modifier (`origin`) is rebuilt from the card's own record and tells nothing. */
+function liesAlike(state: ScenarioState, held: CardInstance, card: CardInstance): boolean {
+  const aimed = (id: string) => state.modifiers.some((modifier) => modifier.instanceId === id && modifier.origin == null);
+  return (
+    held.code === card.code && held.zone === card.zone && held.controller === card.controller && held.host === card.host && held.damage === card.damage && held.progress === card.progress && held.resources === card.resources &&
+    held.exhausted === card.exhausted && held.face === card.face && held.shadowId === card.shadowId && (held.extraShadowIds ?? []).join() === (card.extraShadowIds ?? []).join() &&
+    held.attachments.length === 0 && card.attachments.length === 0 && !aimed(held.id) && !aimed(card.id)
+  );
+}
+
+/** The cards the first player picks among: copies that lie alike are one choice, as two Ancient Foundations in the staging area are; the oldest one stands for both. Copies that differ stay apart. */
 function scourOptions(state: ScenarioState, ids: readonly string[]): string[] {
   const kept: string[] = [];
   for (const id of distinctChoices(state, ids)) {
     const card = state.cards[id];
-    const alike = kept.some((other) => {
-      const held = state.cards[other];
-      return card != null && held != null && held.code === card.code && held.zone === card.zone && held.controller === card.controller && held.host === card.host && held.damage === card.damage && held.progress === card.progress && held.attachments.length === 0 && card.attachments.length === 0;
-    });
-    if (!alike) kept.push(id);
+    if (card && !kept.some((other) => { const held = state.cards[other]; return held != null && liesAlike(state, held, card); })) kept.push(id);
   }
   return kept;
 }

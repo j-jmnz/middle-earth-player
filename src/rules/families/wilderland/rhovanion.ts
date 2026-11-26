@@ -13,7 +13,7 @@ import { lastPicked } from "../../interpret/player-verbs.ts";
 import { restricted } from "../../interpret/restrictions.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, updateCard } from "../../core/state.ts";
+import { hostOf, inPlay, updateCard } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import { advanceStage } from "../../quest/quest.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
@@ -37,7 +37,7 @@ export function advanceToRandomStage(state: ScenarioState, instruction: Verb<"Ad
 }
 
 function inPlayWithCode(state: ScenarioState, code: string): string | undefined {
-  return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id;
+  return hostOf(state, code) ?? undefined;
 }
 
 /** The card `id` becomes the card `into`, faceup and ready in the staging area, controlled by no one, with its damage removed; it keeps its resources and the cards attached to it, and the card it was is kept as its other side. Shared by FlipToEnemySide and ReturnFromVictory. */

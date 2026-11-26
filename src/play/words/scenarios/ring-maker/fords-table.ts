@@ -126,7 +126,7 @@ export const illTidingsWords = (owner: string | null): string => `Held in ${owne
 export const ILL_TIDINGS_MARK = { text: "held", speech: "Held in the hand" } as const;
 
 /** The verbs the ring-maker family adds, in words, or null for any other instruction. */
-export function ringMakerWords(instruction: Instruction): string | null {
+export function ringMakerWords(instruction: Instruction, nameOf: (code: string) => string): string | null {
   switch (instruction.verb) {
     case "RemoveTimeFromQuest":
       return `remove ${typeof instruction.amount === "number" ? plural(instruction.amount, "time counter") : "time counters"} from the current quest`;
@@ -134,6 +134,11 @@ export function ringMakerWords(instruction: Instruction): string | null {
       return "the first player draws this card into his hand";
     case "EngageTopDiscarded":
       return `put the topmost ${instruction.trait} enemy discarded this way into play engaged with that player`;
+    // Celebrimbor's Secret (08134:A:1; the asks file words the choice again for the sheet).
+    case "TriggerScour":
+      return instruction.scope === "topmostDiscard" ? "trigger the topmost Scour effect in the discard pile" : "trigger each Scour effect in play";
+    case "PlaceRandomHandUnder":
+      return `each player puts a random card from hand facedown underneath ${nameOf(instruction.code)}`;
     default:
       return null;
   }
