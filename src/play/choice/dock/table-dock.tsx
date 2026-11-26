@@ -89,6 +89,7 @@ export function TableDock({
   onTop,
   onHeight,
   onNumbers,
+  lineCap,
 }: {
   // The step in words ("Combat", "Stops on, Combat"): not drawn, the rail names the phase; a screen reader hears it before the title.
   step: string;
@@ -99,6 +100,8 @@ export function TableDock({
   // The title names the card the moment is about (a look's card, a Response's source): a tap on it opens that card in the preview, as Read does.
   onTitle?: () => void;
   note: string | null;
+  // The lines the folded line may take: one on a dense dock and two on a taller one, unless the moment asks for more (the outcome sheet's reason wraps to three).
+  lineCap?: number;
   // The cards picked so far, in words ("Frodo Baggins, Sam Gamgee"), or an ability's printed line, or null: heard in the
   // primary's hint; no line shows it.
   picked: string | null;
@@ -155,7 +158,8 @@ export function TableDock({
   // The folded line is one line on a short phone (under DENSE_BELOW tall, as the choice rows) and two on a taller one.
   const { height: screenHeight, fontScale } = useWindowDimensions();
   const dense = isDense(screenHeight, s);
-  const lines = dockLines({ guide, note, unavailable, chars: (dense ? 1 : 2) * labelChars(room.text - PILL_PT * s, s, fontScale) });
+  const cap = lineCap ?? (dense ? 1 : 2);
+  const lines = dockLines({ guide, note, unavailable, chars: cap * labelChars(room.text - PILL_PT * s, s, fontScale) });
   // The words' window (budget in dock/budget.ts): the title keeps the lines that fit above the folded line and the buttons (and, with the
   // choice open, above one row), and the rest of it waits behind the "i", which sits on the title row when the room cannot hold a
   // folded line. With the choice open the folded line waits behind the "i" too.
@@ -220,7 +224,7 @@ export function TableDock({
             {plan.showLine && lines.first ? (
               <View className="mt-0.5 flex-row items-start gap-1.5">
                 {/* A budgeted slot (dockLines, labelChars at the font scale): one line shows on a dense dock, two on a taller one; the rest is behind the "i". A screen reader hears every line from it. */}
-                <Text testID={lines.first.testID} numberOfLines={dense ? 1 : 2} accessibilityLabel={lines.spoken} className={`flex-1 text-label ${lineTone(lines.first.kind)}`}>
+                <Text testID={lines.first.testID} numberOfLines={cap} accessibilityLabel={lines.spoken} className={`flex-1 text-label ${lineTone(lines.first.kind)}`}>
                   {lines.first.text}
                 </Text>
                 {plan.pillOnTitle ? null : pill}

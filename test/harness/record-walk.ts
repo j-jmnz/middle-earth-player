@@ -8,8 +8,8 @@ export { walk } from "../../src/play/words/record-path.ts";
 // The instructions that ask a player for a card: the sheet words them with pickWords (src/play/choice/sheets.ts).
 export const ASKING_VERBS: ReadonlySet<string> = new Set(["Pick", "SearchMove", "AttachSelf", "ReturnToStaging", "DiscardFromHand", "DiscardAlliesForWillpower"]);
 
-// The instructions that ask for something besides a Pick of a card: the sheet words them with pickWords too.
-const ASKING = new Set([...ASKING_VERBS, "PickEncounter", "ChooseX", "Reattach", "PlayFromHand", "PayToPlay", "SpendResources", "ChooseAmount", "DiscardRestricted", "AssignDamage"]);
+// The instructions that ask for something besides a Pick of a card: the sheet words them with pickWords too. EngageSeatWithMost (haradrim, 16061:A:3) asks the first player which tied seat it engages, so a scenario that deals it needs its entry.
+const ASKING = new Set([...ASKING_VERBS, "PickEncounter", "ChooseX", "Reattach", "PlayFromHand", "PayToPlay", "SpendResources", "ChooseAmount", "DiscardRestricted", "AssignDamage", "EngageSeatWithMost"]);
 
 /**
  * Does the instruction ask a player something the sheet has to word: a verb of ASKING, or RevealCorsair when the first player names who reveals it (12154:A:1; its other readings name nobody). The one predicate the words

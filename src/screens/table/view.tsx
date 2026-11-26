@@ -389,6 +389,7 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
               title={choice.header.title}
               onTitle={titleRead(choice.extras)}
               note={choice.header.note}
+              lineCap={choice.sheet.kind === "outcome" ? 3 : undefined}
               picked={choice.picked}
               unavailable={choice.unavailable}
               readout={dockReadout(choice.readout, meterShown)}
