@@ -3,17 +3,14 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
-import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { isLocationId } from "../../core/printed.ts";
 import { type ScenarioState, updateCard } from "../../core/state.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
-import { askTarget } from "../../windows/choices.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
-import { queueFront } from "../play/refs.ts";
 import { textBlank } from "../attachments/hold.ts";
 import { activeLocations } from "../south/locations.ts";
+import { distributeOneAtATime } from "./distribute.ts";
 import { holdsTimeCounter, removeTimeCounterFrom, timeLimit, timeOf } from "./time.ts";
 
 type Remove = Extract<Instruction, { verb: "RemoveTimeCounters" }>;
@@ -30,7 +27,7 @@ export function locationsInPlay(state: ScenarioState, ctx: ReduceContext): strin
 export function removeTimeCountersFromLocations(state: ScenarioState, instruction: Remove, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
   if (instruction.distribute != null) return distribute(state, instruction, amount, focus, ctx, steps);
-  const targets = instruction.target === "active" ? activeLocations(state) : locationsInPlay(state, ctx);
+  const targets = (instruction.target === "active" ? activeLocations(state) : locationsInPlay(state, ctx)).filter((id) => holdsTimeCounter(state, id, ctx));
   let next = state;
   for (const id of targets) for (let removed = 0; removed < amount; removed += 1) next = removeTimeCounterFrom(next, id, ctx);
   return next;
@@ -38,14 +35,9 @@ export function removeTimeCountersFromLocations(state: ScenarioState, instructio
 
 // One counter at a time: the chooser picks the location, and the rest of the total waits in a queued copy of the instruction (`left`).
 function distribute(state: ScenarioState, instruction: Remove, total: number, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const left = instruction.left ?? total;
-  const options = locationsInPlay(state, ctx).filter((id) => holdsTimeCounter(state, id, ctx));
-  if (left <= 0 || options.length === 0) return state;
   const seat = instruction.distribute === "firstPlayer" ? state.firstPlayer : focus.seat;
-  const chosen = focus.chosen && options.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;
-  if (!chosen) return effectData(state) ? askTarget(state, { instruction: { ...instruction, left }, seat, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, options) : state;
-  const removed = removeTimeCounterFrom(state, chosen, ctx);
-  return left > 1 ? queueFront(removed, [{ instruction: { ...instruction, left: left - 1 }, seat, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }]) : removed;
+  const options = locationsInPlay(state, ctx).filter((id) => holdsTimeCounter(state, id, ctx));
+  return distributeOneAtATime(state, { instruction, left: instruction.left ?? total, seat, options, focus, steps, takeOne: (from, id) => removeTimeCounterFrom(from, id, ctx) });
 }
 
 /** PlaceTimeCounters on `locationsWithNone`: each location in play with the Time X keyword, its text not blank, and no time counter gets its printed X, as one revealed does (mec108.time-x). */

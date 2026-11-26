@@ -3,6 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
+import { addModifier } from "../../core/modified-stat.ts";
 import { cardMap, hero, idleScenario } from "../../core/test-fixture.ts";
 import { definePrinted } from "../../core/printed.ts";
 import { settle } from "../../engine/machine.ts";
@@ -67,6 +68,18 @@ describe("RemoveTimeCounters on locations (08147:B:2, 08159:A:1)", () => {
     const s = scene();
     const next = run(s.state, [{ verb: "RemoveTimeCounters", target: "locations", amount: 2 }]);
     expect([counters(next, s.camp), counters(next, s.ford), counters(next, s.hill)]).toEqual([1, 0, 2]);
+  });
+
+  it("a location with resource tokens and no Time X loses none, and a Time location with blank text keeps its counters (mec108.time-x)", () => {
+    const s = scene();
+    const tokens = put(s.state, "plain", "staging", 2);
+    const blanked = addModifier(tokens.state, s.camp, s.camp, "blankText", 1, "endOfGame");
+    for (const target of ["locations", "active"] as const) {
+      const next = run(blanked, [{ verb: "RemoveTimeCounters", target }]);
+      expect([counters(next, tokens.id), counters(next, s.camp)]).toEqual([2, 3]);
+      expect(heard(next, tokens.id)).toBe(false);
+    }
+    expect(counters(run(blanked, [{ verb: "RemoveTimeCounters", target: "locations" }]), s.hill)).toBe(3);
   });
 
   it("touches no enemy and no other kind of card", () => {
