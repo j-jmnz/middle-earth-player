@@ -5,6 +5,7 @@ import { useMemo } from "react";
 
 import type { Effect } from "../../catalog/boundary.ts";
 import { captivesOf } from "../../rules/families/captives/values.ts";
+import { stagedDial } from "./haradrim/staged.ts";
 import { stageOf } from "../../rules/families/breaking/areas.ts";
 import type { ScenarioState } from "../../rules/engine/reduce.ts";
 
@@ -67,7 +68,7 @@ function heldDialList(game: ScenarioState, nameOf: (code: string) => string): re
   if (prisoner && prisoner.owner != null) return [{ seat: prisoner.owner, words: prisonerWords(nameOf(prisoner.code)), mark: "hero" }];
   const marks = new Map<number, HeldDial>();
   for (const held of Object.values(game.cards)) {
-    if (held.zone !== "captive" || held.guardedHero !== true || held.owner == null) continue;
+    if (held.zone !== "captive" || held.guardedHero !== true || held.captive === true || held.owner == null) continue;
     const holder = held.host ? game.cards[held.host] : undefined;
     // The Ring-bearer lying faceup under Topmost Chamber, a guarded objective (146066:A:1): the first player takes it back, and its dial wears the Ring mark.
     const words = held.face === "up" && holder ? captiveDialWords(nameOf(held.code), nameOf(holder.code)) : `${nameOf(held.code)} is held facedown${holder ? ` by ${nameOf(holder.code)}` : ""}`;
@@ -87,7 +88,7 @@ export function heldDials(game: ScenarioState, nameOf: (code: string) => string,
   for (const card of captivesOf(game)) {
     if (card.owner == null) continue;
     const host = card.host ? game.cards[card.host] : undefined;
-    const words = `${nameOf(card.code)} is a Captive${host ? ` ${isEnemy(host.code) ? "held by" : "under"} ${nameOf(host.code)}` : ""}`;
+    const words = stagedDial(game, card, nameOf) ?? `${nameOf(card.code)} is a Captive${host ? ` ${isEnemy(host.code) ? "held by" : "under"} ${nameOf(host.code)}` : ""}`;
     const before = dials.get(card.owner);
     dials.set(card.owner, { seat: card.owner, words: before ? `${before.words}. ${words}` : words, mark: before?.mark ?? "hero" });
   }

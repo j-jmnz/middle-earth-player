@@ -11,8 +11,8 @@ import { pickedList } from "../../interpret/player-verbs.ts";
 import { printedOf } from "../../core/printed.ts";
 import { inPlay, updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
-import { backInPlace } from "../prisoner/index.ts";
-import { captureHero, heldFrom, releaseHero } from "../south/captive.ts";
+import { releaseCaptive } from "../captives/index.ts";
+import { captureHero, heldFrom } from "../south/captive.ts";
 
 /** The hero the enemy guards, or null: the guarded hero lying under it, whether or not the enemy is still in play. */
 export function heroGuardedBy(state: ScenarioState, enemyId: string): string | null {
@@ -42,9 +42,7 @@ export function releaseGuardedHero(state: ScenarioState, subject: string | null)
   const seat = hero.owner;
   // An eliminated owner has left the game (rr.player-elimination): the hero goes to its discard pile instead of back among no one's heroes.
   if (state.seats[seat]?.eliminated) return updateCard(moveCard(state, heroId, { zone: "discard", seat }), heroId, { face: "up", guardedHero: undefined, owner: undefined, heroSlot: undefined });
-  const slot = hero.heroSlot;
-  const released = releaseHero(state, heroId, seat, { exhausted: true, face: "up", guardedHero: undefined, owner: undefined, heroSlot: undefined, host: null });
-  return slot == null ? released : backInPlace(released, seat, heroId, slot);
+  return releaseCaptive(state, heroId, { exhausted: true });
 }
 
 /** DiscardGuardedHeroes: each hero an enemy guards goes to its owner's discard pile; a player with no hero left is eliminated. */
@@ -86,9 +84,7 @@ export function returnHeldHeroes(state: ScenarioState, stage: number): ScenarioS
       next = updateCard(moveCard(next, id, { zone: "discard", seat }), id, { face: "up", guardedHero: undefined, owner: undefined, heroSlot: undefined });
       continue;
     }
-    const slot = hero.heroSlot;
-    const released = releaseHero(next, id, seat, { exhausted: true, face: "up", guardedHero: undefined, owner: undefined, heroSlot: undefined, host: null });
-    next = slot == null ? released : backInPlace(released, seat, id, slot);
+    next = releaseCaptive(next, id, { exhausted: true });
   }
   return next;
 }

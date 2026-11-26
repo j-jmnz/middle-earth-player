@@ -306,6 +306,7 @@ export function ThreatPanel({
   threat,
   limit,
   rows,
+  held,
   onClose,
 }: {
   // "Player 2" in two-handed play, else null.
@@ -314,6 +315,8 @@ export function ThreatPanel({
   // The elimination level: 99 while the main quest has Dire (mec113.dire); the usual one when absent.
   limit?: number;
   rows: readonly { id: string; name: string; cost: number; verdict: { word: string; engages: boolean } }[];
+  // What the seat's dial says of a hero it has lost to the staging area or an Orc ("Legolas is in the staging area"), in the same words: the dial's glyph is too small to read.
+  held?: readonly string[];
   onClose: () => void;
 }) {
   const s = useUiScale();
@@ -329,6 +332,9 @@ export function ThreatPanel({
       <PanelClose testID="threat-panel-close" onPress={onClose} />
       <ScrollView className="mt-3" style={{ flexGrow: 0, flexShrink: 1 }}>
         <Text className="text-body text-inkMuted">{`At the engagement checks, each enemy in staging whose engagement cost is at or below your threat engages you. At ${of} you are eliminated.`}</Text>
+        {(held ?? []).map((words) => (
+          <Text key={words} testID="threat-held" className="mt-2 text-body text-ink">{`${words}.`}</Text>
+        ))}
         {rows.length === 0 ? <Text className="mt-2 text-body text-inkMuted">No enemy is in staging.</Text> : null}
         {rows.map((row) => (
           <View

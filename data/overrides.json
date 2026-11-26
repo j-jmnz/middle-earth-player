@@ -349,6 +349,16 @@
     },
     {
       "match": {
+        "code": "16071"
+      },
+      "set": {
+        "questPoints": null
+      },
+      "reason": "Hall of Beorn lists 0 quest points for Surprise Attack, but the scan of side B prints no quest points box and side A prints none. The stage has none: its Forced effect advances the players to stage 2A after the first progress (16071:B:3), and a stage with 0 quest points would be completed as it is revealed.",
+      "source": "scan 16071.A, scan 16071.B"
+    },
+    {
+      "match": {
         "code": "12041"
       },
       "set": {
@@ -3862,6 +3872,58 @@
       },
       "reason": "Hall of Beorn gives this encounter side quest no quest points. The scan prints a quest points box of 5, so progress can be placed on it as a quest card (hrd.side-quests-in-play).",
       "source": "scan 16060.A"
+    },
+    {
+      "match": {
+        "code": "16031"
+      },
+      "set": {
+        "willpower": 2,
+        "attack": 2,
+        "defense": 2,
+        "health": 3
+      },
+      "reason": "Hall of Beorn gives the objective-hero Kahliel no stat fields. The scan prints Willpower 2, Attack 2, Defense 2 and 3 hit points (the red 3), and no threat cost, so the hero can quest, fight and take damage as a hero (hrd.objective-heroes: it functions the same as a regular hero).",
+      "source": "scan 16031.A, data/printed/haradrim.json"
+    },
+    {
+      "match": {
+        "code": "16032"
+      },
+      "set": {
+        "willpower": 3,
+        "attack": 1,
+        "defense": 2,
+        "health": 3
+      },
+      "reason": "Hall of Beorn gives the objective-hero Firyal no stat fields. The scan prints Willpower 3, Attack 1, Defense 2 and 3 hit points (the red 3), and no threat cost, so the hero can quest, fight and take damage as a hero (hrd.objective-heroes: it functions the same as a regular hero).",
+      "source": "scan 16032.A, data/printed/haradrim.json"
+    },
+    {
+      "match": {
+        "code": "16033"
+      },
+      "set": {
+        "willpower": 2,
+        "attack": 3,
+        "defense": 1,
+        "health": 3
+      },
+      "reason": "Hall of Beorn gives the objective-hero Yazan no stat fields. The scan prints Willpower 2, Attack 3, Defense 1 and 3 hit points (the red 3), and no threat cost, so the hero can quest, fight and take damage as a hero (hrd.objective-heroes: it functions the same as a regular hero).",
+      "source": "scan 16033.A, data/printed/haradrim.json"
+    },
+    {
+      "match": {
+        "code": "16034"
+      },
+      "set": {
+        "willpower": 1,
+        "attack": 2,
+        "defense": 3,
+        "health": 3
+      },
+      "reason": "Hall of Beorn gives the objective-hero Jubayr no stat fields. The scan prints Willpower 1, Attack 2, Defense 3 and 3 hit points (the red 3), and no threat cost, so the hero can quest, fight and take damage as a hero (hrd.objective-heroes: it functions the same as a regular hero).",
+      "source": "scan 16034.A, data/printed/haradrim.json"
     },
     {
       "match": {

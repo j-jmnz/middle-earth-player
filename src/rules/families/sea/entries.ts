@@ -13,8 +13,12 @@ const READS_LIMIT = '"verb":"LimitEntries"';
 const READS_PER_PLAYER = '"perPlayer":true';
 
 // The allies in play that came in after the clock reading `mark`.
+// An objective-hero (a card of printed type objective among a seat's heroes, hrd.objective-heroes) is a hero, though isAllyLike reads its printed type and hit points: it is no ally entering play.
 function enteredCards(state: ScenarioState, mark: number, ctx: ReduceContext): CardInstance[] {
-  return Object.values(state.cards).filter((card) => inPlay(card.zone) && card.enteredPlay > mark && isAllyLike(printedOf(ctx.cards, card.code)) && printedOf(ctx.cards, card.code).type !== "hero");
+  return Object.values(state.cards).filter((card) => {
+    const printed = printedOf(ctx.cards, card.code);
+    return inPlay(card.zone) && card.enteredPlay > mark && isAllyLike(printed) && printed.type !== "hero" && !(card.zone === "heroes" && printed.type === "objective");
+  });
 }
 
 // This round's allies by the controller each has now, in a game with a per-player limit.

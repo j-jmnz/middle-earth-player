@@ -53,6 +53,7 @@ describe("effects render read fields, picks", () => {
     engagedEnemies: true,
     keyword: "ambush",
     hasShadow: true,
+    facedownShadow: true,
     copyInDiscard: true,
     controlled: true,
     questCard: true,

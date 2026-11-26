@@ -3,8 +3,8 @@
 // The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; dh1 and dh2 are the first seat's, dh3 the second's.
 import { describe, expect, it } from "vitest";
 
-import { updateCard } from "../../../rules/core/state.ts";
-import { timeLimit, timeOnReveal } from "../../../rules/families/angmar/time.ts";
+import { livingSeats, updateCard } from "../../../rules/core/state.ts";
+import { timeLimit, timeOnReveal, timePlayersOf } from "../../../rules/families/angmar/time.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
@@ -45,6 +45,17 @@ describe("Time X is 5 times the players (08013:B:1)", () => {
 
   it("08013:B:1 a player eliminated before the stage turns is not counted", () => {
     expect(turned({ seats: 2 }, 1)).toBe(5);
+  });
+
+  it("08013:B:1 keeps the count the stage made (2 players) in timePlayers when a player is eliminated after it turns", () => {
+    const t = table({ seats: 2, stage: STAGE_3, side: "A" });
+    const stage = t.state.questStage ?? "";
+    const turnedState = timeOnReveal(updateCard(t.state, stage, { face: "B" }), stage, t.ctx);
+    expect(timePlayersOf(turnedState, stage)).toBe(2);
+    const seats = turnedState.seats.map((seat, at) => (at === 1 ? { ...seat, eliminated: true } : seat)) as unknown as typeof turnedState.seats;
+    const after = { ...turnedState, seats };
+    expect(livingSeats(after).length).toBe(1);
+    expect(timePlayersOf(after, stage)).toBe(2);
   });
 
   it("08011:B:1 the first stage keeps its printed Time 2, and the limit is 5 for each player on stage 3B", () => {

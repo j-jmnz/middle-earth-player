@@ -2,6 +2,7 @@
 // the same objects, so a Zustand subscriber of one zone does not render when another zone changes: a threat change leaves
 // the hand slice alone (docs/architecture.md, State). The reducer keeps the references of the zones it did not touch;
 // these selectors only keep that property through the join of ids and instances.
+import { guardedUnder, stagedHeroIds } from "../readouts/haradrim/staged.ts";
 import { underAlleyway } from "../readouts/haradrim/umbar.ts";
 import { BLACK_GATE } from "../../rules/families/harad/under.ts";
 import { live as stewardsFear, stackUnder } from "../readouts/against-the-shadow/stewards-fear.ts";
@@ -115,8 +116,12 @@ export function zoneIds(game: ScenarioState, zone: ZoneId, seat: number, facts?:
       const stage = stageOf(game, seat) ?? game.questStage;
       return stage ? [stage] : NONE;
     }
-    case "staging":
-      return withArea(game, stagingOrder(game, areaOrShared(game, seat)));
+    case "staging": {
+      // The heroes in the staging area (The Long Arm of Mordor) are in play under no player's control: drawn here after the staging cards.
+      const staged = stagedHeroIds(game);
+      const cards = withArea(game, stagingOrder(game, areaOrShared(game, seat)));
+      return staged.length > 0 ? [...cards, ...staged] : cards;
+    }
     case "activeLocation": {
       const active = activeOf(game, seat);
       return active ? [active] : NONE;
@@ -390,7 +395,7 @@ export function inspectTargets(game: ScenarioState, cardId: string): readonly st
   const host = (card.host ? game.cards[card.host] : undefined) ?? card;
   // The loot a location guards is faceup (22024:B:2): a card to read with the location's attachments; so is the enemy under Narrow Alleyway (16016:A:1).
   const loot = game.lootDecks ? lootUnder(game, host.id) : NONE;
-  const under = [...host.attachments, ...loot, ...underAlleyway(game, host.id), ...shadowCards(host)].filter((id) => game.cards[id] != null && game.cards[id]?.face !== "down");
+  const under = [...host.attachments, ...loot, ...underAlleyway(game, host.id), ...guardedUnder(game, host.id), ...shadowCards(host)].filter((id) => game.cards[id] != null && game.cards[id]?.face !== "down");
   return [host.id, ...under];
 }
 

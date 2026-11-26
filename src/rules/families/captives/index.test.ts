@@ -8,6 +8,7 @@ import { runInstruction } from "../../interpret/interpret.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import { settle } from "../../engine/machine.ts";
 import { eliminateEmpties } from "../../core/eliminate.ts";
+import { destroyCard } from "../../core/keywords.ts";
 import { moveCard } from "../../core/zones.ts";
 import { fireForced } from "../../windows/triggers.ts";
 import { textBlank } from "../attachments/hold.ts";
@@ -83,6 +84,19 @@ describe("the rescue at the win (143070:B:3)", () => {
     expect(slot).toBeDefined();
     expect(rescued.seats[0].heroes.indexOf(id)).toBe(slot);
     expect(textBlank(syncConstants(rescued, ctxOf()), id, ctxOf().cards)).toBe(false);
+  });
+
+  it("a card another player played on the Captive changes control with it and keeps its owner, so its destruction discards it to its owner's pile (rr.ownership-and-control)", () => {
+    const made = tableFromLayout("the-uruk-hai", { seats: 2, stage: "143069", staging: ["143022", "143024"], captive: { hero: "dh2", under: "143022" }, attached: [{ code: "attachment", to: "dh2" }] }, {});
+    const hero = idOf(made.state, "dh2");
+    const attachment = idOf(made.state, "attachment");
+    const played = updateCard(made.state, attachment, { controller: 1 });
+    const rescued = rescueCaptives(played);
+    expect(rescued.cards[hero]).toMatchObject({ zone: "heroes", controller: 0 });
+    expect(rescued.cards[attachment]).toMatchObject({ host: hero, controller: 0, owner: 1 });
+    const destroyed = destroyCard(rescued, hero, made.ctx.cards, [], false, true);
+    expect(destroyed.seats[1].discard).toContain(attachment);
+    expect(destroyed.seats[0].discard).not.toContain(attachment);
   });
 
   it("changes nothing when no Captive is held", () => {

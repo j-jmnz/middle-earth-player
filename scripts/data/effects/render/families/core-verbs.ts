@@ -63,7 +63,7 @@ export const CORE_TEMPLATES: Templates = {
   }),
   SpendResources: (i, ctx) => ({
     text: i.target === undefined
-      ? `${i.group === true ? "the players as a group" : "the acting player"} spend ${amt(i.amount, ctx)} resource(s) from heroes with ${typeof i.sphere === "string" ? `the ${SPHERE(i.sphere)} icon` : "this card's sphere icon"}, choosing a hero for each resource${i.group === true ? " (any player's)" : " (their own)"} (with fewer resources than that, nothing is spent)`
+      ? `${i.group === true ? "the players as a group" : "the acting player"} spend ${amt(i.amount, ctx)} resource(s) from ${typeof i.sphere === "string" ? `heroes with the ${SPHERE(i.sphere)} icon` : "any hero they control (no resource icon is matched)"}, choosing a hero for each resource${i.group === true ? " (any player's)" : " (their own)"} (with fewer resources than that, nothing is spent)`
       : `${amt(i.amount, ctx)} resource(s) are spent from the pool of ${cardRef(i.target)} (nobody chooses; a pool with fewer spends nothing)`,
     read: ["amount", "target", "sphere", "group", "paid"],
   }),
@@ -81,7 +81,7 @@ export const CORE_TEMPLATES: Templates = {
   RemoveQuestProgress: (i) => ({ text: `remove ${str(i.perPlayer)} progress from the current quest card for each player ${i.startedPlayers === true ? "who started the game" : "in the game"} (it stops at 0)`, read: ["perPlayer", "startedPlayers"] }),
   TransferHost: (i) => ({ text: `the host of this card, its resource pool, and every card attached to it pass to ${who(i.who)}`, read: ["who"] }),
   PutOnDeck: (i) => ({ text: `${i.target === undefined ? "the picked card" : cardRef(i.target)} goes ${i.position === "top" ? "on top of" : i.position === "bottom" ? "to the bottom of" : "into"} its owner's deck${i.position === "shuffle" ? ", which is shuffled" : ""} (a card leaving play this way leaves play)`, read: ["target", "position"] }),
-  IgnoreResourceMatch: (i, ctx) => ({ text: `(constant) a ${pck(i.pick, ctx)} needs no resource match, and any of its controller's heroes may pay for it${i.firstEachRound === true ? ", only the first such card each round" : ""}${i.firstEachPhase === true ? ", only the first such card played in the phase" : ""}`, read: ["pick", "firstEachRound", "firstEachPhase"] }),
+  IgnoreResourceMatch: (i, ctx) => ({ text: `(constant) a ${pck(i.pick, ctx)} needs no resource match, and any of its controller's heroes may pay for it${i.firstEachRound === true ? ", only the first such card each round" : ""}${i.firstEachPhase === true ? ", only the first such card played in the phase" : ""}${i.anyPlayer === true ? "; the rule binds every player, whoever controls this card, each player counting their own plays" : ""}`, read: ["pick", "firstEachRound", "firstEachPhase", "anyPlayer"] }),
   PlaceQuestProgress: (i) => ({ text: `place ${str(i.perPlayer)} progress on the current quest for each player in the game; the active location takes it first and a full quest card advances unless something forbids it`, read: ["perPlayer"] }),
   DamageAll: (i) => ({ text: `deal ${str(i.amount)} damage to each ${str(i.type)} in play${typeof i.maxWillpower === "number" ? ` with Willpower ${i.maxWillpower} or less (a value below 0 counts as 0)` : ""}`, read: ["amount", "type", "maxWillpower"] }),
   BarAttack: (i) => ({ text: i.scope === "any" ? `the acting player picks an enemy engaged with any player; it cannot attack that player until ${UNTIL[str(i.until ?? "endOfPhase") as keyof typeof UNTIL] ?? str(i.until)}` : "the acting player picks an enemy engaged with them; it cannot attack them until the end of the round", read: ["scope", "until"] }),
@@ -149,7 +149,7 @@ export const CORE_SAMPLES: Samples = {
   RemoveQuestProgress: [{ verb: "RemoveQuestProgress", perPlayer: 5, startedPlayers: true }],
   TransferHost: [{ verb: "TransferHost", who: "firstPlayer" }],
   PutOnDeck: [{ verb: "PutOnDeck", position: "bottom", target: "host" }, { verb: "PutOnDeck", position: "shuffle" }, { verb: "PutOnDeck", position: "top" }],
-  IgnoreResourceMatch: [{ verb: "IgnoreResourceMatch", pick: { type: "card", control: "you" }, firstEachRound: true, firstEachPhase: true }],
+  IgnoreResourceMatch: [{ verb: "IgnoreResourceMatch", pick: { type: "card", control: "you" }, firstEachRound: true, firstEachPhase: true, anyPlayer: true }],
   PlaceQuestProgress: [{ verb: "PlaceQuestProgress", perPlayer: 1 }],
   DamageAll: [{ verb: "DamageAll", amount: 2, type: "ally", maxWillpower: 0 }],
   BarAttack: [{ verb: "BarAttack", scope: "any", until: "endOfRound" }, { verb: "BarAttack" }],

@@ -1,0 +1,420 @@
+Scenario piles that place cards with no record (quest: 16071 Surprise Attack; quest: 16072 Find the Others; quest: 16073 Free the Captives; quest: 16074 Escape into the Jungle; staging: 16035 Sauron's Enforcers; setAside: 16061 Uruk Chieftain; setAside: 16031 Kahliel; setAside: 16032 Firyal; setAside: 16033 Yazan; setAside: 16034 Jubayr)
+
+## 16031 Kahliel
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+16031:A:1 (front): Response: At the beginning of the planning phase, add 1 resource to a hero's pool.
+  16031:response:1: Response when a phase begins
+    only if it is the Planning phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (any player controls)
+    - add 1 resources to the picked card
+
+16031:A:2 (front): If Kahliel leaves play, you are eliminated from the game.
+  16031:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player who controlled the card when it left play (the leave-play event names that player, the card having no controller afterwards)
+    - the acting player is eliminated from the game by a card effect
+
+## 16032 Firyal
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+16032:A:1 (front): Response: After Firyal commits to a quest, look at the top card of the encounter deck. Then, you may discard that card.
+  16032:response:1: Response after a card is committed to the quest (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player looks at the top 1 card(s) of the encounter deck (a card with a Forced effect for being looked at acts at once and is not one of them)
+    - the acting player chooses one of:
+      * option "discard" (only if the picked card is any card):
+        - the picked card goes to the encounter discard pile
+      * option "keep":
+
+16032:A:2 (front): If Firyal leaves play, you are eliminated from the game.
+  16032:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player who controlled the card when it left play (the leave-play event names that player, the card having no controller afterwards)
+    - the acting player is eliminated from the game by a card effect
+
+## 16033 Yazan
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+16033:A:1: Ranged.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+16033:A:2 (front): Response: After Yazan is declared as an attacker, deal 1 damage to a non-unique enemy in play. (Limit once per phase.)
+  16033:response:1: Response after a character is declared as an attacker (heard about this card; limit once per phase)
+    only if there is a non-unique enemy (any player controls) or in the staging area to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose non-unique enemy (any player controls) or in the staging area
+    - deal 1 damage to the picked card
+
+16033:A:3 (front): If Yazan leaves play, you are eliminated from the game.
+  16033:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player who controlled the card when it left play (the leave-play event names that player, the card having no controller afterwards)
+    - the acting player is eliminated from the game by a card effect
+
+## 16034 Jubayr
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+16034:A:1: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+16034:A:2 (front): Response: After Jubayr is declared as a defender, discard 1 facedown shadow card from a non-unique enemy. (Limit once per phase.)
+  16034:response:1: Response after a character is declared as a defender (heard about this card; limit once per phase)
+    only if there is a non-unique enemy (any player controls) holding a facedown shadow card to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose non-unique enemy (any player controls) holding a facedown shadow card
+    - discard a shadow card dealt to the picked card
+
+16034:A:3 (front): If Jubayr leaves play, you are eliminated from the game.
+  16034:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player who controlled the card when it left play (the leave-play event names that player, the card having no controller afterwards)
+    - the acting player is eliminated from the game by a card effect
+
+## 16035 Sauron's Enforcers
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+16035:A:1 (front): X is the stage number on the main quest.
+  16035:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat the stage number of the quest, while this card is in play
+    - this card: stat attack the stage number of the quest, while this card is in play
+    - this card: stat defense the stage number of the quest, while this card is in play
+
+16035:A:2 (front): Forced: At the end of the round, assign X damage among characters in play.
+  16035:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the acting player assigns the stage number of the quest damage among the character (any player controls) (Captives included), chosen by the first player, one at a time
+
+## 16036 Southron Boma
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16036:A:1 (front): X is the stage number of the main quest.
+  16036:constant:1: Constant
+    - this card: stat threat the stage number of the quest, while this card is in play
+
+16036:A:2 (front): Travel: Each player spends 1 resource to travel here.
+  16036:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player's heroes hold fewer resources than they must spend (read by the investigation family)
+    - for each player, first player first:
+      - the acting player spend 1 resource(s) from any hero they control (no resource icon is matched), choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
+
+16036:A:3 (shadow): Shadow: If the defending character is an objective-hero, ready it and cancel all damage from this attack.
+  16036:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the defender is a hero (any player controls) named "Kahliel" or "Firyal" or "Yazan" or "Jubayr": ready the defender
+    - then, if the defender is a hero (any player controls) named "Kahliel" or "Firyal" or "Yazan" or "Jubayr" (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat dealsNoDamage 1, until the end of the attack
+
+## 16037 Village Hut
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16037:A:1 (front): Response: After the players travel to Village Hut, the first player discards the top card of his deck. If that card is an ally, he puts it into play under his control, exhausted.
+  16037:response:1: Response after the players travel (heard about this card only: with no subject, an event about one card is heard by that card alone)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the rest of the effect is carried out by the first player
+    - the top 1 card(s) of the acting player's deck go to their discard pile
+    - choose card (you control) in the discard pile, of card type ally, among the cards this effect looked at or discarded
+    - the picked card is put into play from wherever it is out of play (hand, discard pile, deck): it is not played, so no cost is paid and no play restriction applies, and a unique card with a copy in play stays where it is; a hero goes among its controller's heroes, any other card into the play area, exhausted, under the acting player's control
+
+16037:A:2 (front): Travel: Discard the top card of the encounter deck. If that card is an enemy, add it to the staging area.
+  16037:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top card of the encounter deck goes to the encounter discard pile
+    - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+
+## 16038 Savage Attack
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16038:A:1 (front): When Revealed: Each player must choose: either discard the highest cost ally you control, or reveal the top card of the encounter deck.
+  16038:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "ally" (only if there is a ally (you control) with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides) to choose):
+          - choose ally (you control) with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides)
+          - discard the picked card
+        * option "reveal":
+          - the acting player reveals an encounter card
+
+16038:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, reveal the top card of the encounter deck.
+  16038:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player reveals an encounter card
+
+## 16039 Overrun by Orcs
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16039:A:1 (front): When Revealed: Until the end of the phase, increase the total Threat in the staging area by X, where X is twice the stage number of the main quest.
+  16039:whenRevealed:1: When revealed
+    - the total Threat in the staging area is the stage number of the quest x 2 higher until the end of the phase
+
+16039:A:2 (shadow): Shadow: Assign X damage among characters you control, where X is the stage number of the main quest.
+  16039:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player assigns the stage number of the quest damage among the character (you control), one at a time
+
+## 16056 Jungle Trail
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16056:A:1 (front): While Jungle Trail is the active location, each location in the staging area gets -1 Threat.
+  16056:constant:1: Constant
+    only if this card is the active location
+    - each location (any player controls) in the staging area only: stat threat -1, while this card is in play
+
+16056:A:2 (front): Travel: Reveal the top card of the encounter deck to travel here.
+  16056:travel:1: Travel
+    - the acting player reveals an encounter card
+
+## 16057 Forest Clearing
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16057:A:1 (front): Forced: When Forest Clearing is explored, discard the top card of the encounter deck. If that card is an enemy, add that enemy to the staging area.
+  16057:forced:1: Forced on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top card of the encounter deck goes to the encounter discard pile
+    - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+
+16057:A:2 (shadow): Shadow: Discard an attachment you control.
+  16057:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control)
+    - discard the picked card
+
+## 16058 Dense Jungle
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16058:A:1 (front): Forced: When Dense Jungle is explored, discard the top card of the encounter deck. If that card is a location, add that location to the staging area.
+  16058:forced:1: Forced on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top card of the encounter deck goes to the encounter discard pile
+    - then, if the picked card is a location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+
+16058:A:2 (shadow): Shadow: Discard a random card from your hand.
+  16058:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player discards 1 random card(s) from hand
+
+## 16059 Overgrown
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16059:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+16059:A:2 (front): When Revealed: Attach to the highest Threat location in the staging area without a copy of Overgrown attached. (Counts as a Condition attachment with the text: "Attached location gets +1 Threat and gains 'Immune to player card effects.'")
+  16059:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls) in the staging area only, with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), chosen by the first player, with no attachment named "Overgrown"
+    - then, if there is a location (any player controls) in the staging area only, with no attachment named "Overgrown" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this card attaches to the picked card (nowhere if that card carries one of its title already)
+  16059:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Condition attachment while it is attached
+    - its host: stat threat 1, while this card is in play
+    - its host: stat immuneToPlayerCards 1, while this card is in play
+
+## 16060 Uruks of the Eye
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16060:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+16060:A:2 (front): Each Orc enemy in the staging area gets -5 engagement cost.
+  16060:constant:1: Constant
+    - each Orc enemy (any player controls) in the staging area only: stat engagementCost -5, while this card is in play
+
+16060:A:3 (front): Each Orc enemy engaged with a player gets +1 Threat.
+  16060:constant:2: Constant
+    - each Orc enemy (any player controls): stat threat 1, while this card is in play
+
+## 16061 Uruk Chieftain
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+16061:A:1 (front): Cannot have player card attachments or be optionally engaged.
+  16061:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat noPlayerAttachments (no player card can be attached to it) 1, while this card is in play
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+16061:A:2 (front): While the engaged player is engaged with another Orc enemy, Uruk Chieftain cannot take damage.
+  16061:constant:2: Constant
+    only if all of: (this card is engaged with a player (that player is who "you" means in this record)) and (the number of Orc enemy (any player controls) engaged with you, other than this card is at least 1)
+    - this card: stat cannotTakeDamage 1, while this card is in play
+
+16061:A:3 (front): Forced: At the end of the encounter phase, Uruk Chieftain engages the player engaged with the most non-unique Orc enemies.
+  16061:forced:1: Forced at the end of the phase
+    only if it is the Encounter phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - this enemy engages the player engaged with the most non-unique Orc enemy (any player controls) (the first player chooses among players that tie, all players at 0; nothing changes when it is already engaged with that player, else it moves to that player)
+
+## 16062 Uruk of Mordor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16062:A:1 (front): Each ally with less Willpower than Uruk of Mordor's Threat cannot defend against Uruk of Mordor.
+  16062:constant:1: Constant
+    - this card: stat defendersBelowThreat (an ally with less Willpower than this enemy's current Threat cannot be declared as a defender against it; heroes are never barred) 1, while this card is in play
+
+16062:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if its Threat is greater than the defending character's Willpower).
+  16062:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attacking enemy's current Threat is greater than the defending character's current Willpower (false when the attack has no defending character)): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attacking enemy's current Threat is greater than the defending character's current Willpower (false when the attack has no defending character) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 16063 Uruk Warg-rider
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16063:A:1 (front): Uruk Warg-rider gets +X Attack while attacking a character with less Willpower than Uruk Warg-rider's Threat. X is the difference.
+  16063:constant:1: Constant
+    - this card: stat attack while this enemy attacks a defending character with less Willpower than its own Threat: its Threat less that Willpower (otherwise 0; an undefended attack has no defending character), while this card is in play
+
+16063:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
+  16063:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 16064 Mordor Warg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16064:A:1 (front): When Revealed: Attach to an Orc enemy and return that enemy to the staging area. Limit 1 per enemy. (Counts as a Mount attachment with the text: "Attached enemy gets +2 Threat, +2 Attack, +2 Defense and +2 hit points. Forced: When attached enemy leaves play, add Mordor Warg to the staging area.")
+  16064:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose Orc enemy (any player controls) or in the staging area, chosen by the first player, with no attachment named "Mordor Warg"
+    - then, if there is a Orc enemy (any player controls) or in the staging area, chosen by the first player, with no attachment named "Mordor Warg" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy, out of play, attaches to the picked card as an attachment: it has no enemy text there and returns to the staging area as an enemy when that card leaves play
+    - then, if the picked card is a Orc enemy (any player controls) or in the staging area, with an attachment named "Mordor Warg" (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
+    - then, if not (the picked card is a Orc enemy (any player controls) or in the staging area) (checked when this step runs, after the steps above; not tied to whether they did anything): this card goes to the encounter discard pile
+  16064:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Mount attachment while it is attached
+    - its host: stat threat 2, while this card is in play
+    - its host: stat attack 2, while this card is in play
+    - its host: stat defense 2, while this card is in play
+    - its host: stat hitPoints 2, while this card is in play
+
+## 16065 Fear of Mordor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+16065:A:1 (front): When Revealed: Each ally in play gets -1 Willpower, -1 Attack, and -1 Defense until the end of the round.
+  16065:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - every ally in play, now and entering later: stat willpower -1, until the end of the round
+    - every ally in play, now and entering later: stat attack -1, until the end of the round
+    - every ally in play, now and entering later: stat defense -1, until the end of the round
+
+16065:A:2 (shadow): Shadow: If attacking enemy's Threat is greater than the defending character's Willpower, it makes an additional attack after this one.
+  16065:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - if the attacking enemy's current Threat is greater than the defending character's current Willpower (false when the attack has no defending character): when the attack in progress ends:
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
+
+## 16071 Surprise Attack
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+16071:A:1 (front): Setup: Set Uruk Chieftain aside, out of play. Each player adds 1 copy of Sauron's Enforcers to the staging area. Move each hero to the staging area. Each player takes control of an objective-hero and adds 2 resources to its resource pool. Remove each remaining objective-hero from the game. For the remainder of the game, heroes in the staging area are in play but under no player's control, immune to player card effects, and their text boxes are considered to be blank.
+  16071:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each hero of every player moves to the staging area: it stays in play as a Captive held by no card, under no player's control, with its tokens and attachments, and its owner is not out of heroes while it is there (its text box is blank and it is immune to player card effects from then on)
+    - for each player, first player first:
+      - the acting player takes control of one of the set-aside objective-heroes (16031, 16032, 16033, 16034) and adds 2 resources to its pool (asked when several are left; it functions as a hero)
+    - every set-aside copy of the card with code 16031 is removed from the game
+    - every set-aside copy of the card with code 16032 is removed from the game
+    - every set-aside copy of the card with code 16033 is removed from the game
+    - every set-aside copy of the card with code 16034 is removed from the game
+
+16071:B:1 (back): Damage from undefended attacks must be dealt to a hero in the staging area, if able.
+  16071:constant:1: Constant
+    - the damage of undefended attacks must be dealt to a hero in the staging area if able: the attacked player names which hero takes it, and with none able it goes to the player's own heroes, while this card is in play
+
+16071:B:2 (back): The first card each player plays each phase does not require a resource match.
+  16071:constant:2: Constant
+    - (constant) a card (you control) needs no resource match, and any of its controller's heroes may pay for it, only the first such card played in the phase; the rule binds every player, whoever controls this card, each player counting their own plays
+
+16071:B:3 (back): Forced: After placing progress on this stage from questing successfully, each player chooses a hero he owns in the staging area, takes control of that hero, and exhausts it. Advance to stage 2A.
+  16071:forced:1: Forced once, after a quest that succeeded has placed progress on the stage itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player chooses a hero they own in the staging area (a Captive held by no card), takes control of it and exhausts it; it returns to its old place among their heroes with its tokens and attachments (nothing when they own none; asked when they own several)
+    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 16072 becomes the stage, side B up with no progress, its When Revealed effects resolving (nothing when no such card is there)
+
+## 16072 Find the Others
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+16072:B:1 (back): Damage from undefended attacks must be dealt to a hero in the staging area, if able.
+  16072:constant:1: Constant
+    - the damage of undefended attacks must be dealt to a hero in the staging area if able: the attacked player names which hero takes it, and with none able it goes to the player's own heroes, while this card is in play
+
+16072:B:2 (back): The first card each player plays each phase does not require a resource match.
+  16072:constant:2: Constant
+    - (constant) a card (you control) needs no resource match, and any of its controller's heroes may pay for it, only the first such card played in the phase; the rule binds every player, whoever controls this card, each player counting their own plays
+
+16072:B:3 (back): Forced: When this stage is defeated, each player chooses a hero he owns in the staging area, takes control of that hero, and exhausts it.
+  16072:forced:1: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - for each player, first player first:
+      - the acting player chooses a hero they own in the staging area (a Captive held by no card), takes control of it and exhausts it; it returns to its old place among their heroes with its tokens and attachments (nothing when they own none; asked when they own several)
+
+## 16073 Free the Captives
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+16073:A:1 (front): When Revealed: Each player searches the encounter deck and discard pile for an Orc enemy and adds it to the staging area. Shuffle the encounter deck. Attach each hero in the staging area to a different Orc enemy in the staging area. Each hero attached to an enemy is guarded by that enemy. Guarded heroes are under no player's control, immune to player card effects, and their text boxes are considered to be blank.
+  16073:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one Orc enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+    - the first player attaches each hero in the staging area to a different Orc enemy in the staging area that guards no hero: the hero is guarded by that enemy, under no player's control, immune to player card effects, and with a blank text box (the settle sweep marks each guarded hero; asked which Orc when several are free; a hero with no Orc left stays in the staging area)
+
+16073:B:1 (back): While an enemy is guarding a hero it gets +1 Threat, +1 Attack, +1 Defense and is immune to player card effects.
+  16073:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) or in the staging area, that guards a hero, in play or not: stat threat 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, that guards a hero, in play or not: stat attack 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, that guards a hero, in play or not: stat defense 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, that guards a hero, in play or not: stat immuneToPlayerCards 1, while this card is in play
+
+16073:B:2 (back): Forced: When the enemy guarding a hero is defeated, that hero's owner takes control of that hero and exhausts it.
+  16073:forced:1: Forced after a card leaves play (heard about card (any player controls) or in the staging area or the active location, that guards a hero, in play or not)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the hero the event's subject (the enemy) guarded comes back among its owner's heroes, faceup and exhausted (when the enemy leaves play in any way)
+
+16073:B:3 (back): This stage cannot be defeated while an enemy is guarding a hero.
+  16073:constant:2: Constant
+    only if there is a enemy (any player controls) or in the staging area, that guards a hero, in play or not to choose
+    - the players cannot defeat this stage while this holds
+
+## 16074 Escape into the Jungle
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+16074:A:1 (front): When Revealed: Add Uruk Chieftain to the staging area. Shuffle the encounter discard pile into the encounter deck and reveal 1 encounter card per player.
+  16074:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one set-aside card with code 16061 joins the staging area (it is not revealed)
+    - shuffle the encounter discard pile into the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+16074:B:1 (back): Uruk Chieftain cannot take non-combat damage.
+  16074:constant:1: Constant
+    - each enemy (any player controls) or in the staging area, named "Uruk Chieftain": stat cannotTakeNonCombatDamage 1, while this card is in play
+
+16074:B:2 (back): Each non-unique Orc enemy gets -10 engagement cost.
+  16074:constant:2: Constant
+    - each non-unique Orc enemy (any player controls) or in the staging area: stat engagementCost -10, while this card is in play
+
+16074:B:3 (back): Forced: After Uruk Chieftain engages a player, it makes an immediate attack.
+  16074:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about enemy (any player controls) or in the staging area, named "Uruk Chieftain")
+    who acts: the acting player is the player the enemy engaged
+    - the enemy the event is about, engaged with a player, attacks that player now, dealt a new shadow card after its old ones are discarded
+
+16074:B:4 (back): The players cannot defeat this stage while Uruk Chieftain is in play. If the players defeat this stage, they win the game.
+  16074:constant:3: Constant
+    only if the card with code 16061 is in play
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
+    - the players cannot defeat this stage while this holds
+  16074:questResolution:1: Quest resolution
+    - the players win the game
+
+(rendered pieces: 247 by template, 0 as JSON)

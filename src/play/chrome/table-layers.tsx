@@ -30,6 +30,7 @@ import { adjustWords, threatSourcesOf } from "../readouts/threat-sources.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
 import { seatDialLimit } from "../readouts/threat-level.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
+import { heldDials } from "../readouts/widgets.ts";
 import { DialPanel, LogPanel, PileList, RowList, SetAsideList, SettingsPanel, ThreatPanel, ThreatSourceList, type ListCard } from "./reading-panels.tsx";
 import { IslandPanel } from "../dream-chaser/island-panel.tsx";
 import { WAITING, islandFit, islandPanelWidth, islandReadout, standingWords } from "../dream-chaser/island-table.ts";
@@ -175,6 +176,7 @@ function ThreatReading({ store, ctx, names, seat, onClose }: { store: TableStore
       threat={game.seats[seat]?.threat ?? 0}
       limit={seatDialLimit(game, seat)}
       rows={threatRows(game, ctx, seat).map((row) => ({ id: row.id, name: names.card(row.id), cost: row.cost, verdict: threatVerdict(row, seat) }))}
+      held={heldDials(game, (code) => ctx.cards.get(code)?.name ?? code, (code) => ctx.cards.get(code)?.type === "enemy").filter((dial) => dial.seat === seat).map((dial) => dial.words)}
       onClose={onClose}
     />
   );

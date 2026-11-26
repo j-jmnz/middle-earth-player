@@ -1,6 +1,7 @@
 // What a long press on a table card shows (card-preview.tsx): the card, the cards attached to it and its face-up shadow cards,
 // each with the effects on it now, opened on the card that was pressed. Pure: the screen hands over how a code is pictured.
 import { umbarDetail, underAlleywayRole } from "../readouts/haradrim/umbar.ts";
+import { guardedRole } from "../readouts/haradrim/staged.ts";
 import { stageSeat, viewOf } from "../../rules/families/breaking/areas.ts";
 import { isLostIsland } from "../../rules/families/uncharted/pick.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
@@ -67,7 +68,7 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
   // A stage with Defense says where questing's progress goes, and a stage whose filling loses the game says so (mec112.defense, 143075:B:3).
   const rest = stageDetail(game, ctx, stage.code, points, hold, null).join(". ");
   // A time stage with 2 counters or fewer says what the dial warns of first, as the dial's own words do (rm.time-x): the sheet the dial opens is this preview.
-  const facts = FORDS_STAGES.includes(stage.code) && stage.face === "B" ? timeTakes(game, stage.code) : null;
+  const facts = FORDS_STAGES.includes(stage.code) && stage.face === "B" ? timeTakes(game, ctx, stage.code) : null;
   const near = facts != null && (stage.resources <= 2 || facts.takes >= stage.resources) ? stageTimeNearWords(stage.code, stage.resources, facts) : null;
   const detail = near ? [near, rest].filter((part) => part !== "").join(" ") : rest;
   if (points != null) return { title: `${name} · ${stage.progress} / ${points}`, ...(detail ? { detail } : {}) };
@@ -140,7 +141,7 @@ export function previewCards(
     if (earlier.includes(id)) return [earlierStage(game, ctx, card.code, describe)];
     // The loot a location guards is under it, out of play, and still its player's (22024:B:2).
     const loot = game.lootDecks != null && card.zone === "under" && card.controller != null;
-    const role = index === 0 ? null : card.zone === "shadow" ? "Shadow card" : loot ? LOOT_ROLE : (underAlleywayRole(game, id) ?? (card.host ? hostedRole(printedOf(ctx.cards, card.code)) : null));
+    const role = index === 0 ? null : card.zone === "shadow" ? "Shadow card" : loot ? LOOT_ROLE : (underAlleywayRole(game, id) ?? guardedRole(game, id) ?? (card.host ? hostedRole(printedOf(ctx.cards, card.code)) : null));
     // The effects on it, then what a delayed effect will do to it (Sneak Attack's return); for the pressed hand card, why it
     // does not glow.
     const effects = [...effectLines(game, ctx, id, cardName), ...delayedLines(game, id, cardName)];

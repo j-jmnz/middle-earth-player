@@ -400,8 +400,8 @@ export const simpleVerbs = [
     anyPlayer: z.literal(true).optional(),
     ...when,
   }),
-  // `firstEachPhase`: only the first such card played in the phase (the sidequests family: "The first non-unique card you play each planning phase").
-  z.strictObject({ verb: z.literal("IgnoreResourceMatch"), pick: pickSchema, firstEachRound: z.boolean().optional(), firstEachPhase: z.boolean().optional(), ...when }),
+  // `firstEachPhase`: only the first such card played in the phase (the sidequests family: "The first non-unique card you play each planning phase"). `anyPlayer`: the rule of a card no player controls (a quest stage) binds every seat, each counting its own plays (16071:B:2).
+  z.strictObject({ verb: z.literal("IgnoreResourceMatch"), pick: pickSchema, firstEachRound: z.boolean().optional(), firstEachPhase: z.boolean().optional(), anyPlayer: z.literal(true).optional(), ...when }),
   z.strictObject({ verb: z.literal("PaysFor"), pick: pickSchema, spheres: z.array(z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"])).min(1).optional(), ...when }),
   // Constant on a card in hand: its cost must be paid from at least `min` (at most `max`) different heroes' pools.
   z.strictObject({ verb: z.literal("PayDistinctHeroes"), min: z.number().int().positive().optional(), max: z.number().int().positive().optional(), ...when }),
