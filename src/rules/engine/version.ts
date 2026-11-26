@@ -183,9 +183,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 44, scenarios: ["the-wizards-quest"], note: "Necromancer's Pass reads the first player's hand, not the hand of the player who revealed it, to keep a card and to see whether a second card is there to hold." },
   { version: 45, scenarios: "all", note: "A surge chain whose passes change nothing, like a lone Take Cover! shuffled back again and again, ends instead of repeating for ever." },
   { version: 46, scenarios: "all", note: "In the combat phase each engaged enemy is dealt a shadow card, also an enemy that already holds one from a card's effect, which then holds both." },
+  { version: 47, scenarios: "all", note: "Damage that a Response cancels after it was placed, like Mithril Shirt's, no longer counts as damage dealt by the attack for a shadow effect that reads it." },
 ];
 
-export const ENGINE_VERSION = 46;
+export const ENGINE_VERSION = 47;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {
