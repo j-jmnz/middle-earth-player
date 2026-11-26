@@ -9,12 +9,14 @@ import { idOf, run as runInstruction, tableFromLayout } from "../../../test/harn
 import { advancedTo, CHIEFTAIN, prepared, stageId } from "../../rules/families/haradrim/race-kit.ts";
 
 import { effectLines } from "../cards/card-effects.ts";
-import { areaFacts, areaGroup, areaRoleOf, areaSpeech, stageFactsOf } from "../store/stormcaller-table.ts";
+import { areaFacts, areaGroup, areaKind, areaRoleOf, areaSpeech, stageFactsOf } from "../store/stormcaller-table.ts";
 import { momentOf } from "../store/outcome.ts";
 import { zoneSelector } from "../store/selectors.ts";
 import { ORCS_APART, ORCS_SAME_STAGE, ORCS_STAGE_LOSS, ORCS_TOGETHER, orcsStageTitle, orcsTell, orcsVerbWords } from "../words/scenarios/haradrim/orcs-table.ts";
 import { orcsBeats } from "../readouts/haradrim/orcs.ts";
 import { stateBeats } from "../readouts/state-beats.ts";
+import { areaWordsOf } from "../words/scenarios/area-words.ts";
+import { pileSpeech } from "../canvas/pile-speech.ts";
 import { previewCards } from "../cards/table-preview.ts";
 
 const ROAD = "17042";
@@ -100,6 +102,18 @@ describe("reader labels and list words", () => {
     expect(label).toContain("Out of reach: the players are at another stage");
     expect(areaSpeech(settled, idOf(settled, CHIEFTAIN), name, 10)).toBe("Uruk Chieftain, in the Orcs' area, out of reach");
     expect(orcsTell("together")).toBe("in the Orcs' area, in the staging area");
+  });
+});
+
+describe("17047:A:1 one key says which area the game has, and every site reads its words", () => {
+  it("areaKind is the Orcs' for this game, the same as the facts' who, and its words say the Orcs' area everywhere", () => {
+    const { made, state } = prepared(APART);
+    const settled = settle(state, made.ctx, []);
+    expect(areaKind(settled)).toBe("orcs");
+    expect(areaFacts(settled)?.who).toBe("orcs");
+    const words = areaWordsOf(areaKind(settled));
+    expect([words.apart, words.together, words.listTitle, words.foldWhere].join(" ")).not.toContain("Stormcaller");
+    expect(pileSpeech({ zone: "staging", count: 3, fold: "staging", areaFold: true, points: undefined }, false, null, false, areaKind(settled)).label).toBe("3 more cards in the Orcs' area");
   });
 });
 

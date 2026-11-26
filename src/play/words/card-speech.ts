@@ -17,14 +17,13 @@ import { controlSpeech, treasureSpeech } from "../cards/dungeon-preview.ts";
 import { shareHint, shareValue, wordOf } from "../choice/tray-logic.ts";
 import type { OptionMark, Sheet } from "../choice/sheet-types.ts";
 import { actingSeat, hidesFace, isDead, isLooked, isPrisoner, type ZoneFacts, type ZoneId } from "../store/selectors.ts";
-import { areaRoleOf, areaSpeech } from "../store/stormcaller-table.ts";
+import { areaKind, areaRoleOf, areaSpeech } from "../store/stormcaller-table.ts";
 import { villagerUnit } from "../readouts/against-the-shadow/amon-din.ts";
 import { plural } from "./list.ts";
 import { seatTag } from "./scenarios/area.ts";
 import { REANIMATED_DEAD } from "./scenarios/angmar/dread-realm-table.ts";
 import { grappleDetail } from "./scenarios/grapple.ts";
-import { areaTell } from "./scenarios/stormcaller.ts";
-import { orcsTell } from "./scenarios/haradrim/orcs-table.ts";
+import { areaWordsOf } from "./scenarios/area-words.ts";
 import { islandTell } from "./scenarios/uncharted.ts";
 
 /** Everything the speech reads besides the state, so the function stays pure: the table's lookups, the engine's numbers, what the open moment marks. */
@@ -183,7 +182,7 @@ function labelOf(game: ScenarioState, seat: number, card: CardInstance, deps: Ca
   // The sentences a card whose number or place is only drawn on the canvas has always said.
   const role = areaRoleOf(game, card.id);
   const said = [
-    stage == null && role != null && role !== "stage" ? (game.orcs ? orcsTell(role) : areaTell(role)) : null,
+    stage == null && role != null && role !== "stage" ? areaWordsOf(areaKind(game)).tell(role) : null,
     island,
     info.under?.speech,
     grappleDetail(game, card.id),

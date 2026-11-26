@@ -8,8 +8,9 @@ import type { StageFacts } from "../stormcaller.ts";
 export const ORCS_APART = "In the Orcs' area: not in the staging area, immune to player card effects";
 /** The preview sentence of a card of the area while the players are at the Orcs' stage: it is a staging card. */
 export const ORCS_TOGETHER = "In the Orcs' area, at the Orcs' stage: in the staging area";
-/** The title of the row list a fold stack opens when only the area's group folded. */
+/** The title of the row list a fold stack opens when only the area's group folded, and the reader phrase of that fold stack. */
 export const ORCS_LIST_TITLE = "Orcs' area";
+export const ORCS_FOLD_WHERE = "the Orcs' area";
 /** The words of the stage when the Orcs fill their last stage: the players lose (17054:B:3). */
 export const ORCS_STAGE_LOSS = "When this stage is full the players lose: the Orcs have caught them";
 /** What the same stage switches, said on the stage's preview (hrd.orcs-area-same-stage). */

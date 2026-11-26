@@ -12,9 +12,8 @@ import { cellOf, islandOf } from "../../rules/families/island/map.ts";
 
 import { aflameLine, aflameMark, burnLine, burnMark } from "../words/scenarios/aflame.ts";
 import type { PlaceMark } from "../store/island-place.ts";
-import { areaRoleOf, stageFactsOf } from "../store/stormcaller-table.ts";
-import { AREA_APART, AREA_TOGETHER, stageLines } from "../words/scenarios/stormcaller.ts";
-import { ORCS_APART, ORCS_TOGETHER, orcsStageLines } from "../words/scenarios/haradrim/orcs-table.ts";
+import { areaKind, areaRoleOf, stageFactsOf } from "../store/stormcaller-table.ts";
+import { areaWordsOf } from "../words/scenarios/area-words.ts";
 import { shipLoss, type ShipLoss } from "../words/scenarios/grapple.ts";
 import { heldWords } from "../words/scenarios/sea.ts";
 import { BLANK_WORD, blankWords, noReadyWords, type BlankKeeps } from "../words/card-bars.ts";
@@ -229,16 +228,15 @@ export function effectLines(game: ScenarioState, ctx: ReduceContext, cardId: str
   if (aflame && inPlay(card.zone)) lines.push(aflameLine(aflame));
   const burn = burnTally(game, cardId, ctx);
   if (burn) lines.push(burnLine(burn));
-  // A card of the Stormcaller's area says where it stands (dcce.stormcallers-area-stages).
-  // The Orcs' area of Race Across Harad says the same in its own words (store/orcs-table.ts).
-  const role = areaRoleOf(game, cardId);
-  const orcs = game.orcs != null && role != null;
-  const standing = orcs ? (role === "stage" ? "stage" : role) : areaStanding(game, cardId);
-  if (standing === "apart") lines.push(orcs ? ORCS_APART : AREA_APART);
-  else if (standing === "together") lines.push(orcs ? ORCS_TOGETHER : AREA_TOGETHER);
+  // A card of a quest area says where it stands (dcce.stormcallers-area-stages, hrd.orcs-area), in the words of its area (words/scenarios/area-words.ts).
+  const kind = areaKind(game);
+  const words = areaWordsOf(kind);
+  const standing = kind === "orcs" ? areaRoleOf(game, cardId) : areaStanding(game, cardId);
+  if (standing === "apart") lines.push(words.apart);
+  else if (standing === "together") lines.push(words.together);
   else if (standing === "stage" || standing === "stageApart") {
     const facts = stageFactsOf(game, questPointsOf(game, card, ctx.cards));
-    if (facts) lines.push(...(facts.who === "orcs" ? orcsStageLines(facts) : stageLines(facts)));
+    if (facts) lines.push(...words.stageLines(facts));
   }
   for (const modifier of game.modifiers) {
     if (!heldBy(modifier, card, printed) || !modifierActive(game, modifier)) continue;

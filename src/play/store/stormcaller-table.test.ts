@@ -290,7 +290,7 @@ describe("every phone size and scale", () => {
           else {
             expect(folded.area, scene).toBe(true);
             expect(stack?.areaFold, scene).toBe(true);
-            expect(pileSpeech(stack as CardSlot).label, scene).toBe(`${folded.cards.length} more cards in ${AREA_FOLD_WHERE}`);
+            expect(pileSpeech(stack as CardSlot, false, null, false, "stormcaller").label, scene).toBe(`${folded.cards.length} more cards in ${AREA_FOLD_WHERE}`);
             expect(stack?.code, scene).toBe(made.state.cards[folded.top]?.code);
           }
           expect(hitBounds(stack as CardSlot).w, scene).toBeGreaterThanOrEqual(44);
