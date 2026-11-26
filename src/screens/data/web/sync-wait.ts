@@ -18,3 +18,27 @@ export function noteSyncWait(startedAt: number, now: number): void {
 export function syncWaitExpired(startedAt: number, now: number, limitMs: number = SYNC_WAIT_LIMIT_MS): boolean {
   return now - startedAt >= limitMs;
 }
+
+// The size of the buffer a synchronous call's answer comes back in (expo-sqlite's own limit for one answer).
+export const SYNC_RESULT_BYTES = 1024 * 1024;
+
+export type SyncBuffers = { lockBuffer: SharedArrayBuffer; resultBuffer: SharedArrayBuffer };
+
+let spare: SyncBuffers | null = null;
+
+/**
+ * The lock and the answer's buffer for one synchronous call. expo-sqlite makes both anew for every call, and an answer's buffer is a megabyte: the 280 reads
+ * that open a campaign left 280 MB for the page's and the worker's garbage collectors, and Safari's engine drew the page slowly until both had run. The
+ * page waits for each call's answer before it makes the next, so one pair serves them all. A call takes the pair and gives it back when its answer is read.
+ * A call that timed out does not give it back: the worker may still write its late answer there, so the next call makes a new pair.
+ */
+export function takeSyncBuffers(): SyncBuffers {
+  const buffers = spare ?? { lockBuffer: new SharedArrayBuffer(4), resultBuffer: new SharedArrayBuffer(SYNC_RESULT_BYTES) };
+  spare = null;
+  return buffers;
+}
+
+/** Gives the pair back once the call's answer is copied out of it. */
+export function giveBackSyncBuffers(buffers: SyncBuffers): void {
+  spare = buffers;
+}
