@@ -34,6 +34,10 @@ const STANDING: Readonly<Record<string, string>> = {
   "08100": "Each enemy in the staging area gets -20 engagement cost.",
 };
 
+/** The words of a table flag that a stage of this cycle holds (`commitDiscardsRandom`, 08096:B:3), for the sheets the flag changes. */
+const FLAG_STANDING: Readonly<Record<string, string>> = { commitDiscardsRandom: STANDING["08096"] ?? "" };
+export const flagStandingWords = (flag: string): string => FLAG_STANDING[flag] ?? "";
+
 /** The standing rule of a stage, or an empty string. */
 export const stageStandingWords = (code: string): string => STANDING[code] ?? "";
 

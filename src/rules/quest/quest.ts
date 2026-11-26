@@ -296,8 +296,8 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     // A quest that branches (BranchStage, 01120:B:1) chooses the next stage at random and ends at a stage it led to.
     const branched = ordered ? null : branchFrom(next, current.code);
     if (branched) next = branched.state;
-    // A stage that names AdvanceToRandomStage (19048:B:2) proceeds to one of the stages it lists at random, each played once.
-    const rolled = ordered || branched ? null : randomStageFrom(next, current.code, randomSet);
+    // A stage that names AdvanceToRandomStage (19048:B:2) proceeds to one of the stages it lists at random, each played once. The set a record names for this one advance (`randomSet`) is the source stage's alone: a stage reached with its quest points already filled goes on by its own.
+    const rolled = ordered || branched ? null : randomStageFrom(next, current.code, hop === 0 ? randomSet : undefined);
     if (rolled) next = rolled.state;
     // A stage that names AdvanceIfAttached (50601:B:3) proceeds to the stage its Loot condition names.
     const attached = ordered || branched || rolled ? null : attachedStageFrom(next, current.code, cards);

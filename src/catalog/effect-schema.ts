@@ -363,9 +363,9 @@ export const effectSchema = z.strictObject({
   // RaiseStagingThreat names the amount it raises or the live count (the allies in a discard pile), never both and never neither (01104:A:1, 145060:A:2).
   message: "RaiseStagingThreat names exactly one of amount and live",
   path: ["instructions"],
-}).refine((effect) => effect.instructions.every((instruction) => instruction.verb !== "AddSetAsideToStaging" || (instruction.code != null) !== (instruction.trait != null)), {
+}).refine((effect) => effect.instructions.every((instruction) => instruction.verb !== "AddSetAsideToStaging" || ((instruction.code != null) !== (instruction.trait != null) && !(instruction.outOfPlay === true && instruction.trait != null))), {
   // AddSetAsideToStaging names the code it adds or the trait the set aside cards share, never both and never neither (145078:B:1).
-  message: "AddSetAsideToStaging names exactly one of code and trait",
+  message: "AddSetAsideToStaging names exactly one of code and trait, and outOfPlay only with code",
   path: ["instructions"],
 });
 

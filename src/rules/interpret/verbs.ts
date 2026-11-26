@@ -124,7 +124,8 @@ export function runExtraVerb(
     case "ShuffleEncounterDeck":
       return shuffleEncounterDeck(state);
     case "AddSetAsideToStaging": {
-      const copies = (instruction.outOfPlay === true && instruction.code != null ? outOfPlayCopies(state, instruction.code) : state.setAside).filter((candidate) => (instruction.code != null ? state.cards[candidate]?.code === instruction.code : instruction.trait != null && hasTrait(state, candidate, instruction.trait, ctx)));
+      const pool = instruction.outOfPlay === true && instruction.code != null ? outOfPlayCopies(state, instruction.code) : state.setAside;
+      const copies = pool.filter((candidate) => (instruction.code != null ? state.cards[candidate]?.code === instruction.code : instruction.trait != null && hasTrait(state, candidate, instruction.trait, ctx)));
       // The card is out of play, so putting it in the staging area is entering play: moveEncounter (into the acting seat's own staging area once stages are separate, mec109.multiple-staging-areas) announces it to the cards that hear it.
       return (instruction.all === true ? copies : copies.slice(0, 1)).reduce((next, id) => updateCard(moveEncounter(next, id, "staging", focus.seat, ctx, steps), id, { face: turnedUp(next, id) }), state);
     }
