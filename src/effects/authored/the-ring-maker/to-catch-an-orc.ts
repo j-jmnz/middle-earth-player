@@ -183,6 +183,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "response",
     trigger: "questSucceeded",
     eventSeat: "you",
+    // Offered only when an option can change something: the quest card is no player card, so the engine does not read its idle options (`noChangeReason`).
+    condition: { kind: "any", conditions: [{ kind: "questProgressNoted", is: true }, { kind: "canPick", pick: MUGASH_IN_PLAY }] },
     instructions: [
       {
         verb: "Choose",

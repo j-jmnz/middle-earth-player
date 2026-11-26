@@ -210,8 +210,7 @@ describe("07063:B:3 Mugash in play", () => {
 });
 
 describe("07063:B:3 a Response that can change nothing", () => {
-  // FAULT: the guide says a Response whose whole effect cannot happen is not offered; with no progress on the stage and no Mugash in play both options are gated, yet the engine offers it.
-  it.fails("07063:B:3 is not offered when no progress reached the stage and Mugash is not in play", () => {
+  it("07063:B:3 is not offered when no progress reached the stage and Mugash is not in play", () => {
     const made = make({ stage: "07063", timeCounters: 1, active: "07028" });
     let at = send(send(opened(made), { type: "Commit", cardIds: [made.hero] }, made.ctx), { type: "Pass" }, made.ctx);
     for (let guard = 0; guard < 16 && at.state.phase === "Quest" && !legalIntents(at.state, made.ctx).some((intent) => intent.type === "Trigger" ) && at.state.mode !== "travel"; guard += 1) at = send(at, { type: "Pass" }, made.ctx);

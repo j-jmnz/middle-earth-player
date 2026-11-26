@@ -16,8 +16,8 @@ const MUGASH_ON_DH2 = { code: "07024", to: "dh2", encounter: true } as const;
 describe("To Catch an Orc: the lines whose records leave the table as the engine has it", () => {
   const taken: Layout = { stage: STAGE_2, timeCounters: 1, active: "07054", deck: ["f0"] };
 
-  it("07063:B:3 when the active location took all the progress nothing is cancelled and the Response offers no time counter (rr.then)", () => {
-    const done = playedLayout(SCENARIO, taken, [quest("success"), respond(STAGE_2)]);
+  it("07063:B:3 when the active location took all the progress nothing is cancelled and the Response is not offered (it could change nothing: rr.then)", () => {
+    const done = playedLayout(SCENARIO, taken, [quest("success")]);
     expect(done.run.state.cards[idOf(done.run.state, STAGE_2)]?.resources).toBe(1);
     expect(done.run.state.cards[idOf(done.run.state, "07054")]?.progress).toBe(4);
   });
