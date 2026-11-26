@@ -79,6 +79,11 @@ export function refreshTakes(state: ScenarioState, ctx: ReduceContext): number {
 /** The pick filter `timeCounter`: a card with the Time keyword that holds a time counter (a card with no Time loses none, mec108.time-x). True for a pick that does not ask. */
 export function timeCounterMatches(state: ScenarioState, id: string, spec: PickSpec, ctx: ReduceContext): boolean {
   if (spec.timeCounter !== true) return true;
+  return holdsTimeCounter(state, id, ctx);
+}
+
+/** A card with the Time X keyword, at least one time counter and its text not blanked: the one test the pick filter, the refresh sweep and a picked target share. */
+function holdsTimeCounter(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
   const card = state.cards[id];
   return card != null && card.resources > 0 && timeOf(ctx, card.code) != null && !textBlank(state, id, ctx.cards);
 }
@@ -86,7 +91,7 @@ export function timeCounterMatches(state: ScenarioState, id: string, spec: PickS
 /** The cards in play that hold the Time X keyword and at least one time counter. */
 function timeCards(state: ScenarioState, ctx: ReduceContext): string[] {
   if (constantVerbCodes(ctx, "Time").size === 0) return [];
-  return Object.values(state.cards).filter((card) => inPlay(card.zone) && card.resources > 0 && timeOf(ctx, card.code) != null && !textBlank(state, card.id, ctx.cards)).map((card) => card.id);
+  return Object.values(state.cards).filter((card) => inPlay(card.zone) && holdsTimeCounter(state, card.id, ctx)).map((card) => card.id);
 }
 
 /**
@@ -102,10 +107,10 @@ function timeEnemies(state: ScenarioState, ctx: ReduceContext): string[] {
   return timeCards(state, ctx).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "enemy");
 }
 
-/** The last picked card when it has the Time X keyword, as a list of one; none otherwise (a card with no Time loses no counter). */
+/** The last picked card when it holds a time counter, as a list of one; none otherwise (a card with no Time, or its text blanked, loses no counter). */
 function pickedTimeCard(state: ScenarioState, ctx: ReduceContext): string[] {
   const picked = lastPicked(state);
-  return picked && timeOf(ctx, state.cards[picked]?.code ?? "") != null ? [picked] : [];
+  return picked && holdsTimeCounter(state, picked, ctx) ? [picked] : [];
 }
 
 /**
