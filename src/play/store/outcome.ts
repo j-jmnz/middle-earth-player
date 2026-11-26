@@ -26,7 +26,7 @@ import { hostName, playWords, type PlayInto } from "../cards/host-words.ts";
 import { STAT_WORD } from "../cards/card-effects.ts";
 import { progressAttack, willpowerAttack } from "../readouts/against-the-shadow/druadan.ts";
 import { controlChanges, changeWords } from "../readouts/against-the-shadow/osgiliath.ts";
-import { stateBeats } from "../readouts/state-beats.ts";
+import { stateBeats } from "./state-beats.ts";
 import { deadVillagers, heldBeat, onVillagers, villagerLines } from "../readouts/against-the-shadow/amon-din.ts";
 import { underHost } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { hiddenChanges, hiddenLines } from "../readouts/against-the-shadow/blood-steps.ts";
@@ -385,7 +385,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
     groups.push({ rank: 1, title: `Traveled to ${names.card(after.activeLocation)}`, tone: "plain", lines: [{ text: "It is the active location now", mark: null }] });
   }
 
-  // The beats no step tells (the Underworld's takes, the Orcs' advance, a return to stage 3B) read the two states (readouts/state-beats.ts).
+  // The beats no step tells (the Underworld's takes, the Orcs' advance, a return to stage 3B) read the two states (store/state-beats.ts).
   groups.push(...stateBeats(before, after, names.card));
 
   const shown = groups.filter((group) => group.lines.length > 0 || group.title !== "");

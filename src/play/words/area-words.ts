@@ -1,7 +1,7 @@
 // Rules: dcce.stormcallers-area, hrd.orcs-area (data/rules/entries.json). The words of a quest area, one record for each kind of area (the Stormcaller's, the Orcs'). Every site that says something of the area (a card's preview, what a screen
 // reader hears, a row list's title, a fold stack's phrase) reads its record through `areaWordsOf(areaKind(game))`, so a new sentence is written once for each kind and no site chooses between two sets of words. Pure.
-import { ORCS_APART, ORCS_FOLD_WHERE, ORCS_LIST_TITLE, ORCS_TOGETHER, orcsMemberSpeech, orcsStageLines, orcsStagePill, orcsStageSpeech, orcsTell } from "./haradrim/orcs-table.ts";
-import { AREA_APART, AREA_FOLD_WHERE, AREA_LIST_TITLE, AREA_TOGETHER, areaTell, memberSpeech, stageLines, stagePill, stageSpeech, type AreaKind, type StageFacts, type StagePill } from "./stormcaller.ts";
+import { ORCS_APART, ORCS_FOLD_WHERE, ORCS_LIST_TITLE, ORCS_TOGETHER, orcsMemberSpeech, orcsStageLines, orcsStagePill, orcsStageSpeech, orcsTell } from "./scenarios/haradrim/orcs-table.ts";
+import { AREA_APART, AREA_FOLD_WHERE, AREA_LIST_TITLE, AREA_TOGETHER, areaTell, memberSpeech, stageLines, stagePill, stageSpeech, type AreaKind, type StageFacts, type StagePill } from "./scenarios/stormcaller.ts";
 
 export type AreaWords = {
   /** The preview sentence of a card of the area while the players are at another stage, and at the area's stage. */

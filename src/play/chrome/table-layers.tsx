@@ -36,7 +36,7 @@ import { IslandPanel } from "../dream-chaser/island-panel.tsx";
 import { WAITING, islandFit, islandPanelWidth, islandReadout, standingWords } from "../dream-chaser/island-table.ts";
 import { foldTitle } from "../layout/row-fold.ts";
 import { areaKind, areaRoleOf } from "../store/stormcaller-table.ts";
-import { areaWordsOf } from "../words/scenarios/area-words.ts";
+import { areaWordsOf } from "../words/area-words.ts";
 import { facedownSplitWords } from "../words/scenarios/against-the-shadow/stewards-fear.ts";
 import { alwaysRows } from "./settings-words.ts";
 import { useReaderMode, useScreenReader } from "../../ui/screen-reader.ts";

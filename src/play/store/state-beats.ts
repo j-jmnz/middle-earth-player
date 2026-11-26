@@ -2,10 +2,10 @@
 // the Orcs' advance (Race Across Harad) and a player's return from stage 4B to stage 3B (Fog on the Barrow-downs). Pure; momentOf (store/outcome.ts) adds them to the groups its steps made.
 import type { ScenarioState } from "../../rules/core/state.ts";
 
-import { orcsBeats } from "./haradrim/orcs.ts";
-import { returnLines } from "./standalone-scenarios/barrow-downs.ts";
-import { BACK_TITLE } from "./standalone-scenarios/barrow-downs-words.ts";
-import { stackTakes } from "./against-the-shadow/stewards-fear.ts";
+import { orcsBeats } from "../readouts/haradrim/orcs.ts";
+import { returnLines } from "../readouts/standalone-scenarios/barrow-downs.ts";
+import { BACK_TITLE } from "../readouts/standalone-scenarios/barrow-downs-words.ts";
+import { stackTakes } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { UNDERWORLD_TITLE } from "../words/scenarios/against-the-shadow/stewards-fear.ts";
 
 type PlainLine = { text: string; mark: null };

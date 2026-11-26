@@ -27,7 +27,7 @@ import { tableLayout, type CardSlot, type Rect } from "../layout/layout.ts";
 import { slotBounds } from "../layout/hits.ts";
 import { rowFeet } from "../layout/column-reach.ts";
 import { areaFacts } from "../store/stormcaller-table.ts";
-import { areaWordsOf } from "../words/scenarios/area-words.ts";
+import { areaWordsOf } from "../words/area-words.ts";
 import { NO_DRAG, NO_HIGHLIGHT, NO_TARGETS } from "../store/peek.ts";
 import { actingSeat, lookedOf, shownSeat, stacksUnder } from "../store/selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";

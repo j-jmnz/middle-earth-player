@@ -13,7 +13,7 @@ import { cellOf, islandOf } from "../../rules/families/island/map.ts";
 import { aflameLine, aflameMark, burnLine, burnMark } from "../words/scenarios/aflame.ts";
 import type { PlaceMark } from "../store/island-place.ts";
 import { areaKind, areaRoleOf, stageFactsOf } from "../store/stormcaller-table.ts";
-import { areaWordsOf } from "../words/scenarios/area-words.ts";
+import { areaWordsOf } from "../words/area-words.ts";
 import { shipLoss, type ShipLoss } from "../words/scenarios/grapple.ts";
 import { heldWords } from "../words/scenarios/sea.ts";
 import { BLANK_WORD, blankWords, noReadyWords, type BlankKeeps } from "../words/card-bars.ts";
@@ -228,7 +228,7 @@ export function effectLines(game: ScenarioState, ctx: ReduceContext, cardId: str
   if (aflame && inPlay(card.zone)) lines.push(aflameLine(aflame));
   const burn = burnTally(game, cardId, ctx);
   if (burn) lines.push(burnLine(burn));
-  // A card of a quest area says where it stands (dcce.stormcallers-area-stages, hrd.orcs-area), in the words of its area (words/scenarios/area-words.ts).
+  // A card of a quest area says where it stands (dcce.stormcallers-area-stages, hrd.orcs-area), in the words of its area (words/area-words.ts).
   const kind = areaKind(game);
   const words = areaWordsOf(kind);
   const standing = kind === "orcs" ? areaRoleOf(game, cardId) : areaStanding(game, cardId);

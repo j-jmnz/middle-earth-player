@@ -19,8 +19,8 @@ import { momentOf } from "../store/outcome.ts";
 import { zoneSelector } from "../store/selectors.ts";
 import { ORCS_APART, ORCS_SAME_STAGE, ORCS_STAGE_LOSS, ORCS_TOGETHER, orcsStageTitle, orcsTell, orcsVerbWords } from "../words/scenarios/haradrim/orcs-table.ts";
 import { orcsBeats } from "../readouts/haradrim/orcs.ts";
-import { stateBeats } from "../readouts/state-beats.ts";
-import { areaWordsOf } from "../words/scenarios/area-words.ts";
+import { stateBeats } from "../store/state-beats.ts";
+import { areaWordsOf } from "../words/area-words.ts";
 import { pileSpeech } from "../canvas/pile-speech.ts";
 import { previewCards } from "../cards/table-preview.ts";
 

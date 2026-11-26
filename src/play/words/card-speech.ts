@@ -23,7 +23,7 @@ import { plural } from "./list.ts";
 import { seatTag } from "./scenarios/area.ts";
 import { REANIMATED_DEAD } from "./scenarios/angmar/dread-realm-table.ts";
 import { grappleDetail } from "./scenarios/grapple.ts";
-import { areaWordsOf } from "./scenarios/area-words.ts";
+import { areaWordsOf } from "./area-words.ts";
 import { islandTell } from "./scenarios/uncharted.ts";
 
 /** Everything the speech reads besides the state, so the function stays pure: the table's lookups, the engine's numbers, what the open moment marks. */

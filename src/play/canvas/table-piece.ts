@@ -64,7 +64,7 @@ export type PieceProps = BodyProps & {
   tokens: TokenImages;
 };
 
-/** The marks a quest area's stage wears (words/scenarios/area-words.ts, pill). */
+/** The marks a quest area's stage wears (words/area-words.ts, pill). */
 export type StageMarksView = { pill: StagePill; apart: boolean };
 
 /** What the canvas knows for one render, from which every slot's props are made. */

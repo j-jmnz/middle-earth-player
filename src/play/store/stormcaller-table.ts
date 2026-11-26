@@ -1,13 +1,13 @@
 // Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages, hrd.orcs-area (data/rules/entries.json). What the table reads of a quest area (docs/design-system-table.md, The Stormcaller's area): which cards make its group,
 // where each stands, and the numbers the reader labels say. The Stormcaller's area is read here; a game with the Orcs' area of Race Across Harad is handed to orcs-table.ts, and `areaKind` says which area the game has: its
-// words are the one record of words/scenarios/area-words.ts. Pure. A game with no area has no group and no role.
+// words are the one record of words/area-words.ts. Pure. A game with no area has no group and no role.
 import { membersStanding } from "../../rules/core/area-members.ts";
 import { areaOf } from "../../rules/families/stormcaller/zone.ts";
 import { stageNumber } from "../../rules/families/caves/progress.ts";
 import { areaPlace, atStormcallersStage, stormcallerLastStage } from "../../rules/families/stormcaller/values.ts";
 import type { CardInstance, ScenarioState } from "../../rules/core/state.ts";
 
-import { areaWordsOf } from "../words/scenarios/area-words.ts";
+import { areaWordsOf } from "../words/area-words.ts";
 import type { AreaKind, StageFacts } from "../words/scenarios/stormcaller.ts";
 import { orcsFacts, orcsGroup, orcsRoleOf } from "./orcs-table.ts";
 
