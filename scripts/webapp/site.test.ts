@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ASSET_FILE_LIMIT, assetsIgnore, dynamicPages, headersFile, oversize, withHomeScreenTags } from "./site.ts";
+import { ASSET_FILE_LIMIT, assetsIgnore, dynamicPages, headersFile, oversize, withEarlyMeter, withHomeScreenTags } from "./site.ts";
 
 describe("what the web app adds to the export for Cloudflare", () => {
   it("isolates every page with require-corp, which Safari supports", () => {
@@ -38,5 +38,12 @@ describe("what the web app adds to the export for Cloudflare", () => {
     expect(tagged).toContain('<link rel="apple-touch-icon" href="/apple-touch-icon.png"/></head>');
     expect(withHomeScreenTags(tagged)).toBe(tagged);
     expect(withHomeScreenTags("no head")).toBe("no head");
+  });
+
+  it("puts the early script first in a page's head, once", () => {
+    const page = withEarlyMeter("<html><head><title>x</title></head><body></body></html>");
+    expect(page).toBe('<html><head><script src="/meter-early.js"></script><title>x</title></head><body></body></html>');
+    expect(withEarlyMeter(page)).toBe(page);
+    expect(withEarlyMeter("no head")).toBe("no head");
   });
 });

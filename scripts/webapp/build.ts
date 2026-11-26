@@ -10,13 +10,13 @@ import sharp from "sharp";
 import { exportDesktopWeb, packAssets } from "../desktop/shell.ts";
 import { bytes, runScript, type Log } from "../log.ts";
 import { ROUTES_PATH } from "../../webapp/routes.ts";
-import { ASSET_COUNT_LIMIT, assetsIgnore, dynamicPages, headersFile, oversize, TOUCH_ICON, withHomeScreenTags, type SiteFile } from "./site.ts";
+import { ASSET_COUNT_LIMIT, assetsIgnore, dynamicPages, EARLY_FILE, EARLY_SCRIPT, headersFile, oversize, TOUCH_ICON, withEarlyMeter, withHomeScreenTags, type SiteFile } from "./site.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
 export const WEB_DIR = path.join(ROOT, "webapp", "build", "web");
 // What this script writes into the export; webapp/worker.ts reads the list at ROUTES_PATH.
 const ROUTES_FILE = ROUTES_PATH.slice(1);
-const WRITTEN = new Set(["_headers", ".assetsignore", ROUTES_FILE, TOUCH_ICON]);
+const WRITTEN = new Set(["_headers", ".assetsignore", ROUTES_FILE, TOUCH_ICON, EARLY_FILE]);
 
 function filesIn(dir: string, root: string, out: SiteFile[] = []): SiteFile[] {
   for (const name of readdirSync(dir).sort()) {
@@ -41,17 +41,18 @@ async function main(log: Log): Promise<void> {
     if (!file.path.endsWith(".html")) continue;
     const at = path.join(WEB_DIR, file.path);
     const html = readFileSync(at, "utf8");
-    const tagged = withHomeScreenTags(html);
+    const tagged = withEarlyMeter(withHomeScreenTags(html));
     if (tagged !== html) writeFileSync(at, tagged);
   }
+  writeFileSync(path.join(WEB_DIR, EARLY_FILE), EARLY_SCRIPT);
   const pages = dynamicPages(files.map((file) => file.path));
   writeFileSync(path.join(WEB_DIR, "_headers"), headersFile());
   writeFileSync(path.join(WEB_DIR, ROUTES_FILE), `${JSON.stringify(pages)}\n`);
   writeFileSync(path.join(WEB_DIR, ".assetsignore"), assetsIgnore(files));
   const large = oversize(files);
   for (const file of large) log.warn(`${file.path} is ${bytes(file.size)}, over Cloudflare's 25 MiB for a static asset: it is not uploaded`);
-  // The page list and the icon are assets too; `_headers` and `.assetsignore` are not.
-  const count = files.length - large.length + 2;
+  // The page list, the icon and the early script are assets too; `_headers` and `.assetsignore` are not.
+  const count = files.length - large.length + 3;
   if (count > ASSET_COUNT_LIMIT) throw new Error(`${count} files, over Cloudflare's ${ASSET_COUNT_LIMIT} static assets for a Worker`);
   log.notice(`webapp: ${count} files, ${bytes(files.reduce((sum, file) => sum + file.size, 0))}, ${pages.length} dynamic pages, ${large.length} left out, in webapp/build/web`);
 }

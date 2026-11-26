@@ -82,12 +82,12 @@ function watchErrors(show: (text: string) => void): void {
  * (the time each took off the page), `tex` the whole pictures handed to the graphics chip and `texpx` their size in thousands of pixels (in place of a time), `sub`
  * the parts of a picture handed over (the letters' atlas), and `shader` the drawing programs it compiled and linked; `ctx` counts the WebGL contexts made, since each canvas has
  * its own and compiles its programs again (watchGraphics). `busy` is how long the page's
- * own thread was held, whatever held it: the sum of the waits over 12 ms between one message and the next of a channel that answers itself (watchBusy). A second
+ * own thread was held, whatever held it: the sum of the waits over 20 ms between one message and the next of a channel that answers itself (watchBusy). A second
  * with a low frame rate and no `busy` was slowed by the browser or the graphics chip, not by the page's script.
  */
-export type Work = Partial<Record<SpanName, readonly [ms: number, count: number]>>;
+export type Work = Readonly<Record<string, readonly [ms: number, count: number]>>;
 
-/** The order the log prints the work in. */
+/** The order the log prints the page's own spans in; the early script's tasks follow them by name (scripts/webapp/site.ts, EARLY_SCRIPT). */
 export const SPAN_ORDER: readonly SpanName[] = ["busy", "raf", "draw", "db", "save", "audio", "tap", "img", "tex", "texpx", "sub", "shader", "ctx"];
 
 /**
@@ -103,11 +103,17 @@ const FRAME_MS = 1000 / 60;
 // How many seconds the log keeps.
 export const LOG_SECONDS = 60;
 
+// The names of some work in the log's order: the page's spans first, then the rest by name.
+function namesOf(work: Work): string[] {
+  const known: readonly string[] = SPAN_ORDER;
+  return [...known.filter((name) => work[name]), ...Object.keys(work).filter((name) => !known.includes(name)).sort()];
+}
+
 /** A second's frames and work as its log entry. */
 export function secondOf(gaps: readonly number[], work: Work = {}): Second {
   const total = gaps.reduce((sum, gap) => sum + gap, 0);
-  const rounded: Work = {};
-  for (const name of SPAN_ORDER) {
+  const rounded: Record<string, readonly [number, number]> = {};
+  for (const name of namesOf(work)) {
     const done = work[name];
     if (done) rounded[name] = [Math.round(done[0]), done[1]];
   }
@@ -130,7 +136,7 @@ export function summaryLine(log: readonly Second[]): string {
 
 /** A second as its line of the log: its frames, then each kind of work it had as `name ms/count`. */
 export function secondLine(second: Second): string {
-  const work = SPAN_ORDER.flatMap((name) => {
+  const work = namesOf(second.work).flatMap((name) => {
     const done = second.work[name];
     return done ? [`${name} ${done[0]}/${done[1]}`] : [];
   });
@@ -146,6 +152,18 @@ export function logText(log: readonly Second[], scale: number): string {
 let work: Record<string, [number, number]> = {};
 // The size of the last copy of the saves to storage, for the meter's first line.
 let savedBytes = 0;
+
+// What the early script timed since the meter last read it (scripts/webapp/site.ts, EARLY_SCRIPT), added to this second's work and cleared.
+function takeEarly(): void {
+  const early = (window as { __early?: { work: Record<string, [number, number]> } }).__early;
+  if (!early) return;
+  for (const [name, done] of Object.entries(early.work)) {
+    const mine = (work[name] ??= [0, 0]);
+    mine[0] += done[0];
+    mine[1] += done[1];
+  }
+  early.work = {};
+}
 
 function note(name: SpanName, ms: number): void {
   const done = (work[name] ??= [0, 0]);
@@ -217,7 +235,8 @@ function sizeUploads(owner: object | undefined): void {
 }
 
 // How long the page's thread was held: a message channel answers itself, and a wait over BUSY_MS between two answers is time something held the thread.
-const BUSY_MS = 12;
+const BUSY_MS = 20;
+const BUSY_EVERY_MS = 5;
 
 function watchBusy(): void {
   const channel = new MessageChannel();
@@ -226,8 +245,8 @@ function watchBusy(): void {
     const now = performance.now();
     if (now - last > BUSY_MS) note("busy", now - last);
     last = now;
-    // One answer a millisecond is enough, and leaves the thread to the page.
-    setTimeout(() => channel.port2.postMessage(0), 1);
+    // An answer every few milliseconds is enough, and leaves the thread to the page.
+    setTimeout(() => channel.port2.postMessage(0), BUSY_EVERY_MS);
   };
   channel.port2.postMessage(0);
 }
@@ -346,6 +365,7 @@ function startMeter(): void {
     if (!paused) {
       gaps.push(now - last);
       if (now - shown >= 1000) {
+        takeEarly();
         const second = secondOf(gaps, work);
         work = {};
         log = [...log, second].slice(-LOG_SECONDS);

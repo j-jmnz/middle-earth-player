@@ -62,3 +62,82 @@ export function withHomeScreenTags(html: string): string {
   if (html.includes("apple-mobile-web-app-capable") || !html.includes("</head>")) return html;
   return html.replace("</head>", `${HOME_SCREEN_TAGS}</head>`);
 }
+
+/** The test meter's early script, at the export's root (EARLY_SCRIPT). */
+export const EARLY_FILE = "meter-early.js";
+
+/**
+ * What the test meter cannot time from inside the bundle: by the time the app's code runs, React has made the channel its work comes through and the page's
+ * listeners are set. This script is the first the page runs. Only while the meter is on (`?fps=1`, or its stored choice: src/ui/web/render-scale.ts), it times
+ * each outermost task by what started it and sums them in `window.__early.work`, which the meter reads each second: `sched` is a message of a channel (React's
+ * rendering and commits), `timer` a timeout or interval, `worker` a worker's message (the database's answers), and `ev.<type>` an event's listeners.
+ */
+export const EARLY_SCRIPT = `(function () {
+  try {
+    var asked = new URLSearchParams(location.search).get("fps");
+    var on = asked !== null ? asked !== "0" : localStorage.getItem("middle-earth-player.frame-meter") === "1";
+    if (!on) return;
+  } catch (error) {
+    return;
+  }
+  var early = (window.__early = { work: {} });
+  var depth = 0;
+  function timed(name, run) {
+    return function () {
+      if (depth > 0) return run.apply(this, arguments);
+      depth += 1;
+      var started = performance.now();
+      try {
+        return run.apply(this, arguments);
+      } finally {
+        depth -= 1;
+        var done = early.work[name] || (early.work[name] = [0, 0]);
+        done[0] += performance.now() - started;
+        done[1] += 1;
+      }
+    };
+  }
+  function wrapHandler(proto, name) {
+    var own = Object.getOwnPropertyDescriptor(proto, "onmessage");
+    if (!own || !own.set || !own.get) return;
+    Object.defineProperty(proto, "onmessage", {
+      configurable: true,
+      get: own.get,
+      set: function (handler) {
+        own.set.call(this, typeof handler === "function" ? timed(name, handler) : handler);
+      },
+    });
+  }
+  wrapHandler(MessagePort.prototype, "sched");
+  if (window.Worker) wrapHandler(Worker.prototype, "worker");
+  ["setTimeout", "setInterval"].forEach(function (method) {
+    var original = window[method];
+    window[method] = function (handler) {
+      var args = Array.prototype.slice.call(arguments);
+      if (typeof handler === "function") args[0] = timed("timer", handler);
+      return original.apply(window, args);
+    };
+  });
+  var wrapped = new WeakMap();
+  var add = EventTarget.prototype.addEventListener;
+  var remove = EventTarget.prototype.removeEventListener;
+  EventTarget.prototype.addEventListener = function (type, listener, options) {
+    if (typeof listener !== "function") return add.call(this, type, listener, options);
+    var byType = wrapped.get(listener) || {};
+    wrapped.set(listener, byType);
+    var name = this instanceof Worker ? "worker" : this instanceof MessagePort ? "sched" : "ev." + type;
+    byType[type] = byType[type] || timed(name, listener);
+    return add.call(this, type, byType[type], options);
+  };
+  EventTarget.prototype.removeEventListener = function (type, listener, options) {
+    var byType = typeof listener === "function" ? wrapped.get(listener) : undefined;
+    return remove.call(this, type, (byType && byType[type]) || listener, options);
+  };
+})();
+`;
+
+/** A page of the export with the early script first in its head; a page that has it, or no head, is returned as it is. */
+export function withEarlyMeter(html: string): string {
+  if (html.includes(EARLY_FILE) || !html.includes("<head>")) return html;
+  return html.replace("<head>", `<head><script src="/${EARLY_FILE}"></script>`);
+}
