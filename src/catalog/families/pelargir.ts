@@ -26,7 +26,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("AttachToHighestThreatCost"), ...when }),
   // The enemy the answered event is about, in the staging area, makes an immediate attack against the player whose hero has the objective with this code attached, from the staging area ("makes an immediate attack against the player who controls Alcaron's
   // Scroll from the staging area", 05067:B:2): a shadow card is dealt to it and the defender may be declared. With no such player (the objective is in the staging area or on an enemy) no attack is made.
-  z.strictObject({ verb: z.literal("AttackScrollHolder"), code: z.string().min(1), ...when }),
+  // `card`: the enemy that attacks is this card (the last picked one for "Bellach makes an attack against the player who controls Celebrimbor's Mould", 08123:A:1) instead of the card the answered event is about.
+  z.strictObject({ verb: z.literal("AttackScrollHolder"), code: z.string().min(1), card: cardRefSchema.optional(), ...when }),
   // DiscardEncounterTop, but the cards it discards join the cards the effect has discarded so far, so `discardedMatching` counts them all ("Discard 2 cards from the top of the encounter deck. Discard an additional 2 cards ... Then, raise each player's threat by 2
   // for each location discarded by this effect", 05024:A:1). A deck that runs out is reset when `reset` is set.
   z.strictObject({ verb: z.literal("DiscardEncounterTopMore"), count: positiveAmountSchema, reset: z.literal(true).optional(), ...when }),

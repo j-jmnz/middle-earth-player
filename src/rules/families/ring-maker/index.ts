@@ -9,6 +9,8 @@ import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { engageCaptiveHolders, returnAttachedByName } from "./captor.ts";
 import { engageTopDiscarded } from "./engage.ts";
+import { buryDamaged, placeDestroyedUnder, placeRandomHandUnder } from "./orcs-search.ts";
+import { triggerScour } from "./scour.ts";
 import { announceThreatZero, attackNalir, eliminateAtLevel } from "./nalir.ts";
 import { drawSelfIntoHand } from "./hand.ts";
 import { createOutOfPlayDecks, discardEliminatedDecks, revealOutOfPlay, shuffleHandCardIntoOutOfPlay, shuffleIntoOutOfPlayDecks } from "./outofplay.ts";
@@ -61,12 +63,21 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return attackNalir(state, ctx, steps, instruction.enemy);
     case "EliminateAtLevel":
       return eliminateAtLevel(state, steps);
+    case "TriggerScour":
+      return triggerScour(state, instruction, focus, ctx, steps);
+    case "PlaceRandomHandUnder":
+      return placeRandomHandUnder(state, instruction);
+    case "PlaceDestroyedUnder":
+      return placeDestroyedUnder(state, instruction, focus);
+    case "ExcessToActiveLocation":
+      return state.pendingAttack ? { ...state, pendingAttack: { ...state.pendingAttack, excessToActive: true } } : state;
     case "EngageCaptiveHolder":
     case "EngageSeat":
+    case "BuryDamagedLocations":
       return state;
     default:
       return null;
   }
 }
 
-export const manifest: RulesFamily = { name: "ring-maker", verbs: ["NoteEncounterDiscards", "RemoveTimeFromQuest", "DrawSelfIntoHand", "EngageTopDiscarded", "CreateOutOfPlayDecks", "ShuffleIntoOutOfPlayDecks", "RevealOutOfPlay", "ShuffleHandCardIntoOutOfPlay", "ReturnAttachedEnemy", "RevealChosenFromDiscard", "CapRefresh", "EngageCaptiveHolder", "AdvanceToChosenStage", "PickSetAside", "AttachPickedToPrevious", "AddPickedToStaging", "ShufflePickedIntoBottom", "RevealFromVictory", "AddInPlayToVictory", "EngageSeat", "AttackNalir", "EliminateAtLevel"], run, settle: { sweep: (state, ctx, steps) => announceThreatZero(announceAlliesOverLimit(announceTrialKey(engageSeats(discardEliminatedDecks(engageCaptiveHolders(state, ctx, steps)), ctx, steps), ctx), ctx), ctx) }, deckReset: { hold: inOwnSurgeChain } };
+export const manifest: RulesFamily = { name: "ring-maker", verbs: ["NoteEncounterDiscards", "RemoveTimeFromQuest", "DrawSelfIntoHand", "EngageTopDiscarded", "CreateOutOfPlayDecks", "ShuffleIntoOutOfPlayDecks", "RevealOutOfPlay", "ShuffleHandCardIntoOutOfPlay", "ReturnAttachedEnemy", "RevealChosenFromDiscard", "CapRefresh", "EngageCaptiveHolder", "AdvanceToChosenStage", "PickSetAside", "AttachPickedToPrevious", "AddPickedToStaging", "ShufflePickedIntoBottom", "RevealFromVictory", "AddInPlayToVictory", "EngageSeat", "AttackNalir", "EliminateAtLevel", "TriggerScour", "BuryDamagedLocations", "PlaceRandomHandUnder", "PlaceDestroyedUnder", "ExcessToActiveLocation"], run, settle: { sweep: (state, ctx, steps) => buryDamaged(announceThreatZero(announceAlliesOverLimit(announceTrialKey(engageSeats(discardEliminatedDecks(engageCaptiveHolders(state, ctx, steps)), ctx, steps), ctx), ctx), ctx), ctx, steps) }, deckReset: { hold: inOwnSurgeChain } };

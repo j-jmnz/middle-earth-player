@@ -176,7 +176,7 @@ export function resolveAmount(state: ScenarioState, amount: Amount, scope: Amoun
   else if (amount.dealt) value = scope.dealt ?? 0;
   else if (amount.excess) value = scope.excess ?? 0;
   else if (amount.stagingThreat) value = stagingThreat(state, ctx.cards, scope.actor);
-  else if (amount.facedown || amount.resourcesAboveCopies || amount.victoryPoints || amount.remainingQuestPoints) value = miscAmount(state, amount, scope.sourceId, ctx.cards);
+  else if (amount.facedown || amount.facedownUnder || amount.resourcesAboveCopies || amount.victoryPoints || amount.remainingQuestPoints) value = miscAmount(state, amount, scope.sourceId, ctx.cards);
   else if (amount.grappled) value = grappledCount(state);
   else if (amount.islandLeft) value = leftThreat(state, ctx);
   else if (amount.resourcesOn) value = resourcesOnMatching(state, amount.resourcesOn, scope, ctx, amount.max === true);

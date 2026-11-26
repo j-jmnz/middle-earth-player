@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
-import { positiveAmountSchema } from "../effect-schema-amount.ts";
+import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { verbFlags } from "../verb-flags.ts";
 
@@ -63,9 +63,24 @@ const VERBS = [
   z.strictObject({ verb: z.literal("AttackNalir"), enemy: z.string().min(1).optional(), ...when }),
   // "reduce each player's threat elimination level by 10" (08066:B:2), the engine's check after the level moved: each seat whose threat is at or above its elimination level now is eliminated at once (rm.threat-elimination-level). The record puts the `eliminationReduction` flag first.
   z.strictObject({ verb: z.literal("EliminateAtLevel"), ...when }),
+  // "Trigger each Scour effect currently in play" (08122:B:2, 08123:A:1, 08134:A:1), "trigger the topmost Scour effect in the discard pile, if able" (08133:A:1; rm.scour): each card in the scope that has a record hearing `scour` resolves it as its source, one after the other, in the order the first player
+  // chooses (asked when two cards with different titles are left). `inPlay`: the cards in the staging area, engaged with a player or the active location, the set fixed as the trigger starts; `topmostDiscard`: the card nearest the top of the encounter discard pile, which stays there. `remaining` is the
+  // verb's own note of the cards still to resolve.
+  z.strictObject({ verb: z.literal("TriggerScour"), scope: z.enum(["inPlay", "topmostDiscard"]), remaining: z.array(z.string()).optional(), ...when }),
+  // "When a location has damage equal to its printed quest points, place it facedown underneath The Orcs' Search" (08125:A:1), a constant marker on the objective: each location in play (staging area, active location) whose damage is at least its printed quest points goes facedown underneath the source at
+  // each settle (rm.the-orcs-search); the damage, the progress and the attachments are discarded first. The settle sweep is families/ring-maker/orcs-search.ts; the run does nothing.
+  z.strictObject({ verb: z.literal("BuryDamagedLocations") }),
+  // "Each player places a random card from his hand facedown underneath The Orcs' Search" (08134:A:1): each living player in turn, the first player first, puts one card of his hand, chosen with the game's seed, facedown under the card in play with this code, out of play and still its owner's. An empty hand, or no such card in play, does nothing.
+  z.strictObject({ verb: z.literal("PlaceRandomHandUnder"), code: z.string().min(1), ...when }),
+  // "Place that character facedown underneath The Orcs' Search" (08134:A:2): the character the attack destroyed (`card`, the other card of the attack's end by default), lying in its owner's discard pile, goes facedown under the card in play with this code and stays its owner's.
+  z.strictObject({ verb: z.literal("PlaceDestroyedUnder"), code: z.string().min(1), card: cardRefSchema.optional(), ...when }),
+  // "Excess damage dealt by this attack must be placed on the active location, if able" (08131:A:3): a Shadow effect marks the attack in progress: the damage beyond the defender's remaining hit points goes on the active location; with none, it is lost.
+  z.strictObject({ verb: z.literal("ExcessToActiveLocation"), ...when }),
 ] as const;
 
 const TRIGGERS = [
+  // About the card that has a Scour effect: `TriggerScour` runs its record (08124:A:2, rm.scour). Never announced as an event: the verb resolves the record in a frame of its own.
+  "scour",
   // The players control the current trial's Key objective (a hero holds the Key `trialKey` marks), announced at a settle with nothing resolving (08036:B:2 to 08038:B:2).
   "trialKeyControlled",
   // The allies in play, all seats together, are more than the table's `alliesLimit` (08047:A:1): the event is about the first player, who chooses the allies that stay.
@@ -97,6 +112,8 @@ const FLAGS = [
   "cannotDrawByPlayerCard",
   // On the table: a player who commits characters to the quest first discards a card at random from his hand, and a player with none cannot commit ("In order to commit characters to the quest, a player must first discard a card at random from his hand", 08096:B:3).
   "commitDiscardsRandom",
+  // On an Ancient Foundation: it is the copy whose scour effect acts ("this ability does not stack with other copies of Ancient Foundation", 08132:A:1). It is held with `doesNotStack`, so only the oldest copy in play holds it; the scour record's condition reads it.
+  "scoursAlone",
 ] as const;
 
 export const manifest = { name: "ring-maker", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

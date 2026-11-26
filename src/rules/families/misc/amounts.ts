@@ -55,6 +55,7 @@ export function miscAmount(state: ScenarioState, amount: AmountExpr, sourceId: s
   if (amount.remainingQuestPoints) return remainingQuestPoints(state, cards);
   if (amount.victoryPoints) return state.victory.reduce((sum, id) => sum + victoryPointsOf(state, id, cards), 0);
   if (amount.facedown) return facedownCount(state, sourceId);
+  if (amount.facedownUnder) return facedownCount(state, Object.values(state.cards).find((card) => card.code === amount.facedownUnder && inPlay(card.zone))?.id ?? null);
   if (amount.resourcesAboveCopies) return resourcesAboveCopies(state, sourceId);
   return 0;
 }

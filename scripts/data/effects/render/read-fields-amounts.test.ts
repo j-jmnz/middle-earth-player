@@ -42,6 +42,7 @@ describe("effects render read fields, amounts", () => {
     { archeryOf: PICK, max: true },
     { damageOn: PICK },
     { facedown: true, times: 2 },
+    { facedownUnder: "08125" },
     { firstPlayerTens: true },
     { mostPerPlayer: PICK },
     { guardedCost: true },
