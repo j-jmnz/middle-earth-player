@@ -77,6 +77,8 @@ export function orcsVerbWords(instruction: Instruction): string | null {
   }
 }
 
-/** The preview of a Tamed Mûmak in play (17038:A:1 to A:3): whose it is, that it takes every undefended attack, and the elimination when it leaves play. `who` is "you" when one player plays, else "Player N". */
-export const mumakWords = (who: string): string =>
-  `${who === "you" ? "Your" : `${who}'s`} Tamed Mûmak, an objective ally immune to player card effects. All damage of an undefended attack on ${who} goes to it, past its hit points. If it leaves play, ${who === "you" ? "you are" : `${who} is`} eliminated from the game.`;
+/** The preview of a Tamed Mûmak in play (17038:A:1 to A:3): whose it is, that it takes every undefended attack and how much more it takes before it is destroyed, and the elimination when it leaves play. `who` is "you" when one player plays, else "Player N". */
+export const mumakWords = (who: string, hurt: { damage: number; hitPoints: number }): string => {
+  const left = Math.max(hurt.hitPoints - hurt.damage, 0);
+  return `${who === "you" ? "Your" : `${who}'s`} Tamed Mûmak, an objective ally immune to player card effects. All damage of an undefended attack on ${who} goes to it: ${hurt.damage} damage of ${hurt.hitPoints} hit points, ${left} more eliminates ${who}. If it leaves play, ${who === "you" ? "you are" : `${who} is`} eliminated from the game.`;
+};

@@ -49,7 +49,7 @@ export function syncOrcsArea(state: ScenarioState): ScenarioState {
   return sameMembers(kept, now.members) ? next : { ...next, orcs: { ...now, members: kept } };
 }
 
-/** A scene's Orcs' area as the Setup leaves it (test/harness/layout.ts, `orcs`): the area prepared from the set-aside stages, the cards of `members` moved into it from where they stand, `progress` on the Orcs' stage. */
+/** A scene's Orcs' area as a played game leaves it (test/harness/layout.ts, `orcs`): the area prepared from the set-aside stages, the cards of `members` moved into it from where they stand, `progress` on the Orcs' stage, and the sync that stands the cards where the players' stage says. */
 export function withOrcsArea(state: ScenarioState, layout: { stages: readonly string[]; place?: readonly string[]; members?: readonly string[]; progress?: number }): ScenarioState {
   let next = prepareOrcsArea(state, { verb: "PrepareOrcsArea", stages: [...layout.stages], number: 1, ...(layout.place ? { place: [...layout.place] } : {}) });
   for (const code of layout.members ?? []) {
@@ -57,5 +57,6 @@ export function withOrcsArea(state: ScenarioState, layout: { stages: readonly st
     if (id) next = updateCard(moveCard(next, id, { zone: "orcsArea" }), id, { face: "up", controller: null });
   }
   const stage = next.orcs?.stage;
-  return layout.progress != null && stage ? updateCard(next, stage, { progress: layout.progress }) : next;
+  // The sync a played game runs (settle): at the Orcs' stage the cards of the area stand in the staging area and count there.
+  return syncOrcsArea(layout.progress != null && stage ? updateCard(next, stage, { progress: layout.progress }) : next);
 }

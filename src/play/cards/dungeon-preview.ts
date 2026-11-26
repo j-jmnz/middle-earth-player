@@ -93,7 +93,7 @@ function ownDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name
   const kept = keptDetail(game, cardId, name);
   if (kept) return kept;
   // The heroes in the staging area, the heroes an Orc guards and the objective-heroes (The Long Arm of Mordor) are told before the Captives' words, which would call them Captives of The Uruk-hai.
-  const staged = stagedDetail(game, cardId, name) ?? objectiveDetail(game, ctx, cardId) ?? mumakDetail(game, cardId);
+  const staged = stagedDetail(game, cardId, name) ?? objectiveDetail(game, ctx, cardId) ?? mumakDetail(game, ctx, cardId);
   if (staged) return staged;
   const captive = captiveDetail(game, ctx, card, name);
   if (captive) return captive;

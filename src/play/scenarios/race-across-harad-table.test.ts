@@ -4,12 +4,15 @@
 import { describe, expect, it } from "vitest";
 
 import { settle } from "../../rules/engine/machine.ts";
+import { stagingThreat } from "../../rules/quest/quest.ts";
+import { screensOf } from "../../../test/harness/screens.ts";
 import { modifiedStat } from "../../rules/core/modified-stat.ts";
 import { idOf, run as runInstruction, tableFromLayout } from "../../../test/harness/scene-kit.ts";
 import { advancedTo, CHIEFTAIN, prepared, stageId } from "../../rules/families/haradrim/race-kit.ts";
 
 import { effectLines } from "../cards/card-effects.ts";
 import { areaFacts, areaGroup, areaKind, areaRoleOf, areaSpeech, stageFactsOf } from "../store/stormcaller-table.ts";
+import { damageOutcome, outcomeWords } from "../store/foresight.ts";
 import { momentOf } from "../store/outcome.ts";
 import { zoneSelector } from "../store/selectors.ts";
 import { ORCS_APART, ORCS_SAME_STAGE, ORCS_STAGE_LOSS, ORCS_TOGETHER, orcsStageTitle, orcsTell, orcsVerbWords } from "../words/scenarios/haradrim/orcs-table.ts";
@@ -105,6 +108,23 @@ describe("reader labels and list words", () => {
   });
 });
 
+describe("17047:A:1 hrd.orcs-area-same-stage the scenes stand the Orcs' cards as a played game does", () => {
+  it("the together scene has the area's cards in the staging area, counted in its Threat, and the apart scene keeps them in the area", async () => {
+    const moments = await screensOf("race-across-harad");
+    const built = (name: string) => {
+      const layout = moments.find((moment) => moment.name === name)!.layout;
+      const t = tableFromLayout("race-across-harad", layout);
+      const zones = [CHIEFTAIN, "17042", "16062"].map((code) => t.state.cards[idOf(t.state, code)]?.zone);
+      return { zones, threat: stagingThreat(t.state, t.ctx.cards) };
+    };
+    const together = built("orcs-together");
+    const apart = built("orcs-apart");
+    expect(together.zones).toEqual(["staging", "staging", "staging"]);
+    expect(apart.zones).toEqual(["orcsArea", "orcsArea", "orcsArea"]);
+    expect(together.threat).toBeGreaterThan(apart.threat);
+  });
+});
+
 describe("17047:A:1 one key says which area the game has, and every site reads its words", () => {
   it("areaKind is the Orcs' for this game, the same as the facts' who, and its words say the Orcs' area everywhere", () => {
     const { made, state } = prepared(APART);
@@ -150,8 +170,8 @@ describe("17052:B:2 the Orcs' progress and advance in the banner", () => {
 });
 
 describe("17038:A:1 to 17038:A:3 the Tamed Mûmak says what it takes and what its loss costs", () => {
-  const preview = (seats: 1 | 2) => {
-    const t = tableFromLayout("race-across-harad", { seats, stage: "17048", play: ["17038"] });
+  const preview = (seats: 1 | 2, damage = 0) => {
+    const t = tableFromLayout("race-across-harad", { seats, stage: "17048", play: [{ code: "17038", damage }] });
     const id = idOf(t.state, "17038");
     return JSON.stringify(previewCards(t.state, t.ctx, id, (one) => ({ name: t.ctx.cards.get(one)?.name ?? one, source: null, text: "" }), (card) => t.ctx.cards.get(card)?.name ?? card));
   };
@@ -159,8 +179,22 @@ describe("17038:A:1 to 17038:A:3 the Tamed Mûmak says what it takes and what it
   it("solo it says all undefended damage goes to it and that its loss eliminates you", () => {
     const text = preview(1);
     expect(text).toContain("Your Tamed Mûmak, an objective ally immune to player card effects");
-    expect(text).toContain("All damage of an undefended attack on you goes to it, past its hit points");
+    expect(text).toContain("All damage of an undefended attack on you goes to it: 0 damage of 8 hit points, 8 more eliminates you");
     expect(text).toContain("you are eliminated from the game");
+    expect(text).not.toContain("past its hit points");
+  });
+
+  it("with damage on it says how much more eliminates its controller", () => {
+    expect(preview(1, 6)).toContain("6 damage of 8 hit points, 2 more eliminates you");
+    expect(preview(2, 6)).toMatch(/6 damage of 8 hit points, 2 more eliminates Player \d\./);
+  });
+
+  it("17038:A:3 the dock names the elimination of the destroyed Mûmak, and the loss when it is the last seat", () => {
+    const solo = tableFromLayout("race-across-harad", { seats: 1, stage: "17048", play: [{ code: "17038", damage: 6 }] });
+    expect(outcomeWords(damageOutcome(solo.state, solo.ctx, idOf(solo.state, "17038"), 2), "Tamed Mûmak", false)).toBe("Tamed Mûmak is destroyed: Player 1 is eliminated and the game is lost");
+    const two = tableFromLayout("race-across-harad", { seats: 2, stage: "17048", play: [{ code: "17038", damage: 6, seat: 0 }, { code: "17038", seat: 1 }] });
+    expect(outcomeWords(damageOutcome(two.state, two.ctx, idOf(two.state, "17038"), 2), "Tamed Mûmak", false)).toBe("Tamed Mûmak is destroyed: Player 1 is eliminated");
+    expect(outcomeWords(damageOutcome(solo.state, solo.ctx, idOf(solo.state, "17038"), 1), "Tamed Mûmak", true)).toBe("1 more damage destroys Tamed Mûmak");
   });
 
   it("two-handed it names the player", () => {
