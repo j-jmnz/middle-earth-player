@@ -76,6 +76,7 @@ export function QuestAdvanceView({
   const tiles = asks ? trayTiles(sheet) : [];
   const marks = new Set(choice.choice.ids);
   const note = choice.header.note;
+  const bare = sheet.kind === "pick" && sheet.bare === true;
   const readHint = tiles.some((tile) => tile.readId);
   return (
     <View testID="quest-advance" accessibilityViewIsModal onAccessibilityEscape={asks ? undefined : onProgress} style={StyleSheet.absoluteFill}>
@@ -99,7 +100,7 @@ export function QuestAdvanceView({
           <Text testID="quest-advance-title" accessibilityRole="header" className="mt-1 font-display text-title text-bone">
             {words.title}
           </Text>
-          {words.detail && !(asks && short) ? (
+          {words.detail && !(asks && short && bare) ? (
             <Text testID="quest-advance-detail" className="mt-1 text-label text-muted">
               {words.detail}
             </Text>

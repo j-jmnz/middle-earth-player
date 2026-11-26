@@ -52,7 +52,7 @@ describe("Time X is 5 times the players (08013:B:1)", () => {
     const stage = t.state.questStage ?? "";
     const turnedState = timeOnReveal(updateCard(t.state, stage, { face: "B" }), stage, t.ctx);
     expect(timePlayersOf(turnedState, stage)).toBe(2);
-    const seats = turnedState.seats.map((seat, at) => (at === 1 ? { ...seat, eliminated: true } : seat)) as typeof turnedState.seats;
+    const seats = turnedState.seats.map((seat, at) => (at === 1 ? { ...seat, eliminated: true } : seat)) as unknown as typeof turnedState.seats;
     const after = { ...turnedState, seats };
     expect(livingSeats(after).length).toBe(1);
     expect(timePlayersOf(after, stage)).toBe(2);
