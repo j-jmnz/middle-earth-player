@@ -21,6 +21,8 @@ import { heldByName, ILL_TIDINGS_MARK } from "../words/scenarios/ring-maker/ford
 import { heldInHand } from "../../rules/families/ring-maker/hand.ts";
 import { grimaLyingOn } from "../readouts/ring-maker/fords.ts";
 import { mugashLyingOn } from "../readouts/ring-maker/orc.ts";
+import { restLyingOn } from "../readouts/ring-maker/fangorn.ts";
+import { REST_MARK } from "../words/scenarios/ring-maker/fangorn-table.ts";
 import { lootDeckWords, lootGuardWords } from "../words/loot.ts";
 import { lootUnder } from "../../rules/families/sidequests/loot.ts";
 import { alleywayMark, championMark, seizeMark } from "../readouts/haradrim/umbar.ts";
@@ -433,6 +435,8 @@ function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): Unde
   // Mugash attached to a hero (To Catch an Orc, 07024:A:2): "1 held" on the hero, wherever it lies.
   const mugash = mugashLyingOn(game, cardId);
   if (mugash.length > 0) return heldByName(mugash.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
+  // In Need of Rest on a hero (Into Fangorn, 07058:A:1): its strip under the card shows no name, so the pill says "Rest".
+  if (restLyingOn(game, cardId).length > 0) return REST_MARK;
   const captives = captivesUnder(game, cardId);
   if (captives.length > 0) return heldWords(captives.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
   const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);

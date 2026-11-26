@@ -92,7 +92,7 @@ Scenario piles that place cards with no record (quest: 131026 A Short Rest; ques
 131064:A:1 (front): While at least one Stone-Giant is in the staging area, the Galloping Boulders card gains surge.
   131064:constant:1: Constant
     only if this card is in the staging area
-    - each card (any player controls) in the staging area only, named "Galloping Boulders": stat gainsSurge (it has the Surge keyword as it is revealed) 1, while this card is in play (does not stack: only the oldest copy of this card in play gives it)
+    - each card (any player controls) in the staging area only, named "Galloping Boulders": stat gainsSurge (it has the Surge keyword as it is revealed) 1, while this card is in play (does not stack: only the oldest copy of this card in play whose condition holds gives it)
 
 131064:A:2 (front): Forced: After Stone-Giant engages a player, that player chooses and discards 1 ally he controls.
   131064:forced:1: Forced after an enemy engages a player (heard about this card)

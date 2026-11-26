@@ -121,6 +121,8 @@ export type PrintedCard = {
   backType: "player" | "encounter" | null;
   // An Objective-Location (Lost in Mirkwood, 18029 to 18032): an objective card that the players travel to, that takes progress as the active location and goes to the victory display explored. `type` stays "objective" (it is guarded, claimed and revealed as an objective).
   objectiveLocation: boolean;
+  // The printed type line ("Objective Ally", "Ship-objective"), empty where the source gives none; the table's preview names an objective by it.
+  typeName: string;
   // The copies the card allows in a deck, when the catalog states it (rr.deckbuilding; read by AddEventsToHand, 40009:B:2). Absent where the engine never needs it.
   deckLimit?: number | null;
   // Null for a card that is not a ship.
@@ -222,6 +224,7 @@ export function definePrinted(
     backType: null,
     ship: null,
     objectiveLocation: false,
+    typeName: "",
     encounterSet: null,
     upgraded: null,
     ...card,
@@ -431,6 +434,7 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
     backType: card.backType,
     ship,
     objectiveLocation: card.typeName === "Objective Location",
+    typeName: card.typeName ?? "",
     encounterSet: card.encounterSet,
     upgraded: card.upgraded ?? upgradedOfBack(card.back),
     keywords: {

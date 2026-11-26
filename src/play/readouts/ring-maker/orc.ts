@@ -9,6 +9,8 @@ import type { TableDial } from "../dials.ts";
 
 /** Mugash's code. */
 export const MUGASH = "07024";
+/** Mugash the objective of Into Fangorn (07031): lying on Edge of Fangorn, then on a hero. */
+export const MUGASH_OBJECTIVE = "07031";
 /** Mugash's Guard's code. */
 export const GUARD = "07025";
 // A deck with this many cards or fewer warms while Mugash is not found.
@@ -48,8 +50,8 @@ export function orcDials(game: ScenarioState): readonly TableDial[] {
   ];
 }
 
-/** The ids of Mugash lying on this card (the hero he is attached to). Empty for any other card and in every other game. The card's pill says "1 held". */
+/** The ids of Mugash (the enemy of To Catch an Orc, the objective of Into Fangorn) lying on this card: the hero he is attached to, or Edge of Fangorn. Empty for any other card and in every other game. The card's pill names him. */
 export function mugashLyingOn(game: ScenarioState, hostId: string): readonly string[] {
   const host = game.cards[hostId];
-  return host == null || host.attachments.length === 0 ? [] : host.attachments.filter((id) => game.cards[id]?.code === MUGASH);
+  return host == null || host.attachments.length === 0 ? [] : host.attachments.filter((id) => game.cards[id]?.code === MUGASH || game.cards[id]?.code === MUGASH_OBJECTIVE);
 }

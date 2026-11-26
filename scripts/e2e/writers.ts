@@ -91,6 +91,7 @@ import { bloodFixtures } from "./against-the-shadow/the-blood-of-gondor.ts";
 import { valeFixtures } from "./against-the-shadow/the-morgul-vale.ts";
 import { isenFixtures } from "./the-ring-maker/the-fords-of-isen.ts";
 import { orcFixtures } from "./the-ring-maker/to-catch-an-orc.ts";
+import { fangornFixtures } from "./the-ring-maker/into-fangorn.ts";
 import { umbarFixtures } from "./haradrim/escape-from-umbar.ts";
 import { crossingFixtures } from "./haradrim/desert-crossing.ts";
 
@@ -195,6 +196,7 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "the-battle-of-five-armies": () => armiesFixtures(),
   "the-fords-of-isen": () => isenFixtures(),
   "to-catch-an-orc": () => orcFixtures(),
+  "into-fangorn": () => fangornFixtures(),
   "escape-from-umbar": () => umbarFixtures(),
   "desert-crossing": () => crossingFixtures(),
 };

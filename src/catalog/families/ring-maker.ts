@@ -30,6 +30,12 @@ const VERBS = [
   // "While a player controls a hero with Mugash attached, Mugash's Guard engages that player" (07025:A:1), a constant marker on the Guard: in the staging area, or engaged with another seat, it engages the seat that controls a hero with the enemy of this title attached, at once and whatever its engagement cost. The settle sweep is
   // families/ring-maker/captor.ts; the run does nothing.
   z.strictObject({ verb: z.literal("EngageCaptiveHolder"), captive: z.string().min(1) }),
+  // "Each player must choose an enemy or objective in the discard pile, reveal it and add it to the staging area" (07067:B:2): the actor picks a card of one of these `types` in the encounter discard pile (the player's choice, whichever card lies there; one card per player, as the card leaves
+  // the pile) and reveals it in full: its When Revealed effects and its keywords resolve (an objective with Guarded takes its guard), and it joins the staging area. A pile with no such card does nothing.
+  z.strictObject({ verb: z.literal("RevealChosenFromDiscard"), types: z.array(z.enum(["enemy", "objective", "location", "treachery"])).min(1), ...when }),
+  // "Each player cannot refresh more than 5 characters during the refresh phase" (07036:A:1): run by the actor in a Forced effect at the beginning of the refresh phase. The exhausted characters the actor controls beyond `amount` that would ready are chosen by the actor and do not ready
+  // this phase (`doesNotReady`). With `amount` or fewer to ready, nothing happens.
+  z.strictObject({ verb: z.literal("CapRefresh"), amount: z.number().int().positive(), ...when }),
 ] as const;
 
 const FLAGS = [

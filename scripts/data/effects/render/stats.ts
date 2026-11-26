@@ -102,7 +102,7 @@ export const STAT_TEMPLATES: Readonly<Record<string, Template>> = {
     const trait = typeof i.trait === "string" ? ` (${i.trait} only)` : "";
     const sign = i.subtract === true ? "minus " : "";
     const resources = `${i.eachResource === true ? " for each resource on the holder" : ""}${isObj(i.eachAttached) ? ` for each ${pick(i.eachAttached, ctx)} attached to the holder${i.eachAttached.facedownUnder === true ? " (here: each facedown player card under the holder)" : ""}` : ""}`;
-    const stacking = i.doesNotStack === true ? " (does not stack: only the oldest copy of this card in play gives it)" : "";
+    const stacking = i.doesNotStack === true ? " (does not stack: only the oldest copy of this card in play whose condition holds gives it)" : "";
     return { text: `${holders}${trait}: stat ${str(i.stat)}${STAT_NOTE[str(i.stat)] ?? ""} ${sign}${amount(i.amount, ctx)}${per}${resources}, ${untilWords(i.until)}${stacking}`, read: ["stat", "amount", "until", "holders", "target", "per", "trait", "subtract", "eachResource", "doesNotStack", "eachAttached"] };
   },
   // A restriction read from the record's own fields; one the template does not word (attach, heroLimit, travelOnly) prints as JSON.

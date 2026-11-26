@@ -131,6 +131,8 @@ const VERBS = [
 const TRIGGERS = [
   // About the card that held a time counter: its last one was just removed at the end of the refresh phase (the subject is the card; mec108.time-x): "After the last time counter is removed from this stage".
   "lastTimeCounterRemoved",
+  // About the current quest stage: a time counter was just taken off it, one counter at a time, by the refresh phase or a card ("After a time counter is removed from the current quest", 07058:A:1). Raised only in a game whose records hear it (families/angmar/time.ts removeTimeCounterFrom).
+  "timeCounterRemoved",
   // About the enemy whose attack just damaged a character (a hero or an ally; the other card is the character), once for the attack: "After an attack damages a character" (10158:A:1). Damage canceled or prevented is not damage, and an attack that damages nobody is not heard.
   "attackDamagedCharacter",
   // The Time objective was flipped to Daybreak or to Nightfall (not heard at Setup, where Daybreak is dealt faceup): every card in play hears it, the staging area and the quest card included ("Forced: When it becomes Night, reveal an encounter card", 10012:A:2).

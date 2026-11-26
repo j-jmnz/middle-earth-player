@@ -15,6 +15,6 @@ export function removeTimeFromQuest(state: ScenarioState, instruction: Extract<I
   if (!stage || timeOf(ctx, stage.code) == null) return state;
   const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
   let next = state;
-  for (let removed = 0; removed < amount && (next.cards[stage.id]?.resources ?? 0) > 0; removed += 1) next = removeTimeCounterFrom(next, stage.id);
+  for (let removed = 0; removed < amount && (next.cards[stage.id]?.resources ?? 0) > 0; removed += 1) next = removeTimeCounterFrom(next, stage.id, ctx);
   return next;
 }
