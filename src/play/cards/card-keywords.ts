@@ -97,7 +97,8 @@ export function cardKeywords(game: ScenarioState, ctx: ReduceContext, cardId: st
   if (villagers > 0 && usable) add("villagers", lostAll, villagers);
   if (usable && printsArcheryX(game, ctx, instance.code) && archery <= 0) found.set("archery", { key: "archery", word: "Archery 0", lost: lostAll });
 
-  if (indestructible(game, cardId, printed)) add("indestructible", false);
+  // A card that prints no Indestructible but cannot leave play (Chief Turch) shows the words it prints, not a keyword it does not have.
+  if (indestructible(game, cardId, printed)) add(!kw.indestructible && flagged(game, cardId, "cannotLeavePlay") ? "cannotLeave" : "indestructible", false);
   else shown("indestructible", kw.indestructible);
   if (!playerCardEffectCanChoose(printed, game, cardId)) add("immune", false);
   else shown("immune", kw.immuneToPlayerCardEffects);

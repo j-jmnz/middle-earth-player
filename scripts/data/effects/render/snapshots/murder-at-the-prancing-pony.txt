@@ -123,7 +123,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 50706:A:2 (front): While Combe Storehouse is in the victory display, each Suspect gains: "Forced: After this enemy engages a player, it makes an immediate attack."
-  50706:forced:1: Forced after an enemy engages a player (heard about Suspect enemy (any player controls) or in the staging area; used from the victory display)
+  50706:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about Suspect enemy (any player controls) or in the staging area; used from the victory display)
     only if this card is in the victory display
     who acts: the acting player is the player the enemy engaged
     - the enemy the event is about, engaged with a player, attacks that player now, dealt a new shadow card after its old ones are discarded

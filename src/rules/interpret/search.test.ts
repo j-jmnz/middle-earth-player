@@ -2,8 +2,11 @@
 import { describe, expect, it } from "vitest";
 
 import { definePrinted } from "../core/printed.ts";
-import { cardMap } from "../core/test-fixture.ts";
+import { cardMap, idleScenario } from "../core/test-fixture.ts";
 import { spawn } from "../core/zones.ts";
+import { settle } from "../engine/machine.ts";
+import { pushCardEffects } from "./effect-frames.ts";
+import type { Effect } from "../../catalog/boundary.ts";
 import { enemy, hero, table } from "../families/defense/table.ts";
 import { searchable } from "./search.ts";
 
@@ -27,5 +30,15 @@ describe("search selector traits (146073:A:1)", () => {
     const ctx = { effects: [], cards: cardMap(cards) };
     expect(searchable(state, { traits: ["Nazgûl", "Orc"], type: "enemy" }, ctx)).toHaveLength(1);
     expect(searchable(state, { traits: ["Nazgûl", "Orc"], type: "enemy", victory: true }, ctx)).toHaveLength(2);
+  });
+});
+
+describe("a `different` search after a Pick that found nothing", () => {
+  it("skips the empty pick and finds the card (an empty Pick leaves a blank id in the frame)", () => {
+    const orc = spawn(idleScenario(1, "Travel"), "orc", { zone: "encounterDeck" });
+    const effect = { id: "ring:whenRevealed:1", cardCode: "ring", lines: ["ring:A:1"], timing: "whenRevealed", instructions: [{ verb: "Pick", pick: { type: "ally", control: "you" } }, { verb: "SearchMove", type: "enemy", trait: "Orc", to: "engaged", different: true }] } as Effect;
+    const ctx = { effects: [effect], cards: cardMap(cards) };
+    const done = settle(pushCardEffects(orc.state, "ResolveEffect", "", 0, false, [effect], ctx, []), ctx, []);
+    expect(done.cards[orc.id]?.zone).toBe("engaged");
   });
 });

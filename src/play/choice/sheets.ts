@@ -292,6 +292,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           ...base,
           note: [`${ask}${/^Player \d+[:,] /.test(ask) ? "" : who}`, chosen?.bare ? null : lineOf(asker ?? effect, names)].filter((part) => part != null).join(" "),
           printed: chosen?.bare ? null : lineOf(asker ?? effect, names),
+          ...(chosen?.bare ? { bare: true as const } : {}),
           verb: "Choose",
           confirm: "Confirm",
           // The Embassy's pair: the Read button opens the player card and the encounter card it is paired with.
@@ -324,6 +325,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         ...(stopsDefenders ? { alternative: { label: "No more defenders", intent: { type: "Choose" as const, optionId: DONE } } } : {}),
         note: [`${asked.prompt}${asked.owned ? "" : who}`, committedNote(game, ctx, effect, window.seat), asked.bare ? null : line].filter((part) => part != null).join(" "),
         printed: asked.bare ? null : line,
+        ...(asked.bare ? { bare: true as const } : {}),
         verb: asked.verb,
         // Which Ringwraith copy goes in: the primary says the action alone, so the pill does not wrap on a long zone name.
         ...(outOfPlay ? { confirm: asked.verb } : {}),

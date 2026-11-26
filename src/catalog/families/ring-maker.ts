@@ -41,6 +41,8 @@ const VERBS = [
 const FLAGS = [
   // On a card in a hand: it cannot leave that hand ("Ill Tidings cannot leave that player's hand", 07023:A:1). core/zones.ts moveCard refuses the move; a pick that would discard it and a random discard leave it out (families/wilderland/pick.ts barredFromPlayerDiscard).
   "cannotLeaveHand",
+  // On a Hills of Dunland in the staging area: it is the copy whose Forced effect after a draw acts ("this ability does not stack with other copies", 08020:A:1). It is held with `doesNotStack`, so only the oldest copy in the staging area holds it; the Forced effect's condition reads it.
+  "huntsOnDraw",
 ] as const;
 
 export const manifest = { name: "ring-maker", verbs: VERBS, triggers: [], flags: FLAGS } as const satisfies CatalogFamily;

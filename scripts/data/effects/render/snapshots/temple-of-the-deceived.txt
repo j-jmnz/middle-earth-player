@@ -419,8 +419,8 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
     - the player with the highest threat becomes the picked player (the first player chooses among a tie)
     - the effect goes on with the picked player as the acting player
     - engage this card
-    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
-    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+    - this enemy (the card the record is on, wherever it is in play) is dealt an additional shadow card, beside any it has; the card stays on it until its next attack
+    - this enemy (the card the record is on, wherever it is in play) is dealt an additional shadow card, beside any it has; the card stays on it until its next attack
 
 ## 12077 Profane Dead
 (the scenario deals it into the encounter pile; the piles place it, no record does)
