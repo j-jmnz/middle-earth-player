@@ -142,6 +142,7 @@ export function destroyCard(
   if (!instance) return state;
   const printed = printedOf(cards, instance.code);
   if (printed.keywords.permanent && heroHostInPlay(state, instance)) return state;
+  // An explored location leaves the staging area although it holds cannotLeaveStaging: the exploring is the rule (rr.explored), and a location that stayed would be explored again at every settle (The Crossing at Tharbad, 08071:A:1).
   // The cards attached to a leaving location or destroyed enemy hear about it, with whether the location was explored decided here (announceHostLeaving).
   let next = announceHostLeaving(state, id, cards, explored);
   // The active location explored: every card hears it, with the number of attachments it had (10006:A:1, 19026:A:2).
@@ -156,7 +157,7 @@ export function destroyCard(
   // "Add each ally that leaves play to its owner's hand instead of placing it in the discard pile" (families/deck/rules.ts).
   // An enemy that "gains victory" (the flag gainsVictory, 11178:A:1) goes to the victory display as one that prints it does.
   const victorious = heldAmount(state, id, "gainsVictory") > 0 && printed.type === "enemy" && printed.victory == null ? { ...printed, victory: heldAmount(state, id, "gainsVictory") } : printed;
-  next = moveCard(next, id, alliesToHandDestination(next, latest, victorious) ?? defeatedDestination(latest, victorious, next), { released: instance.attachments, defeated: byDamage });
+  next = moveCard(next, id, alliesToHandDestination(next, latest, victorious) ?? defeatedDestination(latest, victorious, next), { released: instance.attachments, defeated: byDamage, supersedes: explored && isLocationCard(printed) });
   steps.push({ kind: "destroy", targetId: id });
   next = announceAllyLeft(next, instance, cards);
   next = discardedFromPlay(next, instance, byDamage);

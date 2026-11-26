@@ -7,6 +7,7 @@ import type { EngineStep } from "../../../rules/core/intents.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { pushCardEffects } from "../../../rules/interpret/effect-frames.ts";
 import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { destroyCard } from "../../../rules/core/destroy.ts";
 import { moveCard } from "../../../rules/core/zones.ts";
 import { holds } from "../../../rules/interpret/conditions.ts";
 import { runInstruction } from "../../../rules/interpret/interpret.ts";
@@ -252,6 +253,18 @@ describe("The Crossing at Tharbad (08071:A:1 to 08071:A:3)", () => {
     expect(where(part, CROSSING)).toBe("staging");
     const done = run(t, part, { verb: "PlaceProgressOnNamed", name: "The Crossing at Tharbad", amount: 1 });
     expect(done.stageCleared).toBe(true);
+  });
+
+  it("08071:A:1 explored, it leaves the staging area although it cannot leave it, and the game is won once, not at every settle", () => {
+    const t = table({ stage: STAGE_2, staging: [CROSSING] });
+    let explored = 0;
+    const steps: EngineStep[] = [];
+    const first = settle(destroyCard(t.state, idOf(t.state, CROSSING), t.ctx.cards, steps, true), t.ctx, steps);
+    explored += first.pendingEvents?.filter((event) => event.trigger === "locationExplored").length ?? 0;
+    expect(where(first, CROSSING)).not.toBe("staging");
+    const after = settle(first, t.ctx, steps);
+    expect(explored).toBeLessThanOrEqual(1);
+    expect(after.pendingEvents?.filter((event) => event.trigger === "locationExplored").length ?? 0).toBe(0);
   });
 
   it("08071:A:1 the players cannot travel to it", () => {

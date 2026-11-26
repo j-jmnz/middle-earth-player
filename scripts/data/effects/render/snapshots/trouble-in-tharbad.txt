@@ -130,7 +130,7 @@ Scenario piles that place cards with no record (quest: 08066 Double Dealings; qu
 08071:A:1 (front): Immune to player card effects. Cannot leave the staging area.
   (the keyword part is owned by the card's keywords; the records cover: Cannot leave the staging area.)
   08071:constant:1: Constant
-    - the players cannot travel to the location with code 08071 while this holds
+    - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
 
 08071:A:2 (front): The Crossing at Tharbad gets +2 quest points for each player in the game.
   08071:constant:2: Constant
