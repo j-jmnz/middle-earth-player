@@ -80,7 +80,9 @@ export function releaseCaptive(state: ScenarioState, heroId: string, options: { 
     if (attached && attached.owner == null && attached.controller != null && attached.controller !== seat) next = updateCard(next, id, { owner: attached.controller });
   }
   const patch = { face: "up" as const, captive: undefined, guardedHero: undefined, owner: undefined, heroSlot: undefined, host: null, ...(options.exhausted ? { exhausted: true } : {}) };
-  const released = releaseHero(next, heroId, seat, patch, { owner: undefined });
+  let released = releaseHero(next, heroId, seat, patch);
+  // Control changed, ownership did not (rr.ownership-and-control): a card another player owns keeps its owner; one the hero's owner owns needs none.
+  for (const id of hero.attachments ?? []) if (released.cards[id]?.owner === seat) released = updateCard(released, id, { owner: undefined });
   return hero.heroSlot == null ? released : backInPlace(released, seat, heroId, hero.heroSlot);
 }
 

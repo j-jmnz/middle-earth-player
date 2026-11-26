@@ -230,10 +230,10 @@ describe("16073:B:2 an attachment another player controls", () => {
     const freed = releaseGuardedHero(guarded, guard);
     expect(freed.seats[0]?.heroes).toContain(heroes[0]);
     expect(freed.cards[heroes[0] ?? ""]).toMatchObject({ exhausted: true, controller: 0 });
-    expect(freed.cards[attachment]).toMatchObject({ host: heroes[0], controller: 0 });
+    expect(freed.cards[attachment]).toMatchObject({ host: heroes[0], controller: 0, owner: 1 });
     // A stage's release (ReleaseStagedHero) gives the same answer.
     const stage = releaseStagedHero(played, { verb: "ReleaseStagedHero" }, { seat: 0, sourceId: null, chosen: heroes[0] ?? "" }, []);
-    expect(stage.cards[attachment]).toMatchObject({ host: heroes[0], controller: 0 });
+    expect(stage.cards[attachment]).toMatchObject({ host: heroes[0], controller: 0, owner: 1 });
   });
 });
 
