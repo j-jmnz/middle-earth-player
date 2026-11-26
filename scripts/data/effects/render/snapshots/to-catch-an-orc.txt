@@ -250,6 +250,7 @@ Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc
 
 07063:B:3 (back): Response: After questing successfully, cancel all progress that would be placed on this stage. Then, place 1 time counter on this stage. Or, if Mugash is in play, advance to stage 3.
   07063:response:1: Response after the players quest successfully (event happened to the controller)
+    only if any of: (progress was placed on the current quest card this quest phase (the quest card itself, the overflow of an explored active location included)) or (there is a card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose)
     - the acting player chooses one of:
       * option "time" (only if progress was placed on the current quest card this quest phase (the quest card itself, the overflow of an explored active location included)):
         - the progress placed on the current quest card since the phase began, the overflow of an explored active location included, is taken off it and forgotten
@@ -281,4 +282,4 @@ Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc
   07064:questResolution:1: Quest resolution
     - the players win the game
 
-(rendered pieces: 171 by template, 0 as JSON)
+(rendered pieces: 175 by template, 0 as JSON)
