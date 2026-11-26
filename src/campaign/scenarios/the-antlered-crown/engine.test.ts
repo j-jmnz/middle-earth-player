@@ -201,3 +201,13 @@ describe("the time counters on the locations in play (08153:A:1, 08159:A:1, 0816
     expect(revealedTop(hit, "08161").encounterDeck).toHaveLength(2);
   });
 });
+
+describe("Fierce Folk (08160:A:2)", () => {
+  it("08160:A:2 each player draws 3 cards, and players cannot play events until the end of the round, and not after it", () => {
+    const t = table({ seats: 2, deckOf: ["filler", "filler", "filler", "filler", "filler", "filler", "filler", "filler"] });
+    const { state } = resolveRecords(t.state, t.ctx, "08160", "whenRevealed");
+    expect(handSize(state)).toBe(handSize(t.state) + 3);
+    expect(handSize(state, 1)).toBe(handSize(t.state, 1) + 3);
+    expect(state.modifiers.some((modifier) => modifier.stat === "cannotPlayEvents" && modifier.until === "endOfRound")).toBe(true);
+  });
+});
