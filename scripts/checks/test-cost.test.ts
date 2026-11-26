@@ -68,7 +68,6 @@ const OVER_INTENTS: Readonly<Record<string, number>> = {
   "the-fate-of-numenor": 5541,
   "the-fate-of-wilderland": 5064,
   "the-ghost-of-framsburg": 11173,
-  "the-thing-in-the-depths": 3031,
   "the-withered-heath": 8001,
 };
 

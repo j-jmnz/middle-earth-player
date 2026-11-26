@@ -81,11 +81,12 @@ lineSpec("06149:A:1", "Forced: after progress tokens are placed on To the Tower 
   const t = table({ phase: "Encounter", staging: [tower, sorcerer, tracker], deck: [bodyguard, bodyguard, bodyguard, bodyguard] }, effects, [fog]);
   const engaged = send(opened(t), { type: "Engage", enemyId: idOf(t.state, tracker) }, t.ctx).state;
   expect(tokens(engaged)).toBe(1);
-  expect(shadowsOf(engaged, sorcerer)).toBe(1);
+  // The engagement check engaged the Sorcerer too, so the combat phase's step 6.2 dealt it a card beside the one the Forced effect dealt (rr.step-6-2).
+  expect(shadowsOf(engaged, sorcerer)).toBe(2);
   const revealed = revealFromTop(engaged, t.ctx, fog, []);
   const fogged = answer({ state: revealed.state, steps: [] }, t.ctx, () => "tokens").state;
   expect(tokens(fogged)).toBe(4);
-  expect(shadowsOf(fogged, sorcerer)).toBe(2);
+  expect(shadowsOf(fogged, sorcerer)).toBe(3);
 });
 
 lineSpec("06150:A:1", "Forced: when a player optionally engages Morgul Tracker 1 token goes on To the Tower; an engagement of the engagement check does not place one", (effects) => {

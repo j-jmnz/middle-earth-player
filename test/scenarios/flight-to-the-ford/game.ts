@@ -85,7 +85,7 @@ export const FORD_GOLDENS: readonly FordGolden[] = [
   { name: "true solo, strong, Easy, won", seatCount: 1, seed: 3, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "true solo, starter decks, lost on life", seatCount: 1, seed: 1, difficulty: "Normal", decks: "starter", outcome: "lost", lossReason: LIFE },
   { name: "two-handed, starter decks, lost on life", seatCount: 2, seed: 1, difficulty: "Normal", decks: "starter", outcome: "lost", lossReason: LIFE },
-  { name: "true solo, weak, lost on life", seatCount: 1, seed: 2, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: LIFE },
+  { name: "true solo, weak, lost on life", seatCount: 1, seed: 41, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: LIFE },
   { name: "true solo, weak, lost on threat", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
 ];
 

@@ -79,10 +79,10 @@ export type AndrosGolden = { name: string; seatCount: 1 | 2; seed: number; diffi
 // - "Last Battle as Battle": the three Battleground locations are explored (6 victory points). The Citadel's Response removes stage 4; the Responses of The Approach and The Banks find stages 3 and 2 already played, so they remove nothing, and The Last Battle counts Attack.
 // The Easy win follows the same path as "Last Battle as Battle". The losses are the two ways to lose here: the threat of every player at 50 (heroes too weak to quest, solo) and every hero destroyed (heroes too brittle, two-handed).
 export const ANDROS_GOLDENS: readonly AndrosGolden[] = [
-  { name: "solo win, all five stages", seatCount: 1, seed: 3, difficulty: "Normal", decks: "strong", outcome: "won", policy: { travel: false } },
-  { name: "two-handed win, Banks destroyed", seatCount: 2, seed: 9, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "solo win, all five stages", seatCount: 1, seed: 7, difficulty: "Normal", decks: "strong", outcome: "won", policy: { travel: false } },
+  { name: "two-handed win, Banks destroyed", seatCount: 2, seed: 37, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed win, Last Battle as Battle", seatCount: 2, seed: 6, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "Easy solo win, all three locations explored", seatCount: 1, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "Easy solo win, all three locations explored", seatCount: 1, seed: 26, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "solo loss: threat 50", seatCount: 1, seed: 2, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed loss: every hero destroyed", seatCount: 2, seed: 4, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
 ];

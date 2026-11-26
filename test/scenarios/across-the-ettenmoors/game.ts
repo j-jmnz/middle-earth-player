@@ -44,7 +44,7 @@ export type EttenmoorsGolden = { name: string; seatCount: 1 | 2; seed: number; d
 // players meet the encounter deck: a safe location they travel to, explore for refuge and leave in the victory display), true solo and two-handed; the loss is the heroes too small to quest, whose threat reaches 50. A quick win with the strong heroes would not travel anywhere, so
 // it is not pinned. The way to lose that no seed reaches is Amarthiúl's destruction (10067:A:1's lose line, a spec row), and every hero destroyed needs an attack the policy never lets fall (the heroes defend nothing and the enemies stay out of reach of the stand-ins).
 export const ETTENMOORS_GOLDENS: readonly EttenmoorsGolden[] = [
-  { name: "true solo, won, a safe location in the victory display", seatCount: 1, seed: 3, difficulty: "Normal", decks: "steady", outcome: "won", after: true },
+  { name: "true solo, won, a safe location in the victory display", seatCount: 1, seed: 1, difficulty: "Normal", decks: "steady", outcome: "won", after: true },
   { name: "two-handed, won, a safe location in the victory display", seatCount: 2, seed: 5, difficulty: "Normal", decks: "steady", outcome: "won", after: true },
   { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 5, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain" },
 ];

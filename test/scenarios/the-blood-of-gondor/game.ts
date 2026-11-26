@@ -143,18 +143,18 @@ export type BloodGolden = { name: string; seatCount: 1 | 2; seed: number; diffic
 
 // The games to pin (.claude/rules/code-standards.md, Test cost): a solo and a two-handed Normal win, an Easy two-handed win and a loss for each way to lose (the golden suite names each). The policy keeps The Cross-roads in the staging area
 // until stage 2, so stage 2 has Siege in each win.
-// - solo win (seed 13): the whole scenario in one game: hidden cards taken in the quest phase, by the combat choice, by a Travel cost and by a Shadow line, the combat choice's turn (an enemy engages and attacks in the same phase, a
+// - solo win (seed 10264): the whole scenario in one game: hidden cards taken in the quest phase, by the combat choice, by a Travel cost and by a Shadow line, the combat choice's turn (an enemy engages and attacks in the same phase, a
 //   location or treachery is discarded), Faramir's and Lord Alcaron's Actions, Captured! with the allies held under it, the turn at 5 hidden cards, The Cross-roads (Siege) and Conflict at the Crossroads, the win;
 // - two-handed win (seed 10): the same moments for two players, the first-player token passing and with it the control of Faramir and Lord Alcaron, each Action used by the controller only;
-// - Easy two-handed win (seed 29): the Easy deal (3 Mordor Looms, no Conflict at the Crossroads, ...);
+// - Easy two-handed win (seed 18): the Easy deal (3 Mordor Looms, no Conflict at the Crossroads, ...);
 // - solo loss, Faramir leaves play (seed 5);
 // - two-handed loss, Lord Alcaron leaves play (seed 2, weak heroes);
 // - solo loss, every hero destroyed (seed 2, brittle heroes);
 // - two-handed loss, threat 50 (seed 1, weak heroes);
 export const BLOOD_GOLDENS: readonly BloodGolden[] = [
-  { name: "solo win", seatCount: 1, seed: 13, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "solo win", seatCount: 1, seed: 10264, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed win", seatCount: 2, seed: 10, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "Easy two-handed win", seatCount: 2, seed: 29, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "Easy two-handed win", seatCount: 2, seed: 18, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "solo loss: Faramir leaves play", seatCount: 1, seed: 5, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "Faramir left play" },
   { name: "two-handed loss: Lord Alcaron leaves play", seatCount: 2, seed: 2, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "Lord Alcaron left play" },
   { name: "solo loss: every hero destroyed", seatCount: 1, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },

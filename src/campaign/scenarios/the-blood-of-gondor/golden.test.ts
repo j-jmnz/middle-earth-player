@@ -73,11 +73,11 @@ describe("The Blood of Gondor golden", () => {
     checks({ game, world }) {
       it("takes a hidden card in each way: at the beginning of the quest phase, by the combat choice, by a Travel cost, by a Shadow line and when an enemy engages", () => {
         const moments = momentsOf(game(golden(SOLO)), world(golden(SOLO)).ctx);
-        expect(list(moments, "takeQuest")).toEqual(["1/0", "13/0", "28/0", "39/0", "57/0", "74/0", "95/0", "116/0", "142/0", "165/0", "195/0", "226/0", "252/0", "277/0"]);
-        expect(list(moments, "takeChoice")).toEqual(["8/0", "35/0", "62/0", "100/0", "147/0", "200/0"]);
-        expect(list(moments, "takeTravel")).toEqual(["31/0", "198/0", "229/0"]);
-        expect(list(moments, "takeShadow")).toEqual(["22/0", "66/0", "104/0", "136/0", "175/0", "181/0", "268/0"]);
-        expect(list(moments, "takeEngaged")).toEqual(["79/0", "122/0", "170/0"]);
+        expect(list(moments, "takeQuest")).toEqual(["1/0", "15/0", "32/0", "49/0", "73/0", "94/0", "113/0", "139/0", "172/0", "206/0", "233/0", "261/0"]);
+        expect(list(moments, "takeChoice")).toEqual(["8/0", "37/0", "78/0", "119/0", "177/0"]);
+        expect(list(moments, "takeTravel")).toEqual(["209/0"]);
+        expect(list(moments, "takeShadow")).toEqual(["41/0", "57/0", "63/0", "86/0", "107/0", "123/0", "184/0", "214/0"]);
+        expect(list(moments, "takeEngaged")).toEqual(["143/0", "144/0"]);
         const played = game(golden(SOLO));
         // Each take is one card more in the seat's hidden list: it was no hidden card before and lies facedown after.
         const takes = moments.filter((moment) => moment.kind.startsWith("take") && moment.kind !== "takeRevealed");
@@ -96,30 +96,30 @@ describe("The Blood of Gondor golden", () => {
         const played = game(golden(SOLO));
         const { ctx } = world(golden(SOLO));
         const moments = momentsOf(played, ctx);
-        expect(list(moments, "turnChoice")).toEqual(["20/0", "79/0", "122/0", "171/0"]);
+        expect(list(moments, "turnChoice")).toEqual(["22/0", "54/0", "99/0", "144/0"]);
         for (const moment of moments.filter((item) => item.kind === "turnChoice")) expect(played.intents[moment.at]).toEqual({ type: "Choose", optionId: "turn" });
-        // Intent 79: Mordor Looms (treachery) twice, Evil Crow and Brutal Uruk. The enemies engage the player, whatever their engagement cost, and attack before the phase ends.
-        const turn = moments.find((item) => item.kind === "turnChoice" && item.at === 79) as Moment;
-        const before = beforeOf(played, 79);
-        const after = played.trail?.[79] as ScenarioState;
-        expect(turn.codes).toEqual(["06130", "06122", "06121", "06130"]);
+        // Intent 144: Conflict at the Crossroads and Scourge of Mordor (treacheries), Lying in Wait (treachery), Evil Crow and Brutal Uruk. The enemies engage the player, whatever their engagement cost, and attack before the phase ends.
+        const turn = moments.find((item) => item.kind === "turnChoice" && item.at === 144) as Moment;
+        const before = beforeOf(played, 144);
+        const after = played.trail?.[144] as ScenarioState;
+        expect(turn.codes).toEqual(["06131", "06122", "05064", "06129", "06121"]);
         const engaged = (turn.ids ?? []).filter((id) => after.seats[0]?.engaged.includes(id));
         expect(engaged.map((id) => codeOf(after, id))).toEqual(["06122", "06121"]);
         const discarded = (turn.ids ?? []).filter((id) => after.cards[id]?.zone === "encounterDiscard");
-        expect(discarded.map((id) => codeOf(after, id))).toEqual(["06130", "06130"]);
+        expect(discarded.map((id) => codeOf(after, id))).toEqual(["06131", "05064", "06129"]);
         expect(before.phase).toBe("Combat");
         const steps = stepsByIntent(played, ctx);
         const attackers = new Set<string>();
-        for (let at = 79; at < played.intents.length; at += 1) {
+        for (let at = 144; at < played.intents.length; at += 1) {
           const state = played.trail?.[at] as ScenarioState;
           if (state.round !== after.round) break;
           for (const step of steps[at] ?? []) if (step.kind === "strike" && step.side === "enemy") attackers.add(step.enemyId);
         }
         for (const id of engaged) expect(attackers.has(id), codeOf(after, id)).toBe(true);
-        // Intent 20: a location (Northern Road) and a treachery (Lying in Wait): both discarded, nothing engaged.
-        const quiet = moments.find((item) => item.kind === "turnChoice" && item.at === 20) as Moment;
-        const later = played.trail?.[20] as ScenarioState;
-        expect(quiet.codes).toEqual(["06129", "06126"]);
+        // Intent 99: a location (Southern Road) and two treacheries (Mordor Looms, Lying in Wait): all discarded, nothing engaged.
+        const quiet = moments.find((item) => item.kind === "turnChoice" && item.at === 99) as Moment;
+        const later = played.trail?.[99] as ScenarioState;
+        expect(quiet.codes).toEqual(["06124", "06130", "06129"]);
         expect((quiet.ids ?? []).every((id) => later.cards[id]?.zone === "encounterDiscard")).toBe(true);
       });
 
@@ -127,26 +127,26 @@ describe("The Blood of Gondor golden", () => {
         const solo = game(golden(SOLO));
         const { ctx } = world(golden(SOLO));
         const moments = momentsOf(solo, ctx);
-        expect(list(moments, "turnFive")).toEqual(["279/0"]);
-        const before = beforeOf(solo, 279);
-        const after = solo.trail?.[279] as ScenarioState;
-        // The seat held 4 hidden cards, took the fifth at the beginning of the quest phase and holds none; the stage is Captured!.
-        expect(counts(before)[0]).toBe(4);
+        expect(list(moments, "turnFive")).toEqual(["236/0"]);
+        const before = beforeOf(solo, 236);
+        const after = solo.trail?.[236] as ScenarioState;
+        // The seat held 3 hidden cards, took the fourth by the Travel cost and the fifth when Orc Rabble engages, and holds none; the stage is Captured!.
+        expect(counts(before)[0]).toBe(3);
         expect(counts(after)[0]).toBe(0);
         expect(codeOf(after, after.questStage)).toBe(CAPTURED);
         const two = momentsOf(game(golden(TWO)), world(golden(TWO)).ctx);
-        expect(list(two, "turnFive")).toEqual(["172/0", "172/1"]);
+        expect(list(two, "turnFive")).toEqual(["195/0"]);
       });
 
       it("places Faramir and Lord Alcaron under Captured! (still in play, controlled by nobody), turns every hidden card, and gives stage 2 Siege while The Cross-roads is in the staging area", () => {
         const played = game(golden(SOLO));
         const { ctx } = world(golden(SOLO));
         const moments = momentsOf(played, ctx);
-        expect(list(moments, "captured")).toEqual(["228"]);
-        expect(list(moments, "turnCaptured")).toEqual(["228/0"]);
-        expect(list(moments, "crossroads")).toEqual(["228"]);
-        const before = beforeOf(played, 228);
-        const after = played.trail?.[228] as ScenarioState;
+        expect(list(moments, "captured")).toEqual(["208"]);
+        expect(list(moments, "turnCaptured")).toEqual(["208/0"]);
+        expect(list(moments, "crossroads")).toEqual(["208"]);
+        const before = beforeOf(played, 208);
+        const after = played.trail?.[208] as ScenarioState;
         expect(codeOf(before, before.questStage)).toBe(AMBUSH);
         const stage = after.questStage ?? "";
         for (const code of [FARAMIR, ALCARON]) {
@@ -157,8 +157,8 @@ describe("The Blood of Gondor golden", () => {
         }
         expect(counts(after)[0]).toBe(0);
         // The allies stay held to the end and no Action of theirs is used after.
-        for (const state of (played.trail ?? []).slice(228)) for (const code of [FARAMIR, ALCARON]) expect(Object.values(state.cards).find((item) => item.code === code)?.zone).toBe("captive");
-        expect([...list(moments, "faramir"), ...list(moments, "alcaron")].every((entry) => Number(entry.split("/")[0]) < 228)).toBe(true);
+        for (const state of (played.trail ?? []).slice(208)) for (const code of [FARAMIR, ALCARON]) expect(Object.values(state.cards).find((item) => item.code === code)?.zone).toBe("captive");
+        expect([...list(moments, "faramir"), ...list(moments, "alcaron")].every((entry) => Number(entry.split("/")[0]) < 208)).toBe(true);
         // The Cross-roads is in the staging area on stage 2: Siege (characters quest with Defense), no Battle although Captured! prints it.
         const crossroads = Object.values(after.cards).find((card) => card.code === CROSSROADS);
         expect(crossroads?.zone).toBe("staging");
@@ -172,11 +172,11 @@ describe("The Blood of Gondor golden", () => {
         const played = game(golden(SOLO));
         const { ctx } = world(golden(SOLO));
         const moments = momentsOf(played, ctx);
-        expect(list(moments, "turnFaramir")).toEqual(["10/0", "23/0", "36/0", "63/0", "80/0", "101/0", "123/0", "148/0", "176/0", "201/0"]);
+        expect(list(moments, "turnFaramir")).toEqual(["9/0", "38/0", "58/0", "79/0", "120/0", "145/0", "179/0"]);
         expect(list(moments, "faramir")).toEqual(list(moments, "turnFaramir"));
-        expect(list(moments, "alcaron")).toEqual(["6/0", "18/0", "33/0", "42/0", "54/0", "71/0", "92/0", "113/0", "139/0", "162/0", "192/0", "223/0"]);
-        // Faramir's turn at 63 and 80 reveals an enemy (Orc Ambusher, Orc Arsonist): 3 damage first, then it engages, if it still lives.
-        for (const at of [23, 63, 80, 176]) {
+        expect(list(moments, "alcaron")).toEqual(["6/0", "20/0", "29/0", "46/0", "70/0", "91/0", "110/0", "136/0", "169/0", "203/0"]);
+        // Faramir's turn at 9 and 145 reveals an enemy (Brutal Uruk): 3 damage first, then it engages, if it still lives.
+        for (const at of [9, 145]) {
           const moment = moments.find((item) => item.kind === "turnFaramir" && item.at === at) as Moment;
           const id = moment.ids?.[0] ?? "";
           const state = played.trail?.[at] as ScenarioState;
@@ -199,7 +199,7 @@ describe("The Blood of Gondor golden", () => {
         const played = game(golden(TWO));
         const { ctx } = world(golden(TWO));
         const moments = momentsOf(played, ctx);
-        expect(list(moments, "control")).toEqual(["28/1", "60/0", "94/1", "132/0", "166/1", "206/0"]);
+        expect(list(moments, "control")).toEqual(["28/1", "60/0", "94/1", "132/0", "168/1", "204/0"]);
         const captured = Number(list(moments, "captured")[0]);
         expect(captured).toBe(108);
         for (const moment of moments.filter((item) => item.kind === "control")) {
@@ -229,17 +229,17 @@ describe("The Blood of Gondor golden", () => {
 
       it("reveals Conflict at the Crossroads, which adds the engaged Orcs' Threat to the staging area until the end of the phase", () => {
         const solo = momentsOf(game(golden(SOLO)), world(golden(SOLO)).ctx);
-        expect(list(solo, "conflict")).toEqual(["59"]);
+        expect(list(solo, "conflict")).toEqual(["96"]);
         const two = momentsOf(game(golden(TWO)), world(golden(TWO)).ctx);
-        expect(list(two, "conflict")).toEqual(["0", "42", "176"]);
+        expect(list(two, "conflict")).toEqual(["0", "42", "142"]);
       });
 
       it("discards a random hidden card of the first player when Dark Woods is explored and turns the hidden cards of a destroyed character's controller (Brutal Uruk)", () => {
         const solo = momentsOf(game(golden(SOLO)), world(golden(SOLO)).ctx);
-        expect(list(solo, "discardWoods")).toEqual(["30/0"]);
-        expect(list(solo, "turnUruk")).toEqual(["221/0"]);
+        expect(list(solo, "discardWoods")).toEqual(["75/0"]);
+        expect(list(solo, "turnUruk")).toEqual(["198/0"]);
         const played = game(golden(SOLO));
-        const after = played.trail?.[30] as ScenarioState;
+        const after = played.trail?.[75] as ScenarioState;
         const moment = solo.find((item) => item.kind === "discardWoods") as Moment;
         expect(moment.codes).toHaveLength(1);
         // The discarded card is unresolved: it lies in the encounter discard pile, not in the staging area.

@@ -65,7 +65,7 @@ export type EriadorGolden = { name: string; seatCount: 1 | 2; seed: number; diff
 // points) and Amarthiúl leaving play (every choice the first option: Predatory Wolves discards him as the only ally). Determination is not played by the auto-player: the line tests of pool.test.ts and the campaign test play it and write its mark.
 export const ERIADOR_GOLDENS: readonly EriadorGolden[] = [
   { name: "true solo, won, Normal", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
-  { name: "true solo, won, Fend Off Despair defeated", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", after: true, policy: { choose: "last" } },
+  { name: "true solo, won, Fend Off Despair defeated", seatCount: 1, seed: 96, difficulty: "Normal", decks: "strong", outcome: "won", after: true, policy: { choose: "last" } },
   { name: "two-handed, won, Normal", seatCount: 2, seed: 10, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
   { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 7, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain" },
   { name: "true solo, lost, every hero destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "No seats remain" },

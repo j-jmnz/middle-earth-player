@@ -21,7 +21,7 @@ const holding = (state: ScenarioState): boolean => {
 };
 
 // The villager tokens on Rescued Villagers and the damage tokens on Dead Villagers at the end of each win (the win needs more of the first).
-const COUNTS: Readonly<Record<string, readonly [number, number]>> = { "solo win": [12, 2], "two-handed win, hunt first": [10, 2], "Easy two-handed win": [11, 3] };
+const COUNTS: Readonly<Record<string, readonly [number, number]>> = { "solo win": [12, 2], "two-handed win, hunt first": [10, 2], "Easy two-handed win": [12, 1] };
 
 // A permanent golden: whole standalone games of Encounter at Amon Dîn played by the auto-player (test/scenarios/encounter-at-amon-din/game.ts) on fixed seeds, through a win and through each way to lose. A cycle has no Campaign
 // Mode, so a win settles at once with a score and nothing earned. The players travel to the location with the most villager tokens, quest on stage 1 (progress moves tokens to Rescued Villagers), use Lord Alcaron's Response
