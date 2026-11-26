@@ -298,6 +298,17 @@ describe("the Ancient Marsh-dweller joins the staging area and attacks (08098:A:
     expect(done.state.questStage).toBe(stage);
   });
 
+  it("08101:B:2 and 08103:A:3 on the same removal: the Marsh-dweller takes its token first, then the stage's attack (rr.forced; the engine resolves the later event's Forced effects first)", () => {
+    const t = table({ stage: "08101", phase: "Refresh", staging: [{ code: MARSH, resources: 1 }], deck: FILLERS, threat: [20, 20] });
+    const stage = t.state.questStage ?? "";
+    const steps: EngineStep[] = [];
+    const started = { state: settle(updateCard(t.state, stage, { resources: 1 }), t.ctx, steps), steps };
+    expect(started.state.window?.kind).toBe("defense");
+    expect(marshOf(started.state)?.resources).toBe(2);
+    const done = fought(t, started);
+    expect(marshOf(done.state)?.resources).toBe(2);
+  });
+
   it("08101:B:2 the Marsh-dweller engaged with the second player attacks each player in player order and stays engaged with him", () => {
     const t = table({ stage: "08101", phase: "Refresh", seats: 2, engaged: [{ code: MARSH, seat: 1 }], deck: FILLERS, threat: [20, 20] });
     const stage = t.state.questStage ?? "";
