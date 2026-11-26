@@ -17,6 +17,9 @@ export function attackWords(instruction: Instruction): string | null {
       return "declare an attack against each of those enemies";
     case "ImmediateAttack":
       return instruction.afterThis ? "make an additional attack against the defending player after this one" : "make an immediate attack against you";
+    // The enemy the effect names (the engaged Wild Mûmak, 17015:A:3) makes the attack; its own asks entry words the row on the table.
+    case "ImmediateAttackBy":
+      return "have the enemy make an immediate attack against you";
     case "AttackFromStaging":
       return instruction.target === "host" ? "make the attached enemy attack from the staging area" : "make an immediate attack against you from the staging area";
     // An AfterAttack inside a Choose option (145021:A:3, Haunted Path's shadow): the enemy that attacked returns to the staging area once the attack has ended.
