@@ -41,6 +41,21 @@ describe("the time dial of stages 1B, 2B and 3B", () => {
     }
   });
 
+  it("07057:A:2 warns that the next refresh phase takes 2 counters only while Off Track is attached, and counts each Off Track in play", () => {
+    const dial = (layout: Layout, left: number) => {
+      const made = built({ stage: "07065", ...layout });
+      const state = updateCard(made.state, idOf(made.state, "07065"), { resources: left });
+      return scenarioDials(state, made.ctx, nameOf(made)).find((found) => found.testID?.startsWith("ring-maker-time:"));
+    };
+    const onEdge = { staging: ["07050", "07051"], attached: [{ code: "07057", to: "07050", encounter: true as const }] };
+    expect(dial(onEdge, 2)?.warn?.words).toMatch(/^The next refresh phase takes the last 2 time counters\./);
+    expect(dial(onEdge, 3)?.warn?.words).toBeUndefined();
+    expect(dial(onEdge, 3)?.note).toMatch(/^3 time counters left\. 2 come off at the end of each refresh phase\./);
+    expect(dial({ staging: ["07050", "07051"] }, 2)?.warn?.words).toBe("2 time counters are left.");
+    const both = { staging: ["07050", "07051"], attached: [{ code: "07057", to: "07050", encounter: true as const }, { code: "07057", to: "07051", encounter: true as const }] };
+    expect(dial(both, 3)?.warn?.words).toMatch(/^The next refresh phase takes the last 3 time counters\./);
+  });
+
   it("07065:B:2 and 07066:B:2 say the last counter shuffles Mugash into the deck, even from a hero, and advances the quest to stage 3", () => {
     const words = "With the last gone, Mugash is shuffled into the encounter deck, even from a hero, and the quest advances to stage 3.";
     expect(timeDial("07065", 1)?.warn?.words).toBe(`The next refresh phase takes the last time counter. ${words}`);

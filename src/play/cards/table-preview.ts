@@ -67,7 +67,7 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
   // A stage with Defense says where questing's progress goes, and a stage whose filling loses the game says so (mec112.defense, 143075:B:3).
   const rest = stageDetail(game, ctx, stage.code, points, hold, null).join(". ");
   // A time stage with 2 counters or fewer says what the dial warns of first, as the dial's own words do (rm.time-x): the sheet the dial opens is this preview.
-  const facts = FORDS_STAGES.includes(stage.code) && stage.face === "B" ? timeTakes(game, stage.code) : null;
+  const facts = FORDS_STAGES.includes(stage.code) && stage.face === "B" ? timeTakes(game, ctx, stage.code) : null;
   const near = facts != null && (stage.resources <= 2 || facts.takes >= stage.resources) ? stageTimeNearWords(stage.code, stage.resources, facts) : null;
   const detail = near ? [near, rest].filter((part) => part !== "").join(" ") : rest;
   if (points != null) return { title: `${name} · ${stage.progress} / ${points}`, ...(detail ? { detail } : {}) };

@@ -102,7 +102,7 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
       if (instruction.verb !== "SearchMove" || !instruction.different) return found;
       // A different title: not one an earlier search of this effect has found.
       // An empty Pick leaves "" in `picked`: only a card in the game has a title.
-      const taken = new Set((data?.kind === "effect" ? (data.picked ?? []) : []).filter((id) => state.cards[id] != null).map((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").name));
+      const taken = new Set((data?.kind === "effect" ? (data.picked ?? []) : []).flatMap((id) => { const picked = state.cards[id]; return picked == null ? [] : [printedOf(ctx.cards, picked.code).name]; }));
       return found.filter((id) => !taken.has(printedOf(ctx.cards, state.cards[id]?.code ?? "").name));
     }
     case "ShuffleIntoDeck":

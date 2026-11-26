@@ -11,6 +11,7 @@ import { addModifier } from "../../core/modified-stat.ts";
 import { heldAmount, inPlay, livingSeats, updateCard, type ScenarioState } from "../../core/state.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { effectsOf } from "../../windows/listen.ts";
+import { holds } from "../../interpret/conditions.ts";
 import { listens } from "../encounter/reveal.ts";
 import { textBlank } from "../attachments/hold.ts";
 
@@ -54,6 +55,23 @@ export function timeOnReveal(state: ScenarioState, id: string, ctx: ReduceContex
   const counted = updateCard(state, id, { resources: card.resources + amount });
   // A per-player Time X remembers the count it was made with, for the dial that shows it (08013:B:1).
   return timeInstruction(ctx, card.code)?.perPlayer ? addModifier(counted, id, id, "timePlayers", livingSeats(state).length, "endOfGame") : counted;
+}
+
+/**
+ * The time counters the next refresh phase takes off the current quest: the stage's own one, and the amount of each Forced record at the end of the refresh phase in play that removes counters from the current quest (RemoveTimeFromQuest: Old South Road 08016:forced:1,
+ * Off Track 07057:forced:1) whose condition holds now (Off Track only while it is attached). The records are read, so a card with that record counts with no change here. Counters come off "if able", so the dial compares this with the counters left.
+ */
+export function refreshTakes(state: ScenarioState, ctx: ReduceContext): number {
+  let takes = 1;
+  for (const card of Object.values(state.cards)) {
+    if (!inPlay(card.zone) || textBlank(state, card.id, ctx.cards)) continue;
+    const scope = { actor: state.firstPlayer, sourceId: card.id, returned: 0, phase: "Refresh" };
+    for (const effect of effectsOf(ctx, card.code)) {
+      if (effect.timing !== "forced" || effect.trigger !== "endOfPhase" || (effect.condition != null && !holds(state, effect.condition, scope, ctx))) continue;
+      for (const instruction of effect.instructions) if (instruction.verb === "RemoveTimeFromQuest" && typeof instruction.amount === "number") takes += instruction.amount;
+    }
+  }
+  return takes;
 }
 
 /** The cards in play that hold the Time X keyword and at least one time counter. */
