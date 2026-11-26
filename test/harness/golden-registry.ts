@@ -215,6 +215,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-dunland-trap", "The Dunland Trap", trap.TRAP_GOLDENS, trap.trapWorld, trap.playGolden),
   entry("the-three-trials", "The Three Trials", trials.TRIALS_GOLDENS, trials.trialsWorld, trials.playGolden),
   entry("trouble-in-tharbad", "Trouble in Tharbad", tharbad.THARBAD_GOLDENS, tharbad.tharbadWorld, tharbad.playGolden),
+  entry("the-nin-in-eilph", "The Nîn-in-Eilph", eilph.EILPH_GOLDENS, eilph.eilphWorld, eilph.playGolden),
   entry("escape-from-umbar", "Escape from Umbar", umbar.UMBAR_GOLDENS, umbar.umbarWorld, umbar.playGolden),
   entry("desert-crossing", "Desert Crossing", crossing.CROSSING_GOLDENS, crossing.crossingWorld, crossing.playGolden),
   entry("the-long-arm-of-mordor", "The Long Arm of Mordor", mordor.MORDOR_GOLDENS, mordor.mordorWorld, mordor.playGolden),
@@ -233,5 +234,4 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-mines-of-moria", "The Mines of Moria", mines.MINES_GOLDENS, mines.minesWorld, mines.playGolden),
   entry("escape-from-khazad-dum", "Escape from Khazad-dûm", khazad.KHAZAD_GOLDENS, khazad.khazadWorld, khazad.playGolden),
   entry("the-hunt-for-the-dreadnaught", "The Hunt for the Dreadnaught", dreadnaught.DREADNAUGHT_GOLDENS, dreadnaught.dreadnaughtWorld, dreadnaught.playGolden),
-  entry("the-nin-in-eilph", "The Nîn-in-Eilph", eilph.EILPH_GOLDENS, eilph.eilphWorld, eilph.playGolden),
 ];
