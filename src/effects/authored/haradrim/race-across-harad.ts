@@ -35,9 +35,12 @@ const WARG_HOST: PickSpec = { type: "enemy", control: "any", staging: true, allI
 const MUMAK_NOT_COMMITTED: PickSpec = { type: "ally", control: "any", names: ["Tamed Mûmak"], committed: false };
 // "Forced: After characters are committed to the quest, no more than 5 progress can be placed here this round (10 progress instead if each Tamed Mûmak in play is committed to the quest)": the trigger is the start of the staging step, after the commitment (reading of
 // The Woodland Realm, 51101:B:1's form); the cap holds to the end of the round, so a stage revealed after the commit step has none that round.
+// The cap is on this stage card ("here"), so the Forced sets it only while the main quest card is the current quest: a side quest that is the current quest takes its progress uncapped (readings of 17048:B:2, 17049:B:3, 17050:B:1).
+const MAIN_QUEST_CURRENT: Cond = { kind: "not", condition: { kind: "currentQuest", is: "side" } };
+const MUMAK_OUT: Cond = { kind: "canPick", pick: MUMAK_NOT_COMMITTED };
 const PROGRESS_CAP: Effect["instructions"] = [
-  { verb: "ModifyStat", stat: "questProgressCap", amount: 5, until: "endOfRound", target: "table", when: { kind: "canPick", pick: MUMAK_NOT_COMMITTED } },
-  { verb: "ModifyStat", stat: "questProgressCap", amount: 10, until: "endOfRound", target: "table", when: { kind: "not", condition: { kind: "canPick", pick: MUMAK_NOT_COMMITTED } } },
+  { verb: "ModifyStat", stat: "questProgressCap", amount: 5, until: "endOfRound", target: "table", when: MUMAK_OUT },
+  { verb: "ModifyStat", stat: "questProgressCap", amount: 10, until: "endOfRound", target: "table", when: { kind: "not", condition: MUMAK_OUT } },
 ];
 // "Forced: At the end of the quest phase": the Orcs' stage makes progress.
 const END_OF_QUEST_PHASE = { timing: "forced", trigger: "endOfPhase", condition: { kind: "phase", is: "Quest" } } as const satisfies Partial<Effect>;
@@ -96,12 +99,15 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         { verb: "MoveEncounterCard", card: "self", to: "discard", when: { kind: "not", condition: { kind: "matches", card: "picked", pick: { type: "enemy", control: "any", trait: "Orc" } } } },
       ],
     },
+    { id: "17044:constant:1", cardCode: "17044", lines: ["17044:A:2"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Mount" }] },
+    // "Attached enemy gets +1 Threat, +1 Attack, +1 Defense and +1 hit point": the bonus holds only while the host is an enemy.
     {
-      id: "17044:constant:1",
+      id: "17044:constant:2",
       cardCode: "17044",
       lines: ["17044:A:2"],
       timing: "constant",
-      instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Mount" }, ...(["threat", "attack", "defense", "hitPoints"] as const).map((stat): Instruction => ({ verb: "ModifyStat", stat, amount: 1, until: "whileSourceInPlay", target: "host" }))],
+      condition: { kind: "matches", card: "host", pick: { type: "enemy", control: "any" } },
+      instructions: (["threat", "attack", "defense", "hitPoints"] as const).map((stat): Instruction => ({ verb: "ModifyStat", stat, amount: 1, until: "whileSourceInPlay", target: "host" })),
     },
 
     // 17045 Pursuers from Mordor (Doomed 2 is a keyword). When Revealed an Orc enemy discarded from the top of the deck goes into the Orcs' area; Shadow: +1 Attack, and when the attack destroys a character 2 progress goes on the Orcs' stage.
@@ -169,7 +175,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       ],
     },
     { id: "17048:constant:1", cardCode: "17048", lines: ["17048:B:1"], timing: "constant", instructions: [CHIEFTAIN_TAKES_NO_DAMAGE] },
-    { id: "17048:forced:1", cardCode: "17048", lines: ["17048:B:2"], timing: "forced", trigger: "stagingStepBegins", instructions: PROGRESS_CAP },
+    { id: "17048:forced:1", cardCode: "17048", lines: ["17048:B:2"], timing: "forced", trigger: "stagingStepBegins", condition: MAIN_QUEST_CURRENT, instructions: PROGRESS_CAP },
 
     // 17049 Hunted in Harad (stage 3). When Revealed: the discard pile is shuffled into the deck and the first Orc enemy discarded goes into the Orcs' area. Side B: as 2B, and one more encounter card is revealed while the Orcs' stage is 2D and Uruk Chieftain is in the Orcs' area.
     { id: "17049:whenRevealed:1", cardCode: "17049", lines: ["17049:A:1"], timing: "whenRevealed", instructions: SHUFFLE_AND_ADD_AN_ORC },

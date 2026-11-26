@@ -61,6 +61,7 @@ const TRIGGER: Readonly<Record<string, string>> = {
   beginningOfPhase: "when a phase begins",
   stagingStepBegins: "when the staging step begins, before the first card is revealed",
   becameActive: "after this location becomes the active location",
+  orcsStageDefeated: "when the Orcs' stage in play is defeated, checked at once and before the Orcs advance to their next stage (only the defeated stage's own record hears it, so a loss line reads the defeat of its own stage and no other)",
   lost: "when the \"Lost:\" effects are triggered (only a card effect triggers them; each faceup card in play with a Lost line hears it, a shadow card does not)",
   progressWouldBePlaced: "before progress is placed on this location (the whole placement, the effect's X, waits for this effect)",
   progressPlacedOnSelf: "after progress is placed on this card, the placement that explores it included (X is the amount placed; the card may have left play)",

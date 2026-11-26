@@ -8,7 +8,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
 
 17038:A:2 (front): Damage from undefended attacks against you must be assigned to Tamed Mûmak.
   17038:constant:1: Constant
-    - this card: stat undefendedToMumak 1, while this card is in play
+    - this card: stat undefendedToMumak (the damage of undefended attacks against its controller, and only theirs, must all be assigned to this card, even past its hit points; a defended attack is not redirected) 1, while this card is in play
 
 17038:A:3 (front): If Tamed Mûmak leaves play, the controlling player is eliminated.
   17038:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
@@ -97,12 +97,14 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
 17044:A:2 (front): When Revealed: Attach to an Orc enemy. Limit 1 per enemy. (Counts as a Mount attachment with the text: "Attached enemy gets +1 Threat, +1 Attack, +1 Defense, and +1 hit point. Forced: When attached enemy leaves play, return Racing Warg to the staging area.")
   17044:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose Orc enemy (any player controls) or in the staging area, chosen by the first player, with no attachment named "Racing Warg", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not
-    - then, if there is a Orc enemy (any player controls) or in the staging area, chosen by the first player, with no attachment named "Racing Warg", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy, out of play, attaches to the picked card as an attachment: it has no enemy text there and returns to the staging area as an enemy when that card leaves play
+    - choose Orc enemy (any player controls) or in the staging area, chosen by the first player, with no attachment named "Racing Warg", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not; an Orc enemy in the Orcs' area counts, at the same stage and at another
+    - then, if there is a Orc enemy (any player controls) or in the staging area, chosen by the first player, with no attachment named "Racing Warg", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not; an Orc enemy in the Orcs' area counts, at the same stage and at another to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy, out of play, attaches to the picked card as an attachment: it has no enemy text there and returns to the staging area as an enemy when that card leaves play
     - then, if not (the picked card is a Orc enemy (any player controls)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card goes to the encounter discard pile
   17044:constant:1: Constant
-    (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Mount attachment while it is attached
+  17044:constant:2: Constant
+    only if its host is a enemy (any player controls)
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - its host: stat threat 1, while this card is in play
     - its host: stat attack 1, while this card is in play
     - its host: stat defense 1, while this card is in play
@@ -134,7 +136,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
 17046:A:1 (front): When Revealed: If the players are not at the same stage as the Orcs, add the total Threat of each card in the Orcs' area to the total Threat in the staging area until the end of the phase. If the players are at the same stage as the Orcs, each enemy gets +1 Threat until the end of the phase.
   17046:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if the players' main quest stage has another number than the Orcs' stage (a side quest as the current quest changes nothing; false in a game with no Orcs' area): the table: stat orcsInStagingThreat 1, until the end of the phase
+    - if the players' main quest stage has another number than the Orcs' stage (a side quest as the current quest changes nothing; false in a game with no Orcs' area): the table: stat orcsInStagingThreat (while it lasts the total Threat of the cards in the Orcs' area, read live, is added to the total Threat in the staging area; at the Orcs' stage those cards stand in the staging area and count there already) 1, until the end of the phase
     - then, if the players' main quest stage has the same number as the Orcs' stage (a side quest as the current quest changes nothing; false in a game with no Orcs' area) (checked when this step runs, after the steps above; not tied to whether they did anything): every enemy in play, staged or engaged, now and entering later while the effect lasts: stat threat 1, until the end of the phase
 
 17046:A:2 (shadow): Shadow: Raise your threat by 1.
@@ -179,6 +181,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
 
 17048:B:2 (back): Forced: After characters are committed to the quest, no more than 5 progress can be placed here this round (10 progress instead if each Tamed Mûmak in play is committed to the quest).
   17048:forced:1: Forced when the staging step begins, before the first card is revealed
+    only if not (the current quest is a side quest)
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a ally (any player controls) named "Tamed Mûmak", not committed to the quest to choose: the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 5, until the end of the round
@@ -206,6 +209,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
 
 17049:B:3 (back): Forced: After characters are committed to the quest, no more than 5 progress can be placed here this round (10 progress instead if each Tamed Mûmak in play is committed to the quest).
   17049:forced:2: Forced when the staging step begins, before the first card is revealed
+    only if not (the current quest is a side quest)
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a ally (any player controls) named "Tamed Mûmak", not committed to the quest to choose: the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 5, until the end of the round
@@ -224,6 +228,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
 
 17050:B:1 (back): Forced: After characters are committed to the quest, no more than 5 progress can be placed here this round (10 progress instead if each Tamed Mûmak in play is committed to the quest).
   17050:forced:1: Forced when the staging step begins, before the first card is revealed
+    only if not (the current quest is a side quest)
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a ally (any player controls) named "Tamed Mûmak", not committed to the quest to choose: the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) 5, until the end of the round
@@ -243,7 +248,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
 
 17051:B:1 (back): Uruk Chieftain cannot leave the Orcs' area.
   17051:constant:1: Constant
-    - each enemy (any player controls) or in the staging area, named "Uruk Chieftain", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not: stat cannotLeaveOrcsArea 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Uruk Chieftain", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not: stat cannotLeaveOrcsArea (the card is never engaged or moved out of the Orcs' area: it stays in the area zone, or in the staging area at the Orcs' stage) 1, while this card is in play
 
 17051:B:2 (back): Forced: At the end of the quest phase, discard the top card of the encounter deck. Place X progress on this stage, where X is the discarded card's Threat plus the total Threat in the Orcs' area.
   17051:forced:1: Forced at the end of the phase
@@ -264,7 +269,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
 17052:B:1 (back): While the players are at stage 3B, Uruk Chieftain cannot leave the Orcs' area.
   17052:constant:1: Constant
     only if the players are on stage 3
-    - each enemy (any player controls) or in the staging area, named "Uruk Chieftain", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not: stat cannotLeaveOrcsArea 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Uruk Chieftain", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not: stat cannotLeaveOrcsArea (the card is never engaged or moved out of the Orcs' area: it stays in the area zone, or in the staging area at the Orcs' stage) 1, while this card is in play
 
 17052:B:2 (back): Forced: At the end of the quest phase, return Uruk Chieftain to the Orcs' area and discard the top card of the encounter deck. Place X progress on this stage, where X is the discarded card's Threat plus the total Threat in the Orcs' area.
   17052:forced:1: Forced at the end of the phase
@@ -276,7 +281,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
     - the top card of the encounter deck is discarded, and the Orcs' current stage takes progress equal to its printed Threat plus the total current Threat of the cards in the Orcs' area, Uruk Chieftain included; a full stage is defeated: its loss, if its text has one, resolves and the Orcs advance to the next stage, C side first (its When Revealed resolves), then D side
 
 17052:B:3 (back): If you are at stage 2B when this stage is defeated, you lose the game.
-  17052:forced:2: Forced on the event orcsStageDefeated
+  17052:forced:2: Forced when the Orcs' stage in play is defeated, checked at once and before the Orcs advance to their next stage (only the defeated stage's own record hears it, so a loss line reads the defeat of its own stage and no other)
     only if the players are on stage 2
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game (The Orcs defeated stage 2D while the players were at stage 2B)
@@ -294,7 +299,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
 17053:B:1 (back): While the players are at stage 4B, Uruk Chieftain cannot leave the Orcs' area and each enemy at this stage gets +1 Threat.
   17053:constant:1: Constant
     only if the players are on stage 4
-    - each enemy (any player controls) or in the staging area, named "Uruk Chieftain", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not: stat cannotLeaveOrcsArea 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Uruk Chieftain", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not: stat cannotLeaveOrcsArea (the card is never engaged or moved out of the Orcs' area: it stays in the area zone, or in the staging area at the Orcs' stage) 1, while this card is in play
   17053:constant:2: Constant
     only if the players are on stage 4
     - each enemy (any player controls) or in the staging area, in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not, in the Orcs' area (the area zone while the players are at another stage than the Orcs, the staging area at the same stage): stat threat 1, while this card is in play
@@ -309,7 +314,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
     - the top card of the encounter deck is discarded, and the Orcs' current stage takes progress equal to its printed Threat plus the total current Threat of the cards in the Orcs' area, Uruk Chieftain included; a full stage is defeated: its loss, if its text has one, resolves and the Orcs advance to the next stage, C side first (its When Revealed resolves), then D side
 
 17053:B:3 (back): If you are at stage 3B when this stage is defeated, you lose the game.
-  17053:forced:2: Forced on the event orcsStageDefeated
+  17053:forced:2: Forced when the Orcs' stage in play is defeated, checked at once and before the Orcs advance to their next stage (only the defeated stage's own record hears it, so a loss line reads the defeat of its own stage and no other)
     only if the players are on stage 3
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game (The Orcs defeated stage 3D while the players were at stage 3B)
@@ -329,8 +334,8 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
     - the top card of the encounter deck is discarded, and the Orcs' current stage takes progress equal to its printed Threat plus the total current Threat of each enemy engaged with a player; a full stage is defeated: its loss, if its text has one, resolves and the Orcs advance to the next stage, C side first (its When Revealed resolves), then D side
 
 17054:B:3 (back): If the Orcs defeat this stage, the Orcs have caught you and you lose the game.
-  17054:forced:2: Forced on the event orcsStageDefeated
+  17054:forced:2: Forced when the Orcs' stage in play is defeated, checked at once and before the Orcs advance to their next stage (only the defeated stage's own record hears it, so a loss line reads the defeat of its own stage and no other)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players lose the game (The Orcs have caught you)
 
-(rendered pieces: 205 by template, 0 as JSON)
+(rendered pieces: 214 by template, 0 as JSON)

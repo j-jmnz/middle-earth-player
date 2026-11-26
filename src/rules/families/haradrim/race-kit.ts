@@ -14,7 +14,12 @@ export const TREACHERY = "16051";
 
 /** The scenario's table, the players at stage 2B by default, the Orcs' stages and the Chieftain set aside as the piles leave them. */
 /** `effects` are the records the table runs (the authored ones by default): a line spec passes them without the records of its line. */
-export const raceTable = (layout: Layout = {}, effects?: readonly Effect[]) => tableFromLayout("race-across-harad", { seats: 1, stage: "17048", setAside: [...ORCS_STAGES, CHIEFTAIN], ...layout }, effects ? { effects } : {});
+export const raceTable = (layout: Layout = {}, effects?: readonly Effect[], extra?: readonly string[]) => tableFromLayout("race-across-harad", { seats: 1, stage: "17048", setAside: [...ORCS_STAGES, CHIEFTAIN], ...layout }, { ...(effects ? { effects } : {}), ...(extra ? { extra } : {}) });
+
+/** The side quest `id` (a card of the layout's staging area) is the current quest until the end of the game: the game notes its side quest and the card holds `currentQuest`. */
+export function sideQuestCurrent(state: ScenarioState, id: string): ScenarioState {
+  return { ...state, sideQuests: true, modifiers: [...state.modifiers, { instanceId: id, sourceId: id, stat: "currentQuest", amount: 1, until: "endOfGame" }] };
+}
 export type RaceTable = ReturnType<typeof raceTable>;
 
 const PREPARE: Instruction = { verb: "PrepareOrcsArea", stages: ORCS_STAGES, number: 1, place: [CHIEFTAIN] };
