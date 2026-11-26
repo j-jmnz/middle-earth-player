@@ -4,8 +4,8 @@ import { describe, expect, it } from "vitest";
 
 import { flagged } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
-import { idOf, idsOf, opened, resolveRecords, run as runInstruction } from "../../../../test/harness/scene-kit.ts";
-import { advancedTo, CHIEFTAIN, codeOf, prepared, raceTable, record, URUK } from "./race-kit.ts";
+import { idOf, idsOf, opened, resolveRecords, revealFromTop, run as runInstruction } from "../../../../test/harness/scene-kit.ts";
+import { advancedTo, CHIEFTAIN, codeOf, ORCS_STAGES, prepared, raceTable, record, URUK } from "./race-kit.ts";
 
 const WARG_RIDER = "16063";
 
@@ -24,33 +24,22 @@ describe("17042:A:1 Harad Road is added to the Orcs' area when revealed", () => 
   });
 });
 
-describe("17042:A:2 17043:A:2 shadow cards that move or engage when the players are at another stage", () => {
-  it("17042:A:2 at another stage the attacking enemy moves to the Orcs' area after the attack, at the same stage it stays engaged", () => {
-    const apart = prepared({ phase: "Combat", engaged: [URUK] });
-    const start = opened(apart.made, { ...apart.state, encounterDeck: [] }).state;
-    const withShadow = { ...start };
-    expect(withShadow.orcs?.number).toBe(1);
-    // The shadow record itself, resolved for the attacking enemy as an AfterAttack runs it.
-    const uruk = idOf(start, URUK);
-    const moved = runInstruction(apart.made, start, { verb: "MoveToOrcsArea" }, { sourceId: uruk });
-    expect(moved.cards[uruk]?.zone).toBe("orcsArea");
-    const same = prepared({ stage: "17047", phase: "Combat", engaged: [URUK] });
-    expect(same.state.cards[idOf(same.state, URUK)]?.zone).toBe("engaged");
-  });
-});
-
 describe("17043:A:1 Uruk Pursuer goes into the Orcs' area and gains surge at another stage", () => {
   it("it joins the area, and gains surge only while the players are at another stage", () => {
-    const apart = prepared({ staging: ["17043"] });
-    const pursuer = idOf(apart.state, "17043");
-    const done = record(apart.made, apart.state, "17043:whenRevealed:1", pursuer, "whenRevealed");
-    expect(done.cards[pursuer]?.zone).toBe("orcsArea");
-    expect(flagged(done, pursuer, "gainsSurge") || done.modifiers.some((modifier) => modifier.stat === "gainsSurge")).toBeDefined();
-    const same = prepared({ stage: "17047", staging: ["17043"] });
-    const here = record(same.made, same.state, "17043:whenRevealed:1", idOf(same.state, "17043"), "whenRevealed");
-    expect(here.cards[idOf(here, "17043")]?.zone).toBe("staging");
-  });
-});
+    // The Pursuer is revealed from the top of a deck of 3 cards: at another stage it surges and reveals one more, at the same stage it reveals nothing else.
+    const revealed = (stage: string) => {
+      const table = raceTable({ stage, setAside: [...ORCS_STAGES, CHIEFTAIN], deck: ["f0", "f0", "f0"] });
+      const state = runInstruction(table, opened(table).state, { verb: "PrepareOrcsArea", stages: ORCS_STAGES, number: 1, place: [CHIEFTAIN] });
+      const done = revealFromTop(state, table.ctx, "17043", []).state;
+      return { done, deck: done.encounterDeck.length };
+    };
+    const apart = revealed("17048");
+    expect(apart.deck).toBe(2);
+    expect(apart.done.cards[idOf(apart.done, "17043")]?.zone).toBe("orcsArea");
+    const same = revealed("17047");
+    expect(same.deck).toBe(3);
+    expect(same.done.cards[idOf(same.done, "17043")]?.zone).toBe("staging");
+  });});
 
 describe("17044:A:2 Racing Warg attaches to an Orc enemy, the Orcs' area included", () => {
   it("the first player's choice among the Orcs in play: with only the Chieftain in the Orcs' area he is the host", () => {

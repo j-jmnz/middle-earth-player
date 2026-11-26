@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import { modifiedStat } from "../../core/keywords.ts";
 import { fightEnemy, idOf, opened, run as runInstruction, type FightOptions, type Layout, type LayoutTable } from "../../../../test/harness/scene-kit.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { spawn } from "../../core/zones.ts";
 import { ORCS_STAGES, CHIEFTAIN, raceTable, URUK } from "./race-kit.ts";
 
 const table = (layout: Layout = {}): LayoutTable => raceTable({ setAside: [...ORCS_STAGES, CHIEFTAIN], ...layout });
@@ -25,11 +26,14 @@ describe("17042:A:2 Harad Road's shadow moves the attacking enemy to the Orcs' a
     expect(fought.run.state.cards[idOf(fought.run.state, URUK)]?.zone).toBe("engaged");
   });
 
-  it("an attacker destroyed by the attack is not moved: it is in the discard pile", () => {
-    const fought = fightEnemy(table, "17042", URUK, { stage: "17048" }, options({ tweak: (state, made) => { const set = prepare(state, made); const id = idOf(set, URUK); return { ...set, cards: { ...set.cards, [id]: { ...set.cards[id]!, damage: 3 } } }; } }));
-    expect(["encounterDiscard", "orcsArea"]).toContain(fought.run.state.cards[idOf(fought.run.state, URUK)]?.zone);
-  });
-});
+  it("an attacker that is no longer in play when the shadow's instruction runs is not moved: it stays in the discard pile", () => {
+    const made = table({ stage: "17048" });
+    const state = prepare(made.state, made);
+    const uruk = spawn(state, URUK, { zone: "encounterDiscard" });
+    const done = runInstruction(made, uruk.state, { verb: "MoveToOrcsArea" }, { sourceId: uruk.id });
+    expect(done.cards[uruk.id]?.zone).toBe("encounterDiscard");
+    expect(done.orcs?.members).not.toContain(uruk.id);
+  });});
 
 describe("17043:A:2 Uruk Pursuer's shadow comes into play engaged with the defending player at another stage", () => {
   it("at another stage the Pursuer is engaged with the defending player after the shadow resolves, and the attacker stays", () => {
