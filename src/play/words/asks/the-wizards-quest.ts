@@ -16,4 +16,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
 
   // 51036:A:1 (Befouled Equipment): attached to the character with the most attachments that has no Befouled Equipment.
   "51036:whenRevealed:1 @0 AttachSelf": { owned: true, note: "Befouled Equipment: characters are tied for the most attachments. Choose the one that carries it.", verb: "Attach" },
+
+  "51001:setup:1 @1 ChooseQuestStage": { note: "{card}: choose 1 of the stage 2 quest cards to play with. The others are set aside.", verb: "Choose" },
+  "51001:setup:1 @2 ChooseQuestStage": { note: "{card}: choose 1 of the stage 3 quest cards to play with. The others are set aside.", verb: "Choose" },
 };

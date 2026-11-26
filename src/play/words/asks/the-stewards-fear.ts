@@ -33,4 +33,6 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "06028:action:1 @0 Pick": { owned: true, note: "A Prisoner: choose a ready hero you control to exhaust. It claims the card, which goes to the victory display. 2 resource tokens go on the current quest.", verb: "Exhaust" },
   // 06027:A:1 (Secret Map, Action): exhaust a hero to claim the objective and attach it to that hero.
   "06027:action:1 @0 Pick": { owned: true, note: "Secret Map: choose a ready hero you control to exhaust. It claims Secret Map and carries it.", verb: "Exhaust" },
+
+  "05041:whenRevealed:1 @0 AttachToHighestThreatCost": { note: "{card}: heroes are tied for the highest threat cost. Choose the hero it attaches to. Each time that hero exhausts, readies or triggers an ability, its controller raises their threat by 1.", verb: "Attach" },
 };

@@ -19,4 +19,6 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "143045:whenRevealed:1 @0 reveal": { label: "Reveal 2 additional encounter cards" },
   // 143074:A:1: Helm's Gate is already in the staging area (the search found no other); the Pick makes it the active location.
   "143074:whenRevealed:1 @2 Pick": { note: "The Hosts of Isengard: choose the Helm's Gate in the staging area to make the active location, returning the previous one to the staging area.", verb: "Make active" },
+
+  "143042:whenRevealed:1 @0 AttachToActiveLocation": { note: "{card}: choose the active location it attaches to. Each enemy gets +1 Threat.", verb: "Attach" },
 };

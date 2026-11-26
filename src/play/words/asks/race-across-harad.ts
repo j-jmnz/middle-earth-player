@@ -10,6 +10,9 @@ const ALWAYS: Condition = { kind: "all", conditions: [] };
 // `pnpm test scenario race-across-harad --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=race-across-harad` prints each sentence.
 // X is the stage number of the main quest (17041): the bind reads it from the quest.
 export const ASKS: Readonly<Record<string, Ask>> = {
+  // 17047:A:1 (Setup): each player takes control of a Tamed Mûmak; copies of one card are one choice, so this asks only when the set-aside copies differ.
+  "17047:setup:1 @0.0 TakeObjectiveAlly": { owned: true, note: "Setup: take control of a Tamed Mûmak. It enters play under your control, ready.", verb: "Take" },
+
   // 16064:A:1 (Mordor Warg): it attaches to an Orc enemy in play, also one in the Orcs' area; that enemy returns to the staging area.
   "16064:whenRevealed:1 @0 Pick": { owned: true, note: "Mordor Warg: choose an Orc enemy in play, in the staging area, engaged or in the Orcs' area, to attach to. It returns to the staging area.", verb: "Attach" },
 

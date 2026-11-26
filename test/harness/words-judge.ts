@@ -28,7 +28,7 @@ export function judgePick(t: WordsTable, effect: Effect, instruction: Instructio
   // What the same function says for a Pick with no instruction after it, or for a verb it has no words for.
   const fallback = pickWords(instruction.verb === "Pick" ? instruction : ({ verb: "NoSuchVerb" } as unknown as Instruction), undefined, t.names, null);
   const key = `${effect.id} @${path} ${instruction.verb}`;
-  const problem = !/^[A-Z].*\.$/.test(words.prompt) ? `not a sentence: ${words.prompt}` : BARE.test(words.prompt) ? `a bare "${words.prompt}"` : words.prompt === fallback.prompt ? `the fallback sentence "${words.prompt}"` : null;
+  const problem = !/^[A-Z].*[.?]$/.test(words.prompt) ? `not a sentence: ${words.prompt}` : BARE.test(words.prompt) ? `a bare "${words.prompt}"` : words.prompt === fallback.prompt ? `the fallback sentence "${words.prompt}"` : null;
   return { key, line: `${key}: ${words.verb} / ${words.prompt}`, problem };
 }
 

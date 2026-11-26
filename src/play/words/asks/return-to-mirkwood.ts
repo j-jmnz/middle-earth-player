@@ -45,4 +45,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "900909:whenRevealed:1 @0 Choose": { owned: true, note: "{card}: choose one you can resolve: reveal the topmost Tantrum in the encounter discard pile, or reveal 2 additional encounter cards." },
   "900909:whenRevealed:1 @0 tantrum": { label: "Reveal the topmost Tantrum in the encounter discard pile" },
   "900909:whenRevealed:1 @0 reveal": { label: "Reveal 2 additional encounter cards" },
+
+  "02139:forced:1 @0 EngageSeatWith": { note: "{card}: more than one player controls Gollum. Choose the player it engages, regardless of threat.", verb: "Engage" },
+  "900903:forced:1 @0 EngageSeatWith": { note: "{card}: more than one player is guarding Gollum. Choose the player it engages. It then makes an immediate attack against that player.", verb: "Engage" },
 };

@@ -56,4 +56,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
 
   // 40043:A:1 (Out of the Mist).
   "40043:whenRevealed:1 @0 Pick": { note: "Out of the Mist: choose the enemy in the staging area with the highest engagement cost. It engages the first player and attacks them.", verb: "Engage" },
+
+  "40009:response:1 @0 AddEventsToHand": { owned: true, note: "{card}: choose up to 2 events from your discard pile and your collection to add to your hand, following deckbuilding rules.", verb: "Add" },
+  "40033:whenRevealed:1 @0 PickFewestHitPoints": { note: "{card}: Ship enemies or objectives are tied for the fewest remaining hit points. Choose the one that takes 4 damage.", verb: "Damage" },
 };

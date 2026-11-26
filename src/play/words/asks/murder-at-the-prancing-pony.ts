@@ -16,4 +16,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "50728:whenRevealed:1 @0 shuffle": { label: "Shuffle Rising Body Count into the Investigation deck" },
   "50728:shadow:1 @0 threat": { label: "Raise your threat by 2 if this attack destroys a character" },
   "50728:shadow:1 @0 shuffle": { label: "Shuffle Rising Body Count into the Investigation deck if this attack destroys a character" },
+
+  "50702:forced:2 @0.accuse.0 NameInvestigation": { note: "{card}: make the accusation. Name 1 of the 5 Suspect enemies, then 1 of the 5 Hideout locations.", verb: "Name" },
+  "50702:forced:2 @0.accuse.1 NameInvestigation": { note: "{card}: name 1 of the 5 Hideout locations. If either name is wrong, each player raises their threat by 3.", verb: "Name" },
 };

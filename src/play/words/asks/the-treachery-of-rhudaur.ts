@@ -57,4 +57,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   ...DETERMINATION_ASKS,
   ...POOL_BOON_ASKS,
   ...LOOT_BOON_ASKS,
+
+  "10109:forced:1 @0 PickHighestThreat": { note: "{card}: players are tied for the highest threat. Choose the player the Undead enemy engages. Its Threat counts in the staging area until the end of the phase.", verb: "Engage" },
+  "10109:forced:3 @0 PickHighestThreat": { note: "{card}: players are tied for the highest threat. Choose the player the Undead enemy engages. Its Threat counts in the staging area until the end of the phase.", verb: "Engage" },
 };

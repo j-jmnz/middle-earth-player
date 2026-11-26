@@ -12,4 +12,6 @@ export const ASKS: Readonly<Record<string, Ask>> = {
 
   // 900608:A:2 (When Revealed): attaches to Wilyador, who may already carry a copy; no choice is open unless several cards qualify.
   "900608:whenRevealed:1 @0 AttachSelf": { note: "{card}: attach it to Wilyador. A heal by a card effect other than Athelas then heals only 1 damage, and Noxious Supplies is then discarded.", verb: "Attach" },
+
+  "900603:forced:1 @0 EngageSeatWith": { note: "{card}: more than one player controls Wilyador. Choose the player it engages, regardless of threat.", verb: "Engage" },
 };

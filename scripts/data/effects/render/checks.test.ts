@@ -56,6 +56,21 @@ describe("render checks", () => {
     expect(tags("Travel: Exhaust a hero to travel here.")).toEqual(["travel-cost"]);
   });
 
+  it("tags the readings a review of The Ring-maker cycle found", () => {
+    expect(tags("When Revealed: Add Ancient Marsh-dweller to the staging area (from out of play or engaged with a player) and heal all damage from it.")).toEqual(["out-of-play"]);
+    expect(tags("Add a card from set aside to the staging area.")).toEqual(["out-of-play"]);
+    expect(tags("Search the victory display for a card.")).toEqual(["out-of-play"]);
+    expect(tags("Return the set-aside Dunland enemy to the staging area.")).toEqual(["out-of-play"]);
+    // A zone named with no verb before it is a Setup or a count, not a source to read.
+    expect(tags("Set aside all 7 unique enemies. The victory display holds 2 cards.")).toEqual([]);
+    expect(tags("Forced: After any number of time counters are removed from the current quest, Giant Swamp Adder attacks the engaged player.")).toEqual(["engaged-player", "same-moment"]);
+    expect(tags("Forced: After any number of time counters are removed from the current quest, place a resource token here.")).toEqual(["same-moment"]);
+    expect(tags("Forced: At the beginning of the encounter phase, each player reveals the top card of his out-of-play deck.")).toEqual(["out-of-play", "same-moment"]);
+    expect(tags("Forced: After the last time counter is removed from this stage, trigger each Scour effect currently in play.")).toEqual(["in-play", "same-moment", "fixed-set"]);
+    expect(tags("Forced: Mugash gains +1 Attack.")).toEqual([]);
+    expect(tags("Response: Exhaust Gandalf to engage the first enemy.")).toEqual([]);
+  });
+
   it("prints each check as an indented CHECK row, and nothing for a plain line", () => {
     expect(checkLines("Draw a card.", [])).toEqual([]);
     const rows = checkLines("Then draw a card.", []);

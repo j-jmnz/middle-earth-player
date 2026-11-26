@@ -57,4 +57,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   ...DETERMINATION_ASKS,
   ...POOL_BOON_ASKS,
   ...LOOT_BOON_ASKS,
+
+  "10044:response:1 @1 PutCapturedIntoPlay": { note: "{card}: choose 1 of the rescued cards to put into play at no cost, under its owner's control.", verb: "Put" },
+  "10046:response:1 @1 PutCapturedIntoPlay": { note: "{card}: choose 1 of the cards captured under it to put into play at no cost. The others stay captured under it.", verb: "Put" },
 };

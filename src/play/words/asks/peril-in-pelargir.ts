@@ -17,4 +17,6 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "05065:whenRevealed:1 @0.0 SearchMove": { owned: true, note: "Choose a Harbor Thug from the encounter deck to add to the staging area.", verb: "Add" },
   // 05067:A:1 (stage 3B): each player searches the encounter deck and discard pile for an enemy.
   "05067:whenRevealed:1 @0.0 SearchMove": { owned: true, note: "Choose an enemy from the encounter deck or discard pile to add to the staging area.", verb: "Add" },
+
+  "05041:whenRevealed:1 @0 AttachToHighestThreatCost": { note: "{card}: heroes are tied for the highest threat cost. Choose the hero it attaches to. Each time that hero exhausts, readies or triggers an ability, its controller raises their threat by 1.", verb: "Attach" },
 };

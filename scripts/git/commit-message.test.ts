@@ -60,8 +60,12 @@ describe("commit subjects (.claude/rules/commit-standards.md, Subject line)", ()
 
   it("refuses a Pipeline measure without the task times and the review findings (docs/agents/agent-brief.md, Measure)", () => {
     expect(bodyProblem("feat: Add a scenario\n\nPipeline measure: 40 open lines\n")).toContain("Pipeline measure");
-    const full = "feat: Add a scenario\n\nPipeline measure: 40 open lines; review findings: 3 words; Read wait minutes 4, writing minutes 20\n";
+    const times = "Read: 0 wait minutes, 5 writing minutes. Build: 4 wait minutes, 20 writing minutes. Tests: 0 wait minutes, 9 writing minutes. Words: 0 wait minutes, 8 writing minutes. Games: 2 wait minutes, 15 writing minutes. Fix: 0 wait minutes, 30 writing minutes.";
+    const full = `feat: Add a scenario\n\nPipeline measure: 40 open lines; review findings: 3 words.\n${times}\n`;
     expect(bodyProblem(full)).toBeUndefined();
+    // The compact "Read 0/5" form passes the phrases but the measures table reads no task time from it.
+    const compact = "feat: Add a scenario\n\nPipeline measure: review findings: 3 words. Wait minutes / writing minutes per task: Read 0/5, Build 4/20, Tests 0/9, Words 0/8, Games 2/15, Fix 0/30\n";
+    expect(bodyProblem(compact)).toContain("cannot read");
     expect(bodyProblem("refactor: Draw the fog faster\n\nMeasure: 643 -> 312 ms\n")).toBeUndefined();
   });
 

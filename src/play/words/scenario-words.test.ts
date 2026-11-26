@@ -26,10 +26,6 @@ import { pickWords, type ChoiceNames } from "./choice.ts";
 // The judgement of a Pick and of a branch is test/harness/words-judge.ts's (the record's asks entry first, then the chain), the one asks.test.ts uses for a scenario worded by an asks file.
 const asks = asksPlayer;
 
-// A sentence that is allowed to equal the fallback or to be a bare prompt, by `<record id> @<the instruction's path in the record> <verb | option id>`
-// (test/harness/record-walk.ts). Each entry says why it is fine, and the test fails on an entry no sentence needs any more.
-const ALLOWED: Readonly<Record<string, string>> = {};
-
 const cards = new Map(loadCards().map((card) => [card.code, card]));
 const campaigns = loadCampaigns();
 const dump = process.env.WORDS_DUMP;
@@ -44,17 +40,13 @@ describe.each(WORDS_SCENARIOS)("the words of %s", (id) => {
   const ctx: ReduceContext = { effects: EFFECTS, cards: new Map() };
   const lines: string[] = [];
   const problems: string[] = [];
-  // The allowlist keys a sentence needed, over both tests.
-  const needed = new Set<string>();
 
   afterAll(() => {
     if (dump === id || dump === "all") process.stdout.write(`\n${id}\n${[...new Set(lines)].join("\n")}\n`);
   });
 
   const judge = (key: string, problem: string | null): void => {
-    if (problem === null) return;
-    needed.add(key);
-    if (ALLOWED[key] === undefined) problems.push(`${key}: ${problem}`);
+    if (problem !== null) problems.push(`${key}: ${problem}`);
   };
 
   it("names the number, the side and whose deck in every pick", () => {
@@ -83,12 +75,6 @@ describe.each(WORDS_SCENARIOS)("the words of %s", (id) => {
       });
     }
     expect(problems).toEqual([]);
-  });
-
-  // An entry of a card this scenario deals that no sentence needs any more is removed, so the list holds only what is still open.
-  it("keeps no allowlist entry that no sentence needs", () => {
-    const stale = Object.keys(ALLOWED).filter((key) => codes.has(key.split(":")[0] ?? "") && !needed.has(key));
-    expect(stale).toEqual([]);
   });
 });
 
