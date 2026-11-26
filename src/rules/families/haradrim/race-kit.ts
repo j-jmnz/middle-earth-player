@@ -4,7 +4,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { opened, run as runInstruction, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { settle } from "../../engine/machine.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
-import type { Instruction } from "../../../catalog/boundary.ts";
+import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 
 export const ORCS_STAGES = ["17051", "17052", "17053", "17054"];
 export const CHIEFTAIN = "16061";
@@ -13,14 +13,15 @@ export const URUK = "16062";
 export const TREACHERY = "16051";
 
 /** The scenario's table, the players at stage 2B by default, the Orcs' stages and the Chieftain set aside as the piles leave them. */
-export const raceTable = (layout: Layout = {}) => tableFromLayout("race-across-harad", { seats: 1, stage: "17048", setAside: [...ORCS_STAGES, CHIEFTAIN], ...layout });
+/** `effects` are the records the table runs (the authored ones by default): a line spec passes them without the records of its line. */
+export const raceTable = (layout: Layout = {}, effects?: readonly Effect[]) => tableFromLayout("race-across-harad", { seats: 1, stage: "17048", setAside: [...ORCS_STAGES, CHIEFTAIN], ...layout }, effects ? { effects } : {});
 export type RaceTable = ReturnType<typeof raceTable>;
 
 const PREPARE: Instruction = { verb: "PrepareOrcsArea", stages: ORCS_STAGES, number: 1, place: [CHIEFTAIN] };
 
 /** The table with the Orcs' area prepared as the Setup of stage 1A leaves it. */
-export function prepared(layout: Layout = {}): { made: RaceTable; state: ScenarioState } {
-  const made = raceTable(layout);
+export function prepared(layout: Layout = {}, effects?: readonly Effect[]): { made: RaceTable; state: ScenarioState } {
+  const made = raceTable(layout, effects);
   return { made, state: runInstruction(made, opened(made).state, PREPARE) };
 }
 

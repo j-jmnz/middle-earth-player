@@ -182,9 +182,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 44, scenarios: ["into-the-pit"], note: "The first player, not the player who revealed Goblin Ambush of the Nightmare deck, searches for its Orc enemies and chooses them." },
   { version: 44, scenarios: ["the-wizards-quest"], note: "Necromancer's Pass reads the first player's hand, not the hand of the player who revealed it, to keep a card and to see whether a second card is there to hold." },
   { version: 45, scenarios: "all", note: "A surge chain whose passes change nothing, like a lone Take Cover! shuffled back again and again, ends instead of repeating for ever." },
+  { version: 46, scenarios: ["attack-on-dol-guldur", "deadmens-dike", "encounter-at-amon-din", "fog-on-the-barrow-downs", "race-across-harad", "roam-across-rhovanion", "the-black-gate-opens", "the-blood-of-gondor", "the-massing-at-osgiliath", "the-road-to-isengard", "the-siege-of-annuminas"], note: "An objective ally that an attack destroys, like the Tamed Mûmak, counts as a character the attack destroyed: the shadow cards and Forced effects that ask whether an attack destroyed a character now see it." },
 ];
 
-export const ENGINE_VERSION = 45;
+export const ENGINE_VERSION = 46;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

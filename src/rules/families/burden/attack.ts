@@ -64,13 +64,13 @@ export function immediateAttackEach(state: ScenarioState, instruction: Each, foc
 }
 
 // The characters an attack destroyed, once it is over: its defenders and the hero an undefended attack landed on (or the character their
-// damage was redirected to) that are in the discard pile with as much damage as they have hit points ("If this attack destroys a
+// damage was redirected to) that are in the discard pile (an objective ally in the encounter discard pile) with as much damage as they have hit points ("If this attack destroys a
 // character", 141065:A:2, 141066:A:2; "After a character is destroyed by a Hill Troll", 01130:A:4).
 export function destroyedByAttack(state: ScenarioState, attack: PendingAttack, ctx: ReduceContext): string[] {
   const hit = new Set([...declaredDefenders(attack), ...(attack.heroId ? [attack.heroId] : [])].flatMap((id) => [id, damageGoesTo(state, id, "combat")]));
   return [...hit].filter((id) => {
     const card = state.cards[id];
-    if (!card || card.zone !== "discard") return false;
+    if (!card || (card.zone !== "discard" && card.zone !== "encounterDiscard")) return false;
     const health = printedOf(ctx.cards, card.code).health;
     return health != null && card.damage >= health;
   });
