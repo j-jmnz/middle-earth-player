@@ -13,7 +13,7 @@ const ASKING = new Set<string>([...ASKING_VERBS, "PickEncounter", "ChooseX", "Re
 
 // The verbs whose engine path opens a choice window (`askTarget`, or `openBranch` for a Choose the engine builds) when more than one card or option is left, found from the call graph of
 // the verb's handler under src/rules. A verb the engine asks about is a pick the sheet words, so each needs an asks entry or words of its own (words-judge.ts), though no Pick or Choose of the record names it.
-// A new verb whose handler calls `askTarget` is added here; the type keeps a name that is no verb out.
+// scripts/checks/engine-asks.test.ts fails on a family verb whose handler reaches a window and is not here; the type keeps a name that is no verb out.
 const ENGINE_ASKING = [
   "ActivateFromCaves", "AddEventsToHand", "AddSourceToHandOfMost", "ArrangeCaves", "ArrangeEncounter", "ArrangeLookedDeck", "ArrangeTop", "AssignFaceup",
   "AttachCollectionHero", "AttachLootFromDiscard", "AttachRandomTreasure", "AttachSacked", "AttachSearched", "AttachToActiveLocation", "AttachToHighestThreatCost",
@@ -51,6 +51,9 @@ function asksWithOption(instruction: Instruction): boolean {
       return false;
   }
 }
+
+/** Every verb the words check counts as asking, with or without an option (scripts/checks/engine-asks.test.ts reads it). */
+export const ASKING_VERB_NAMES: ReadonlySet<string> = new Set([...ASKING, "RevealCorsair", "RemoveTimeCounters", "RevealOutOfPlay", "Each", "TriggerScour"]);
 
 /**
  * Does the instruction ask a player something the sheet has to word: a verb of ASKING, or RevealCorsair when the first player names who reveals it (12154:A:1; its other readings name nobody). The one predicate the words
