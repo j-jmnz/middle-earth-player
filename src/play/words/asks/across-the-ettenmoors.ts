@@ -77,4 +77,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   ...DETERMINATION_ASKS,
   ...POOL_BOON_ASKS,
   ...LOOT_BOON_ASKS,
+
+  "09049:whenRevealed:1 @0.current.0 ChooseCurrentQuest": { note: "{card}: choose the main quest card or a side quest in the staging area to be the current quest this phase.", verb: "Choose" },
+  "10083:forced:1 @0 PickHighestThreat": { note: "{card}: players are tied for the highest threat. Choose the player the Troll enemy engages.", verb: "Engage" },
 };

@@ -42,4 +42,6 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 132036:A:1 and A:2 (Dark Bats, of the Wilderland set): once it damages a character, or as a Shadow effect, it attaches to the character.
   "132036:forced:1 @0 AttachSelf": { note: "{card}: choose the character it damaged to carry it. That character gets -1 Willpower, Attack and Defense.", verb: "Attach" },
   "132036:shadow:1 @0 AttachSelf": { note: "{card}: choose the defending character that carries it. That character gets -1 Willpower, Attack and Defense.", verb: "Attach" },
+
+  "132050:whenRevealed:1 @0.0 AttackHighestWillpower": { note: "{card}: players are tied for the highest willpower committed to the quest. Choose the player each Dragon enemy in the staging area attacks.", verb: "Attack" },
 };

@@ -34,4 +34,11 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 50630:A:1 and A:2 (Covered Pit).
   "50630:whenRevealed:1 @0.0 Pick": { owned: true, note: "Covered Pit: choose an ally you control to discard.", verb: "Discard" },
   "50630:shadow:1 @0 Pick": { owned: true, note: "Covered Pit: choose a Loot objective you control. It is attached to the attacking enemy as a guarded objective.", verb: "Guard" },
+
+  "50621:forced:1 @0 Discover": { note: "{card}, Discover 5: look at the top 5 cards of the encounter deck. Choose 1 looked-at Loot objective to attach to it as a guarded objective. A looked-at Hazard card is revealed, and the rest are discarded.", verb: "Attach" },
+  "50622:forced:1 @0 Discover": { note: "{card}, Discover 2: look at the top 2 cards of the encounter deck, and 1 more for each player. Choose 1 looked-at Loot objective to attach to it as a guarded objective. A looked-at Hazard card is revealed, and the rest are discarded.", verb: "Attach" },
+  "50623:forced:1 @0 Discover": { note: "{card}, Discover 4: look at the top 4 cards of the encounter deck. Choose 1 looked-at Loot objective to attach to it as a guarded objective. 1 more Hazard card is revealed for each other player, and the rest are discarded.", verb: "Attach" },
+  "50624:forced:1 @0 Discover": { note: "{card}, Discover 2: look at the top 2 cards of the encounter deck. Choose 1 looked-at Loot objective to attach to it as a guarded objective. A looked-at Hazard card is revealed, and the rest are discarded.", verb: "Attach" },
+  "50625:forced:1 @0 Discover": { note: "{card}, Discover 3: look at the top 3 cards of the encounter deck. Choose 1 looked-at Loot objective to attach to it as a guarded objective. A looked-at Hazard card is revealed, and the rest are discarded.", verb: "Attach" },
+  "50626:forced:1 @0 Discover": { note: "{card}, Discover 3: look at the top 3 cards of the encounter deck. Choose 1 looked-at Loot objective to attach to it as a guarded objective. A looked-at Hazard card is revealed, and the rest are discarded.", verb: "Attach" },
 };

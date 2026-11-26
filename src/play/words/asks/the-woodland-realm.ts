@@ -26,4 +26,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 51151 (Ambushing Orcs): the attack from the staging area, and the Shadow that engages the lowest engagement cost enemy there.
   "51151:whenRevealed:1 @0 Pick": { note: "Ambushing Orcs: it makes an immediate attack against the first player.", verb: "Attack" },
   "51151:shadow:1 @0 Pick": { note: "Ambushing Orcs: the enemy in the staging area with the lowest engagement cost engages you and is dealt a shadow card. Choose it.", verb: "Engage" },
+
+  "51101:setup:1 @1 ChooseQuestStage": { note: "{card}: choose 1 of the stage 2 quest cards to play with. The others are set aside.", verb: "Choose" },
+  "51101:setup:1 @2 ChooseQuestStage": { note: "{card}: choose 1 of the stage 3 quest cards to play with. The others are set aside.", verb: "Choose" },
 };

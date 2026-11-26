@@ -47,4 +47,11 @@ export const ASKS: Readonly<Record<string, Ask>> = {
 
   // 50223:A:2 (Fisherman's Dock): with 1 active location, a hero is exhausted to travel here, and it becomes the second active location.
   "50223:travel:1 @0 Pick": { owned: true, note: "Fisherman's Dock: choose a ready hero you control to exhaust. You travel here even though a location is active, and it becomes the second active location.", verb: "Exhaust" },
+
+  "50202:triggered:1 @0 HealLakeTownByProgress": { note: "{card}: the players quested successfully. Choose how much of the progress to discard instead of placing it, to remove that much damage from Lake-town.", verb: "Choose" },
+  "50205:whenRevealed:1 @0 ResolveBurn": { owned: true, note: "{card}: resolve all burn damage from the locations in play. You may exhaust ready characters you control to take it; the rest goes on Lake-town.", verb: "Choose" },
+  "50210:whenRevealed:1 @0 ResolveBurn": { owned: true, note: "{card}: resolve all burn damage from the locations in play. You may exhaust ready characters you control to take it; the rest goes on Lake-town.", verb: "Choose" },
+  "50210:shadow:1 @1 ResolveBurn": { owned: true, note: "{card}: its When Revealed effect resolves for the attack: resolve all burn damage from the locations in play. You may exhaust ready characters you control to take it; the rest goes on Lake-town.", verb: "Choose" },
+  "50214:shadow:1 @0.0 ResolveBurn": { owned: true, note: "{card}: the attack destroyed a character, so resolve all burn damage from the locations in play. You may exhaust ready characters you control to take it; the rest goes on Lake-town.", verb: "Choose" },
+  "50221:whenRevealed:1 @0 ResolveBurn": { owned: true, note: "{card}: resolve all burn damage from the locations in play. You may exhaust ready characters you control to take it; the rest goes on Lake-town.", verb: "Choose" },
 };

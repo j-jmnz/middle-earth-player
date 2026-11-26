@@ -16,7 +16,6 @@ import { dealtCodes, loadCampaigns, loadAnyScenario } from "../../../scripts/dat
 import { ROOT } from "../../../scripts/data/paths.ts";
 import { asksFileNames, checkAsksNames, renderAsksBarrel } from "../../../scripts/data/effects/asks-barrel.ts";
 import { walk } from "../../../test/harness/record-walk.ts";
-import { WORDS_OPEN } from "../../../test/harness/words-open.ts";
 import { entryProblems, judgeBranch, judgePick, renderedEntry, tailsOf } from "../../../test/harness/words-judge.ts";
 
 import { askWords } from "./ask.ts";
@@ -218,7 +217,7 @@ describe.each(Object.keys(ASKS_BY_SCENARIO))("the asks of %s", (id) => {
     for (const effect of records) {
       walk(effect.instructions, (instruction, next, after, at) => {
         const verdict = judgePick(judged, effect, instruction, next, after, at);
-        if (verdict?.problem && WORDS_OPEN[verdict.key] === undefined) problems.push(`${verdict.key}: ${verdict.problem}`);
+        if (verdict?.problem) problems.push(`${verdict.key}: ${verdict.problem}`);
         // A Choose with no note entry is worded by its rows: each branch has a label entry or words that are not the fallback.
         if (instruction.verb === "Choose") {
           for (const option of instruction.options) {
