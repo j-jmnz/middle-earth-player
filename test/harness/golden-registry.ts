@@ -207,6 +207,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-fords-of-isen", "The Fords of Isen", isen.ISEN_GOLDENS, isen.isenWorld, isen.playGolden),
   entry("to-catch-an-orc", "To Catch an Orc", orc.ORC_GOLDENS, orc.orcWorld, orc.playGolden),
   entry("into-fangorn", "Into Fangorn", fangorn.FANGORN_GOLDENS, fangorn.fangornWorld, fangorn.playGolden),
+  entry("the-dunland-trap", "The Dunland Trap", trap.TRAP_GOLDENS, trap.trapWorld, trap.playGolden),
   entry("escape-from-umbar", "Escape from Umbar", umbar.UMBAR_GOLDENS, umbar.umbarWorld, umbar.playGolden),
   entry("desert-crossing", "Desert Crossing", crossing.CROSSING_GOLDENS, crossing.crossingWorld, crossing.playGolden),
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
@@ -223,5 +224,4 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-mines-of-moria", "The Mines of Moria", mines.MINES_GOLDENS, mines.minesWorld, mines.playGolden),
   entry("escape-from-khazad-dum", "Escape from Khazad-dûm", khazad.KHAZAD_GOLDENS, khazad.khazadWorld, khazad.playGolden),
   entry("the-hunt-for-the-dreadnaught", "The Hunt for the Dreadnaught", dreadnaught.DREADNAUGHT_GOLDENS, dreadnaught.dreadnaughtWorld, dreadnaught.playGolden),
-  entry("the-dunland-trap", "The Dunland Trap", trap.TRAP_GOLDENS, trap.trapWorld, trap.playGolden),
 ];

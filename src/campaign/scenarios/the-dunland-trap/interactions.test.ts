@@ -3,12 +3,13 @@
 // The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; dh1 and dh2 are the first seat's, dh3 the second's.
 import { describe, expect, it } from "vitest";
 
+import { expireModifiers, flagged } from "../../../rules/core/state.ts";
 import { eliminateSeat } from "../../../rules/core/eliminate.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import type { GameEvent, ScenarioState } from "../../../rules/core/state.ts";
-import { fightEnemy, finish, idOf, opened, resolveRecords, revealedTop, run, tableFromLayout, zoneOf, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { fightEnemy, finish, idOf, opened, resolveRecords, revealedTop, run, statOf, tableFromLayout, zoneOf, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "the-dunland-trap";
 const table = (layout: Layout) => tableFromLayout(SCENARIO, layout);
@@ -105,5 +106,31 @@ describe("Shared cards in this scenario (07046, 08023)", () => {
     const t = table({ seats: 2, staging: [FOOTHILLS], deck: ["f0", "f0"], deckOf: FILLERS });
     const done = revealedTop({ state: opened(t).state, ctx: t.ctx }, "08023");
     expect(done.cards[idOf(done, FOOTHILLS)]?.resources).toBe(2);
+  });
+});
+
+describe("Limits and durations of the encounter cards (08017, 08023, 08024)", () => {
+  it("08017:A:1 the bonus ends at +4 however many resource tokens the Stalker holds", () => {
+    const t = table({ engaged: [{ code: "08017", seat: 0, resources: 9 }] });
+    const state = opened(t).state;
+    const base = t.ctx.cards.get("08017");
+    expect(statOf(state, t.ctx.cards, "08017", "attack")).toBe((base?.attack ?? 0) + 4);
+    expect(statOf(state, t.ctx.cards, "08017", "defense")).toBe((base?.defense ?? 0) + 4);
+  });
+
+  it("08023:A:2 the attacker cannot take damage until the end of the round: it holds at the end of the combat phase and lapses at the end of the round", () => {
+    const fight = fightEnemy((layout: Layout) => table(layout), "08023", TRIBESMAN, {}, { undefended: true });
+    const enemy = idOf(fight.during, TRIBESMAN);
+    expect(flagged(fight.during, enemy, "cannotTakeDamage")).toBe(true);
+    expect(flagged(expireModifiers(fight.during, ["endOfCombat"]), enemy, "cannotTakeDamage")).toBe(true);
+    expect(flagged(expireModifiers(fight.during, ["endOfRound"]), enemy, "cannotTakeDamage")).toBe(false);
+  });
+
+  it("08024:A:2 a second Dunlending Ambush on the same location is discarded again at once: the limit is 1 per location", () => {
+    const t = table({ active: "08019", deck: ["08024", "08024", "f0"], phase: "Quest" });
+    const first = revealedTop({ state: opened(t).state, ctx: t.ctx }, "08024");
+    const second = revealedTop({ state: opened(t, first).state, ctx: t.ctx }, "08024");
+    const attached = Object.values(second.cards).filter((card) => card.code === "08024" && card.zone === "attached");
+    expect(attached).toHaveLength(1);
   });
 });
