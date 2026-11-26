@@ -5,7 +5,11 @@ import type { Ask } from "../asks.ts";
 // The Scour order picks (`TriggerScour`, asked of the first player when two or more cards are left) are asked by the engine, not by a record's Pick, so the words test does not reach them; their entries are keyed on the record that triggers them.
 const SCOUR_ORDER: Ask = {
   owned: true,
-  note: "Choose which Scour effect resolves next. Each one finishes before the next starts, so damage from one can bury a location before Ancient Foundation counts locations.",
+  // The clause about Ancient Foundation is said only while one is in play: it is the card that counts locations.
+  note: [
+    { when: { kind: "canPick", pick: { type: "location", control: "any", staging: true, names: ["Ancient Foundation"] } }, text: "Choose which Scour effect resolves next. Each one finishes before the next starts, so damage from one can bury a location before Ancient Foundation counts locations." },
+    { text: "Choose which Scour effect resolves next. Each one finishes before the next starts." },
+  ],
   verb: "Resolve",
 };
 
@@ -19,7 +23,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
 
   // 08123:A:1 (The Enemy's Servant): each Scour effect, then Bellach attacks the player who controls Celebrimbor's Mould, then the Mould is attached to Bellach.
   "08123:whenRevealed:1 @0 TriggerScour": SCOUR_ORDER,
-  "08123:whenRevealed:1 @1 Pick": { note: "The Enemy's Servant: Bellach attacks the player who controls Celebrimbor's Mould. Then the Mould is attached to Bellach.", verb: "Attack" },
+  "08123:whenRevealed:1 @1 Pick": { owned: true, note: "The Enemy's Servant: Bellach attacks the player who controls Celebrimbor's Mould. Then the Mould is attached to Bellach.", verb: "Attack" },
 
   // 08124:A:1 (Bellach): Scour, each player searches the encounter deck and discard pile for an Orc enemy and adds it to the staging area.
   "08124:triggered:1 @0.0 SearchMove": { owned: true, note: "Bellach's Scour: choose an Orc enemy from the encounter deck or discard pile. It is added to the staging area.", verb: "Add" },
@@ -35,7 +39,15 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "08130:shadow:1 @0 AssignDamage": { owned: true, note: "Ruined Plaza's shadow: assign {left} damage among characters you control, one for each card underneath The Orcs' Search.", title: "{card}: assign {left}", verb: "Assign" },
 
   // 08132:A:1 (Ancient Foundation): Scour, the first player assigns X damage among locations in play.
-  "08132:triggered:1 @0 AssignDamage": { owned: true, note: "Ancient Foundation's Scour: assign {left} damage among locations in play, one for each location in play. A location with damage at least its quest points goes underneath The Orcs' Search.", title: "{card}: assign {left}", verb: "Assign" },
+  "08132:triggered:1 @0 AssignDamage": {
+    owned: true,
+    note: [
+      { when: { kind: "canPick", pick: { type: "location", control: "any", staging: true, names: ["The Secret Chamber"] } }, text: "Ancient Foundation's Scour: assign {left} damage among locations in play, one for each location. A location at its quest points goes underneath The Orcs' Search. If The Secret Chamber goes there, the players lose the game." },
+      { text: "Ancient Foundation's Scour: assign {left} damage among locations in play, one for each location. A location at its quest points goes underneath The Orcs' Search." },
+    ],
+    title: "{card}: assign {left}",
+    verb: "Assign",
+  },
 
   // 08134:A:1 (Discovered!): trigger each Scour effect, or each player puts a random hand card underneath The Orcs' Search.
   "08134:whenRevealed:1 @0.scour.0 TriggerScour": SCOUR_ORDER,

@@ -64,6 +64,7 @@ export function celebrimborDials(game: ScenarioState, ctx: ReduceContext, nameOf
       id: "search",
       testID: "ring-maker-search",
       label: "Search",
+      icon: "shadow",
       name: `Cards facedown under ${nameOf(ORCS_SEARCH)}:`,
       value: count,
       cardId: search.id,

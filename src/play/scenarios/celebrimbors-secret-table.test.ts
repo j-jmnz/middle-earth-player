@@ -47,9 +47,17 @@ describe("the cards underneath The Orcs' Search (08125:A:1, 08125:A:2, 08124:A:1
     expect(searchDial(far)?.warn).toBeUndefined();
   });
 
-  it("08126:A:3 says The Secret Chamber's cost to travel and its risk in its preview", () => {
+  it("08125:A:1 the Search dial has its own icon, and the preview of The Orcs' Search names a location near its quest points", () => {
+    const made = built({ staging: [SEARCH, { code: CHAMBER, damage: 4 }] });
+    expect(searchDial(made)?.icon).toBe("shadow");
+    expect(detail(made, made.state, SEARCH)).toContain("The Secret Chamber has 4 of 6 damage. At 6 it goes underneath The Orcs' Search, and the players lose the game.");
+    const calm = built({ staging: [SEARCH] });
+    expect(detail(calm, calm.state, SEARCH)).not.toContain("damage.");
+  });
+
+  it("08126:A:3 says The Secret Chamber's damage and its risk first in its preview, without the printed face's words", () => {
     const made = built({ staging: [SEARCH, { code: CHAMBER, damage: 1 }] });
-    expect(detail(made, made.state, CHAMBER)).toContain("To travel here, remove 3 progress from the current quest. 1 of 6 damage: at 6 it goes underneath The Orcs' Search, and the players lose the game.");
+    expect(detail(made, made.state, CHAMBER)).toBe("1 of 6 damage. At 6 it goes underneath The Orcs' Search, and the players lose the game.");
   });
 });
 
@@ -57,20 +65,20 @@ describe("Celebrimbor's Mould (08127:A:1, 08127:A:2)", () => {
   it("08127:A:2 on a hero says that losing the hero loses the game, and the hero wears the pill", () => {
     const made = built({ attached: [{ code: MOULD, to: "dh1", encounter: true }] });
     expect(detail(made, made.state, MOULD)).toMatch(/is held by .*\. If .* leaves play, the players lose the game\.$/);
-    expect(ringMakerHeldMark(made.state, made.ctx, made.hero)).toMatchObject({ text: "held" });
+    expect(ringMakerHeldMark(made.state, made.ctx, made.hero)).toMatchObject({ text: "Mould" });
   });
 
   it("08127:A:1 on The Secret Chamber says it is not free while the Chamber is in play", () => {
     const made = built({ staging: [CHAMBER], attached: [{ code: MOULD, to: CHAMBER, encounter: true }] });
     expect(detail(made, made.state, MOULD)).toContain("It is not free of encounters while The Secret Chamber is in play.");
     expect(detail(made, made.state, CHAMBER)).toContain("The Secret Chamber holds Celebrimbor's Mould.");
-    expect(ringMakerHeldMark(made.state, made.ctx, idOf(made.state, CHAMBER))).toMatchObject({ text: "held" });
+    expect(ringMakerHeldMark(made.state, made.ctx, idOf(made.state, CHAMBER))).toMatchObject({ text: "Mould" });
   });
 
-  it("08123:A:1 on Bellach says no hero holds it, and the stage cannot advance", () => {
+  it("08123:A:1 on Bellach says no hero holds it, and stage 2 cannot be defeated", () => {
     const made = built({ stage: "08123", staging: [BELLACH], attached: [{ code: MOULD, to: BELLACH, encounter: true }] });
-    expect(detail(made, made.state, MOULD)).toContain("No hero holds it, so the stage cannot advance.");
-    expect(detail(made, made.state, BELLACH)).toContain("Bellach holds Celebrimbor's Mould.");
+    expect(detail(made, made.state, MOULD)).toContain("No hero holds it, so the stage cannot be defeated.");
+    expect(detail(made, made.state, BELLACH)).toContain("Bellach holds Celebrimbor's Mould. No hero holds it, so the stage cannot be defeated.");
   });
 });
 
@@ -114,8 +122,8 @@ describe("Bellach's immunity (08122:B:3, 08123:B:3)", () => {
 
   it("08123:B:3 says it holds until stage 2 has 12 progress, with the progress now, and then that he can be engaged", () => {
     const low = built({ stage: "08123", staging: [BELLACH, SEARCH], progress: 5 });
-    expect(detail(low, opened(low).state, BELLACH)).toContain("until stage 2 has 12 progress (5 now).");
+    expect(detail(low, opened(low).state, BELLACH)).toContain("until stage 2 has at least 12 progress (5 now).");
     const high = built({ stage: "08123", staging: [BELLACH, SEARCH], progress: 12 });
-    expect(detail(high, opened(high).state, BELLACH)).toContain("The stage holds 12 progress, so players can engage Bellach");
+    expect(detail(high, opened(high).state, BELLACH)).toContain("The stage has at least 12 progress, so players can engage Bellach");
   });
 });

@@ -31,7 +31,8 @@ const sheetOf = (t: Table, state: ScenarioState) => {
   if (sheet?.kind !== "pick") throw new Error(`no pick sheet: ${JSON.stringify(state.window)}`);
   return sheet;
 };
-const SAYS = "hoose which Scour effect resolves next. Each one finishes before the next starts, so damage from one can bury a location before Ancient Foundation counts locations.";
+const SAYS = "hoose which Scour effect resolves next. Each one finishes before the next starts.";
+const FOUNDATION_SAYS = " Each one finishes before the next starts, so damage from one can bury a location before Ancient Foundation counts locations.";
 const TITLES = ["Bellach's Scout", "Collapsed Tower"];
 
 // Each case: the asks key it proves, the card and record that open the window.
@@ -55,6 +56,22 @@ describe("the Scour order pick (TriggerScour, asked by the engine from the recor
       expect(alone.note).not.toContain("Player 1");
     });
   }
+
+  it("08132:A:1 names Ancient Foundation in the order sentence only while one is in play, and lists two copies that lie alike once", () => {
+    const t = tableFromLayout(ID, { seats: 1, phase: "Quest", stage: "08122", staging: [SCOUT, "08132", "08132"], active: PLAZA, deckOf: ["filler", "filler", "filler"] });
+    const sheet = sheetOf(t, opened(t, "08122", "08122:forced:1", "forced", t.state.questStage ?? ""));
+    expect(sheet.note).toContain(FOUNDATION_SAYS);
+    expect(sheet.options.map((option) => option.label).sort()).toEqual(["Ancient Foundation", "Bellach's Scout"]);
+  });
+
+  it("08132:A:1 the damage sheet of Ancient Foundation warns that The Secret Chamber going underneath The Orcs' Search loses the game, only while the Chamber is in play", () => {
+    const sayOf = (staging: readonly string[]) => {
+      const t = tableFromLayout(ID, { seats: 1, phase: "Quest", stage: "08122", staging, active: PLAZA, deckOf: ["filler", "filler", "filler"] });
+      return sheetOf(t, opened(t, "08132", "08132:triggered:1", "forced", idOf(t.state, "08132"))).note;
+    };
+    expect(sayOf(["08132", "08126", "08125"])).toContain("If The Secret Chamber goes there, the players lose the game.");
+    expect(sayOf(["08132", "08125"])).not.toContain("Secret Chamber");
+  });
 
   it("08134:A:1 words the order under the key 08134:whenRevealed:1 @0.scour.0 TriggerScour once the first player chose to trigger each Scour effect", () => {
     const t = tableFromLayout(ID, { seats: 2, phase: "Quest", staging: [SCOUT, TOWER, "08134"], active: PLAZA, deckOf: ["filler", "filler", "filler"] });

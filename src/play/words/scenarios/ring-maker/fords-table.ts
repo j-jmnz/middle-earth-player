@@ -36,7 +36,7 @@ const STANDING: Readonly<Record<string, string>> = {
   "08099": "Each player readies at most 5 characters in the refresh phase.",
   "08100": "Each enemy in the staging area gets -20 engagement cost.",
   "08122": "Bellach is immune to player card effects and cannot be engaged.",
-  "08123": "Until this stage has 12 progress, Bellach is immune to player card effects and cannot be engaged.",
+  "08123": "Bellach is immune to player card effects and cannot be engaged until this stage has at least 12 progress. At 12 or more the immunity is lifted.",
 };
 
 /** The words of a table flag that a stage of this cycle holds (`commitDiscardsRandom`, 08096:B:3), for the sheets the flag changes. */

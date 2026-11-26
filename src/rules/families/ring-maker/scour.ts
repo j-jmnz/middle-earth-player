@@ -38,14 +38,28 @@ function stillInScope(state: ScenarioState, id: string, scope: Scour["scope"]): 
   return zone != null && (scope === "inPlay" ? inPlay(zone) : zone === "encounterDiscard");
 }
 
+/** The cards the first player picks among: two copies of one title that lie alike (same place, same damage and progress, no attachments, the same holder) are one choice, as two Ancient Foundations in the staging area are; the oldest one stands for both. Copies that differ stay apart. */
+function scourOptions(state: ScenarioState, ids: readonly string[]): string[] {
+  const kept: string[] = [];
+  for (const id of distinctChoices(state, ids)) {
+    const card = state.cards[id];
+    const alike = kept.some((other) => {
+      const held = state.cards[other];
+      return card != null && held != null && held.code === card.code && held.zone === card.zone && held.controller === card.controller && held.host === card.host && held.damage === card.damage && held.progress === card.progress && held.attachments.length === 0 && card.attachments.length === 0;
+    });
+    if (!alike) kept.push(id);
+  }
+  return kept;
+}
+
 /**
- * TriggerScour: the set of Scour cards is fixed when the trigger starts (`remaining` carries what is left). The first player chooses which resolves next: one pick for each card in play (asked whenever two or more cards are left: each card in play is its own choice, even a copy of the same title). The chosen card's scour effect runs in a frame of its own with the card
+ * TriggerScour: the set of Scour cards is fixed when the trigger starts (`remaining` carries what is left). The first player chooses which resolves next: one pick for each card in play (asked whenever two or more choices are left: each card in play is its own choice, except copies that lie alike, which are one). The chosen card's scour effect runs in a frame of its own with the card
  * as its source, wherever the card lies (a card in the discard pile resolves from there and stays); a frame under it carries on with the cards left, so the effects resolve one after the other, each before the effect that follows the trigger.
  */
 export function triggerScour(state: ScenarioState, instruction: Scour, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const left = (instruction.remaining ?? scourCards(state, instruction.scope, ctx)).filter((id) => stillInScope(state, id, instruction.scope) && scourEffects(state, id, ctx).length > 0);
   if (left.length === 0) return state;
-  const options = distinctChoices(state, left);
+  const options = scourOptions(state, left);
   const chosen = focus.chosen != null && left.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;
   if (chosen == null) return askTarget(state, { instruction: { ...instruction, remaining: left }, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, options);
   const rest = left.filter((id) => id !== chosen);

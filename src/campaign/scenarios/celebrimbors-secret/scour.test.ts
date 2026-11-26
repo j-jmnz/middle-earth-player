@@ -30,7 +30,7 @@ describe("TriggerScour in play (rm.scour)", () => {
     expect(state.activeLocation).toBeNull();
   });
 
-  it("08122:B:2 asks the first player which of two Scour cards with different titles resolves first, and resolves both", () => {
+  it("08122:B:2 asks the first player which of two Scour cards resolves first, and resolves both", () => {
     const t = table({ staging: [SCOUT, TOWER], active: PLAZA });
     const stage = t.state.questStage ?? "";
     let options: string[] = [];
@@ -44,6 +44,21 @@ describe("TriggerScour in play (rm.scour)", () => {
     expect(damage(picked.state, PLAZA)).toBe(1);
     expect(damage(picked.state, TOWER)).toBe(2);
     expect(picked.state.cards[stage]?.resources).toBe(3);
+  });
+
+  it("08132:A:1 offers two Foundations that lie alike as one choice, and a damaged copy as another", () => {
+    const offered = (layout: Layout): string[] => {
+      const t = table(layout);
+      let options: string[] = [];
+      resolveRecords(t.state, t.ctx, "08122", "forced", t.state.questStage ?? "", (state) => {
+        const now = state.window?.kind === "choose" ? [...state.window.options] : [];
+        options = options.length === 0 ? now : options;
+        return now[0] ?? "";
+      });
+      return options.map((id) => t.state.cards[id]?.code ?? "");
+    };
+    expect(offered({ staging: [FOUNDATION, FOUNDATION, SCOUT] })).toEqual([FOUNDATION, SCOUT]);
+    expect(offered({ staging: [FOUNDATION, { code: FOUNDATION, damage: 1 }, SCOUT] })).toEqual([FOUNDATION, FOUNDATION, SCOUT]);
   });
 
   it("08124:A:2 fixes the set at the start: a Scour card that enters play during the trigger does not resolve", () => {
