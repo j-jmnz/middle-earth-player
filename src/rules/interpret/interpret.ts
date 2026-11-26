@@ -248,13 +248,16 @@ export function dealStepShadow(state: ScenarioState, enemyId: string, steps: Eng
   return next;
 }
 
+/** Where an additional shadow card comes from when the record names it. */
+export type ShadowSource = "encounter" | "raven";
+
 // One more shadow card for an enemy, beside any it has (141069:A:2). With none yet it is simply its shadow card. An empty
 // encounter deck deals nothing (rr.step-6-2).
-// An enemy that holds `shadowsFromBalrog` is dealt from the Balrog deck, which is refilled from its discard pile when it is empty (901801:A:3, A:4); `fromEncounter` deals from the encounter deck whatever the enemy holds ("from the encounter deck (not the Balrog deck)", 901806:A:1).
-// `fromRaven` deals it from the Raven deck ("Deal attacking enemy 2 additional shadow cards from the Raven deck", 08156:A:2; rm.raven-deck), which is refilled from its own discard pile, where the shadow card goes when it is discarded.
-export function dealAdditionalShadow(given: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext, fromEncounter = false, fromRaven = false): ScenarioState {
-  const balrog = !fromEncounter && !fromRaven && given.piles?.balrogDeck !== undefined && flagged(given, enemyId, "shadowsFromBalrog");
-  const raven = fromRaven && given.piles?.ravenDeck !== undefined;
+// An enemy that holds `shadowsFromBalrog` is dealt from the Balrog deck, which is refilled from its discard pile when it is empty (901801:A:3, A:4); `from` "encounter" deals from the encounter deck whatever the enemy holds ("from the encounter deck (not the Balrog deck)", 901806:A:1).
+// `from` "raven" deals it from the Raven deck ("Deal attacking enemy 2 additional shadow cards from the Raven deck", 08156:A:2; rm.raven-deck), which is refilled from its own discard pile, where the shadow card goes when it is discarded.
+export function dealAdditionalShadow(given: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext, from?: ShadowSource): ScenarioState {
+  const balrog = from == null && given.piles?.balrogDeck !== undefined && flagged(given, enemyId, "shadowsFromBalrog");
+  const raven = from === "raven" && given.piles?.ravenDeck !== undefined;
   // An empty deck is refilled at once while the Nightmare setup card says so (encounterRefill, 900201:A:3); the reset is logged.
   const state = balrog ? refillDeck(given, DECKS.balrog, steps) : raven ? refillDeck(given, DECKS.raven, steps) : refillEncounterDeck(given, steps, ctx);
   const enemy = state.cards[enemyId];
