@@ -115,7 +115,7 @@ Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; sta
 
 08098:B:3 (back): Each location in play gets +1 Threat.
   08098:constant:2: Constant
-    - each location (any player controls): stat threat 1, while this card is in play
+    - each location (any player controls) or in the staging area: stat threat 1, while this card is in play
 
 ## 08099 Lost in the Swanfleet
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -182,7 +182,7 @@ Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; sta
     - heal all damage from the picked card
     - choose enemy (any player controls) or in the staging area, named "Ancient Marsh-dweller"
     - for each player, first player first:
-      - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
+      - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card (or engaged)
 
 08101:B:1 (back): Time 2.
   08101:constant:1: Constant
@@ -194,11 +194,11 @@ Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; sta
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Ancient Marsh-dweller"
     - for each player, first player first:
-      - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
+      - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card (or engaged)
     - place 2 resource tokens on this card
 
 08101:B:3 (back): When Ancient Marsh-dweller is defeated, the players win the game.
-  08101:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) named "Ancient Marsh-dweller")
+  08101:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Ancient Marsh-dweller")
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
@@ -249,7 +249,8 @@ Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; sta
   08104:forced:1: Forced on the event timeCountersRemoved
     only if this card is engaged with a player (that player is who "you" means in this record)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - this enemy attacks the acting player now, as an attack outside the combat phase: from the staging area though it is not engaged, or while it is engaged with them; it is dealt a shadow card of its own (nothing when it is engaged with another player or out of play)
+    - for each player, first player first:
+      - if this card is an enemy engaged with the acting player: this enemy attacks the acting player now, as an attack outside the combat phase: from the staging area though it is not engaged, or while it is engaged with them; it is dealt a shadow card of its own (nothing when it is engaged with another player or out of play)
 
 ## 08105 Neekerbreekers
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -259,8 +260,8 @@ Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; sta
     only if this card is engaged with a player (that player is who "you" means in this record)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:
-      - if there is a ally (you control) to choose: choose ally (you control)
-      - then, if there is a ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
+      - if all of: (this card is an enemy engaged with the acting player) and (there is a ally (you control) to choose): choose ally (you control)
+      - then, if all of: (this card is an enemy engaged with the acting player) and (there is a ally (you control) to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
 
 08105:A:2 (shadow): Shadow: Deal 1 damage to the defending character.
   08105:shadow:1: Shadow
@@ -290,7 +291,7 @@ Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; sta
   08107:forced:1: Forced at the end of the round
     only if this card is in the staging area
     who acts: the acting player is the first player (a phase has no player of its own)
-    - remove up to 1 progress from each location (any player controls) (the number of tokens removed in all is the effect's X)
+    - remove up to 1 progress from each location (any player controls) or in the staging area (the number of tokens removed in all is the effect's X)
 
 08107:A:2 (shadow): Shadow: If this attack destroys a character remove all progress from the current quest.
   08107:shadow:1: Shadow
@@ -355,4 +356,4 @@ Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; sta
       - the acting player finds one Creature enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
     - shuffle the encounter deck
 
-(rendered pieces: 189 by template, 0 as JSON)
+(rendered pieces: 195 by template, 0 as JSON)

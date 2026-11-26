@@ -2,19 +2,30 @@
 // The encounter cards of The Nîn-in-Eilph on its scene: each record that rests on an engine path this task checks (the time trigger, the staging area's granted Forced effects, the shadow effects that read the table), resolved in a real state.
 import { describe, expect, it } from "vitest";
 
-import { updateCard, type ScenarioState } from "../../core/state.ts";
-import { settle } from "../../engine/machine.ts";
-import { syncConstants } from "../../interpret/constants.ts";
-import { queueEvent } from "../../windows/queue.ts";
-import { modifiedStat } from "../../core/keywords.ts";
-import { definePrinted, type PrintedCard } from "../../core/printed.ts";
-import { attachTo, spawn } from "../../core/zones.ts";
-import { legalIntents } from "../../engine/legal.ts";
-import type { PlayerIntent } from "../../core/intents.ts";
+import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import { syncConstants } from "../../../rules/interpret/constants.ts";
+import { queueEvent } from "../../../rules/windows/queue.ts";
+import { modifiedStat } from "../../../rules/core/keywords.ts";
+import { definePrinted, type PrintedCard } from "../../../rules/core/printed.ts";
+import { attachTo, spawn } from "../../../rules/core/zones.ts";
+import { legalIntents } from "../../../rules/engine/legal.ts";
+import type { EngineStep, PlayerIntent } from "../../../rules/core/intents.ts";
+import { startScenario } from "../../../rules/setup/setup.ts";
+import { reduce } from "../../../rules/engine/reduce.ts";
+import { eilphStart, eilphWorld } from "../../../../test/scenarios/the-nin-in-eilph/game.ts";
 import { fightEnemy, finish, idOf, resolveRecords, run, send, statOf, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const table = (layout: Layout) => tableFromLayout("the-nin-in-eilph", layout);
 const STAGE = "08098";
+const STAGES_2: readonly string[] = ["08095", "08096", "08097"];
+// The real Setup of a seeded game: the opening hands kept, the searches answered with the first option offered.
+const playedSetup = ({ ctx }: Awaited<ReturnType<typeof eilphWorld>>, seats: 1 | 2): ScenarioState => {
+  let state = reduce(startScenario(eilphStart(seats, 1, "Normal"), ctx), { type: "Keep" }, ctx).state;
+  if (seats === 2) state = reduce(state, { type: "Keep" }, ctx).state;
+  for (let guard = 0; guard < 8 && state.window?.kind === "choose"; guard += 1) state = reduce(state, { type: "Choose", optionId: state.window.options[0] ?? "" }, ctx).state;
+  return state;
+};
 const FILLERS = ["f0", "f0", "f0", "f0"];
 // Stand-ins for the attachments the Sinking Bog counts: an Item and a Condition.
 const ITEM = "item";
@@ -45,6 +56,23 @@ describe("after any number of time counters come off the current quest, an engag
     expect(done.pendingAttack?.seat).toBe(0);
   });
 
+  it("08104:A:2 the Giant Swamp Adder engaged with the second player attacks that player, whoever the first player is", () => {
+    for (const firstPlayer of [0, 1] as const) {
+      const { t, state } = counted({ seats: 2, firstPlayer, engaged: [{ code: "08104", seat: 1 }], deck: FILLERS });
+      const done = run(t, state, { verb: "RemoveTimeFromQuest", amount: 1 });
+      expect(done.pendingAttack?.enemyId).toBe(idOf(done, "08104"));
+      expect(done.pendingAttack?.seat).toBe(1);
+    }
+  });
+
+  it("08104:A:2 the Giant Swamp Adder engaged with the first player attacks him once, not each player", () => {
+    const { t, state } = counted({ seats: 2, firstPlayer: 1, engaged: [{ code: "08104", seat: 0 }], deck: FILLERS });
+    const steps: EngineStep[] = [];
+    const done = run(t, state, { verb: "RemoveTimeFromQuest", amount: 1 }, { steps });
+    expect(done.pendingAttack?.seat).toBe(0);
+    expect(steps.filter((step) => step.kind === "attack")).toHaveLength(1);
+  });
+
   it("08104:A:2 the Giant Swamp Adder in the staging area does nothing", () => {
     const { t, state } = counted({ staging: ["08104"], deck: FILLERS });
     const done = run(t, state, { verb: "RemoveTimeFromQuest", amount: 1 });
@@ -57,6 +85,15 @@ describe("after any number of time counters come off the current quest, an engag
     const ally = idOf(state, "ally");
     const done = run(t, state, { verb: "RemoveTimeFromQuest", amount: 1 });
     expect(done.cards[ally]?.damage === 2 || done.cards[ally]?.zone !== "play").toBe(true);
+  });
+
+  it("08105:A:1 Neekerbreekers engaged with the second player deal 2 damage once, to an ally that player controls and no other", () => {
+    const { t, state } = counted({ seats: 2, engaged: [{ code: "08105", seat: 1 }], play: [{ code: "ally", seat: 0 }, { code: "ally", seat: 1 }] });
+    const done = run(t, state, { verb: "RemoveTimeFromQuest", amount: 1 });
+    // The stand-in ally has 2 hit points: it takes 2 damage and is destroyed.
+    const allies = (seat: number) => Object.values(done.cards).filter((card) => card.code === "ally" && card.controller === seat);
+    expect(allies(0).map((card) => [card.zone, card.damage])).toEqual([["play", 0]]);
+    expect(allies(1).map((card) => [card.zone, card.damage])).toEqual([["discard", 2]]);
   });
 
   it("08105:A:1 Neekerbreekers engaged with a player who has no ally deal no damage to a hero", () => {
@@ -99,6 +136,13 @@ describe("Fen of Reeds, Finger of Glanduin and the cards that grant Forced effec
   it("08106:A:1 the first stage of the game is no advance: Fen of Reeds, added by the Setup, waits for the quest to advance", () => {
     const t = table({ stage: "08094", side: "A", staging: ["08106"] });
     expect(exhaustedCount(t.state)).toBe(0);
+  });
+
+  it("08106:A:1 the Setup's flip of stage 1 is no advance: with Fen of Reeds staged by the search, the one player exhausts a character once, for the advance to a stage 2", async () => {
+    const state = playedSetup(await eilphWorld("strong"), 1);
+    expect(state.staging.map((id) => state.cards[id]?.code)).toContain("08106");
+    expect(STAGES_2).toContain(state.cards[state.questStage ?? ""]?.code ?? "");
+    expect(exhaustedCount(state)).toBe(1);
   });
 
   it("08107:A:1 at the end of the round 1 progress comes off each location in play, the active location too, while Finger of Glanduin is in the staging area", () => {
@@ -230,6 +274,21 @@ describe("the Setup and Nalir (08094:A:1, 08102:A:1, 08102:A:2)", () => {
     const staged = done.staging.map((id) => done.cards[id]?.code);
     expect(staged).toHaveLength(2);
     expect(new Set(staged).size).toBe(2);
+  });
+
+  it("08094:A:1 the played Setup stages one searched Marsh location for each player, and the four searched copies are not dealt into the staging area", async () => {
+    const locations = ["08106", "08107", "08108", "08109"];
+    for (const seats of [1, 2] as const) {
+      const state = playedSetup(await eilphWorld("strong"), seats);
+      const staged = state.staging.map((id) => state.cards[id]?.code ?? "");
+      expect(staged, `${seats} seats`).toHaveLength(seats);
+      expect(new Set(staged).size).toBe(seats);
+      expect(staged.every((code) => locations.includes(code))).toBe(true);
+      // The pile's four searched copies lie in the encounter deck as search targets: 7 printed locations and the 4 make 11, and each search took one.
+      expect(state.encounterDeck.filter((id) => locations.includes(state.cards[id]?.code ?? ""))).toHaveLength(11 - seats);
+      expect(inZone(state, "08103")).toBe("setAside");
+      expect(state.cards[idOf(state, "08102")]).toMatchObject({ zone: "play", controller: 0 });
+    }
   });
 
   it("08102:A:1 control of Nalir goes to the first player", () => {

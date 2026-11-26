@@ -19,7 +19,10 @@ const EACH_PLAYER = (instructions: Extract<Instruction, { verb: "ForEachPlayer" 
 const MARSH: PickSpec = { type: "enemy", control: "any", staging: true, names: ["Ancient Marsh-dweller"] };
 const READY_CHARACTER: PickSpec = { type: "character", control: "you", state: "ready" };
 const OWN_ALLY: PickSpec = { type: "ally", control: "you" };
-const LOCATION_IN_PLAY: PickSpec = { type: "location", control: "any" };
+// "Each location in play": the active location and every location in the staging area.
+const LOCATION_IN_PLAY: PickSpec = { type: "location", control: "any", staging: true };
+const ENGAGED_WITH_ACTOR: Condition = { kind: "engagedWithActor" };
+const HAS_OWN_ALLY: Condition = { kind: "all", conditions: [ENGAGED_WITH_ACTOR, { kind: "canPick", pick: OWN_ALLY }] };
 const HAS_READY_CHARACTER: Condition = { kind: "canPick", pick: READY_CHARACTER };
 // "Add Ancient Marsh-dweller to the staging area (from out of play or engaged with a player) and heal all damage from it" (08098:A:1 to 08101:A:1): the set-aside copy joins the staging area, a copy engaged with a player returns to it, and its damage (not its resource tokens) is healed.
 const MARSH_TO_STAGING: Instruction[] = [
@@ -28,8 +31,8 @@ const MARSH_TO_STAGING: Instruction[] = [
   { verb: "ReturnToStaging", target: { kind: "picked" } },
   { verb: "Heal", all: true, target: "picked" },
 ];
-// "Ancient Marsh-dweller makes an attack against each player in player order" (08101:A:1, B:2): a normal attack on each player from the staging area, the first player first.
-const MARSH_ATTACKS: Instruction[] = [{ verb: "Pick", pick: MARSH }, EACH_PLAYER([{ verb: "AttackFromStaging" }])];
+// "Ancient Marsh-dweller makes an attack against each player in player order" (08101:A:1, B:2): an attack outside the combat phase on each player, the first player first, wherever the enemy is (staged or engaged); it does not move (agent recommendation, scenario file).
+const MARSH_ATTACKS: Instruction[] = [{ verb: "Pick", pick: MARSH }, EACH_PLAYER([{ verb: "AttackFromStaging", orEngaged: true }])];
 
 // The three stages 2 print the same When Revealed, Time, last-counter and defeat lines; each has its own third line (B:3).
 const stageTwo = (code: string, bar: Instruction[]): Effect[] => [
@@ -78,7 +81,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "08101:whenRevealed:1", cardCode: STAGE_4, lines: ["08101:A:1"], timing: "whenRevealed", instructions: [...MARSH_TO_STAGING, ...MARSH_ATTACKS] },
     { id: "08101:constant:1", cardCode: STAGE_4, lines: ["08101:B:1"], timing: "constant", instructions: [{ verb: "Time", amount: 2 }] },
     { id: "08101:forced:1", cardCode: STAGE_4, lines: ["08101:B:2"], timing: "forced", trigger: "lastTimeCounterRemoved", subject: "self", instructions: [...MARSH_ATTACKS, { verb: "PlaceResourceTokens", amount: 2, on: "self" }] },
-    { id: "08101:triggered:1", cardCode: STAGE_4, lines: ["08101:B:3"], timing: "triggered", trigger: "enemyDestroyed", subject: { type: "enemy", control: "any", names: ["Ancient Marsh-dweller"] }, instructions: [{ verb: "WinGame" }] },
+    { id: "08101:triggered:1", cardCode: STAGE_4, lines: ["08101:B:3"], timing: "triggered", trigger: "enemyDestroyed", subject: { type: "enemy", control: "any", staging: true, names: ["Ancient Marsh-dweller"] }, instructions: [{ verb: "WinGame" }] },
 
     // 08102 Nalir (objective ally): as in Trouble in Tharbad, the first player controls him as the first player token passes and raises his threat by the players at the beginning of the refresh phase (the build writes the loss when he leaves play).
     copyLines("08068", NALIR, "A:1", "A:2"),
@@ -87,11 +90,11 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "08103:constant:2", cardCode: MARSH_DWELLER, lines: ["08103:A:2"], timing: "constant", instructions: ["threat", "attack"].map((stat): Instruction => ({ verb: "ModifyStat", stat: stat as "threat" | "attack", amount: { stat: "resources", of: "self" }, until: "whileSourceInPlay", target: "self" })) },
     afterTimeRemoved("08103:forced:1", MARSH_DWELLER, "08103:A:3", [{ verb: "PlaceResourceTokens", amount: 1, on: "self" }]),
 
-    // 08104 Giant Swamp Adder. Engaged, it attacks its player after a removal of time counters; staged it does nothing.
-    afterTimeRemoved("08104:forced:1", "08104", "08104:A:2", [{ verb: "AttackActor" }], SELF_ENGAGED),
+    // 08104 Giant Swamp Adder. Engaged, it attacks the player it is engaged with after a removal of time counters (the loop reaches that player whoever acts first); staged it does nothing.
+    afterTimeRemoved("08104:forced:1", "08104", "08104:A:2", [EACH_PLAYER([{ verb: "AttackActor", when: ENGAGED_WITH_ACTOR }])], SELF_ENGAGED),
 
-    // 08105 Neekerbreekers. Engaged, its player deals 2 damage to an ally he controls after a removal of time counters (none to deal it to: nothing). Shadow: 1 damage to the defending character.
-    afterTimeRemoved("08105:forced:1", "08105", "08105:A:1", [EACH_PLAYER([{ verb: "Pick", pick: OWN_ALLY, when: { kind: "canPick", pick: OWN_ALLY } }, { verb: "DamageCard", amount: 2, target: "picked", when: { kind: "canPick", pick: OWN_ALLY } }])], SELF_ENGAGED),
+    // 08105 Neekerbreekers. Engaged, the player it is engaged with deals 2 damage to one ally he controls (once, not for each player) after a removal of time counters (none to deal it to: nothing). Shadow: 1 damage to the defending character.
+    afterTimeRemoved("08105:forced:1", "08105", "08105:A:1", [EACH_PLAYER([{ verb: "Pick", pick: OWN_ALLY, when: HAS_OWN_ALLY }, { verb: "DamageCard", amount: 2, target: "picked", when: HAS_OWN_ALLY }])], SELF_ENGAGED),
     { id: "08105:shadow:1", cardCode: "08105", lines: ["08105:A:2"], timing: "shadow", instructions: [{ verb: "DamageCard", amount: 1, target: "defender" }] },
 
     // 08106 Fen of Reeds. In the staging area it holds a Forced effect: after the players advance to a quest stage each player exhausts a character he controls (one with none ready exhausts none). Shadow: +1 Attack for each time counter on the quest.

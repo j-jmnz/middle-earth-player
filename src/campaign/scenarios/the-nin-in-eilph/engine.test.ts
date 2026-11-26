@@ -3,16 +3,16 @@
 // (`timeCountersRemoved`), and the table flags that bar what player card effects give and what committing costs.
 import { describe, expect, it } from "vitest";
 
-import { updateCard, type ScenarioState } from "../../core/state.ts";
-import type { EngineStep } from "../../core/intents.ts";
-import { settle } from "../../engine/machine.ts";
-import { legalTargets } from "../../engine/legal.ts";
-import { reduce } from "../../engine/reduce.ts";
-import { syncConstants } from "../../interpret/constants.ts";
-import { drawMany } from "../../interpret/interpret.ts";
-import { mayGainResources } from "../misc/guards.ts";
-import { ruleCause, UNATTRIBUTED } from "../../core/cause.ts";
-import { placeDamage } from "../../core/keywords.ts";
+import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import type { EngineStep } from "../../../rules/core/intents.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import { legalTargets } from "../../../rules/engine/legal.ts";
+import { reduce } from "../../../rules/engine/reduce.ts";
+import { syncConstants } from "../../../rules/interpret/constants.ts";
+import { drawMany } from "../../../rules/interpret/interpret.ts";
+import { mayGainResources } from "../../../rules/families/misc/guards.ts";
+import { ruleCause, UNATTRIBUTED } from "../../../rules/core/cause.ts";
+import { placeDamage } from "../../../rules/core/keywords.ts";
 import { codesIn, fight, idOf, resolveRecords, run, statOf, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const table = (layout: Layout) => tableFromLayout("the-nin-in-eilph", layout);
@@ -104,7 +104,7 @@ describe("timeCountersRemoved: once for a whole removal of counters from the cur
   };
   const tokens = (state: ScenarioState): number => Object.values(state.cards).find((card) => card.code === MARSH)?.resources ?? 0;
 
-  it("a removal of 2 counters puts 1 token on the Marsh-dweller, not 2", () => {
+  it("08103:A:3 a removal of 2 counters puts 1 token on the Marsh-dweller, not 2", () => {
     const { t, stage, state } = withCounters(3);
     const done = run(t, state, { verb: "RemoveTimeFromQuest", amount: 2 });
     expect(done.cards[stage]?.resources).toBe(1);
@@ -202,6 +202,14 @@ describe("the stage 2 flags: what player card effects give and what committing c
     expect(done.seats[0]?.discard.length).toBe(1);
   });
 
+  it("08096:B:3 a player who commits two characters at once discards one card, not one for each character", () => {
+    const t = at("08096", { phase: "Quest" });
+    const before = t.state.seats[0]?.hand.length ?? 0;
+    const done = commits(t.state, t.ctx, [t.hero, idOf(t.state, "dh2")]);
+    expect(done.cards[idOf(t.state, "dh2")]?.committed).toBe(true);
+    expect(done.seats[0]?.hand.length).toBe(before - 1);
+  });
+
   it("08096:B:3 a player with no card in hand cannot commit", () => {
     const t = tableFromLayout("the-nin-in-eilph", { stage: "08096", phase: "Quest", play: ["ally"] });
     expect(t.state.seats[0]?.hand.length).toBe(0);
@@ -267,6 +275,21 @@ describe("the Ancient Marsh-dweller joins the staging area and attacks (08098:A:
     expect(attacked(done.steps)).toEqual([0]);
     expect(done.state.cards[stage]?.resources).toBe(2);
     expect(done.state.questStage).toBe(stage);
+  });
+
+  it("08101:B:2 the Marsh-dweller engaged with the second player attacks each player in player order and stays engaged with him", () => {
+    const t = table({ stage: "08101", phase: "Refresh", seats: 2, engaged: [{ code: MARSH, seat: 1 }], deck: FILLERS, threat: [20, 20] });
+    const stage = t.state.questStage ?? "";
+    const steps: EngineStep[] = [];
+    const started = { state: settle(updateCard(t.state, stage, { resources: 1 }), t.ctx, steps), steps };
+    const done = fought(t, started);
+    // Player order from the first player: the token has passed to the second seat in the refresh phase, so he is attacked first.
+    const first = started.state.firstPlayer;
+    expect(attacked(done.steps)).toEqual([first, 1 - first]);
+    // The attack on its own player does not move it (the stand-in hero is destroyed later in the line, so the check is made as the first attack begins).
+    expect(marshOf(started.state)?.zone).toBe("engaged");
+    expect(started.state.seats[1]?.engaged).toContain(idOf(started.state, MARSH));
+    expect(done.state.cards[stage]?.resources).toBe(2);
   });
 
   it("08101:B:3 the players win when the Marsh-dweller is destroyed, staged or engaged", () => {
