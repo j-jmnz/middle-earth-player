@@ -40,7 +40,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "Time":
       return state;
     case "RemoveTimeCounters":
-      return removeTimeCounters(state, ctx);
+      return removeTimeCounters(state, ctx, instruction);
     case "HoldUnder":
       return holdUnder(state, instruction, focus);
     case "DiscardHeld":

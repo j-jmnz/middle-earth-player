@@ -36,13 +36,42 @@ const VERBS = [
   // "Each player cannot refresh more than 5 characters during the refresh phase" (07036:A:1): run by the actor in a Forced effect at the beginning of the refresh phase. The exhausted characters the actor controls beyond `amount` that would ready are chosen by the actor and do not ready
   // this phase (`doesNotReady`). With `amount` or fewer to ready, nothing happens.
   z.strictObject({ verb: z.literal("CapRefresh"), amount: z.number().int().positive(), ...when }),
+  // "The players advance to a stage 2A quest of their choice" (08035:B:1, 08036:B:2): of the stages with these `codes` still in the quest deck the first player chooses one and the quest advances to it (a defeated stage lies set aside, so it is not offered again); one left is taken without a question; none left, the quest advances to `otherwise`
+  // ("If all stage 2 quests have been defeated, advance to stage 3A, instead"). The stage left is defeated and the new stage's When Revealed effects resolve (AdvanceToStage).
+  z.strictObject({ verb: z.literal("AdvanceToChosenStage"), codes: z.array(z.string().min(1)).min(1), otherwise: z.string().min(1), ...when }),
+  // "Randomly choose 1 of the remaining set aside Guardian enemies" (08036:A:1), "Find the set aside Key objective that shares a Trait with the just revealed Guardian enemy" (08036:A:1): the last picked card becomes one of the set-aside cards of this printed type with this Trait, chosen with the game's seed; with `sharesTraitWithPicked`
+  // only one that shares a Trait with the card picked before it. With `trialKey` the card is marked as the current trial's Key objective for the stage that picks it (the flag `trialKey`). Nothing is picked when no card matches, so the verbs that read the picked card do nothing.
+  z.strictObject({ verb: z.literal("PickSetAside"), cardType: z.enum(["enemy", "location", "objective"]), trait: z.string().min(1), sharesTraitWithPicked: z.literal(true).optional(), trialKey: z.literal(true).optional(), ...when }),
+  // "Attach it to that enemy" (08036:A:1, 08037:A:1): the last picked card, a set-aside Key, lies attached to the card picked before it as a claimed objective that no player controls; when its host leaves play it goes to the staging area (its own text). `attached` is announced.
+  z.strictObject({ verb: z.literal("AttachPickedToPrevious"), ...when }),
+  // "Shuffle it into the bottom 10 cards of the encounter deck" (08038:A:1): the last picked card joins the last `count` cards of the encounter deck (all of them when fewer) and those are shuffled.
+  z.strictObject({ verb: z.literal("ShufflePickedIntoBottom"), count: z.number().int().positive(), ...when }),
+  // "Reveal each Guardian enemy in the victory display, adding them to the staging area" (08039:A:1), "reveal a random Guardian enemy from the victory display" (08054:A:1): each card in the victory display with this Trait is revealed in full (Time counters put on again) and joins the staging area;
+  // with `random`, one of them, chosen with the seed.
+  z.strictObject({ verb: z.literal("RevealFromVictory"), trait: z.string().min(1), random: z.literal(true).optional(), ...when }),
+  // "Add all Barrow locations in play to the victory display" (08036:B:2), "add all Guardian enemies in play" (08037:B:2): each card in play (the staging area, an engagement area, the active location) of this printed `cardType` with this Trait goes to the victory display, a card that cannot leave play for a player card too (a quest effect).
+  z.strictObject({ verb: z.literal("AddInPlayToVictory"), cardType: z.enum(["enemy", "location"]), trait: z.string().min(1), ...when }),
+  // "Each Guardian enemy engages the first player" (08036:B:1 to 08038:B:1), "Each Guardian enemy engages the player who controls the Key objective with a Trait shared by that enemy" (08039:B:1), a constant marker on the stage: while it is the stage in play, each enemy with this Trait in the staging area or engaged
+  // with another player engages that player at once, whatever its engagement cost, and follows the first player token (the settle sweep, families/ring-maker/trial-sweeps.ts; the run does nothing). A Guardian whose Key no player controls stays where it is.
+  z.strictObject({ verb: z.literal("EngageSeat"), who: z.enum(["firstPlayer", "keyHolder"]), trait: z.string().min(1) }),
+] as const;
+
+const TRIGGERS = [
+  // The players control the current trial's Key objective (a hero holds the Key `trialKey` marks), announced at a settle with nothing resolving (08036:B:2 to 08038:B:2).
+  "trialKeyControlled",
+  // The allies in play, all seats together, are more than the table's `alliesLimit` (08047:A:1): the event is about the first player, who chooses the allies that stay.
+  "alliesOverLimit",
 ] as const;
 
 const FLAGS = [
+  // On the current trial's Key objective, set by PickSetAside `trialKey` (the stage that picked it is the modifier's source): the stage's 2B hears `trialKeyControlled` once a hero holds the Key (08036:B:2).
+  "trialKey",
+  // On the table: the players, as a group, cannot have more than this many allies in play ("cannot have more than 5 allies", 08047:A:1). At each settle with nothing resolving, `alliesOverLimit` is announced for the first player when more allies are in play.
+  "alliesLimit",
   // On a card in a hand: it cannot leave that hand ("Ill Tidings cannot leave that player's hand", 07023:A:1). core/zones.ts moveCard refuses the move; a pick that would discard it and a random discard leave it out (families/wilderland/pick.ts barredFromPlayerDiscard).
   "cannotLeaveHand",
   // On a Hills of Dunland in the staging area: it is the copy whose Forced effect after a draw acts ("this ability does not stack with other copies", 08020:A:1). It is held with `doesNotStack`, so only the oldest copy in the staging area holds it; the Forced effect's condition reads it.
   "huntsOnDraw",
 ] as const;
 
-export const manifest = { name: "ring-maker", verbs: VERBS, triggers: [], flags: FLAGS } as const satisfies CatalogFamily;
+export const manifest = { name: "ring-maker", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

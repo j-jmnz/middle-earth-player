@@ -14,6 +14,8 @@ import { effectsOf } from "../../windows/listen.ts";
 import { holds } from "../../interpret/conditions.ts";
 import { listens } from "../encounter/reveal.ts";
 import { textBlank } from "../attachments/hold.ts";
+import { lastPicked } from "../../interpret/player-verbs.ts";
+import { printedOf } from "../../core/printed.ts";
 
 type TimeInstruction = Extract<Instruction, { verb: "Time" }>;
 
@@ -84,9 +86,14 @@ function timeCards(state: ScenarioState, ctx: ReduceContext): string[] {
  * RemoveTimeCounters: one time counter comes off each card in play with Time X, if able; a card whose last counter is removed is announced (`lastTimeCounterRemoved`) and its Forced effect resolves ("When the last time counter is removed, there is a triggered effect that
  * resolves on that card", mec108.time-x). A card with no counter left loses none.
  */
-export function removeTimeCounters(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+export function removeTimeCounters(state: ScenarioState, ctx: ReduceContext, instruction?: Extract<Instruction, { verb: "RemoveTimeCounters" }>): ScenarioState {
+  if (instruction?.target == null) return timeCards(state, ctx).reduce((next, id) => removeTimeCounterFrom(next, id, ctx), state);
+  // "Remove X time counters from each enemy ... with the time keyword" (08055:A:1) and "remove a time counter from an enemy" (08051:A:2): up to `amount` counters, one at a time, so the last one is heard once.
+  const amount = (instruction.amount ?? 1) * (instruction.perPlayer ? livingSeats(state).length : 1);
+  const picked = lastPicked(state);
+  const ids = instruction.target === "picked" ? (picked && timeOf(ctx, state.cards[picked]?.code ?? "") != null ? [picked] : []) : timeCards(state, ctx).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "enemy");
   let next = state;
-  for (const id of timeCards(state, ctx)) next = removeTimeCounterFrom(next, id, ctx);
+  for (const id of ids) for (let removed = 0; removed < amount; removed += 1) next = removeTimeCounterFrom(next, id, ctx);
   return next;
 }
 
