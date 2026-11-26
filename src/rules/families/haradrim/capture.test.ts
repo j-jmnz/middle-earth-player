@@ -1,15 +1,11 @@
 // Rules: rr.attachment-cards, rr.in-play-and-out-of-play, rr.engaged, rr.ownership-and-control (data/rules/entries.json); ledger lines 17027:A:1, 17011:A:1, 17012:A:1.
-// AttachRandomSetAside (stage 2A's Captures: random, seeded, lying uncontrolled on a Wild Mûmak) and ActAsEngagedWithHost (a Capture's Response is the engaged player's).
+// AttachRandomSetAside (stage 2A's Captures: random, seeded, lying uncontrolled on a Wild Mûmak) (the Response's seat is `answeredBy`, tested in the scenario's lines.test.ts).
 import { describe, expect, it } from "vitest";
 
-import type { Effect } from "../../../catalog/boundary.ts";
-import type { EngineStep } from "../../core/intents.ts";
 import { destroyCard } from "../../core/destroy.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { countMatching } from "../../interpret/pick.ts";
-import { pushCardEffects } from "../../interpret/effect-frames.ts";
-import { settle } from "../../engine/machine.ts";
-import { idOf, idsOf, opened, resolveRecords, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { idOf, opened, resolveRecords, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const CAPTURES = ["17011", "17012", "17013", "17014"];
 const MUMAK = "17015";
@@ -62,30 +58,5 @@ describe("17027:A:1 AttachRandomSetAside: each player attaches one random set-as
     const left = destroyCard(state, idOf(state, MUMAK), made.ctx.cards, []);
     for (const code of attachedCodes(state)) expect(left.cards[idOf(left, code)]?.zone).toBe("encounterDiscard");
     expect(countMatching(left, { type: "card", control: "any", allInPlay: true, trait: "Capture" }, 0, null, made.ctx)).toBe(0);
-  });
-});
-
-describe("17011:A:1 ActAsEngagedWithHost: the steps after it resolve for the player the host is engaged with", () => {
-  const probe: Effect = { id: "17011:forced:probe", cardCode: "17011", lines: ["17011:A:1"], timing: "forced", trigger: "endOfRound", instructions: [{ verb: "ActAsEngagedWithHost" }, { verb: "RaiseThreat", amount: 3, who: "actor" }] };
-  function threats(layout: Layout) {
-    const made = table({ setAside: [], threat: [30, 30], attached: [{ code: "17011", to: MUMAK, encounter: true }], ...layout });
-    const steps: EngineStep[] = [];
-    const pushed = pushCardEffects(opened(made).state, "forced", idOf(made.state, "17011"), 0, false, [probe], made.ctx, steps);
-    const state = settle({ ...pushed, window: null, mode: "stopped" }, made.ctx, steps);
-    return [state.seats[0]?.threat, state.seats[1]?.threat];
-  }
-
-  it("a host engaged with the second player is answered for that player alone", () => {
-    expect(threats({ staging: [], engaged: [{ code: MUMAK, seat: 1 }] })).toEqual([30, 33]);
-    expect(threats({ staging: [], engaged: [{ code: MUMAK, seat: 0 }] })).toEqual([33, 30]);
-  });
-
-  it("a host in the staging area drops the rest of the effect: no player is engaged with it", () => {
-    expect(threats({})).toEqual([30, 30]);
-  });
-
-  it("the Lasso, Spear, Trap and Noose of one Mûmak are on the one card each", () => {
-    const { state } = attachAll();
-    expect(idsOf(state, MUMAK)).toHaveLength(1);
   });
 });

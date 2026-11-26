@@ -1,7 +1,7 @@
 // Rules: rr.attachment-cards, rr.in-play-and-out-of-play, rr.engaged (data/rules/entries.json); ledger lines 17027:A:1, 17011:A:1, 17012:A:1, 17013:A:1, 17014:A:1.
 //
 // The Capture objectives of The Mûmakil. Stage 2A attaches one random set-aside Capture to a Wild Mûmak for each player (`AttachRandomSetAside`): the Capture lies attached to the Mûmak, faceup and controlled by nobody, so it is an objective in play, no player's
-// card, and it leaves play with its host (releaseAttachments, src/rules/core/destroy.ts). Its Response is the engaged player's: `ActAsEngagedWithHost` runs the rest of the effect for the seat its host is engaged with, and drops it while the host is in the staging area.
+// card, and it leaves play with its host (releaseAttachments, src/rules/core/destroy.ts). Its Response is the engaged player's (`answeredBy: hostEngaged`, src/rules/windows/responses.ts): it is not offered while the host is in the staging area.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { nextUint } from "../../core/seed.ts";
@@ -11,8 +11,6 @@ import { attachTo, inPlay, moveCard } from "../../core/zones.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import { queueEvent } from "../../windows/queue.ts";
-import { patchTop } from "../../windows/windows.ts";
-import { effectData } from "../deck/moves.ts";
 import { addToVictory } from "../sidequests/victory.ts";
 import type { Focus } from "../index.ts";
 
@@ -35,15 +33,6 @@ export function hostEngagedSeat(state: ScenarioState, sourceId: string | null): 
   if (!host) return null;
   const seat = Object.keys(state.seats).map(Number).find((index) => state.seats[index]?.engaged.includes(host.id));
   return seat ?? null;
-}
-
-/** ActAsEngagedWithHost: the instructions after it resolve for the seat the source's host is engaged with; with none the rest of the effect is dropped. */
-export function actAsEngagedWithHost(state: ScenarioState, focus: Focus): ScenarioState {
-  const data = effectData(state);
-  if (!data) return state;
-  const seat = hostEngagedSeat(state, focus.sourceId);
-  if (seat == null || state.seats[seat]?.eliminated) return patchTop(state, { data: { ...data, queue: [] } });
-  return patchTop(state, { data: { ...data, queue: data.queue.map((item) => ({ ...item, seat })) } });
 }
 
 /** AddWithHostToVictory: the source and then its host enemy go to the victory display; the host is taken before the source leaves play, which clears its host. */

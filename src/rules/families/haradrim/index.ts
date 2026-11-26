@@ -9,7 +9,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
-import { actAsEngagedWithHost, addWithHostToVictory, attachRandomSetAside } from "./capture.ts";
+import { addWithHostToVictory, attachRandomSetAside } from "./capture.ts";
 import { exploredCondition } from "./explored.ts";
 import { haradrimPickMatches } from "./pick.ts";
 import { allyBelowThreat, threatAboveWillpower, willpowerGap } from "./combat.ts";
@@ -36,8 +36,6 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return engageSeatWithMost(state, instruction, focus, ctx, steps);
     case "AttachRandomSetAside":
       return attachRandomSetAside(state, instruction, ctx);
-    case "ActAsEngagedWithHost":
-      return actAsEngagedWithHost(state, focus);
     case "AddWithHostToVictory":
       return addWithHostToVictory(state, focus, ctx);
     default:
@@ -47,7 +45,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "haradrim",
-  verbs: ["PlaceUnderSelfFaceup", "SetTemperature", "RaiseTemperature", "LowerTemperature", "MoveHeroesToStaging", "TakeObjectiveHero", "ReleaseStagedHero", "GuardStagedHeroes", "EngageSeatWithMost", "AttachRandomSetAside", "ActAsEngagedWithHost", "AddWithHostToVictory"],
+  verbs: ["PlaceUnderSelfFaceup", "SetTemperature", "RaiseTemperature", "LowerTemperature", "MoveHeroesToStaging", "TakeObjectiveHero", "ReleaseStagedHero", "GuardStagedHeroes", "EngageSeatWithMost", "AttachRandomSetAside", "AddWithHostToVictory"],
   run,
   condition: (state, condition, _scope, ctx) => (condition.kind === "threatAboveWillpower" ? threatAboveWillpower(state, ctx.cards) : (haradrimCondition(state, condition) ?? exploredCondition(state, condition) ?? temperatureCondition(state, condition))),
   amount: (state, found, scope, ctx) => (found.willpowerGap ? willpowerGap(state, scope.sourceId ?? null, ctx.cards) : temperatureAmount(state, found)),

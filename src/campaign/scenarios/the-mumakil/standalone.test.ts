@@ -9,6 +9,7 @@ import { reduce, startScenario } from "../../../rules/engine/reduce.ts";
 
 import { loadAnyScenario } from "../../../../scripts/data/load-scenarios.ts";
 import { mumakilStart, mumakilWorld } from "../../../../test/scenarios/the-mumakil/game.ts";
+import { expectOpening } from "../../../../test/scenarios/the-mumakil/kit.ts";
 
 const mumakil = loadAnyScenario("the-mumakil");
 
@@ -21,7 +22,6 @@ async function opened(seatCount: 1 | 2, difficulty: "Easy" | "Normal") {
   for (let guard = 0; guard < 10 && state.window?.kind === "choose"; guard += 1) state = expectOk(reduce(state, { type: "Choose", optionId: state.window.options[0] ?? "" }, ctx)).state;
   return state;
 }
-const zonesOf = (state: Awaited<ReturnType<typeof opened>>, codes: readonly string[]) => Object.values(state.cards).filter((card) => codes.includes(card.code)).map((card) => card.zone);
 
 describe("The Mûmakil in the haradrim cycle", () => {
   it("has no Nightmare deck to deal", () => {
@@ -32,12 +32,7 @@ describe("The Mûmakil in the haradrim cycle", () => {
     for (const difficulty of ["Easy", "Normal"] as const) {
       for (const seatCount of [1, 2] as const) {
         const state = await opened(seatCount, difficulty);
-        const label = `${difficulty} ${seatCount}`;
-        expect(zonesOf(state, ["17015"]), label).toEqual(["setAside", "setAside", "setAside", "setAside"]);
-        expect(zonesOf(state, ["17011", "17012", "17013", "17014"]), label).toEqual(["setAside", "setAside", "setAside", "setAside"]);
-        const staged = Object.values(state.cards).filter((card) => card.zone === "staging" && ["17020", "16056", "16057", "16058"].includes(card.code));
-        expect(staged, label).toHaveLength(seatCount);
-        expect(new Set(staged.map((card) => card.code)).size, label).toBe(seatCount);
+        expectOpening(state, seatCount, `${difficulty} ${seatCount}`);
       }
     }
   });

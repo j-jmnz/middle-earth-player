@@ -165,11 +165,11 @@ export function runExtraVerb(
         return noteEncounterThreat(raiseThreat(discarded, seat, cost, steps, currentCause(steps, UNATTRIBUTED)), seat, cost, focus.sourceId, ctx);
       }
       if (!instruction.remember) return discarded;
-      // `remember`: the card discarded is the effect's picked card afterward ("the discarded card's printed cost", 143066:A:2).
+      // `remember`: the card discarded is the effect's picked card afterward ("the discarded card's printed cost", 143066:A:2). An empty hand discards nothing: the picked card is "" then (as a pick that found none), never an earlier player's card.
       const pile = discarded.seats[seat]?.discard ?? [];
       const id = pile.length > (state.seats[seat]?.discard.length ?? 0) ? pile.at(-1) : undefined;
       const data = topFrame(discarded)?.data;
-      return id && data?.kind === "effect" ? patchTop(discarded, { data: { ...data, picked: [...(data.picked ?? []), id] } }) : discarded;
+      return data?.kind === "effect" ? patchTop(discarded, { data: { ...data, picked: [...(data.picked ?? []), id ?? ""] } }) : discarded;
     }
     case "PlaceUnderSelf": {
       const id = lastPicked(state);

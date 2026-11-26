@@ -7,6 +7,7 @@ import type { EngineStep } from "../core/intents.ts";
 import { destroyCard } from "../core/destroy.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { settle } from "../engine/machine.ts";
+import { EFFECTS } from "../../effects/index.ts";
 import { idOf, opened, send, tableFromLayout } from "../../../test/harness/scene-kit.ts";
 
 const TRAIL = "17020";
@@ -44,7 +45,6 @@ describe("17020:A:1 whenFirst: the Mûmak Trail's Response comes before stage 1B
   });
 
   it("only the Trail's record sets the field", () => {
-    const flagged = tableFromLayout("the-mumakil", layout).ctx.effects;
-    expect(flagged.filter((effect) => effect.whenFirst).map((effect) => effect.id)).toEqual(["17020:response:1"]);
+    expect(EFFECTS.filter((effect) => effect.whenFirst).map((effect) => effect.id)).toEqual(["17020:response:1"]);
   });
 });

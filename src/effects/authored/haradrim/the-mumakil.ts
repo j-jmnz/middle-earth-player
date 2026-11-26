@@ -4,13 +4,11 @@ import { withCopies } from "../reprint.ts";
 
 // Records for The Mûmakil (haradrim cycle part 4, no campaign card). Every line is read from the scan ledger (data/printed/haradrim.json); a line a template already writes (pnpm data build) or another card prints
 // word for word needs no record here. See docs/scenarios/haradrim/the-mumakil.md, Readings, for each reading. The Wild Mûmak and the Capture objectives are set aside by the scenario's piles; stage 2A attaches a random Capture to a
-// Mûmak (`AttachRandomSetAside`), where it lies faceup and controlled by nobody. Each Capture's Response is the player's the Mûmak is engaged with (`ActAsEngagedWithHost`): it adds the Capture and then the Mûmak to the victory display.
+// Mûmak (`AttachRandomSetAside`), where it lies faceup and controlled by nobody. Each Capture's Response is the player's the Mûmak is engaged with (`answeredBy`): it adds the Capture and then the Mûmak to the victory display.
 // Rules: rr.attachment-cards, rr.victory, rr.response, rr.forced, rr.engaged, rr.staging, rr.search, rr.first-player, rr.cannot, rr.explored, rr.active-location, rr.in-play-and-out-of-play, rr.shadow-effects, rr.blank, rr.current-quest, rr.travel (data/rules/entries.json).
 type Cond = NonNullable<Effect["condition"]>;
 type Instruction = Effect["instructions"][number];
 
-// The card the step discarded from the actor's hand is the picked card; with an empty hand nothing was discarded and the picked card is an earlier one (another player's), which the actor does not control: no damage.
-const DISCARDED_BY_ME: Cond = { kind: "matches", card: "picked", pick: { type: "card", control: "you", controlledBy: "actor" } };
 const WILD_MUMAK: PickSpec = { type: "enemy", control: "any", staging: true, names: ["Wild Mûmak"] };
 const A_CHARACTER: PickSpec = { type: "character", control: "any" };
 const THIS_ENEMY: PickSpec = { type: "enemy", control: "any", isSource: true };
@@ -18,8 +16,7 @@ const EACH_PLAYER = (instructions: Extract<Instruction, { verb: "ForEachPlayer" 
 // "After ~ attacks and destroys a character": the character's destruction by the attack names the attacking enemy as the other card, and `isSource` keeps it to the copy that attacked.
 const DESTROYS_A_CHARACTER = { trigger: "characterDestroyedByAttack", subject: A_CHARACTER, condition: { kind: "matches", card: "other", pick: THIS_ENEMY } } as const satisfies Partial<Effect>;
 
-// The Capture objectives lie attached to a Wild Mûmak. Their Response is offered only while the Mûmak is engaged with a player ("the engaged player"): in the staging area no player is engaged with it.
-const HOST_ENGAGED: Extract<Cond, { kind: "matches" }> = { kind: "matches", card: "host", pick: { type: "enemy", control: "any" }, inPlay: true, inStaging: false };
+// The Capture objectives lie attached to a Wild Mûmak. Their Response is the engaged player's (`answeredBy: hostEngaged`): it is not offered while the Mûmak is in the staging area, where no player is engaged with it. Noose of Vines names no engaged player: the defender's controller answers it.
 const HOST_REMAINING = { stat: "hitPoints", of: "host", remaining: true } as const;
 // "If X is equal to or greater than the attached enemy's remaining hit points": one less than the remaining hit points is less than X, read when the step runs.
 const REACHES = (amount: Extract<Cond, { kind: "less" }>["left"]): Extract<Cond, { kind: "less" }> => ({ kind: "less", left: { ...HOST_REMAINING, plus: -1 }, right: amount });
@@ -36,9 +33,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "response",
       trigger: "damaged",
       subject: "host",
-      condition: HOST_ENGAGED,
+      answeredBy: "hostEngaged",
       instructions: [
-        { verb: "ActAsEngagedWithHost" },
         { verb: "ShuffleDeck" },
         { verb: "SetX", value: 0 },
         { verb: "DiscardTopOfDeck" },
@@ -64,10 +60,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "response",
       trigger: "traveled",
       subject: { type: "location", control: "any" },
-      condition: HOST_ENGAGED,
-      instructions: [{ verb: "ActAsEngagedWithHost" }, ...CAPTURE_AND_MUMAK(REACHES({ stat: "threat", of: "subject", printed: true }))],
+      answeredBy: "hostEngaged",
+      instructions: [...CAPTURE_AND_MUMAK(REACHES({ stat: "threat", of: "subject", printed: true }))],
     },
-    // 17014 Noose of Vines. After a character defends an attack against the attached enemy, if the defender (still in play) has more remaining hit points than the enemy.
+    // 17014 Noose of Vines. After a character defends an attack against the attached enemy (offered to the defender's controller, also when the Mûmak attacks from the staging area), if the defender (still in play) has more remaining hit points than the enemy. An undefended attack has no defender: no offer.
     {
       id: "17014:response:1",
       cardCode: "17014",
@@ -75,11 +71,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "response",
       trigger: "attackResolved",
       subject: "host",
-      condition: HOST_ENGAGED,
-      instructions: [
-        { verb: "ActAsEngagedWithHost" },
-        ...CAPTURE_AND_MUMAK({ kind: "all", conditions: [{ kind: "matches", card: "other", pick: A_CHARACTER, inPlay: true }, { kind: "less", left: HOST_REMAINING, right: { stat: "hitPoints", of: "other", remaining: true } }] }),
-      ],
+      answeredBy: "defender",
+      condition: { kind: "matches", card: "other", pick: A_CHARACTER, inPlay: true },
+      instructions: [...CAPTURE_AND_MUMAK({ kind: "less", left: HOST_REMAINING, right: { stat: "hitPoints", of: "other", remaining: true } })],
     },
 
     // 17015 Wild Mûmak. A:2: no more than 3 damage a round. A:3: at the end of the round the engaged player chooses to return it to the staging area or have it make an immediate attack (it is dealt a shadow card and stays engaged).
@@ -233,7 +227,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [
         EACH_PLAYER([
           { verb: "DiscardRandomFromHand", remember: true },
-          { verb: "AssignDamage", amount: { stat: "cost", of: "picked", printed: true }, pick: { type: "character", control: "you" }, when: DISCARDED_BY_ME },
+          { verb: "AssignDamage", amount: { stat: "cost", of: "picked", printed: true }, pick: { type: "character", control: "you" } },
         ]),
       ],
     },
@@ -242,7 +236,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "17024",
       lines: ["17024:A:2"],
       timing: "shadow",
-      instructions: [{ verb: "DiscardRandomFromHand", remember: true }, { verb: "AssignDamage", amount: { stat: "cost", of: "picked", printed: true }, pick: { type: "character", control: "you" }, when: DISCARDED_BY_ME }],
+      instructions: [{ verb: "DiscardRandomFromHand", remember: true }, { verb: "AssignDamage", amount: { stat: "cost", of: "picked", printed: true }, pick: { type: "character", control: "you" } }],
     },
 
     // 17025 Guardians of the Jungle (encounter side quest). A:1: each location gets +1 Threat. A:2: each time it becomes the current quest, the encounter deck and discard pile are searched for a Territorial Ape, put into play engaged with the first player.

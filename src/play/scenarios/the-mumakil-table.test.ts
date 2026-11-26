@@ -4,11 +4,10 @@ import { describe, expect, it } from "vitest";
 
 import { idOf, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
 
+import { MUMAK, captures } from "../../../test/scenarios/the-mumakil/kit.ts";
 import { zoneSelector } from "../store/selectors.ts";
 
-const MUMAK = "17015";
 const at = (layout: Layout = {}) => tableFromLayout("the-mumakil", { stage: "17027", side: "B", phase: "Quest", ...layout });
-const captures = (...codes: string[]) => codes.map((code) => ({ code, to: MUMAK, encounter: true as const }));
 
 describe("the Capture objectives on their Wild Mûmak", () => {
   it("17027:A:1 draws each Capture on the Mûmak it lies on, in the staging area and engaged, two on one Mûmak", () => {

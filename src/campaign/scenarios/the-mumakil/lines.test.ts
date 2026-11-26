@@ -5,15 +5,15 @@ import { describe, expect, it } from "vitest";
 import { UNATTRIBUTED } from "../../../rules/core/cause.ts";
 import { placeDamage } from "../../../rules/core/damage.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
-import type { ScenarioState } from "../../../rules/core/state.ts";
+import { flagged, type ScenarioState } from "../../../rules/core/state.ts";
 import { legalIntents, type PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { EFFECTS } from "../../../effects/index.ts";
-import { attack, defend, quest, respond, reveal, travel } from "../../../../test/harness/card-spec.ts";
+import { attack, defend, endRound, quest, respond, reveal, travel } from "../../../../test/harness/card-spec.ts";
 import { playedLayout } from "../../../../test/harness/card-spec-play.ts";
 import { fightEnemy, idOf, opened, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { MUMAK, captures } from "../../../../test/scenarios/the-mumakil/kit.ts";
 
-const MUMAK = "17015";
 const TRAIL = "17020";
 const table = (layout: Layout) => tableFromLayout("the-mumakil", { stage: "17027", side: "B", ...layout });
 const zoneOf = (state: ScenarioState, code: string): string | undefined => Object.values(state.cards).find((card) => card.code === code)?.zone;
@@ -33,7 +33,6 @@ const use = (made: ReturnType<typeof table>, state: ScenarioState, code: string)
   const sent = send({ state, steps: [] }, intent as PlayerIntent, made.ctx);
   return settle({ ...sent.state, mode: "stopped" }, made.ctx, []);
 };
-const captures = (...codes: string[]) => codes.map((code) => ({ code, to: MUMAK, encounter: true as const }));
 
 describe("17011:A:1 Horse-hair Lasso: the Lasso and the Mûmak go to the victory display together", () => {
   const layout = { engaged: [{ code: MUMAK, seat: 0, damage: 5 }], attached: captures("17011", "17013"), deckOf: ["c3"] } as const;
@@ -65,6 +64,24 @@ describe("17011:A:1 Horse-hair Lasso: the Lasso and the Mûmak go to the victory
   it("17011:A:1 a Mûmak in the staging area is no one's: no player is offered the Response", () => {
     const { made, state } = hit({ ...layout, engaged: [], staging: [{ code: MUMAK, damage: 5 }] }, 1);
     expect(offered(state, made, "17011")).toEqual([]);
+  });
+});
+
+// The seat whose window is open: the player the Response is offered to.
+const windowSeat = (state: ScenarioState): number | null => (state.window?.kind === "response" ? state.window.seat : null);
+
+describe("17011:A:1, 17013:A:1 Capture Responses: offered to the player the Mûmak is engaged with, whoever is the first player", () => {
+  it("17011:A:1 a Mûmak engaged with the second player offers the Lasso to him alone, and the first player's deck is not touched", () => {
+    const { made, state } = hit({ seats: 2, engaged: [{ code: MUMAK, seat: 1, damage: 5 }], attached: captures("17011"), deckOf: ["c3"], deck: [] }, 1);
+    expect(windowSeat(state)).toBe(1);
+    expect(offered(state, made, "17011")).toHaveLength(1);
+    const done = use(made, state, "17011");
+    expect([zoneOf(done, "17011"), zoneOf(done, MUMAK)]).toEqual(["victory", "victory"]);
+  });
+
+  it("17013:A:1 a Mûmak engaged with the second player offers the Pit Trap to him", () => {
+    const done = playedLayout("the-mumakil", { stage: "17027", side: "B", seats: 2, phase: "Travel", staging: [TRAIL], engaged: [{ code: MUMAK, seat: 1, damage: 7 }], attached: captures("17013") }, [travel(TRAIL)]);
+    expect(windowSeat(done.run.state)).toBe(1);
   });
 });
 
@@ -112,6 +129,24 @@ describe("17014:A:1 Noose of Vines: a defender the attack destroys does not qual
   });
 });
 
+describe("17014:A:1 Noose of Vines: offered to the defender's controller, after an attack that had a defender", () => {
+  it("17014:A:1 a Mûmak attacking from the staging area, with a defender, offers the Noose to the defender's controller", () => {
+    const opening = playedLayout("the-mumakil", { stage: "17027", side: "B", seats: 2, staging: [{ code: MUMAK, damage: 8 }], attached: captures("17014"), deck: ["f0", "f0"] }, reveal("17021"));
+    expect(opening.run.state.window?.kind).toBe("defense");
+    const sent = send(opening.run, { type: "DeclareDefender", defenderId: opening.table.hero }, opening.table.ctx);
+    const state = settle({ ...sent.state, mode: "stopped" }, opening.table.ctx, []);
+    expect(windowSeat(state)).toBe(0);
+    const done = use(opening.table, state, "17014");
+    expect([zoneOf(done, "17014"), zoneOf(done, MUMAK)]).toEqual(["victory", "victory"]);
+  });
+
+  it("17014:A:1 an undefended attack has no defender: the Noose is offered to nobody, the first player included", () => {
+    const hero = playedLayout("the-mumakil", { stage: "17027", side: "B", seats: 2, engaged: [{ code: MUMAK, seat: 0, damage: 8 }], attached: captures("17014"), deck: ["f0", "f0"] }, [attack(MUMAK, { undefended: true })]);
+    expect(offered(hero.run.state, hero.table, "17014")).toEqual([]);
+    expect([zoneOf(hero.run.state, "17014"), zoneOf(hero.run.state, MUMAK)]).toEqual(["attached", "engaged"]);
+  });
+});
+
 describe("17015:A:2 Wild Mûmak: the damage cap", () => {
   it("17015:A:2 5 damage in one round leaves 3, and no more is dealt that round", () => {
     const made = table({ engaged: [MUMAK] });
@@ -142,11 +177,20 @@ describe("17018:A:2 Strangling Python: a character the damage destroys cannot ta
   });
 });
 
-describe("17020:A:1 Mûmak Trail: its Response comes before stage 1B's Forced effect", () => {
-  it("17020:A:1 with no Wild Mûmak in the encounter deck the Trail finds none, and the Mûmak stage 1B shuffles in stays in the deck", () => {
-    const done = playedLayout("the-mumakil", { stage: "17026", active: TRAIL, deck: ["f0"], setAside: [MUMAK] }, [quest("success"), respond(TRAIL)]);
-    expect([Object.values(done.run.state.cards).filter((card) => card.code === MUMAK && card.zone === "staging").length, zoneOf(done.run.state, MUMAK)]).toEqual([0, "encounterDeck"]);
-  });
+describe("17019:A:1, 17019:A:2, 17023:A:2 until the end of the round: the effect ends when the round does", () => {
+  const rows = [
+    { line: "17019:A:1", stat: "blankText", act: (): Parameters<typeof playedLayout>[2] => attack("17019", { undefended: true }), layout: { stage: "17027", side: "B", deck: ["f0"] } },
+    { line: "17019:A:2", stat: "blankText", act: (): Parameters<typeof playedLayout>[2] => attack("f0", { shadow: "17019" }), layout: { deck: ["f0"] } },
+    { line: "17023:A:2", stat: "cannotReady", act: (): Parameters<typeof playedLayout>[2] => attack("f0", { shadow: "17023" }), layout: { deck: ["f0"] } },
+  ] as const;
+  for (const row of rows) {
+    it(`${row.line} the effect holds through the round and is gone at the end of the round`, () => {
+      const during = playedLayout("the-mumakil", { ...row.layout }, row.act());
+      expect(flagged(during.run.state, idOf(during.run.state, "dh1"), row.stat), "during the round").toBe(true);
+      const ended = playedLayout("the-mumakil", { ...row.layout }, [row.act(), endRound].flat());
+      expect(flagged(ended.run.state, idOf(ended.run.state, "dh1"), row.stat), "after the end of the round").toBe(false);
+    });
+  }
 });
 
 describe("17022:A:1 The Savage South: a hero shares a title with a discarded card", () => {

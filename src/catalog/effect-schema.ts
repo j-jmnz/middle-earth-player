@@ -320,8 +320,11 @@ export const effectSchema = z.strictObject({
   anyPlayer: z.boolean().optional(),
   // This Response is the player's the event happened to, whoever controls the source ("the engaged player may ...", 12125:A:3): the seat of the event answers it, and it is not offered when the event names no seat.
   // `guardian`: the player guarding Gollum answers it ("the player guarding Gollum may choose a new player to guard him", 02134:A:1).
-  answeredBy: z.enum(["eventSeat", "guardian"]).optional(),
+  // `hostEngaged`: the player the source's host enemy is engaged with answers it, and it is not offered while the host is in the staging area (the Capture objectives, 17011:A:1 to 17013:A:1).
+  // `defender`: the controller of the defending character the event names as `other` answers it, and it is not offered after an undefended attack (Noose of Vines, 17014:A:1).
+  answeredBy: z.enum(["eventSeat", "guardian", "hostEngaged", "defender"]).optional(),
   // This Response is offered before the Forced effects of the same event resolve: "When" Responses resolve before "After" ones (rr.response), and the engine otherwise resolves every Forced effect first (Mûmak Trail, 17020:A:1).
+  // It puts the marked Responses above every Forced frame of the event, a "When" Forced effect too; no record has that case.
   whenFirst: z.literal(true).optional(),
   // This Action, Response or Forced effect of a card that is not an event is used from its owner's hand, and only there ("put ~ into play
   // from your hand", rr.in-play-and-out-of-play: an ability that refers to being used from an out-of-play area; Lost in the Wild's Forced effect, 18026:A:1).

@@ -35,9 +35,6 @@ const VERBS = [
   // "Each player attaches 1 random set aside Capture objective to a Wild Mûmak in play" (17027:A:1): the last picked card in play is the host; one set-aside card with this trait is drawn by the game seed and lies attached to it faceup, controlled by nobody (it leaves play
   // with its host, and is no player's card). The actor's choice of host is the Pick before it. Nothing changes with no host picked or no such card set aside; `attached` is queued.
   z.strictObject({ verb: z.literal("AttachRandomSetAside"), trait: z.string().min(1), ...when }),
-  // "the engaged player ..." for a card that lies attached to an enemy and is controlled by nobody (the Captures, 17011:A:1 to 17014:A:1): the instructions after it resolve for the player the source's host enemy is engaged with. With the host in the staging area, or not an enemy, the
-  // rest of the effect is dropped (no player is engaged with it).
-  z.strictObject({ verb: z.literal("ActAsEngagedWithHost"), ...when }),
   // "Add [the Capture] and attached enemy to the victory display" (17011:A:1 to 17014:A:1): the source goes to the victory display and then its host enemy, the host read before the source leaves play (its own `when` is read once, with the host still attached). The host's other attachments leave with it. No host: only the source goes.
   z.strictObject({ verb: z.literal("AddWithHostToVictory"), ...when }),
 ] as const;

@@ -15,7 +15,6 @@ export const HARADRIM_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => M
   ReleaseStagedHero: () => ({ text: "the acting player chooses a hero they own in the staging area (a Captive held by no card), takes control of it and exhausts it; it returns to its old place among their heroes with its tokens and attachments (nothing when they own none; asked when they own several)", read: [] }),
   GuardStagedHeroes: () => ({ text: "the first player attaches each hero in the staging area to a different Orc enemy in the staging area that guards no hero: the hero is guarded by that enemy, under no player's control, immune to player card effects, and with a blank text box (the settle sweep marks each guarded hero; asked which Orc when several are free; a hero with no Orc left stays in the staging area)", read: [] }),
   AttachRandomSetAside: (i) => ({ text: `the last picked card in play receives one random set-aside card with the trait ${str(i.trait)} (drawn by the game seed): it lies attached to it faceup, controlled by nobody and no player's card, and leaves play with its host (nothing with no host picked or no such card set aside)`, read: ["trait"] }),
-  ActAsEngagedWithHost: () => ({ text: "the engaged player (the player this card's host enemy is engaged with) resolves the steps after this one; with the host in the staging area, or not an enemy, the rest of the effect is dropped", read: [] }),
   AddWithHostToVictory: () => ({ text: "this card and its host enemy are added to the victory display, this card first (the host and its remaining hit points are read before this card leaves play)", read: [] }),
   EngageSeatWithMost: (i, ctx) => ({ text: `this enemy engages the player engaged with the most ${pck(i.pick, ctx)} (the first player chooses among players that tie, all players at 0; nothing changes when it is already engaged with that player, else it moves to that player)`, read: ["pick"] }),
 };
@@ -32,7 +31,6 @@ export const HARADRIM_SAMPLES: Samples = {
   ReleaseStagedHero: [{ verb: "ReleaseStagedHero" }],
   GuardStagedHeroes: [{ verb: "GuardStagedHeroes" }],
   AttachRandomSetAside: [{ verb: "AttachRandomSetAside", trait: "Capture" }],
-  ActAsEngagedWithHost: [{ verb: "ActAsEngagedWithHost" }],
   AddWithHostToVictory: [{ verb: "AddWithHostToVictory" }],
   EngageSeatWithMost: [{ verb: "EngageSeatWithMost", pick: { type: "enemy", control: "any", trait: "Orc", nonUnique: true } }],
 };
