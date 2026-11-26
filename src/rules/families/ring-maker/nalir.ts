@@ -17,17 +17,35 @@ function nalirIn(state: ScenarioState, ctx: ReduceContext): { id: string; seat: 
   return card?.controller != null ? { id: card.id, seat: card.controller } : null;
 }
 
-/**
- * AttackNalir (08067:B:2, 08083:A:1): the last picked enemy, staged or engaged with any player, makes an immediate attack against the player who controls Nalir; the attack is made against Nalir, so what no defender takes goes to him (`onlyHeroes`, read by the undefended step).
- * The attack is counted by the running effect, so its frames wait for it.
- */
-export function attackNalir(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const enemy = lastPicked(state);
+/** The enemy `id` makes its immediate attack against the player who controls Nalir now (`onlyHeroes`: what no defender takes goes to him), or null when it cannot; the attack is counted by the running effect, so its frames wait for it. */
+function beginNalirAttack(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[], enemy: string, rest: readonly string[]): ScenarioState | null {
   const nalir = nalirIn(state, ctx);
-  if (!enemy || !state.cards[enemy] || !nalir || state.pendingAttack != null) return state;
+  if (!state.cards[enemy] || !nalir) return null;
   const begun = attackWith(state, enemy, ctx, steps, nalir.seat, 0, true);
   const attack = begun.pendingAttack;
-  return attack && attack !== state.pendingAttack ? { ...begun, pendingAttack: { ...attack, onlyHeroes: [nalir.id] } } : begun;
+  if (!attack || attack === state.pendingAttack) return null;
+  return { ...begun, pendingAttack: { ...attack, onlyHeroes: [nalir.id], ...(rest.length > 0 ? { nalirAttackers: rest } : {}) } };
+}
+
+/**
+ * AttackNalir (08067:B:2, 08083:A:1): the picked enemy (`enemy` names one the attack end left waiting), staged or engaged with any player, makes an immediate attack against the player who controls Nalir.
+ * One attack is in progress at a time (Spy From Mordor's Forced at 6.4.1, 08072:A:1, can run this inside an attack): the enemy then waits in the attack's `nalirAttackers` and attacks once that attack has ended, as a shadow attacker does (defense/shadow-attack.ts).
+ */
+export function attackNalir(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[], named?: string): ScenarioState {
+  const enemy = named ?? lastPicked(state);
+  if (!enemy || !state.cards[enemy] || !nalirIn(state, ctx)) return state;
+  const waiting = state.pendingAttack;
+  if (waiting) return { ...state, pendingAttack: { ...waiting, nalirAttackers: [...(waiting.nalirAttackers ?? []), enemy] } };
+  return beginNalirAttack(state, ctx, steps, enemy, []) ?? state;
+}
+
+/** The end of an attack: the first of `ids` that can attack Nalir attacks now, the ones after it wait on its attack. With none able the state stays as it is. */
+export function startNalirAttacks(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[], ids: readonly string[]): ScenarioState {
+  for (let at = 0; at < ids.length; at += 1) {
+    const begun = beginNalirAttack(state, ctx, steps, ids[at]!, ids.slice(at + 1));
+    if (begun) return begun;
+  }
+  return state;
 }
 
 /** EliminateAtLevel (08066:B:2): the level just went down, so each seat at or above it leaves the game now (rr.player-elimination). */

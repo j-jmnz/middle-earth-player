@@ -26,6 +26,7 @@ import { attackCanceled, defendersDeclared, holdAttackEnd, specialStrike } from 
 import { attackSwitched } from "../families/pelargir/vale/switch.ts";
 import { holdAttack } from "../families/defense/listen.ts";
 import { startShadowAttack } from "../families/defense/shadow-attack.ts";
+import { startNalirAttacks } from "../families/ring-maker/nalir.ts";
 import { announceShadowRaise, noteShadowStart } from "../families/defense/shadow.ts";
 import { announceShadowResolved } from "../families/dungeon/shadow.ts";
 import { announceShadowsResolved } from "../families/angmar/reanimate/shadows.ts";
@@ -344,10 +345,15 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   const base = troll ? [...(attack.after ?? []), ...troll.instructions] : (attack.after ?? []);
   const after = pillage ? [...base, pillage] : base;
   const waiting = attack.shadowAttackers ?? [];
-  if (after.length === 0 && waiting.length > 0) return startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended;
-  if (after.length === 0) return ended;
+  const nalir = attack.nalirAttackers ?? [];
+  // Enemies an effect made attack Nalir during this attack follow the shadow attackers (08067:B:2).
+  const next = (): ScenarioState => {
+    const shadow = waiting.length > 0 ? startShadowAttack(ended, attack.seat, waiting, ctx, steps, nalir) : null;
+    return shadow?.pendingAttack ? shadow : nalir.length > 0 ? startNalirAttacks(shadow ?? ended, ctx, steps, nalir) : (shadow ?? ended);
+  };
+  if (after.length === 0) return next();
   // The attack's own state decides where it was made from: an enemy that attacked from the staging area without being flagged is `fromStaging`.
-  if (!attackHere(state, attack.enemyId)) return waiting.length > 0 ? (startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended) : ended;
+  if (!attackHere(state, attack.enemyId)) return next();
   // Only the effect that searches the deck for another copy of a destroyed ally (DiscardCopiesFromDeck of "other", 10137:A:2) reads the ally the attack destroyed.
   const destroyedAlly = after.some((one) => one.verb === "DiscardCopiesFromDeck" && one.of === "other") ? destroyedAllyOf(state, attack, ctx) : undefined;
   // Only an effect that reanimates the character the attack destroyed (Unholy Crypt, 101161:A:2), or one that acts for its controller (Assault on Osgiliath, 06100:A:2), reads it.
@@ -360,7 +366,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       actor: attack.seat,
       peril: false,
       effectId: `${attack.enemyId}:afterAttack`,
-      instructions: waiting.length > 0 ? [...after, { verb: "StartShadowAttack", attackers: [...waiting] }] : after,
+      instructions: [...after, ...(waiting.length > 0 ? [{ verb: "StartShadowAttack" as const, attackers: [...waiting] }] : []), ...nalir.map((enemy) => ({ verb: "AttackNalir" as const, enemy }))],
       cancel: null,
       blockCancel: null,
       // An attack that sends its excess damage on (excessToShip) leaves that damage (0 when there was none) for the effect; X is the characters it destroyed.

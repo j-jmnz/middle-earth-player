@@ -59,8 +59,8 @@ const VERBS = [
   // with another player engages that player at once, whatever its engagement cost, and follows the first player token (the settle sweep, families/ring-maker/trial-sweeps.ts; the run does nothing). A Guardian whose Key no player controls stays where it is.
   z.strictObject({ verb: z.literal("EngageSeat"), who: z.enum(["firstPlayer", "keyHolder"]), trait: z.string().min(1) }),
   // "Bellach makes an immediate attack against Nalir" (08067:B:2, 08083:A:1; rm.attacks-against-nalir): the last picked enemy, in the staging area or engaged with any player, makes an immediate attack, dealt a shadow card of its own, against the player who controls Nalir. That player declares defenders as for any
-  // attack; undefended damage must be assigned to Nalir. Nothing happens when no player controls Nalir or the enemy may not attack.
-  z.strictObject({ verb: z.literal("AttackNalir"), ...when }),
+  // attack; undefended damage must be assigned to Nalir. Nothing happens when no player controls Nalir or the enemy may not attack. During an attack the enemy waits for its end (`enemy` names the card the attack end left waiting; a record never sets it).
+  z.strictObject({ verb: z.literal("AttackNalir"), enemy: z.string().min(1).optional(), ...when }),
   // "reduce each player's threat elimination level by 10" (08066:B:2), the engine's check after the level moved: each seat whose threat is at or above its elimination level now is eliminated at once (rm.threat-elimination-level). The record puts the `eliminationReduction` flag first.
   z.strictObject({ verb: z.literal("EliminateAtLevel"), ...when }),
 ] as const;

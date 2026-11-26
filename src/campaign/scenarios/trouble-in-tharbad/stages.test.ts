@@ -14,7 +14,7 @@ import { replaceStageProgress } from "../../../rules/quest/progress-replaced.ts"
 import { addModifier } from "../../../rules/core/modified-stat.ts";
 import { removeTimeCounterFrom } from "../../../rules/families/angmar/time.ts";
 import { travelBlocked } from "../../../rules/interpret/restrictions.ts";
-import { idOf, run, statOf, tableFromLayout, where, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { drive, fight, idOf, opened, run, statOf, tableFromLayout, where, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "trouble-in-tharbad";
 const STAGE_1 = "08066";
@@ -53,6 +53,25 @@ describe("AttackNalir (08067:B:2, 08083:A:1)", () => {
     const begun = attack(t.state, t.ctx, ["Spy from Mordor"], false);
     expect(begun.pendingAttack?.enemyId).toBe(idOf(t.state, SPY));
     expect(begun.pendingAttack?.seat).toBe(0);
+  });
+
+  it("08067:B:2 an attack in progress is not lost: Bellach waits for its end, then attacks Nalir (Spy From Mordor's Forced at 6.4.1, 08072:A:1)", () => {
+    const t = table({ stage: STAGE_2, play: [NALIR], engaged: [SPY], staging: [BELLACH], phase: "Encounter" });
+    const atDefense = drive(t, opened(t), (state) => state.window?.kind === "defense");
+    expect(atDefense.state.pendingAttack?.enemyId).toBe(idOf(t.state, SPY));
+    const bellach = idOf(t.state, BELLACH);
+    const queued = run(t, atDefense.state, { verb: "AttackNalir", enemy: bellach });
+    // No second attack begins in the middle of the first; it waits.
+    expect(queued.pendingAttack?.enemyId).toBe(idOf(t.state, SPY));
+    expect(queued.pendingAttack?.nalirAttackers).toEqual([bellach]);
+    let seen: ScenarioState["pendingAttack"] = null;
+    fight(t, { ...atDefense, state: queued }, (state) => {
+      if (state.pendingAttack?.enemyId === bellach) seen = state.pendingAttack;
+      return seen != null;
+    });
+    expect(seen).not.toBeNull();
+    expect(seen!.seat).toBe(0);
+    expect(seen!.onlyHeroes).toEqual([idOf(t.state, NALIR)]);
   });
 
   it("08067:B:2 with Nalir out of play no attack is made", () => {

@@ -31,7 +31,7 @@ export function shadowAttacks(state: ScenarioState, sourceId: string | null): Sc
 // StartShadowAttack (engine use) and the end of an attack: the first of `attackers` still in the game attacks the player `seat` now, or
 // null when none waits. The shadow card, face up, leaves its enemy and comes into play engaged with that player; the attackers after
 // it wait on its attack.
-export function startShadowAttack(state: ScenarioState, seat: number, attackers: readonly string[], ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
+export function startShadowAttack(state: ScenarioState, seat: number, attackers: readonly string[], ctx: ReduceContext, steps: EngineStep[], nalir: readonly string[] = []): ScenarioState | null {
   const attackerId = attackers.find((id) => state.cards[id] != null);
   if (!attackerId) return null;
   const rest = attackers.slice(attackers.indexOf(attackerId) + 1);
@@ -42,5 +42,5 @@ export function startShadowAttack(state: ScenarioState, seat: number, attackers:
   if (!begun.pendingAttack) return begun;
   const stays: Instruction = { verb: "MoveEncounterCard", card: "self", to: "deckTop", when: { kind: "matches", card: "self", inPlay: true } };
   const after: readonly Instruction[] = [{ verb: "Delay", until: "endOfPhase", instructions: [stays] }];
-  return { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true, shadowAttack: true, after, ...(rest.length > 0 ? { shadowAttackers: rest } : {}) } };
+  return { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true, shadowAttack: true, after, ...(rest.length > 0 ? { shadowAttackers: rest } : {}), ...(nalir.length > 0 ? { nalirAttackers: nalir } : {}) } };
 }

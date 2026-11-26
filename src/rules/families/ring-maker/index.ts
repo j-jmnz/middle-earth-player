@@ -58,7 +58,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "NoteEncounterDiscards":
       return { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: focus.sourceId ?? "table", stat: "noteEncounterDiscards", amount: 1, until: "endOfGame" }] };
     case "AttackNalir":
-      return attackNalir(state, ctx, steps);
+      return attackNalir(state, ctx, steps, instruction.enemy);
     case "EliminateAtLevel":
       return eliminateAtLevel(state, steps);
     case "EngageCaptiveHolder":
