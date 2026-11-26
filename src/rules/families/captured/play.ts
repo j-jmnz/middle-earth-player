@@ -49,11 +49,11 @@ export function capturingAttack(state: ScenarioState): ScenarioState {
   return state.pendingAttack ? { ...state, pendingAttack: { ...state.pendingAttack, captures: true } } : state;
 }
 
-// EngageSelfWithPicked: the source enemy engages the picked player; one already engaged with that player stays.
+// EngageSelfWithPicked: the source enemy engages the picked player; one already engaged with that player stays. A source enemy lying in the encounter discard pile, whose effect a card triggers from there (a Scour effect, rm.scour), engages from the pile.
 export function engageSelfWithPicked(state: ScenarioState, focus: Focus): ScenarioState {
   const seat = seatOf(lastPicked(state));
   const enemy = focus.sourceId ? state.cards[focus.sourceId] : undefined;
-  if (seat == null || !enemy || !state.seats[seat] || state.seats[seat]?.eliminated || !inPlay(enemy.zone)) return state;
+  if (seat == null || !enemy || !state.seats[seat] || state.seats[seat]?.eliminated || !(inPlay(enemy.zone) || enemy.zone === "encounterDiscard")) return state;
   if (enemy.zone === "engaged" && enemy.controller === seat) return state;
   return queueEvent(updateCard(moveCard(state, enemy.id, { zone: "engaged", seat }), enemy.id, { controller: seat }), { trigger: "engaged", seat, subject: enemy.id });
 }

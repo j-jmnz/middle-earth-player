@@ -13,8 +13,8 @@ export const PELARGIR_TEMPLATES: Templates = {
   }),
   AttachToHighestThreatCost: () => ({ text: "this card attaches to the hero with the highest printed threat cost among the heroes (any player's) that carry no copy of it and may have it, the first player choosing among heroes tied; with no such hero it is not attached", read: [] }),
   AttackScrollHolder: (i) => ({
-    text: `the enemy the event is about, in the staging area, makes an immediate attack against the player whose hero has the card with code ${str(i.code)} attached, from the staging area: it is dealt a shadow card and the defender may be declared; with no such hero (the card is in the staging area or on an enemy) there is no attack`,
-    read: ["code"],
+    text: `${i.card ? `the ${i.card} enemy` : "the enemy the event is about"}, in the staging area, makes an immediate attack against the player whose hero has the card with code ${str(i.code)} attached, from the staging area: it is dealt a shadow card and the defender may be declared; with no such hero (the card is in the staging area or on an enemy) there is no attack`,
+    read: ["code", "card"],
   }),
   DiscardEncounterTopMore: (i, ctx) => ({
     text: `discard ${amt(i.count, ctx)} card(s) from the top of the encounter deck${i.reset === true ? " (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)" : ""}; they join the cards this effect discarded before, so a later amount "discarded by this effect" counts them all`,
@@ -141,7 +141,7 @@ export const PELARGIR_TEMPLATES: Templates = {
 export const PELARGIR_SAMPLES: Samples = {
   AttachObjectiveTo: [{ verb: "AttachObjectiveTo", card: "other" }, { verb: "AttachObjectiveTo", code: "05019", card: "subject", orStaging: true }],
   AttachToHighestThreatCost: [{ verb: "AttachToHighestThreatCost" }],
-  AttackScrollHolder: [{ verb: "AttackScrollHolder", code: "05019" }],
+  AttackScrollHolder: [{ verb: "AttackScrollHolder", code: "05019" }, { verb: "AttackScrollHolder", code: "08127", card: "picked" }],
   DiscardEncounterTopMore: [{ verb: "DiscardEncounterTopMore", count: 2, reset: true }],
   RaiseThreatPerDiscarded: [{ verb: "RaiseThreatPerDiscarded", type: "location", amount: 2 }],
   TakeControlOfStagedObjectives: [{ verb: "TakeControlOfStagedObjectives", trait: "Ranger" }],

@@ -81,6 +81,16 @@ function eachLimits(i: Obj, ctx: Ctx): string {
   return `${bound === "" ? "" : ` (${bound})`}${taken}`;
 }
 
+// The Each verb in three cases: with an empty `rest` the chosen ones get the steps; with a `rest` the chosen ones are kept (and get the second list when `instructions` has steps) and the others get `rest`; with no `rest` every match gets the steps.
+function eachText(i: Obj, ctx: Ctx): string {
+  const rest = i.rest;
+  const hasSteps = Array.isArray(i.instructions) && i.instructions.length > 0;
+  const choose = () => `the actor must choose ${amount(i.upTo, ctx)} of the ${pick(i.pick, ctx)}`;
+  if (Array.isArray(rest) && rest.length === 0 && hasSteps) return `${choose()} (all of them when no more match; nothing is asked then); for each chosen one:`;
+  if (Array.isArray(rest)) return `${choose()} to keep (all stay with no more than that many; nothing is asked then); for each of the others${hasSteps ? " (the chosen ones get the steps in the second list)" : ""}:`;
+  return `for each ${pick(i.pick, ctx)}${eachLimits(i, ctx)}:`;
+}
+
 const FLIP_GOLLUM = {
   smeagol: "flip Gollum to Sméagol: discard his damage; he enters play exhausted, controlled by the first player (not the discard pile or the victory display)",
   gollum: "flip Sméagol to Gollum: discard his damage; he enters play ready, engaged with the first player (nothing if Sméagol is not in play)",
@@ -424,9 +434,9 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     children: Array.isArray(i.options) ? (i.options as readonly Obj[]) : [],
   }),
   Each: (i, ctx) => ({
-    text: Array.isArray(i.rest) ? `the actor must choose ${amount(i.upTo, ctx)} of the ${pick(i.pick, ctx)} to keep (all stay with no more than that many; nothing is asked then); for each of the others${Array.isArray(i.instructions) && i.instructions.length > 0 ? " (the chosen ones get the steps in the second list)" : ""}:` : `for each ${pick(i.pick, ctx)}${eachLimits(i, ctx)}:`,
+    text: eachText(i, ctx),
     read: ["pick", "upTo", "instructions", "totalCost", "taken", "rest"],
-    children: Array.isArray(i.rest) ? (i.rest as readonly Obj[]) : Array.isArray(i.instructions) ? (i.instructions as readonly Obj[]) : [],
+    children: Array.isArray(i.rest) && i.rest.length > 0 ? (i.rest as readonly Obj[]) : Array.isArray(i.instructions) ? (i.instructions as readonly Obj[]) : [],
   }),
   Delay: (i, ctx) => ({
     text: `later, ${i.phase === "Quest" ? "at the end of the quest phase (the next one, when this is not the quest phase)" : (DELAY_UNTIL[str(i.until)] ?? `at ${str(i.until)}`)}${i.subject === "picked" ? ", acting on the card last picked" : ""}${isObj(i.uncancelable) ? ` (cannot be canceled while ${renderCondition(i.uncancelable, ctx)})` : ""}:`,

@@ -60,6 +60,8 @@ export type EngineStep =
   | { kind: "discover"; locationId: string; looked: readonly string[]; loot?: string; hazard?: string; cause: Cause }
   // A card from the encounter discard pile was set aside for the Resolution to add a copy of to the campaign pool (A Growing Threat, 12167:A:2; emce.campaign-pool-encounter): the card that did it and the card set aside.
   | { kind: "setAsideForPool"; sourceId: string; cardId: string; cause: Cause }
+  // A card of a player's hand was put facedown underneath a card in play (Discovered!, 08134:A:2): hidden, so the line never names it.
+  | { kind: "placeUnder"; seat: number; hostId: string }
   // A character was given poison (hob.venom-poison): `count` is the poison it has now, `of` its printed hit points; one more at `of` makes it unconscious.
   | { kind: "poison"; targetId: string; count: number; of: number; cause: Cause }
   // A character was made unconscious (hob.unconscious-characters), or, with `ready`, readied from it.
