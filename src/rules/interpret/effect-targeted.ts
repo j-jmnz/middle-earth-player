@@ -42,7 +42,9 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
   switch (instruction.verb) {
     case "ReturnToStaging": {
       const target = instruction.target;
-      if (target.kind === "self") return sourceId ? [sourceId] : [];
+      // A card in the encounter deck is not returned to the staging area: it would lie there facedown (the attacker of an AfterAttack that an earlier Forced effect shuffled into the encounter deck, 143049:A:2).
+      // A shadow card or a set-aside card that adds itself to the staging area (Thunderstruck, 11177:A:5) still does; only a card that went back into the encounter deck stays there.
+      if (target.kind === "self") return sourceId && state.cards[sourceId]?.zone !== "encounterDeck" ? [sourceId] : [];
       if (target.kind === "host") return [hostOf(state, sourceId)].filter((id): id is string => id != null);
       if (target.kind === "activeLocation") {
         // The acting seat's own active location once stages are separate.
