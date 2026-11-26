@@ -2,9 +2,10 @@
 // What the engine of The Antlered Crown does with the real records: the Setup of the Raven deck, a reveal from it against a take-and-add, the shuffle that cannot fail, the Raven shadow pair, a location dealt as a shadow card and the attacks of the last stage.
 import { describe, expect, it } from "vitest";
 
-import { fightEnemy, idOf, idsOf, resolveRecords, revealedTop, send, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
+import { engagedCodes, fightEnemy, idOf, idsOf, resolveRecords, revealedTop, send, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { pileOf } from "../../../rules/core/piles.ts";
+import { updateCard } from "../../../rules/core/state.ts";
 import { moveCard } from "../../../rules/core/zones.ts";
 
 const SCENARIO = "the-antlered-crown";
@@ -209,5 +210,47 @@ describe("Fierce Folk (08160:A:2)", () => {
     expect(handSize(state)).toBe(handSize(t.state) + 3);
     expect(handSize(state, 1)).toBe(handSize(t.state, 1) + 3);
     expect(state.modifiers.some((modifier) => modifier.stat === "cannotPlayEvents" && modifier.until === "endOfRound")).toBe(true);
+  });
+});
+
+describe("the Camp added by 08149:A:1 and the add that is no reveal (08149:A:1, 08147:A:1, 08155:A:1)", () => {
+  it("08149:A:1 the Camp that joined the staging area from the set-aside pile holds 3 time counters and its Forced effect fires once the last is gone", () => {
+    const t = table({ seats: 1, stage: STAGE_3, side: "A", setAside: [RAVEN_CHIEF, CAMP], play: [{ code: "ally", damage: 1 }] });
+    const added = resolveRecords(t.state, t.ctx, STAGE_3, "whenRevealed", t.state.questStage ?? "").state;
+    const camp = idOf(added, CAMP);
+    expect(added.cards[camp]).toMatchObject({ zone: "staging", resources: 3 });
+    // Its three counters taken off, the Camp exhausts each damaged character and puts 3 counters back (08152:A:2).
+    const spent = updateCard(added, camp, { resources: 0 });
+    const forced = resolveRecords(spent, t.ctx, CAMP, "forced", camp).state;
+    expect(forced.cards[camp]?.resources).toBe(3);
+    expect(forced.cards[idOf(forced, "ally")]?.exhausted).toBe(true);
+  });
+
+  it("08147:A:1 each player's own pick is added to the staging area: the encounter deck is not revealed from and no Surge adds a card", () => {
+    const t = table({ seats: 2, stage: STAGE_1, side: "A", active: BATTLEFIELD, staging: [WAR_CAMP], deck: ["f0", "f0", "f0"], setAside: [TURCH, RAVEN_CHIEF, CAMP, PROWLER, PROWLER, WATCHER, "07044", TRIBESMAN, TRIBESMAN, "07047", "07048"] });
+    const done = resolveRecords(t.state, t.ctx, STAGE_1, "setup", t.state.questStage ?? "").state;
+    expect(done.encounterDeck).toHaveLength(3);
+    expect(done.staging.filter((id) => done.cards[id]?.code !== WAR_CAMP)).toHaveLength(2);
+    expect(done.staging.every((id) => done.cards[id]?.zone === "staging")).toBe(true);
+  });
+
+  it("08155:A:1 the draw goes in player order from the first player: each card is engaged with the player it is for, and none is revealed", () => {
+    const raven = { seats: 2 as const, staging: [{ code: WAR_CAMP, resources: 0 }], piles: { ravenDeck: [PROWLER, WATCHER, TRIBESMAN] }, deckOf: ["filler", "filler", "filler", "filler"] };
+    const first = table({ ...raven, firstPlayer: 0 });
+    const a = resolveRecords(first.state, first.ctx, WAR_CAMP, "forced", idOf(first.state, WAR_CAMP)).state;
+    expect([engagedCodes(a, 0), engagedCodes(a, 1)]).toEqual([[PROWLER], [WATCHER]]);
+    const second = table({ ...raven, firstPlayer: 1 });
+    const b = resolveRecords(second.state, second.ctx, WAR_CAMP, "forced", idOf(second.state, WAR_CAMP)).state;
+    expect([engagedCodes(b, 1), engagedCodes(b, 0)]).toEqual([[PROWLER], [WATCHER]]);
+    // The Tribesman (When Revealed: each player draws) stays in the deck, and no card of the encounter deck was drawn.
+    expect(pileOf(a, "ravenDeck").map((id) => a.cards[id]?.code)).toEqual([TRIBESMAN]);
+    expect(handSize(a)).toBe(handSize(first.state));
+  });
+
+  it("08155:A:1 a Tribesman drawn this way does not resolve its When Revealed", () => {
+    const t = table({ seats: 2, staging: [{ code: WAR_CAMP, resources: 0 }], piles: { ravenDeck: [TRIBESMAN, TRIBESMAN] }, deckOf: ["filler", "filler", "filler", "filler"] });
+    const done = resolveRecords(t.state, t.ctx, WAR_CAMP, "forced", idOf(t.state, WAR_CAMP)).state;
+    expect([engagedCodes(done, 0), engagedCodes(done, 1)]).toEqual([[TRIBESMAN], [TRIBESMAN]]);
+    expect(handSize(done) + handSize(done, 1)).toBe(handSize(t.state) + handSize(t.state, 1));
   });
 });

@@ -5,6 +5,7 @@ import { renderCondition } from "./conditions.ts";
 import { who } from "./family-kit.ts";
 import { FAMILY_TEMPLATES } from "./families.ts";
 import { compact, done, isObj, jsonOf, joinAnd, joinOr, quoted, str, withArticle, type Ctx, type Obj } from "./kit.ts";
+import { EFFECTS } from "../../../../src/effects/index.ts";
 import { renderPick } from "./picks.ts";
 import { ANGMAR_TEMPLATES } from "./families/angmar.ts";
 import { ESCAPE_TEMPLATES } from "./families/escape.ts";
@@ -33,6 +34,10 @@ export { BURGLE_SAMPLES } from "./families/burgle.ts";
 export { DREADNAUGHT_SAMPLES, ERECH_SAMPLES, FOG_SAMPLES, GULDUR_SAMPLES, GUARDIAN_SAMPLES, INVESTIGATION_SAMPLES, LONG_DARK_SAMPLES, POISON_SAMPLES, RUINS_SAMPLES, SIEGE_SAMPLES, SMAUG_SAMPLES, SACK_SAMPLES, STONE_SAMPLES, WESTERN_LANDS_SAMPLES, WIZARDS_QUEST_SAMPLES };
 
 type Made = { text: string; read: readonly string[]; children?: readonly Obj[] };
+// Cards that print Time X: one added to the staging area from set aside takes its counters (moveEncounter), which the line "(it is not revealed)" alone would hide.
+let timed: ReadonlySet<string> | undefined;
+const timedCodes = (): ReadonlySet<string> => (timed ??= new Set(EFFECTS.filter((effect) => effect.timing === "constant" && effect.instructions.some((step) => step.verb === "Time")).map((effect) => effect.cardCode)));
+
 type Template = (ins: Obj, ctx: Ctx) => Made | null;
 
 // The note on a hand amount: `{ hand: true, plus: -N }` is "until N cards are left"; a hand amount with no negative `plus` gets none.
@@ -190,7 +195,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   ChooseCurrentQuest: (i) => ({ text: i.until === "endOfRound" ? "the first player chooses a quest card other than the current quest (the main quest card, a quest stage in play together, or a side quest in the staging area) to be the current quest until the end of the round" : "the first player chooses a quest card other than the current quest (the main quest card, or an encounter side quest in the staging area) to be the current quest until the end of the phase", read: ["until"] }),
   AttachNewTo: (i) => ({ text: `a copy of the card with code ${str(i.code)} from the supply is put into play attached to the card titled "${str(i.to)}"`, read: ["code", "to"] }),
   TradeDamageForResources: (i) => ({ text: `starting with the first player, each player may place ${str(i.damage)} damage on the card with code ${str(i.code)} to add ${str(i.resources)} resource to each of their heroes' pools`, read: ["code", "damage", "resources"] }),
-  AddSetAsideToStaging: (i) => ({ text: `${i.all === true ? "every" : "one"} ${i.outOfPlay === true ? "out-of-play" : "set-aside"} card ${typeof i.code === "string" ? `with code ${i.code}` : `with the trait ${str(i.trait)}`} joins the staging area (it is not revealed)`, read: ["code", "trait", "all", "outOfPlay"] }),
+  AddSetAsideToStaging: (i) => ({ text: `${i.all === true ? "every" : "one"} ${i.outOfPlay === true ? "out-of-play" : "set-aside"} card ${typeof i.code === "string" ? `with code ${i.code}` : `with the trait ${str(i.trait)}`} joins the staging area (it is not revealed${typeof i.code === "string" && timedCodes().has(i.code) ? "; it gets its printed Time counters as it joins" : ""})`, read: ["code", "trait", "all", "outOfPlay"] }),
   PlayFromHand: (i, ctx) => ({
     text: `the acting player plays ${i.picked === true ? `each card picked so far (a ${pick(i.pick, ctx)}) that is in its owner's hand` : `a ${pick(i.pick, ctx)} from their hand`} as part of the effect${i.free === true ? ", at no cost (no payment at all)" : ""}${typeof i.reduce === "number" ? `, its cost reduced by ${i.reduce}${typeof i.min === "number" ? ` (not below ${i.min})` : ""}` : ""}${i.noMatch === true ? ", needing no resource match" : ""}${i.onSelf === true ? ", an attachment played on this card" : ""}`,
     read: ["pick", "picked", "free", "reduce", "min", "noMatch", "onSelf"],
