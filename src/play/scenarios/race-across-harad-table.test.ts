@@ -137,6 +137,18 @@ describe("17047:A:1 one key says which area the game has, and every site reads i
   });
 });
 
+describe("17052:B:3 17053:B:3 17054:B:3 the Orcs' stage pill says whose stage it is and warns when filling it loses", () => {
+  it("\"Orcs 2\" while filling the stage only advances them, red \"Orcs 2/4\" when the players are at its stage, and always red at the last stage", () => {
+    const pill = areaWordsOf("orcs").pill;
+    expect(pill({ number: 1, last: 4, together: true })).toEqual({ text: "Orcs 1", short: "1", danger: false });
+    expect(pill({ number: 2, last: 4, together: false })).toEqual({ text: "Orcs 2", short: "2", danger: false });
+    expect(pill({ number: 2, last: 4, together: true })).toEqual({ text: "Orcs 2/4", short: "2/4", danger: true });
+    expect(pill({ number: 3, last: 4, together: true })).toEqual({ text: "Orcs 3/4", short: "3/4", danger: true });
+    expect(pill({ number: 3, last: 4, together: false }).danger).toBe(false);
+    expect(pill({ number: 4, last: 4, together: false })).toEqual({ text: "Orcs 4/4", short: "4/4", danger: true });
+  });
+});
+
 describe("17052:B:2 the Orcs' progress and advance in the banner", () => {
   it("the progress is told as the quest's is, and the advance of the Orcs is a beat of its own with no advance step", () => {
     const t = prepared(APART);
@@ -161,7 +173,8 @@ describe("17052:B:2 the Orcs' progress and advance in the banner", () => {
   });
 
   it("17054:B:3 the last stage's advance says that filling it loses", () => {
-    const t = prepared(APART);
+    // The players are at stage 4B, so the Orcs' defeats of 2D and 3D only advance them.
+    const t = prepared({ staging: [ROAD], stage: "17050" });
     const third = advancedTo(t.made, t.state, 3);
     const last = runInstruction(t.made, third, { verb: "AddOrcsProgress", amount: 20 });
     const beats = orcsBeats(third, last, (id) => id);

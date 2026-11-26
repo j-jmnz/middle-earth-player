@@ -30,9 +30,14 @@ export function stageLines(facts: StageFacts): string[] {
   return facts.number >= facts.last ? [line, STAGE_LOSS] : [line];
 }
 
+/** The pill a quest area's stage wears: `text` says whose stage it is when two stages in the row share a name, `short` is what the pill shows when the room is too small for it, and `danger` draws it in threat red when filling the stage loses the game. */
+export type StagePill = { text: string; short: string; danger: boolean };
+
 /** The stage pill on the Stormcaller's stage: its number, and "4/4" in threat red at its last stage, where filling it loses the game. */
-export function stagePill(facts: Pick<StageFacts, "number" | "last">): { text: string; danger: boolean } {
-  return facts.number >= facts.last ? { text: `${facts.number}/${facts.last}`, danger: true } : { text: `${facts.number}`, danger: false };
+export function stagePill(facts: Pick<StageFacts, "number" | "last">): StagePill {
+  const danger = facts.number >= facts.last;
+  const text = danger ? `${facts.number}/${facts.last}` : `${facts.number}`;
+  return { text, short: text, danger };
 }
 
 /** The cue on the Stormcaller's stage while the players are at another stage. */

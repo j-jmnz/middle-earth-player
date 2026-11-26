@@ -284,7 +284,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
   17052:forced:2: Forced when the Orcs' stage in play is defeated, checked at once and before the Orcs advance to their next stage (only the defeated stage's own record hears it, so a loss line reads the defeat of its own stage and no other)
     only if the players are on stage 2
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the players lose the game (The Orcs defeated stage 2D while the players were at stage 2B)
+    - the players lose the game (The Orcs completed Racing North (stage 2) while the players were at stage 2)
 
 ## 17053 Hunted in Harad
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -317,7 +317,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
   17053:forced:2: Forced when the Orcs' stage in play is defeated, checked at once and before the Orcs advance to their next stage (only the defeated stage's own record hears it, so a loss line reads the defeat of its own stage and no other)
     only if the players are on stage 3
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the players lose the game (The Orcs defeated stage 3D while the players were at stage 3B)
+    - the players lose the game (The Orcs completed Hunted in Harad (stage 3) while the players were at stage 3)
 
 ## 17054 The Ford of Harnen
 (the scenario deals it into the setAside pile; the piles place it, no record does)

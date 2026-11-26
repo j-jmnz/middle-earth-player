@@ -53,7 +53,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "TakeObjectiveAlly":
       return takeObjectiveAlly(state, instruction, focus, steps);
     case "EliminateAfterAttack":
-      return eliminateAfterAttack(state, focus, steps);
+      return eliminateAfterAttack(state, focus, ctx, steps);
     default:
       return runHeat(state, instruction, focus, ctx);
   }

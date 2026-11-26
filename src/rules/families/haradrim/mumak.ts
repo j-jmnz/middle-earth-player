@@ -3,6 +3,8 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { printedOf } from "../../core/printed.ts";
 import { eliminateSeat } from "../../core/eliminate.ts";
 import { flagged, updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
@@ -27,9 +29,18 @@ export function undefendedMumak(state: ScenarioState): readonly string[] {
   return id ? [id] : [];
 }
 
-/** EliminateAfterAttack (17038:A:3): the acting seat is eliminated; while an enemy attack on that seat is in progress the elimination is left for the attack's end, after the Orcs' progress it gives (the first player takes progress first, reading of 17038:A:3 in docs/scenarios/haradrim/race-across-harad.md). */
-export function eliminateAfterAttack(state: ScenarioState, focus: Focus, steps: EngineStep[]): ScenarioState {
+/** EliminateAfterAttack (17038:A:3): the acting seat is eliminated; while an enemy attack on that seat is in progress the elimination is left for the attack's end, after the Orcs' progress it gives (the first player takes progress first, reading of 17038:A:3 in docs/scenarios/haradrim/race-across-harad.md). With no seat left the loss says why: "Tamed Mûmak was destroyed: Player 1 is eliminated". */
+export function eliminateAfterAttack(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const attack = state.pendingAttack;
-  if (attack?.seat !== focus.seat) return eliminateSeat(state, focus.seat, steps);
+  if (attack?.seat !== focus.seat) return named(state, eliminateSeat(state, focus.seat, steps), focus, ctx);
   return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), { verb: "EliminateAfterAttack" }] } };
+}
+
+// The loss that ends the game when this was the last seat names the card and the seat instead of "No seats remain" (the loss any elimination of the last seat gives).
+function named(before: ScenarioState, after: ScenarioState, focus: Focus, ctx: ReduceContext): ScenarioState {
+  const card = focus.sourceId ? after.cards[focus.sourceId] : undefined;
+  if (before.lost || !after.lost || after.lossReason !== "No seats remain" || !card) return after;
+  const printed = printedOf(ctx.cards, card.code);
+  const how = printed.health != null && card.damage >= printed.health ? "was destroyed" : "left play";
+  return { ...after, lossReason: `${printed.name} ${how}: Player ${focus.seat + 1} is eliminated` };
 }

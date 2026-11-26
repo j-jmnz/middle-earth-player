@@ -6,6 +6,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import { currentCause, UNATTRIBUTED, type Cause } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
+import { holds } from "../../interpret/conditions.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat } from "../../core/modified-stat.ts";
@@ -33,14 +34,18 @@ function placeOnStage(state: ScenarioState, amount: number, ctx: ReduceContext, 
   return (next.cards[stage.id]?.progress ?? 0) >= points ? defeatOrcsStage(next, ctx, steps) : next;
 }
 
-// The Orcs' stage is full. Its records that hear `orcsStageDefeated` resolve (the loss of 2D, 3D and 4D); the Orcs advance to the next stage, C side first (its When Revealed effects resolve), then D side (hrd.orcs-area). The last stage stays where it is.
+// The Orcs' stage is full. Its records that hear `orcsStageDefeated` resolve (the loss of 2D, 3D and 4D); unless that loses the game, the Orcs advance to the next stage, C side first (its When Revealed effects resolve), then D side (hrd.orcs-area). The last stage stays where it is.
 function defeatOrcsStage(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const area = orcsOf(state);
   const stage = area ? state.cards[area.stage] : undefined;
   if (!area || !stage) return state;
   const [upcoming, ...rest] = area.deck;
+  const defeated = ctx.effects.filter((effect) => effect.cardCode === stage.code && effect.trigger === "orcsStageDefeated");
+  // A defeat that loses the game leaves the Orcs on the stage they defeated, so the table at the loss shows the stage the loss names: the check comes before the advance (17052:B:3, 17053:B:3, 17054:B:3).
+  const scope = { actor: state.firstPlayer, sourceId: stage.id, returned: 0 };
+  const loses = defeated.some((effect) => (effect.condition == null || holds(state, effect.condition, scope, ctx)) && effect.instructions.some((instruction) => instruction.verb === "LoseGame"));
   let next = state;
-  if (upcoming) {
+  if (upcoming && !loses) {
     // The defeated stage leaves play; the new one becomes the current stage before it moves, so it is not taken for a card of the area.
     next = { ...next, orcs: { ...area, stage: upcoming, number: area.number + 1, deck: rest } };
     next = moveCard(next, area.stage, { zone: "setAside" });
@@ -49,7 +54,6 @@ function defeatOrcsStage(state: ScenarioState, ctx: ReduceContext, steps: Engine
     next = pushCardEffects(next, "whenRevealed", upcoming, next.firstPlayer, false, revealed, ctx, steps);
   }
   // Pushed last, so the loss resolves before the C side's When Revealed.
-  const defeated = ctx.effects.filter((effect) => effect.cardCode === stage.code && effect.trigger === "orcsStageDefeated");
   return pushCardEffects(next, "forced", stage.id, state.firstPlayer, false, defeated, ctx, steps);
 }
 

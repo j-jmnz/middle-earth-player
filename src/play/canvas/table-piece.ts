@@ -14,6 +14,7 @@ import type { BackImages, Fonts, TokenImages } from "./pieces.native.tsx";
 import type { CardSlot } from "../layout/layout.ts";
 import { AT_REST, still, type Motion } from "../motion/motion.ts";
 import type { OptionMark } from "../choice/sheet-types.ts";
+import type { StagePill } from "../words/scenarios/stormcaller.ts";
 import type { TableHighlight } from "./table-canvas-types.ts";
 import type { TableTokens } from "../../ui/tokens.ts";
 
@@ -63,12 +64,12 @@ export type PieceProps = BodyProps & {
   tokens: TokenImages;
 };
 
-/** The marks the Stormcaller's stage wears (words/scenarios/stormcaller.ts, stagePill). */
-export type StageMarksView = { pill: { text: string; danger: boolean }; apart: boolean };
+/** The marks a quest area's stage wears (words/scenarios/area-words.ts, pill). */
+export type StageMarksView = { pill: StagePill; apart: boolean };
 
 /** What the canvas knows for one render, from which every slot's props are made. */
 export type PieceContext = {
-  /** The Stormcaller's stage marks for this render, or null outside Flight of the Stormcaller. */
+  /** The area stage's marks for this render, or null in a game with no quest area. */
   stageMarks: StageMarksView | null;
   highlight: TableHighlight;
   targetIds: ReadonlySet<string>;

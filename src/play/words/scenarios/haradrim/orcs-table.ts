@@ -2,7 +2,7 @@
 // Orcs' current quest stage and its progress, where each card of the area stands against the players' stage, and what "the same stage" switches. The numbers are the engine's. Pure.
 import type { Instruction } from "../../../../catalog/boundary.ts";
 
-import type { StageFacts } from "../stormcaller.ts";
+import type { StageFacts, StagePill } from "../stormcaller.ts";
 
 /** The preview sentence of a card in the Orcs' area while the players are at another stage: it is no staging card, so it adds no Threat, cannot be engaged or traveled to, and is immune to player card effects. */
 export const ORCS_APART = "In the Orcs' area: not in the staging area, immune to player card effects";
@@ -82,3 +82,10 @@ export const mumakWords = (who: string, hurt: { damage: number; hitPoints: numbe
   const left = Math.max(hurt.hitPoints - hurt.damage, 0);
   return `${who === "you" ? "Your" : `${who}'s`} Tamed Mûmak, an objective ally immune to player card effects. All damage of an undefended attack on ${who} goes to it: ${hurt.damage} damage of ${hurt.hitPoints} hit points, ${left} more eliminates ${who}. If it leaves play, ${who === "you" ? "you are" : `${who} is`} eliminated from the game.`;
 };
+
+/** The pill on the Orcs' stage: "Orcs 2", so it is told from the players' stage of the same name, and "Orcs 2/4" in threat red whenever filling the stage loses the game: the last stage always, stages 2 and 3 while the players are at their stage (17052:B:3, 17053:B:3, 17054:B:3). */
+export function orcsStagePill(facts: Pick<StageFacts, "number" | "last" | "together">): StagePill {
+  const danger = facts.number >= facts.last || (facts.number >= 2 && facts.together);
+  const number = danger ? `${facts.number}/${facts.last}` : `${facts.number}`;
+  return { text: `Orcs ${number}`, short: number, danger };
+}

@@ -195,9 +195,9 @@ describe("what a screen reader hears", () => {
   });
 
   it("pills the stage with its number, and \"4/4\" in threat red at the last stage", () => {
-    expect(stagePill({ number: 2, last: 4 })).toEqual({ text: "2", danger: false });
-    expect(stagePill({ number: 3, last: 4 })).toEqual({ text: "3", danger: false });
-    expect(stagePill({ number: 4, last: 4 })).toEqual({ text: "4/4", danger: true });
+    expect(stagePill({ number: 2, last: 4 })).toEqual({ text: "2", short: "2", danger: false });
+    expect(stagePill({ number: 3, last: 4 })).toEqual({ text: "3", short: "3", danger: false });
+    expect(stagePill({ number: 4, last: 4 })).toEqual({ text: "4/4", short: "4/4", danger: true });
   });
 
   it("knows the last stage and the players' stage", () => {

@@ -201,10 +201,26 @@ describe("hrd.orcs-area the Orcs advance through their quest deck, C side first,
 });
 
 describe("17052:B:3 17053:B:3 17054:B:3 a stage the Orcs defeat loses the game when its line says so", () => {
+  it("1D defeated, and the advance to 2D, lose nothing: no line of 1D or 2C loses the game", () => {
+    const at2 = prepared({ stage: "17048" });
+    const advanced = runInstruction(at2.made, at2.state, { verb: "AddOrcsProgress", amount: 10 });
+    expect(advanced.lost).toBeFalsy();
+    expect(advanced.orcs?.number).toBe(2);
+    const same = prepared({ stage: "17047" });
+    const together = runInstruction(same.made, same.state, { verb: "AddOrcsProgress", amount: 10 });
+    expect(together.lost).toBeFalsy();
+    expect(together.orcs?.number).toBe(2);
+  });
+
+
   it("2D defeated while the players are at 2B loses the game; at 3B the Orcs advance and the game goes on", () => {
     const at2 = prepared({ stage: "17048" });
     const lost = runInstruction(at2.made, advancedTo(at2.made, at2.state, 2), { verb: "AddOrcsProgress", amount: 15 });
     expect(lost.lost).toBeTruthy();
+    // The loss names the stage the Orcs defeated, and the table at the loss still holds it: the check comes before the advance.
+    expect(lost.lossReason).toBe("The Orcs completed Racing North (stage 2) while the players were at stage 2");
+    expect(codeOf(lost, stageId(lost))).toBe("17052");
+    expect(lost.orcs?.number).toBe(2);
     const at3 = prepared({ stage: "17049" });
     const goes = runInstruction(at3.made, advancedTo(at3.made, at3.state, 2), { verb: "AddOrcsProgress", amount: 15 });
     expect(goes.lost).toBeFalsy();
@@ -215,6 +231,8 @@ describe("17052:B:3 17053:B:3 17054:B:3 a stage the Orcs defeat loses the game w
     const at3 = prepared({ stage: "17049" });
     const lost = runInstruction(at3.made, advancedTo(at3.made, at3.state, 3), { verb: "AddOrcsProgress", amount: 20 });
     expect(lost.lost).toBeTruthy();
+    expect(lost.lossReason).toBe("The Orcs completed Hunted in Harad (stage 3) while the players were at stage 3");
+    expect(lost.orcs?.number).toBe(3);
     const at4 = prepared({ stage: "17050" });
     const goes = runInstruction(at4.made, advancedTo(at4.made, at4.state, 3), { verb: "AddOrcsProgress", amount: 20 });
     expect(goes.lost).toBeFalsy();

@@ -206,7 +206,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "17052:whenRevealed:1", cardCode: "17052", lines: ["17052:A:1"], timing: "whenRevealed", condition: DEFEATED(2), instructions: ADD_AN_ORC },
     { id: "17052:constant:1", cardCode: "17052", lines: ["17052:B:1"], timing: "constant", condition: ON_STAGE(3), instructions: [CHIEFTAIN_STAYS] },
     { id: "17052:forced:1", cardCode: "17052", lines: ["17052:B:2"], ...END_OF_QUEST_PHASE, instructions: [...RETURN_CHIEFTAIN, { verb: "OrcsProgress" }] },
-    { id: "17052:forced:2", cardCode: "17052", lines: ["17052:B:3"], ...LOSES("The Orcs defeated stage 2D while the players were at stage 2B", ON_STAGE(2)) },
+    { id: "17052:forced:2", cardCode: "17052", lines: ["17052:B:3"], ...LOSES("The Orcs completed Racing North (stage 2) while the players were at stage 2", ON_STAGE(2)) },
 
     // 17053 Hunted in Harad (3C / 3D). As 2C with stage 3B; while the players are at 4B the Chieftain cannot leave the area and each enemy of the Orcs' area gets +1 Threat.
     { id: "17053:whenRevealed:1", cardCode: "17053", lines: ["17053:A:1"], timing: "whenRevealed", condition: DEFEATED(3), instructions: ADD_AN_ORC },
@@ -220,7 +220,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [{ verb: "ModifyStat", stat: "threat", amount: 1, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", staging: true, allInPlay: true, inOrcsArea: true } }],
     },
     copyLine("17052:B:2", "17053:B:2"),
-    { id: "17053:forced:2", cardCode: "17053", lines: ["17053:B:3"], ...LOSES("The Orcs defeated stage 3D while the players were at stage 3B", ON_STAGE(3)) },
+    { id: "17053:forced:2", cardCode: "17053", lines: ["17053:B:3"], ...LOSES("The Orcs completed Hunted in Harad (stage 3) while the players were at stage 3", ON_STAGE(3)) },
 
     // 17054 The Ford of Harnen (4C / 4D). The Chieftain takes no damage while River Harnen is in the staging area; at the end of the quest phase the Orcs make progress from the engaged enemies' Threat; the players lose when the Orcs defeat this stage.
     {

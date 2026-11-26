@@ -123,7 +123,7 @@ describe("samePiece on a crowded table", () => {
 describe("samePiece on the Stormcaller's stage", () => {
   const { views, piles } = crowdedTable();
   const slot = { ...(laidOut(views, piles).slots[0] as CardSlot), stormcaller: "stage" as const };
-  const marks = (text: string, apart: boolean) => ({ ...contextOf(), stageMarks: { pill: { text, danger: text.includes("/") }, apart } });
+  const marks = (text: string, apart: boolean) => ({ ...contextOf(), stageMarks: { pill: { text, short: text, danger: text.includes("/") }, apart } });
 
   it("carries its marks only on the stage, and redraws it when the number or the Apart plate changes", () => {
     expect(pieceProps({ ...slot, stormcaller: undefined }, marks("3", true)).stageMarks).toBeNull();
