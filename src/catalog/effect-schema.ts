@@ -321,6 +321,8 @@ export const effectSchema = z.strictObject({
   // This Response is the player's the event happened to, whoever controls the source ("the engaged player may ...", 12125:A:3): the seat of the event answers it, and it is not offered when the event names no seat.
   // `guardian`: the player guarding Gollum answers it ("the player guarding Gollum may choose a new player to guard him", 02134:A:1).
   answeredBy: z.enum(["eventSeat", "guardian"]).optional(),
+  // This Response is offered before the Forced effects of the same event resolve: "When" Responses resolve before "After" ones (rr.response), and the engine otherwise resolves every Forced effect first (Mûmak Trail, 17020:A:1).
+  whenFirst: z.literal(true).optional(),
   // This Action, Response or Forced effect of a card that is not an event is used from its owner's hand, and only there ("put ~ into play
   // from your hand", rr.in-play-and-out-of-play: an ability that refers to being used from an out-of-play area; Lost in the Wild's Forced effect, 18026:A:1).
   fromHand: z.literal(true).optional(),

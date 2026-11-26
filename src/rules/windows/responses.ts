@@ -22,10 +22,12 @@ import { isPlayerCardEffect } from "../core/keywords.ts";
 import { guardianSeat } from "../families/guardian/seats.ts";
 
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
+export type ResponseOrder = "when" | "rest";
 
 // Responses are optional. After an event, each Response that applies is offered to the seat that
 // controls its card (the first player, for an encounter or quest card). A seat may use it or pass.
-function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): ResponseOffer[] {
+// `only` narrows the records by `whenFirst`: "when" takes those that resolve before the event's Forced effects, "rest" the others; unset takes all.
+function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, only?: ResponseOrder): ResponseOffer[] {
   const offers: ResponseOffer[] = [];
   const order = livingSeats(state);
   // Only the cards with a Response to this trigger are sorted and looked at.
@@ -37,7 +39,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
     // An event card in the hand hears every event; a card in play hears the events about itself or about the table. The
     // top card of a deck its controller may play as if it were in the hand (Gandalf, 142002) is in the hand for this.
     const inHand = instance.zone === "hand" || (instance.zone === "deck" && instance.controller != null && playableFromDeck(state, instance.id, instance.controller, ctx));
-    const records = effectsOfCard(state, ctx, instance).filter((effect) => effect.timing === "response" && hears(state, effect, instance, event, ctx));
+    const records = effectsOfCard(state, ctx, instance).filter((effect) => effect.timing === "response" && (only == null || (effect.whenFirst === true) === (only === "when")) && hears(state, effect, instance, event, ctx));
     if (records.length === 0) continue;
     // A card nobody controls (a quest or encounter card) is answered by the first player, or, while a Peril card's
     // staging resolves, by the revealing player: the other players are the ones Peril keeps out (mec109.peril).
@@ -71,12 +73,12 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
  * cannot be paid yet waits in the window and is listed once it can (Théodred adds the resource Aragorn spends, the video's
  * combo). With nothing usable now, no window opens.
  */
-export function offerResponses(state: ScenarioState, event: GameEvent, ctx: ReduceContext, steps: EngineStep[], also: readonly GameEvent[] = []): ScenarioState {
-  if (ctx.effects.length === 0) return state;
+export function offerResponses(state: ScenarioState, event: GameEvent, ctx: ReduceContext, steps: EngineStep[], also: readonly GameEvent[] = [], only?: ResponseOrder): ScenarioState {
+  if (ctx.effects.length === 0 || (only === "when" && !ctx.effects.some((effect) => effect.whenFirst))) return state;
   const order = livingSeats(state);
   const seen = new Set<string>();
   const offers = [event, ...also]
-    .flatMap((each) => collect(state, each, ctx))
+    .flatMap((each) => collect(state, each, ctx, only))
     .filter((offer) => !barred(state, offer, ctx))
     .filter((offer) => {
       // Each event of the occurrence is its own triggering condition: a card that hears two of them is offered twice.

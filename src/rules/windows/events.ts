@@ -60,8 +60,9 @@ export function drainEvents(state: ScenarioState, ctx: ReduceContext, steps: Eng
     rest.length > 0 ? { ...without, pendingEvents: rest } : (without as ScenarioState),
   );
   // The Forced effects go on top of the response frame, the first event's last, so they resolve in the order of the events.
+  // The Responses marked `whenFirst` ("When" Responses, rr.response) go on top of the Forced frames, so they resolve before them.
   const announce = (from: ScenarioState): ScenarioState =>
-    [event, ...together].reverse().reduce((current, each) => fireForced(current, each, ctx, steps), offerResponses(from, event, ctx, steps, together));
+    offerResponses([event, ...together].reverse().reduce((current, each) => fireForced(current, each, ctx, steps), offerResponses(from, event, ctx, steps, together, "rest")), event, ctx, steps, together, "when");
   // An enemy with the ambush keyword added to the staging area makes its checks once what hears it enter has resolved: their frame goes down first (families/encounter/ambush.ts).
   const ambush = (from: ScenarioState): ScenarioState => [event, ...together].reduce((current, each) => pushAmbush(current, each, ctx, steps), from);
   const window = cleared.window;

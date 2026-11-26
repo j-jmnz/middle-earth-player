@@ -32,6 +32,12 @@ const VERBS = [
   // "Uruk Chieftain engages the player engaged with the most non-unique Orc enemies" (16061:A:3): the source enemy engages the living player with the most enemies matching `pick` engaged with them; the first player chooses among players that tie (all players tie at 0). Nothing
   // changes when the source is already engaged with that player.
   z.strictObject({ verb: z.literal("EngageSeatWithMost"), pick: pickSchema, ...when }),
+  // "Each player attaches 1 random set aside Capture objective to a Wild Mûmak in play" (17027:A:1): the last picked card in play is the host; one set-aside card with this trait is drawn by the game seed and lies attached to it faceup, controlled by nobody (it leaves play
+  // with its host, and is no player's card). The actor's choice of host is the Pick before it. Nothing changes with no host picked or no such card set aside; `attached` is queued.
+  z.strictObject({ verb: z.literal("AttachRandomSetAside"), trait: z.string().min(1), ...when }),
+  // "the engaged player ..." for a card that lies attached to an enemy and is controlled by nobody (the Captures, 17011:A:1 to 17014:A:1): the instructions after it resolve for the player the source's host enemy is engaged with. With the host in the staging area, or not an enemy, the
+  // rest of the effect is dropped (no player is engaged with it).
+  z.strictObject({ verb: z.literal("ActAsEngagedWithHost"), ...when }),
 ] as const;
 
 const TRIGGERS = [
@@ -54,6 +60,10 @@ const FLAGS = [
   "undefendedToStaged",
   // On an enemy: an ally with less Willpower than the enemy's Threat cannot defend against it (16062:A:1); the `combat.defense` hook reads it.
   "defendersBelowThreat",
+  // On the table, for the rest of the game: each location explored is noted for the round ("if a location was explored this round", 17017:A:2); the Setup of The Mûmakil sets it (families/haradrim/explored.ts). Absent, no game notes anything.
+  "noteExplored",
+  // On the table, until the end of the round: a location was explored (the note `noteExplored` makes; condition `locationExploredThisRound`).
+  "exploredThisRound",
 ] as const;
 
 export const manifest = { name: "haradrim", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;
