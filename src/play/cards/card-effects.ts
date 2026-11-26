@@ -28,7 +28,6 @@ import { stackMark } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { capturedPill } from "../words/scenarios/angmar/gram-table.ts";
 import { capturedOwners } from "../readouts/gram.ts";
 import { hiddenMark, isHeldFaceup, keptMark } from "../readouts/standalone-scenarios/wizards-quest.ts";
-import { areaStanding } from "../../rules/families/stormcaller/values.ts";
 import { placedLimit } from "../../rules/families/uncharted/limit.ts";
 import { modifiedStat, printedStat } from "../../rules/core/keywords.ts";
 import { heldBy } from "../../rules/core/holder-classes.ts";
@@ -231,10 +230,10 @@ export function effectLines(game: ScenarioState, ctx: ReduceContext, cardId: str
   // A card of a quest area says where it stands (dcce.stormcallers-area-stages, hrd.orcs-area), in the words of its area (words/area-words.ts).
   const kind = areaKind(game);
   const words = areaWordsOf(kind);
-  const standing = kind === "orcs" ? areaRoleOf(game, cardId) : areaStanding(game, cardId);
+  const standing = areaRoleOf(game, cardId);
   if (standing === "apart") lines.push(words.apart);
   else if (standing === "together") lines.push(words.together);
-  else if (standing === "stage" || standing === "stageApart") {
+  else if (standing === "stage") {
     const facts = stageFactsOf(game, questPointsOf(game, card, ctx.cards));
     if (facts) lines.push(...words.stageLines(facts));
   }

@@ -5,10 +5,11 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
-import { eliminateSeat } from "../../core/eliminate.ts";
+import { NO_SEATS_REMAIN, eliminateSeat } from "../../core/eliminate.ts";
 import { flagged, updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
+import { effectData } from "../encounter/moves.ts";
 import { ask, chosenOf } from "./staged.ts";
 
 /** TakeObjectiveAlly: the actor takes one of the set-aside objective allies with these codes into their play area, faceup and ready (the actor is asked when several different cards are left; copies of one card are one choice). It is an ally in play by its printed combat stats (an objective ally a player controls). */
@@ -36,13 +37,14 @@ export function eliminateAfterAttack(state: ScenarioState, focus: Focus, ctx: Re
   return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), { verb: "EliminateAfterAttack" }] } };
 }
 
-// The loss that ends the game when this was the last seat names the Mûmak and the seat instead of "No seats remain" (the loss any elimination of the last seat gives). A deferred elimination runs in the attacking enemy's frame, so the Mûmak is found by its code.
+// The loss that ends the game when this was the last seat names the Mûmak and the seat instead of "No seats remain" (the loss any elimination of the last seat gives). The Mûmak is the one the effect
+// runs for (a `leftPlay` record's source) or the one the undefended attack landed on (`other` of the attack's end, where the deferred elimination runs in the attacking enemy's frame).
 const MUMAK = "17038";
 function named(before: ScenarioState, after: ScenarioState, focus: Focus, ctx: ReduceContext): ScenarioState {
-  if (before.lost || !after.lost || after.lossReason !== "No seats remain") return after;
+  if (before.lost || !after.lost || after.lossReason !== NO_SEATS_REMAIN) return after;
   const printed = printedOf(ctx.cards, MUMAK);
-  const mine = Object.values(after.cards).filter((card) => card.code === MUMAK);
+  const mine = [focus.sourceId, effectData(before)?.other].find((id) => id != null && before.cards[id]?.code === MUMAK);
   // A Mûmak in the encounter discard pile was destroyed (its damage is cleared when it leaves play); one anywhere else left play another way.
-  const destroyed = mine.some((card) => card.zone === "encounterDiscard");
+  const destroyed = mine != null && before.cards[mine]?.zone === "encounterDiscard";
   return { ...after, lossReason: `${printed.name} ${destroyed ? "was destroyed" : "left play"}: Player ${focus.seat + 1} is eliminated` };
 }

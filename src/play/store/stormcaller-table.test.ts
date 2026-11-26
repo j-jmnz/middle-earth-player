@@ -189,7 +189,7 @@ describe("what a screen reader hears", () => {
   });
 
   it("says what a stage with no quest points or no cards in the area reads, and that the last stage loses the game", () => {
-    const last = { number: 4, last: 4, progress: 2, points: null, playersAt: 2, together: false };
+    const last = { who: "stormcaller" as const, number: 4, last: 4, progress: 2, points: null, playersAt: 2, together: false };
     expect(stageSpeech({ ...last, name: "Cape", names: [] })).toBe(`Stormcaller · stage 4 of 4 · 2, Cape. No cards in the area. Out of reach: the players are at another stage, so its cards are immune and not in the staging area. ${STAGE_LOSS}`);
     expect(stageTitle({ ...last, number: 3, points: 18, progress: 12 })).toBe("Stormcaller · stage 3 of 4 · 12/18");
   });

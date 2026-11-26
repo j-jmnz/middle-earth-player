@@ -43,6 +43,7 @@ function defeatOrcsStage(state: ScenarioState, ctx: ReduceContext, steps: Engine
   const defeated = ctx.effects.filter((effect) => effect.cardCode === stage.code && effect.trigger === "orcsStageDefeated");
   // A defeat that loses the game leaves the Orcs on the stage they defeated, so the table at the loss shows the stage the loss names: the check comes before the advance (17052:B:3, 17053:B:3, 17054:B:3).
   const scope = { actor: state.firstPlayer, sourceId: stage.id, returned: 0 };
+  // Only a top-level LoseGame counts: the records of 2D, 3D and 4D write it so (a LoseGame inside a conditional instruction would not be seen here).
   const loses = defeated.some((effect) => (effect.condition == null || holds(state, effect.condition, scope, ctx)) && effect.instructions.some((instruction) => instruction.verb === "LoseGame"));
   let next = state;
   if (upcoming && !loses) {

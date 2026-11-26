@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { EngineStep } from "../../core/intents.ts";
-import type { ScenarioState } from "../../core/state.ts";
+import { withSeat, type ScenarioState } from "../../core/state.ts";
 import { fight, idOf, idsOf, legalTargets, opened, run as runInstruction, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { moveCard, spawn } from "../../core/zones.ts";
 import { finishAttack } from "../../combat/shadow.ts";
@@ -157,11 +157,14 @@ describe("17038:A:3 a destroyed Tamed Mûmak still gives the progress of the att
 describe("17038:A:3 the elimination a destroyed Tamed Mûmak owes is never lost", () => {
   const SETS = ["17051", "17052", "17053", "17054", "16061"];
   // The attack ends with the elimination of seat 0 owed (the Mûmak was destroyed by an undefended attack) and its attacker no longer engaged: the instructions of an enemy that left the attack are dropped, this one is not.
-  function ended(seats: 1 | 2, left: boolean): ScenarioState {
+  function ended(seats: 1 | 2, left: boolean, destroyedSeat?: number): ScenarioState {
     const made = table({ seats, stage: "17050", engaged: [URUK], heroes: [], setAside: SETS, play: [{ code: MUMAK, seat: 0 }, ...(seats === 2 ? [{ code: MUMAK, seat: 1 }] : [])] });
     const state = runInstruction(made, opened(made).state, { verb: "PrepareOrcsArea", stages: SETS.slice(0, 4), number: 1 });
     const uruk = idOf(state, URUK);
-    const attacking = { ...state, pendingAttack: { enemyId: uruk, seat: 0, undefended: true, after: [{ verb: "EliminateAfterAttack" } as const] } };
+    // `destroyedSeat`: that seat's Mûmak is the one the attack destroyed (in the encounter discard pile); the other seat's Mûmak, if any, is destroyed by nothing.
+    const mumak = (seat: number): string => (state.seats[seat]?.play ?? []).find((id) => state.cards[id]?.code === MUMAK) ?? "";
+    const gone = destroyedSeat == null ? state : moveCard(state, mumak(destroyedSeat), { zone: "encounterDiscard" });
+    const attacking = { ...gone, pendingAttack: { enemyId: uruk, seat: 0, undefended: true, heroId: destroyedSeat == null ? undefined : mumak(destroyedSeat), after: [{ verb: "EliminateAfterAttack" } as const] } };
     const steps: EngineStep[] = [];
     const away = left ? moveCard(attacking, uruk, { zone: "staging" }) : attacking;
     return settle(finishAttack(away, made.ctx, steps), made.ctx, steps);
@@ -175,6 +178,22 @@ describe("17038:A:3 the elimination a destroyed Tamed Mûmak owes is never lost"
     const done = ended(1, true);
     expect(done.lost).toBe(true);
     // The deferred elimination runs in the attacker's frame, but the reason names the Mûmak, not the attacker.
+    expect(done.lossReason).toBe("Tamed Mûmak left play: Player 1 is eliminated");
+  });
+
+  it("solo: a Mûmak the attack destroyed gives the reason \"was destroyed\"", () => {
+    const done = ended(1, true, 0);
+    expect(done.lost).toBe(true);
+    expect(done.lossReason).toBe("Tamed Mûmak was destroyed: Player 1 is eliminated");
+  });
+
+  it("the reason names this seat's Mûmak: another seat's destroyed Mûmak does not make it \"was destroyed\"", () => {
+    const made = table({ seats: 2, stage: "17050", engaged: [URUK], heroes: [], setAside: SETS, play: [{ code: MUMAK, seat: 0 }, { code: MUMAK, seat: 1 }] });
+    const opening = runInstruction(made, opened(made).state, { verb: "PrepareOrcsArea", stages: SETS.slice(0, 4), number: 1 });
+    // Seat 1 is out already, its Mûmak in the encounter discard pile; seat 0's Mûmak is still in play when its elimination runs.
+    const seat1 = (opening.seats[1]?.play ?? []).find((id) => opening.cards[id]?.code === MUMAK) ?? "";
+    const out = withSeat(moveCard(opening, seat1, { zone: "encounterDiscard" }), 1, { ...opening.seats[1]!, eliminated: true });
+    const done = settle(finishAttack({ ...out, pendingAttack: { enemyId: idOf(out, URUK), seat: 0, undefended: true, after: [{ verb: "EliminateAfterAttack" } as const] } }, made.ctx, []), made.ctx, []);
     expect(done.lossReason).toBe("Tamed Mûmak left play: Player 1 is eliminated");
   });
 

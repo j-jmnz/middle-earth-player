@@ -1,5 +1,6 @@
 import type { Amount } from "../../../catalog/boundary.ts";
 import type { Ask } from "../asks.ts";
+import { URUK_CHIEFTAIN_ASKS } from "../haradrim-asks.ts";
 
 // The choice words of The Long Arm of Mordor (haradrim part 3), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario the-long-arm-of-mordor --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=the-long-arm-of-mordor` prints each sentence.
@@ -19,13 +20,8 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "16073:whenRevealed:1 @0.0 SearchMove": { owned: true, note: "Free the Captives: choose an Orc enemy in the encounter deck or discard pile to add to the staging area.", verb: "Add" },
   "16073:whenRevealed:1 @2 GuardStagedHeroes": { owned: true, note: "Free the Captives: choose the Orc enemy in the staging area that will guard {hero}. The hero goes under it.", verb: "Guard" },
 
-  // 16061:A:3 (Uruk Chieftain): at the end of the encounter phase it engages the player engaged with the most non-unique Orc enemies; the first player picks among tied players.
-  "16061:forced:1 @0 EngageSeatWithMost": {
-    owned: true,
-    note: "Uruk Chieftain: choose which tied player it engages, the one engaged with the most non-unique Orc enemies. It attacks that player at once.",
-    verb: "Engage",
-    labels: { "seat:0": "Player 1", "seat:1": "Player 2", "seat:2": "Player 3", "seat:3": "Player 4" },
-  },
+  // 16061:A:3 (Uruk Chieftain): the first player picks among tied players (haradrim-asks.ts).
+  ...URUK_CHIEFTAIN_ASKS,
 
   // 16031:A:1 (Kahliel): at the beginning of the planning phase he may add 1 resource to a hero in play (any player's; a hero in the staging area is immune).
   "16031:response:1 @0 Pick": { owned: true, note: "Kahliel: choose a hero in play to add 1 resource to.", verb: "Add" },

@@ -12,6 +12,7 @@ import { declaredDefenders, pooledDefense, standingDefenders } from "../../rules
 import { destroyCard, modifiedStat, placeDamage } from "../../rules/core/keywords.ts";
 import { engagementCostOf, engagementForecast } from "../../rules/quest/quest.ts";
 import type { EngineStep, ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
+import { NO_SEATS_REMAIN } from "../../rules/core/eliminate.ts";
 import { flagged, inPlay, livingSeats } from "../../rules/core/state.ts";
 import { effectsOf } from "../../rules/windows/listen.ts";
 
@@ -31,7 +32,6 @@ export type DamageOutcome = {
 };
 
 const MOST = 20;
-const NO_SEATS = "No seats remain";
 
 function place(game: ScenarioState, ctx: ReduceContext, cardId: string, amount: number): ScenarioState {
   const steps: EngineStep[] = [];
@@ -96,7 +96,7 @@ export function damageOutcome(game: ScenarioState, ctx: ReduceContext, cardId: s
       }
     }
   }
-  const loss = after.lost && !game.lost ? (after.lossReason ?? "The game is lost") : everyoneOut ? NO_SEATS : destroyed ? leavesPlayLoss(game, ctx, cardId) : null;
+  const loss = after.lost && !game.lost ? (after.lossReason ?? "The game is lost") : everyoneOut ? NO_SEATS_REMAIN : destroyed ? leavesPlayLoss(game, ctx, cardId) : null;
   return { damage, destroyed, loss, eliminated, spare };
 }
 
@@ -117,7 +117,7 @@ export function undefendedDamage(game: ScenarioState, ctx: ReduceContext, enemyI
 
 /** The words for a loss reason, as the dock says it: "The One Ring leaves play and the game is lost". */
 export function lossWords(reason: string): string {
-  if (reason === NO_SEATS) return "the game is lost";
+  if (reason === NO_SEATS_REMAIN) return "the game is lost";
   const held = new RegExp(`^(.*) left play${HELD}$`).exec(reason);
   if (held) return alcaronHeldWords(held[1] ?? "");
   const left = /^(.*) left play$/.exec(reason);
@@ -131,7 +131,7 @@ export function lossWords(reason: string): string {
 export function outcomeWords(outcome: DamageOutcome, name: string, shadowNext: boolean): string {
   if (outcome.destroyed) {
     // The seats a destruction eliminates are named first, and the loss follows when no seat is left ("Tamed Mûmak is destroyed: Player 1 is eliminated and the game is lost").
-    if (outcome.eliminated.length > 0 && (outcome.loss == null || outcome.loss === NO_SEATS)) {
+    if (outcome.eliminated.length > 0 && (outcome.loss == null || outcome.loss === NO_SEATS_REMAIN)) {
       const seats = outcome.eliminated.map((seat) => `Player ${seat + 1}`).join(" and ");
       return `${name} is destroyed: ${seats} ${outcome.eliminated.length === 1 ? "is" : "are"} eliminated${outcome.loss ? ` and ${lossWords(outcome.loss)}` : ""}`;
     }

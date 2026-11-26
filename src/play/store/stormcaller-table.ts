@@ -9,6 +9,7 @@ import type { CardInstance, ScenarioState } from "../../rules/core/state.ts";
 
 import { areaWordsOf } from "../words/area-words.ts";
 import type { AreaKind, StageFacts } from "../words/scenarios/stormcaller.ts";
+import { orcsOf } from "../../rules/families/haradrim/orcs-zone.ts";
 import { orcsFacts, orcsGroup, orcsRoleOf } from "./orcs-table.ts";
 
 /** Where a card of the area's group stands: the Stormcaller's current quest stage, a card of the area while the players are at another stage (`apart`: in the area zone, veiled), or a card of the area
@@ -17,7 +18,7 @@ export type AreaRole = "stage" | "apart" | "together";
 
 /** Which area the game has: the one key every site reads (`areaFacts(game)?.who` says the same for a game whose stage card is in play). Null with no area. */
 export function areaKind(game: Pick<ScenarioState, "sea" | "orcs">): AreaKind | null {
-  return areaOf(game) ? "stormcaller" : game.orcs ? "orcs" : null;
+  return areaOf(game) ? "stormcaller" : orcsOf(game) ? "orcs" : null;
 }
 
 /** The ids of the area's group, in the order the staging row draws them: the Stormcaller's current stage, then the cards of the area (the Stormcaller first) wherever they stand, in the area zone or in the

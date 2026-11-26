@@ -42,12 +42,3 @@ export function areaPlace(game: Pick<ScenarioState, "sea" | "cards">, id: string
   const area = areaOf(game);
   return !area || id === area.stage ? null : memberPlace(game, area.members, "stormcallerArea", id);
 }
-
-/** Where a card stands in the Stormcaller's area, for its preview: `apart` (a card of the area while the players are at another stage), `together` (a card of the area in the staging area, the players being at the
- * Stormcaller's stage), `stage` (the Stormcaller's current quest stage once the players have reached it), `stageApart` (that stage while the players are at another), or null for any other card. */
-export function areaStanding(state: ScenarioState, id: string): "apart" | "together" | "stage" | "stageApart" | null {
-  const area = areaOf(state);
-  if (!area || !state.cards[id]) return null;
-  if (id === area.stage) return atStormcallersStage(state) ? "stage" : "stageApart";
-  return areaPlace(state, id);
-}

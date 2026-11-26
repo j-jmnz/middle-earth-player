@@ -1,6 +1,7 @@
 import type { Condition } from "../../../catalog/boundary.ts";
 
 import type { Ask } from "../asks.ts";
+import { URUK_CHIEFTAIN_ASKS } from "../haradrim-asks.ts";
 
 // A condition that always holds: a caution that does not depend on the table.
 const ALWAYS: Condition = { kind: "all", conditions: [] };
@@ -37,11 +38,6 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "17052:forced:1 @0 Pick": { note: "{card}: Uruk Chieftain returns to the Orcs' area at the end of the quest phase, before the Orcs' progress is counted.", verb: "Return" },
   "17053:forced:1 @0 Pick": { note: "{card}: Uruk Chieftain returns to the Orcs' area at the end of the quest phase, before the Orcs' progress is counted.", verb: "Return" },
 
-  // 16061:A:3 (Uruk Chieftain) with the Orcs' area: at the end of the encounter phase, at the Orcs' stage, it engages the player engaged with the most non-unique Orc enemies; the first player picks among tied players.
-  "16061:forced:1 @0 EngageSeatWithMost": {
-    owned: true,
-    note: "Uruk Chieftain: choose which tied player it engages, the one engaged with the most non-unique Orc enemies. It attacks that player at once.",
-    verb: "Engage",
-    labels: { "seat:0": "Player 1", "seat:1": "Player 2", "seat:2": "Player 3", "seat:3": "Player 4" },
-  },
+  // 16061:A:3 (Uruk Chieftain): the first player picks among tied players (haradrim-asks.ts).
+  ...URUK_CHIEFTAIN_ASKS,
 };

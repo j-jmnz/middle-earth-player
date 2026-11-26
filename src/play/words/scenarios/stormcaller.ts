@@ -16,7 +16,7 @@ export const STAGE_LOSS = "When this stage is full the players lose: Captain Sah
 /** The numbers of the Stormcaller's current quest stage: its number of the last, its progress against its quest points (null for a stage without), the players' stage number and whether it is theirs. */
 /** The two quest areas a table can hold: the Stormcaller's (Flight of the Stormcaller) and the Orcs' (Race Across Harad). */
 export type AreaKind = "stormcaller" | "orcs";
-export type StageFacts = { who?: AreaKind; number: number; last: number; progress: number; points: number | null; playersAt: number; together: boolean };
+export type StageFacts = { who: AreaKind; number: number; last: number; progress: number; points: number | null; playersAt: number; together: boolean };
 
 const progressOf = (facts: Pick<StageFacts, "progress" | "points">): string => (facts.points == null ? `${facts.progress}` : `${facts.progress}/${facts.points}`);
 
