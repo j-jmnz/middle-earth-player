@@ -77,7 +77,7 @@ Scenario piles that place cards with no record (quest: 19168 Urdug's Assault; qu
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 19158:A:1 (front): Forced: After Urdug's Elite engages you, either exhaust a character you control, or place 1 progress on The Goblins' Assault.
-  19158:forced:1: Forced after an enemy engages a player (heard about this card)
+  19158:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "exhaust" (only if there is a ready character (you control) to choose):
@@ -98,7 +98,7 @@ Scenario piles that place cards with no record (quest: 19168 Urdug's Assault; qu
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 19159:A:1 (front): Forced: After Fierce Vanguard engages you, either it gets +2 Attack until the end of the round, or place 1 progress on The Goblins' Assault.
-  19159:forced:1: Forced after an enemy engages a player (heard about this card)
+  19159:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "attack":

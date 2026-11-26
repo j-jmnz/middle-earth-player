@@ -159,7 +159,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 18035:A:1 (front): Forced: After Ravenous Spider engages you, it makes an immediate attack.
-  18035:forced:1: Forced after an enemy engages a player (heard about this card)
+  18035:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
@@ -283,7 +283,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     - each player: stat noThreatReduction 1, while this card is in play
 
 18071:B:2 (back): Forced: After an enemy engages a player, raise that player's threat by 1.
-  18071:forced:1: Forced after an enemy engages a player
+  18071:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect)
     who acts: the acting player is the player the enemy engaged
     - raise threat by 1 (the player the event is about)
 

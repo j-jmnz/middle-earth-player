@@ -39,7 +39,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     - the table: stat mustTravel (in the travel phase the players cannot decline to travel while a location in the staging area could be traveled to and an active location slot is free) 1, while this card is in play
 
 142021:B:2 (back): Forced: After an enemy engages a player, place 1 damage on the active location, if able.
-  142021:forced:1: Forced after an enemy engages a player
+  142021:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose location (any player controls) chosen by the first player, that is the active location
@@ -65,7 +65,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     - place 1 damage token(s) on the card the event is about (placed, not dealt: nothing cancels or reduces them)
 
 142022:B:3 (back): Forced: After an enemy engages a player, place 1 damage on the active location, if able.
-  142022:forced:2: Forced after an enemy engages a player
+  142022:forced:2: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose location (any player controls) chosen by the first player, that is the active location
@@ -88,7 +88,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     - the table: stat mustTravel (in the travel phase the players cannot decline to travel while a location in the staging area could be traveled to and an active location slot is free) 1, while this card is in play
 
 142023:B:2 (back): Forced: After an enemy engages a player, place 1 damage on each active location.
-  142023:forced:1: Forced after an enemy engages a player
+  142023:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect)
     who acts: the acting player is the player the enemy engaged
     - for each location (any player controls) that is the active location:
       - place 1 damage token(s) on the picked card (placed, not dealt: nothing cancels or reduces them)
@@ -127,7 +127,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     - this card: stat cannotHaveAttachments 1, while this card is in play
 
 142025:A:2 (front): Forced: After Great Warg Chief engages you, discard cards from the encounter deck until a Warg enemy is discarded. Put that enemy into play engaged with you.
-  142025:forced:1: Forced after an enemy engages a player (heard about this card)
+  142025:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until an enemy with the trait Warg is discarded, or the deck is empty; that card becomes the picked card
@@ -185,7 +185,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
         - engage this card
 
 142028:A:3 (front): Forced: After Crebain from Dunland engages a player, reveal the top card of the encounter deck.
-  142028:forced:1: Forced after an enemy engages a player (heard about this card)
+  142028:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - the player the event is about reveals an encounter card
 

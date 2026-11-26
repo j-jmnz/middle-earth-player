@@ -151,7 +151,7 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 07044:A:1 (front): Forced: After Dunland Raider engages a player, that player must deal X damage divided among characters he controls where X equals the number of cards in his hand.
-  07044:forced:1: Forced after an enemy engages a player (heard about this card)
+  07044:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - the acting player assigns the cards in your hand damage among the character (you control), one at a time
 
@@ -199,7 +199,7 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 07047:A:1 (front): Forced: After Dunland Chieftain engages a player, discard X cards from the top of the encounter deck where X is the number of cards in the engaged player's hand. Put the topmost Dunland enemy discarded this way into play engaged with that player.
-  07047:forced:1: Forced after an enemy engages a player (heard about this card)
+  07047:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard the cards in your hand card(s) from the top of the encounter deck

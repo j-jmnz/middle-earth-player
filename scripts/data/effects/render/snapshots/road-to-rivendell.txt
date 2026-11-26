@@ -80,7 +80,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
   04043:constant:1: Constant
     only if this card is the active location
     - the first enemy revealed from the encounter deck each round gains ambush (counted from the round's start, whether or not this card is in play)
-  04043:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) that has the ambush keyword because a card gave it (the round's first enemy revealed, even one that prints Ambush))
+  04043:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about enemy (any player controls) that has the ambush keyword because a card gave it (the round's first enemy revealed, even one that prints Ambush))
     only if this card is the active location
     who acts: the acting player is the player the enemy engaged
     - the card the event is about (an enemy engaged with the actor) makes an immediate attack against the actor, dealt a shadow card of its own
@@ -170,7 +170,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 04049:A:2 (front): Forced: After Goblin Taskmaster engages a player, that player deals 2 damage to 1 character he controls.
-  04049:forced:1: Forced after an enemy engages a player (heard about this card)
+  04049:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control)
@@ -183,7 +183,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 04050:A:2 (front): Forced: After Orc Raiders engages a player, that player discards 2 attachments he controls, if able.
-  04050:forced:1: Forced after an enemy engages a player (heard about this card)
+  04050:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - repeat 2 times:
       - choose attachment (you control)
@@ -213,7 +213,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 04052:A:2 (front): Forced: After Wild Bear engages a player, it makes an immediate attack.
-  04052:forced:1: Forced after an enemy engages a player (heard about this card)
+  04052:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
@@ -225,7 +225,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
   (inert: the engine applies it by rule, no record)
 
 901401:A:2 (front): Forced: When an enemy with the ambush keyword engages a player during the quest phase, it contributes its Threat to the total Threat in the staging area until the end of the phase.
-  901401:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) with the ambush keyword, printed or gained)
+  901401:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about enemy (any player controls) with the ambush keyword, printed or gained)
     only if it is the Quest phase
     who acts: the acting player is the player the enemy engaged
     - the card the event is about: stat engagedThreat (while engaged it still adds its Threat to the total Threat in the staging area) 1, until the end of the phase
@@ -322,7 +322,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 901404:A:2 (front): Forced: After Goblin Trapper engages a player, that player must exhaust a character he controls.
-  901404:forced:1: Forced after an enemy engages a player (heard about this card)
+  901404:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready character (you control)
@@ -339,7 +339,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 901405:A:2 (front): Forced: After Raiding Party engages a player, each player discards the top card of the encounter deck, starting with the first player. Each player who discards an enemy with the ambush keyword must make an engagement check against that enemy.
-  901405:forced:1: Forced after an enemy engages a player (heard about this card)
+  901405:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - for each player, first player first:
       - the acting player discards the top card of the encounter deck; an enemy with the ambush keyword so discarded makes one engagement check against that player alone: it engages them from the discard pile when their threat reaches its engagement cost, else it stays in the discard pile
@@ -357,7 +357,7 @@ Scenario piles that place cards with no record (quest: 04038 Along the Misty Mou
 ## 901407 Treacherous Bluffs
 
 901407:A:1 (front): Forced: When an enemy with the ambush keyword engages a player, Treacherous Bluffs gets +2 Threat until the end of the phase.
-  901407:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) with the ambush keyword, printed or gained)
+  901407:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about enemy (any player controls) with the ambush keyword, printed or gained)
     only if any of: (this card is in the staging area) or (this card is the active location)
     who acts: the acting player is the player the enemy engaged
     - this card: stat threat 2, until the end of the phase

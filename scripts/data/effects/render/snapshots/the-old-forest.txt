@@ -156,7 +156,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 147009:A:1 (front): Forced: After Grasping Root engages a player, that player must assign X damage among characters he controls. X is the number of locations in the victory display.
-  147009:forced:1: Forced after an enemy engages a player (heard about this card)
+  147009:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - the acting player assigns the number of location (any player controls) in the victory display damage among the character (you control), one at a time
 
@@ -167,7 +167,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 147010:A:2 (front): Forced: After Army of Flies engages a player, that player discards a non-objective attachment he controls.
-  147010:forced:1: Forced after an enemy engages a player (heard about this card)
+  147010:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose attachment (you control) that is not an objective

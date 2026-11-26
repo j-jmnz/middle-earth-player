@@ -179,7 +179,7 @@ Scenario piles that place cards with no record (quest: 05065 The Leaping Fish; q
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 05042:A:1 (front): Forced: When Zealous Traitor engages a player, that player must deal 1 damage to each ally he controls. (2 damage instead if Zealous Traitor was not optionally engaged.)
-  05042:forced:1: Forced after an enemy engages a player (heard about this card)
+  05042:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if this card holds the flag engagedOptionally: for each ally (you control):
@@ -191,7 +191,7 @@ Scenario piles that place cards with no record (quest: 05065 The Leaping Fish; q
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 05043:A:1 (front): Forced: When Lossarnach Bandit engages a player, that player discards 1 resource from each of his heroes' resource pools. (2 resources instead if Lossarnach Bandit was not optionally engaged.)
-  05043:forced:1: Forced after an enemy engages a player (heard about this card)
+  05043:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if this card holds the flag engagedOptionally: for each hero (you control) with resources on it:
@@ -206,7 +206,7 @@ Scenario piles that place cards with no record (quest: 05065 The Leaping Fish; q
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 05044:A:2 (front): Forced: When Umbar Assassin engages a player, that player must deal 3 damage to a hero he controls. (Discard that hero instead if Umbar Assassin was not optionally engaged.)
-  05044:forced:1: Forced after an enemy engages a player (heard about this card)
+  05044:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)

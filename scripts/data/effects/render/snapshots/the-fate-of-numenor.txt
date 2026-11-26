@@ -161,7 +161,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 11029:A:1 (front): Forced: When Servant of the Deceiver engages you, look at the top card of your deck. If its printed cost is 2 or less, place it on the bottom of your deck and Servant of the Deceiver gets +2 Attack until the end of the round.
-  11029:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+  11029:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card; event happened to the controller)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player looks at the top 1 card(s) of their own deck (a card with a Forced effect for being looked at acts at once and is not one of them)
@@ -330,7 +330,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
     - engagedSeat: stat noDeckSearch 1, while this card is in play
 
 11069:A:2 (front): Forced: When Soulless Cadaver engages you, place each card in your hand with printed cost 2 or less on the bottom of your deck.
-  11069:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+  11069:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card; event happened to the controller)
     who acts: the acting player is the player the enemy engaged
     - for each card (you control) in hand, with a printed cost of 2 or less:
       - the picked card (only from hand) goes to the bottom of its owner's deck

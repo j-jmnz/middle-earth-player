@@ -22,7 +22,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 01075:A:1 (front): Forced: After Hummerhorns engages you, deal 5 damage to a single hero you control.
-  01075:forced:1: Forced after an enemy engages a player (heard about this card)
+  01075:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
@@ -131,7 +131,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 01091:A:1 (front): Forced: When Dol Guldur Beastmaster attacks, deal it 1 additional shadow card.
   01091:forced:1: Forced when this enemy attacks, before the defender is declared
     who acts: the acting player is the defending player (the player the attack is against)
-    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+    - this enemy (the card the record is on, wherever it is in play) is dealt an additional shadow card, beside any it has; the card stays on it until its next attack
 
 ## 01092 Driven by Shadow
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -179,7 +179,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 (the scenario deals it into the staging pile; the piles place it, no record does)
 
 01096:A:1 (front): Forced: After Forest Spider engages a player, it gets +1 Attack until the end of the round.
-  01096:forced:1: Forced after an enemy engages a player (heard about this card)
+  01096:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - this card: stat attack 1, until the end of the round
 
@@ -355,7 +355,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 ## 900103 Ungoliant's Brood
 
 900103:A:1 (front): Forced: After you engage Ungoliant's Brood, your cards cannot ready for the remainder of the round.
-  900103:forced:1: Forced after an enemy engages a player (heard about this card)
+  900103:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - each card (you control) (only the cards that match now: one that arrives later does not get it): stat cannotReady 1, until the end of the round
 
@@ -368,7 +368,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 ## 900104 Forest Flies
 
 900104:A:1 (front): Forced: After you engage Forest Flies, deal 1 damage to each exhausted character you control.
-  900104:forced:1: Forced after an enemy engages a player (heard about this card)
+  900104:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - deal 1 damage to each exhausted character (you control)
 

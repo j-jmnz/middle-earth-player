@@ -43,7 +43,7 @@ const TRIGGER: Readonly<Record<string, string>> = {
   enemyDestroyed: "after an enemy is destroyed",
   attacks: "when this enemy attacks, before the defender is declared",
   revealed: "after a card is revealed",
-  engaged: "after an enemy engages a player",
+  engaged: "after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect)",
   traveled: "after the players travel",
   leftPlay: "after a card leaves play",
   played: "after this card is played",

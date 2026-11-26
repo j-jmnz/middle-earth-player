@@ -21,7 +21,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     - ignore the deep keyword(s)
 
 12189:B:2 (back): Response: After Fram's Shade engages a player while the players are at stage 1B or 2B, look at 3 random undiscovered treasures and attach 1 of them to Fram's Shade as a guarded objective. When the treasure is free of encounters, the players claim it and attach it to an eligible character. (Group limit once per game.)
-  12189:response:1: Response after an enemy engages a player (heard about card (any player controls) or in the staging area or the active location, named "Fram's Shade", (enemies engaged with a player included); limit oncePerGameGroup)
+  12189:response:1: Response after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about card (any player controls) or in the staging area or the active location, named "Fram's Shade", (enemies engaged with a player included); limit oncePerGameGroup)
     only if any of: (the players are on stage 1) or (the players are on stage 2)
     - 3 treasures the log has not recorded and the game has not dealt are drawn with the game's seed, the first player chooses one, and it enters the staging area attached to the card the event is about, which guards it (it is free of encounters when the guard leaves play; the players claim it then)
 

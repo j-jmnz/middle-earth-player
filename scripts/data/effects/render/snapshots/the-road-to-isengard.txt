@@ -177,7 +177,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 143056:A:1 (front): While Underground Armoury is in the staging area, it gains: "Forced: After an enemy engages a player, deal it a shadow card."
-  143056:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls))
+  143056:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about enemy (any player controls))
     only if this card is in the staging area
     who acts: the acting player is the player the enemy engaged
     - the card the event is about is dealt a shadow card

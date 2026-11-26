@@ -101,7 +101,7 @@ Scenario piles that place cards with no record (quest: 08011 The Road to Tharbad
     - this enemy moves to the first player's play area and engages them (nothing if it is not engaged, or already engaged with them)
 
 08014:A:3 (front): Forced: After an enemy engages a player, remove 1 time counter from the current quest.
-  08014:forced:3: Forced after an enemy engages a player (heard about enemy (any player controls))
+  08014:forced:3: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about enemy (any player controls))
     who acts: the acting player is the player the enemy engaged
     - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
 
@@ -145,7 +145,7 @@ Scenario piles that place cards with no record (quest: 08011 The Road to Tharbad
   08018:forced:1: Forced on the event cardsDrawn
     only if this card is an enemy engaged with the acting player
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+    - this enemy (the card the record is on, wherever it is in play) is dealt an additional shadow card, beside any it has; the card stays on it until its next attack
 
 08018:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each shadow card on it.
   08018:shadow:1: Shadow

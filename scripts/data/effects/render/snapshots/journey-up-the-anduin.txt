@@ -125,7 +125,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
 
 18021:A:2 (front): While Stray Goblin is in the staging area, it gains: "Forced: After a player engages an enemy, Stray Goblin engages that player."
-  18021:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) other than this card)
+  18021:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about enemy (any player controls) other than this card)
     only if this card is in the staging area
     who acts: the acting player is the player the enemy engaged
     - engage this card

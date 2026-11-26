@@ -474,7 +474,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     - each character (you control): stat cannotAttackDreadnaught 1, while this card is in play
 
 40016:A:3 (front): Forced: After Descendant of Castamir engages you, put the top 2 cards of the Corsair deck into play engaged with you and deal each of them 1 shadow card.
-  40016:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+  40016:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card; event happened to the controller)
     who acts: the acting player is the player the enemy engaged
     - the acting player reveals the top 2 cards of the Corsair deck and puts each into play engaged with them (the deck refills from its discard pile when it runs out); each card put into play is dealt 1 shadow card(s) at once
 
@@ -634,7 +634,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     - this card: stat cannotHaveAttachments 1, while this card is in play
 
 40027:A:2 (front): Forced: When Corsair Skiff engages you from the staging area, either raise your threat by 3 or it gains Boarding 1.
-  40027:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+  40027:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card; event happened to the controller)
     only if the engagement the Forced effect answers was from the staging area (known only in a game with ships)
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
@@ -679,7 +679,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     - this card: stat cannotHaveAttachments 1, while this card is in play
 
 40030:A:2 (front): Forced: After Ramming Ship engages you, it gets +4 Attack until the end of the round.
-  40030:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+  40030:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card; event happened to the controller)
     who acts: the acting player is the player the enemy engaged
     - this card: stat attack 4, until the end of the round
 
@@ -711,7 +711,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     - this card: stat cannotHaveAttachments 1, while this card is in play
 
 40032:A:2 (front): Forced: When War Galley engages you from the staging area, either raise your threat by 4 or it gains Boarding 1.
-  40032:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+  40032:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card; event happened to the controller)
     only if the engagement the Forced effect answers was from the staging area (known only in a game with ships)
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:

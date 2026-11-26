@@ -95,7 +95,7 @@ Scenario piles that place cards with no record (quest: 131026 A Short Rest; ques
     - each card (any player controls) in the staging area only, named "Galloping Boulders": stat gainsSurge (it has the Surge keyword as it is revealed) 1, while this card is in play (does not stack: only the oldest copy of this card in play whose condition holds gives it)
 
 131064:A:2 (front): Forced: After Stone-Giant engages a player, that player chooses and discards 1 ally he controls.
-  131064:forced:1: Forced after an enemy engages a player (heard about this card)
+  131064:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ally (you control)
@@ -119,7 +119,7 @@ Scenario piles that place cards with no record (quest: 131026 A Short Rest; ques
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
 
 131067:A:1 (front): While Great Cavern Room is the active location, it gains: "Forced: After a player engages a Goblin enemy, he must deal 1 damage to a character he controls."
-  131067:forced:1: Forced after an enemy engages a player (heard about Goblin enemy (any player controls))
+  131067:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about Goblin enemy (any player controls))
     only if this card is the active location
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)

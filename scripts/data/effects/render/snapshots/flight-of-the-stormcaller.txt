@@ -293,7 +293,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
     - this card: stat cannotHaveAttachments 1, while this card is in play
 
 12022:A:3 (front): Forced: When Corsair Skiff engages you from the staging area, either raise your threat by 3 or it gains Boarding 1.
-  12022:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+  12022:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card; event happened to the controller)
     only if the engagement the Forced effect answers was from the staging area (known only in a game with ships)
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:

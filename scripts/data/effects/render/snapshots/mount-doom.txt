@@ -156,7 +156,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 146051:A:1 (front): Forced: After Orc Captain engages you, make a Fortitude test. If you fail this test, reveal the top card of the encounter deck.
-  146051:forced:1: Forced after an enemy engages a player (heard about this card)
+  146051:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player makes a Fortitude test: exhausts any number of ready heroes to commit them, discards the top X cards of the encounter deck (X the tens digit of their threat), counts the Sauron's Eye icons on them, the players take actions, and the committed heroes' total Willpower must be greater than the icons to pass (equal or fewer fails)
@@ -172,7 +172,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 146052:A:1 (front): Forced: After Big Uruk engages you, either raise your threat by 4, or Big Uruk makes an immediate attack against you.
-  146052:forced:1: Forced after an enemy engages a player (heard about this card)
+  146052:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "threat":

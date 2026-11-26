@@ -109,7 +109,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 145022:A:2 (front): Forced: After Dead Man of Dunharrow engages you, either attach a set aside Overcome by Fear to your threat dial, or raise your threat by 2.
-  145022:forced:1: Forced after an enemy engages a player (heard about this card)
+  145022:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "attach" (only if a copy of the card with code 145016 is set aside and the actor's threat dial holds none):
@@ -164,7 +164,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 145025:A:2 (front): Forced: When Shadow Host engages you, either attach a set aside Overcome by Fear to your threat dial, or it makes an immediate attack.
-  145025:forced:1: Forced after an enemy engages a player (heard about this card)
+  145025:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
       * option "attach" (only if a copy of the card with code 145016 is set aside and the actor's threat dial holds none):
