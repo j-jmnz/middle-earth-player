@@ -13,19 +13,29 @@ describe("slowState", () => {
 });
 
 describe("runProbes", () => {
-  it("counts the frames as the page is, with each thing taken away, and as the page is again", async () => {
+  const host = (rate: (css: string | null, cured: boolean) => number, cure: string | null) => {
     let css: string | null = null;
+    let cured = false;
     const applied: (string | null)[] = [];
-    const line = await runProbes({
-      rate: () => Promise.resolve(css?.startsWith("canvas") ? 59.6 : 24.2),
+    return {
+      applied,
+      rate: () => Promise.resolve(rate(css, cured)),
       wait: () => Promise.resolve(),
-      style: (next) => {
+      style: (next: string | null) => {
+        if (css !== null && cure !== null && css.startsWith(cure)) cured = true;
         css = next;
         applied.push(next);
       },
-    });
-    expect(line).toBe("base 24, paused 24, fog 24, canvas 60, img 24, all 24, base 24");
-    expect(applied.filter((entry) => entry !== null)).toEqual(PROBES.map(([, rule]) => rule));
-    expect(applied.at(-1)).toBeNull();
+    };
+  };
+  it("writes each probe's rate with its CSS and after it, from the probe the run starts with", async () => {
+    const page = host((css) => (css?.startsWith("canvas") ? 59.6 : 24.2), null);
+    expect(await runProbes(page, 5, 42)).toBe("base 24, img 24>24, all 24>24, paused 24>24, tiles 24>24, blend 24>24, mask 24>24, canvas 60>24");
+    expect(page.applied.filter((entry) => entry !== null)).toHaveLength(PROBES.length);
+    expect(page.applied.at(-1)).toBeNull();
+  });
+  it("stops at the probe after which the page is fast again", async () => {
+    const page = host((_css, cured) => (cured ? 60 : 24), "[data-probe-a]");
+    expect(await runProbes(page, 0, 42)).toBe("base 24, paused 24>24, tiles 24>60");
   });
 });
