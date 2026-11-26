@@ -10,8 +10,8 @@ import { mouldGateWords } from "../../words/scenarios/ring-maker/celebrimbor-tab
 import { mouldState, STAGE_1, STAGE_2 } from "./celebrimbor.ts";
 import { seatLevel } from "../threat-level.ts";
 
-/** The quest stages of The Fords of Isen, of To Catch an Orc (stages 2B and 3B), of Into Fangorn (stages 1B, 2B and 3B) and of The Dunland Trap (stages 1B and 3B; 2B prints none) of Trouble in Tharbad (stages 1B and 2B) and of Celebrimbor's Secret (stages 1B and 2B) and of The Nîn-in-Eilph (the three stages 2B, the three stages 3B and stage 4B) that print Time X. */
-export const FORDS_STAGES: readonly string[] = ["07059", "07060", "07061", "07063", "07064", "07065", "07066", "07067", "08011", "08013", "08066", "08067", "08095", "08096", "08097", "08098", "08099", "08100", "08101", "08122", "08123"];
+/** The quest stages of The Fords of Isen, of To Catch an Orc (stages 2B and 3B), of Into Fangorn (stages 1B, 2B and 3B) and of The Dunland Trap (stages 1B and 3B; 2B prints none) of Trouble in Tharbad (stages 1B and 2B) and of Celebrimbor's Secret (stages 1B and 2B) and of The Antlered Crown (stages 1B, 2B and 3B) and of The Nîn-in-Eilph (the three stages 2B, the three stages 3B and stage 4B) that print Time X. */
+export const FORDS_STAGES: readonly string[] = ["07059", "07060", "07061", "07063", "07064", "07065", "07066", "07067", "08011", "08013", "08066", "08067", "08095", "08096", "08097", "08098", "08099", "08100", "08101", "08122", "08123", "08147", "08148", "08149"];
 
 const TURCH = "08014";
 const NO_WAY_OUT = "08013";

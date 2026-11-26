@@ -35,6 +35,7 @@ const STANDING: Readonly<Record<string, string>> = {
   "08098": "Each location in play gets +1 Threat.",
   "08099": "Each player readies at most 5 characters in the refresh phase.",
   "08100": "Each enemy in the staging area gets -20 engagement cost.",
+  "08148": "Each location in the staging area gets +2 quest points, until it becomes the active location.",
   "08122": "Bellach is immune to player card effects and cannot be engaged.",
   "08123": "Bellach is immune to player card effects and cannot be engaged until this stage has at least 12 progress. At 12 or more the immunity is lifted.",
 };
@@ -66,6 +67,9 @@ const LAST_COUNTER: Readonly<Record<string, string | ((levels: NewLevels) => str
   "08099": STAGE_3_LAST,
   "08100": STAGE_3_LAST,
   "08101": "Ancient Marsh-dweller attacks each player in player order, and 2 time counters are placed on this stage.",
+  "08147": "1 time counter comes off each location in play, and 3 time counters return.",
+  "08148": "the top card of the Raven deck is revealed and added to the staging area, and 3 time counters return.",
+  "08149": "each engaged enemy makes an attack, and 2 time counters return.",
   "08122": SCOUR_LAST,
   "08123": SCOUR_LAST,
   "07067": "5 cards from the top of the encounter deck are discarded, each player adds an enemy or objective from the discard pile to the staging area, and 3 time counters return.",

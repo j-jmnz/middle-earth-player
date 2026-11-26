@@ -15,4 +15,6 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "08157:forced:1 @0.0 AssignDamage": { owned: true, note: "Dunland Battlefield: assign damage among characters you control, one for each card in your hand ({left} left).", title: "{card}: assign {left}", verb: "Assign" },
   // 08158:shadow:1 (Raven Country): the defender assigns the printed Time X of the active location.
   "08158:shadow:1 @0 AssignDamage": { owned: true, note: "Raven Country's shadow: assign damage among characters you control, as many as the Time value of the active location ({left} left).", title: "{card}: assign {left}", verb: "Assign" },
+  // 08153:forced:1 (Raven Warrior): the first player divides the counters among the locations, one at a time; it answers for the group, so the sentence is not owned.
+  "08153:forced:1 @0 RemoveTimeCounters": { note: "Raven Warrior engaged: choose a location in play to lose a time counter.", verb: "Remove" },
 };
