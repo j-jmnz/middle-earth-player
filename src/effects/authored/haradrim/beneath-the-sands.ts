@@ -151,7 +151,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "17074",
     lines: ["17074:A:2"],
     timing: "whenRevealed",
-    instructions: [{ verb: "AttachToQuest", main: true, when: { kind: "inPlay", code: "17074", is: false } }],
+    instructions: [{ verb: "AttachToQuest", main: true, when: { kind: "count", pick: { type: "attachment", control: "any", names: ["Grabbed by Spiders"] }, max: 0 } }],
   },
   { id: "17074:constant:1", cardCode: "17074", lines: ["17074:A:2"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }] },
   {
@@ -236,7 +236,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     trigger: "endOfPhase",
     condition: { kind: "phase", is: "Quest" },
     instructions: [
-      { verb: "AddResources", amount: 1, to: "self" },
+      { verb: "PlaceResourceTokens", amount: 1, on: "self" },
       {
         verb: "Choose",
         who: "firstPlayer",
