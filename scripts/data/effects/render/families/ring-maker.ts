@@ -16,6 +16,8 @@ export const RING_MAKER_TEMPLATES: Templates = {
   EngageCaptiveHolder: (i) => ({ text: `(constant, does nothing when run) while this enemy is in the staging area or engaged with another player it engages the player who controls a hero with ${str(i.captive)} attached, at once and whatever its engagement cost`, read: ["captive"] }),
   RevealChosenFromDiscard: (i) => ({ text: `the acting player chooses a card of type ${(i.types as string[]).join(" or ")} in the encounter discard pile (whichever card lies there; a pile with none does nothing) and reveals it in full: its When Revealed effects and keywords resolve (an objective with Guarded takes its guard) and it joins the staging area; the card has left the pile for the next player`, read: ["types"] }),
   CapRefresh: (i) => ({ text: `the acting player chooses, one at a time, the exhausted characters he controls beyond ${i.amount} that would ready in the refresh phase: they stay exhausted this phase (nothing with ${i.amount} or fewer)`, read: ["amount"] }),
+  AttackNalir: () => ({ text: "the picked enemy, in the staging area or engaged with any player, makes an immediate attack against the player who controls Nalir (it is dealt a shadow card; that player declares defenders as for any attack, and undefended damage must be assigned to Nalir); nothing happens when no player controls Nalir", read: [] }),
+  EliminateAtLevel: () => ({ text: "each player whose threat is at or above his threat elimination level now (50, less what the effects before this one took off) is eliminated at once", read: [] }),
   ReturnAttachedEnemy: (i) => ({ text: `each enemy named ${str(i.name)} lying attached to a card goes back to the staging area as an enemy (one anywhere else stays)`, read: ["name"] }),
 };
 
@@ -31,4 +33,6 @@ export const RING_MAKER_SAMPLES: Samples = {
   CapRefresh: [{ verb: "CapRefresh", amount: 5 }],
   ReturnAttachedEnemy: [{ verb: "ReturnAttachedEnemy", name: "Mugash" }],
   EngageCaptiveHolder: [{ verb: "EngageCaptiveHolder", captive: "Mugash" }],
+  AttackNalir: [{ verb: "AttackNalir" }],
+  EliminateAtLevel: [{ verb: "EliminateAtLevel" }],
 };

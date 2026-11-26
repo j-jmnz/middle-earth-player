@@ -7,12 +7,14 @@ import type { EngineStep } from "../../core/intents.ts";
 import { settle } from "../../engine/machine.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
+import { moveCard } from "../../core/zones.ts";
 import { holds } from "../../interpret/conditions.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
 import { replaceStageProgress } from "../../quest/progress-replaced.ts";
 import { addModifier } from "../../core/modified-stat.ts";
 import { removeTimeCounterFrom } from "../angmar/time.ts";
-import { idOf, run, tableFromLayout, where, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { travelBlocked } from "../../interpret/restrictions.ts";
+import { idOf, run, statOf, tableFromLayout, where, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "trouble-in-tharbad";
 const STAGE_1 = "08066";
@@ -196,5 +198,46 @@ describe("The Empty Mug (08069:A:1, 08069:A:2)", () => {
     const done = lower(t.state, t.ctx, idOf(t.state, ALLY));
     expect(done.seats[0]?.threat).toBe(8);
     expect(done.cards[idOf(done, ALLY)]?.zone).toBe("play");
+  });
+});
+
+describe("Bellach (08070:A:3)", () => {
+  it("08070:A:3 destroyed, he is shuffled into the encounter deck and not left in the discard pile", () => {
+    const t = table({ stage: STAGE_2, staging: [BELLACH] });
+    const id = idOf(t.state, BELLACH);
+    const done = resolve(t.state, t.ctx, [{ verb: "Pick", pick: { type: "enemy", control: "any", staging: true, names: ["Bellach"] } }, { verb: "DamageCard", amount: 20, target: "picked" }]);
+    expect(done.cards[id]?.zone).toBe("encounterDeck");
+    expect(done.encounterDiscard).not.toContain(id);
+  });
+
+  it("08070:A:3 a Bellach that is discarded without being destroyed stays in the discard pile", () => {
+    const t = table({ stage: STAGE_2, staging: [BELLACH] });
+    const id = idOf(t.state, BELLACH);
+    const done = settle(moveCard(t.state, id, { zone: "encounterDiscard" }), t.ctx, []);
+    expect(done.cards[id]?.zone).toBe("encounterDiscard");
+  });
+});
+
+describe("The Crossing at Tharbad (08071:A:1 to 08071:A:3)", () => {
+  it("08071:A:2 it has 10 quest points and 2 more for each player", () => {
+    const one = table({ stage: STAGE_2, staging: [CROSSING] });
+    expect(statOf(one.state, one.ctx.cards, CROSSING, "questPoints")).toBe(12);
+    const two = table({ stage: STAGE_2, seats: 2, staging: [CROSSING] });
+    expect(statOf(two.state, two.ctx.cards, CROSSING, "questPoints")).toBe(14);
+  });
+
+  it("08071:A:3 the progress that explores it in the staging area wins the game", () => {
+    const t = table({ stage: STAGE_2, staging: [CROSSING] });
+    const part = run(t, t.state, { verb: "PlaceProgressOnNamed", name: "The Crossing at Tharbad", amount: 11 });
+    expect(part.stageCleared).not.toBe(true);
+    expect(where(part, CROSSING)).toBe("staging");
+    const done = run(t, part, { verb: "PlaceProgressOnNamed", name: "The Crossing at Tharbad", amount: 1 });
+    expect(done.stageCleared).toBe(true);
+  });
+
+  it("08071:A:1 the players cannot travel to it", () => {
+    const t = table({ stage: STAGE_2, staging: [CROSSING, "08074"], phase: "Travel" });
+    expect(travelBlocked(t.state, t.ctx, idOf(t.state, CROSSING))).toBe(true);
+    expect(travelBlocked(t.state, t.ctx, idOf(t.state, "08074"))).toBe(false);
   });
 });
