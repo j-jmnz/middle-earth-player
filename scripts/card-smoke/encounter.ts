@@ -31,10 +31,7 @@ import { encounterStart, encounterWorld, kept, type EncounterWorld } from "./enc
  * message that contains `error` on an intent that contains `intent`: any other problem of that game, and any other game, still fails. Delete an entry when its engine fix lands.
  */
 export type KnownFailure = { scenario: string; game: number; seed: number; intent: string; error: string; note: string };
-export const KNOWN: readonly KnownFailure[] = [
-  // Found by the face check of the table faults (scripts/card-smoke/invariants.ts): 143049 lies facedown in the staging area after an Undefended intent. The cause is in the engine of that scenario, not of Celebrimbor's Secret; no fix here.
-  { scenario: "the-road-to-isengard", game: 2, seed: 3, intent: "Undefended", error: "143049 (i4) lies facedown in staging", note: "a facedown card in the staging area (face check); to fix in the engine of The Road to Isengard" },
-];
+export const KNOWN: readonly KnownFailure[] = [];
 
 export type EncounterSummary = { scenario: string; cards: CardResult[]; games: GameSummary[]; ms: number };
 
