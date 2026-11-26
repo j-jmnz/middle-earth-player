@@ -32,6 +32,7 @@ const ROWS: readonly Row[] = [
   { line: "17068:A:2", name: "After it becomes the active location the objective flips to On Track and Brood Mother is added to the staging area", layout: { staging: ["17068", OFF], setAside: [BROOD_MOTHER] }, act: announce("becameActive", "17068"), expect: [count(ON, "staging", 1), count(OFF, "staging", 0), zone(BROOD_MOTHER, "engaged")] },
 
   // 17069 Pitch Black Tunnel.
+  { line: "17069:A:1", name: "Track 4: four cards are discarded and a marked card flips Off Track to On Track", layout: { staging: ["17069", OFF], deck: ["f0", "f0", "f0", "17072", "f3"] }, act: announce("traveled", "17069"), expect: [count(ON, "staging", 1), deckCount(1)] },
   { line: "17069:A:2", name: "X, its Threat, is the number of characters the first player controls", layout: { staging: ["17069"], play: ["ally"] }, act: [], expect: stat("17069", "threat", 3) },
 
   // 17070 Nest of Vermin.
@@ -77,6 +78,8 @@ const ROWS: readonly Row[] = [
   { line: "17079:A:2", name: "Progress cannot be placed on the main quest while it is in play", layout: { stage: STAGE_1, side: "B", staging: [OFF] }, act: quest("success"), expect: progressOn(STAGE_1, 0) },
 
   // 17080 On Track.
+  { line: "17080:A:1", name: "End of the quest phase: the first marked card of the top 3 is added to the staging area and the rest are discarded", layout: { phase: "Quest", stage: STAGE_1, side: "B", staging: [ON], deck: ["f0", "17072", "17066", "f3"] }, act: announce("endOfPhase"), expect: [zone("17072", "staging"), zone("f0", "encounterDiscard"), zone("17066", "encounterDiscard"), count(ON, "staging", 1), deckCount(1)] },
+  { line: "17080:A:1", name: "End of the quest phase: with no marked card in the top 3 the objective flips to Off Track", layout: { phase: "Quest", stage: STAGE_1, side: "B", staging: [ON], deck: ["f0", "f0", "f3", "17066"] }, act: announce("endOfPhase"), expect: [count(OFF, "staging", 1), deckCount(1)] },
   { line: "17080:A:2", name: "After the players quest unsuccessfully it flips to Off Track", layout: { stage: STAGE_1, side: "B", staging: [ON, "f3", "f3", "f3", "f3"], deck: ["17066", "f0", "f0", "17067", "f0", "f0"] }, act: quest("fail"), expect: [count(OFF, "staging", 1), count(ON, "staging", 0)] },
 ];
 

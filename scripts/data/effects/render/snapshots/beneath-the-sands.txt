@@ -176,14 +176,14 @@ Scenario piles that place cards with no record (quest: 17076 Searching the Caves
     - if the number of attachment (any player controls) named "Grabbed by Spiders" is at most 0: this card is attached to the main quest card (never a side quest) and leaves with it
   17074:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
-  17074:forced:1: Forced on the event flippedOver (heard about objective (any player controls) named "Off Track")
+  17074:forced:1: Forced after the Search objective is flipped to Off Track (a flip to On Track does not fire it) (heard about objective (any player controls))
     only if this card is attached to a card
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
+    - if each living player controls an ally in play (read when the instruction starts, so before any discard that follows it): discard this card
     - for each player, first player first:
       - if there is a ally (you control) to choose: choose ally (you control)
       - then, if there is a ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
-    - discard this card
 
 ## 17075 Lost Underground
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -243,7 +243,7 @@ Scenario piles that place cards with no record (quest: 17076 Searching the Caves
     - each enemy (any player controls) or in the staging area, named "Brood Mother": stat losesNoDamage 1, while this card is in play
 
 17078:B:2 (back): Forced: After the Search objective is flipped to Off Track, remove all progress tokens from this stage.
-  17078:forced:1: Forced on the event flippedOver (heard about objective (any player controls) named "Off Track")
+  17078:forced:1: Forced after the Search objective is flipped to Off Track (a flip to On Track does not fire it) (heard about objective (any player controls))
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - remove progress of this card progress from this card
 
@@ -272,7 +272,7 @@ Scenario piles that place cards with no record (quest: 17076 Searching the Caves
 
 17079:A:2 (front): Progress cannot be placed on the main quest.
   17079:constant:1: Constant
-    - the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, while this card is in play
+    - the table: stat noMainQuestProgress (no progress can be placed on the main quest card while it lasts; a side quest that is the current quest still takes progress) 1, while this card is in play
 
 ## 17080 On Track
 
@@ -287,4 +287,4 @@ Scenario piles that place cards with no record (quest: 17076 Searching the Caves
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the Search objective in play flips to Off Track (nothing while Lost Underground is in play); nothing changes when it already shows that side; the flip is announced as a card flipped over
 
-(rendered pieces: 158 by template, 0 as JSON)
+(rendered pieces: 159 by template, 0 as JSON)

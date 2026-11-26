@@ -223,7 +223,7 @@ export function placeQuestProgress(
     const stageId = next.questStage;
     const stage = next.cards[stageId];
     // A card in play may limit the progress the quest card takes this round, or stop it (families/caves/progress.ts).
-    remaining = mainQuestBlocked(next) ? 0 : Math.min(remaining, questRoom(next));
+    remaining = Math.min(remaining, questRoom(next));
     if (stage && remaining > 0) {
       // The explored location's Forced effect may cancel this progress (Orthanc): the stage takes what it needs and advances once those effects have resolved (families/wizardry/progress.ts).
       const waits = overflowWaits(next, steps, started, cards);
@@ -240,7 +240,6 @@ export function placeOnMainQuest(state: ScenarioState, amount: number, cards: Ca
   const stageId = state.questStage;
   const stage = stageId ? state.cards[stageId] : undefined;
   if (!stageId || !stage || state.stageCleared || currentSideQuest(state) == null) return placeQuestProgress(state, amount, cards, steps, canAdvance);
-  if (mainQuestBlocked(state)) return state;
   return putOnStage(state, stageId, amount, questPointsOf(state, stage, cards), cards, steps, canAdvance, ruleCause("mec108.side-quests-in-play"), { counted: false, reduced: false });
 }
 
@@ -253,6 +252,8 @@ export function putOnStage(from: ScenarioState, stageId: string, wanted: number,
   const { counted, reduced = true } = options;
   // "Progress cannot be placed here" (148003:B:1, while a Great Barrow is in play): the stage takes none, whatever places it.
   if (flagged(from, stageId, "noProgressPlaced")) return from;
+  // "The players cannot place progress on the main quest" (17079:A:2): no main quest card takes any, whatever places it; a side quest that is the current quest still does.
+  if (mainQuestBlocked(from)) return from;
   // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1).
   const { state, remaining: absorbed } = absorbFirst(from, stageId, wanted, cards, steps);
   // Each Orc Grunts in play reduces the progress placed on the current quest by 1 (10130:A:2).
