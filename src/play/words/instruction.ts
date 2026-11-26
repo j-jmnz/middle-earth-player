@@ -97,8 +97,8 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return "reveal an additional encounter card";
     // The Antlered Crown (the asks file words the choice again for the sheet): Raven Skirmisher's counter off the active location.
     case "RemoveTimeCounters": {
-      const amount = typeof instruction.amount === "number" ? instruction.amount : 1;
-      return instruction.target === "active" ? `remove ${amount} time counter${amount === 1 ? "" : "s"} from the active location` : null;
+      const amount = amountWords(instruction.amount);
+      return instruction.target === "active" ? `remove ${amount} time counter${amount === "1" ? "" : "s"} from the active location` : null;
     }
     // The Passage of the Marshes (the asks file words them again for the sheet): Shifting Quagmire, We Hates Them!.
     case "ReturnRandomVictoryLocation":

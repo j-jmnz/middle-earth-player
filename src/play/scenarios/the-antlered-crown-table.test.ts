@@ -3,6 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import { idOf, legalIntents, resolveRecords, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
+import { instructionWords } from "../words/instruction.ts";
 import { sheetFor } from "../choice/sheets.ts";
 import type { SheetNames } from "../choice/sheet-types.ts";
 import { questTitle } from "../cards/table-preview.ts";
@@ -36,7 +37,7 @@ describe("the Raven deck and its discard pile", () => {
 
 describe("the time dial of the stages", () => {
   it("08147:B:1 reads the counters against Time 3 and says the last one takes a counter off each location and returns 3", () => {
-    expect(stageDial("08147", 3)).toMatchObject({ label: "Time", value: 3, limit: 3, limitWords: "Time 3: it starts with 3 time counters" });
+    expect(stageDial("08147", 3)).toMatchObject({ label: "Stage", value: 3, limit: 3, limitWords: "Time 3: it starts with 3 time counters" });
     expect(stageDial("08147", 1)?.warn?.words).toBe("The next refresh phase takes the last time counter. With the last gone, 1 time counter comes off each location in play, and 3 time counters return.");
   });
 
@@ -70,6 +71,28 @@ describe("the time dial of the locations", () => {
     expect(dials(made, "crown-time:")[0]?.warn?.words).toContain("Each damaged character is exhausted, and 3 time counters return.");
   });
 
+  it("08157:A:1 a location at 0 counters has no dial and none at 2 warns: the warning holds at exactly 1 counter", () => {
+    expect(dials(built({ stage: "08147", active: { code: "08157", resources: 0 } }), "crown-time:")).toEqual([]);
+    expect(dials(built({ stage: "08147", staging: [{ code: "08155", resources: 2 }] }), "crown-time:")[0]?.warn).toBeUndefined();
+    expect(dials(built({ stage: "08147", staging: [{ code: "08155", resources: 1 }] }), "crown-time:")[0]?.warn?.level).toBe("near");
+  });
+
+  it("08155:A:1 each location dial wears the short name of its location, the active one is marked, and the fewest counters stand first", () => {
+    const made = built({ stage: "08147", staging: [{ code: "08155", resources: 3 }, { code: "08156", resources: 2 }, { code: "08158", resources: 4 }], active: { code: "08157", resources: 1 } });
+    const found = dials(made, "crown-time:");
+    expect(found.map((dial) => [dial.label, dial.value])).toEqual([["Battlefield", 1], ["Village", 2], ["War-camp", 3], ["Country", 4]]);
+    expect(found.filter((dial) => dial.current === true).map((dial) => dial.label)).toEqual(["Battlefield"]);
+    expect(found[0]?.note).toContain("on the active location");
+    expect(found[1]?.note).not.toContain("active location");
+  });
+
+  it("08156:A:1 a tap on a location dial opens its preview with what the dial says: the last counter's effect at 1, the standing rule above", () => {
+    const warn = detail(built({ stage: "08147", staging: [{ code: "08156", resources: 1 }] }), "08156");
+    expect(warn).toBe(dials(built({ stage: "08147", staging: [{ code: "08156", resources: 1 }] }), "crown-time:")[0]?.warn?.words);
+    expect(detail(built({ stage: "08147", staging: [{ code: "08156", resources: 2 }] }), "08156")).toBe("One comes off at the end of each refresh phase. With the last gone, the top Raven card is revealed and added to the staging area.");
+    expect(detail(built({ stage: "08147", staging: [{ code: "08156", resources: 0 }] }), "08156")).toBeNull();
+  });
+
   it("08147:B:1 leaves a location with no Time X out, and any other scenario has none of these dials", () => {
     expect(dials(built({ stage: "08147", staging: ["08160"] }), "crown-time:")).toEqual([]);
     expect(dials(tableFromLayout("the-dunland-trap", {}), "crown-time:")).toEqual([]);
@@ -78,8 +101,9 @@ describe("the time dial of the locations", () => {
 
 describe("Chief Turch (08150:A:1, 08150:A:3)", () => {
   it("08150:A:1 solo he is yours; two-handed the player is named; he follows the first player and the players lose if he leaves", () => {
-    expect(detail(built({ stage: "08147", play: ["08150"] }), "08150")).toBe("You control Chief Turch. He passes to the first player each round, does not exhaust to defend and is immune to player card effects. If he leaves play, the players lose.");
+    expect(detail(built({ stage: "08147", play: ["08150"] }), "08150")).toBe("You control Chief Turch. He passes to the first player each round, does not exhaust to defend. If he leaves play, the players lose.");
     expect(detail(built({ stage: "08147", seats: 2, play: ["08150"] }), "08150")).toContain("Player 1 controls Chief Turch.");
+    expect(detail(built({ stage: "08147", play: ["08150"] }), "08150")).not.toMatch(/immune/);
   });
 });
 
@@ -87,18 +111,22 @@ describe("Raven Chief and his Camp (08151:A:1, 08152:A:1, 08149:B:3)", () => {
   it("08151:A:1 says whether the Camp keeps Raven Chief from damage, and his place in the victory display", () => {
     const withCamp = detail(built({ stage: "08149", staging: ["08151", "08152"] }), "08151");
     expect(withCamp).toMatch(/^While Raven Chief's Camp is in play, Raven Chief cannot be damaged\./);
-    expect(withCamp).toContain("In the victory display at the end of the round on stage 3, the players win.");
+    expect(withCamp).toContain("If he is in the victory display at the end of a round on stage 3, the players win.");
     expect(detail(built({ stage: "08149", staging: ["08151"] }), "08151")).toMatch(/^Raven Chief's Camp is not in play, so he can be damaged\./);
   });
 
   it("08152:A:1 the Camp's preview says it is immune and shields Raven Chief", () => {
     expect(detail(built({ stage: "08149", staging: ["08152"] }), "08152")).toBe("Raven Chief's Camp is immune to player card effects. While it is in play, Raven Chief cannot be damaged.");
+    expect(detail(built({ stage: "08149", staging: [{ code: "08152", resources: 3 }] }), "08152")).toBe("Raven Chief's Camp is immune to player card effects. While it is in play, Raven Chief cannot be damaged. One comes off at the end of each refresh phase. With the last gone, each damaged character is exhausted, and 3 time counters return.");
   });
 
   it("08149:B:3 the stage 3 preview says no quest points and that Raven Chief in the victory display wins at the end of the round", () => {
     const made = built({ stage: "08149", timeCounters: 2 });
     const stage = questTitle(made.state, made.ctx, idOf(made.state, "08149"), "The Last Stage", (id) => (id === "08149:B:3" ? "At the end of the round, if Raven Chief is in the victory display, the players win the game." : null));
     expect(stage?.detail).toBe("To win: At the end of the round, if Raven Chief is in the victory display, the players win the game.");
+    const won = built({ stage: "08149", timeCounters: 2, victory: ["08151"] });
+    expect(questTitle(won.state, won.ctx, idOf(won.state, "08149"), "The Last Stage", () => null)?.detail).toContain("Raven Chief is in the victory display: the players win at the end of the round.");
+    expect(stage?.detail).not.toContain("is in the victory display: the players win");
     const two = built({ stage: "08148", timeCounters: 1 });
     expect(questTitle(two.state, two.ctx, idOf(two.state, "08148"), "The Raven Clan", () => null)?.detail).toMatch(/^Each location in the staging area gets \+2 quest points, until it becomes the active location\. The next refresh phase takes the last time counter\./);
   });
@@ -113,7 +141,32 @@ describe("the picks of the Raven cards", () => {
       seen.push(sheetFor(state, made.ctx, legalIntents(state, made.ctx), namesOf(made, state)));
       return state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "";
     }, true, 1);
-    expect(seen[0]).toMatchObject({ note: "Raven Warrior engaged: choose a location in play to lose a time counter. Player 1 chooses.", options: [{ label: "Raven Village" }, { label: "Dunland Battlefield" }] });
+    expect(seen[0]).toMatchObject({ title: "Raven Warrior: remove 2", note: expect.stringContaining("Raven Warrior engaged: choose a location in play to lose a time counter (2 left to take off). Player 1 chooses."), options: [{ label: "Raven Village \u00b7 2 time counters" }, { label: "Dunland Battlefield \u00b7 3 time counters" }] });
+  });
+
+  it("08153:A:1 a location on its last counter says before the confirm what that counter starts, and the others carry no warning", () => {
+    const made = built({ stage: "08147", staging: [{ code: "08156", resources: 1 }], active: { code: "08157", resources: 3 }, engaged: [{ code: "08153" }], hand: ["filler", "filler"] });
+    const seen: { options: { label: string; caution?: string }[] }[] = [];
+    resolveRecords(made.state, made.ctx, "08153", "forced", idOf(made.state, "08153"), (state) => {
+      seen.push(sheetFor(state, made.ctx, legalIntents(state, made.ctx), namesOf(made, state)) as never);
+      return state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "";
+    });
+    expect(seen[0]?.options).toEqual([
+      expect.objectContaining({ label: "Raven Village \u00b7 last time counter", caution: "Tap again: this takes the last time counter off Raven Village, and the top Raven card is revealed and added to the staging area." }),
+      expect.objectContaining({ label: "Dunland Battlefield \u00b7 3 time counters" }),
+    ]);
+    expect(seen[0]?.options[1]?.caution).toBeUndefined();
+  });
+
+  it("08153:A:2 the shadow pick tells two attachments of one title apart by the host and still says its sentence", () => {
+    const made = built({ seats: 2, stage: "08147", active: { code: "08157", resources: 3 }, engaged: [{ code: "08153", seat: 0 }], attached: [{ code: "attachment", to: "dh1" }, { code: "attachment", to: "dh2" }] });
+    const seen: { note: string; options: { label: string }[] }[] = [];
+    resolveRecords(made.state, made.ctx, "08153", "shadow", idOf(made.state, "08153"), (state) => {
+      seen.push(sheetFor(state, made.ctx, legalIntents(state, made.ctx), namesOf(made, state)) as never);
+      return state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "";
+    });
+    expect(seen[0]?.options.map((option) => option.label)).toEqual(["attachment \u00b7 on dh1", "attachment \u00b7 on dh2"]);
+    expect(seen[0]?.note).toBe("Player 1: Raven Warrior's shadow: choose an attachment you control to discard.");
   });
 
   it("08154:A:1 the first player chooses between a counter off the active location and an extra reveal", () => {
@@ -123,6 +176,25 @@ describe("the picks of the Raven cards", () => {
       seen.push(sheetFor(state, made.ctx, legalIntents(state, made.ctx), namesOf(made, state)));
       return state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "";
     });
-    expect(seen[0]).toMatchObject({ note: "Raven Skirmisher: remove 1 time counter from the active location, or reveal an additional encounter card.", options: [{ label: "Remove 1 time counter from the active location" }, { label: "Reveal an additional encounter card" }] });
+    expect(seen[0]).toMatchObject({ note: expect.stringMatching(/^Raven Skirmisher: remove 1 time counter from the active location, or reveal an additional encounter card\./), options: [{ label: "Remove 1 time counter from the active location" }, { label: "Reveal an additional encounter card" }] });
+  });
+
+  it("08154:A:1 two-handed the sentence names the first player, who chooses for the group", () => {
+    const made = built({ seats: 2, firstPlayer: 1, stage: "08147", staging: ["08154"], active: { code: "08157", resources: 3 }, deck: ["f0", "f0"] });
+    const seen: { note: string }[] = [];
+    resolveRecords(made.state, made.ctx, "08154", "whenRevealed", idOf(made.state, "08154"), (state) => {
+      seen.push(sheetFor(state, made.ctx, legalIntents(state, made.ctx), namesOf(made, state)) as never);
+      return state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "";
+    });
+    expect(seen[0]?.note).toMatch(/^Player 2, for the group: remove 1 time counter from the active location, or reveal an additional encounter card\./);
+    expect(seen[0]?.note).not.toContain("chooses.");
+  });
+
+  it("08154:A:1 a branch that takes an amount of counters off the active location says the amount, not 1", () => {
+    const made = built({ stage: "08147", active: { code: "08157", resources: 3 } });
+    const names = { card: (id: string) => id, code: (code: string) => code } as never;
+    expect(instructionWords({ verb: "RemoveTimeCounters", target: "active", amount: { handSize: "actor" } } as never, made.state, names, null)).toBe("remove X time counters from the active location");
+    expect(instructionWords({ verb: "RemoveTimeCounters", target: "active", amount: 2 }, made.state, names, null)).toBe("remove 2 time counters from the active location");
+    expect(instructionWords({ verb: "RemoveTimeCounters", target: "active" }, made.state, names, null)).toBe("remove 1 time counter from the active location");
   });
 });

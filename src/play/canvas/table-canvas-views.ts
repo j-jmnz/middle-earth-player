@@ -81,3 +81,12 @@ export function stripText(slot: CardSlot, questPoints: number | null, owner?: st
   const count = `${owner ? `${owner} · ` : ""}${slot.progress}${slot.stormcaller === "stage" ? "/" : " / "}${questPoints}`;
   return loses ? `${count} · lose` : count;
 }
+
+/**
+ * The x the strip's count is centred on: the middle of the card, moved right of the resource token at the card's foot (`resources`; a location with time counters wears one) and left of the progress token (`tokenLeft`, its left edge; null with none),
+ * so a token never covers a digit. `half` is half the text's width; `token` the token art's size, both at the scale `s`. The progress token wins when the card is too narrow for both.
+ */
+export function stripCenterX(x: number, w: number, half: number, tokenLeft: number | null, resources: boolean, token: number, s: number): number {
+  const clearOfResources = resources ? Math.max(x + w / 2, x + (token + 1) * s + 2 * s + half) : x + w / 2;
+  return tokenLeft == null ? clearOfResources : Math.min(clearOfResources, tokenLeft - 2 * s - half);
+}

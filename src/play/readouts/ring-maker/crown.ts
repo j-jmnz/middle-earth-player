@@ -4,7 +4,7 @@
 import { inPlay } from "../../../rules/core/state.ts";
 import type { ScenarioState } from "../../../rules/engine/reduce.ts";
 
-import { isTimeLocation, locationTimeNearWords, locationTimeWords } from "../../words/scenarios/ring-maker/crown-table.ts";
+import { isTimeLocation, locationDialLabel, locationPreviewWords, locationTimeNearWords, locationTimeWords } from "../../words/scenarios/ring-maker/crown-table.ts";
 import type { TableDial } from "../dials.ts";
 
 export const CROWN = "the-antlered-crown";
@@ -12,15 +12,30 @@ export const CROWN = "the-antlered-crown";
 export function crownDials(game: ScenarioState, nameOf: (code: string) => string): readonly TableDial[] {
   if (game.scenarioId !== CROWN) return [];
   return Object.values(game.cards)
-    .filter((card) => inPlay(card.zone) && isTimeLocation(card.code) && card.zone !== "attached")
-    .map((card): TableDial => ({
-      id: `time:${card.id}`,
-      testID: `crown-time:${card.id}`,
-      label: "Time",
-      name: `Time counters left on ${nameOf(card.code)}:`,
-      value: card.resources,
-      cardId: card.id,
-      ...(card.resources <= 1 ? { warn: { level: "near" as const, words: locationTimeNearWords(card.code, card.resources) } } : {}),
-      note: locationTimeWords(card.code, card.resources, 1),
-    }));
+    // A location with no counter left has no dial: its last counter is gone and the words of the last one would be false.
+    .filter((card) => inPlay(card.zone) && isTimeLocation(card.code) && card.zone !== "attached" && card.resources > 0)
+    // The fewest counters first: the location nearest its last counter stands first in the row, where a row that scrolls shows it.
+    .sort((a, b) => a.resources - b.resources)
+    .map((card): TableDial => {
+      const active = game.activeLocation === card.id;
+      return {
+        id: `time:${card.id}`,
+        testID: `crown-time:${card.id}`,
+        label: locationDialLabel(card.code),
+        name: `Time counters left on ${nameOf(card.code)}:`,
+        value: card.resources,
+        cardId: card.id,
+        ...(active ? { current: true as const } : {}),
+        // The next refresh phase takes one counter, so only a location on exactly 1 counter loses its last.
+        ...(card.resources === 1 ? { warn: { level: "near" as const, words: locationTimeNearWords(card.code, card.resources) } } : {}),
+        note: locationTimeWords(card.code, card.resources, 1, active),
+      };
+    });
+}
+
+/** The time words the card preview of a location says: what the dial warns of, else its standing rule. Null for a card that has no time dial here. */
+export function crownLocationWords(game: ScenarioState, cardId: string): string | null {
+  const card = game.cards[cardId];
+  if (game.scenarioId !== CROWN || card == null || !inPlay(card.zone) || !isTimeLocation(card.code) || card.resources <= 0) return null;
+  return locationPreviewWords(card.code, card.resources, 1);
 }

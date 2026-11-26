@@ -152,7 +152,8 @@ export function copyLabel(game: ScenarioState, names: SheetNames, id: string, op
     return lying == null ? undefined : lying.zone === "engaged" ? engagedWords(game, game.seats.findIndex((one) => one.engaged.includes(other))) : places[lying.zone];
   };
   const shared = new Set(options.map(placeOf)).size < 2;
-  const host = card.zone === "attached" && card.host ? `on ${names.card(card.host)}` : undefined;
+  // An attachment of a player is in the play zone with its host set, so the host is read from the host's attachments as well as from the attached zone.
+  const host = card.host && (card.zone === "attached" || game.cards[card.host]?.attachments.includes(id) === true) ? `on ${names.card(card.host)}` : undefined;
   const attachments = card.attachments.map((other) => names.card(other));
   const attacking = game.pendingAttack?.enemyId === id ? "attacking" : undefined;
   const damage = card.damage > 0 ? `${card.damage} damage` : undefined;

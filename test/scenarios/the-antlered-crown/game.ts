@@ -134,7 +134,6 @@ const game = standaloneGame<CrownDecks, CrownPolicy>({
   campaign: cycle,
   scenario: crown,
   stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles and its Nightmare deck.
   codes: [...crown.cards.map((card) => card.code)],
   intent: crownIntent,
   policy: DEFAULT_POLICY,
