@@ -156,6 +156,15 @@ export function discardEncounterTop(state: ScenarioState, instruction: Verb<"Dis
   return data ? patchTop(next, { data: { ...data, looked: ids } }) : next;
 }
 
+/**
+ * "Discard the top X cards of the encounter deck to travel here" (Orc Cave, 07028:A:2): a Travel line is a cost and a partial discard is not a payment (rr.travel, rr.cost), so
+ * with fewer than X cards in the deck the players cannot travel. The deck is not refilled outside the quest phase (rr.running-out-of-cards); a line with `reset` refills it as it discards.
+ */
+export function travelUnpayable(state: ScenarioState, instruction: Instruction, ctx: ReduceContext, locationId: string): boolean {
+  if (instruction.verb !== "DiscardEncounterTop" || instruction.reset) return false;
+  return state.encounterDeck.length < resolveAmount(state, instruction.count, frameScope(state, state.firstPlayer, locationId), ctx);
+}
+
 /** StageLooked: each player in turn adds one card of the trait and type, among those the effect discarded, to the staging area. */
 export function stageLooked(state: ScenarioState, instruction: Verb<"StageLooked">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const order = livingSeats(state);

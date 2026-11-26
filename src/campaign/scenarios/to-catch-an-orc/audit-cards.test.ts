@@ -1,4 +1,4 @@
-// Rules: rm.out-of-play-deck, rm.searches-x, rm.time-x, rm.mugash-player-card-backs, rr.then, rr.explored, rr.in-play-and-out-of-play, rr.engaged, rr.forced, rr.shadow-effects (data/rules/entries.json); ledger lines 07024:A:1, 07024:A:2, 07025:A:1, 07025:A:2, 07026:A:1, 07026:A:2, 07027:A:1, 07027:A:2, 07028:A:1, 07028:A:2, 07029:A:1, 07029:A:2, 07030:A:1, 07038:A:1, 07038:A:2, 07039:A:1, 07039:A:2, 07040:A:2, 07041:A:1, 07053:A:1, 07053:A:2, 07054:A:1, 07054:A:2, 07055:A:2, 07062:A:1, 07062:B:1, 07063:B:1, 07063:B:2, 07063:B:3, 07064:B:1, 07064:B:2, 07064:B:3.
+// Rules: rm.out-of-play-deck, rm.searches-x, rm.time-x, rm.mugash-player-card-backs, rr.then, rr.explored, rr.in-play-and-out-of-play, rr.engaged, rr.forced, rr.travel, rr.cost, rr.shadow-effects (data/rules/entries.json); ledger lines 07024:A:1, 07024:A:2, 07025:A:1, 07025:A:2, 07026:A:1, 07026:A:2, 07027:A:1, 07027:A:2, 07028:A:1, 07028:A:2, 07029:A:1, 07029:A:2, 07030:A:1, 07038:A:1, 07038:A:2, 07039:A:1, 07039:A:2, 07040:A:2, 07041:A:1, 07053:A:1, 07053:A:2, 07054:A:1, 07054:A:2, 07055:A:2, 07062:A:1, 07062:B:1, 07063:B:1, 07063:B:2, 07063:B:3, 07064:B:1, 07064:B:2, 07064:B:3.
 // An audit of To Catch an Orc: each test is built from the printed words and the rule spans, on the smallest table of the scene kit. A line's test runs again without the line's records and must fail there (`lineSpec`).
 import { describe, expect } from "vitest";
 
@@ -6,6 +6,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 import { pileOf } from "../../../rules/core/piles.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { settle } from "../../../rules/engine/machine.ts";
+import { reduce } from "../../../rules/engine/reduce.ts";
 import { stagingThreat } from "../../../rules/quest/quest.ts";
 import { attachTargetCodes, engagedHandTable, codesIn, drive, fight, finish, fightEnemy, idOf, layoutTableFor, opening, opened, revealFromTop, run as runInstruction, send, statOf, type Layout, type LayoutTable, type Run } from "../../../../test/harness/scene-kit.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
@@ -215,6 +216,12 @@ describe("07028 Orc Cave", () => {
     expect(stagingCodes(solo)).toEqual([]);
     expect(codesIn(solo, "encounterDiscard")).toEqual(["f0"]);
     expect(codesIn(solo, "encounterDeck")).toEqual(["07038"]);
+    // A partial discard is not a payment (rr.travel, rr.cost): two players and a deck of one card cannot travel, and nothing is discarded.
+    const short = make({ seats: 2, phase: "Travel", staging: ["07028"], deck: ["07038"] }, effects);
+    const refused = reduce(opened(short).state, { type: "Travel", locationId: idOf(short.state, "07028") }, short.ctx);
+    expect(refused.ok).toBe(false);
+    if (!refused.ok) expect(refused.reason).toBe("The players cannot pay that location's Travel cost");
+    expect(codesIn(short.state, "encounterDeck")).toEqual(["07038"]);
   });
 });
 

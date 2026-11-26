@@ -7,7 +7,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
-import { addCampaignResource, attachSetAsideTo, discardBottom, discardCostlier, discardEncounterTop, eachExhaustsOne, lookAtBottom, mayDiscardShadow, putSetAsideInPlay, removeWillpowerFromQuest, stageLooked, tradeDamageForThreat } from "./cards.ts";
+import { addCampaignResource, attachSetAsideTo, discardBottom, discardCostlier, discardEncounterTop, eachExhaustsOne, lookAtBottom, mayDiscardShadow, putSetAsideInPlay, removeWillpowerFromQuest, stageLooked, tradeDamageForThreat, travelUnpayable } from "./cards.ts";
 import { addFromGrottoDeck, flipDoubleSided, prepareGrottoDeck, resolveActiveForced } from "./grotto.ts";
 import { addLostIslands, addSetAside, addStageProgress, flip, lookAtFacedown, prepareDeck, scramble } from "./deck.ts";
 
@@ -67,4 +67,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "uncharted", verbs: ["PrepareUnchartedDeck", "PrepareGrottoDeck", "AddFromGrottoDeck", "FlipDoubleSided", "ResolveActiveForced", "AddLostIslands", "AddSetAsideLostIsland", "ScrambleUncharted", "FlipUncharted", "LookAtFacedown", "AddStageProgress", "PutSetAsideInPlay", "AttachSetAsideTo", "TradeDamageForThreat", "KeepCampaignCard", "AddCampaignResource", "LookAtBottom", "DiscardBottom", "DiscardCostlier", "DiscardEncounterTop", "StageLooked", "RemoveWillpowerFromQuest", "EachExhaustsOne", "MayDiscardShadow"], run };
+export const manifest: RulesFamily = { name: "uncharted", verbs: ["PrepareUnchartedDeck", "PrepareGrottoDeck", "AddFromGrottoDeck", "FlipDoubleSided", "ResolveActiveForced", "AddLostIslands", "AddSetAsideLostIsland", "ScrambleUncharted", "FlipUncharted", "LookAtFacedown", "AddStageProgress", "PutSetAsideInPlay", "AttachSetAsideTo", "TradeDamageForThreat", "KeepCampaignCard", "AddCampaignResource", "LookAtBottom", "DiscardBottom", "DiscardCostlier", "DiscardEncounterTop", "StageLooked", "RemoveWillpowerFromQuest", "EachExhaustsOne", "MayDiscardShadow"], run, travel: { unpayable: travelUnpayable } };
