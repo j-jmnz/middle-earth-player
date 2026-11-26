@@ -76,7 +76,7 @@ const NAASIYAH_LOST = "Na'asiyah left play";
 export const DEPTHS_GOLDENS: readonly DepthsGolden[] = [
   { name: "true solo, won", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, Easy, won", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
-  { name: "true solo, after Flight of the Stormcaller, won", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
+  { name: "true solo, after Flight of the Stormcaller, won", seatCount: 1, seed: 35, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
   { name: "true solo, the last option of each choice, won", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", policy: { choose: "last" } },
   { name: "true solo, Hard Mode card, won", seatCount: 1, seed: 8, difficulty: "Normal", decks: "strong", outcome: "won", mode: "hard" },
   { name: "true solo, Upgraded Black Keys and Come Together, won", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", upgraded: true },
@@ -87,7 +87,7 @@ export const DEPTHS_GOLDENS: readonly DepthsGolden[] = [
   { name: "true solo, Easy, Na'asiyah destroyed, lost", seatCount: 1, seed: 7, difficulty: "Easy", decks: "strong", outcome: "lost", lossReason: NAASIYAH_LOST },
   { name: "two-handed, a Ship location reaches 9 Threat, lost", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: STORMCALLER_LOST },
   { name: "two-handed, Easy, Captain Sahír destroyed, lost", seatCount: 2, seed: 4, difficulty: "Easy", decks: "strong", outcome: "lost", lossReason: SAHIR_LOST },
-  { name: "two-handed, Na'asiyah destroyed, lost", seatCount: 2, seed: 8, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: NAASIYAH_LOST },
+  { name: "two-handed, Na'asiyah destroyed, lost", seatCount: 2, seed: 41, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: NAASIYAH_LOST },
   { name: "true solo, weak, lost on threat", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: THREAT_LOST },
   { name: "two-handed, weak, lost on threat", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: THREAT_LOST },
   { name: "true solo, brittle heroes, lost", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: THREAT_LOST },

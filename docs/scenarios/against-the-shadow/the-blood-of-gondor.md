@@ -135,7 +135,7 @@ The hidden cards are in the family `pelargir` (`src/catalog/families/pelargir.ts
 
 ## Limits
 
-- The first player's choice of order between turning the hidden cards at the beginning of the combat phase and dealing the shadow cards (`hidden.order-vs-shadow`) is not offered: the engine turns first. An Orc Arsonist that the turn engages deals its Forced shadow cards at once, and the card the combat phase would deal to an enemy that already holds one is not dealt, so each enemy ends with 1 shadow card.
+- The first player's choice of order between turning the hidden cards at the beginning of the combat phase and dealing the shadow cards (`hidden.order-vs-shadow`) is not offered: the engine turns first. An Orc Arsonist that the turn engages deals its Forced shadow cards at once, and step 6.2 then deals each engaged enemy one more (`rr.step-6-2`: no enemy is skipped for holding a card), so each enemy ends with 2 shadow cards.
 - Faramir's hidden card is picked by the game's seed, not by the player.
 
 ## Table

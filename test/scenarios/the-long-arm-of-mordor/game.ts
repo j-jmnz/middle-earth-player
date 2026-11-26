@@ -75,7 +75,7 @@ export type MordorGolden = { name: string; seatCount: 1 | 2; seed: number; diffi
 // neither has a golden of its own) and each way to lose: every player's threat at 50 (heroes that start at a threat of 14) and every player eliminated by heroes destroyed (heroes too brittle for the attacks, the objective-heroes among them).
 export const MORDOR_GOLDENS: readonly MordorGolden[] = [
   { name: "true solo, won, Normal", seatCount: 1, seed: 7, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "two-handed, won, Normal", seatCount: 2, seed: 7, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed, won, Normal", seatCount: 2, seed: 38, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 2, difficulty: "Normal", decks: "tense", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed, lost, threat reaches 50", seatCount: 2, seed: 2, difficulty: "Normal", decks: "tense", outcome: "lost", lossReason: "No seats remain" },
   { name: "true solo, lost, every hero destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },

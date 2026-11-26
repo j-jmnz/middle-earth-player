@@ -213,7 +213,7 @@ export const RHOVANION_GOLDENS: readonly RhovanionGolden[] = [
   { name: "true solo, Easy, won, Melanwar's and Isolde's lines, Key, Horn, Tiny", seatCount: 1, seed: 7, difficulty: "Easy", decks: "strong", outcome: "won", after: true, variant: "oathline" },
   { name: "two-handed, won from a blank log, Tiny, Key, Horn, a different location chosen by each player, a Misplaced Trust for each", seatCount: 2, seed: 11, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed, won from a blank log, Key, Tiny, Horn, the last location offered to each player, different titles", seatCount: 2, seed: 12, difficulty: "Normal", decks: "strong", outcome: "won", policy: { location: "last" } },
-  { name: "two-handed, won from a blank log, Horn, Tiny, Key, no location left in the staging area, so nobody is asked", seatCount: 2, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed, won from a blank log, Horn, Tiny, Key, no location left in the staging area, so nobody is asked", seatCount: 2, seed: 174, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed, won, after the earlier parts, Horn, Tiny, Key, one title in the staging area twice, so both players choose it", seatCount: 2, seed: 56, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
   { name: "two-handed, won, after the earlier parts, Tiny, Horn, Key", seatCount: 2, seed: 76, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
   { name: "two-handed, won, after the earlier parts, Key, Horn, Tiny, trust twice, Urdug's Cunning for each player", seatCount: 2, seed: 172, difficulty: "Normal", decks: "strong", outcome: "won", after: true, policy: { trust: 2 } },
