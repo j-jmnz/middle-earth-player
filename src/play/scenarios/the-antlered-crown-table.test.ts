@@ -53,11 +53,13 @@ describe("the time dial of the stages", () => {
 });
 
 describe("the time dial of the locations", () => {
-  it("08155:A:1 gives each location in play that prints Time X a dial of its own, with what its last counter does", () => {
-    const made = built({ stage: "08147", staging: [{ code: "08155", resources: 3 }], active: { code: "08157", resources: 3 } });
-    const found = dials(made, "crown-time:");
-    expect(found.map((dial) => dial.name)).toEqual(expect.arrayContaining(["Time counters left on Raven War-camp:", "Time counters left on Dunland Battlefield:"]));
-    expect(found.find((dial) => dial.name.includes("War-camp"))?.note).toBe("3 time counters left. One comes off at the end of each refresh phase. With the last gone, each player in turn, the first player first, draws the top Raven card and it enters play engaged with him.");
+  it("08155:A:1 shows a dial for the active location and one on exactly 1 counter, and none for another location on 2 or 3", () => {
+    const made = built({ stage: "08147", staging: [{ code: "08155", resources: 3 }, { code: "08156", resources: 2 }, { code: "08158", resources: 1 }], active: { code: "08157", resources: 3 } });
+    expect(dials(made, "crown-time:").map((dial) => dial.label).sort()).toEqual(["Battlefield", "Country"]);
+    const camp = dials(built({ stage: "08147", staging: [{ code: "08155", resources: 1 }], active: { code: "08157", resources: 3 } }), "crown-time:");
+    expect(camp.map((dial) => dial.name)).toEqual(expect.arrayContaining(["Time counters left on Raven War-camp:", "Time counters left on Dunland Battlefield:"]));
+    const found = dials(built({ stage: "08147", active: { code: "08157", resources: 3 } }), "crown-time:");
+    expect(found.find((dial) => dial.name.includes("Battlefield"))?.note).toBe("3 time counters left on the active location. One comes off at the end of each refresh phase. With the last gone, each player assigns damage among his characters, one for each card in his hand.");
     expect(found.every((dial) => dial.warn == null)).toBe(true);
   });
 
@@ -78,12 +80,12 @@ describe("the time dial of the locations", () => {
   });
 
   it("08155:A:1 each location dial wears the short name of its location, the active one is marked, and the fewest counters stand first", () => {
-    const made = built({ stage: "08147", staging: [{ code: "08155", resources: 3 }, { code: "08156", resources: 2 }, { code: "08158", resources: 4 }], active: { code: "08157", resources: 1 } });
+    const made = built({ stage: "08147", staging: [{ code: "08155", resources: 1 }, { code: "08156", resources: 2 }, { code: "08158", resources: 1 }], active: { code: "08157", resources: 3 } });
     const found = dials(made, "crown-time:");
-    expect(found.map((dial) => [dial.label, dial.value])).toEqual([["Battlefield", 1], ["Village", 2], ["War-camp", 3], ["Country", 4]]);
+    expect(found.map((dial) => [dial.label, dial.value])).toEqual([["War-camp", 1], ["Country", 1], ["Battlefield", 3]]);
     expect(found.filter((dial) => dial.current === true).map((dial) => dial.label)).toEqual(["Battlefield"]);
-    expect(found[0]?.note).toContain("on the active location");
-    expect(found[1]?.note).not.toContain("active location");
+    expect(found[2]?.note).toContain("on the active location");
+    expect(found[0]?.note).not.toContain("active location");
   });
 
   it("08156:A:1 a tap on a location dial opens its preview with what the dial says: the last counter's effect at 1, the standing rule above", () => {

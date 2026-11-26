@@ -13,7 +13,8 @@ export function crownDials(game: ScenarioState, nameOf: (code: string) => string
   if (game.scenarioId !== CROWN) return [];
   return Object.values(game.cards)
     // A location with no counter left has no dial: its last counter is gone and the words of the last one would be false.
-    .filter((card) => inPlay(card.zone) && isTimeLocation(card.code) && card.zone !== "attached" && card.resources > 0)
+    // Only the active location and a location on exactly 1 counter (the one the next refresh phase fires) have a dial, so the bar keeps its names; the others show their counters on the card's token and in the preview.
+    .filter((card) => inPlay(card.zone) && isTimeLocation(card.code) && card.zone !== "attached" && card.resources > 0 && (card.resources === 1 || game.activeLocation === card.id))
     // The fewest counters first: the location nearest its last counter stands first in the row, where a row that scrolls shows it.
     .sort((a, b) => a.resources - b.resources)
     .map((card): TableDial => {
