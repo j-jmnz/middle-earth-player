@@ -34,8 +34,8 @@ const VERBS = [
   // no excess. A Shadow effect: it is read as the damage is dealt, in families/defense/excess.ts.
   z.strictObject({ verb: z.literal("ExcessToCard"), name: z.string().min(1), ...when }),
   // Deals the enemy (`target`) one more shadow card from the encounter deck ("deal the attacking enemy another shadow card"):
-  // during its attack it resolves after the ones it has. `from: encounter`: the card comes from the encounter deck even for an enemy that is dealt from another deck ("from the encounter deck (not the Balrog deck)", 901806:A:1).
-  z.strictObject({ verb: z.literal("DealShadowTo"), target: cardRefSchema, from: z.literal("encounter").optional(), inPlay: z.literal(true).optional(), ...when }),
+  // during its attack it resolves after the ones it has. `from: encounter`: the card comes from the encounter deck even for an enemy that is dealt from another deck ("from the encounter deck (not the Balrog deck)", 901806:A:1). `from: raven`: the card comes from the Raven deck, which is refilled from its discard pile when empty, and goes there when discarded ("Deal attacking enemy 2 additional shadow cards from the Raven deck": two of these, 08156:A:2; rm.raven-deck).
+  z.strictObject({ verb: z.literal("DealShadowTo"), target: cardRefSchema, from: z.enum(["encounter", "raven"]).optional(), inPlay: z.literal(true).optional(), ...when }),
   // Shows the actor a facedown shadow card dealt to the enemy (`target`, the picked one by default). `markEffect`: the effect's X
   // becomes 1 when that card has a shadow effect, else 0 ("If that card has a shadow effect, ~ gets +2 Defense").
   z.strictObject({ verb: z.literal("LookAtShadow"), target: cardRefSchema.optional(), markEffect: z.boolean().optional(), ...when }),

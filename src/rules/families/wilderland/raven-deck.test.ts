@@ -6,7 +6,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import { settle } from "../../engine/machine.ts";
 import { pileOf } from "../../core/piles.ts";
-import { moveCard } from "../../core/zones.ts";
+import { moveCard, shadowCards, spawn } from "../../core/zones.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { codesOf, ctxOf, deal, record, table } from "./fixture.ts";
 
@@ -14,9 +14,9 @@ import { codesOf, ctxOf, deal, record, table } from "./fixture.ts";
 const REVEALED = record("orc:whenRevealed:1", "orc", "whenRevealed", [{ verb: "PlaceResourceTokens", amount: 2, on: "self" }]);
 const ctx = ctxOf([REVEALED]);
 
-function run(state: ScenarioState, instruction: Instruction | readonly Instruction[]): ScenarioState {
+function run(state: ScenarioState, instruction: Instruction | readonly Instruction[], sourceId = "none"): ScenarioState {
   const instructions = Array.isArray(instruction) ? [...instruction] : [instruction as Instruction];
-  return settle(pushEffectFrame(state, { frame: "whenRevealed", sourceId: "none", actor: 0, peril: false, effectId: "fixture:whenRevealed:1", instructions, cancel: null, blockCancel: null }, []), ctx, []);
+  return settle(pushEffectFrame(state, { frame: "whenRevealed", sourceId, actor: 0, peril: false, effectId: "fixture:whenRevealed:1", instructions, cancel: null, blockCancel: null }, []), ctx, []);
 }
 
 const withRaven = (codes: readonly string[], discarded: readonly string[] = []) => {
@@ -124,5 +124,43 @@ describe("an enemy of the Raven deck that leaves play (rm.raven-deck)", () => {
     const next = run(withRaven([], ["ec1"]), { verb: "AddFromPile", pile: "raven", to: "staging" });
     expect(codesOf(next, next.staging)).toEqual(["ec1"]);
     expect(run(withRaven([]), { verb: "AddFromPile", pile: "raven", to: "staging", count: 2 }).staging).toEqual([]);
+  });
+});
+
+describe("shadow cards from the Raven deck (08156:A:2, rm.raven-deck)", () => {
+  const TWO: Instruction[] = [{ verb: "DealShadowTo", target: "self", from: "raven" }, { verb: "DealShadowTo", target: "self", from: "raven" }];
+  const engagedEnemy = (raven: readonly string[], discarded: readonly string[] = []) => {
+    const enemy = spawn(deal(withRaven(raven, discarded), ["mist", "mist"], { zone: "encounterDeck" }).state, "ec1", { zone: "engaged", seat: 0 });
+    return { state: enemy.state, id: enemy.id };
+  };
+
+  it("the two shadow cards come one after the other from the top of the Raven deck, and the encounter deck is not touched", () => {
+    const { state, id } = engagedEnemy(["orc", "ec2", "orc"]);
+    const next = run(state, TWO, id);
+    expect(codesOf(next, shadowCards(next.cards[id]))).toEqual(["orc", "ec2"]);
+    expect(codesOf(next, pileOf(next, "ravenDeck"))).toEqual(["orc"]);
+    expect(next.encounterDeck).toHaveLength(2);
+  });
+
+  it("a shadow card from the Raven deck that is discarded goes to the Raven discard pile", () => {
+    const { state, id } = engagedEnemy(["orc", "ec2", "orc"]);
+    const dealt = run(state, TWO, id);
+    const shadow = shadowCards(dealt.cards[id])[0] ?? "";
+    const gone = moveCard(dealt, shadow, { zone: "encounterDiscard" });
+    expect(pileOf(gone, "ravenDiscard")).toEqual([shadow]);
+    expect(gone.encounterDiscard).toEqual([]);
+  });
+
+  it("an empty Raven deck is refilled from its discard pile first, and an empty discard pile deals nothing", () => {
+    const refilled = engagedEnemy([], ["orc", "ec2"]);
+    const next = run(refilled.state, TWO, refilled.id);
+    expect(shadowCards(next.cards[refilled.id])).toHaveLength(2);
+    const empty = engagedEnemy([]);
+    expect(shadowCards(run(empty.state, TWO, empty.id).cards[empty.id])).toEqual([]);
+  });
+
+  it("a game that dealt no Raven deck deals from the encounter deck, as a Balrog flag does without a Balrog deck", () => {
+    const enemy = spawn(deal(table(), ["mist", "mist"], { zone: "encounterDeck" }).state, "ec1", { zone: "engaged", seat: 0 });
+    expect(codesOf(enemy.state, shadowCards(run(enemy.state, TWO, enemy.id).cards[enemy.id]))).toEqual(["mist", "mist"]);
   });
 });

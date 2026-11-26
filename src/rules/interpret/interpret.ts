@@ -251,12 +251,14 @@ export function dealStepShadow(state: ScenarioState, enemyId: string, steps: Eng
 // One more shadow card for an enemy, beside any it has (141069:A:2). With none yet it is simply its shadow card. An empty
 // encounter deck deals nothing (rr.step-6-2).
 // An enemy that holds `shadowsFromBalrog` is dealt from the Balrog deck, which is refilled from its discard pile when it is empty (901801:A:3, A:4); `fromEncounter` deals from the encounter deck whatever the enemy holds ("from the encounter deck (not the Balrog deck)", 901806:A:1).
-export function dealAdditionalShadow(given: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext, fromEncounter = false): ScenarioState {
-  const balrog = !fromEncounter && given.piles?.balrogDeck !== undefined && flagged(given, enemyId, "shadowsFromBalrog");
+// `fromRaven` deals it from the Raven deck ("Deal attacking enemy 2 additional shadow cards from the Raven deck", 08156:A:2; rm.raven-deck), which is refilled from its own discard pile, where the shadow card goes when it is discarded.
+export function dealAdditionalShadow(given: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext, fromEncounter = false, fromRaven = false): ScenarioState {
+  const balrog = !fromEncounter && !fromRaven && given.piles?.balrogDeck !== undefined && flagged(given, enemyId, "shadowsFromBalrog");
+  const raven = fromRaven && given.piles?.ravenDeck !== undefined;
   // An empty deck is refilled at once while the Nightmare setup card says so (encounterRefill, 900201:A:3); the reset is logged.
-  const state = balrog ? refillDeck(given, DECKS.balrog, steps) : refillEncounterDeck(given, steps, ctx);
+  const state = balrog ? refillDeck(given, DECKS.balrog, steps) : raven ? refillDeck(given, DECKS.raven, steps) : refillEncounterDeck(given, steps, ctx);
   const enemy = state.cards[enemyId];
-  const top = balrog ? state.piles?.balrogDeck?.[0] : state.encounterDeck[0];
+  const top = balrog ? state.piles?.balrogDeck?.[0] : raven ? state.piles?.ravenDeck?.[0] : state.encounterDeck[0];
   // "Do not deal Nazgûl enemies a shadow card" (141061:A:1).
   if (!enemy || !top || flagged(state, enemyId, "noShadowDealt")) return state;
   // Face down, or face up while the player it is engaged with holds shadowsFaceUp (07009).
