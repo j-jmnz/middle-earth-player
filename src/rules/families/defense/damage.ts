@@ -13,7 +13,7 @@ import { familyAttackDamaged } from "../../interpret/family-hooks.ts";
 import { modifiedStat, placeDamage, type DamageSource } from "../../core/keywords.ts";
 import { isCharacterType, printedOf, type PrintedCard } from "../../core/printed.ts";
 import { placeQuestProgress, questPointsOf } from "../../quest/quest.ts";
-import type { CardInstance, GameEvent, ScenarioState } from "../../core/state.ts";
+import type { CardInstance, GameEvent, PendingAttack, ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, modifierActive, updateCard } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { queueEvent } from "../../windows/queue.ts";
@@ -39,14 +39,26 @@ export function afterCancel(state: ScenarioState, id: string, canceled: number, 
 }
 
 // Takes `amount` of the damage the answered damageDealt event dealt off the damaged card: what a later cancel of the same
-// damage can still take is what is left (rr.cancel).
-function cancelDealt(state: ScenarioState, id: string, amount: number, dealt: number, ctx: ReduceContext): ScenarioState {
+// damage can still take is what is left (rr.cancel). A cancel (`canceled`) of the damage the attack in progress dealt means the attack did
+// not deal it, so `landed` (what a shadow effect reads as "damage dealt by this attack") loses it; redirected damage is still dealt by the attack.
+export function cancelDealt(state: ScenarioState, id: string, amount: number, dealt: number, ctx: ReduceContext, canceled = false): ScenarioState {
   const card = state.cards[id];
   if (!card || amount <= 0) return state;
-  const canceled = updateCard(state, id, { damage: card.damage - amount });
-  const data = topFrame(canceled)?.data;
-  const patched = data?.kind === "effect" ? patchTop(canceled, { data: { ...data, dealt: dealt - amount } }) : canceled;
+  const lowered = updateCard(state, id, { damage: card.damage - amount });
+  const removed = canceled ? lowerLanded(lowered, id, amount) : lowered;
+  const data = topFrame(removed)?.data;
+  const patched = data?.kind === "effect" ? patchTop(removed, { data: { ...data, dealt: dealt - amount } }) : removed;
   return afterCancel(patched, id, amount, dealt - amount, ctx);
+}
+
+// The attack in progress keeps the damage it landed only while a shadow effect reads it (noteLanded): the cancel takes its share off.
+function lowerLanded(state: ScenarioState, id: string, amount: number): ScenarioState {
+  const attack = state.pendingAttack;
+  const landed = attack?.defense?.landed;
+  if (!attack || !landed) return state;
+  const target = afterTarget(attack);
+  if (!target || (id !== target && id !== damageGoesTo(state, target, "combat"))) return state;
+  return { ...state, pendingAttack: { ...attack, defense: { ...attack.defense, landed: Math.max(0, landed - amount) } } };
 }
 
 // "Place that damage on ~ instead": the damage just dealt to the event's card moves to another card in play.
@@ -159,4 +171,9 @@ function queueBeforeDestruction(state: ScenarioState, event: GameEvent): Scenari
   const pending = state.pendingEvents ?? [];
   const at = pending.findIndex((one) => one.trigger === "characterDestroyed" && one.subject === event.subject);
   return at < 0 ? queueEvent(state, event) : { ...state, pendingEvents: [...pending.slice(0, at), event, ...pending.slice(at)] };
+}
+
+/** The card an attack damaged: the undefended hero, or the defender. */
+export function afterTarget(attack: PendingAttack): string | undefined {
+  return attack.undefended || !attack.defenderId ? attack.heroId : attack.defenderId;
 }
