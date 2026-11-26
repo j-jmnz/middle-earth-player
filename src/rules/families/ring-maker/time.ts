@@ -6,7 +6,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { removeTimeCounterFrom, timeOf } from "../angmar/time.ts";
+import { countersRemoved, removeTimeCounterFrom, timeOf } from "../angmar/time.ts";
 import type { Focus } from "../index.ts";
 
 /** RemoveTimeFromQuest: up to `amount` time counters come off the current quest stage, one at a time. A stage with no Time X, or with no counter left, loses none. */
@@ -16,5 +16,5 @@ export function removeTimeFromQuest(state: ScenarioState, instruction: Extract<I
   const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
   let next = state;
   for (let removed = 0; removed < amount && (next.cards[stage.id]?.resources ?? 0) > 0; removed += 1) next = removeTimeCounterFrom(next, stage.id, ctx);
-  return next;
+  return countersRemoved(state, next, ctx);
 }

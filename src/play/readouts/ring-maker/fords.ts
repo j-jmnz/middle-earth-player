@@ -1,15 +1,15 @@
-// Rules: rm.time-x, rm.grima-objective-ally (data/rules/entries.json); ledger lines 08011:B:2, 08013:B:1, 08013:B:3, 08014:A:3, 08016:A:1, 07063:B:1, 07063:B:2, 07064:B:1, 07064:B:2, 07059:B:1, 07059:B:2, 07060:B:2, 07060:B:3, 07061:B:1, 07061:B:2, 07065:B:1, 07065:B:2, 07066:B:1, 07066:B:2, 07067:B:1, 07067:B:2, 08066:B:1, 08066:B:2, 08067:B:1, 08067:B:2.
+// Rules: rm.time-x, rm.grima-objective-ally (data/rules/entries.json); ledger lines 08011:B:2, 08013:B:1, 08013:B:3, 08014:A:3, 08016:A:1, 07063:B:1, 07063:B:2, 07064:B:1, 07064:B:2, 07059:B:1, 07059:B:2, 07060:B:2, 07060:B:3, 07061:B:1, 07061:B:2, 07065:B:1, 07065:B:2, 07066:B:1, 07066:B:2, 07067:B:1, 07067:B:2, 08066:B:1, 08066:B:2, 08067:B:1, 08067:B:2, 08095:B:1, 08095:B:2, 08096:B:1, 08096:B:2, 08097:B:1, 08097:B:2, 08098:B:1, 08098:B:2, 08099:B:1, 08099:B:2, 08100:B:1, 08100:B:2, 08101:B:1, 08101:B:2.
 // The time dial of the quest stages of The Fords of Isen, To Catch an Orc, Into Fangorn, The Dunland Trap and Trouble in Tharbad: the counters left against the Time X the stage was given (the printed X, times the players it counted when its record says `perPlayer`, read from the flag `timePlayers`), warming as the counters the next refresh phase takes reach the counters left. The engine decided every number (`timeInstruction`, `timePlayersOf`, the counters on the card); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
 import { inPlay, livingSeats } from "../../../rules/core/state.ts";
 import { refreshTakes, timeInstruction, timeLimit, timePlayersOf } from "../../../rules/families/angmar/time.ts";
 import type { ReduceContext, ScenarioState } from "../../../rules/engine/reduce.ts";
 
-import { ELIMINATION_DROP, LEVEL_STAGE, stageTimeLimitWords, stageTimeNearWords, stageTimeWords, type NewLevels, type TimeTakes } from "../../words/scenarios/ring-maker/fords-table.ts";
+import { ELIMINATION_DROP, LEVEL_STAGE, stageTimeLimitWords, stageTimeNearWords, stageTimeWords, timeDialWarms, type NewLevels, type TimeTakes } from "../../words/scenarios/ring-maker/fords-table.ts";
 import { cardsOf, type TableDial } from "../dials.ts";
 import { seatLevel } from "../threat-level.ts";
 
-/** The quest stages of The Fords of Isen, of To Catch an Orc (stages 2B and 3B), of Into Fangorn (stages 1B, 2B and 3B) and of The Dunland Trap (stages 1B and 3B; 2B prints none) and of Trouble in Tharbad (stages 1B and 2B) that print Time X. */
-export const FORDS_STAGES: readonly string[] = ["07059", "07060", "07061", "07063", "07064", "07065", "07066", "07067", "08011", "08013", "08066", "08067"];
+/** The quest stages of The Fords of Isen, of To Catch an Orc (stages 2B and 3B), of Into Fangorn (stages 1B, 2B and 3B) and of The Dunland Trap (stages 1B and 3B; 2B prints none) of Trouble in Tharbad (stages 1B and 2B) and of The Nîn-in-Eilph (the three stages 2B, the three stages 3B and stage 4B) that print Time X. */
+export const FORDS_STAGES: readonly string[] = ["07059", "07060", "07061", "07063", "07064", "07065", "07066", "07067", "08011", "08013", "08066", "08067", "08095", "08096", "08097", "08098", "08099", "08100", "08101"];
 
 const TURCH = "08014";
 const NO_WAY_OUT = "08013";
@@ -36,7 +36,7 @@ export function ringMakerDials(game: ScenarioState, ctx: ReduceContext, nameOf: 
       const limit = Math.max(counted != null ? time.amount * counted : printed, card.resources);
       // Only stage 1B's last counter is a loss; the other two return counters, so their dials warm near and are never critical.
       const level = card.resources <= 1 && code === "07059" ? ("critical" as const) : ("near" as const);
-      const warms = card.resources <= 2 || facts.takes >= card.resources;
+      const warms = timeDialWarms(code, card.resources, facts.takes);
       dials.push({
         id: `time:${card.id}`,
         testID: `ring-maker-time:${card.id}`,

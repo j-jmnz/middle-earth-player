@@ -72,6 +72,8 @@ const TRIGGERS = [
   "alliesOverLimit",
   // Every living player's threat is 0 (08066:B:4), announced at a settle with nothing resolving and only while a record of the current quest stage hears it; the event is about no card (the stage's record answers it).
   "allThreatZero",
+  // After a removal of time counters took any off the current quest (08103:A:3, 08104:A:2, 08105:A:1): once for the whole removal, not for each counter, however it came off (the refresh phase, a card effect). An event about no card; a record hears it only in a game that deals one.
+  "timeCountersRemoved",
 ] as const;
 
 const FLAGS = [
@@ -89,6 +91,12 @@ const FLAGS = [
   "progressToCrossing",
   // On the table: no time counter can be removed from the current quest ("time counters cannot be removed from the current quest", 08075:A:2): the refresh phase, a card effect and a Shadow all leave it as it is (families/angmar/time.ts removeTimeCounterFrom).
   "timeBarred",
+  // On the table: no player card effect gains resources, and none draws cards ("Player card effects cannot be used to gain resources or draw cards", 08095:B:3). The resource phase's collection and the framework's draws stand (rr.effects: no card effect).
+  // Modelled on `cannotReadyByPlayerCard`: the effect's source is read (a player card, rr.player-deck).
+  "cannotGainResourcesByPlayerCard",
+  "cannotDrawByPlayerCard",
+  // On the table: a player who commits characters to the quest first discards a card at random from his hand, and a player with none cannot commit ("In order to commit characters to the quest, a player must first discard a card at random from his hand", 08096:B:3).
+  "commitDiscardsRandom",
 ] as const;
 
 export const manifest = { name: "ring-maker", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

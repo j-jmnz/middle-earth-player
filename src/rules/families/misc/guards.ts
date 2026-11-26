@@ -8,6 +8,7 @@ import { effectsOf } from "../../windows/listen.ts";
 import { isPlayerType, printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
+import { resourcesBarredByPlayerCard } from "../ring-maker/player-bars.ts";
 
 // Whether the effect of the source card may not choose or affect the target: the target is immune to cards without a Trait and
 // the source has none of it. A rule (no source card) is not a card effect.
@@ -48,6 +49,8 @@ export function mayGainResources(state: ScenarioState, heroId: string, sourceId:
   // "Players cannot gain resources from card effects" (07018:A:1): every hero, whatever the card; the collection in the resource phase has no source card.
   if (flagged(state, "table", "noCardResources")) return false;
   const printed = printedOf(ctx.cards, source.code);
+  // "Player card effects cannot be used to gain resources" (08095:B:3).
+  if (resourcesBarredByPlayerCard(state) && isPlayerType(printed)) return false;
   if (flagged(state, heroId, "noPlayerCardResources") && isPlayerType(printed)) return false;
   // A card effect (the source is a card) of any kind: "cannot gain resources from card effects" (148013:A:1).
   if (flagged(state, heroId, "noCardResources")) return false;

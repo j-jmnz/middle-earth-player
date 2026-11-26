@@ -1,0 +1,359 @@
+Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; staging: 08107 Finger of Glanduin; staging: 08108 Hidden Eyot; staging: 08109 Sinking Bog; quest: 08094 Fleeing from Tharbad; quest: 08095 Through the Marsh; quest: 08096 Through the Marsh; quest: 08097 Through the Marsh; quest: 08098 Lost in the Swanfleet; quest: 08099 Lost in the Swanfleet; quest: 08100 Lost in the Swanfleet; quest: 08101 Out of the Swamp; setAside: 08102 Nalir; setAside: 08103 Ancient Marsh-dweller)
+
+## 08094 Fleeing from Tharbad
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08094:A:1 (front): Setup: The first player takes control of Nalir. Set the Ancient Marsh-dweller aside, out of play. Each player searches the encounter deck for a different location and adds it to the staging area. Shuffle the encounter deck.
+  08094:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the set-aside card with code 08102 enters play under the first player's control, ready
+    - for each player, first player first:
+      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
+    - shuffle the encounter deck
+
+08094:B:1 (back): When Revealed: Advance to a random stage 2A.
+  08094:whenRevealed:1: When revealed
+    - the quest proceeds to one of the stages with codes 08095, 08096 and 08097, each played once in a random order (the game's seed): one still in the quest deck (the scenario definition copies it onto the stage and the quest takes it when the stage is defeated; run on the stage the quest is at, it advances the quest at once)
+
+## 08095 Through the Marsh
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08095:A:1 (front): When Revealed: Raise each player's threat by 1.
+  08095:whenRevealed:1: When revealed
+    - raise threat by 1 (each player)
+
+08095:B:1 (back): Time 3.
+  08095:constant:1: Constant
+    - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+08095:B:2 (back): Forced: After the last time counter is removed from this stage, advance to a different stage 2A at random. Return this stage to the quest deck.
+  08095:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - advance to a random stage out of 08095, 08096, 08097, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed); the quest advances at once, by this set alone
+
+08095:B:3 (back): Player card effects cannot be used to gain resources or draw cards.
+  08095:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the table: stat cannotGainResourcesByPlayerCard (a player card's effect gains no resources; the resource phase still collects) 1, while this card is in play
+    - the table: stat cannotDrawByPlayerCard (a player card's effect draws no cards; the draw phase still draws) 1, while this card is in play
+
+08095:B:4 (back): Forced: When the players defeat this stage, advance to a random stage 3A.
+  08095:forced:2: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the quest proceeds to one of the stages with codes 08098, 08099 and 08100, each played once in a random order (the game's seed): one still in the quest deck (the scenario definition copies it onto the stage and the quest takes it when the stage is defeated; run on the stage the quest is at, it advances the quest at once)
+
+## 08096 Through the Marsh
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08096:A:1 (front): When Revealed: Raise each player's threat by 1.
+  08096:whenRevealed:1: When revealed
+    - raise threat by 1 (each player)
+
+08096:B:1 (back): Time 3.
+  08096:constant:1: Constant
+    - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+08096:B:2 (back): Forced: After the last time counter is removed from this stage, advance to a different stage 2A at random. Return this stage to the quest deck.
+  08096:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - advance to a random stage out of 08095, 08096, 08097, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed); the quest advances at once, by this set alone
+
+08096:B:3 (back): In order to commit characters to the quest, a player must first discard a card at random from his hand.
+  08096:constant:2: Constant
+    - the table: stat commitDiscardsRandom (a player who commits characters to the quest first discards 1 card at random from his hand, once for each commit; a player with an empty hand cannot commit) 1, while this card is in play
+
+08096:B:4 (back): Forced: When the players defeat this stage, advance to a random stage 3A.
+  08096:forced:2: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the quest proceeds to one of the stages with codes 08098, 08099 and 08100, each played once in a random order (the game's seed): one still in the quest deck (the scenario definition copies it onto the stage and the quest takes it when the stage is defeated; run on the stage the quest is at, it advances the quest at once)
+
+## 08097 Through the Marsh
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08097:A:1 (front): When Revealed: Raise each player's threat by 1.
+  08097:whenRevealed:1: When revealed
+    - raise threat by 1 (each player)
+
+08097:B:1 (back): Time 3.
+  08097:constant:1: Constant
+    - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+08097:B:2 (back): Forced: After the last time counter is removed from this stage, advance to a different stage 2A at random. Return this stage to the quest deck.
+  08097:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - advance to a random stage out of 08095, 08096, 08097, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed); the quest advances at once, by this set alone
+
+08097:B:3 (back): Each player cannot play more than 1 card each round.
+  08097:constant:2: Constant
+    - each player cannot play more than 1 card each round, in any phase (a card put into play is not played and does not count)
+
+08097:B:4 (back): Forced: When the players defeat this stage, advance to a random stage 3A.
+  08097:forced:2: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the quest proceeds to one of the stages with codes 08098, 08099 and 08100, each played once in a random order (the game's seed): one still in the quest deck (the scenario definition copies it onto the stage and the quest takes it when the stage is defeated; run on the stage the quest is at, it advances the quest at once)
+
+## 08098 Lost in the Swanfleet
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08098:A:1 (front): When Revealed: Raise each player's threat by 1. Add Ancient Marsh-dweller to the staging area (from out of play or engaged with a player) and heal all damage from it.
+  08098:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - raise threat by 1 (each player)
+    - one out-of-play card with code 08103 joins the staging area (it is not revealed)
+    - choose enemy (any player controls) or in the staging area, named "Ancient Marsh-dweller"
+    - return the picked card to the staging area
+    - heal all damage from the picked card
+
+08098:B:1 (back): Time 3.
+  08098:constant:1: Constant
+    - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+08098:B:2 (back): Forced: After the last time counter is removed from this stage, advance to a different stage 3A at random. Return this stage to the quest deck.
+  08098:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - advance to a random stage out of 08098, 08099, 08100, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed); the quest advances at once, by this set alone
+
+08098:B:3 (back): Each location in play gets +1 Threat.
+  08098:constant:2: Constant
+    - each location (any player controls) or in the staging area: stat threat 1, while this card is in play
+
+## 08099 Lost in the Swanfleet
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08099:A:1 (front): When Revealed: Raise each player's threat by 1. Add Ancient Marsh-dweller to the staging area (from out of play or engaged with a player) and heal all damage from it.
+  08099:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - raise threat by 1 (each player)
+    - one out-of-play card with code 08103 joins the staging area (it is not revealed)
+    - choose enemy (any player controls) or in the staging area, named "Ancient Marsh-dweller"
+    - return the picked card to the staging area
+    - heal all damage from the picked card
+
+08099:B:1 (back): Time 3.
+  08099:constant:1: Constant
+    - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+08099:B:2 (back): Forced: After the last time counter is removed from this stage, advance to a different stage 3A at random. Return this stage to the quest deck.
+  08099:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - advance to a random stage out of 08098, 08099, 08100, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed); the quest advances at once, by this set alone
+
+08099:B:3 (back): Each player cannot ready more than 5 characters during the refresh phase.
+  08099:forced:2: Forced when a phase begins
+    only if it is the Refresh phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - for each player, first player first:
+      - the acting player chooses, one at a time, the exhausted characters he controls beyond 5 that would ready in the refresh phase: they stay exhausted this phase (nothing with 5 or fewer)
+
+## 08100 Lost in the Swanfleet
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08100:A:1 (front): When Revealed: Raise each player's threat by 1. Add Ancient Marsh-dweller to the staging area (from out of play or engaged with a player) and heal all damage from it.
+  08100:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - raise threat by 1 (each player)
+    - one out-of-play card with code 08103 joins the staging area (it is not revealed)
+    - choose enemy (any player controls) or in the staging area, named "Ancient Marsh-dweller"
+    - return the picked card to the staging area
+    - heal all damage from the picked card
+
+08100:B:1 (back): Time 3.
+  08100:constant:1: Constant
+    - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+08100:B:2 (back): Forced: After the last time counter is removed from this stage, advance to a different stage 3A at random. Return this stage to the quest deck.
+  08100:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - advance to a random stage out of 08098, 08099, 08100, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed); the quest advances at once, by this set alone
+
+08100:B:3 (back): Each enemy in the staging area gets -20 engagement cost.
+  08100:constant:2: Constant
+    - each enemy (any player controls) in the staging area only: stat engagementCost -20, while this card is in play
+
+## 08101 Out of the Swamp
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08101:A:1 (front): When Revealed: Add Ancient Marsh-dweller to the staging area (from out of play or engaged with a player) and heal all damage from it. Then, Ancient Marsh-dweller makes an attack against each player in player order.
+  08101:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one out-of-play card with code 08103 joins the staging area (it is not revealed)
+    - choose enemy (any player controls) or in the staging area, named "Ancient Marsh-dweller"
+    - return the picked card to the staging area
+    - heal all damage from the picked card
+    - choose enemy (any player controls) or in the staging area, named "Ancient Marsh-dweller"
+    - for each player, first player first:
+      - the picked enemy attacks the acting player now, from where it is (the staging area, or engaged with a player; it does not move), dealt a shadow card
+
+08101:B:1 (back): Time 2.
+  08101:constant:1: Constant
+    - Time 2: when this card is revealed, 2 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+08101:B:2 (back): Forced: After the last time counter is removed from this stage, Ancient Marsh-dweller makes an attack against each player in order. Place 2 time counters on this stage.
+  08101:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Ancient Marsh-dweller"
+    - for each player, first player first:
+      - the picked enemy attacks the acting player now, from where it is (the staging area, or engaged with a player; it does not move), dealt a shadow card
+    - place 2 resource tokens on this card
+
+08101:B:3 (back): When Ancient Marsh-dweller is defeated, the players win the game.
+  08101:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Ancient Marsh-dweller")
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players win the game
+
+## 08102 Nalir
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08102:A:1 (front): The first player gains control of Nalir.
+  08102:constant:1: Constant
+    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them, and from then on it follows the first player token: it passes to the new first player each time the token moves, while it stays free of encounters
+
+08102:A:2 (front): Forced: At the beginning of the refresh phase, raise your threat by 1 for each player in the game.
+  08102:forced:1: Forced when a phase begins
+    only if it is the Refresh phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - raise threat by the number of players (the acting player)
+
+08102:A:3 (front): If Nalir leaves play, the players lose the game.
+  08102:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players lose the game
+
+## 08103 Ancient Marsh-dweller
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08103:A:1 (front): Cannot have attachments.
+  08103:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+08103:A:2 (front): Ancient Marsh-dweller gets +1 Threat and +1 Attack for each resource token on it.
+  08103:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat resources of this card, while this card is in play
+    - this card: stat attack resources of this card, while this card is in play
+
+08103:A:3 (front): Forced: After any number of time counters are removed from the current quest, place a resource token here.
+  08103:forced:1: Forced on the event timeCountersRemoved
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 1 resource tokens on this card
+
+## 08104 Giant Swamp Adder
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08104:A:1 (front): Cannot have attachments.
+  08104:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+08104:A:2 (front): Forced: After any number of time counters are removed from the current quest, Giant Swamp Adder attacks the engaged player.
+  08104:forced:1: Forced on the event timeCountersRemoved
+    only if this card is engaged with a player (that player is who "you" means in this record)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - for each player, first player first:
+      - if this card is an enemy engaged with the acting player: this enemy attacks the acting player now, as an attack outside the combat phase: from the staging area though it is not engaged, or while it is engaged with them; it is dealt a shadow card of its own (nothing when it is engaged with another player or out of play)
+
+## 08105 Neekerbreekers
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08105:A:1 (front): Forced: After any number of time counters are removed from the current quest, the engaged player must deal 2 damage to an ally he controls.
+  08105:forced:1: Forced on the event timeCountersRemoved
+    only if this card is engaged with a player (that player is who "you" means in this record)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - for each player, first player first:
+      - if all of: (this card is an enemy engaged with the acting player) and (there is a ally (you control) to choose): choose ally (you control)
+      - then, if all of: (this card is an enemy engaged with the acting player) and (there is a ally (you control) to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
+
+08105:A:2 (shadow): Shadow: Deal 1 damage to the defending character.
+  08105:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - deal 1 damage to the defender
+
+## 08106 Fen of Reeds
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+08106:A:1 (front): While Fen of Reeds is in the staging area, it gains: 'Forced: After the players advance to a quest stage, each player must exhaust a character he controls.'
+  08106:forced:1: Forced after a quest stage is revealed and its When Revealed effects have resolved, a parallel stage that replaces the stage before fires it too; the flip of the opening stage in the Setup does not
+    only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - for each player, first player first:
+      - if there is a ready character (you control) to choose: choose ready character (you control)
+      - then, if there is a ready character (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): exhaust the picked card
+
+08106:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each time counter on the quest.
+  08106:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack resources of the current quest stage, until the end of the attack
+
+## 08107 Finger of Glanduin
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+08107:A:1 (front): While Finger of Glanduin is in the staging area, it gains: 'Forced: At the end of each round, remove 1 progress from each location in play.'
+  08107:forced:1: Forced at the end of the round
+    only if this card is in the staging area
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - remove up to 1 progress from each location (any player controls) or in the staging area (the number of tokens removed in all is the effect's X)
+
+08107:A:2 (shadow): Shadow: If this attack destroys a character remove all progress from the current quest.
+  08107:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): all progress on the current quest is removed (the encounter side quest that is the current quest while there is one, else the main quest card)
+
+## 08108 Hidden Eyot
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+08108:A:1 (front): Response: After Hidden Eyot leaves play as an explored location, place 2 time counters on the current quest.
+  08108:response:1: Response after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - place 2 resource tokens on the current quest stage
+
+08108:A:2 (front): Travel: Each player must exhaust a character he controls to travel here.
+  08108:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player has no card to choose and exhaust
+    - for each player, first player first:
+      - choose ready character (you control)
+      - exhaust the picked card
+
+## 08109 Sinking Bog
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+08109:A:1 (front): While Sinking Bog is in the staging area, each character gets -1 Willpower, -1 Attack, and -1 Defense for each Item attached to it. This ability does not stack with other copies of Sinking Bog.
+  08109:constant:1: Constant
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each character (any player controls): stat willpower -1 for each Item attachment (any player controls) attached to the holder, while this card is in play (does not stack: only the oldest copy of this card in play whose condition holds gives it)
+    - each character (any player controls): stat attack -1 for each Item attachment (any player controls) attached to the holder, while this card is in play (does not stack: only the oldest copy of this card in play whose condition holds gives it)
+    - each character (any player controls): stat defense -1 for each Item attachment (any player controls) attached to the holder, while this card is in play (does not stack: only the oldest copy of this card in play whose condition holds gives it)
+
+08109:A:2 (shadow): Shadow: Defending character gets -1 Defense for this attack for each attachment attached to it.
+  08109:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the defender: stat defense minus attachments of the defender, until the end of the attack
+
+## 08110 Shifting Marshland
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08110:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+08110:A:2 (front): When Revealed: Remove 1 time counter from the current quest.
+  08110:whenRevealed:1: When revealed
+    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+
+08110:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
+  08110:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
+
+## 08111 Remnants of Elder Days
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08111:A:1 (front): When Revealed: Each player must search the encounter deck and discard pile for a Creature enemy and put it into play engaged with him. Shuffle the encounter deck. This effect cannot be canceled.
+  08111:whenRevealed:1: When revealed (cannot be canceled while this card is in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one Creature enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
+    - shuffle the encounter deck
+
+(rendered pieces: 195 by template, 0 as JSON)

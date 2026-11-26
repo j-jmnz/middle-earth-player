@@ -45,6 +45,7 @@ const THEN_SHORT: Readonly<Record<string, string>> = {
   "50931:forced:2": "The discards belong to the Forced effect of the stage 3 the first step selected, which resolves as a whole; the part after \"Then\" holds the stage's own conditions.",
   "900106:whenRevealed:1": "The exhaust reads the ready heroes: a hero already exhausted is in the state the line asks for, so the line is resolved in full.",
   "11195:action:1": "The \"then\" adds the event to the victory display after the number of characters is set; the later \"Until the end of the round\" sentences are the Heal and the bonuses.",
+  "08101:whenRevealed:1": "The first part brings the Marsh-dweller to the staging area from out of play or from an engagement and heals it: one already in the staging area, or undamaged, is the state the line asks for, so the attacks follow in every case (docs/scenarios/the-ring-maker/the-nin-in-eilph.md, Readings).",
   "19046:whenRevealed:1": "The part after \"Then\" is for the players who did not engage an enemy, so it reads the result of the first part itself (its `when`): a first part that fell short is what it answers.",
   "10172:action:1": "Both Each steps are the part after \"Then\"; the part before it is the attach, which `ATTACHED` reads, and the readies cannot come up short before the second Each.",
   "144065:whenRevealed:1": "The `when` of both steps is the card's own \"if\" (fewer locations than players); the second step adds the card the discard stopped at, and the discard comes up short only when no location is left to add.",
