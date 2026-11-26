@@ -49,6 +49,8 @@ export function lineChecks(text: string, owners: readonly Effect[]): LineCheck[]
   const optional = owners.some((effect) => (effect.timing === "action" || effect.timing === "response") && (effect.instructions as readonly { verb?: string }[])[0]?.verb === "Pick");
   if (optional) add({ tag: "pick-first", entry: "An optional ability that can change nothing", ask: "the ability opens with a Pick: is it not offered, and its cost not paid, when the Pick has no candidate?" });
   if (owners.some((effect) => effect.timing === "shadow" && (effect as { condition?: unknown }).condition != null)) add({ tag: "shadow-condition", entry: "A Shadow's condition", ask: "the record holds a record-level condition, which is never read: is each condition on the instruction that needs it?" });
+  // A step that reads the picked card after a step that remembers a card and can find none (`remember`): a stale pick from an earlier seat or step.
+  if (owners.some((effect) => JSON.stringify(effect.instructions).includes('"remember":true') && /"(?:of|card)":"picked"/.test(JSON.stringify(effect.instructions)))) add({ tag: "stale-pick", entry: "A stale picked card", ask: "a step reads the picked card after a step that can find none: does it read no card (not an earlier seat's or step's) when the hand, deck or pool is empty?" });
   if (/^\s*travel\b/i.test(text)) add({ tag: "travel-cost", entry: "A Travel cost gated by `when`", ask: "does each instruction of the cost carry its condition, so the location can be traveled to when it fails?" });
   return found;
 }
