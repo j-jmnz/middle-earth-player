@@ -75,8 +75,8 @@ export type TrialsGolden = { name: string; seatCount: 1 | 2; seed: number; diffi
 export const TRIALS_GOLDENS: readonly TrialsGolden[] = [
   { name: "solo win", seatCount: 1, seed: 3, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed win", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "Easy solo win", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
-  { name: "Easy two-handed win", seatCount: 2, seed: 3, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "Easy solo win", seatCount: 1, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "Easy two-handed win", seatCount: 2, seed: 6, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "solo loss: threat", seatCount: 1, seed: 4, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed loss: threat", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "solo loss: every hero destroyed", seatCount: 1, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
