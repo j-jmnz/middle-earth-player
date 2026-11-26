@@ -144,7 +144,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40005:B:2 (back): Action: Remove 5 PerPlayer progress from this stage to choose any group to shuffle 1 set aside Gondorian Warship card into their encounter deck.
   40005:action:1: Action
-    only if all of: (a copy of the card with code 40012 is set aside, out of play) and (the current quest stage holds at least 5 progress for each player who started the game)
+    only if all of: (a copy of the card with code 40012 is set aside, out of play) and (the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 5 progress for each player who started the game)
     who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - remove 5 progress from the current quest card for each player who started the game (it stops at 0)

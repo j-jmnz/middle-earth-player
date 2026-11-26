@@ -93,7 +93,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 
 10015:B:1 (back): Pack Leader cannot take damage unless there are at least 5 progress tokens on this stage.
   10015:constant:1: Constant
-    only if not (the current quest stage holds at least 5 progress)
+    only if not (the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 5 progress)
     - each enemy (any player controls) or in the staging area, named "Pack Leader": stat cannotTakeDamage 1, while this card is in play
 
 10015:B:2 (back): Forced: When it becomes Day, discard all progress from this stage.

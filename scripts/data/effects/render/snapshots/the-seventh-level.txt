@@ -230,7 +230,7 @@ Scenario piles that place cards with no record (quest: 03067 Search for the Cham
 901102:A:2 (front): The players cannot win the game unless Overseer Maurûl is in the victory display.
   901102:constant:2: Constant
     only if the card with code 901102 is not in the victory display
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat the main quest stage while this holds
 
 ## 901103 Chamber of Records
 

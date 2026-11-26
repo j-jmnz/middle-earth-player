@@ -51,7 +51,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 
 10126:B:2 (back): While Midwinter's Crux has 15 or more progress on it, Thaurdir loses indestructible. You cannot defeat this stage while Thaurdir is in play.
   10126:constant:2: Constant
-    only if the current quest stage holds at least 15 progress
+    only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 15 progress
     - each enemy (any player controls) or in the staging area, named "Thaurdir": stat losesKeywords (it loses its Indestructible keyword) 1, while this card is in play
   10126:constant:3: Constant
     only if any of: (the card with code 10127 is in play) or (the card with code 10128 is in play)

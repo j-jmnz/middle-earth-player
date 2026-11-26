@@ -331,7 +331,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 906301:A:2 (front): The players cannot win while Ford of Bruinen is in play.
   906301:constant:1: Constant
     only if all of: (the card with code 906303 is in play) and (the card with code 141029 is in play)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat the main quest stage while this holds
 
 906301:B:1 (back): Begin with the standard quest deck and encounter deck for the Flight to the Ford scenario.
   (inert: the engine applies it by rule, no record)

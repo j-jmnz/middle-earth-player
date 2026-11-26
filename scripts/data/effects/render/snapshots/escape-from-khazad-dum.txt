@@ -131,7 +131,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
   51308:constant:1: Constant
     - each enemy (any player controls) or in the staging area, named "Durin's Bane": stat damageCap (it takes no more than this much damage each round; damage past it is not placed) progress of this card, while this card is in play
   51308:constant:2: Constant
-    only if not (the current quest stage holds at least 1 progress)
+    only if not (the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 1 progress)
     - each enemy (any player controls) or in the staging area, named "Durin's Bane": stat cannotTakeDamage 1, while this card is in play
 
 51308:B:3 (back): This stage cannot be defeated while Durin's Bane is in play. If the players defeat this stage, they win the game.
