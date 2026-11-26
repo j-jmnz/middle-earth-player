@@ -1,4 +1,4 @@
-// Rules: rm.time-x, rm.grima-objective-ally, rr.cannot, rr.first-player (data/rules/entries.json); ledger lines 08011:B:2, 08013:B:3, 07016:A:1, 07016:A:3, 07023:A:1, 07059:A:1, 07059:B:1, 07059:B:2, 07059:B:3, 07060:B:2, 07060:B:3, 07061:B:1, 07061:B:2, 07061:B:3, 08066:B:1, 08066:B:2, 08067:B:1, 08067:B:2, 07065:B:1, 07065:B:2, 07066:B:1, 07066:B:2, 07067:B:1, 07067:B:2.
+// Rules: rm.time-x, rm.grima-objective-ally, rr.cannot, rr.first-player (data/rules/entries.json); ledger lines 08011:B:2, 08013:B:3, 07016:A:1, 07016:A:3, 07023:A:1, 07059:A:1, 07059:B:1, 07059:B:2, 07059:B:3, 07060:B:2, 07060:B:3, 07061:B:1, 07061:B:2, 07061:B:3, 08066:B:1, 08066:B:2, 08067:B:1, 08067:B:2, 08095:B:1, 08095:B:2, 08095:B:3, 08096:B:1, 08096:B:2, 08096:B:3, 08097:B:1, 08097:B:2, 08097:B:3, 08098:B:1, 08098:B:2, 08099:B:1, 08099:B:2, 08099:B:3, 08100:B:1, 08100:B:2, 08101:B:1, 08101:B:2, 07065:B:1, 07065:B:2, 07066:B:1, 07066:B:2, 07067:B:1, 07067:B:2.
 // What the table says of The Fords of Isen's pieces (src/play/readouts/ring-maker/fords.ts, src/play/cards/ring-maker/preview.ts): the time counters on the current stage against the Time X it printed, Gríma on The Islet and in a player's play area, and Ill Tidings in a hand.
 // The engine decided every number; these only say it. Each sentence stays at about 25 words (docs/design-system-table.md, Choice tray, Plain words).
 import type { Instruction } from "../../../../catalog/boundary.ts";
@@ -20,6 +20,23 @@ function newLevelWords(levels: NewLevels): string {
   return ` (to ${levels.map((one) => `${one.level} for Player ${one.seat + 1}`).join(", ")})`;
 }
 
+// The three stages 2B and the three stages 3B are replaced by another of their number chosen at random: the replaced stage goes back to the quest deck and loses its progress and counters.
+const STAGE_2_LAST = "this stage goes back to the quest deck, losing its progress and counters, and a different stage 2 chosen at random replaces it.";
+const STAGE_3_LAST = "this stage goes back to the quest deck, losing its progress and counters, and a different stage 3 chosen at random replaces it.";
+
+/** The standing rule of each stage of The Nîn-in-Eilph, said first on its dial so the three stages with one name read apart (08095:B:3, 08096:B:3, 08097:B:3, 08098:B:3, 08099:B:3, 08100:B:3). */
+const STANDING: Readonly<Record<string, string>> = {
+  "08095": "Player card effects cannot gain resources or draw cards.",
+  "08096": "Before committing characters to the quest, a player discards a card at random from his hand. With no card, he cannot commit.",
+  "08097": "Each player can play only 1 card each round.",
+  "08098": "Each location in play gets +1 Threat.",
+  "08099": "Each player readies at most 5 characters in the refresh phase.",
+  "08100": "Each enemy in the staging area gets -20 engagement cost.",
+};
+
+/** The standing rule of a stage, or an empty string. */
+export const stageStandingWords = (code: string): string => STANDING[code] ?? "";
+
 /** What the last time counter does on each stage, as a clause with no lead: the dial's notes and the Choose's caution put their own words before it. A clause that reads the table is a function of what it reads. */
 const LAST_COUNTER: Readonly<Record<string, string | ((levels: NewLevels) => string)>> = {
   "07059": "Gríma is discarded and the players lose.",
@@ -33,6 +50,13 @@ const LAST_COUNTER: Readonly<Record<string, string | ((levels: NewLevels) => str
   "08013": "the players make engagement checks and each engaged enemy attacks. The players win if no hero is destroyed, and lose if one is.",
   "08066": (levels) => `each player's threat elimination level goes down by ${ELIMINATION_DROP} for the rest of the game${newLevelWords(levels)}, a player whose threat is at or above his new level is eliminated at once, and 4 time counters return.`,
   "08067": "the first player chooses: each player raises their threat by 3, or Bellach attacks Nalir. Then 3 time counters return.",
+  "08095": STAGE_2_LAST,
+  "08096": STAGE_2_LAST,
+  "08097": STAGE_2_LAST,
+  "08098": STAGE_3_LAST,
+  "08099": STAGE_3_LAST,
+  "08100": STAGE_3_LAST,
+  "08101": "Ancient Marsh-dweller attacks each player in player order, and 2 time counters are placed on this stage.",
   "07067": "5 cards from the top of the encounter deck are discarded, each player adds an enemy or objective from the discard pile to the staging area, and 3 time counters return.",
 };
 
@@ -53,7 +77,7 @@ export type TimeTakes = { takes: number; engages?: boolean; levels?: NewLevels }
 const ONE: TimeTakes = { takes: 1 };
 
 /** The note of the stage's time dial: the counters left, the refresh phase that takes some and what the last one does. */
-export const stageTimeWords = (code: string, left: number, facts: TimeTakes = ONE): string => `${plural(left, "time counter")} left. ${facts.takes === 1 ? "One comes off" : `${facts.takes} come off`} at the end of each refresh phase. ${withLastGone(code, facts.levels ?? [])}`.trim();
+export const stageTimeWords = (code: string, left: number, facts: TimeTakes = ONE): string => `${stageStandingWords(code)} ${plural(left, "time counter")} left. ${facts.takes === 1 ? "One comes off" : `${facts.takes} come off`} at the end of each refresh phase. ${withLastGone(code, facts.levels ?? [])}`.trim();
 
 /** The warning once the next refresh phase takes the last counters, or two are left: what the refresh phase takes, any engagement that takes one too, and what the last one does. */
 export function stageTimeNearWords(code: string, left: number, facts: TimeTakes = ONE): string {
