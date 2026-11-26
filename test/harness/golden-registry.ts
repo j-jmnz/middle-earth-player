@@ -211,6 +211,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("escape-from-umbar", "Escape from Umbar", umbar.UMBAR_GOLDENS, umbar.umbarWorld, umbar.playGolden),
   entry("desert-crossing", "Desert Crossing", crossing.CROSSING_GOLDENS, crossing.crossingWorld, crossing.playGolden),
   entry("the-long-arm-of-mordor", "The Long Arm of Mordor", mordor.MORDOR_GOLDENS, mordor.mordorWorld, mordor.playGolden),
+  entry("the-mumakil", "The Mûmakil", mumakil.MUMAKIL_GOLDENS, mumakil.mumakilWorld, mumakil.playGolden),
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
   entry("the-battle-of-lake-town", "The Battle of Lake-town", town.TOWN_GOLDENS, town.townWorld, town.playGolden),
   entry("the-stone-of-erech", "The Stone of Erech", erech.ERECH_GOLDENS, erech.erechWorld, erech.playGolden),
@@ -225,5 +226,4 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-mines-of-moria", "The Mines of Moria", mines.MINES_GOLDENS, mines.minesWorld, mines.playGolden),
   entry("escape-from-khazad-dum", "Escape from Khazad-dûm", khazad.KHAZAD_GOLDENS, khazad.khazadWorld, khazad.playGolden),
   entry("the-hunt-for-the-dreadnaught", "The Hunt for the Dreadnaught", dreadnaught.DREADNAUGHT_GOLDENS, dreadnaught.dreadnaughtWorld, dreadnaught.playGolden),
-  entry("the-mumakil", "The Mûmakil", mumakil.MUMAKIL_GOLDENS, mumakil.mumakilWorld, mumakil.playGolden),
 ];
