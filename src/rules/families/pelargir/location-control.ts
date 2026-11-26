@@ -16,6 +16,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { TOWER } from "./ruined-tower.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { patchTop } from "../../windows/windows.ts";
+import { reseatQueue } from "../deck/moves.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 
@@ -129,7 +130,7 @@ export function announceAddedToStaging(state: ScenarioState, instruction: Verb<"
 
 /** ActForDestroyedController: the player who controlled the character the attack destroyed (the effect's `destroyedCharacter`, which a shadow effect with this verb is given) acts for the instructions that follow, as for a Pick of "his" locations. With no destroyed character the actor stays. */
 export function actForDestroyedController(state: ScenarioState): ScenarioState {
-  const data = effectData(state);
-  const seat = data?.destroyedCharacter ? state.cards[data.destroyedCharacter]?.controller : null;
-  return seat == null || !data ? state : patchTop(state, { data: { ...data, queue: data.queue.map((item) => ({ ...item, seat })) } });
+  const destroyed = effectData(state)?.destroyedCharacter;
+  const seat = destroyed ? state.cards[destroyed]?.controller : null;
+  return seat == null ? state : reseatQueue(state, seat);
 }

@@ -10,8 +10,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import { askTarget } from "../../windows/choices.ts";
-import { patchTop } from "../../windows/windows.ts";
-import { effectData } from "../encounter/moves.ts";
+import { reseatQueue } from "../deck/moves.ts";
 import { markPicked } from "../play/refs.ts";
 import type { Focus } from "../index.ts";
 
@@ -29,6 +28,5 @@ export function pickFewestHitPointsLeft(state: ScenarioState, focus: Focus, ctx:
   if (!chosen) return askTarget(state, { instruction: { verb: "PickFewestHitPointsLeft" } as Instruction, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, tied);
   const picked = markPicked(state, chosen);
   const seat = picked.cards[chosen]?.controller;
-  const data = effectData(picked);
-  return seat == null || !data ? picked : patchTop(picked, { data: { ...data, queue: data.queue.map((item) => ({ ...item, seat })) } });
+  return seat == null ? picked : reseatQueue(picked, seat);
 }
