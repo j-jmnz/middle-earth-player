@@ -52,8 +52,8 @@ const BELLACH = "08124";
 const rules = (policy: SecretPolicy): Policy => [chooseFirstOrLast(policy.choose), commitAllBut(policy.reserve), travelFewestQuestPoints(), undefendedLeastDamaged(), engageUpTo(99, { allow: (state, id) => state.cards[id]?.code === BELLACH }), attackAllTogether((state, id) => (state.cards[id]?.code === BELLACH ? 0 : 1)), declineAttack()];
 
 // Every intent is one the reducer listed.
-export function secretIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: SecretPolicy = DEFAULT_POLICY): PlayerIntent {
-  return policyIntent(rules(policy), SECRET_POLICY, state, ctx, memory);
+export function secretIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: SecretPolicy = DEFAULT_POLICY, fallback: PolicyOptions = SECRET_POLICY): PlayerIntent {
+  return policyIntent(rules(policy), fallback, state, ctx, memory);
 }
 
 export type SecretGame = PlayedGame;
