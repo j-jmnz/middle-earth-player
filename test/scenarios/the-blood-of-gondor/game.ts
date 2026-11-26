@@ -152,9 +152,9 @@ export type BloodGolden = { name: string; seatCount: 1 | 2; seed: number; diffic
 // - solo loss, every hero destroyed (seed 2, brittle heroes);
 // - two-handed loss, threat 50 (seed 1, weak heroes);
 export const BLOOD_GOLDENS: readonly BloodGolden[] = [
-  { name: "solo win", seatCount: 1, seed: 13, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "solo win", seatCount: 1, seed: 10264, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed win", seatCount: 2, seed: 10, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "Easy two-handed win", seatCount: 2, seed: 29, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "Easy two-handed win", seatCount: 2, seed: 18, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "solo loss: Faramir leaves play", seatCount: 1, seed: 5, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "Faramir left play" },
   { name: "two-handed loss: Lord Alcaron leaves play", seatCount: 2, seed: 2, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "Lord Alcaron left play" },
   { name: "solo loss: every hero destroyed", seatCount: 1, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },

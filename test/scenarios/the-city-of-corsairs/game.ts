@@ -170,7 +170,7 @@ export const CORSAIRS_GOLDENS: readonly CorsairsGolden[] = [
   { name: "true solo, brittle heroes, lost", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: THREAT_LOST },
   { name: "true solo, the Dream-chaser destroyed, lost", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", policy: HUNT, lossReason: DREAM_CHASER_LOST },
   { name: "two-handed, the Dream-chaser destroyed, lost", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", policy: HUNT, lossReason: DREAM_CHASER_LOST },
-  { name: "true solo, the Stormcaller sunk, Captain Sahir not destroyed, lost", seatCount: 1, seed: 4, difficulty: "Normal", decks: "armed", outcome: "lost", policy: SINK, lossReason: THREAT_LOST },
+  { name: "true solo, the Stormcaller sunk, Captain Sahir not destroyed, lost", seatCount: 1, seed: 30, difficulty: "Normal", decks: "armed", outcome: "lost", policy: SINK, lossReason: THREAT_LOST },
   { name: "two-handed, Captain Sahir not destroyed, lost", seatCount: 2, seed: 4, difficulty: "Normal", decks: "strong", outcome: "lost", policy: HUNT, lossReason: THREAT_LOST },
 ];
 
