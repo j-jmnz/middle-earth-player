@@ -1,20 +1,22 @@
 // Rules: rm.time-x, rm.grima-objective-ally (data/rules/entries.json); ledger lines 07063:B:1, 07063:B:2, 07064:B:1, 07064:B:2, 07059:B:1, 07059:B:2, 07060:B:2, 07060:B:3, 07061:B:1, 07061:B:2, 07065:B:1, 07065:B:2, 07066:B:1, 07066:B:2, 07067:B:1, 07067:B:2.
 // The time dial of the quest stages of The Fords of Isen, To Catch an Orc and Into Fangorn: the counters left against the Time X the stage printed, warming as the last refresh phase gets near. The engine decided every number (`timeOf`, the counters on the card); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
-import { timeOf } from "../../../rules/families/angmar/time.ts";
+import { timeLimit } from "../../../rules/families/angmar/time.ts";
 import type { ReduceContext, ScenarioState } from "../../../rules/engine/reduce.ts";
 
 import { stageTimeLimitWords, stageTimeNearWords, stageTimeWords } from "../../words/scenarios/ring-maker/fords-table.ts";
 import { cardsOf, type TableDial } from "../dials.ts";
 
-/** The quest stages of The Fords of Isen, of To Catch an Orc (stages 2B and 3B) and of Into Fangorn (stages 1B, 2B and 3B) that print Time X. */
-export const FORDS_STAGES: readonly string[] = ["07059", "07060", "07061", "07063", "07064", "07065", "07066", "07067"];
+/** The quest stages of The Fords of Isen, of To Catch an Orc (stages 2B and 3B), of Into Fangorn (stages 1B, 2B and 3B) and of The Dunland Trap (stages 1B and 3B; 2B prints none) that print Time X. */
+export const FORDS_STAGES: readonly string[] = ["07059", "07060", "07061", "07063", "07064", "07065", "07066", "07067", "08011", "08012", "08013"];
 
 export function ringMakerDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
   const dials: TableDial[] = [];
   for (const code of FORDS_STAGES) {
-    const limit = timeOf(ctx, code);
-    if (limit == null) continue;
+    const printed = timeLimit(game, ctx, code);
+    if (printed == null) continue;
     for (const card of cardsOf(game, code)) {
+      // A stage that counted the players when it turned keeps its counters if a player leaves later.
+      const limit = Math.max(printed, card.resources);
       // Only stage 1B's last counter is a loss; the other two return counters, so their dials warm near and are never critical.
       const level = card.resources <= 1 && code === "07059" ? ("critical" as const) : ("near" as const);
       dials.push({

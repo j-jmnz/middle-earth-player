@@ -11,8 +11,8 @@ const code = z.string().min(1);
 
 const VERBS = [
   // The Time X keyword (mec108.time-x), a constant marker on the card ("Time 4.", 09024:A:1): when the card is revealed (from the encounter deck or by an effect) X resource tokens, its time counters, are put on it, and at the end of each refresh phase one comes off it
-  // (RemoveTimeCounters). The last one's removal is heard by the card (`lastTimeCounterRemoved`). The verb itself does nothing when a record runs it.
-  z.strictObject({ verb: z.literal("Time"), amount: z.number().int().positive() }),
+  // (RemoveTimeCounters). The last one's removal is heard by the card (`lastTimeCounterRemoved`). With `perPlayer` the amount is multiplied by the players in the game (those still living) when the card is revealed, and the count is never made again ("X is 5 times the number of players", 08013:B:1). The verb itself does nothing when a record runs it.
+  z.strictObject({ verb: z.literal("Time"), amount: z.number().int().positive(), perPlayer: z.literal(true).optional() }),
   // The end of the refresh phase (engine use, run by the rules' own frame, not by a card): one time counter comes off each card in play with the Time X keyword that holds one, and a card whose last counter goes is announced (`lastTimeCounterRemoved`).
   z.strictObject({ verb: z.literal("RemoveTimeCounters") }),
   // The card in play with this code, controlled by a player, loses its controller and lies facedown underneath the source, still in play, with its attachments and tokens ("The first player loses control of Iârion and places him facedown underneath this stage", 09024:A:2;

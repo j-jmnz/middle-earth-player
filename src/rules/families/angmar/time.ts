@@ -7,7 +7,7 @@ import { effectCause } from "../../core/cause.ts";
 import { constantVerbCodes } from "../../interpret/constant-records.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { inPlay, updateCard, type ScenarioState } from "../../core/state.ts";
+import { inPlay, livingSeats, updateCard, type ScenarioState } from "../../core/state.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import { listens } from "../encounter/reveal.ts";
@@ -23,11 +23,22 @@ export function timeOf(ctx: ReduceContext, code: string): number | null {
   return null;
 }
 
+/** The Time X the card holds in this game: the printed number, times the living players when its record says `perPlayer` (08013:B:1). The counters are put on once, so this is read when the card is revealed. */
+export function timeLimit(state: ScenarioState, ctx: ReduceContext, code: string): number | null {
+  const amount = timeOf(ctx, code);
+  if (amount == null) return null;
+  for (const effect of effectsOf(ctx, code)) {
+    if (effect.timing !== "constant") continue;
+    for (const instruction of effect.instructions) if (instruction.verb === "Time" && instruction.perPlayer) return amount * livingSeats(state).length;
+  }
+  return amount;
+}
+
 /** A card with Time X was just revealed (the reveal frame's first step): the players put X resource tokens on it, its time counters (mec108.time-x). One that left play at once, or has its text blank, gets none. */
 export function timeOnReveal(state: ScenarioState, id: string, ctx: ReduceContext): ScenarioState {
   const card = state.cards[id];
   if (!card || !inPlay(card.zone)) return state;
-  const amount = timeOf(ctx, card.code);
+  const amount = timeLimit(state, ctx, card.code);
   if (amount == null || textBlank(state, id, ctx.cards)) return state;
   return updateCard(state, id, { resources: card.resources + amount });
 }
