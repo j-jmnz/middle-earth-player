@@ -12,12 +12,12 @@ const STAGE = { stage: "17027", side: "B" as const, phase: "Quest" as const };
 export const screens: ScreenMoment[] = [
   {
     name: "capture-on-staged-mumak",
-    note: "17027:A:1: two Capture objectives (Horse-hair Lasso 17011, Poisoned Spear 17012) lie faceup on a Wild Mûmak in the staging area, controlled by nobody; a tap on a Capture opens its Response and says it is not offered while the Mûmak is in the staging area (17011:A:1).",
+    note: "17027:A:1: two Capture objectives (Horse-hair Lasso 17011, Poisoned Spear 17012) lie faceup on a Wild Mûmak in the staging area, controlled by nobody. No Response is offered while the Mûmak is in the staging area (no player is engaged with it, 17011:A:1), so the table shows the cards and nothing to use.",
     layout: { ...STAGE, seats: 2, staging: [MUMAK], attached: captures("17011", "17012") },
   },
   {
     name: "capture-on-engaged-mumak",
-    note: "17027:A:1, 17014:A:1: a Noose of Vines lies faceup on a Wild Mûmak engaged with the first player; its Response is offered to him, after a character defends the Mûmak's attack and has more remaining hit points than it.",
+    note: "17027:A:1, 17014:A:1: a Noose of Vines lies faceup on a Wild Mûmak engaged with the first player; its Response is offered to the controller of the character that defends the Mûmak's attack, when that character has more remaining hit points than the Mûmak; no attack is under way here, so nothing is offered.",
     layout: { ...STAGE, seats: 2, engaged: [{ code: MUMAK, seat: 0 }], attached: captures("17014") },
   },
 ];

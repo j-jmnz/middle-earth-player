@@ -1,5 +1,4 @@
-// Rules: rr.step-3-4, rr.quest-advancement, rr.travel, rr.step-6-4-3, rr.step-6-8-3, rr.damage, rr.step-7-3
-// (data/rules/entries.json).
+// Rules: rr.step-3-4, rr.quest-advancement, rr.travel, rr.step-6-4-3, rr.step-6-8-3, rr.damage, rr.step-7-3 (data/rules/entries.json).
 //
 // What the last accepted intent did, in a few words, for the banner over the table: the quest's result (willpower against
 // threat, then the threat raised or the progress placed and the stage it advanced to), each attack's numbers and damage,
@@ -13,6 +12,7 @@ import type { LogMark } from "./log.ts";
 import { plural } from "../words/list.ts";
 import { reshuffleWords } from "./pile-ids.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
+import { captureAttachedLine } from "../words/scenarios/haradrim/capture.ts";
 import { boardingWords } from "../words/scenarios/sea.ts";
 import type { FateNames } from "../words/scenarios/fate-beats.ts";
 import { ignoredRevealNote } from "../readouts/ettenmoors.ts";
@@ -259,10 +259,12 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         const raised = names.fate?.revealed(after, step.cardId, before.phase === "Quest" && !steps.slice(0, index).some((earlier) => earlier.kind === "quest"));
         if (raised) line(raised, null, [step.cardId]);
         return;
-      // The enemy was faceup when it was revealed: the line names it and the location it is facedown under now (dcce.grapple).
+      // The enemy was faceup when it was revealed: the line names it and the location it is facedown under now (dcce.grapple). A random Capture lies on a Wild Mûmak (17027:A:1): the Capture, the Mûmak and where it stands.
       case "grapple":
+      case "attachDrawn":
         if (!current || current.rank !== 3 || current.whole) open(3, "Staging", "plain");
-        line(grappleLine(names.card(step.enemyId), names.card(step.locationId)), null, [step.locationId]);
+        if (step.kind === "attachDrawn") line(captureAttachedLine(names.card(step.cardId), names.card(step.hostId), step.seat, after.seatCount), null, [step.cardId, step.hostId]);
+        else line(grappleLine(names.card(step.enemyId), names.card(step.locationId)), null, [step.locationId]);
         return;
       // The enemies grappled with a location that became the active location or was explored come out from under it, faceup, into the staging area (dcce.grapple).
       case "detach":

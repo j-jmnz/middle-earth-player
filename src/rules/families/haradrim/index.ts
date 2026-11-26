@@ -35,7 +35,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "EngageSeatWithMost":
       return engageSeatWithMost(state, instruction, focus, ctx, steps);
     case "AttachRandomSetAside":
-      return attachRandomSetAside(state, instruction, ctx);
+      return attachRandomSetAside(state, instruction, ctx, steps);
     case "AddWithHostToVictory":
       return addWithHostToVictory(state, focus, ctx);
     default:
