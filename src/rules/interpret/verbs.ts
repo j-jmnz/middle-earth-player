@@ -15,7 +15,6 @@ import { eliminateEmpties } from "../core/eliminate.ts";
 import { lastPicked, otherSeat, seatsFor } from "./player-verbs.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { queueFront } from "../families/play/refs.ts";
-import { patchTop, topFrame } from "../windows/windows.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { engageEnemy, engageWith, stagingEnemies } from "../quest/quest.ts";
 import { placeEffectProgress } from "../families/quest/effect-progress.ts";
@@ -39,7 +38,7 @@ import { currentCause, ruleCause, UNATTRIBUTED } from "../core/cause.ts";
 import { takeProgressOff } from "../core/progress.ts";
 import { forgetCommitted } from "../families/costs/pay.ts";
 import { noteEncounterThreat } from "../families/encounter/reveal.ts";
-import { moveEncounter } from "../families/encounter/moves.ts";
+import { moveEncounter, pushPicked } from "../families/encounter/moves.ts";
 import { isGollum } from "../families/gollum/index.ts";
 import { guardianSeat } from "../families/guardian/seats.ts";
 
@@ -106,6 +105,12 @@ export function shuffleIntoEncounterDeck(state: ScenarioState, id: string): Scen
   return shuffleEncounterDeck(updateCard(moveCard(state, id, { zone: "encounterDeck" }), id, { face: "down" }));
 }
 
+// The card that joined the seat's discard pile between two states, or undefined when none did (a card that left the hand another way, a hand with none).
+function joinedDiscard(before: ScenarioState, after: ScenarioState, seat: number): string | undefined {
+  const pile = after.seats[seat]?.discard ?? [];
+  return pile.length > (before.seats[seat]?.discard.length ?? 0) ? pile.at(-1) : undefined;
+}
+
 // Verbs that run to completion with no choice and no child frame. A verb that needs either is handled
 // by the effect frame (effect-frames.ts) before it reaches here.
 export function runExtraVerb(
@@ -159,17 +164,13 @@ export function runExtraVerb(
       const discarded = discardRandom(state, seat, instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx), focus.sourceId, ctx);
       if (instruction.raiseByCost) {
         // The discarded card is the one now on top of the discard pile (a card that left the hand another way, a hand with none, raises nothing).
-        const pile = discarded.seats[seat]?.discard ?? [];
-        const id = pile.length > (state.seats[seat]?.discard.length ?? 0) ? pile.at(-1) : undefined;
+        const id = joinedDiscard(state, discarded, seat);
         const cost = id ? (printedOf(ctx.cards, discarded.cards[id]?.code ?? "").cost ?? 0) : 0;
         return noteEncounterThreat(raiseThreat(discarded, seat, cost, steps, currentCause(steps, UNATTRIBUTED)), seat, cost, focus.sourceId, ctx);
       }
       if (!instruction.remember) return discarded;
       // `remember`: the card discarded is the effect's picked card afterward ("the discarded card's printed cost", 143066:A:2). An empty hand discards nothing: the picked card is "" then (as a pick that found none), never an earlier player's card.
-      const pile = discarded.seats[seat]?.discard ?? [];
-      const id = pile.length > (state.seats[seat]?.discard.length ?? 0) ? pile.at(-1) : undefined;
-      const data = topFrame(discarded)?.data;
-      return data?.kind === "effect" ? patchTop(discarded, { data: { ...data, picked: [...(data.picked ?? []), id ?? ""] } }) : discarded;
+      return pushPicked(discarded, joinedDiscard(state, discarded, seat));
     }
     case "PlaceUnderSelf": {
       const id = lastPicked(state);

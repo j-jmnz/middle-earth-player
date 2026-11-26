@@ -5,6 +5,7 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
+import { engagedSeat } from "../../core/engaged.ts";
 import { nextUint } from "../../core/seed.ts";
 import { printedOf } from "../../core/printed.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
@@ -27,12 +28,6 @@ export function attachRandomSetAside(state: ScenarioState, instruction: Verb<"At
   const lying = updateCard(attachTo(moveCard({ ...state, seedCursor: state.seedCursor + 1 }, drawn, { zone: "attached" }), drawn, host.id), drawn, { face: "up", exhausted: false });
   steps.push({ kind: "attachDrawn", cardId: drawn, hostId: host.id, seat: engagedSeat(state, host.id) });
   return queueEvent(lying, { trigger: "attached", seat: state.firstPlayer, subject: drawn, other: host.id });
-}
-
-/** The seat an enemy is engaged with, or null: it is in the staging area. */
-function engagedSeat(state: ScenarioState, enemyId: string): number | null {
-  const seat = Object.keys(state.seats).map(Number).find((index) => state.seats[index]?.engaged.includes(enemyId));
-  return seat ?? null;
 }
 
 /** The seat the source's host enemy is engaged with, or null: no host, the host is not an enemy in an engagement area (it is in the staging area or gone). */

@@ -9,6 +9,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-na
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CardImage } from "../../ui/card-image.tsx";
+import { BAR_PAD, MENU_BUTTON } from "../chrome/top-bar-layout.ts";
 import { ringRoom, ringScroll } from "../../ui/focus-ring-style.ts";
 import { PreviewPicture, type PreviewCard } from "../cards/card-preview.tsx";
 import { DockButtons } from "../choice/dock/buttons.tsx";
@@ -30,7 +31,7 @@ const SCRIM = 0.9;
 // A screen this many points tall or less, at Medium, is short for the question's column.
 const SHORT = 440;
 // How far the header stays from the right edge, clear of the table menu button (about 60 from the edge, 16 of it the column's padding).
-const MENU_CLEAR = 44;
+const MENU_CLEAR = MENU_BUTTON + 2 * BAR_PAD - 16;
 
 export function QuestAdvanceView({
   card,
