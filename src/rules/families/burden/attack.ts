@@ -82,8 +82,10 @@ export function readsX(instructions: readonly unknown[]): boolean {
   return READS_X.test(JSON.stringify(instructions));
 }
 
-export function charactersDestroyed(state: ScenarioState, attack: PendingAttack, ctx: ReduceContext): number {
-  return destroyedByAttack(state, attack, ctx).length;
+// The X of an effect an attack leaves for its end: the characters it destroyed. An objective ally in the encounter discard pile counts only for an effect that reads X (`reads`),
+// so the frame of a record that does not read it (Fog Bank's) holds the same X it held before objective allies counted.
+export function charactersDestroyed(state: ScenarioState, attack: PendingAttack, ctx: ReduceContext, reads: boolean): number {
+  return destroyedByAttack(state, attack, ctx).filter((id) => reads || state.cards[id]?.zone === "discard").length;
 }
 
 // Queues `characterDestroyedByAttack` for each character the attack destroyed, when some card in the game hears it (so no other game

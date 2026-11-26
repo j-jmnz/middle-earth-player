@@ -321,7 +321,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   // The characters this attack destroyed are the X of the effect it leaves for its end ("If this attack destroys a character").
   // Cave-troll's excess damage (excessToDamage) is one more instruction for the attack's end.
   const troll = excessDamageAfter(state, attack, ctx);
-  const destroyed = readsX(attack.after ?? []) ? charactersDestroyed(state, attack, ctx) : 0;
+  const destroyed = (attack.after ?? []).length > 0 ? charactersDestroyed(state, attack, ctx, readsX(attack.after ?? [])) : 0;
   const sendsExcess = flagged(state, attack.enemyId, "excessToShip");
   const done = expireModifiers(state, ["endOfAttack"]);
   const resolvedAttacks =
