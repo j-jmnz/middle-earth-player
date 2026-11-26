@@ -108,6 +108,7 @@ export const FIXTURE_REGISTRY = [
   { scenarioId: "into-fangorn", kind: "standalone", names: ["fangorn-lost"] },
   { scenarioId: "the-dunland-trap", kind: "standalone", names: ["trap-lost"] },
   { scenarioId: "the-three-trials", kind: "standalone", names: ["trials-lost"] },
+  { scenarioId: "trouble-in-tharbad", kind: "standalone", names: ["tharbad-lost"] },
   { scenarioId: "escape-from-umbar", kind: "standalone", names: ["umbar-lost"] },
   { scenarioId: "desert-crossing", kind: "standalone", names: ["crossing-lost"] },
   { scenarioId: "the-long-arm-of-mordor", kind: "standalone", names: ["mordor-lost"] },

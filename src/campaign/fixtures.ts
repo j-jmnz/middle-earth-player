@@ -106,6 +106,7 @@ import trapFixtures from "./fixtures/the-dunland-trap.json";
 import mordorFixtures from "./fixtures/the-long-arm-of-mordor.json";
 import trialsFixtures from "./fixtures/the-three-trials.json";
 import mumakilFixtures from "./fixtures/the-mumakil.json";
+import tharbadFixtures from "./fixtures/trouble-in-tharbad.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -226,6 +227,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "into-fangorn": fangornFixtures,
   "the-dunland-trap": trapFixtures,
   "the-three-trials": trialsFixtures,
+  "trouble-in-tharbad": tharbadFixtures,
   "escape-from-umbar": umbarFixtures,
   "desert-crossing": crossingFixtures,
   "the-long-arm-of-mordor": mordorFixtures,
