@@ -47,7 +47,7 @@ export const HARADRIM_SAMPLES: Samples = {
   AttachRandomSetAside: [{ verb: "AttachRandomSetAside", trait: "Capture" }],
   AddWithHostToVictory: [{ verb: "AddWithHostToVictory" }],
   PrepareOrcsArea: [{ verb: "PrepareOrcsArea", stages: ["17051", "17052"], number: 1, place: ["16061"] }],
-  MoveToOrcsArea: [{ verb: "MoveToOrcsArea", target: "picked" }, { verb: "MoveToOrcsArea", code: "16063" }, { verb: "MoveToOrcsArea", target: "self" }],
+  MoveToOrcsArea: [{ verb: "MoveToOrcsArea", target: "picked" }, { verb: "MoveToOrcsArea", code: "16063" }, { verb: "MoveToOrcsArea" }],
   OrcsProgress: [{ verb: "OrcsProgress" }, { verb: "OrcsProgress", engaged: true }],
   AddOrcsProgress: [{ verb: "AddOrcsProgress", amount: 2 }],
   TakeObjectiveAlly: [{ verb: "TakeObjectiveAlly", codes: ["17038"] }],
