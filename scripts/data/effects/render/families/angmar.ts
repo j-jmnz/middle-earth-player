@@ -7,6 +7,17 @@ type Made = { text: string; read: readonly string[] };
 const amount = (value: unknown, ctx: Ctx): string => renderAmount(value, ctx, renderPick);
 
 export const ANGMAR_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => Made>> = {
+  RemoveTimeCounters: (i, ctx) => {
+    const read = ["target", "amount", "perPlayer", "distribute", "left"];
+    if (i.target == null) return { text: "one time counter comes off each card in play with Time X (the end of the refresh phase, after its Forced effects); a card whose last counter goes hears it", read };
+    const count = typeof i.amount === "object" ? amount(i.amount, ctx) : str(i.amount ?? 1);
+    const counters = `${count} time counter${i.amount === 1 || i.amount == null ? "" : "s"}${i.perPlayer === true ? " for each player still in the game" : ""}`;
+    if (i.distribute !== undefined) return { text: `${counters} come off the locations in play (staging area and active location) that hold some, the ${i.distribute === "firstPlayer" ? "first player" : "acting player"} choosing the location one counter at a time (a single location is taken without asking), stopping when none is left; a location whose last counter goes hears it${i.left === undefined ? "" : `; ${str(i.left)} still to go`}`, read };
+    if (i.target === "locations" || i.target === "active") return { text: `${counters} come off ${i.target === "active" ? "the active location, if it holds any" : "each location in play (staging area and active location) that holds some"}, one at a time, stopping when none is left; a location whose last counter goes hears it, after the effect resolves`, read };
+    const who = i.target === "picked" ? "the last picked card (an enemy with Time X; a card with no Time loses none)" : "each enemy in play with Time X";
+    return { text: `${counters} come off ${who}, one at a time, stopping when none is left; a card whose last counter goes hears it once`, read };
+  },
+  PlaceTimeCounters: (i) => ({ text: `each location in play (staging area or active) with the Time X keyword and no time counter (${str(i.target)}) gets its printed X time counters, as a revealed one does`, read: ["target"] }),
   Reanimate: (i, ctx) => {
     const seats: Readonly<Record<string, string>> = { firstPlayer: "the first player", controller: "that ally's controller", defending: "the defending player" };
     const seat = seats[str(i.who)] ?? "the acting player";
