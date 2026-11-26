@@ -10,7 +10,7 @@ import { heldAmountByClass } from "../core/holder-classes.ts";
 import { isAllyLike, isCharacterType, printedOf, type PrintedCard } from "../core/printed.ts";
 import type { CardInstance, ScenarioState } from "../core/state.ts";
 import { flagged, heldAmount, livingSeats } from "../core/state.ts";
-import { dealOneShadow, type ReduceContext } from "../interpret/interpret.ts";
+import { dealStepShadow, type ReduceContext } from "../interpret/interpret.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { exhaustAnnounced } from "../windows/exhaust.ts";
 import { resolveAttack } from "./shadow.ts";
@@ -110,7 +110,7 @@ export function dealShadows(state: ScenarioState, ctx: ReduceContext, steps: Eng
       return instance ? (engagementCostOf(next, instance, ctx.cards) ?? 0) : 0;
     };
     const order = [...(next.seats[seat]?.engaged ?? [])].sort((a, b) => cost(b) - cost(a));
-    for (const enemyId of order) next = dealOneShadow(next, enemyId, steps, ctx);
+    for (const enemyId of order) next = dealStepShadow(next, enemyId, steps, ctx);
   }
   return next;
 }

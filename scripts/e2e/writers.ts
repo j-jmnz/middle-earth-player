@@ -96,6 +96,7 @@ import { umbarFixtures } from "./haradrim/escape-from-umbar.ts";
 import { crossingFixtures } from "./haradrim/desert-crossing.ts";
 import { trapFixtures } from "./the-ring-maker/the-dunland-trap.ts";
 import { mordorFixtures } from "./haradrim/the-long-arm-of-mordor.ts";
+import { trialsFixtures } from "./the-ring-maker/the-three-trials.ts";
 import { mumakilFixtures } from "./haradrim/the-mumakil.ts";
 import { haradFixtures } from "./haradrim/race-across-harad.ts";
 
@@ -202,6 +203,7 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "to-catch-an-orc": () => orcFixtures(),
   "into-fangorn": () => fangornFixtures(),
   "the-dunland-trap": () => trapFixtures(),
+  "the-three-trials": () => trialsFixtures(),
   "escape-from-umbar": () => umbarFixtures(),
   "desert-crossing": () => crossingFixtures(),
   "the-long-arm-of-mordor": () => mordorFixtures(),

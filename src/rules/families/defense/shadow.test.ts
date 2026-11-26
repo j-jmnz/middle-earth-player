@@ -7,6 +7,7 @@ import { holds } from "../../interpret/conditions.ts";
 import { syncConstants } from "../../interpret/constants.ts";
 import { modifiedStat } from "../../core/keywords.ts";
 import { definePrinted } from "../../core/printed.ts";
+import { dealOneShadow } from "../../interpret/interpret.ts";
 import { resolveQuest } from "../../quest/quest.ts";
 import { legalIntents } from "../../engine/reduce.ts";
 import type { ScenarioState } from "../../core/state.ts";
@@ -187,5 +188,35 @@ describe("enemies that cannot attack, and other combat effects", () => {
     expect(early.mode).toBe("enemyAttacks");
     const struck = send(early, { type: "DeclareAttackers", enemyId: ids.orc!, attackerIds: [ids.a!] }, ctx);
     expect(struck.cards[ids.orc!]?.zone).toBe("encounterDiscard");
+  });
+});
+
+describe("step 6.2 deals a shadow card to an enemy that already holds one (rr.step-6-2, ltp.deal-shadow-cards)", () => {
+  const lamp = definePrinted({ code: "07009", name: "Silver Lamp", type: "attachment", sphere: "spirit", cost: 2 });
+  // The orc holds one spite (dealt before the combat phase, as a card's effect would) and step 6.2 deals it a second; each gives +2 Attack, so the undefended hero takes 3 + 2 + 2.
+  const undefendedDamage = (withLamp: boolean) => {
+    const built = table({
+      cards: [hero("a", { sphere: "spirit" }), lamp, enemy("orc", { attack: 3 }), spite],
+      effects: [...recordsOf(RECORDS, "07009"), spiteShadow],
+      heroes: [{ code: "a" }],
+      attachments: withLamp ? [{ code: "07009", host: "a" }] : [],
+      enemies: [{ code: "orc" }],
+      encounter: ["spite", "spite"],
+    });
+    const orc = built.ids.orc!;
+    const held = dealOneShadow(syncConstants(built.state, built.ctx), orc, [], built.ctx);
+    expect(held.cards[orc]?.shadowId).toBeTruthy();
+    const dealt = until(send(held, { type: "DeclineEngage" }, built.ctx), built.ctx, defenseWindow);
+    expect(dealt.cards[orc]?.extraShadowIds).toHaveLength(1);
+    const after = send(dealt, { type: "Undefended", heroId: built.ids.a! }, built.ctx);
+    return after.cards[built.ids.a!]?.damage;
+  };
+
+  it("resolves both shadow effects of an enemy that holds a card and is dealt another", () => {
+    expect(undefendedDamage(false)).toBe(7);
+  });
+
+  it("07009:A:2 resolves both shadow effects while Silver Lamp deals the cards face up", () => {
+    expect(undefendedDamage(true)).toBe(7);
   });
 });

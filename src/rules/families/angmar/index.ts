@@ -27,7 +27,7 @@ import { noteFirstTrait, noteRevealDoomed, revealedGainDoomed } from "./weather.
 import { discardHeld, holdUnder } from "./hold.ts";
 import { chooseCurrentQuest, currentQuestHolds, hitPointsLeftHolds, questCardsAmount, questLeadsHolds } from "./quest.ts";
 import { advanceWhenFlagged, removeSideQuestsFromGame } from "./stage.ts";
-import { removeTimeCounters, timeOnReveal } from "./time.ts";
+import { removeTimeCounters, removeTimeCountersFrom, timeCounterMatches, timeOnReveal } from "./time.ts";
 import { attachNewTo, tradeDamageForResources } from "./trade.ts";
 import { attachEnemyToPicked, destroyHighestCostAlly, discardOtherInPlay, removePickedFromGame } from "./reanimate/attached.ts";
 import { dealSourceAsShadow, resolveWhenRevealedOf } from "./reanimate/shadows.ts";
@@ -40,7 +40,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "Time":
       return state;
     case "RemoveTimeCounters":
-      return removeTimeCounters(state, ctx);
+      return instruction.target == null ? removeTimeCounters(state, ctx) : removeTimeCountersFrom(state, ctx, instruction);
     case "HoldUnder":
       return holdUnder(state, instruction, focus);
     case "DiscardHeld":
@@ -124,7 +124,7 @@ export const manifest: RulesFamily = {
   run,
   revealed: (state, id, ctx) => noteRevealDoomed(noteFirstTrait(timeOnReveal(state, id, ctx), id, ctx), id),
   travel: { unpayable: travelUnpayable },
-  pick: (state, id, spec, _at, ctx) => determinedMatches(state, id, spec) && safePickMatches(state, id, spec, ctx) && reanimatedPickMatches(state, id, spec, ctx),
+  pick: (state, id, spec, _at, ctx) => determinedMatches(state, id, spec) && safePickMatches(state, id, spec, ctx) && timeCounterMatches(state, id, spec, ctx) && reanimatedPickMatches(state, id, spec, ctx),
   pool: (state, spec) => allInPlayPool(state, spec),
   combat: { attack: (state, enemyId, _attacker, _target, attackerId) => attackerFacing(state, enemyId, attackerId), defense: (state, defender, _cards, defenderId) => defenderFacing(state, defender, defenderId) },
   condition: (state, condition, scope, ctx) => timeOfDayHolds(state, condition) ?? currentQuestHolds(state, condition, scope, ctx) ?? questLeadsHolds(state, condition, ctx) ?? hitPointsLeftHolds(state, condition, ctx) ?? safeActiveHolds(state, condition, ctx) ?? setAsideHasHolds(state, condition),

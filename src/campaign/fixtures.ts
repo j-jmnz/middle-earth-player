@@ -104,6 +104,7 @@ import umbarFixtures from "./fixtures/escape-from-umbar.json";
 import crossingFixtures from "./fixtures/desert-crossing.json";
 import trapFixtures from "./fixtures/the-dunland-trap.json";
 import mordorFixtures from "./fixtures/the-long-arm-of-mordor.json";
+import trialsFixtures from "./fixtures/the-three-trials.json";
 import mumakilFixtures from "./fixtures/the-mumakil.json";
 import haradFixtures from "./fixtures/race-across-harad.json";
 
@@ -225,6 +226,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "to-catch-an-orc": orcFixtures,
   "into-fangorn": fangornFixtures,
   "the-dunland-trap": trapFixtures,
+  "the-three-trials": trialsFixtures,
   "escape-from-umbar": umbarFixtures,
   "desert-crossing": crossingFixtures,
   "the-long-arm-of-mordor": mordorFixtures,

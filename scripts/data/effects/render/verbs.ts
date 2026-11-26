@@ -174,7 +174,12 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   Time: (i) => (i.perPlayer === true
     ? { text: `Time ${str(i.amount)} for each player: when this card is revealed, ${str(i.amount)} times the players still in the game resource tokens (time counters) are put on it, counted once, and one comes off at the end of each refresh phase`, read: ["amount", "perPlayer"] }
     : { text: `Time ${str(i.amount)}: when this card is revealed, ${str(i.amount)} resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase`, read: ["amount"] }),
-  RemoveTimeCounters: () => ({ text: "one time counter comes off each card in play with Time X (the end of the refresh phase, after its Forced effects); a card whose last counter goes hears it", read: [] }),
+  RemoveTimeCounters: (i) => {
+    if (i.target == null) return { text: "one time counter comes off each card in play with Time X (the end of the refresh phase, after its Forced effects); a card whose last counter goes hears it", read: ["target", "amount", "perPlayer"] };
+    const counters = `${str(i.amount ?? 1)} time counter${i.amount === 1 || i.amount == null ? "" : "s"}${i.perPlayer === true ? " for each player still in the game" : ""}`;
+    const who = i.target === "picked" ? "the last picked card (an enemy with Time X; a card with no Time loses none)" : "each enemy in play with Time X";
+    return { text: `${counters} come off ${who}, one at a time, stopping when none is left; a card whose last counter goes hears it once`, read: ["target", "amount", "perPlayer"] };
+  },
   HoldUnder: (i) => ({ text: `the card with code ${str(i.code)} that a player controls lies facedown under this card, still in play, controlled by no one, with what is attached to it; when this card is defeated it returns under the first player, exhausted`, read: ["code"] }),
   DiscardHeld: () => ({ text: "the card held under this card is discarded from where it lies, and leaves play", read: [] }),
   PlaceHandUnderSelf: () => ({ text: "the acting player places every card in their hand facedown under this card (out of play, still theirs)", read: [] }),

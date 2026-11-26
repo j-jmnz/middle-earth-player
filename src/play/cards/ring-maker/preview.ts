@@ -10,6 +10,7 @@ import { hillsWords, oldSouthRoadWords, ravineWords, turchWords } from "../../wo
 import { timeOf } from "../../../rules/families/angmar/time.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 import { IN_NEED_OF_REST } from "../../readouts/ring-maker/fangorn.ts";
+import { trialsDetail } from "./trials-preview.ts";
 import { GUARD, MUGASH, MUGASH_OBJECTIVE, mugashLyingOn } from "../../readouts/ring-maker/orc.ts";
 
 const GRIMA = "07016";
@@ -84,6 +85,8 @@ export function ringMakerDetail(game: ScenarioState, ctx: ReduceContext, cardId:
   if (fangorn) return fangorn;
   const dunland = dunlandDetail(ctx, game, cardId);
   if (dunland) return dunland;
+  const trials = trialsDetail(game, ctx, cardId, name);
+  if (trials) return trials;
   if (card.code === ILL_TIDINGS && card.zone === "hand" && flagged(game, cardId, "cannotLeaveHand")) return illTidingsWords(game.seatCount > 1 && card.controller != null ? `Player ${card.controller + 1}` : null);
   if (card.code === MUGASH) return card.zone === "attached" && card.host != null && game.cards[card.host] ? mugashHeldWords(name(card.host)) : null;
   if (card.code === GUARD && (card.zone === "staging" || card.zone === "engaged")) {

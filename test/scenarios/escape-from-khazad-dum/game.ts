@@ -77,7 +77,7 @@ export const KHAZAD_GOLDENS: readonly KhazadGolden[] = [
   { name: "solo win: A Wrong Turn, The Bridge of Khazad-dûm", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", policy: { stage2: 1, stage3: 0 } },
   { name: "solo win: Old One Lair, The Bridge of Khazad-dûm", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", policy: { stage2: 0, stage3: 0 } },
   { name: "solo win: A Way Up, The Rear Guard", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", policy: { stage2: 2, stage3: 2 } },
-  { name: "two-handed win: Old One Lair, Last Lord of Moria", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", policy: { stage2: 0, stage3: 1 } },
+  { name: "two-handed win: Old One Lair, Last Lord of Moria", seatCount: 2, seed: 12, difficulty: "Normal", decks: "strong", outcome: "won", policy: { stage2: 0, stage3: 1 } },
   { name: "two-handed win: A Wrong Turn, The Rear Guard", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", policy: { stage2: 1, stage3: 2 } },
   { name: "two-handed win: A Way Up, The Bridge of Khazad-dûm", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", policy: { stage2: 2, stage3: 0 } },
   { name: "solo loss: Durin's Bane's undefended attacks put 10 damage on the stage", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", policy: { stage2: 1, stage3: 0, undefended: true }, lossReason: "Nearing the Gate holds" },

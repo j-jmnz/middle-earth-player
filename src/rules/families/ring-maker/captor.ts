@@ -10,9 +10,9 @@ import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { holds } from "../../interpret/conditions.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
-import { engageWith } from "../../quest/quest.ts";
 import { returnAttachedEnemy } from "../angmar/reanimate/attached.ts";
 import { effectsOfCard } from "../misc/text.ts";
+import { engageEnemies } from "./engage.ts";
 
 /** The title a card's `EngageCaptiveHolder` record names, or null for a card without one (a card that shows no such text, or any card of another game). */
 function captiveOf(state: ScenarioState, ctx: ReduceContext, card: CardInstance): string | null {
@@ -42,13 +42,7 @@ export function captorSeat(state: ScenarioState, ctx: ReduceContext, guardId: st
 export function engageCaptiveHolders(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.stack.length > 0 || state.lost || state.failure || !gameReads(state, ctx, '"EngageCaptiveHolder"')) return state;
   // A Guard engaged with another player moves to the holder too (agent recommendation, docs/scenarios/the-ring-maker/to-catch-an-orc.md, 07025:A:1): the text engages "that player" for as long as it holds, and an enemy is engaged with one player only.
-  const guards = [...state.staging, ...state.seats.flatMap((seat) => seat.engaged)];
-  return guards.reduce((next, id) => {
-    const card = next.cards[id];
-    if (card?.zone !== "staging" && card?.zone !== "engaged") return next;
-    const seat = captorSeat(next, ctx, id);
-    return seat == null || (card.zone === "engaged" && card.controller === seat) ? next : engageWith(next, seat, id, steps);
-  }, state);
+  return engageEnemies(state, steps, (next, id) => captorSeat(next, ctx, id));
 }
 
 /** ReturnAttachedEnemy: each enemy with the title that lies attached to a card as an attachment goes back to the staging area as an enemy (the angmar family's `returnAttachedEnemy`, which clears its host). One that lies elsewhere stays. */

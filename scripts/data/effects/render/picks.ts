@@ -126,6 +126,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["sameTitleAsDiscarded"], pick.sameTitleAsDiscarded === true ? "that shares its printed title with a card the effect discarded from the chooser's own deck" : null);
   note(["inOrcsArea"], pick.inOrcsArea === true ? "in the Orcs' area (the area zone while the players are at another stage than the Orcs, the staging area at the same stage)" : null);
   note(["copyOfDefender"], pick.copyOfDefender === true ? "with the title of the defending character" : null);
+  note(["timeCounter"], pick.timeCounter === true ? "with the Time keyword and a time counter on it" : null);
   note(["minDamage"], typeof pick.minDamage === "number" ? `with at least ${pick.minDamage} damage on it` : null);
   note(["aboveThreat"], pick.aboveThreat === true ? "with an engagement cost higher than the chooser's threat" : null);
   note(["on"], onWords(pick.on));
