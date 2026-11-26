@@ -33,9 +33,14 @@ describe("the cards underneath The Orcs' Search (08125:A:1, 08125:A:2, 08124:A:1
   it("08125:A:2 reads the count, what each player's threat rises by and Bellach's Threat X", () => {
     const made = built({ staging: [SEARCH, BELLACH, "08128", "08128", "08128"] });
     expect(searchDial(made)).toMatchObject({ label: "Search", value: 0 });
-    const three = under(made, 3);
+    const three = opened(made, under(made, 3)).state;
     expect(searchDial(made, three)).toMatchObject({ value: 3, note: "3 cards lie facedown underneath The Orcs' Search. At the end of the refresh phase each player raises their threat by 3. Bellach's Threat is 3." });
     expect(detail(made, three, BELLACH)).toContain("Bellach's Threat is 3, one for each card underneath The Orcs' Search.");
+  });
+
+  it("08124:A:1 the Search dial names Bellach's Threat only while Bellach is in play, as the table reads it", () => {
+    const without = built({ staging: [SEARCH, "08128"] });
+    expect(searchDial(without, opened(without, under(without, 1)).state)?.note).toBe("1 card lies facedown underneath The Orcs' Search. At the end of the refresh phase each player raises their threat by 1.");
   });
 
   it("08125:A:1 warns before a damaged location goes underneath, and says The Secret Chamber there loses the game", () => {

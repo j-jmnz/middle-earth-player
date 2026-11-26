@@ -1,6 +1,7 @@
 // Rules: rm.scour, rm.the-orcs-search, rr.cannot (data/rules/entries.json); ledger lines 08122:B:4, 08123:B:4, 08125:A:1, 08125:A:2, 08126:A:3, 08127:A:1, 08127:A:2.
 // Celebrimbor's Secret's pieces on the table: the cards facedown underneath The Orcs' Search as one top-bar dial (a count, never which cards), warming when a damaged location in play comes near its printed quest points, and where Celebrimbor's Mould lies
 // (a hero, The Secret Chamber, Bellach or free). The engine decided every number (`facedownCount`, the settle sweep `buryDamaged`); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
+import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { printedOf } from "../../../rules/core/printed.ts";
 import { inPlay, type ScenarioState } from "../../../rules/core/state.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
@@ -24,6 +25,12 @@ const NEAR = 2;
 
 /** The Orcs' Search in play, the host of the facedown cards. */
 export const searchIn = (game: ScenarioState) => cardsOf(game, ORCS_SEARCH)[0];
+
+/** Bellach's Threat as the table reads it now (08124:A:1: the cards underneath The Orcs' Search, with every modifier), or null while he is not in play. */
+export function bellachThreat(game: ScenarioState, ctx: ReduceContext): number | null {
+  const bellach = cardsOf(game, BELLACH)[0];
+  return bellach ? modifiedStat(game, bellach, "threat", ctx.cards) : null;
+}
 
 /** The cards facedown underneath The Orcs' Search now (0 in a game without it). */
 export const cardsUnderSearch = (game: ScenarioState): number => facedownCount(game, searchIn(game)?.id ?? null);
@@ -69,7 +76,7 @@ export function celebrimborDials(game: ScenarioState, ctx: ReduceContext, nameOf
       value: count,
       cardId: search.id,
       ...(near.length > 0 ? { warn: { level: near.some((one) => one.code === SECRET_CHAMBER) ? ("critical" as const) : ("near" as const), words: words.join(" ") } } : {}),
-      note: searchNote(count),
+      note: searchNote(count, bellachThreat(game, ctx)),
     },
   ];
 }

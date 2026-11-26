@@ -3,11 +3,11 @@
 // Celebrimbor's Mould wherever it lies, the stage gate and Bellach's immunity. The engine decided every number; these only say it. Each sentence stays at about 25 words (docs/design-system-table.md, Choice tray, Plain words).
 import { plural } from "../../list.ts";
 
-/** The cards facedown under The Orcs' Search: what they cost each player at the end of the refresh phase and that Bellach's Threat is the same number (08125:A:2, 08124:A:1). */
-export const searchNote = (cards: number): string =>
+/** The cards facedown under The Orcs' Search: what they cost each player at the end of the refresh phase and, with Bellach in play, his Threat as the table reads it now (08125:A:2, 08124:A:1). */
+export const searchNote = (cards: number, bellach: number | null): string =>
   cards === 0
     ? "No cards lie underneath The Orcs' Search. A location whose damage reaches its quest points goes there, facedown."
-    : `${plural(cards, "card")} lie facedown underneath The Orcs' Search. At the end of the refresh phase each player raises their threat by ${cards}. Bellach's Threat is ${cards}.`;
+    : `${plural(cards, "card")} ${cards === 1 ? "lies" : "lie"} facedown underneath The Orcs' Search. At the end of the refresh phase each player raises their threat by ${cards}.${bellach == null ? "" : ` Bellach's Threat is ${bellach}.`}`;
 
 /** A damaged location in play near its printed quest points: at the quest points it goes underneath The Orcs' Search (08125:A:1); The Secret Chamber there loses the game (08126:A:3). */
 export const nearBuriedWords = (name: string, damage: number, points: number, loses: boolean): string =>
@@ -39,8 +39,8 @@ export const mouldGateWords = (stage: 1 | 2, onHero: boolean): string =>
   onHero ? "A hero holds the Mould, so the stage advances as it fills." : `No hero holds the Mould, so the stage cannot ${stage === 1 ? "advance" : "be defeated"}. It keeps its progress and ${stage === 1 ? "advances" : "is defeated"} the moment a hero holds it.`;
 
 /** Bellach in the preview (08122:B:3, 08123:B:3, 08124:A:1): Threat from the cards underneath The Orcs' Search, and whether he is immune and cannot be engaged. */
-export function bellachWords(cards: number, shielded: boolean, stage: 1 | 2 | null, progress: number): string {
-  const threat = `Bellach's Threat is ${cards}, one for each card underneath The Orcs' Search.`;
+export function bellachWords(threatNow: number, shielded: boolean, stage: 1 | 2 | null, progress: number): string {
+  const threat = `Bellach's Threat is ${threatNow}, one for each card underneath The Orcs' Search.`;
   if (!shielded) return `${threat} The stage has at least 12 progress, so players can engage Bellach and choose him with player card effects.`;
   const until = stage === 2 ? ` until stage 2 has at least 12 progress (${progress} now)` : "";
   return `${threat} He is immune to player card effects and cannot be engaged${until}.`;

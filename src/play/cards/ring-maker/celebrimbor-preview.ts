@@ -3,7 +3,7 @@
 import { flagged, inPlay, type ScenarioState } from "../../../rules/core/state.ts";
 import { printedOf } from "../../../rules/core/printed.ts";
 import type { ReduceContext } from "../../../rules/interpret/interpret.ts";
-import { BELLACH, MOULD, ORCS_SEARCH, SECRET_CHAMBER, STAGE_1, STAGE_2, cardsUnderSearch, mouldLyingOn, mouldState, nearBuried } from "../../readouts/ring-maker/celebrimbor.ts";
+import { BELLACH, MOULD, ORCS_SEARCH, SECRET_CHAMBER, STAGE_1, STAGE_2, bellachThreat, cardsUnderSearch, mouldLyingOn, mouldState, nearBuried } from "../../readouts/ring-maker/celebrimbor.ts";
 import { bellachWords, chamberWords, mouldHostWords, mouldWords, nearBuriedWords, searchNote } from "../../words/scenarios/ring-maker/celebrimbor-table.ts";
 
 /** The quest stage in play as 1 or 2, null for any other card. */
@@ -22,9 +22,9 @@ export function celebrimborDetail(game: ScenarioState, ctx: ReduceContext, cardI
   }
   const held = mouldLyingOn(game, cardId).length > 0 ? mouldState(game, ctx) : null;
   const lines: string[] = [held != null && held.where !== "free" ? mouldHostWords(held.where, name(cardId), stageNumber(game)) : ""];
-  if (card.code === ORCS_SEARCH) lines.push(searchNote(cardsUnderSearch(game)), ...nearBuried(game, ctx).map((one) => nearBuriedWords(name(one.id), one.damage, one.points, one.code === SECRET_CHAMBER)));
+  if (card.code === ORCS_SEARCH) lines.push(searchNote(cardsUnderSearch(game), bellachThreat(game, ctx)), ...nearBuried(game, ctx).map((one) => nearBuriedWords(name(one.id), one.damage, one.points, one.code === SECRET_CHAMBER)));
   if (card.code === BELLACH && (card.zone === "staging" || card.zone === "engaged")) {
-    lines.push(bellachWords(cardsUnderSearch(game), flagged(game, cardId, "immuneToPlayerCards") || flagged(game, cardId, "cannotBeEngaged"), stageNumber(game), game.questStage ? (game.cards[game.questStage]?.progress ?? 0) : 0));
+    lines.push(bellachWords(bellachThreat(game, ctx) ?? 0, flagged(game, cardId, "immuneToPlayerCards") || flagged(game, cardId, "cannotBeEngaged"), stageNumber(game), game.questStage ? (game.cards[game.questStage]?.progress ?? 0) : 0));
   }
   if (card.code === SECRET_CHAMBER && inPlay(card.zone)) lines.push(chamberWords(card.damage, printedOf(ctx.cards, card.code).questPoints ?? 0));
   const text = lines.filter((line) => line !== "").join(" ");
