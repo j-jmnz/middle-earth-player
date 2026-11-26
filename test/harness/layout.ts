@@ -99,6 +99,8 @@ export type Layout = {
   night?: Entry;
   // The time counters on the current quest stage (a Time X stage after some refresh phases: The Fords of Isen).
   timeCounters?: number;
+  // The threat elimination level of every seat lowered this much for the rest of the game, as the stage's record leaves it (Trouble in Tharbad, 08066:B:2).
+  eliminationReduction?: number;
   // The codes of the cards in a hand that cannot leave it, as the card's own effect leaves them (Ill Tidings, 07023:A:1).
   heldInHand?: readonly string[];
   // The scenario's saga hero (Bilbo Baggins in The Hobbit, the loadout deals him) is a hero of the first seat, with this many resources in his pool.
@@ -266,6 +268,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   if (layout.pursuit != null) state = { ...state, pursuit: layout.pursuit };
   for (const code of layout.exhaustedCards ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { exhausted: true });
   if (layout.timeCounters != null && state.questStage) state = updateCard(state, state.questStage, { resources: layout.timeCounters });
+  if (layout.eliminationReduction != null) for (let seat = 0; seat < seats; seat += 1) state = addModifier(state, `seat:${seat}`, state.questStage ?? "", "eliminationReduction", layout.eliminationReduction, "endOfGame");
   for (const code of layout.heldInHand ?? []) for (const id of idsOf(state, code)) state = addModifier(state, id, id, "cannotLeaveHand", 1, "endOfGame");
   for (const code of layout.committed ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { committed: true });
   // A game that deals encounter side quests in its encounter deck reads the side quest rules, as its start notes (families/wilderland/night-quest.ts markSideQuests).

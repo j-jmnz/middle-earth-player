@@ -1,0 +1,68 @@
+// Rules: rr.active-location, rr.explored, rr.step-6-2, rr.step-6-4-2, rr.step-6-4-3, rr.cancel (data/rules/entries.json); ledger lines 08066:B:3, 08067:B:3, 08076:A:2, 08077:A:2.
+// Moments of played quest and combat phases that the spec rows cannot express: the order of two effects, the shared amount of a shadow card.
+import { describe, expect, it } from "vitest";
+
+import type { ScenarioState } from "../../../rules/core/state.ts";
+import { drive, idOf, opened, send, tableFromLayout, where, type Layout } from "../../../../test/harness/scene-kit.ts";
+
+const SCENARIO = "trouble-in-tharbad";
+const MUG = "08069";
+const STREETS = "08074";
+const CROSSING = "08071";
+const RUINS = "08076";
+const SEEDY_INN = "08077";
+const SPY = "08072";
+const table = (layout: Layout) => tableFromLayout(SCENARIO, layout);
+const progressOn = (state: ScenarioState, code: string): number => state.cards[idOf(state, code)]?.progress ?? 0;
+
+describe("quest resolution on the stages", () => {
+  it("08066:B:3 the excess progress that explores The Empty Mug goes to stage 1B after the Mug has left play, and each player's threat is lowered by it", () => {
+    // Four willpower against the Mug's 4 quest points with 3 progress on it: 1 explores it, the other 3 reach the stage, are canceled and lower the threat 10 to 7.
+    const t = table({ stage: "08066", phase: "Quest", active: { code: MUG, progress: 3 }, committed: ["dh1", "dh2"], threat: [10, 0] });
+    const done = drive(t, opened(t), (state) => state.phase !== "Quest");
+    expect(where(done.state, MUG)).toBe("victory");
+    expect(done.state.seats[0]?.threat).toBe(7);
+    expect(done.state.cards[done.state.questStage ?? ""]?.progress ?? 0).toBe(0);
+  });
+
+  it("08067:B:3 with an active location, it takes progress first and only the excess goes to The Crossing at Tharbad in the staging area", () => {
+    // Four willpower less the 2 Threat of The Crossing: 2 progress, 1 explores Streets of Tharbad (1 quest point), the other 1 lands on The Crossing.
+    const t = table({ stage: "08067", phase: "Quest", active: STREETS, staging: [CROSSING], committed: ["dh1", "dh2"] });
+    const done = drive(t, opened(t), (state) => state.phase !== "Quest");
+    expect(where(done.state, STREETS)).not.toBe("activeLocation");
+    expect(progressOn(done.state, CROSSING)).toBe(1);
+    expect(where(done.state, CROSSING)).toBe("staging");
+  });
+});
+
+describe("shadow cards", () => {
+  it("08076:A:2 the additional shadow card is dealt at the beginning of the combat phase with the enemy's own (step 6.2): two in all at the defense window", () => {
+    // The table starts in the encounter phase, so the combat phase begins (and its Forced effect resolves) in the play.
+    const t = table({ stage: "08066", active: RUINS, engaged: [SPY], deck: ["f0", "f0", "f0"], phase: "Encounter" });
+    const spy = idOf(t.state, SPY);
+    const shadows = (state: ScenarioState): number => (state.cards[spy]?.shadowId ? 1 : 0) + (state.cards[spy]?.extraShadowIds?.length ?? 0);
+    const dealtAt: number[] = [];
+    const done = drive(t, opened(t), (state) => {
+      if (state.phase === "Combat") dealtAt.push(shadows(state));
+      return state.window?.kind === "defense";
+    });
+    expect(done.state.window?.kind).toBe("defense");
+    // Both are dealt as the phase begins: the Forced effect's card and then the enemy's own (step 6.2), so the enemy holds two at its defense window and one card is left in the deck.
+    expect(dealtAt[0]).toBe(2);
+    expect(shadows(done.state)).toBe(2);
+    expect(Object.values(done.state.cards).filter((card) => card.zone === "encounterDeck").length).toBe(1);
+  });
+
+  it("08077:A:2 X is the damage the attack dealt to the defender after its Defense: 3 Attack, 2 Defense, the threat rises by 1", () => {
+    const t = table({ stage: "08066", engaged: [SPY], deck: [SEEDY_INN], phase: "Encounter", threat: [20, 20] });
+    const atDefense = drive(t, opened(t), (state) => state.window?.kind === "defense");
+    const defended = send(atDefense, { type: "DeclareDefender", defenderId: idOf(atDefense.state, "dh1") }, t.ctx);
+    const done = drive(t, defended, (state) => state.phase !== "Combat" || (state.seats[0]?.threat ?? 0) > 20);
+    expect(done.state.cards[idOf(done.state, "dh1")]?.damage).toBe(1);
+    expect(done.state.seats[0]?.threat).toBe(21);
+  });
+
+  // Open: the Mithril Shirt (19152) reduces the damage after it is placed, and the engine's count of the damage this attack dealt (`landed`, families/defense/excess.ts) keeps the 3, so X is 3 where the reading (R9) wants 2. The fix is in the engine's
+  // cancel (families/defense/damage.ts, cancelDealt takes the amount off `landed`) and moves other scenarios' shadow cards, so it goes back to the orchestrator.
+  it.todo("08077:A:2 X is the damage the attack dealt after a Shield reduced it: 3 Attack, 1 reduced, the threat rises by 2");
+});

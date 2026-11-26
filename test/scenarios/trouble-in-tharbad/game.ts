@@ -4,16 +4,19 @@ import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/ru
 import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenarios.ts";
 import type { PolicyOptions } from "../../harness/auto-player.ts";
 import { fillerLoadout, HERO_STATS, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
-import { chooseFirstOrLast, policyIntent, type Policy } from "../../harness/policy-kit.ts";
+import { chooseFirstOrLast, commitAllBut, defendFirst, policyIntent, type Policy } from "../../harness/policy-kit.ts";
 
 const cycle = loadCampaign("the-ring-maker");
 const tharbad = loadAnyScenario("trouble-in-tharbad");
 
-// Test helper. A whole standalone game of Trouble in Tharbad played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. TODO: say how the players travel, engage and answer the choices this scenario asks.
+// Test helper. A whole standalone game of Trouble in Tharbad played by the auto-player, true solo or two-handed. The heroes have a willpower of 6 (the "steady" numbers of HERO_STATS: a quest of 12 a round, so the Time counters, the lowered threat
+// elimination level and the redirect to The Crossing at Tharbad all come into play) and the decks free events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no
+// earlier part, no Resolution. The scenario needs one answer of its own: the players lose the game when Nalir leaves play and every attack made against him (Get That Dwarf!, Bellach, a shadow) sends its undefended damage to him, so each seat keeps one
+// hero home from the quest (`commitAllBut(1)`) and a ready hero defends (`defendFirst()`); the auto-player's own policy commits every hero and leaves Nalir to die in the first Get That Dwarf!. Threat is lowered only by stage 1B's cancelled progress, so the
+// players quest every round (no stalling) and the game is won through the Crossing or lost to the threat elimination level (50, then 40, 30, 20 as stage 1B runs out of Time) or to Nalir.
 export const THARBAD_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
-// "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
-export type TharbadDecks = "strong" | "weak" | "brittle";
+// "strong" is the one deck: heroes with a willpower of 6 (below), so the game takes several rounds and can be won or lost.
+export type TharbadDecks = "strong";
 
 export const tharbadLoadout = fillerLoadout;
 
@@ -42,8 +45,7 @@ export const DEFAULT_POLICY: TharbadPolicy = { choose: "first" };
 //   engageUpTo(most, options)  the optional engagement step: engage the enemy of the lowest `rank` (`allow` permits) while engaged with fewer than `most`
 //   triggerActions(effectIds, oncePerRound)  an Action or Response of the records named, each time (or once a round) the engine offers it and the seat can pay
 //   passCommitWhile(when)  the quest commit: pass without committing while `when` holds
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go in the list, before the auto-player's.
-const rules = (policy: TharbadPolicy): Policy => [chooseFirstOrLast(policy.choose)];
+const rules = (policy: TharbadPolicy): Policy => [chooseFirstOrLast(policy.choose), commitAllBut(1), defendFirst()];
 
 // Every intent is one the reducer listed.
 export function tharbadIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: TharbadPolicy = DEFAULT_POLICY): PlayerIntent {
@@ -55,14 +57,24 @@ export type TharbadGame = PlayedGame;
 // The goldens (src/campaign/scenarios/trouble-in-tharbad/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type TharbadGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: TharbadDecks; outcome: "won" | "lost"; policy?: Partial<TharbadPolicy>; lossReason?: string };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Nightmare) and a few losses (each way the scenario can be lost), each on a fixed seed.
-export const THARBAD_GOLDENS: readonly TharbadGolden[] = [];
+// The games to pin (about 600 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and Easy (one solo win with the elimination level lowered to 40 by stage 1B's Time), each ending when the
+// progress that stage 2B redirects explores The Crossing at Tharbad. The ways to lose are a threat at the elimination level (50, or 30 once stage 1B has run out of Time twice) and Nalir leaving play, each true solo and two-handed.
+export const THARBAD_GOLDENS: readonly TharbadGolden[] = [
+  { name: "solo win", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "solo win, elimination level lowered", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed win", seatCount: 2, seed: 8, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "Easy solo win", seatCount: 1, seed: 7, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "Easy two-handed win", seatCount: 2, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "solo loss: threat at the lowered level", seatCount: 1, seed: 3, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "No seats remain" },
+  { name: "solo loss: Nalir leaves play", seatCount: 1, seed: 5, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "Nalir left play" },
+  { name: "two-handed loss: threat", seatCount: 2, seed: 4, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed loss: Nalir leaves play", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "Nalir left play" },
+];
 
 const game = standaloneGame<TharbadDecks, TharbadPolicy>({
   campaign: cycle,
   scenario: tharbad,
-  stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles and its Nightmare deck.
+  stats: { strong: HERO_STATS.steady },
   codes: [...tharbad.cards.map((card) => card.code)],
   intent: tharbadIntent,
   policy: DEFAULT_POLICY,
