@@ -32,12 +32,18 @@ export function scourCards(state: ScenarioState, scope: Scour["scope"], ctx: Red
     .map((card) => card.id);
 }
 
+/** A card that left its scope since the set was fixed no longer resolves: out of play (under another card, in a discard pile) for `inPlay`, out of the encounter discard pile for `topmostDiscard`. A card that moved inside play stays. */
+function stillInScope(state: ScenarioState, id: string, scope: Scour["scope"]): boolean {
+  const zone = state.cards[id]?.zone;
+  return zone != null && (scope === "inPlay" ? inPlay(zone) : zone === "encounterDiscard");
+}
+
 /**
- * TriggerScour: the set of Scour cards is fixed when the trigger starts (`remaining` carries what is left). The first player chooses which resolves next, asked when two cards with different titles are left. The chosen card's scour effect runs in a frame of its own with the card
+ * TriggerScour: the set of Scour cards is fixed when the trigger starts (`remaining` carries what is left). The first player chooses which resolves next: one pick for each card in play (asked whenever two or more cards are left: each card in play is its own choice, even a copy of the same title). The chosen card's scour effect runs in a frame of its own with the card
  * as its source, wherever the card lies (a card in the discard pile resolves from there and stays); a frame under it carries on with the cards left, so the effects resolve one after the other, each before the effect that follows the trigger.
  */
 export function triggerScour(state: ScenarioState, instruction: Scour, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const left = (instruction.remaining ?? scourCards(state, instruction.scope, ctx)).filter((id) => scourEffects(state, id, ctx).length > 0);
+  const left = (instruction.remaining ?? scourCards(state, instruction.scope, ctx)).filter((id) => stillInScope(state, id, instruction.scope) && scourEffects(state, id, ctx).length > 0);
   if (left.length === 0) return state;
   const options = distinctChoices(state, left);
   const chosen = focus.chosen != null && left.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;

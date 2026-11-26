@@ -2,7 +2,7 @@ import type { Ask } from "../asks.ts";
 
 // The choice words of Celebrimbor's Secret (the-ring-maker part 8), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario celebrimbors-secret --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=celebrimbors-secret` prints each sentence.
-// The Scour order picks (`TriggerScour`, asked of the first player when two cards with different titles are left) are asked by the engine, not by a record's Pick, so the words test does not reach them; their entries are keyed on the record that triggers them.
+// The Scour order picks (`TriggerScour`, asked of the first player when two or more cards are left) are asked by the engine, not by a record's Pick, so the words test does not reach them; their entries are keyed on the record that triggers them.
 const SCOUR_ORDER: Ask = {
   owned: true,
   note: "Choose which Scour effect resolves next. Each one finishes before the next starts, so damage from one can bury a location before Ancient Foundation counts locations.",

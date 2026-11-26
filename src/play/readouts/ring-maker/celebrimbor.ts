@@ -5,6 +5,7 @@ import { printedOf } from "../../../rules/core/printed.ts";
 import { inPlay, type ScenarioState } from "../../../rules/core/state.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { facedownCount } from "../../../rules/families/misc/amounts.ts";
+import { buryPoints } from "../../../rules/families/ring-maker/orcs-search.ts";
 
 import { nearBuriedWords, searchNote } from "../../words/scenarios/ring-maker/celebrimbor-table.ts";
 import type { TableDial } from "../dials.ts";
@@ -45,9 +46,8 @@ export function nearBuried(game: ScenarioState, ctx: ReduceContext): readonly { 
   const found: { id: string; code: string; damage: number; points: number }[] = [];
   for (const card of Object.values(game.cards)) {
     if (!inPlay(card.zone) || card.damage <= 0) continue;
-    const printed = printedOf(ctx.cards, card.code);
-    if (printed.type !== "location" || printed.questPoints == null || printed.questPoints <= 0) continue;
-    if (printed.questPoints - card.damage <= NEAR) found.push({ id: card.id, code: card.code, damage: card.damage, points: printed.questPoints });
+    const points = buryPoints(ctx, card.code);
+    if (points != null && points - card.damage <= NEAR) found.push({ id: card.id, code: card.code, damage: card.damage, points });
   }
   return found.sort((a, b) => a.points - a.damage - (b.points - b.damage));
 }

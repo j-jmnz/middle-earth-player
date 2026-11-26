@@ -1,5 +1,5 @@
 // Rules: rm.scour, rr.first-player (data/rules/entries.json); ledger lines 08122:B:2, 08123:A:1, 08123:B:2, 08134:A:1.
-// The words of the Scour order pick (TriggerScour, 08122:B:2 and the three records after it): the engine asks the first player which of two Scour cards with different titles resolves next (askTarget), not a record's Pick, so the scenario words test cannot reach it. Each test
+// The words of the Scour order pick (TriggerScour, 08122:B:2 and the three records after it): the engine asks the first player which of two or more Scour cards resolves next (askTarget), not a record's Pick, so the scenario words test cannot reach it. Each test
 // opens the record's own window on a table with two Scour cards in play, builds the sheet the player reads and checks the sentence of the asks entry (src/play/words/asks/celebrimbors-secret.ts) under its key.
 import { describe, expect, it } from "vitest";
 

@@ -3,6 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import { settle } from "../../../rules/engine/machine.ts";
+import type { EngineStep } from "../../../rules/core/intents.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { updateCard } from "../../../rules/core/state.ts";
 import { moveCard } from "../../../rules/core/zones.ts";
@@ -27,6 +28,16 @@ describe("BuryDamagedLocations (08125:A:1)", () => {
     const plaza = state.cards[idOf(state, PLAZA)];
     expect(plaza).toMatchObject({ zone: "under", host: idOf(state, ORCS), damage: 0, progress: 0 });
     expect(state.staging).not.toContain(idOf(state, PLAZA));
+  });
+
+  it("08125:A:1 an attachment on the buried location is discarded first and does not go under with it", () => {
+    const t = table({ staging: [ORCS, { code: PLAZA, damage: 2 }], attached: [{ code: "attachment", to: PLAZA }] });
+    const state = settle(t.state, t.ctx, []);
+    const attachment = state.cards[idOf(state, "attachment")];
+    expect(under(state)).toEqual([PLAZA]);
+    expect(attachment?.zone).not.toBe("attached");
+    expect(attachment?.zone).not.toBe("under");
+    expect(state.cards[idOf(state, PLAZA)]?.attachments ?? []).toEqual([]);
   });
 
   it("08125:A:1 damage beyond the printed quest points buries the location too, and the active location is buried as well", () => {
@@ -65,7 +76,9 @@ describe("the amount facedownUnder (08124:A:1)", () => {
 describe("PlaceRandomHandUnder (08134:A:1)", () => {
   it("08134:A:1 each player puts one random card of his hand facedown underneath the objective, still his own", () => {
     const t = table({ seats: 2, staging: [ORCS], hand: ["filler", "ally"] });
-    const state = run(t, t.state, { verb: "PlaceRandomHandUnder", code: ORCS });
+    const steps: EngineStep[] = [];
+    const state = run(t, t.state, { verb: "PlaceRandomHandUnder", code: ORCS }, { steps });
+    expect(steps.filter((step) => step.kind === "placeUnder")).toEqual([{ kind: "placeUnder", seat: 0, hostId: idOf(state, ORCS) }, { kind: "placeUnder", seat: 1, hostId: idOf(state, ORCS) }]);
     const buried = Object.values(state.cards).filter((card) => card.zone === "under");
     expect(buried).toHaveLength(2);
     expect(buried.map((card) => card.owner).sort()).toEqual([0, 1]);
@@ -90,6 +103,9 @@ describe("the Shadow effects that read the defender (08131:A:3, 08134:A:2)", () 
     const hero = fight.run.state.cards[fight.made.hero];
     expect(hero?.zone).toBe("discard");
     expect(fight.run.state.cards[idOf(fight.run.state, FOUNDATION)]?.damage ?? 0).toBeGreaterThan(0);
+    // The excess is the Shadow effect's doing, not the damage rule's.
+    const placed = fight.run.steps.find((step) => step.kind === "damage" && step.targetId === idOf(fight.run.state, FOUNDATION));
+    expect(placed).toMatchObject({ cause: { effect: "08131:shadow:1", line: "08131:A:3" } });
   });
 
   it("08134:A:2 a character the attack destroys goes facedown underneath the objective and stays its owner's", () => {

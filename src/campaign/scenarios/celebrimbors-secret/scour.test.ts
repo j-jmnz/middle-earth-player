@@ -1,8 +1,7 @@
 // Rules: rm.scour, rr.first-player, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 08122:B:2, 08123:A:1, 08124:A:2, 08131:A:2, 08132:A:1, 08133:A:1, 08134:A:1. The Scour keyword: TriggerScour resolves the scour effect of each card in the scope, in the order the first player chooses.
 import { describe, expect, it } from "vitest";
 
-import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
-import { moveCard } from "../../../rules/core/zones.ts";
+import type { ScenarioState } from "../../../rules/core/state.ts";
 import { idOf, idsOf, resolveRecords, run, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "celebrimbors-secret";
@@ -56,6 +55,18 @@ describe("TriggerScour in play (rm.scour)", () => {
   });
 });
 
+describe("a Scour card that leaves play during the trigger (rm.scour, rm.the-orcs-search)", () => {
+  it("08122:B:2 a Scour card buried underneath The Orcs' Search before its turn does not resolve: the Tower stays under and is not in the staging area", () => {
+    const t = table({ staging: [SCOUT, "08125"], active: { code: TOWER, damage: 3 } });
+    const picked = resolveRecords(t.state, t.ctx, "08122", "forced", t.state.questStage ?? "", () => idOf(t.state, SCOUT));
+    // The Scout's 1 damage brings the Tower to its 4 quest points, so it goes under; a card under another is not in play and the examine-each-card trigger skips it.
+    const tower = picked.state.cards[idOf(picked.state, TOWER)];
+    expect(tower?.zone).toBe("under");
+    expect(picked.state.staging).not.toContain(tower?.id);
+    expect(picked.state.window).toBeNull();
+  });
+});
+
 describe("TriggerScour from the discard pile (08133:A:1)", () => {
   it("resolves the Scour card nearest the top of the encounter discard pile, from there, and it stays", () => {
     const t = table({ discard: [FOUNDATION, TOWER, PLAZA], staging: [SCOUT] });
@@ -70,7 +81,6 @@ describe("TriggerScour from the discard pile (08133:A:1)", () => {
     const t = table({ discard: [PLAZA], staging: [TOWER] });
     const state = run(t, t.state, SCOUR_TOP);
     expect(damage(state, TOWER)).toBe(0);
-    expect(updateCard(moveCard(state, idOf(state, PLAZA), { zone: "encounterDiscard" }), idOf(state, PLAZA), {}).cards[idOf(state, PLAZA)]?.zone).toBe("encounterDiscard");
   });
 });
 
@@ -96,13 +106,30 @@ describe("Prowling Orc's Scour (08129:A:2)", () => {
 });
 
 describe("Ancient Foundation's Scour does not stack (08132:A:1)", () => {
-  it("two copies in play assign damage once: X is the locations in play", () => {
+  it("08132:A:1 two copies in play assign damage once: X is the locations in play, one Foundation's 4 plus the Tower's 2", () => {
     const t = table({ staging: [FOUNDATION, FOUNDATION, PLAZA], active: TOWER });
-    const state = run(t, t.state, SCOUR_IN_PLAY);
-    // 4 locations in play (three staged, one active): 4 damage assigned in all, once.
-    let total = 0;
-    for (const code of [FOUNDATION, PLAZA, TOWER]) for (const id of idsOf(state, code)) total += state.cards[id]?.damage ?? 0;
-    expect(total).toBeLessThanOrEqual(4);
+    const total = (state: ScenarioState): number => [FOUNDATION, PLAZA, TOWER].flatMap((code) => idsOf(state, code)).reduce((sum, id) => sum + (state.cards[id]?.damage ?? 0), 0);
+    // The first player picks a Foundation first; any later pick is answered with its first option.
+    const foundations = idsOf(t.state, FOUNDATION);
+    const picked = resolveRecords(t.state, t.ctx, "08122", "forced", t.state.questStage ?? "", (window) => (window.window?.kind === "choose" ? (window.window.options.find((id) => foundations.includes(id)) ?? window.window.options[0] ?? "") : ""));
+    // Three Scour cards in play (two Foundations, the Tower): the Foundation resolves once (does not stack), the Tower returns to staging with 2 damage.
+    expect(picked.state.window).toBeNull();
+    expect(total(picked.state)).toBe(4 + 2);
+  });
+
+  it("08132:A:1 a Foundation that buries itself leaves the second copy alone: it holds the flag and resolves in the same trigger (recommended reading)", () => {
+    const t = table({ staging: ["08125", FOUNDATION, FOUNDATION, PLAZA, "08133"] });
+    const [first, second] = idsOf(t.state, FOUNDATION);
+    // Every pick takes the first copy while it is in play, then the second.
+    const picked = resolveRecords(t.state, t.ctx, "08122", "forced", t.state.questStage ?? "", (window) => {
+      const options = window.window?.kind === "choose" ? window.window.options : [];
+      return options.find((id) => id === first) ?? options.find((id) => id === second) ?? options[0] ?? "";
+    });
+    // The first copy scours: 4 locations in play, its 4 damage all on itself, so it goes under The Orcs' Search.
+    expect(picked.state.cards[first ?? ""]?.zone).toBe("under");
+    // The second copy now holds the flag and scours: 3 locations in play, its 3 damage on itself (below its 4 quest points).
+    expect(picked.state.cards[second ?? ""]).toMatchObject({ zone: "staging", damage: 3 });
+    expect(damage(picked.state, PLAZA)).toBe(0);
   });
 
   it("08132:A:1 the copy in the discard pile scours alone, whatever copy is in play: X is the one location in play", () => {

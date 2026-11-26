@@ -18,7 +18,7 @@ import type { Focus } from "../index.ts";
 export const BLACK_GATE = "144027";
 
 /** The card in play with this code, the host of the facedown cards (null in a game without it). */
-function hostOf(state: ScenarioState, code: string): string | null {
+export function hostOf(state: ScenarioState, code: string): string | null {
   return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id ?? null;
 }
 

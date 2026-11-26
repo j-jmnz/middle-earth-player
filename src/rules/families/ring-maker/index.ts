@@ -66,7 +66,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "TriggerScour":
       return triggerScour(state, instruction, focus, ctx, steps);
     case "PlaceRandomHandUnder":
-      return placeRandomHandUnder(state, instruction);
+      return placeRandomHandUnder(state, instruction, steps);
     case "PlaceDestroyedUnder":
       return placeDestroyedUnder(state, instruction, focus);
     case "ExcessToActiveLocation":

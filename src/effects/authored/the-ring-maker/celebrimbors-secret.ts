@@ -84,12 +84,12 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 08125 The Orcs' Search (objective). A:1: a location in play with damage equal to or more than its printed quest points goes facedown underneath it, the tokens and attachments discarded (a settle sweep). A:2: Forced at the end of the refresh phase, each
   // player raises his threat by 1 for each card underneath.
   { id: "08125:constant:1", cardCode: ORCS_SEARCH, lines: ["08125:A:1"], timing: "constant", instructions: [{ verb: "BuryDamagedLocations" }] },
-  { id: "08125:forced:1", cardCode: ORCS_SEARCH, lines: ["08125:A:2"], timing: "forced", trigger: "endOfPhase", condition: { kind: "phase", is: "Refresh" }, instructions: [{ verb: "RaiseThreat", amount: { facedown: true }, who: "eachSeat" }] },
+  { id: "08125:forced:1", cardCode: ORCS_SEARCH, lines: ["08125:A:2"], timing: "forced", trigger: "endOfPhase", condition: { kind: "phase", is: "Refresh" }, instructions: [{ verb: "RaiseThreat", amount: UNDER_SEARCH, who: "eachSeat" }] },
 
   // 08126 The Secret Chamber. X, its Threat, is the number of players (immune to player card effects: the build). Travel: remove 3 progress from the current quest. If it is placed underneath The Orcs' Search the players lose.
   { id: "08126:constant:1", cardCode: "08126", lines: ["08126:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { players: true }, until: "whileSourceInPlay", target: "self" }] },
   { id: "08126:travel:1", cardCode: "08126", lines: ["08126:A:2"], timing: "travel", instructions: [{ verb: "RemoveProgressFromQuest", amount: 3 }] },
-  { id: "08126:triggered:1", cardCode: "08126", lines: ["08126:A:3"], timing: "triggered", trigger: "placedUnder", subject: "self", instructions: [{ verb: "LoseGame" }] },
+  { id: "08126:triggered:1", cardCode: "08126", lines: ["08126:A:3"], timing: "triggered", trigger: "placedUnder", subject: "self", instructions: [{ verb: "LoseGame", reason: "The Secret Chamber was placed underneath The Orcs' Search" }] },
 
   // 08127 Celebrimbor's Mould (objective). A:1: once free of encounters (nothing guards it, the Chamber or Bellach it lies on has left play) the first player claims it and attaches it to a hero he controls; lying on a card it returns to the staging area when that card
   // leaves play. A:2 (the build writes it, replaced here): the players lose when the hero it is attached to leaves play; on Bellach, it loses nothing.

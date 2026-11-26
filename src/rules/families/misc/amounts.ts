@@ -9,6 +9,7 @@ import { modifiedStat } from "../../core/keywords.ts";
 import { printedOf, type PrintedCard } from "../../core/printed.ts";
 import { victoryPointsOf } from "../../core/printed-stat.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { hostOf } from "../harad/under.ts";
 import { inPlay, livingSeats } from "../../core/state.ts";
 
 // The facedown attachments of a card (AttachFacedown) are out of play under it: zone "under", hosted by the card.
@@ -55,7 +56,7 @@ export function miscAmount(state: ScenarioState, amount: AmountExpr, sourceId: s
   if (amount.remainingQuestPoints) return remainingQuestPoints(state, cards);
   if (amount.victoryPoints) return state.victory.reduce((sum, id) => sum + victoryPointsOf(state, id, cards), 0);
   if (amount.facedown) return facedownCount(state, sourceId);
-  if (amount.facedownUnder) return facedownCount(state, Object.values(state.cards).find((card) => card.code === amount.facedownUnder && inPlay(card.zone))?.id ?? null);
+  if (amount.facedownUnder) return facedownCount(state, hostOf(state, amount.facedownUnder));
   if (amount.resourcesAboveCopies) return resourcesAboveCopies(state, sourceId);
   return 0;
 }

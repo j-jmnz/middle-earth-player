@@ -54,6 +54,12 @@ function flagCause(ctx: ReduceContext, code: string, flag: string): Cause {
   return record ? effectCause(record) : ruleCause("rr.damage");
 }
 
+// The cause of the excess an attack sends to the active location: the record that marked the attack (the Shadow effect of 08131:A:3), else the rule.
+function activeCause(ctx: ReduceContext): Cause {
+  const record = ctx.effects.find((effect) => effect.instructions.some((instruction) => instruction.verb === "ExcessToActiveLocation"));
+  return record ? effectCause(record) : ruleCause("rr.damage");
+}
+
 // The damage an attack landed raises the defending player's threat (damageToThreat): the player the attack is against, or the enemy's controller outside an attack.
 function damageRaisesThreat(state: ScenarioState, before: ScenarioState, enemyId: string, landed: number, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   const seat = before.pendingAttack?.seat ?? before.cards[enemyId]?.controller;
@@ -119,9 +125,11 @@ export function combatDamage(
   // Cruel Mountain-troll (10074:A:1): each point of excess takes a progress token off each quest card in play; the enemy's other excess flags still apply.
   const afterCard = toCard != null && !toStage ? placeDamage(raised, toCard, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")) : raised;
   const eachQuest = toEachQuest && !toStage ? removeProgressFromEachQuest(afterCard, excess, enemy.controller ?? target.controller, ctx, steps, causeOf("excessToEachQuest")) : afterCard;
-  if (active != null && !toStage) return noteHitPointsOn(placeDamage(eachQuest, active, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")), targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
-  if (toLake && lake != null) return noteHitPointsOn(placeDamage(eachQuest, lake, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")), targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
-  if (toStage && state.questStage) return noteHitPointsOn(placeDamage(eachQuest, state.questStage, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")), targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
+  // The excess lands on one card as combat damage; the hit points noted are the defender's.
+  const placeOn = (card: string, cause: Cause) => noteHitPointsOn(placeDamage(eachQuest, card, excess, ctx.cards, steps, "combat", cause), targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
+  if (active != null && !toStage) return placeOn(active, activeCause(ctx));
+  if (toLake && lake != null) return placeOn(lake, ruleCause("rr.damage"));
+  if (toStage && state.questStage) return placeOn(state.questStage, ruleCause("rr.damage"));
   if (!toThreat && !toQuest && !toShip) return noteHitPointsOn(toDamage ? noteExcess(eachQuest, excess) : eachQuest, targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
   // "Excess damage from this attack is dealt to a Ship objective you control" (11055:A:2): the excess is the X of the effect the attack leaves for its end.
   if (toShip && !toThreat && !toQuest) return noteExcess(eachQuest, excess);

@@ -161,6 +161,8 @@ function words(step: EngineStep, names: LogNames, questStat: string | null): str
       return step.count === 0 ? null : `${step.count} ${step.count === 1 ? "card" : "cards"} of ${step.set} ${step.count === 1 ? "is" : "are"} shuffled into the encounter deck`;
     case "setAsideForPool":
       return setAsideLine(names.card(step.sourceId), names.card(step.cardId));
+    case "placeUnder":
+      return `${player(step.seat)} puts a card from their hand facedown underneath ${names.card(step.hostId)}`;
     case "poison":
       return poisonLine(names.card(step.targetId), step.count, step.of);
     case "unconscious":

@@ -21,7 +21,7 @@ export const RING_MAKER_TEMPLATES: Templates = {
   TriggerScour: (i) => ({
     text: `${i.scope === "topmostDiscard"
       ? "the card nearest the top of the encounter discard pile that has a Scour effect resolves that effect as its source and stays in the discard pile (nothing when none has)"
-      : "each card in play (staging area, engaged, active location) that has a Scour effect resolves it as its source, one after the other, in the order the first player chooses (asked when two cards with different titles are left); the set is fixed as the trigger starts"}${i.remaining ? ` (${(i.remaining as string[]).length} left to resolve)` : ""}`,
+      : "each card in play (staging area, engaged, active location) that has a Scour effect resolves it as its source, one after the other, in the order the first player chooses (asked whenever two or more are left: each card in play is its own choice); the set is fixed as the trigger starts"}${i.remaining ? ` (${(i.remaining as string[]).length} left to resolve)` : ""}`,
     read: ["scope", "remaining"],
   }),
   BuryDamagedLocations: () => ({ text: "(constant, does nothing when run) at each settle a location in play, in the staging area or active, whose damage is at least its printed quest points goes facedown underneath this card, out of play, its tokens and attachments discarded", read: [] }),

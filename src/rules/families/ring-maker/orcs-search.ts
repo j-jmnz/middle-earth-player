@@ -12,19 +12,22 @@ import { gameReads } from "../../core/game-reads.ts";
 import { frameScope, refCard } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { queueEvent } from "../../windows/queue.ts";
+import { effectsOf } from "../../windows/listen.ts";
 import { placeUnderHost } from "../encounter/moves.ts";
+import { hostOf } from "../harad/under.ts";
 import { heldInHand } from "./hand.ts";
 import type { Focus } from "../index.ts";
 
-/** The card in play with this code, the host of the facedown cards (null in a game without it). */
-function hostOf(state: ScenarioState, code: string): string | null {
-  return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id ?? null;
-}
-
 /** The host of the card whose record holds BuryDamagedLocations, in play. */
 function searchOf(state: ScenarioState, ctx: ReduceContext): string | null {
-  const host = Object.values(state.cards).find((card) => inPlay(card.zone) && ctx.effects.some((effect) => effect.cardCode === card.code && effect.instructions.some((instruction) => instruction.verb === "BuryDamagedLocations")));
+  const host = Object.values(state.cards).find((card) => inPlay(card.zone) && effectsOf(ctx, card.code).some((effect) => effect.instructions.some((instruction) => instruction.verb === "BuryDamagedLocations")));
   return host?.id ?? null;
+}
+
+/** The printed quest points that bury a card (08125:A:1): those of a location that prints some; null for any other card. */
+export function buryPoints(ctx: ReduceContext, code: string): number | null {
+  const printed = printedOf(ctx.cards, code);
+  return printed.type === "location" && printed.questPoints != null && printed.questPoints > 0 ? printed.questPoints : null;
 }
 
 /** The settle sweep (08125:A:1): a location in play, in the staging area or active, whose damage has reached its printed quest points goes facedown underneath the objective; a game without one looks at nothing. */
@@ -36,15 +39,15 @@ export function buryDamaged(state: ScenarioState, ctx: ReduceContext, steps: Eng
   for (const id of [...state.staging, state.activeLocation, state.secondActiveLocation]) {
     const card = id ? next.cards[id] : undefined;
     if (!id || !card || !inPlay(card.zone)) continue;
-    const printed = printedOf(ctx.cards, card.code);
-    if (printed.type !== "location" || printed.questPoints == null || printed.questPoints <= 0 || card.damage < printed.questPoints) continue;
+    const points = buryPoints(ctx, card.code);
+    if (points == null || card.damage < points) continue;
     next = placeUnderHost(next, id, host, ctx, steps);
   }
   return next;
 }
 
 /** PlaceRandomHandUnder: each living player in turn, the first player first, puts one card of his hand, chosen by the game's seed, facedown underneath the card in play with the code, out of play and still his own. */
-export function placeRandomHandUnder(state: ScenarioState, instruction: Extract<Instruction, { verb: "PlaceRandomHandUnder" }>): ScenarioState {
+export function placeRandomHandUnder(state: ScenarioState, instruction: Extract<Instruction, { verb: "PlaceRandomHandUnder" }>, steps: EngineStep[]): ScenarioState {
   const host = hostOf(state, instruction.code);
   if (!host) return state;
   let next = state;
@@ -53,6 +56,7 @@ export function placeRandomHandUnder(state: ScenarioState, instruction: Extract<
     const id = hand.length === 0 ? undefined : hand[nextUint(next.seed, next.seedCursor) % hand.length];
     if (!id) continue;
     const placed = updateCard(moveCard({ ...next, seedCursor: next.seedCursor + 1 }, id, { zone: "under", locationId: host }), id, { owner: next.cards[id]?.owner ?? seat });
+    steps.push({ kind: "placeUnder", seat, hostId: host });
     next = queueEvent(placed, { trigger: "placedUnder", seat: null, subject: id });
   }
   return next;
