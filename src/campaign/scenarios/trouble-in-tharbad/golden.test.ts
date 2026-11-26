@@ -44,10 +44,11 @@ describe("Trouble in Tharbad golden", () => {
     wins: "ends when the last progress explores The Crossing at Tharbad in the staging area on stage 2B, and settles at once with a score and earns nothing",
     won(state, golden) {
       expect(codeOf(state, state.questStage), golden.name).toBe("08067");
-      // The Crossing was explored: it left the staging area (it cannot leave it any other way) and the quest is won.
-      const crossing = cardsOf(state, "08071").map((card) => card.zone);
+      // The Crossing was explored: it holds `exploredHeld` (it cannot leave the staging area, so it stays there) and the quest is won.
+      const crossing = cardsOf(state, "08071");
       expect(crossing, golden.name).toHaveLength(1);
-      expect(["setAside", "staging", "engaged"], golden.name).not.toContain(crossing[0]);
+      expect(crossing[0]?.zone, golden.name).toBe("staging");
+      expect(heldAmount(state, crossing[0]?.id ?? "", "exploredHeld"), golden.name).toBeGreaterThan(0);
       expect(state.stageCleared, golden.name).toBe(true);
       if (golden.lowered) expect(reductionOf(state, 0), golden.name).toBeGreaterThanOrEqual(10);
       const nalir = cardsOf(state, "08068");
