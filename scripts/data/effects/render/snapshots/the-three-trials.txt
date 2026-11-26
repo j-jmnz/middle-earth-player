@@ -5,7 +5,7 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
 
 08035:A:1 (front): Setup: Set aside all 3 Guardian enemies, all 3 Key objectives, all 3 Barrow locations, and Hallowed Circle.
   08035:setup:1: Setup
-    (no instructions: the record only names the printed line, and the engine runs no step for it)
+    - [json NoteEncounterDiscards {"verb":"NoteEncounterDiscards"}]
 
 08035:B:1 (back): When Revealed: The players advance to a stage 2A quest of their choice.
   08035:whenRevealed:1: When revealed
@@ -147,7 +147,7 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
   08041:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+    - if this card is engaged with a player (that player is who "you" means in this record): this enemy attacks now, dealt a new shadow card after its old ones are discarded
     - place 3 resource tokens on this card
 
 ## 08042 Raven's Guardian
@@ -385,4 +385,4 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
     - if the attacking enemy is a Guardian enemy (any player controls): the attacking enemy is dealt a shadow card
     - then, if the attacking enemy is a Guardian enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy is dealt a shadow card
 
-(rendered pieces: 187 by template, 27 as JSON)
+(rendered pieces: 188 by template, 28 as JSON)

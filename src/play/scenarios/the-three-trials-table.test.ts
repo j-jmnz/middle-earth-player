@@ -38,7 +38,7 @@ describe("the choice of the next trial", () => {
     expect(sheet?.rows.map((row) => row.id)).toEqual(["08036", "08037", "08038"]);
     // The trial, what it puts on the table, its 2B rule; the stage code lets a long press open the card.
     expect(sheet?.rows.map((row) => row.label.split(" · ").length)).toEqual([3, 3, 3]);
-    expect(sheet?.rows[0]?.label).toMatch(/^Strength · Guardian and Barrow, Key on the Guardian · /);
+    expect(sheet?.rows[0]?.label).toMatch(/^Strength · Guardian, Barrow · Barrows immune$/);
     expect(sheet?.rows.map((row) => row.code)).toEqual(["08036", "08037", "08038"]);
   });
 

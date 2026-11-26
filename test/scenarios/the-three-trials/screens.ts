@@ -9,6 +9,7 @@ const marked = (key: string, stage: string) => ({ modified: [{ code: key, from: 
 const keyOnGuardian = { attached: [{ code: "08043", to: "08040", encounter: true as const }], ...marked("08043", STRENGTH) };
 
 export const screens: ScreenMoment[] = [
+  { name: "stage-no-points", layout: { stage: STRENGTH, progress: 36, staging: ["08046"] }, note: "08036:B:2: stage 2 has no quest points, so its quest card shows no points and no progress against them." },
   { name: "trial-key-on-guardian", layout: { stage: STRENGTH, staging: [{ code: "08040", resources: 2 }, "08046"], ...keyOnGuardian }, note: "08036:B:2: the Key dial says Key of the Boar is the current trial's and lies on Boar's Guardian, controlled by no player; the Guardian's pill names the Key (08043:A:1)." },
   { name: "trial-key-claimed", layout: { stage: STRENGTH, staging: ["08046"], attached: [{ code: "08043", to: "dh1", encounter: true }], ...marked("08043", STRENGTH), committed: ["dh1"] }, note: "08036:B:2: a hero holds the current trial's Key, so the Key dial is full and says the players control it; the hero's pill names the Key and its preview says it counts toward Hallowed Circle's cost." },
   { name: "trial-key-barrow", layout: { stage: PERSEVERANCE, staging: ["08046"], attached: [{ code: "08044", to: "08046", encounter: true }], ...marked("08044", PERSEVERANCE) }, note: "08037:A:1: the Key lies on a Barrow location in the staging area; the Barrow's pill names the Key." },

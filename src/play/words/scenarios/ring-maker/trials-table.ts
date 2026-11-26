@@ -7,11 +7,11 @@ import { plural } from "../../list.ts";
 
 type Choose = Extract<Instruction, { verb: "Choose" }>;
 
-/** Each stage 2A in the choice, by code: one line of three parts, the trial's name, what its When Revealed puts on the table and its 2B rule in short (08036:B:1, 08037:B:1, 08038:B:1). */
+/** Each stage 2A in the choice, by code: one line of three parts short enough for a phone on its side, the trial's name, what its When Revealed puts on the table and its 2B rule (Strength: Barrows are immune and cannot be travelled to; Perseverance: Guardians cannot be damaged; Intuition: progress becomes encounter discards) (08036:B:1, 08037:B:1, 08038:B:1). */
 const TRIAL_ROWS: Readonly<Record<string, string>> = {
-  "08036": "Strength · Guardian and Barrow, Key on the Guardian · Barrows immune, not travelled to",
-  "08037": "Perseverance · Barrow with a Key on it, its Guardian · Guardians cannot be hurt",
-  "08038": "Intuition · Guardian and Barrow, Key in the deck · Progress turns into discards",
+  "08036": "Strength · Guardian, Barrow · Barrows immune",
+  "08037": "Perseverance · Barrow, Key, Guardian · Guardians safe",
+  "08038": "Intuition · Guardian, Barrow · Progress discards",
 };
 
 /** The stage in play is the first stage (08035, side B): no trial is done yet. */
