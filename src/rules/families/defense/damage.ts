@@ -21,6 +21,7 @@ import { defendingAgainst } from "../angmar/combat.ts";
 import { scrollDamageTarget } from "../pelargir/scroll.ts";
 import { bodyguardTarget } from "../pelargir/vale/bodyguard.ts";
 import { listened, queueHeard, trimFollowUps } from "./listen.ts";
+import { afterTarget } from "../../combat/shadow.ts";
 import { bilboDamageBarred } from "../riddles/gollum.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
@@ -39,14 +40,15 @@ export function afterCancel(state: ScenarioState, id: string, canceled: number, 
 }
 
 // Takes `amount` of the damage the answered damageDealt event dealt off the damaged card: what a later cancel of the same
-// damage can still take is what is left (rr.cancel). When the card is the character the attack in progress damaged, the
-// damage is no longer dealt by that attack either, so `landed` (what a shadow effect reads as "damage dealt by this attack") loses it.
-export function cancelDealt(state: ScenarioState, id: string, amount: number, dealt: number, ctx: ReduceContext): ScenarioState {
+// damage can still take is what is left (rr.cancel). A cancel (`canceled`) of the damage the attack in progress dealt means the attack did
+// not deal it, so `landed` (what a shadow effect reads as "damage dealt by this attack") loses it; redirected damage is still dealt by the attack.
+export function cancelDealt(state: ScenarioState, id: string, amount: number, dealt: number, ctx: ReduceContext, canceled = false): ScenarioState {
   const card = state.cards[id];
   if (!card || amount <= 0) return state;
-  const canceled = lowerLanded(updateCard(state, id, { damage: card.damage - amount }), id, amount);
-  const data = topFrame(canceled)?.data;
-  const patched = data?.kind === "effect" ? patchTop(canceled, { data: { ...data, dealt: dealt - amount } }) : canceled;
+  const lowered = updateCard(state, id, { damage: card.damage - amount });
+  const removed = canceled ? lowerLanded(lowered, id, amount) : lowered;
+  const data = topFrame(removed)?.data;
+  const patched = data?.kind === "effect" ? patchTop(removed, { data: { ...data, dealt: dealt - amount } }) : removed;
   return afterCancel(patched, id, amount, dealt - amount, ctx);
 }
 
@@ -55,7 +57,7 @@ function lowerLanded(state: ScenarioState, id: string, amount: number): Scenario
   const attack = state.pendingAttack;
   const landed = attack?.defense?.landed;
   if (!attack || !landed) return state;
-  const target = attack.undefended || !attack.defenderId ? attack.heroId : attack.defenderId;
+  const target = afterTarget(attack);
   if (!target || (id !== target && id !== damageGoesTo(state, target, "combat"))) return state;
   return { ...state, pendingAttack: { ...attack, defense: { ...attack.defense, landed: Math.max(0, landed - amount) } } };
 }

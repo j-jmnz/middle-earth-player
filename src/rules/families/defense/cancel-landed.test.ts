@@ -36,9 +36,33 @@ function threatAfterUndefended(canceling: boolean): number {
   return run.seats[0]!.threat;
 }
 
+// "Response: When damage is dealt to a hero, exhaust Dori: he takes all of it instead" (131009:A:1): the attack still deals the 3, to Dori.
+function threatAfterDori(): number {
+  const dori = hero("131009");
+  const built = table({
+    cards: [hero("a"), dori, enemy("brute", { attack: 3 }), omen],
+    effects: [...recordsOf(RECORDS, "131009"), omenShadow],
+    heroes: [{ code: "a" }, { code: "131009" }],
+    enemies: [{ code: "brute" }],
+    encounter: ["omen"],
+    threat: 20,
+  });
+  const window = until(send(built.state, { type: "DeclineEngage" }, built.ctx), built.ctx, (state) => state.window?.kind === "defense");
+  let run = send(window, { type: "Undefended", heroId: built.ids.a! }, built.ctx);
+  expect(offered(legalIntents(run, built.ctx), "131009:response:1")).toBe(true);
+  run = send(run, { type: "Trigger", cardId: built.ids["131009"]!, effectId: "131009:response:1" }, built.ctx);
+  expect(run.cards[built.ids["131009"]!]?.damage).toBe(3);
+  run = until(run, built.ctx, (state) => state.phase !== "Combat" || state.pendingAttack == null);
+  return run.seats[0]!.threat;
+}
+
 describe("damage canceled after it was placed", () => {
   it("19152:A:3 counts the 2 damage left, not the 3 placed, as dealt by the attack", () => {
     expect(threatAfterUndefended(false)).toBe(23);
     expect(threatAfterUndefended(true)).toBe(22);
+  });
+
+  it("131009:A:1 still counts damage redirected to Dori as dealt by the attack", () => {
+    expect(threatAfterDori()).toBe(23);
   });
 });

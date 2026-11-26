@@ -158,8 +158,7 @@ export function runPlayerVerb(
       if (!card || dealt <= 0) return state;
       const amount = Math.min(dealt, card.damage, instruction.all ? dealt : resolveAmount(state, instruction.amount ?? 1, scope, ctx));
       if (amount <= 0) return state;
-      // What is left of the damage is what a later cancel of the same damage can take; the "took damage" events that follow lose that much (defense family).
-      return cancelDealt(state, id, amount, dealt, ctx);
+      return cancelDealt(state, id, amount, dealt, ctx, true);
     }
     case "SetThreat":
       return withThreat(state, focus.seat, instruction.value);

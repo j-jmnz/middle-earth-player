@@ -384,6 +384,6 @@ function destroyedAllyOf(state: ScenarioState, attack: PendingAttack, ctx: Reduc
 }
 
 // The character an attack that ended was made against: its defender, or the hero an undefended attack's damage was assigned to.
-function afterTarget(attack: PendingAttack): string | undefined {
+export function afterTarget(attack: PendingAttack): string | undefined {
   return attack.undefended || !attack.defenderId ? attack.heroId : attack.defenderId;
 }
