@@ -71,7 +71,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   EngageLastPlayer: [{ verb: "EngageLastPlayer" }],
   AttachSetAside: [{ verb: "AttachSetAside", code: "03041", removeWhenLeaving: true }, { verb: "AttachSetAside", code: "03024", claimed: true }],
   ReturnToStage: [{ verb: "ReturnToStage", stage: 2 }],
-  RemoveAllProgress: [{ verb: "RemoveAllProgress", target: "self" }, { verb: "RemoveAllProgress", pick: HERO }],
+  RemoveAllProgress: [{ verb: "RemoveAllProgress", target: "self" }, { verb: "RemoveAllProgress", pick: HERO, remember: true }],
   RemoveProgressEach: [{ verb: "RemoveProgressEach", amount: 1, pick: HERO }],
   UndefendedDamageTo: [{ verb: "UndefendedDamageTo", pick: HERO, character: true }, { verb: "UndefendedDamageTo", pick: HERO }],
   EngageSeatWith: [{ verb: "EngageSeatWith", pick: HERO, controls: true }, { verb: "EngageSeatWith", pick: HERO }],
