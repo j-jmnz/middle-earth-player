@@ -7,7 +7,7 @@ import { stageTimeLimitWords, stageTimeNearWords, stageTimeWords } from "../../w
 import { cardsOf, type TableDial } from "../dials.ts";
 
 /** The quest stages of The Fords of Isen, of To Catch an Orc (stages 2B and 3B), of Into Fangorn (stages 1B, 2B and 3B) and of The Dunland Trap (stages 1B and 3B; 2B prints none) that print Time X. */
-export const FORDS_STAGES: readonly string[] = ["07059", "07060", "07061", "07063", "07064", "07065", "07066", "07067", "08011", "08012", "08013"];
+export const FORDS_STAGES: readonly string[] = ["07059", "07060", "07061", "07063", "07064", "07065", "07066", "07067", "08011", "08013"];
 
 export function ringMakerDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
   const dials: TableDial[] = [];

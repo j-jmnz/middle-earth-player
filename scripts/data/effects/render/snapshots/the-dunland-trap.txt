@@ -1,0 +1,255 @@
+Scenario piles that place cards with no record (quest: 08011 The Road to Tharbad; quest: 08012 A Well Laid Trap; quest: 08013 No Way Out; activeLocation: 08016 Old South Road; setAside: 08014 Chief Turch; setAside: 08015 Munuv Dûv Ravine)
+
+## 08011 The Road to Tharbad
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08011:A:1 (front): Setup: Set Chief Turch and Munuv Dûv Ravine aside, out of play. Make Old South Road the active location. Each player searches the encounter deck for a Boar Clan enemy and puts it into play engaged with him. Shuffle the encounter deck.
+  08011:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one Boar Clan enemy in the encounter deck and puts it into play engaged with them (it is not revealed); its title must differ from every card an earlier search of this effect found
+    - shuffle the encounter deck
+
+08011:B:1 (back): Time 2.
+  08011:constant:1: Constant
+    - Time 2: when this card is revealed, 2 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+08011:B:2 (back): Forced: After the last time counter is removed from this stage, each player discards his hand and draws 2 cards. Place 2 time counters on this stage.
+  08011:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card) [also {"holdsEvents":true}]
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player discards each card (you control) in hand
+      - the acting player draws 2 card(s)
+    - place 2 resource tokens on this card
+
+## 08012 A Well Laid Trap
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08012:A:1 (front): When Revealed: Make Munuv Dûv Ravine the active location (returning any previous active location to the staging area). Each player discards each Item and each Mount attachment he controls. Each player chooses 1 ally he controls and discards each other ally he controls.
+  08012:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the set-aside card with code 08015 becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free
+    - for each player, first player first:
+      - the acting player discards each Item attachment (you control) that a player controls (not an encounter attachment)
+      - the acting player discards each Mount attachment (you control) that a player controls (not an encounter attachment)
+      - then, if there is a ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose ally (you control)
+      - the acting player discards each ally (you control) other than the cards this effect already picked
+
+08012:B:1 (back): When Revealed: Each player searches the encounter deck and discard pile for a Boar Clan enemy and puts it into play engaged with him. Shuffle the encounter deck. Each player shuffles his discard pile into his draw deck and draws 1 card.
+  08012:whenRevealed:2: When revealed [also {"holdsEvents":true}]
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one Boar Clan enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed); its title must differ from every card an earlier search of this effect found
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - the acting player shuffles their discard pile into their deck
+      - the acting player draws 1 card(s)
+
+08012:B:2 (back): Forced: At the end of the combat phase, advance to stage 3A.
+  08012:forced:1: Forced at the end of the phase
+    only if it is the Combat phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - advance to the next quest stage
+
+## 08013 No Way Out
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08013:A:1 (front): When Revealed: Put Chief Turch into play, engaged with the first player.
+  08013:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the rest of the effect is carried out by the first player
+    - one set-aside copy of the card with code 08014 is put into play engaged with the acting player (nothing with no copy set aside)
+
+08013:B:1 (back): Time X. X is 5 times the number of players in the game.
+  08013:constant:1: Constant
+    - Time 5 for each player: when this card is revealed, 5 times the players still in the game resource tokens (time counters) are put on it, counted once, and one comes off at the end of each refresh phase
+
+08013:B:2 (back): If a hero is destroyed at this stage, the players lose the game.
+  08013:forced:1: Forced on the event characterDestroyed (heard about hero (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players lose the game (A hero was destroyed)
+
+08013:B:3 (back): Forced: After the last time counter is removed from this stage, the players make engagement checks. Then, each engaged enemy makes an attack. If no heroes are destroyed by these attacks, the players win the game.
+  08013:forced:2: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the players make engagement checks against each enemy in the staging area, outside the encounter phase: in player order each engages the enemy of the highest engagement cost at or below their threat, pass after pass until a pass engages none
+    - each enemy engaged with a player makes an immediate attack, each dealt a shadow card of its own
+    - the players win the game
+
+## 08014 Chief Turch
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08014:A:1 (front): Cannot have attachments. Cannot leave play.
+  08014:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+    - this card: stat cannotLeavePlay (held by a Captain enemy while its stage is current: it cannot leave play unless destroyed; a pick that feeds a discard, a shuffle, a return to a hand or deck, the victory display or a removal from the game does not offer it, the staging area shuffled into the encounter deck leaves it where it is, and a settle sweep puts it back in the staging area if an effect with no pick moved it out of play) 1, while this card is in play
+    - this card: stat indestructible 1, while this card is in play
+
+08014:A:2 (front): Chief Turch engages the first player.
+  08014:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this enemy, in the staging area, engages the first player
+  08014:forced:2: Forced on the event returnedToStaging (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this enemy, in the staging area, engages the first player
+  08014:triggered:1: Triggered (mandatory, not printed as Forced) on the event firstPlayerTokenPassed
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this enemy moves to the first player's play area and engages them (nothing if it is not engaged, or already engaged with them)
+
+08014:A:3 (front): Forced: After an enemy engages a player, remove 1 time counter from the current quest.
+  08014:forced:3: Forced after an enemy engages a player (heard about enemy (any player controls))
+    who acts: the acting player is the player the enemy engaged
+    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+
+## 08015 Munuv Dûv Ravine
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08015:A:1 (front): Dunland enemies get +1 Attack and +1 Defense.
+  08015:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Dunland enemy (any player controls) or in the staging area: stat attack 1, while this card is in play
+    - each Dunland enemy (any player controls) or in the staging area: stat defense 1, while this card is in play
+
+## 08016 Old South Road
+(the scenario deals it into the activeLocation pile; the piles place it, no record does)
+
+08016:A:1 (front): Forced: At the end of the refresh phase, remove 1 time counter from the current quest.
+  08016:forced:1: Forced at the end of the phase
+    only if it is the Refresh phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+
+## 08017 Boar Clan Stalker
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08017:A:1 (front): Boar Clan Stalker gets +1 Attack and +1 Defense for each resource token on it (limit +4).
+  08017:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack resources of this card, at most 4, while this card is in play
+    - this card: stat defense resources of this card, at most 4, while this card is in play
+
+08017:A:2 (front): Forced: After the engaged player draws any number of cards, put a resource token on Boar Clan Stalker.
+  08017:forced:1: Forced on the event cardsDrawn
+    only if this card is an enemy engaged with the acting player
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 1 resource tokens on this card
+
+## 08018 Boar Clan Warrior
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08018:A:1 (front): Forced: After the engaged player draws any number of cards, deal Boar Clan Warrior a shadow card.
+  08018:forced:1: Forced on the event cardsDrawn
+    only if this card is an enemy engaged with the acting player
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+
+08018:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each shadow card on it.
+  08018:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack shadowCards of the attacking enemy, until the end of the attack
+
+## 08019 Hithaeglir Foothills
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08019:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+08019:A:2 (front): X is the number of resource tokens on this card.
+  08019:constant:1: Constant
+    - this card: stat threat resources of this card, while this card is in play
+
+08019:A:3 (front): Forced: After a player draws any number of cards, place 1 resource token here.
+  08019:forced:1: Forced on the event cardsDrawn
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 1 resource tokens on this card
+
+## 08020 Hills of Dunland
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08020:A:1 (front): While Hills of Dunland is in the staging area, it gains: 'Forced: After a player draws any number of cards, discard the top card of the encounter deck. If the discarded card is a Dunland enemy, put it into play engaged with that player. This ability does not stack with other copies of Hills of Dunland.'
+  08020:constant:1: Constant
+    only if this card is in the staging area
+    - this card: stat huntsOnDraw 1, while this card is in play (does not stack: only the oldest copy of this card in play whose condition holds gives it)
+  08020:forced:1: Forced on the event cardsDrawn
+    only if this card holds the flag huntsOnDraw
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard 1 card(s) from the top of the encounter deck
+    - of the cards this effect discarded from the encounter deck, the Dunland enemy discarded last is put into play engaged with the acting player (as if it had engaged him; nothing when none was discarded)
+
+08020:A:2 (front): Travel: Each player draws a card to travel here.
+  08020:travel:1: Travel [also {"holdsEvents":true}]
+    - for each player, first player first:
+      - the acting player draws 1 card(s)
+
+## 08021 Plains of Enedwaith
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08021:A:1 (front): While Plains of Enedwaith is the active location, players do not draw a card during the resource phase.
+  08021:constant:1: Constant
+    only if this card is the active location
+    - each player: stat extraDraw -1, while this card is in play
+
+08021:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if undefended).
+  08021:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
+
+## 08022 Hithaeglir Stream
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08022:A:1 (front): While Hithaeglir Stream is the active location, players draw 2 cards during the resource phase instead of 1.
+  08022:constant:1: Constant
+    only if this card is the active location
+    - each player: stat extraDraw 1, while this card is in play
+
+08022:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Deal it an additional shadow card.
+  08022:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
+
+## 08023 Frenzied Attack
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08023:A:1 (front): When Revealed: Each player draws a card. Each player discards each ally from his hand. If no allies are discarded this way, Frenzied Attack gains surge.
+  08023:whenRevealed:1: When revealed [also {"holdsEvents":true}]
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player draws 1 card(s)
+    - for each player, first player first:
+      - the acting player discards each ally (you control) in hand
+    - then, if the running effect has discarded no card (with DiscardEach) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+08023:A:2 (shadow): Shadow: Until the end of the round, attacking enemy cannot take damage.
+  08023:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat cannotTakeDamage 1, until the end of the round
+
+## 08024 Dunlending Ambush
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08024:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+08024:A:2 (front): When Revealed: Attach to the active location. (Counts as a Condition attachment with the text: 'Limit 1 per location. Forced: After attached location is explored, each player searches the encounter deck and discard pile for a Dunland enemy and puts it into play engaged with him. Shuffle the encounter deck.')
+  08024:whenRevealed:1: When revealed
+    - this treachery attaches to the active location, chosen by the first player among them; it stays in the staging area's discard when the location already holds a copy (Limit 1 per location) or none is active; the effect's X is 1 when it attached, else 0
+  08024:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  08024:forced:1: Forced on the event hostLeftPlay
+    only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one Dunland enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
+    - shuffle the encounter deck
+
+(rendered pieces: 127 by template, 4 as JSON)

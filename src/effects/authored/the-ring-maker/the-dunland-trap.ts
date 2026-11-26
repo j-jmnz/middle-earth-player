@@ -43,7 +43,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [EACH_PLAYER([{ verb: "DiscardEach", pick: HAND_CARD }, { verb: "Draw", amount: 2 }]), { verb: "PlaceResourceTokens", amount: 2, on: "self" }],
   },
 
-  // 08012 A Well Laid Trap (stage 2). A: the Ravine becomes the active location (the old one returns to the staging area); each player discards each Item and each Mount attachment he controls, then keeps 1 ally of his choice and discards the others. B: each player searches the encounter deck and discard pile for a Boar Clan enemy and puts it into
+  // 08012 A Well Laid Trap (stage 2). A: the Ravine becomes the active location (the old one returns to the staging area); each player discards each Item and each Mount attachment he controls, then keeps 1 ally of his choice and discards the others (a player with no ally picks nothing: an empty pick would leave a blank pick in the frame that stage 2B's search shares). B: each player searches the encounter deck and discard pile for a Boar Clan enemy and puts it into
   // play engaged with him; the deck is shuffled; each player shuffles his discard pile into his deck and draws 1. Forced: at the end of the combat phase advance to stage 3A (stage 2B prints no Time).
   {
     id: "08012:whenRevealed:1",
@@ -55,7 +55,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       EACH_PLAYER([
         { verb: "DiscardEach", pick: OWN_ATTACHMENT("Item") },
         { verb: "DiscardEach", pick: OWN_ATTACHMENT("Mount") },
-        { verb: "Pick", pick: OWN_ALLY },
+        { verb: "Pick", pick: OWN_ALLY, when: { kind: "canPick", pick: OWN_ALLY } },
         { verb: "DiscardEach", pick: { ...OWN_ALLY, different: true } },
       ]),
     ],
@@ -151,7 +151,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   },
   { id: "08023:shadow:1", cardCode: "08023", lines: ["08023:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "endOfRound", target: "attacker" }] },
 
-  // 08024 Dunlending Ambush. Surge is its keyword. When Revealed: it attaches to the active location (a Condition attachment, limit 1 per location; with none, or a copy there, it is discarded). Forced: after the attached location is explored each player searches the encounter deck and discard pile for a Dunland enemy and puts it into play engaged with him; the deck is shuffled.
+  // 08024 Dunlending Ambush. Surge is its keyword. When Revealed: it attaches to the active location (a Condition attachment, limit 1 per location; with none, or a copy there, it is discarded). Forced: after the attached location is explored (the host leaving play explored: the attachment hears it as it is discarded) each player searches the encounter deck and discard pile for a Dunland enemy and puts it into play engaged with him; the deck is shuffled.
   { id: "08024:whenRevealed:1", cardCode: "08024", lines: ["08024:A:2"], timing: "whenRevealed", instructions: [{ verb: "AttachToActiveLocation" }] },
   { id: "08024:constant:1", cardCode: "08024", lines: ["08024:A:2"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }] },
   {
@@ -159,8 +159,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "08024",
     lines: ["08024:A:2"],
     timing: "forced",
-    trigger: "locationExplored",
-    subject: "host",
+    trigger: "hostLeftPlay",
+    condition: { kind: "subjectExplored" },
     instructions: [EACH_PLAYER([{ verb: "SearchMove", type: "enemy", trait: "Dunland", to: "engaged" }]), SHUFFLED],
   },
 ];
