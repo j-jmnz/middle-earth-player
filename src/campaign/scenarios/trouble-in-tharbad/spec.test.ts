@@ -13,7 +13,7 @@ const RUINS = "08076";
 
 // Card specs for Trouble in Tharbad (the-ring-maker part 6): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
-// What a row cannot show is in src/rules/families/ring-maker/tharbad.test.ts and tharbad-cards.test.ts (the stages, Nalir, the later-entering enemies, surge, Bellach, The Crossing).
+// What a row cannot show is in src/campaign/scenarios/trouble-in-tharbad/stages.test.ts and trouble-in-tharbad/cards.test.ts (the stages, Nalir, the later-entering enemies, surge, Bellach, The Crossing).
 const ROWS: readonly Row[] = [
   // 08066 Double Dealings.
   { line: "08066:A:1", name: "Setup: the first player takes control of Nalir, as an ally", layout: { stage: "08066", setAside: [NALIR] }, act: resolve("08066", "setup"), expect: zone(NALIR, "play") },
@@ -24,7 +24,7 @@ const ROWS: readonly Row[] = [
   { line: "08067:B:1", name: "Time 3: a time counter comes off the stage in the refresh phase", layout: { stage: "08067", timeCounters: 3, phase: "Combat" }, act: endRound, expect: resourcesOn("08067", 2) },
   { line: "08067:B:4", name: "Forced: After a character leaves play, raise its controller's threat by 2", layout: { stage: "08067", play: ["ally"], threat: [20, 20] }, act: announce("leftPlay", "ally", { seat: 0 }), expect: threat(22) },
 
-  // 08068 Nalir (08068:A:1 is a titled test in src/rules/families/ring-maker/tharbad-cards.test.ts).
+  // 08068 Nalir (08068:A:1 is a titled test in src/campaign/scenarios/trouble-in-tharbad/cards.test.ts).
   { line: "08068:A:2", name: "Forced: At the beginning of the refresh phase, raise your threat by 1 for each player in the game (2 here, and 1 more for the refresh phase itself)", layout: { seats: 2, play: [NALIR], threat: [20, 20], phase: "Refresh" }, act: announce("beginningOfPhase"), expect: threat(23) },
 
   // 08070 Bellach.

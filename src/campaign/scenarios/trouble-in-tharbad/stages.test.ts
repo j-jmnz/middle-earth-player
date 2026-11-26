@@ -3,17 +3,17 @@
 import { describe, expect, it } from "vitest";
 
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
-import type { EngineStep } from "../../core/intents.ts";
-import { settle } from "../../engine/machine.ts";
-import { pushCardEffects } from "../../interpret/effect-frames.ts";
-import { updateCard, type ScenarioState } from "../../core/state.ts";
-import { moveCard } from "../../core/zones.ts";
-import { holds } from "../../interpret/conditions.ts";
-import { runInstruction } from "../../interpret/interpret.ts";
-import { replaceStageProgress } from "../../quest/progress-replaced.ts";
-import { addModifier } from "../../core/modified-stat.ts";
-import { removeTimeCounterFrom } from "../angmar/time.ts";
-import { travelBlocked } from "../../interpret/restrictions.ts";
+import type { EngineStep } from "../../../rules/core/intents.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import { pushCardEffects } from "../../../rules/interpret/effect-frames.ts";
+import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { moveCard } from "../../../rules/core/zones.ts";
+import { holds } from "../../../rules/interpret/conditions.ts";
+import { runInstruction } from "../../../rules/interpret/interpret.ts";
+import { replaceStageProgress } from "../../../rules/quest/progress-replaced.ts";
+import { addModifier } from "../../../rules/core/modified-stat.ts";
+import { removeTimeCounterFrom } from "../../../rules/families/angmar/time.ts";
+import { travelBlocked } from "../../../rules/interpret/restrictions.ts";
 import { idOf, run, statOf, tableFromLayout, where, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "trouble-in-tharbad";
@@ -40,7 +40,7 @@ const heard = (state: ScenarioState, trigger: string): boolean => (state.pending
 describe("AttackNalir (08067:B:2, 08083:A:1)", () => {
   const attack = (state: ScenarioState, ctx: Ctx, names: string[], staging: boolean): ScenarioState => resolve(state, ctx, [{ verb: "Pick", pick: { type: "enemy", control: "any", staging, names } }, { verb: "AttackNalir" }]);
 
-  it("rm.attacks-against-nalir: a staged enemy attacks the player who controls Nalir and its undefended damage goes to him", () => {
+  it("08067:B:2 rm.attacks-against-nalir: a staged enemy attacks the player who controls Nalir and its undefended damage goes to him", () => {
     const t = table({ stage: STAGE_2, play: [NALIR], staging: [BELLACH] });
     const begun = attack(t.state, t.ctx, ["Bellach"], true);
     expect(begun.pendingAttack?.enemyId).toBe(idOf(t.state, BELLACH));
@@ -48,21 +48,21 @@ describe("AttackNalir (08067:B:2, 08083:A:1)", () => {
     expect(begun.pendingAttack?.seat).toBe(0);
   });
 
-  it("an enemy engaged with another player attacks the player who controls Nalir", () => {
+  it("08067:B:2 an enemy engaged with another player attacks the player who controls Nalir", () => {
     const t = table({ stage: STAGE_2, seats: 2, play: [NALIR], engaged: [{ code: SPY, seat: 1 }] });
     const begun = attack(t.state, t.ctx, ["Spy from Mordor"], false);
     expect(begun.pendingAttack?.enemyId).toBe(idOf(t.state, SPY));
     expect(begun.pendingAttack?.seat).toBe(0);
   });
 
-  it("with Nalir out of play no attack is made", () => {
+  it("08067:B:2 with Nalir out of play no attack is made", () => {
     const t = table({ stage: STAGE_2, staging: [BELLACH] });
     expect(attack(t.state, t.ctx, ["Bellach"], true).pendingAttack ?? null).toBeNull();
   });
 });
 
 describe("EliminateAtLevel (08066:B:2)", () => {
-  it("rm.threat-elimination-level: a player at or above the lowered level is eliminated at once, one below stays", () => {
+  it("08066:B:2 rm.threat-elimination-level: a player at or above the lowered level is eliminated at once, one below stays", () => {
     const t = table({ stage: STAGE_1, seats: 2, threat: [40, 39] });
     const lowered = resolve(t.state, t.ctx, [LOWER]);
     expect(lowered.seats[0]?.eliminated).not.toBe(true);
@@ -71,7 +71,7 @@ describe("EliminateAtLevel (08066:B:2)", () => {
     expect(done.seats[1]?.eliminated).not.toBe(true);
   });
 
-  it("each later reduction adds to the earlier one (50, 40, 30)", () => {
+  it("08066:B:2 each later reduction adds to the earlier one (50, 40, 30)", () => {
     const t = table({ stage: STAGE_1, threat: [25, 0] });
     const reduce = (state: ScenarioState) => resolve(state, t.ctx, [LOWER, { verb: "EliminateAtLevel" }]);
     const once = reduce(t.state);
@@ -83,7 +83,7 @@ describe("EliminateAtLevel (08066:B:2)", () => {
 });
 
 describe("allThreatZero (08066:B:4)", () => {
-  it("it is announced once every living player is at 0 threat, while the stage in play hears it", () => {
+  it("08066:B:4 it is announced once every living player is at 0 threat, while the stage in play hears it", () => {
     const t = table({ stage: STAGE_1, seats: 2, threat: [0, 3] });
     expect(heard(run(t, t.state, { verb: "ShuffleEncounterDeck" }), "allThreatZero")).toBe(false);
     const zero = table({ stage: STAGE_1, seats: 2, threat: [0, 0] });
@@ -91,7 +91,7 @@ describe("allThreatZero (08066:B:4)", () => {
     expect(settled.questStage).not.toBe(zero.state.questStage);
   });
 
-  it("a stage that does not hear it announces nothing", () => {
+  it("08066:B:4 a stage that does not hear it announces nothing", () => {
     const t = table({ stage: STAGE_2, threat: [0, 0] });
     const settled = run(t, t.state, { verb: "ShuffleEncounterDeck" });
     expect(heard(settled, "allThreatZero")).toBe(false);

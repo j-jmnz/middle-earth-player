@@ -2,12 +2,12 @@
 // Trouble in Tharbad encounter cards whose behaviour a spec row cannot show: the lasting effects that reach a card entering play later, the surge read before the engage, Bellach's Threat X and the allies Nalir counts as.
 import { describe, expect, it } from "vitest";
 
-import { modifiedStat } from "../../core/keywords.ts";
-import { settle } from "../../engine/machine.ts";
-import { moveCard } from "../../core/zones.ts";
-import { syncConstants } from "../../interpret/constants.ts";
-import type { ScenarioState } from "../../core/state.ts";
-import type { EngineStep } from "../../core/intents.ts";
+import { modifiedStat } from "../../../rules/core/keywords.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import { moveCard } from "../../../rules/core/zones.ts";
+import { syncConstants } from "../../../rules/interpret/constants.ts";
+import type { ScenarioState } from "../../../rules/core/state.ts";
+import type { EngineStep } from "../../../rules/core/intents.ts";
 import { idOf, idsOf, resolveRecords, revealFromTop, finish, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "trouble-in-tharbad";
@@ -55,7 +55,7 @@ describe("08083:A:1 Get That Dwarf!: the surge check reads the staging area befo
     return done.steps.filter((step) => step.kind === "reveal").length;
   };
 
-  it("with one enemy in the staging area the card gains no surge once that enemy has engaged", () => {
+  it("08083:A:1 with one enemy in the staging area the card gains no surge once that enemy has engaged", () => {
     expect(revealed({ deck: ["f0", "f0", "f0", "f0"], staging: [SPY] })).toBe(1);
     expect(revealed({ deck: ["f0", "f0", "f0", "f0"] })).toBe(2);
   });
@@ -71,14 +71,14 @@ describe("08070:A:1 Bellach: Threat X is the number of players", () => {
 });
 
 describe("08081:A:1 Conspicuous Lot: Nalir counts as an ally his controller controls", () => {
-  it("the first player raises his threat by 1 for Nalir alone", () => {
+  it("08081:A:1 the first player raises his threat by 1 for Nalir alone", () => {
     const made = table({ stage: "08066", play: ["08068"], threat: [20, 20], deck: ["f0", "f0"] });
     const steps: EngineStep[] = [];
     const done = finish({ state: revealFromTop(made.state, made.ctx, "08081", steps).state, steps }, made.ctx, () => "");
     expect(done.state.seats[0]?.threat).toBe(21);
   });
 
-  it("the ally is counted for his controller only", () => {
+  it("08081:A:1 the ally is counted for his controller only", () => {
     const made = table({ stage: "08066", seats: 2, play: ["08068"], threat: [30, 30], deck: ["f0", "f0"] });
     const steps: EngineStep[] = [];
     const done = finish({ state: revealFromTop(made.state, made.ctx, "08081", steps).state, steps }, made.ctx, () => "");
@@ -88,7 +88,7 @@ describe("08081:A:1 Conspicuous Lot: Nalir counts as an ally his controller cont
 });
 
 describe("08068:A:1 Nalir: the first player gains control of him", () => {
-  it("control goes to the first player while Nalir is in play", () => {
+  it("08068:A:1 control goes to the first player while Nalir is in play", () => {
     const made = table({ stage: "08066", seats: 2, firstPlayer: 1, play: [{ code: "08068", seat: 0 }] });
     const synced = settle(syncConstants(made.state, made.ctx), made.ctx, []);
     expect(synced.cards[idOf(synced, "08068")]?.controller).toBe(1);
