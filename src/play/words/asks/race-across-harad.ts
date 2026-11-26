@@ -14,6 +14,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "17041:forced:1 @0 AssignDamage": { owned: true, note: "Blistering Erg: assign {x} damage, the stage number of the main quest, among the characters you control ({left} left).", bind: { x: { stage: true } }, verb: "Assign", title: "{card}: assign {left}" },
 
   // 17048:A:1 (Racing North): the first player chooses where the set aside Uruk Warg-rider is added.
+  "17048:whenRevealed:1 @0 Choose": { note: "Racing North: choose where the set aside Uruk Warg-rider is added, the staging area or the Orcs' area." },
   "17048:whenRevealed:1 @0 staging": { label: "Add Uruk Warg-rider to the staging area" },
   "17048:whenRevealed:1 @0 orcsArea": { label: "Add Uruk Warg-rider to the Orcs' area" },
 
