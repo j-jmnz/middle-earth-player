@@ -100,7 +100,7 @@ export function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: r
       effectId: intent.effectId,
       cardId: intent.cardId,
       timing: TIMING_WORDS[effect.timing],
-      text: [lineOf(effect, names), capture?.numbers, nightActionNote(game, effect), framsburgActionNote(game, ctx, effect, names, intent.cardId)].filter((part) => part != null).join(" ") || null,
+      text: [capture?.numbers, lineOf(effect, names), nightActionNote(game, effect), framsburgActionNote(game, ctx, effect, names, intent.cardId)].filter((part) => part != null).join(" ") || null,
       pay: game.window?.kind === "cancelOffer" ? cancelRequest(game, ctx, intent.cardId) : triggerRequest(game, ctx, intent.cardId, effect),
       ...(caution ? { caution } : {}),
     });

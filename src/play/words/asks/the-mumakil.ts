@@ -15,8 +15,8 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "17021:whenRevealed:1 @0 Pick": { owned: true, note: "Stampeding: choose a Wild Mûmak in the staging area to make an immediate attack against you, the first player. It stays in the staging area.", verb: "Attack" },
   // 17024:A:1, 17024:A:2 (Biting Insects): the card discarded at random from the hand sets X, its cost; the damage is assigned among characters the player controls.
   // The title leads with the damage left; the note names the discarded card and its cost, apart from the damage left.
-  "17024:whenRevealed:1 @0.1 AssignDamage": { owned: true, note: "You discarded {picked} at random (cost {cost}). {left} of {cost} damage left to assign among characters you control.", bind: { cost: { stat: "cost", of: "picked", printed: true } }, verb: "Assign", title: "Assign {left}: {card}" },
-  "17024:shadow:1 @1 AssignDamage": { owned: true, note: "You discarded {picked} at random (cost {cost}). {left} of {cost} damage left to assign among characters you control.", bind: { cost: { stat: "cost", of: "picked", printed: true } }, verb: "Assign", title: "Assign {left}: {card} (shadow)" },
+  "17024:whenRevealed:1 @0.1 AssignDamage": { owned: true, note: "You discarded {picked} (cost {cost}) at random. {left} of {cost} damage left.", bind: { cost: { stat: "cost", of: "picked", printed: true } }, verb: "Assign", title: "Assign {left}: {card}" },
+  "17024:shadow:1 @1 AssignDamage": { owned: true, note: "You discarded {picked} (cost {cost}) at random. {left} of {cost} damage left.", bind: { cost: { stat: "cost", of: "picked", printed: true } }, verb: "Assign", title: "Assign {left}: {card} (shadow)" },
   // 17026:A:1 (Welcome to the Jungle, Setup): each player in turn, the first player first, takes a location from the encounter deck whose title no earlier player took.
   "17026:setup:1 @0.0 SearchMove": { owned: true, note: "Setup: choose a location from the encounter deck to add to the staging area. Its title must differ from each location the players before you took. It is not revealed.", verb: "Add" },
 };

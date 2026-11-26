@@ -97,7 +97,7 @@ describe("17024:A:1 Biting Insects on the choice sheet", () => {
     const sheet = sheetFor(state, made.ctx, legalIntents(state, made.ctx), names);
     expect(sheet?.kind).toBe("pick");
     expect(sheet?.title).toBe("Assign 2: Biting Insects");
-    expect(sheet?.kind === "pick" ? sheet.note : "").toContain("You discarded c2 at random (cost 2). 2 of 2 damage left to assign among characters you control.");
+    expect(sheet?.kind === "pick" ? sheet.note : "").toContain("You discarded c2 (cost 2) at random. 2 of 2 damage left.");
   });
 });
 
