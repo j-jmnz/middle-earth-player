@@ -38,6 +38,7 @@ export const ASIDE_SITES: Readonly<Record<string, AsideSite>> = {
   "families/deck/moves.ts": { functions: ["shuffleSeatDeck"], group: "notListed", why: "A seat's own deck is shuffled with the game's seed; no set-aside card is drawn or hidden." },
   "families/encounter/replace-deck.ts": { functions: ["replaceEncounterDeck"], group: "public", why: "A named set leaves the set-aside zone for the new encounter deck." },
   "families/investigation/deck.ts": { functions: ["hideSuspectAndHideout", "removeRandomInvestigation"], group: "secret", why: "The Suspect and the Hideout the seed picks stay set aside facedown (50701:A:1).", verbs: ["HideSuspectAndHideout"] },
+  "families/haradrim/orcs-stage.ts": { functions: ["defeatOrcsStage"], group: "notListed", why: "The Orcs' stage the Orcs defeat goes set aside as the next one takes its place; quest stages are never listed." },
   "families/haradrim/capture.ts": { functions: ["attachRandomSetAside"], group: "public", why: "AttachRandomSetAside attaches one of the Captures the Setup named, faceup; the players see which, so the Captures left set aside are known." },
   "families/island/cards.ts": { functions: ["placeSecrets", "shuffleIntoPlayerDeck"], group: "public", why: "PlaceSecrets moves the named cards under the Temple locations, where they are hidden; none stays set aside." },
   "families/misc/collection.ts": { functions: ["choose"], group: "notListed", why: "The cards a choice offers out of the collection (`collection`)." },

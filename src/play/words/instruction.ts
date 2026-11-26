@@ -37,6 +37,7 @@ import { hiddenWords } from "./scenarios/against-the-shadow/blood.ts";
 import { ringMakerWords } from "./scenarios/ring-maker/fords-table.ts";
 import { valeWords } from "./scenarios/against-the-shadow/vale.ts";
 import { heatVerbWords } from "./scenarios/haradrim/heat.ts";
+import { orcsVerbWords } from "./scenarios/haradrim/orcs-table.ts";
 import { heathWords } from "./scenarios/heath.ts";
 import type { ChoiceNames } from "./choice.ts";
 
@@ -100,6 +101,9 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       const amount = amountWords(instruction.amount);
       return instruction.target === "active" ? `remove ${amount} time counter${amount === "1" ? "" : "s"} from the active location` : null;
     }
+    // The set aside card or cards that join the staging area (the Warg-rider of Racing North, 17048:A:1): said in a choice branch.
+    case "AddSetAsideToStaging":
+      return instruction.all === true || instruction.trait != null ? "add the set aside cards to the staging area" : "add the set aside card to the staging area";
     // The Passage of the Marshes (the asks file words them again for the sheet): Shifting Quagmire, We Hates Them!.
     case "ReturnRandomVictoryLocation":
       return "return a random location from the victory display to the staging area";
@@ -363,7 +367,7 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? islandWords(instruction) ?? aflameWords(instruction) ?? stormcallerWords(instruction) ?? fortressWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction, names.code) ?? encounterWords(instruction) ?? attachmentWords(instruction, names.code) ?? companyWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction) ?? assaultWords(instruction) ?? pursuitWords(instruction, game) ?? pelennorWords(instruction) ?? blackGateWords(instruction) ?? angmarWords(instruction) ?? investigationWords(instruction) ?? riddlesWords(instruction) ?? villagerWords(instruction) ?? osgiliathWords(instruction) ?? hiddenWords(instruction) ?? valeWords(instruction) ?? ringMakerWords(instruction, names.code) ?? heatVerbWords(instruction, game) ?? heathWords(instruction);
+      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? islandWords(instruction) ?? aflameWords(instruction) ?? stormcallerWords(instruction) ?? fortressWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction, names.code) ?? encounterWords(instruction) ?? attachmentWords(instruction, names.code) ?? companyWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction) ?? assaultWords(instruction) ?? pursuitWords(instruction, game) ?? pelennorWords(instruction) ?? blackGateWords(instruction) ?? angmarWords(instruction) ?? investigationWords(instruction) ?? riddlesWords(instruction) ?? villagerWords(instruction) ?? osgiliathWords(instruction) ?? hiddenWords(instruction) ?? valeWords(instruction) ?? ringMakerWords(instruction, names.code) ?? heatVerbWords(instruction, game) ?? heathWords(instruction) ?? orcsVerbWords(instruction);
   }
 }
 

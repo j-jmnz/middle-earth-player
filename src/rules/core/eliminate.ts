@@ -15,6 +15,9 @@ import type { ScenarioState } from "./state.ts";
 import { flagged, heldAmount, heldHero, livingSeats, updateCard, withSeat } from "./state.ts";
 import { inPlay, moveCard, type Destination } from "./zones.ts";
 
+// The loss reason when every seat is eliminated.
+export const NO_SEATS_REMAIN = "No seats remain";
+
 /** The threat at which a player is eliminated (rr.player-elimination); a Dire quest raises it (`DIRE_ELIMINATION_LEVEL`). */
 export const ELIMINATION_LEVEL = 50;
 
@@ -133,7 +136,7 @@ export function eliminateSeat(state: ScenarioState, index: number, steps: Engine
   }
   steps.push({ kind: "eliminate", seat: index });
   const next = withSeat(state, index, { ...seat, eliminated: true });
-  return livingSeats(next).length === 0 ? markLoss(next, "No seats remain") : next;
+  return livingSeats(next).length === 0 ? markLoss(next, NO_SEATS_REMAIN) : next;
 }
 
 /** The threat at which a seat is eliminated: 99 while the main quest is Dire (mec113.dire), lowered by a card the seat holds (The One Ring, families/misc.ts). */
@@ -167,7 +170,7 @@ export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], fina
       next = eliminateSeat(next, index, steps);
     }
   }
-  if (!next.lost && livingSeats(next).length === 0) next = markLoss(next, "No seats remain");
+  if (!next.lost && livingSeats(next).length === 0) next = markLoss(next, NO_SEATS_REMAIN);
   return next;
 }
 

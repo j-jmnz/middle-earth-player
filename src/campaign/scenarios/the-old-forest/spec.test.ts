@@ -1,7 +1,7 @@
 // Rules: rr.forced, rr.reveal, rr.shadow-effects, rr.travel, rr.active-location, rr.engaged, rr.victory, rr.quest-advancement, mec113.saga-staging-rules (data/rules/entries.json); docs/scenarios/standalone-scenarios/the-old-forest.md (The Old Forest).
 import { describe, it } from "vitest";
 
-import { announce, attack, cardSpecs, damageOn, deckCount, endPhase, endRound, flag, handCount, progressOn, quest, resolve, stat, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, attack, cardSpecs, defend, damageOn, deckCount, endPhase, endRound, flag, handCount, progressOn, quest, resolve, stat, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Old Forest (standalone-scenarios part 4): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests). The lines a row cannot express (the random stage and its
@@ -42,6 +42,7 @@ const ROWS: readonly Row[] = [
   { line: "147012:A:3", name: "Shadow: the defending player discards each ally card in his hand", layout: { engaged: ["f3"], hand: ["ally", "ally", "event"] }, act: attack("f3", { shadow: "147012", undefended: true }), expect: [handCount(1)] },
   { line: "147014:A:1", name: "no character is healed while Strange Woods is in the staging area", layout: { staging: [WOODS] }, act: [], expect: [flag("dh1", "cannotBeHealed")] },
   { line: "147014:A:2", name: "Shadow: the attacking enemy gets +1 Attack", layout: { engaged: ["f3"] }, act: attack("f3", { shadow: WOODS, undefended: true }), expect: [damageOn("dh1", 2)] },
+  { line: "147014:A:2", name: "Shadow: Tom Bombadil, an objective ally the attack destroys, counts as a character destroyed: each player raises his threat by 2", layout: { engaged: ["147008"], play: [{ code: "147022", damage: 5 }] }, act: [attack("147008", { shadow: WOODS }), defend("147022")], expect: [zone("147022", "encounterDiscard"), threat(30)] },
   { line: "147015:A:1", name: "Threat X: the number of players", layout: { seats: 2, staging: [WALL] }, act: [], expect: [stat(WALL, "threat", 2)] },
   { line: "147015:A:2", name: "progress must be placed on Wall of Trees before it can be placed on the current quest", layout: { stage: "147006", staging: [WALL], phase: "Quest", deck: FILLERS }, act: quest("success"), expect: [progressOn("147006", 0)] },
   { line: "147016:A:2", name: "Shadow: with no location in the staging area it is added to the staging area", layout: { engaged: ["f3"] }, act: attack("f3", { shadow: FOREST, undefended: true }), expect: [zone(FOREST, "staging")] },

@@ -25,7 +25,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 12187:B:2 (back): If there is at least 5 progress on Hrogar's Hill, the players look at 3 random undiscovered treasures and choose 1 to attach to an eligible character.
   12187:resolution:2: Resolution
-    - if the current quest stage holds at least 5 progress: Resolution: 3 undiscovered treasures are drawn with the game's seed and the first player chooses one; the scenario is over, so the treasure joins the discovered ones the Resolution writes instead of being attached
+    - if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 5 progress: Resolution: 3 undiscovered treasures are drawn with the game's seed and the first player chooses one; the scenario is over, so the treasure joins the discovered ones the Resolution writes instead of being attached
 
 12187:B:3 (back): The players discover each treasure they control.
   12187:resolution:3: Resolution

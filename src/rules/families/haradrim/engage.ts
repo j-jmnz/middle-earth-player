@@ -13,12 +13,15 @@ import { askTarget } from "../../windows/choices.ts";
 import { engageEnemy, engageWith } from "../../quest/quest.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
+import { orcsOf } from "./orcs-zone.ts";
 import { chosenOf } from "./staged.ts";
 
 export function engageSeatWithMost(state: ScenarioState, instruction: Extract<Instruction, { verb: "EngageSeatWithMost" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = focus.sourceId;
   const enemy = id ? state.cards[id] : undefined;
   if (!id || !enemy || !inPlay(enemy.zone)) return state;
+  // A card of the Orcs' area cannot leave it while the players are at another stage (hrd.orcs-area-different-stage), nor a member that holds `cannotLeaveOrcsArea` (17051:B:1).
+  if (enemy.zone === "orcsArea" || (flagged(state, id, "cannotLeaveOrcsArea") && orcsOf(state)?.members.includes(id))) return state;
   const counts = livingSeats(state).map((seat) => ({ seat, count: (state.seats[seat]?.engaged ?? []).filter((other) => other !== id && matchesPick(state, other, instruction.pick, { seat, sourceId: id }, ctx)).length }));
   const most = Math.max(...counts.map((entry) => entry.count));
   const seats = counts.filter((entry) => entry.count === most).map((entry) => entry.seat);

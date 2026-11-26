@@ -12,12 +12,12 @@ import { type IconName } from "../../ui/icon-map.ts";
 import { glyphCells, type PlaceMark } from "../store/island-place.ts";
 import { COLS, ROWS } from "../dream-chaser/island-table.ts";
 import type { CombatMark, Rect } from "../layout/layout.ts";
-import { STAGE_APART_WORD } from "../words/scenarios/stormcaller.ts";
+import { STAGE_APART_WORD, type StagePill } from "../words/scenarios/stormcaller.ts";
 import type { OptionMark } from "../choice/sheet-types.ts";
 import { currentMark } from "./current-mark.ts";
-import { badgeRoom, hiddenBadges } from "./badge-room.ts";
+import { BADGE_TOP, badgeRoom, hiddenBadges } from "./badge-room.ts";
 import { TOKEN } from "./token-spots.ts";
-import { underMarkBox } from "./under-mark.ts";
+import { STRIP, underMarkBox } from "./under-mark.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 import { CanvasIcon, BADGE_H, type Fonts, type TokenImages } from "./pieces.native.tsx";
 
@@ -291,26 +291,37 @@ export function StagingTag({ rect, text, font, t, s }: { rect: Rect; text: strin
 }
 
 /**
- * The Stormcaller's stage marks, upright in the part of the stage its area's cards leave uncovered (`rect`, shownBounds): a pill at the top corner with the stage's number ("2", "3", threat red "4/4" at the last
- * stage, where filling it loses the game), and, while the players are at another stage, an "Apart" plate across its middle that the veil on the area's cards does not say (docs/design-system-table.md, Cards).
+ * A quest area's stage marks, upright in the part of the stage its area's cards leave uncovered (`rect`, shownBounds): the stage's pill at the lower corner, just above the progress strip ("2", "Orcs 2", threat red
+ * "4/4" where filling the stage loses the game), and, while the players are at another stage, an "Apart" plate under the title band that the veil on the area's cards does not say. Neither stands over the title
+ * (docs/design-system-table.md, The Stormcaller's area).
  */
-export function StageMarks({ rect, pill, apart, fonts, t, s }: { rect: Rect; pill: { text: string; danger: boolean }; apart: boolean; fonts: Fonts; t: TableTokens; s: number }) {
+export function StageMarks({ rect, pill, apart, fonts, t, s }: { rect: Rect; pill: StagePill; apart: boolean; fonts: Fonts; t: TableTokens; s: number }) {
   const height = 11 * s;
-  const words = fonts.small.getTextWidth(pill.text);
-  const pillW = Math.min(rect.w - 6 * s, words + 8 * s);
+  const room = rect.w - 6 * s;
   const plate = fonts.small.getTextWidth(STAGE_APART_WORD);
-  const plateW = Math.min(rect.w - 6 * s, plate + 8 * s);
-  const plateY = rect.y + (rect.h - height) / 2;
+  const plateW = Math.min(room, plate + 8 * s);
+  const pillX = rect.x + 3 * s;
+  const pillY = rect.y + rect.h - STRIP * s - height - 2 * s;
+  // The plate stands under the picture's title band, clear of the pill when the card is tall enough for both; when it is not, the pill keeps only its number and the plate stands beside it.
+  const below = rect.y + BADGE_TOP * s + 1 * s;
+  const roomBelow = below + height + 1 * s <= pillY;
+  const beside = apart && !roomBelow;
+  // The pill says whose stage it is when it fits the uncovered width, and only its number when it does not.
+  const text = !beside && fonts.small.getTextWidth(pill.text) + 8 * s <= room ? pill.text : pill.short;
+  const words = fonts.small.getTextWidth(text);
+  const pillW = Math.min(room, words + 8 * s);
+  const plateX = roomBelow ? rect.x + (rect.w - plateW) / 2 : Math.min(pillX + pillW + 2 * s, rect.x + rect.w - plateW - 1 * s);
+  const plateY = roomBelow ? below : pillY;
   return (
     <Group>
-      <RoundedRect x={rect.x + 3 * s} y={rect.y + 3 * s} width={pillW} height={height} r={height / 2} color={pill.danger ? t.threat : withAlphaHex(t.night, 0.9)} />
-      <RoundedRect x={rect.x + 3 * s} y={rect.y + 3 * s} width={pillW} height={height} r={height / 2} color={pill.danger ? t.danger : t.hairline} style="stroke" strokeWidth={1 * s} />
-      <Text x={rect.x + 3 * s + (pillW - words) / 2} y={rect.y + 3 * s + height - 2.5 * s} text={pill.text} font={fonts.small} color={pill.danger ? t.onThreatPill : t.bone} />
+      <RoundedRect x={pillX} y={pillY} width={pillW} height={height} r={height / 2} color={pill.danger ? t.threat : withAlphaHex(t.night, 0.9)} />
+      <RoundedRect x={pillX} y={pillY} width={pillW} height={height} r={height / 2} color={pill.danger ? t.danger : t.hairline} style="stroke" strokeWidth={1 * s} />
+      <Text x={pillX + (pillW - words) / 2} y={pillY + height - 2.5 * s} text={text} font={fonts.small} color={pill.danger ? t.onThreatPill : t.bone} />
       {apart ? (
         <Group>
-          <RoundedRect x={rect.x + (rect.w - plateW) / 2} y={plateY} width={plateW} height={height} r={2 * s} color={withAlphaHex(t.night, 0.9)} />
-          <RoundedRect x={rect.x + (rect.w - plateW) / 2} y={plateY} width={plateW} height={height} r={2 * s} color={t.hairline} style="stroke" strokeWidth={1 * s} />
-          <Text x={rect.x + (rect.w - plate) / 2} y={plateY + height - 2.5 * s} text={STAGE_APART_WORD} font={fonts.small} color={t.faint} />
+          <RoundedRect x={plateX} y={plateY} width={plateW} height={height} r={2 * s} color={withAlphaHex(t.night, 0.9)} />
+          <RoundedRect x={plateX} y={plateY} width={plateW} height={height} r={2 * s} color={t.hairline} style="stroke" strokeWidth={1 * s} />
+          <Text x={plateX + (plateW - plate) / 2} y={plateY + height - 2.5 * s} text={STAGE_APART_WORD} font={fonts.small} color={t.faint} />
         </Group>
       ) : null}
     </Group>

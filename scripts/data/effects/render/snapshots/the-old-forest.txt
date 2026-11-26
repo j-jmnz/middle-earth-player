@@ -188,7 +188,7 @@ Scenario piles that place cards with no record (staging: 147012 Misleading Path;
 
 147011:A:2 (front): The players cannot win the game while Withywindle is in play.
   147011:constant:1: Constant
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat the main quest stage while this holds
 
 147011:A:3 (front): While Withywindle is the active location, the first player reveals 1 additional encounter card during the quest phase.
   147011:constant:2: Constant

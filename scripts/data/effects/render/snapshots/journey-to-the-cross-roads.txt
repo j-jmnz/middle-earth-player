@@ -98,7 +98,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
     only if the number of cards in the Harad deck is at least 1
     - the players cannot travel to this location while this holds
   144030:constant:3: Constant
-    only if not (the current quest stage holds at least 20 progress)
+    only if not (the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 20 progress)
     - the players cannot travel to this location while this holds
 
 ## 144031 Henneth Annûn

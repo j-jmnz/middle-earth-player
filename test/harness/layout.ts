@@ -17,6 +17,7 @@ import { markEnemyDamage } from "../../src/rules/families/encounter/patrol.ts";
 import { takeHidden } from "../../src/rules/families/pelargir/hidden.ts";
 import { takeControlOfLocation } from "../../src/rules/families/pelargir/location-control.ts";
 import { withTemperature } from "../../src/rules/families/haradrim/heat.ts";
+import { withOrcsArea } from "../../src/rules/families/haradrim/orcs-area.ts";
 import { markSeatedRows } from "../../src/rules/families/encounter/seated.ts";
 
 import { gameCodes, loadAnyScenario, loadCampaigns } from "../../scripts/data/load-scenarios.ts";
@@ -54,6 +55,9 @@ export type Layout = {
   side?: "A" | "B";
   // The heat tracker of Desert Crossing, as its Setup left it (16068:A:1): one table modifier with this value.
   temperature?: number;
+  // The Orcs' area of Race Across Harad as the Setup leaves it (17047:A:1): the set-aside stages (listed in `setAside` too) become the Orcs' quest deck, `place` joins the area, `members` are the cards of `staging` that move into it,
+  // and `progress` sits on the Orcs' current stage.
+  orcs?: { stages: readonly string[]; place?: readonly string[]; members?: readonly string[]; progress?: number };
   // A code, or a code with its tokens.
   active?: Entry;
   // The Nightmare setup card, side A faceup next to the quest deck, with its tokens (901001:A:2 counts on it).
@@ -276,6 +280,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   }
   for (const code of layout.heldInHand ?? []) for (const id of idsOf(state, code)) state = addModifier(state, id, id, "cannotLeaveHand", 1, "endOfGame");
   for (const code of layout.committed ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { committed: true });
+  if (layout.orcs) state = withOrcsArea(state, layout.orcs);
   // A game that deals encounter side quests in its encounter deck reads the side quest rules, as its start notes (families/wilderland/night-quest.ts markSideQuests).
   state = markSideQuests(state, cards);
   state = markProgressNoted(state, ctx);

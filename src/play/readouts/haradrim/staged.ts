@@ -46,9 +46,9 @@ export function stagedDetail(game: ScenarioState, cardId: string, name: (id: str
   return guardsWords(name(first.id), first.owner != null ? ownerWords(game.seatCount, first.owner) : "a player's", name(cardId));
 }
 
-/** Whether a card's own record eliminates the player that controls it once it has left play (an objective-hero, 16031:A:2: EliminatePlayer on leftPlay of itself). */
+/** Whether a card's own record eliminates the player that controls it once it has left play (an objective-hero, 16031:A:2: EliminatePlayer on leftPlay of itself; the Tamed Mûmak, 17038:A:3: EliminateAfterAttack). */
 export function eliminatesWhenLeaving(ctx: ReduceContext, code: string): boolean {
-  return effectsOf(ctx, code).some((effect) => effect.trigger === "leftPlay" && effect.subject === "self" && effect.instructions.some((instruction) => instruction.verb === "EliminatePlayer"));
+  return effectsOf(ctx, code).some((effect) => effect.trigger === "leftPlay" && effect.subject === "self" && effect.instructions.some((instruction) => instruction.verb === "EliminatePlayer" || instruction.verb === "EliminateAfterAttack"));
 }
 
 /** The preview line of an objective-hero in play: what its own record says happens when it leaves play (EliminatePlayer on leftPlay of itself); null for any other card. */

@@ -88,10 +88,10 @@ export type WordsPlan = {
  * What the dock draws in its words window. Off a dense screen the title keeps its own lines and the folded line shows. On a dense
  * one the title is clamped to the lines that fit above the folded line, never fewer than one; with room for less than one title
  * line and one label line, the folded line goes and the button moves to the title row, where the title is counted against the
- * width the button leaves. `foldable` is `DockLines.foldable` (lines wait behind the pill). `clamp` is the choice's rows being open:
+ * width the button leaves. `lineRows` is how many lines the folded line takes (1 unless the moment asks for more). `foldable` is `DockLines.foldable` (lines wait behind the pill). `clamp` is the choice's rows being open:
  * the words are budgeted by their room on a taller screen too, because the rows keep their own minimum and the words cannot shrink.
  */
-export function planWords(a: { space: number; dense: boolean; clamp?: boolean; title: string; textWidth: number; hasLine: boolean; foldable: boolean; text?: number }, scale = 1): WordsPlan {
+export function planWords(a: { space: number; dense: boolean; clamp?: boolean; title: string; textWidth: number; hasLine: boolean; foldable: boolean; text?: number; lineRows?: number }, scale = 1): WordsPlan {
   // The room and the width come in as screen points; the budget is counted in logical ones.
   const space = a.space / scale;
   const textWidth = a.textWidth / scale;
@@ -102,8 +102,10 @@ export function planWords(a: { space: number; dense: boolean; clamp?: boolean; t
     const natural = titleLinesOf(a.title, textWidth, 1, text);
     return { titleLines: natural, cut: false, showLine: a.hasLine, pill: a.foldable, pillOnTitle: !a.hasLine && a.foldable };
   }
-  const showLine = a.hasLine && space >= titlePx + labelPx;
-  const room = space - (showLine ? labelPx : 0);
+  // The folded line takes `lineRows` lines of label type (the outcome sheet's reason wraps to three).
+  const linePx = labelPx * Math.max(1, a.lineRows ?? 1);
+  const showLine = a.hasLine && space >= titlePx + linePx;
+  const room = space - (showLine ? linePx : 0);
   const fits = Math.max(1, Math.floor(room / titlePx));
   const onTitle = !showLine;
   // The button takes the title row's right end when it sits there; count against what it leaves.

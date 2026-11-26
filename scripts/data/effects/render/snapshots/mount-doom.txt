@@ -27,7 +27,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     only if not (the players are on stage 3)
     - the players cannot travel to this location while this holds
   146043:constant:3: Constant
-    only if not (the current quest stage holds at least 20 progress)
+    only if not (the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 20 progress)
     - the players cannot travel to this location while this holds
 
 146043:A:3 (front): Travel: Each player makes a Fortitude test. If a player fails this test, raise his threat by 9.

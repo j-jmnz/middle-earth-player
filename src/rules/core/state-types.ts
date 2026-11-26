@@ -6,6 +6,7 @@ import type { DelayedEffect, Frame, GameEvent, HideFailure, Modifier, PendingAtt
 import type { EngineStep, PlayerIntent } from "./intents.ts";
 import type { CampaignFacts, ResolutionLog } from "./campaign-state.ts";
 import type { SeaState } from "../families/sea/types.ts";
+import type { OrcsArea } from "../families/haradrim/orcs-types.ts";
 import type { UnchartedState } from "../families/uncharted/types.ts";
 import type { PileZone } from "./piles.ts";
 import type { Discount } from "./discount-types.ts";
@@ -56,7 +57,7 @@ export type ZoneName =
   | "corsairDeck"
   | "corsairDiscard"
   // The Uncharted deck (dcce.uncharted-deck), out of play, every card Lost Island side up; the Stormcaller's area (dcce.stormcallers-area) and the Island Map (dcce.island-map), in play, outside the staging area.
-  | "unchartedDeck" | "stormcallerArea" | "islandMap"
+  | "unchartedDeck" | "stormcallerArea" | "islandMap" | "orcsArea"
   // The decks beside the encounter deck in Ered Mithrin (emce.caves-deck, emce.evil-creatures-deck), out of play (core/piles.ts): the Caves deck, the Evil Creatures deck and its own discard pile, and the two encounter sets Lost in Mirkwood sets aside.
   | PileZone
   | "victory"
@@ -101,8 +102,7 @@ export type CardInstance = {
   attachments: readonly string[];
   committed: boolean;
   shadowId: string | null;
-  // Shadow cards dealt beyond the first ("deal it an additional shadow card", 141069:A:2), in the order dealt. Absent
-  // when there are none.
+  // Shadow cards dealt beyond the first ("deal it an additional shadow card", 141069:A:2), in the order dealt. Absent when there are none.
   extraShadowIds?: readonly string[];
   face: CardFace;
   controller: number | null;
@@ -287,9 +287,10 @@ export type ScenarioState = {
   piles?: Readonly<Partial<Record<PileZone, readonly string[]>>>;
   // The Uncharted deck and the codes of the double-sided locations that go back into it, present once a scenario deals one (families/uncharted.ts).
   uncharted?: UnchartedState;
-  // What the sea family keeps for a game with ships or the Stormcaller Elite: the heading, the cards that leave play by a route of their own, a
-  // Sailing test in progress. Absent in every other game (families/sea/types.ts).
+  // What the sea family keeps for a game with ships or the Stormcaller Elite: the heading, the cards that leave play by a route of their own, a Sailing test in progress. Absent in every other game (families/sea/types.ts).
   sea?: SeaState;
+  // The Orcs' area of Race Across Harad: the Orcs' quest stage, its deck and the cards of the area (hrd.orcs-area). Absent in every other game (families/haradrim/orcs-types.ts).
+  orcs?: OrcsArea;
   life?: number;
   victory: readonly string[];
   setAside: readonly string[];
@@ -327,8 +328,7 @@ export type ScenarioState = {
   revealCursor: { seats: readonly number[]; index: number } | null;
   // True between the two passes that resolve the quest.
   questResolved: boolean;
-  // Stage 2B has created a staging area and a quest stage for each seat (`Seat.staging`, `Seat.stage`; families/breaking/areas.ts). Absent
-  // in every other game and until then.
+  // Stage 2B has created a staging area and a quest stage for each seat (`Seat.staging`, `Seat.stage`; families/breaking/areas.ts). Absent in every other game and until then.
   separate?: true;
   // The heroes a card shuffled into their owners' decks (Lost and Alone, 04124:A:1): each is put into play when its owner draws it, and its seat is not out of heroes while it waits (families/deck/hero.ts). Absent in every game that shuffles none.
   heroesInDeck?: readonly string[];

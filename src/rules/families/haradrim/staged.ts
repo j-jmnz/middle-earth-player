@@ -44,7 +44,7 @@ export function chosenOf(options: readonly string[], focus: Focus): string | und
 }
 
 // A choice that needs a running effect to ask it: without one the Setup cannot go on.
-function ask(state: ScenarioState, instruction: Instruction, seat: number, options: readonly string[], steps: EngineStep[]): ScenarioState {
+export function ask(state: ScenarioState, instruction: Instruction, seat: number, options: readonly string[], steps: EngineStep[]): ScenarioState {
   return effectData(state) ? askTarget(state, { instruction, seat, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, options) : { ...state, failure: `${instruction.verb} needs a choice, and no effect is asking` };
 }
 

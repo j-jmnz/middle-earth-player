@@ -166,6 +166,7 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "celebrimbors-secret": { calm: "moria", combat: "uruk" },
   "the-antlered-crown": { calm: "rohan", combat: "isengard" },
   "the-mumakil": { calm: "fangorn", combat: "pelennor" },
+  "race-across-harad": { calm: "rohan", combat: "uruk" },
 };
 
 /** The loop a table plays: its scenario's combat loop during the Combat phase, its calm loop otherwise, and the menu's for a scenario with no pair. */

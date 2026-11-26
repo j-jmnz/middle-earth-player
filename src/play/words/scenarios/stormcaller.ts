@@ -14,7 +14,9 @@ export const AREA_TOGETHER = "In the Stormcaller's area, at the Stormcaller's st
 export const STAGE_LOSS = "When this stage is full the players lose: Captain Sahír has gotten away with the key";
 
 /** The numbers of the Stormcaller's current quest stage: its number of the last, its progress against its quest points (null for a stage without), the players' stage number and whether it is theirs. */
-export type StageFacts = { number: number; last: number; progress: number; points: number | null; playersAt: number; together: boolean };
+/** The two quest areas a table can hold: the Stormcaller's (Flight of the Stormcaller) and the Orcs' (Race Across Harad). */
+export type AreaKind = "stormcaller" | "orcs";
+export type StageFacts = { who: AreaKind; number: number; last: number; progress: number; points: number | null; playersAt: number; together: boolean };
 
 const progressOf = (facts: Pick<StageFacts, "progress" | "points">): string => (facts.points == null ? `${facts.progress}` : `${facts.progress}/${facts.points}`);
 
@@ -28,9 +30,14 @@ export function stageLines(facts: StageFacts): string[] {
   return facts.number >= facts.last ? [line, STAGE_LOSS] : [line];
 }
 
+/** The pill a quest area's stage wears: `text` says whose stage it is when two stages in the row share a name, `short` is what the pill shows when the room is too small for it, and `danger` draws it in threat red when filling the stage loses the game. */
+export type StagePill = { text: string; short: string; danger: boolean };
+
 /** The stage pill on the Stormcaller's stage: its number, and "4/4" in threat red at its last stage, where filling it loses the game. */
-export function stagePill(facts: Pick<StageFacts, "number" | "last">): { text: string; danger: boolean } {
-  return facts.number >= facts.last ? { text: `${facts.number}/${facts.last}`, danger: true } : { text: `${facts.number}`, danger: false };
+export function stagePill(facts: Pick<StageFacts, "number" | "last">): StagePill {
+  const danger = facts.number >= facts.last;
+  const text = danger ? `${facts.number}/${facts.last}` : `${facts.number}`;
+  return { text, short: text, danger };
 }
 
 /** The cue on the Stormcaller's stage while the players are at another stage. */

@@ -27,7 +27,7 @@ export function actorNote(effect: Obj, ctx: Ctx): string {
   if (timing === "whenRevealed" && encounterCard && Array.isArray(effect.instructions) && effect.instructions.some(makesFirstPlayerAct)) return "the acting player is the first player (the record names the first player, not the player who revealed the card)";
   if (timing === "shadow") return "the acting player is the defending player (the player the attack is against)";
   // A card that leaves play names the seat that controlled it in the event (it has no controller afterwards): the objective-hero's "If it leaves play, you are eliminated" is that player's.
-  if ((timing === "forced" || timing === "triggered") && encounterCard && trigger === "leftPlay" && effect.subject === "self" && JSON.stringify(effect.instructions ?? null).includes('"verb":"EliminatePlayer"')) return "the acting player is the player who controlled the card when it left play (the leave-play event names that player, the card having no controller afterwards)";
+  if ((timing === "forced" || timing === "triggered") && encounterCard && trigger === "leftPlay" && effect.subject === "self" && /"verb":"Eliminate(Player|AfterAttack)"/.test(JSON.stringify(effect.instructions ?? null))) return "the acting player is the player who controlled the card when it left play (the leave-play event names that player, the card having no controller afterwards)";
   if ((timing === "forced" || timing === "triggered") && encounterCard) {
     if (ATTACK_EVENTS.has(trigger)) return "the acting player is the defending player (the player the attack is against)";
     if (trigger === "engaged") return "the acting player is the player the enemy engaged";

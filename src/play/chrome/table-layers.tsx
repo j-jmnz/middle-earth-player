@@ -35,8 +35,8 @@ import { DialPanel, LogPanel, PileList, RowList, SetAsideList, SettingsPanel, Th
 import { IslandPanel } from "../dream-chaser/island-panel.tsx";
 import { WAITING, islandFit, islandPanelWidth, islandReadout, standingWords } from "../dream-chaser/island-table.ts";
 import { foldTitle } from "../layout/row-fold.ts";
-import { areaRoleOf } from "../store/stormcaller-table.ts";
-import { AREA_LIST_TITLE } from "../words/scenarios/stormcaller.ts";
+import { areaKind, areaRoleOf } from "../store/stormcaller-table.ts";
+import { areaWordsOf } from "../words/area-words.ts";
 import { facedownSplitWords } from "../words/scenarios/against-the-shadow/stewards-fear.ts";
 import { alwaysRows } from "./settings-words.ts";
 import { useReaderMode, useScreenReader } from "../../ui/screen-reader.ts";
@@ -109,14 +109,15 @@ function RowReading({ store, ctx, row, names, picture, onRead, onClose }: { stor
       })
       .join("\n"),
   );
-  // A stack that holds only the Stormcaller's area's cards is titled for it (stormcaller-table.ts); its stage never folds.
+  // A stack that holds only the area's cards is titled for it (stormcaller-table.ts); its stage never folds.
   const areaOnly = useStore(store, (state) => row === "staging" && ids.length > 0 && ids.every((id) => areaRoleOf(state.game, id) != null));
+  const kind = useStore(store, (state) => areaKind(state.game));
   const rows = rowsKey.split("\n");
   const cards = ids.map((id, at) => {
     const [code = "", key = "", grapple = ""] = (rows[at] ?? "").split("\t");
     return listCard(id, code, key, names, picture, ctx.cards, grapple || null);
   });
-  return <RowList title={areaOnly ? AREA_LIST_TITLE : foldTitle(row)} cards={cards} onRead={onRead} onClose={onClose} />;
+  return <RowList title={areaOnly ? areaWordsOf(kind).listTitle : foldTitle(row)} cards={cards} onRead={onRead} onClose={onClose} />;
 }
 
 // The set-aside cards the players may read, the copies of one card as one row, and the count of the facedown ones (store/set-aside.ts). The panel subscribes to the list as one string,

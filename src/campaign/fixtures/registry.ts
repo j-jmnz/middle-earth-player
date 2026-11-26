@@ -116,6 +116,7 @@ export const FIXTURE_REGISTRY = [
   { scenarioId: "desert-crossing", kind: "standalone", names: ["crossing-lost"] },
   { scenarioId: "the-long-arm-of-mordor", kind: "standalone", names: ["mordor-lost"] },
   { scenarioId: "the-mumakil", kind: "standalone", names: ["mumakil-lost"] },
+  { scenarioId: "race-across-harad", kind: "standalone", names: ["harad-lost"] },
 ] as const satisfies readonly { scenarioId: string; file?: string; kind?: "standalone"; names: readonly string[] }[];
 
 // The entries as plain data, for code that reads `kind` and `file` whichever entries carry them.

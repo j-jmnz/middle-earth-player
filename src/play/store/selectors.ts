@@ -253,7 +253,7 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...loot, ...shadowCards(card), ...under, ...gated, ...alleyway, ...(card.zone === "staging" ? grappledWith(game, id) : []), ...(card.zone === "activeLocation" ? guardedAllyOf(game, card) : [])]);
     const pair = pairs.get(id);
     const rank = facts?.shipRank(card.code) ?? null;
-    const area = game.sea?.stormcaller ? areaRoleOf(game, id) : null;
+    const area = game.sea?.stormcaller || game.orcs ? areaRoleOf(game, id) : null;
     entries.push({ card, attached, ...(card.code !== BLACK_GATE && gated.length > 0 ? { stacked: gated } : {}), paired: pair ? cardsOf(game, pair.ids) : EMPTY, fight: pair?.kind ?? null, ...(facts ? { kind: kindOf(facts.typeOf(card.code)) } : {}), ...(rank != null ? { ship: rank } : {}), ...(area ? { area } : {}) });
   }
   return entries;

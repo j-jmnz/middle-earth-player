@@ -216,10 +216,10 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 901501:A:4 (front): The players cannot win the game unless both Doors of Durin and The Watcher are in the victory display.
   901501:constant:2: Constant
     only if all of: (the card with code 04064 is in play) and (the card with code 04065 is not in the victory display)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat the main quest stage while this holds
   901501:constant:3: Constant
     only if all of: (the card with code 04064 is in play) and (the card with code 04072 is not in the victory display)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat the main quest stage while this holds
 
 901501:B:1 (back): Begin with the standard quest deck and encounter deck for The Watcher in the Water scenario.
   (inert: the engine applies it by rule, no record)

@@ -131,6 +131,7 @@ describe("effects render read fields, picks", () => {
     { type: "card", control: "any", maxCost: { level: true, halved: true, plusChosen: true }, hasAttachment: { playerCard: true, treasure: true, trait: "Item" }, island: "adjacent", captured: "underSelf" },
     { type: "card", control: "any", hasAttachment: {}, island: "start" },
     { type: "card", control: "you", sameTitleAsDiscarded: true },
+    { type: "card", control: "any", inOrcsArea: true },
     { type: "card", control: "any", island: "here", sharesTrait: "self" },
   ];
   const render: Render = (value, ctx) => renderPick(value, ctx);
