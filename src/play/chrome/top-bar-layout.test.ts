@@ -11,6 +11,9 @@ import {
   DIAL_PAD,
   dialScale,
   DIAL_SIZE,
+  CAPTION_OVER,
+  CAPTION_WORDS,
+  captionOf,
   dialZones,
   keepWidest,
   EDGE_FADE,
@@ -269,39 +272,80 @@ describe("the seat dials at Extra large", () => {
   });
 });
 
-describe("the scenario dials' words (dialZones)", () => {
-  // The Hunt for the Dreadnaught at stage 1B on 844 x 390: two seats, the Action dial and the Cap dial, each with its word, then without it.
+describe("the scenario dials' names (dialZones)", () => {
+  // The Hunt for the Dreadnaught at stage 1B on 844 x 390: two seats, the Action dial and the Cap dial, each with its name beside the ring, then under it.
   const bar = 844 - 2 * 8;
   const word = DIAL_LABEL_GAP + 36;
   const seats = 2 * SEAT_DIAL + DIAL_GAP;
-  const scenario = 2 * (2 * DIAL_PAD + DIAL_SIZE) + 2 * DIAL_GAP;
+  const dial = 2 * DIAL_PAD + DIAL_SIZE;
+  const scenario = 2 * dial + 2 * DIAL_GAP;
   const labelled = seats + scenario + 2 * word + DIAL_GAP;
   const bare = seats + scenario + DIAL_GAP;
 
-  it("drops the words when the row with them would scroll, so the last dial stands whole and the rail keeps its size", () => {
-    const withWords = barZones(bar, labelled, 1, bar / 2);
-    expect(withWords.scroll).toBe(true);
+  it("captions the names when the row with them beside the rings would scroll, so the last dial stands whole and the rail keeps its size", () => {
+    const beside = barZones(bar, labelled, 1, bar / 2);
+    expect(beside.scroll).toBe(true);
     const zones = dialZones(bar, bare, labelled, 1, bar / 2);
-    expect(zones.wordless).toBe(true);
+    expect(zones.captioned).toBe(true);
     expect(zones.scroll).toBe(false);
-    expect(zones.rail).toBe(withWords.rail);
-    expect(zones.left).toBe(withWords.left);
+    expect(zones.rail).toBe(beside.rail);
+    expect(zones.left).toBe(beside.left);
   });
 
-  it("keeps the words when the row with them fits, and answers the same whichever width the row has now", () => {
-    expect(dialZones(bar, seats, seats, 1, bar / 2).wordless).toBe(false);
-    expect(dialZones(bar, labelled, 0, 1, bar / 2).wordless).toBe(false);
-    expect(dialZones(bar, labelled, labelled, 1, bar / 2).wordless).toBe(dialZones(bar, bare, labelled, 1, bar / 2).wordless);
+  it("keeps the names beside the rings when the row with them fits, and answers the same whichever width the row has now", () => {
+    expect(dialZones(bar, seats, seats, 1, bar / 2).captioned).toBe(false);
+    expect(dialZones(bar, labelled, 0, 1, bar / 2).captioned).toBe(false);
+    expect(dialZones(bar, labelled, labelled, 1, bar / 2).captioned).toBe(dialZones(bar, bare, labelled, 1, bar / 2).captioned);
   });
 
-  it("still scrolls when the row is too wide even without the words", () => {
+  it("still scrolls when the row is too wide even with the rings alone", () => {
     expect(dialZones(bar, 600, labelled, 1, bar / 2).scroll).toBe(true);
+    expect(dialZones(bar, 600, labelled, 1, bar / 2).captioned).toBe(true);
+  });
+
+  // Two seats and two scenario dials (The Antlered Crown's stage and location, To Catch an Orc's Time and Out of play, The Three Trials' Guardians): the steps by width.
+  const four = (names: number) => 2 * SEAT_DIAL + 2 * dial + 2 * names + 3 * DIAL_GAP;
+  it("steps from names beside the rings, to captions, at the widths of a phone and a tablet", () => {
+    const beside = four(DIAL_LABEL_GAP + 30);
+    const rings = four(0);
+    // 844 pt: the names beside the rings do not fit, the rings with their captions do and need no scroll.
+    const phone = dialZones(844 - 2 * 8, rings, beside, 1, (844 - 2 * 8) / 2);
+    expect(phone.captioned).toBe(true);
+    expect(phone.scroll).toBe(false);
+    // 1180 pt: the names fit beside the rings.
+    const tablet = dialZones(1180 - 2 * 8, beside, beside, 1, (1180 - 2 * 8) / 2);
+    expect(tablet.captioned).toBe(false);
+    expect(tablet.scroll).toBe(false);
+  });
+
+  it("keeps the captions on the narrowest phone, where the rings alone may scroll", () => {
+    const small = dialZones(667 - 2 * 8, four(0), four(DIAL_LABEL_GAP + 30), 1, (667 - 2 * 8) / 2);
+    expect(small.captioned).toBe(true);
+  });
+});
+
+describe("captionOf", () => {
+  it("shows the label whole when it fits under the ring", () => {
+    for (const label of ["Time", "Stage", "Village", "War-camp", "Key", "Boar"]) expect(captionOf(label)).toBe(label);
+  });
+  it("shows a dial's own short name first", () => {
+    expect(captionOf("Out of play", "Out")).toBe("Out");
+    expect(captionOf("Battlefield", "Battle")).toBe("Battle");
+  });
+  it("cuts a name from its detail when the label is too long", () => {
+    expect(captionOf("Gollum \u00b7 HP")).toBe("Gollum");
+    expect(captionOf("Watchers \u00b7 HP")).toBe("Watchers");
+    expect(captionOf("Time \u00b7 staging 1")).toBe("Time");
+  });
+  it("leaves the shorts the dials carry within the caption's room, and the caption within the gap between two dials", () => {
+    for (const short of ["Out", "Battle", "Round", "Losing"]) expect(Math.ceil(short.length * 5.9)).toBeLessThanOrEqual(CAPTION_WORDS);
+    expect(2 * CAPTION_OVER).toBeLessThanOrEqual(DIAL_GAP + 2 * DIAL_PAD + 2 * DIAL_PAD);
   });
 });
 
 describe("keepWidest", () => {
   const was = { key: "a|Time", width: 300 };
-  it("keeps the wider width for the same key: the wordless row's narrower event is kept out", () => {
+  it("keeps the wider width for the same key: the captioned row's narrower event is kept out", () => {
     expect(keepWidest(was, "a|Time", 200)).toBe(was);
     expect(keepWidest(was, "a|Time", 300)).toBe(was);
   });

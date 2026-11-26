@@ -111,17 +111,17 @@ export function barZones(bar: number, dials: number, scale = 1, center = bar / 2
 }
 
 /**
- * The zones when the scenario dials may drop their words (Top bar, The threat dial). `labelled` is the dials row's width measured with the words (0 when there is none to drop), `dials` its width now, in screen points.
- * The dials go wordless when the row with its words would scroll the left zone. The zones are then those of the row with its words, so the rail never changes size, and the row scrolls only if it is still too wide without
- * them. The answer reads `labelled`, never the current width, so it cannot flip back and forth.
+ * The zones when the scenario dials may move their names under the rings (Top bar, The threat dial). `labelled` is the dials row's width measured with the names beside the rings (0 when there is none to move), `dials` its width now, in screen points.
+ * The dials caption their names when the row with them beside the rings would scroll the left zone. A caption takes no room in the row, so the row then holds the rings alone. The zones are those of the row with its names beside the rings, so the rail never
+ * changes size, and the row scrolls only if it is still too wide with the rings alone. The answer reads `labelled`, never the current width, so it cannot flip back and forth.
  */
-export function dialZones(bar: number, dials: number, labelled: number, scale = 1, center = bar / 2): BarZones & { wordless: boolean } {
+export function dialZones(bar: number, dials: number, labelled: number, scale = 1, center = bar / 2): BarZones & { captioned: boolean } {
   const held = barZones(bar, labelled, scale, center);
-  if (labelled <= 0 || !held.scroll) return { ...barZones(bar, dials, scale, center), wordless: false };
-  return { ...held, scroll: Math.ceil(dials / scale) + GAP > held.left / scale, wordless: true };
+  if (labelled <= 0 || !held.scroll) return { ...barZones(bar, dials, scale, center), captioned: false };
+  return { ...held, scroll: Math.ceil(dials / scale) + GAP > held.left / scale, captioned: true };
 }
 
-/** The row's width with its words, kept while the words show. Within one makeup (`key`) the widest width is kept, never a narrower one: a layout event of the wordless row can reach the handler before the render that made it wordless. A new key takes the new width. */
+/** The row's width with its names beside the rings, kept while they stand there. Within one makeup (`key`) the widest width is kept, never a narrower one: a layout event of the captioned row can reach the handler before the render that made it wordless. A new key takes the new width. */
 export function keepWidest(was: { key: string; width: number }, key: string, width: number): { key: string; width: number } {
   return was.key === key && was.width >= width ? was : { key, width };
 }
@@ -148,6 +148,31 @@ export function badgeFoot(scale: number): number {
 export function dialScale(scale: number): number {
   return Math.min(scale, UI_SCALES.large);
 }
+// ---- The caption: a scenario dial's name under its ring when the row has no room for it beside the ring (dialZones). All sizes are logical points at Medium. ----
+
+/** Where the caption's top edge stands on the dial's row (its disc is 46 pt tall, so the caption overlaps the ring's foot by 2 pt), its height, the padding either side of its words, and how far it reaches past the disc on each side. */
+export const CAPTION_TOP = 44;
+export const CAPTION_LINE = 12;
+export const CAPTION_PAD = 4;
+// The caption may fill the dial's box and the gap to its neighbor, less 2 pt, so two neighbors' captions never touch: 8 pt past the disc each side.
+export const CAPTION_OVER = 8;
+// The micro type (Barlow Semi Condensed 11 pt, tracked 0.4 pt) averages under 0.48 em a letter; 0.5 leaves a margin.
+const CAPTION_CHAR = 0.5 * LABEL_SIZE + 0.4;
+/** The widest a caption's words can be: the disc, the dial's padding either side and the gap, less 2 pt, less the caption's own padding. */
+export const CAPTION_WORDS = DIAL_SIZE + 2 * CAPTION_OVER - 2 * CAPTION_PAD;
+const fitsCaption = (words: string): boolean => Math.ceil(words.length * CAPTION_CHAR) <= CAPTION_WORDS;
+
+/**
+ * The words a dial's caption shows: its `short` name when it has one, else its label when that fits, else the label up to the " · " that splits a name from its detail ("Gate · HP" is "Gate"). A label with no such split that is still too long
+ * shows whole and shrinks to fit (table-chrome.tsx); give the dial a `short`.
+ */
+export function captionOf(label: string, short?: string): string {
+  if (short != null && short !== "") return short;
+  if (fitsCaption(label)) return label;
+  const head = label.split(" \u00b7 ")[0] ?? label;
+  return head === "" ? label : head;
+}
+
 /** The fade at the right edge of a scrolling dials row, and the room the row keeps clear of it at its end. */
 export const EDGE_FADE = 28;
 // The seat dial: its disc, its padding and its "P1" label (two letters at label size).

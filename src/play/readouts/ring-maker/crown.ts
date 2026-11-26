@@ -4,7 +4,7 @@
 import { inPlay } from "../../../rules/core/state.ts";
 import type { ScenarioState } from "../../../rules/engine/reduce.ts";
 
-import { isTimeLocation, locationDialLabel, locationPreviewWords, locationTimeNearWords, locationTimeWords } from "../../words/scenarios/ring-maker/crown-table.ts";
+import { isTimeLocation, locationDialLabel, locationDialShort, locationPreviewWords, locationTimeNearWords, locationTimeWords } from "../../words/scenarios/ring-maker/crown-table.ts";
 import type { TableDial } from "../dials.ts";
 
 export const CROWN = "the-antlered-crown";
@@ -23,6 +23,7 @@ export function crownDials(game: ScenarioState, nameOf: (code: string) => string
         id: `time:${card.id}`,
         testID: `crown-time:${card.id}`,
         label: locationDialLabel(card.code),
+        ...(locationDialShort(card.code) ? { short: locationDialShort(card.code) } : {}),
         name: `Time counters left on ${nameOf(card.code)}:`,
         value: card.resources,
         cardId: card.id,

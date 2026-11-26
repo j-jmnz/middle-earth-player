@@ -15,6 +15,8 @@ const LAST: Readonly<Record<string, string>> = {
 /** The short name on a location's dial, over the number: five dials in a row are told apart by it, as The Three Trials' Guardians are by their animal. */
 const DIAL_LABEL: Readonly<Record<string, string>> = { "08152": "Camp", "08155": "War-camp", "08156": "Village", "08157": "Battlefield", "08158": "Country" };
 export const locationDialLabel = (code: string): string => DIAL_LABEL[code] ?? "Time";
+/** The name the caption shows for a label too long for it (Battlefield). */
+export const locationDialShort = (code: string): string | undefined => (code === "08157" ? "Battle" : undefined);
 
 /** The label of a quest stage's time dial in this scenario's three stages. */
 export const CROWN_STAGE_LABEL = "Stage";

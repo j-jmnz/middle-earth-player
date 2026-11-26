@@ -39,6 +39,7 @@ export function orcDials(game: ScenarioState): readonly TableDial[] {
       id: "out-of-play",
       testID: "ring-maker-out-of-play",
       label: "Out of play",
+      short: "Out",
       name: game.seatCount > 1 ? "Out-of-play decks" : "Out-of-play deck",
       value: total,
       ...(warn ? { warn } : {}),

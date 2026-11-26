@@ -169,6 +169,7 @@ export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
       id: "cap",
       testID: "angmar-cap",
       label: "This round",
+      short: "Round",
       name: "Progress placed on the current quest this round:",
       value: cap.placed,
       limit: cap.limit,
