@@ -6,6 +6,7 @@ import { shuffleIds } from "../../core/seed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
+import { skipAreaStage } from "../riddles/area.ts";
 import { stageToVictory } from "../quest/order.ts";
 import type { PrintedCard } from "../../core/printed.ts";
 
@@ -44,4 +45,19 @@ export function leaveStage(state: ScenarioState, id: string, code: string, cards
   const victory = stageToVictory(state, cards, code);
   if (!victory && rolled?.back) return backIntoQuestDeck(state, id, ruleCause("rr.quest-advancement"), steps);
   return moveCard(state, id, { zone: victory ? "victory" : rolled?.remove ? "removed" : "setAside" });
+}
+
+/**
+ * The stage after the one at `index` in the quest's order, none of the stages that share a random set with it (the stages 3 of The Nîn-in-Eilph, one of which the quest took from the stages 2): the stages a random set lists are alternatives, so the stage that follows one of them is the first
+ * stage after the alternatives (08098:B:2 to 08101). A stage in no random set follows as skipAreaStage reads it.
+ */
+export function nextInOrder(state: ScenarioState, index: number): string | undefined {
+  const own = state.stages[index]?.code;
+  const alternatives = own == null ? undefined : state.stages.find((stage) => stage.randomNext?.codes.includes(own))?.randomNext?.codes;
+  let next = skipAreaStage(state, index);
+  for (let at = index; alternatives != null && next != null && alternatives.includes(next); ) {
+    at = state.stages.findIndex((stage) => stage.code === next);
+    next = at < 0 ? undefined : skipAreaStage(state, at);
+  }
+  return next;
 }

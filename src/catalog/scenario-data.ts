@@ -410,7 +410,7 @@ export function stageOf(code: string, effects: readonly Effect[]): { code: strin
   const branch = recordInstructions(effects, code, "forced").find((instruction) => instruction.verb === "BranchStage");
   const look = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "LookAtStages");
   const catchUp = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "CatchUpWins");
-  const random = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "AdvanceToRandomStage");
+  const random = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "AdvanceToRandomStage" && instruction.onDefeat === true);
   const randomNext = random?.verb === "AdvanceToRandomStage" ? { codes: random.codes, ...(random.otherwise != null ? { otherwise: random.otherwise } : {}), ...(random.remove ? { remove: true as const } : {}), ...(random.different ? { different: true as const } : {}) } : undefined;
   const attached = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "AdvanceIfAttached");
   const attachedNext = attached?.verb === "AdvanceIfAttached" ? { code: attached.code, then: attached.then, otherwise: attached.otherwise } : undefined;

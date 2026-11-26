@@ -24,11 +24,18 @@ import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
-/** AdvanceToRandomStage: run on the stage the quest is at, the quest advances now (19047:B:2); run on a stage already defeated, the quest has taken its random stage (advanceStage), so nothing happens. */
-export function advanceToRandomStage(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+/**
+ * AdvanceToRandomStage: run on the stage the quest is at, the quest advances now (19047:B:2); run on a stage already defeated, the quest has taken its random stage (advanceStage), so nothing happens. A record with `onDefeat` advances by the stage's own set; one without it names a set of its own
+ * (08095:B:2), which stands in for the stage's during this advance only, so the stage's defeat keeps its own.
+ */
+export function advanceToRandomStage(state: ScenarioState, instruction: Verb<"AdvanceToRandomStage">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (!focus.sourceId || state.questStage !== focus.sourceId) return state;
   const before = steps.length;
-  return afterProgress(advanceStage(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length), before, ctx, steps);
+  const code = state.cards[focus.sourceId]?.code;
+  const own = instruction.onDefeat === true ? undefined : { codes: instruction.codes, ...(instruction.otherwise != null ? { otherwise: instruction.otherwise } : {}), ...(instruction.remove ? { remove: true as const } : {}), ...(instruction.different ? { different: true as const } : {}) };
+  const run = own ? { ...state, stages: state.stages.map((stage) => (stage.code === code ? { ...stage, randomNext: own } : stage)) } : state;
+  const advanced = afterProgress(advanceStage(run, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length), before, ctx, steps);
+  return own ? { ...advanced, stages: state.stages } : advanced;
 }
 
 function inPlayWithCode(state: ScenarioState, code: string): string | undefined {

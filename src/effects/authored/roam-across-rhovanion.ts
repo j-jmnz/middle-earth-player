@@ -43,7 +43,7 @@ const RANDOM_STAGE = (id: string, code: string, line: string): Effect => ({
   timing: "forced",
   trigger: "questCardDefeated",
   subject: "self",
-  instructions: [{ verb: "AdvanceToRandomStage", codes: STAGE_TWOS, otherwise: "19051", remove: true }],
+  instructions: [{ verb: "AdvanceToRandomStage", codes: STAGE_TWOS, otherwise: "19051", remove: true, onDefeat: true }],
 });
 // When Revealed of a stage 2 (19048:A:1, 19049:A:1, 19050:A:1): the first player searches for the guard, which joins the staging area, and the set-aside objective is attached to it as a guarded objective. A search that finds no copy still brings the objective into the staging area, unguarded, and the first player claims it at once (settle sweep; user ruling, 2026-11-05).
 const FOUND = (title: string): Condition => ({ kind: "matches", card: "picked", pick: { type: "card", control: "any", names: [title] }, inPlay: true });
@@ -288,7 +288,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "forced",
       trigger: "activeExplored",
       condition: CONTROLS_URDUG,
-      instructions: [{ verb: "AdvanceToRandomStage", codes: STAGE_TWOS, otherwise: "19051" }],
+      instructions: [{ verb: "AdvanceToRandomStage", codes: STAGE_TWOS, otherwise: "19051", onDefeat: true }],
     },
     // 19048 Rescue Tiny (stage 2). A Grey Moorland guards Tiny. Side B: the When Revealed effects of treacheries cannot be canceled; the stage leaves the game when defeated and the quest proceeds to another stage 2 at random, else stage 3; the players cannot travel to the Grey Moorland guarding Tiny
     // without 5 progress on this stage, and cannot defeat it unless the first player controls Urdug and Tiny.

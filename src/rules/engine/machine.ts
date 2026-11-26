@@ -71,6 +71,7 @@ import { askingToCommit, askingToLook, askingToShift } from "../families/sea/sai
 import { askCurrentQuest } from "../families/wilderland/night.ts";
 import { askCurrentStage } from "../families/armies/stages.ts";
 import { phaseEnds } from "../families/angmar/phase.ts";
+import { discardToCommit } from "../families/ring-maker/player-bars.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
@@ -439,7 +440,7 @@ function chooseEnemy(
 }
 
 function commit(state: ScenarioState, cardIds: readonly string[], ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  let next = state;
+  let next = discardToCommit(state, state.activeSeat, ctx);
   // One commit is one occurrence: its characters' Responses share a window (rr.triggering-condition), the ones that hear
   // them exhaust ("After ~ exhausts", 12166:A:2) among them.
   const occurrence = `commit:${state.round}:${state.activeSeat}`;

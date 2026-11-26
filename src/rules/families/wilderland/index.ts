@@ -150,7 +150,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "ImmediateAttackBy":
       return immediateAttackBy(state, instruction, focus, ctx, steps);
     case "AdvanceToRandomStage":
-      return advanceToRandomStage(state, focus, ctx, steps);
+      return advanceToRandomStage(state, instruction, focus, ctx, steps);
     case "FlipToEnemySide":
       return flipToEnemySide(state, instruction);
     case "PutTrust":
