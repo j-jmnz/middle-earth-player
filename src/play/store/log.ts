@@ -11,7 +11,7 @@ import { changedWords } from "../words/scenarios/against-the-shadow/amon-din.ts"
 import { barredWords } from "../words/scenarios/against-the-shadow/osgiliath.ts";
 import { reshuffleWords } from "./pile-ids.ts";
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
-import { captureAttachedLine } from "../words/scenarios/haradrim/capture.ts";
+import { captureAttachedLine, mumakLogPlace } from "../words/scenarios/haradrim/capture.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
 import { discoverLogLine, setAsideLine } from "../words/scenarios/wilderland.ts";
 import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poison.ts";
@@ -149,9 +149,8 @@ function words(step: EngineStep, names: LogNames, questStat: string | null): str
     // The enemy was faceup when it was revealed: the line names it and the location it is facedown under now (dcce.grapple).
     case "grapple":
       return grappleLine(names.card(step.enemyId), names.card(step.locationId));
-    // The log names a player as "Player N" in every game (the line's `player`), so the Mûmak's place does too.
     case "attachDrawn":
-      return captureAttachedLine(names.card(step.cardId), names.card(step.hostId), step.seat, 2);
+      return captureAttachedLine(names.card(step.cardId), names.card(step.hostId), mumakLogPlace(step.seat));
     case "detach":
       return detachLine(names.card(step.enemyId), names.card(step.locationId));
     case "flip":

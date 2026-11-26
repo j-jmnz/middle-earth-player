@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 import { UNATTRIBUTED } from "../../rules/core/cause.ts";
 import { placeDamage } from "../../rules/core/damage.ts";
 import type { EngineStep } from "../../rules/core/intents.ts";
-import { legalIntents } from "../../rules/engine/reduce.ts";
+import { legalIntents, type ScenarioState } from "../../rules/engine/reduce.ts";
 import { settle } from "../../rules/engine/machine.ts";
 import { pushCardEffects } from "../../rules/interpret/effect-frames.ts";
 import { idOf, opened, resolveRecords, revealFromTop, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
@@ -17,6 +17,9 @@ import { momentOf } from "../store/outcome.ts";
 import { zoneSelector } from "../store/selectors.ts";
 
 const at = (layout: Layout = {}) => tableFromLayout("the-mumakil", { stage: "17027", side: "B", phase: "Quest", ...layout });
+
+// A card's printed name in a state, as the log and the sheets name it.
+const nameIn = (made: ReturnType<typeof at>, state: ScenarioState) => (id: string): string => made.ctx.cards.get(state.cards[id]?.code ?? "")?.name ?? id;
 
 describe("the Capture objectives on their Wild Mûmak", () => {
   it("17027:A:1 draws each Capture on the Mûmak it lies on, in the staging area and engaged, two on one Mûmak", () => {
@@ -42,7 +45,7 @@ describe("17027:A:1 the line of a Capture attached to a Wild Mûmak", () => {
   const stage = (layout: Layout) => {
     const made = at({ seats: 2, setAside: CAPTURE_CODES, ...layout });
     const run = resolveRecords(opened(made).state, made.ctx, "17027", "whenRevealed", idOf(made.state, "17027"));
-    const names = { card: (id: string) => made.ctx.cards.get(run.state.cards[id]?.code ?? "")?.name ?? id } as LogNames;
+    const names = { card: nameIn(made, run.state) } as LogNames;
     return logLines(run.steps, names).map((line) => line.text);
   };
 
@@ -56,7 +59,7 @@ describe("17027:A:1 the line of a Capture attached to a Wild Mûmak", () => {
     const made = at({ seats: 2, setAside: CAPTURE_CODES, staging: [MUMAK] });
     const before = opened(made).state;
     const run = resolveRecords(before, made.ctx, "17027", "whenRevealed", idOf(made.state, "17027"));
-    const card = (id: string) => made.ctx.cards.get(run.state.cards[id]?.code ?? "")?.name ?? id;
+    const card = nameIn(made, run.state);
     const text = momentOf(before, run.state, run.steps, { card } as never)?.lines.map((line) => line.text) ?? [];
     expect(text.filter((line) => line.includes("is attached to Wild Mûmak, in the staging area."))).toHaveLength(2);
   });
@@ -76,7 +79,7 @@ describe("the Response of a Capture objective on the choice sheet", () => {
     const start = opened(made).state;
     const placed = placeDamage(start, idOf(start, MUMAK), 1, made.ctx.cards, steps, "framework", UNATTRIBUTED);
     const state = settle({ ...placed, window: null, mode: "stopped" }, made.ctx, steps);
-    const names = { card: (id: string) => made.ctx.cards.get(state.cards[id]?.code ?? "")?.name ?? id, line: () => null };
+    const names = { card: nameIn(made, state), line: () => null };
     return sheetFor(state, made.ctx, legalIntents(state, made.ctx), names);
   }
 
@@ -93,7 +96,7 @@ describe("17024:A:1 Biting Insects on the choice sheet", () => {
   it("leads the title with the damage left, and the note names the discarded card and its cost apart from the damage left", () => {
     const made = at({ hand: [{ code: "c2", seat: 0 }] });
     const state = revealFromTop(opened(made).state, made.ctx, "17024", []).state;
-    const names = { card: (id: string) => made.ctx.cards.get(state.cards[id]?.code ?? "")?.name ?? id, line: () => null };
+    const names = { card: nameIn(made, state), line: () => null };
     const sheet = sheetFor(state, made.ctx, legalIntents(state, made.ctx), names);
     expect(sheet?.kind).toBe("pick");
     expect(sheet?.title).toBe("Assign 2: Biting Insects");
@@ -108,7 +111,7 @@ describe("17015:A:3 the Wild Mûmak's end-of-round choice on the choice sheet", 
     const id = idOf(made.state, MUMAK);
     const pushed = pushCardEffects(opened(made).state, "forced", id, 0, false, made.ctx.effects.filter((effect) => effect.id === "17015:forced:1"), made.ctx, steps);
     const state = settle({ ...pushed, window: null, mode: "stopped" }, made.ctx, steps);
-    const names = { card: (cardId: string) => made.ctx.cards.get(state.cards[cardId]?.code ?? "")?.name ?? cardId, line: () => null };
+    const names = { card: nameIn(made, state), line: () => null };
     const sheet = sheetFor(state, made.ctx, legalIntents(state, made.ctx), names);
     expect(sheet?.kind).toBe("pick");
     if (sheet?.kind !== "pick") return;

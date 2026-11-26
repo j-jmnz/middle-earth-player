@@ -4,8 +4,11 @@
 /** Where a Wild Mûmak stands: in the staging area, or engaged with a player ("engaged with Player 1"; `seat` null is the staging area). */
 export const mumakPlace = (seat: number | null, seatCount: number): string => (seat == null ? "in the staging area" : seatCount > 1 ? `engaged with Player ${seat + 1}` : "engaged with you");
 
-/** The banner and log line of a random Capture attached to a Mûmak (17027:A:1). */
-export const captureAttachedLine = (capture: string, host: string, seat: number | null, seatCount: number): string => `${capture} is attached to ${host}, ${mumakPlace(seat, seatCount)}.`;
+/** The same place as the log tells it: the log names a player as "Player N" in every game, so a solo game says "engaged with Player 1" too. */
+export const mumakLogPlace = (seat: number | null): string => mumakPlace(seat, 2);
+
+/** The banner and log line of a random Capture attached to a Mûmak (17027:A:1); `place` is the Mûmak's place in the form of the line's reader (`mumakPlace`, `mumakLogPlace`). */
+export const captureAttachedLine = (capture: string, host: string, place: string): string => `${capture} is attached to ${host}, ${place}.`;
 
 /** The row of a Capture's Response: the Capture on its Mûmak, and where the Mûmak stands. */
 export const captureRowLabel = (capture: string, host: string, seat: number | null, seatCount: number): string => `${capture} · on ${host} ${mumakPlace(seat, seatCount)}`;

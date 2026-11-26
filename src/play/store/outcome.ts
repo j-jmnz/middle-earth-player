@@ -11,7 +11,7 @@ import type { LogMark } from "./log.ts";
 import { plural } from "../words/list.ts";
 import { reshuffleWords } from "./pile-ids.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
-import { captureAttachedLine } from "../words/scenarios/haradrim/capture.ts";
+import { captureAttachedLine, mumakPlace } from "../words/scenarios/haradrim/capture.ts";
 import { boardingWords } from "../words/scenarios/sea.ts";
 import type { FateNames } from "../words/scenarios/fate-beats.ts";
 import { ignoredRevealNote } from "../readouts/ettenmoors.ts";
@@ -265,7 +265,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         staging(grappleLine(names.card(step.enemyId), names.card(step.locationId)), [step.locationId]);
         return;
       case "attachDrawn":
-        staging(captureAttachedLine(names.card(step.cardId), names.card(step.hostId), step.seat, after.seatCount), [step.cardId, step.hostId]);
+        staging(captureAttachedLine(names.card(step.cardId), names.card(step.hostId), mumakPlace(step.seat, after.seatCount)), [step.cardId, step.hostId]);
         return;
       // The enemies grappled with a location that became the active location or was explored come out from under it, faceup, into the staging area (dcce.grapple).
       case "detach":

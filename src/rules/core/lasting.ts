@@ -14,8 +14,6 @@ export const ENGINE_MARKS: ReadonlySet<ModifierStat> = new Set<ModifierStat>([
   // "The first treachery revealed each round" (19137:B:1, families/wilderland/rounds.ts) and the Mount Doom condition `firstTreachery` read the mark on a treachery that is already in the discard pile.
   "firstTreachery",
   "treacheryRevealed",
-  // "If a location was explored this round" (17017:A:2, families/haradrim/explored.ts): the note is made when the location leaves play and read by an enemy's Shadow card later in the round.
-  "exploredThisRound",
   "firstTreacheryNoted",
   // "An enemy that engaged you this round" (142026:A:3 pick filter) and the seat check of `engagedThisRound`: the enemy may be destroyed before the check.
   "engagedThisRound",
@@ -99,6 +97,8 @@ export const ENGINE_MADE_EFFECTS: ReadonlySet<ModifierStat> = new Set<ModifierSt
   "watchReadyHost",
   // The round the main quest card came into play, noted by the haradrim settle hook (families/haradrim/stage.ts): held by the table, source the stage; it lapses with the stage.
   "stageEntered",
+  // "If a location was explored this round" (17017:A:2, families/haradrim/explored.ts): the note is made when the location leaves play and read by an enemy's Shadow card later in the round.
+  "exploredThisRound",
   // The temperature of the heat tracker (families/haradrim/heat.ts): held by the table for the rest of the game, replaced by each verb.
   "temperature",
 ]);

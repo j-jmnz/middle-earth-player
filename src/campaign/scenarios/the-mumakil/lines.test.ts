@@ -140,6 +140,13 @@ describe("17014:A:1 Noose of Vines: offered to the defender's controller, after 
     expect([zoneOf(done, "17014"), zoneOf(done, MUMAK)]).toEqual(["victory", "victory"]);
   });
 
+  it("17014:A:1 a Mûmak engaged with the second player, defended by his hero, offers the Noose to him and not to the first player", () => {
+    const layout = { seats: 2, engaged: [{ code: MUMAK, seat: 1, damage: 8 }], attached: captures("17014"), deck: ["f0", "f0", "f0"] } as const;
+    const fought = fightEnemy(table, "f0", MUMAK, layout, { defender: (made) => made.state.seats[1]?.heroes[0] ?? "" });
+    expect(windowSeat(fought.run.state)).toBe(1);
+    expect(offered(fought.run.state, fought.made, "17014")).toHaveLength(1);
+  });
+
   it("17014:A:1 an undefended attack has no defender: the Noose is offered to nobody, the first player included", () => {
     const hero = playedLayout("the-mumakil", { stage: "17027", side: "B", seats: 2, engaged: [{ code: MUMAK, seat: 0, damage: 8 }], attached: captures("17014"), deck: ["f0", "f0"] }, [attack(MUMAK, { undefended: true })]);
     expect(offered(hero.run.state, hero.table, "17014")).toEqual([]);

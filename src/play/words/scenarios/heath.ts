@@ -53,6 +53,11 @@ export function coldPlace(game: ScenarioState): { id: string | null; at: number;
   return { id: data?.picked?.at(-1) ?? null, at: mine.length, of: mine.length + left };
 }
 
+/** The wilderland family's ImmediateAttackBy (families/wilderland/heath.ts) in words: the enemy the effect names (the engaged Wild Mûmak, 17015:A:3) makes the attack; the scenario's own asks entry words the row on the table. Null for any other verb. */
+export function heathWords(instruction: Instruction): string | null {
+  return instruction.verb === "ImmediateAttackBy" ? "have the enemy make an immediate attack against you" : null;
+}
+
 /** The sentence over a Choose of The Withered Heath: the Accolade boon offered for a stage defeated (12175:B:1), and Deadly Cold's question about one character (19021:A:1). Null for any other Choose. */
 export function heathChooseNote(choose: Choose, game: ScenarioState, names: ChoiceNames): string | null {
   const { say } = seatSays(game);

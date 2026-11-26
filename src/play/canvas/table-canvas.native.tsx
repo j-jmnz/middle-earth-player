@@ -54,9 +54,9 @@ const NO_CARDS: readonly CardInstance[] = [];
 // No card is ringed by a banner beat while the table peeks.
 const NO_BEAT: ReadonlySet<string> = new Set();
 
-// A faint word in an empty zone, so the player knows what the space is for.
-function ZoneWord({ rect, text, font, t, s }: { rect: Rect; text: string; font: SkFont; t: TableTokens; s: number }) {
-  return <Text x={rect.x + 6 * s} y={rect.y + 16 * s} text={text} font={font} color={t.faint} />;
+// A faint word in an empty zone, so the player knows what the space is for. `foot`: the y a card above the zone reaches into it (the staging row's peeks over an empty engagement row); the word stands under it.
+function ZoneWord({ rect, text, font, t, s, foot }: { rect: Rect; text: string; font: SkFont; t: TableTokens; s: number; foot?: number }) {
+  return <Text x={rect.x + 6 * s} y={Math.max(rect.y, foot ?? rect.y) + 16 * s} text={text} font={font} color={t.faint} />;
 }
 
 function Table({ store, width, height, column, reach, onRowFeet, picture, pictureRevision, nameOf, sphereOf, inactive, facts, success, info, highlight: marked, beats, raised, fight, bottomInset, stageArea, handoff, look, onTap, onEmptyTap, onPreview, onDrop }: TableCanvasProps) {
@@ -166,9 +166,9 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
   const lift = lifted ? bodyProps(lifted, ctx) : null;
   const piece = (slot: CardSlot) => <TablePiece key={`${slot.kind}:${slot.id}`} {...pieceProps(slot, ctx)} />;
   const attackerSlot = layout.attacker ? (layout.slots.find((slot) => slot.id === layout.attacker && slot.kind === "card") ?? null) : null;
-  const emptyWords: [Rect, string][] = [
+  const emptyWords: [Rect, string, number?][] = [
     ...(views.staging.entries.length === 0 ? [[layout.zones.staging, stagingWord(game, seat)] as [Rect, string]] : []),
-    ...(views.engaged.entries.length === 0 ? [[layout.zones.engaged, "No enemy engaged"] as [Rect, string]] : []),
+    ...(views.engaged.entries.length === 0 ? [[layout.zones.engaged, "No enemy engaged", layout.stagingFoot] as [Rect, string, number?]] : []),
     ...(views.activeLocation.entries.length === 0 ? [[layout.zones.activeLocation, "No location"] as [Rect, string]] : []),
   ];
 
@@ -188,8 +188,8 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
             />
           </SkRect>
           {owner && views.staging.entries.length > 0 ? <StagingTag rect={layout.zones.staging} text={stagingWord(game, seat)} font={fonts.small} t={t} s={s} /> : null}
-          {emptyWords.map(([rect, text]) => (
-            <ZoneWord key={text} rect={rect} text={text} font={fonts.small} t={t} s={s} />
+          {emptyWords.map(([rect, text, foot]) => (
+            <ZoneWord key={text} rect={rect} text={text} font={fonts.small} t={t} s={s} {...(foot != null ? { foot } : {})} />
           ))}
           {targetZones.map((rect, index) => (
             <RoundedRect key={`z${index}`} x={rect.x - 4 * s} y={rect.y - 4 * s} width={rect.w + 8 * s} height={rect.h + 8 * s} r={RADIUS * s * 2} color={t.accent} style="stroke" strokeWidth={1.5 * s} />

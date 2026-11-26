@@ -249,10 +249,10 @@ export function Tokens({ slot, rect, images, fonts, t, s, ring = null, contrast 
   );
 }
 
-// The strip's count stands in the middle of the card, or just left of the progress token at the card's foot when the card wears one, so the token never covers a digit.
-function stripCenter(x: number, w: number, token: boolean, label: string, font: Fonts["numbers"], s: number): number {
+// The strip's count stands in the middle of the card, or just left of the progress token at the card's foot when the card wears one (`tokenLeft`, its left edge; null with none), so the token never covers a digit.
+function stripCenter(x: number, w: number, tokenLeft: number | null, label: string, font: Fonts["numbers"], s: number): number {
   const half = font.getTextWidth(label) / 2;
-  return token ? Math.min(x + w / 2, x + w - (TOKEN + 2) * s - half) : x + w / 2;
+  return tokenLeft == null ? x + w / 2 : Math.min(x + w / 2, tokenLeft - 2 * s - half);
 }
 
 /**
@@ -371,7 +371,7 @@ export function Badges({
       {questPoints != null ? (
         <Group>
           <RoundedRect x={x} y={y + h - strip} width={w} height={strip} r={0} color={stripOf(t)} />
-          <Outlined x={stripCenter(x, w, slot.progress > 0, label, fonts.numbers, s)} y={y + h - 3 * s} text={label} font={fonts.numbers} t={t} s={s} {...(stageLoses ? { color: t.threat } : {})} />
+          <Outlined x={stripCenter(x, w, slot.progress > 0 ? x + w - TOKEN * s : null, label, fonts.numbers, s)} y={y + h - 3 * s} text={label} font={fonts.numbers} t={t} s={s} {...(stageLoses ? { color: t.threat } : {})} />
         </Group>
       ) : null}
     </Group>
