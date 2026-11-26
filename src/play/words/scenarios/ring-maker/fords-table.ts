@@ -4,6 +4,11 @@
 import type { Instruction } from "../../../../catalog/boundary.ts";
 import { plural } from "../../list.ts";
 
+/** What stage 1B's last counter takes off each seat's threat elimination level (08066:B:2); a test holds it equal to the record's amount. */
+export const ELIMINATION_DROP = 10;
+/** The stage whose last counter lowers the level. */
+export const LEVEL_STAGE = "08066";
+
 /** The threat elimination level each living seat will have once the stage's last counter has lowered it (`seat` is 0-based): read from the engine for each seat, never a fixed number. */
 export type NewLevels = readonly { seat: number; level: number }[];
 
@@ -26,7 +31,7 @@ const LAST_COUNTER: Readonly<Record<string, string | ((levels: NewLevels) => str
   "07066": "Mugash is shuffled into the encounter deck, even from a hero, and the quest advances to stage 3.",
   "08011": "each player discards the hand and draws 2 cards, and 2 time counters return.",
   "08013": "the players make engagement checks and each engaged enemy attacks. The players win if no hero is destroyed, and lose if one is.",
-  "08066": (levels) => `each player's threat elimination level goes down by 10 for the rest of the game${newLevelWords(levels)}, a player whose threat is at or above his new level is eliminated at once, and 4 time counters return.`,
+  "08066": (levels) => `each player's threat elimination level goes down by ${ELIMINATION_DROP} for the rest of the game${newLevelWords(levels)}, a player whose threat is at or above his new level is eliminated at once, and 4 time counters return.`,
   "08067": "the first player chooses: each player raises their threat by 3, or Bellach attacks Nalir. Then 3 time counters return.",
   "07067": "5 cards from the top of the encounter deck are discarded, each player adds an enemy or objective from the discard pile to the staging area, and 3 time counters return.",
 };

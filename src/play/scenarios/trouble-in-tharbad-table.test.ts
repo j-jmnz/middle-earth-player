@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest";
 
 import { updateCard } from "../../rules/core/state.ts";
 import { idOf, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
+import { AUTHORED_EFFECTS } from "../../effects/authored/the-ring-maker/trouble-in-tharbad.ts";
+import { ELIMINATION_DROP } from "../words/scenarios/ring-maker/fords-table.ts";
 import { dungeonDetail } from "../cards/dungeon-preview.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
 import { seatDialLimit, threatLevel } from "../readouts/threat-level.ts";
@@ -38,6 +40,11 @@ describe("the time dial of the stages", () => {
     };
     expect(words(0)).toContain("goes down by 10 for the rest of the game (to 40), a player whose threat is at or above his new level is eliminated at once");
     expect(words(5)).toContain("(to 40 for Player 1, 35 for Player 2)");
+  });
+
+  it("08066:B:2 the amount the words say is the amount of the record", () => {
+    const record = AUTHORED_EFFECTS.find((effect) => effect.id === "08066:forced:1");
+    expect(JSON.stringify(record?.instructions)).toContain(`"stat":"eliminationReduction","amount":${ELIMINATION_DROP}`);
   });
 
   it("08067:B:1 reads Time 3; 08067:B:2 its last counter names the first player's choice and the 3 counters that return", () => {
