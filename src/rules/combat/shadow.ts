@@ -18,7 +18,7 @@ import { moveCard, shadowCards } from "../core/zones.ts";
 import { effectCause, inCause, ruleCause } from "../core/cause.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { enemyAttackWindow } from "../engine/step-window.ts";
-import { noteAttackDamage } from "../families/defense/damage.ts";
+import { afterTarget, noteAttackDamage } from "../families/defense/damage.ts";
 import { announceHurt } from "../families/angmar/damage.ts";
 import { discardableShadow } from "../families/angmar/shadows.ts";
 import { combatDamage, excessDamageAfter } from "../families/defense/excess.ts";
@@ -389,6 +389,3 @@ function destroyedAllyOf(state: ScenarioState, attack: PendingAttack, ctx: Reduc
 }
 
 // The character an attack that ended was made against: its defender, or the hero an undefended attack's damage was assigned to.
-function afterTarget(attack: PendingAttack): string | undefined {
-  return attack.undefended || !attack.defenderId ? attack.heroId : attack.defenderId;
-}
