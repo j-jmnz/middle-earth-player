@@ -12,7 +12,7 @@ import { ICONS } from "../../ui/icons/generated.ts";
 import type { CardSlot, Rect } from "../layout/layout.ts";
 import { medallionAt } from "../layout/look-strip.ts";
 import { medallionCount } from "../words/scenarios/sea.ts";
-import { stripText } from "./table-canvas-views.ts";
+import { progressInStrip as progressInStripOf, stripText } from "./table-canvas-views.ts";
 import { badgeLayout, badgeShown } from "./badge-room.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
@@ -228,12 +228,12 @@ export function StackMark({ slot, fonts, t, s }: { slot: CardSlot; fonts: Fonts;
  * The token art on a card, each with its count: resources bottom left, damage top right, progress bottom right. `rect` is
  * the card's rectangle on screen, so the tokens of an exhausted card stay upright in its sideways footprint.
  */
-export function Tokens({ slot, rect, images, fonts, t, s, ring = null, contrast = false }: { slot: CardSlot; rect: Rect; images: TokenImages; fonts: Fonts; t: TableTokens; s: number; ring?: string | null; contrast?: boolean }) {
+export function Tokens({ slot, rect, images, fonts, t, s, ring = null, contrast = false, progressInStrip = false }: { slot: CardSlot; rect: Rect; images: TokenImages; fonts: Fonts; t: TableTokens; s: number; ring?: string | null; contrast?: boolean; progressInStrip?: boolean }) {
   const size = TOKEN * s;
   const items: { image: SkImage | null; value: number; cx: number; cy: number; fallback: string; ring: string | null }[] = [];
   if (slot.resources > 0) items.push({ image: images.resource, value: slot.resources, ...tokenSpot(rect, "resources", s), fallback: t.accent, ring });
   if (slot.damage > 0) items.push({ image: images.damage, value: slot.damage, ...tokenSpot(rect, "damage", s), fallback: t.threat, ring: null });
-  if (slot.progress > 0) items.push({ image: images.progress, value: slot.progress, ...tokenSpot(rect, "progress", s), fallback: t.bone, ring: null });
+  if (slot.progress > 0 && !progressInStrip) items.push({ image: images.progress, value: slot.progress, ...tokenSpot(rect, "progress", s), fallback: t.bone, ring: null });
   return (
     <Group>
       {items.map((item, index) => (
@@ -374,7 +374,7 @@ export function Badges({
       {questPoints != null ? (
         <Group>
           <RoundedRect x={x} y={y + h - strip} width={w} height={strip} r={0} color={stripOf(t)} />
-          <Outlined x={stripCenter(x, w, slot.progress > 0 ? x + w - TOKEN * s : null, label, fonts.numbers, s)} y={y + h - 3 * s} text={label} font={fonts.numbers} t={t} s={s} {...(stageLoses ? { color: t.threat } : {})} />
+          <Outlined x={stripCenter(x, w, slot.progress > 0 && !progressInStripOf(slot.progress, questPoints) ? x + w - TOKEN * s : null, label, fonts.numbers, s)} y={y + h - 3 * s} text={label} font={fonts.numbers} t={t} s={s} {...(stageLoses ? { color: t.threat } : {})} />
         </Group>
       ) : null}
     </Group>

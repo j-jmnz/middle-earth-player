@@ -110,6 +110,7 @@ export const FIXTURE_REGISTRY = [
   { scenarioId: "the-three-trials", kind: "standalone", names: ["trials-lost"] },
   { scenarioId: "trouble-in-tharbad", kind: "standalone", names: ["tharbad-lost"] },
   { scenarioId: "the-nin-in-eilph", kind: "standalone", names: ["eilph-lost"] },
+  { scenarioId: "celebrimbors-secret", kind: "standalone", names: ["secret-lost"] },
   { scenarioId: "escape-from-umbar", kind: "standalone", names: ["umbar-lost"] },
   { scenarioId: "desert-crossing", kind: "standalone", names: ["crossing-lost"] },
   { scenarioId: "the-long-arm-of-mordor", kind: "standalone", names: ["mordor-lost"] },

@@ -6,10 +6,12 @@ import type { ReduceContext, ScenarioState } from "../../../rules/engine/reduce.
 
 import { ELIMINATION_DROP, LEVEL_STAGE, stageTimeLimitWords, stageTimeNearWords, stageTimeWords, timeDialWarms, type NewLevels, type TimeTakes } from "../../words/scenarios/ring-maker/fords-table.ts";
 import { cardsOf, type TableDial } from "../dials.ts";
+import { mouldGateWords } from "../../words/scenarios/ring-maker/celebrimbor-table.ts";
+import { mouldState, STAGE_1, STAGE_2 } from "./celebrimbor.ts";
 import { seatLevel } from "../threat-level.ts";
 
-/** The quest stages of The Fords of Isen, of To Catch an Orc (stages 2B and 3B), of Into Fangorn (stages 1B, 2B and 3B) and of The Dunland Trap (stages 1B and 3B; 2B prints none) of Trouble in Tharbad (stages 1B and 2B) and of The Nîn-in-Eilph (the three stages 2B, the three stages 3B and stage 4B) that print Time X. */
-export const FORDS_STAGES: readonly string[] = ["07059", "07060", "07061", "07063", "07064", "07065", "07066", "07067", "08011", "08013", "08066", "08067", "08095", "08096", "08097", "08098", "08099", "08100", "08101"];
+/** The quest stages of The Fords of Isen, of To Catch an Orc (stages 2B and 3B), of Into Fangorn (stages 1B, 2B and 3B) and of The Dunland Trap (stages 1B and 3B; 2B prints none) of Trouble in Tharbad (stages 1B and 2B) and of Celebrimbor's Secret (stages 1B and 2B) and of The Nîn-in-Eilph (the three stages 2B, the three stages 3B and stage 4B) that print Time X. */
+export const FORDS_STAGES: readonly string[] = ["07059", "07060", "07061", "07063", "07064", "07065", "07066", "07067", "08011", "08013", "08066", "08067", "08095", "08096", "08097", "08098", "08099", "08100", "08101", "08122", "08123"];
 
 const TURCH = "08014";
 const NO_WAY_OUT = "08013";
@@ -22,6 +24,9 @@ export function timeTakes(game: ScenarioState, ctx: ReduceContext, code: string)
   // The count comes from the records in play (refreshTakes: Old South Road 08016, Off Track 07057), not from card codes.
   return { takes: refreshTakes(game, ctx), engages: code === NO_WAY_OUT && Object.values(game.cards).some((card) => inPlay(card.zone) && card.code === TURCH), ...(code === LEVEL_STAGE ? { levels: newLevels(game) } : {}) };
 }
+
+/** The stage gate of Celebrimbor's Secret (08122:B:4, 08123:B:4) as a sentence for the stage's dial: progress is held until a hero holds the Mould. Empty on any other stage. */
+const mouldGate = (game: ScenarioState, ctx: ReduceContext, code: string): string[] => (code === STAGE_1 || code === STAGE_2 ? [mouldGateWords(code === STAGE_1 ? 1 : 2, mouldState(game, ctx)?.where === "hero")] : []);
 
 export function ringMakerDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
   const dials: TableDial[] = [];
@@ -47,7 +52,7 @@ export function ringMakerDials(game: ScenarioState, ctx: ReduceContext, nameOf: 
         limit,
         limitWords: stageTimeLimitWords(limit, counted != null ? { amount: time.amount, players: counted } : undefined),
         ...(warms ? { warn: { level, words: stageTimeNearWords(code, card.resources, facts) } } : {}),
-        note: stageTimeWords(code, card.resources, facts),
+        note: [stageTimeWords(code, card.resources, facts), ...mouldGate(game, ctx, code)].join(" "),
       });
     }
   }

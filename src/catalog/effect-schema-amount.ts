@@ -57,6 +57,8 @@ export const amountExprSchema = z.strictObject({
   // The cards attached facedown to the source (Eagles of the Misty Mountains), and the resource tokens other copies of the
   // source card hold above the number on this one (Keeping Count; the most any copy holds), read by src/rules/families/misc/amounts.ts.
   facedown: z.literal(true).optional(),
+  // The cards facedown under the card in play with this code ("X is the number of cards underneath The Orcs' Search", 08124:A:1); 0 with no such card in play. Read by src/rules/families/misc/amounts.ts.
+  facedownUnder: z.string().min(1).optional(),
   // The poison under the card the reference names ("equal to the number of poison it has", 132034:A:1; hob.venom-poison). Read by the poison family (src/rules/families/poison/amounts.ts).
   poison: cardRefSchema.optional(),
   resourcesAboveCopies: z.literal(true).optional(),

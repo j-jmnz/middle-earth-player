@@ -10,7 +10,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { destroyCard, destroyOverwhelmed, placeDamage } from "../../core/keywords.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, updateCard } from "../../core/state.ts";
+import { hostOf, updateCard } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { threatCostOf } from "../costs/stats.ts";
@@ -33,7 +33,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 }
 
 function inPlayWith(state: ScenarioState, code: string): string | undefined {
-  return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id;
+  return hostOf(state, code) ?? undefined;
 }
 
 // Damage tokens come on (positive) or off (negative, no further than 0) the card in play with this code: tokens, not dealt damage, so nothing

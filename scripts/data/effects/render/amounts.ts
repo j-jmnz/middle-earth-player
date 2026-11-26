@@ -65,6 +65,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (isObj(expr.discardedMatching)) return { text: `the number of cards this effect discarded from the top of the encounter deck, still in the discard pile, that are ${pick(expr.discardedMatching, ctx)}`, read: ["discardedMatching"] };
   if (expr.destroyedWillpower === true) return { text: "the Willpower the destroyed character had in play (last known)", read: ["destroyedWillpower"] };
   if (expr.facedown === true) return { text: "the number of cards attached facedown to this card", read: ["facedown"] };
+  if (typeof expr.facedownUnder === "string") return { text: `the number of cards facedown underneath the card in play with code ${expr.facedownUnder} (0 when it is not in play)`, read: ["facedownUnder"] };
   if (expr.firstPlayerTens === true) return { text: "the tens digit of the first player's threat, whoever the actor is", read: ["firstPlayerTens"] };
   if (isObj(expr.mostPerPlayer)) return { text: `the most ${pick(expr.mostPerPlayer, ctx)} any one player controls, each player counted from their own side`, read: ["mostPerPlayer"] };
   if (expr.guardedCost === true) return { text: "the printed cost of the card this card guards (one under it, or the host it guards as a guard; 0 for a card with no printed cost)", read: ["guardedCost"] };

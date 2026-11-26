@@ -66,14 +66,16 @@ export function sphereRing(sphere: string | null, t: TableTokens = tableTokens):
   return tint && tint !== "faint" ? t[tint] : null;
 }
 
+/** A card whose progress is past its quest points says the count in its strip and wears no progress token (stripText). */
+export const progressInStrip = (progress: number, questPoints: number | null): boolean => questPoints != null && progress > questPoints;
+
 // The "progress / quest points" strip of a quest card or location, which pops when progress is placed on it.
 // `owner`: the seat the quest card's stage belongs to once stages are separate between players ("P2 · 2 / 8").
 // The Stormcaller's stage keeps it in the part its area's cards leave uncovered, so it is set close ("12/18") to stay inside it at 24/24 (dcce.stormcallers-area).
 // `loses`: filling the stage loses the game (143075:B:3), said in a word as well as the strip's threat red ("5 / 8 · lose").
-// Progress past the quest points (a stage that cannot be defeated yet, 17027:B:2) says "12+ / 12": the progress token at the card's foot holds the full number, and a long one there would cover the strip's count.
+// Progress past the quest points (a stage that cannot be defeated yet, 17027:B:2, 08123:B:4) says its whole count ("20 / 12") and the card wears no progress token (`progressInStrip`): a token at the foot would cover the strip's count.
 export function stripText(slot: CardSlot, questPoints: number | null, owner?: string | null, loses = false): string | null {
   if (questPoints == null) return null;
-  const progress = slot.progress > questPoints ? `${questPoints}+` : `${slot.progress}`;
-  const count = `${owner ? `${owner} · ` : ""}${progress}${slot.stormcaller === "stage" ? "/" : " / "}${questPoints}`;
+  const count = `${owner ? `${owner} · ` : ""}${slot.progress}${slot.stormcaller === "stage" ? "/" : " / "}${questPoints}`;
   return loses ? `${count} · lose` : count;
 }
