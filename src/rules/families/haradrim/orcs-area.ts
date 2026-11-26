@@ -59,3 +59,14 @@ export function syncOrcsArea(state: ScenarioState): ScenarioState {
   if (!now) return next;
   return kept.length === now.members.length && kept.every((id, at) => id === now.members[at]) ? next : { ...next, orcs: { ...now, members: kept } };
 }
+
+/** A scene's Orcs' area as the Setup leaves it (test/harness/layout.ts, `orcs`): the area prepared from the set-aside stages, the cards of `members` moved into it from where they stand, `progress` on the Orcs' stage. */
+export function withOrcsArea(state: ScenarioState, layout: { stages: readonly string[]; place?: readonly string[]; members?: readonly string[]; progress?: number }): ScenarioState {
+  let next = prepareOrcsArea(state, { verb: "PrepareOrcsArea", stages: [...layout.stages], number: 1, ...(layout.place ? { place: [...layout.place] } : {}) });
+  for (const code of layout.members ?? []) {
+    const id = next.staging.find((card) => next.cards[card]?.code === code);
+    if (id) next = updateCard(moveCard(next, id, { zone: "orcsArea" }), id, { face: "up", controller: null });
+  }
+  const stage = next.orcs?.stage;
+  return layout.progress != null && stage ? updateCard(next, stage, { progress: layout.progress }) : next;
+}
