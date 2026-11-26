@@ -15,6 +15,17 @@ Haradrim part 6 (Beneath the Sands, `BtS`), standalone only, on Easy and Normal 
 - Stage 1B discards cards until X locations are discarded and stages them; stage 2A flips Off Track and stages X enemies; stage 3A adds Brood Mother.
 - Quest 17078 is "The Spiders' Hive", as printed on the card and spelled by Hall of Beorn. DragnCards spells it "The Spider's Hive"; no source of `data/cards` reads that spelling.
 
+## Table
+
+What the table shows of the pieces this scenario's records create (`docs/agents/agent-brief.md`, Scenario procedure, The Table step). The engine decides each number; no control types damage, resources, threat, progress or life. The test is `src/play/scenarios/beneath-the-sands-table.test.ts`; the choice sentences are in `src/play/words/asks/beneath-the-sands.ts`; the screen moments are in `test/scenarios/beneath-the-sands/screens.ts`. No tracker, dial or held card is new, so the scenario adds no widget and no readout file.
+
+- **The Search objective** (`17076:A:1`, `17079:A:1`, `17080:A:1`, `hrd.track`). One card in the staging area. A flip changes the code the card holds (`FlipSearchObjective`), so the table shows the face by the card's own picture and name, Off Track or On Track, with no side marker. Its resources (Off Track's Forced effect places them, the flip to On Track discards them) are the card's resource tokens, which every card already draws. No Track dial: the Track values are printed on the locations.
+- **Grabbed by Spiders** (`17074:A:1`). It attaches to the main quest card; the table draws a card attached to a stage as it draws any attachment, under its host.
+- **Brood Mother** (`17076:A:1`, `17068:A:3`, `17078:A:1`). She starts set aside and returns there when Spider Burrow leaves play explored. The set-aside panel lists her (`scripts/checks/set-aside-sites.ts` names the verb that sets her aside); no zone is added for her.
+- **Setup records that create nothing new.** The One Ring's Setup (`141085:setup:1`) attaches a card to a hero, which the table already draws.
+- **The owner on each row of a pick that spans seats.** The picks are the defending player's own (Cobwebbed Cavern, Blocked Passage, Grabbed by Spiders) or the first player's (Forced Off Track, Off Track); the asks entries name the card and the number; the shadow picks say "you control".
+- **Not shot in a browser.** The saved loss fixture `sands-lost` is a Games task, so no table shot of a played game exists yet; the moments `off-track` and `on-track` build in Node (`scripts/browser/scene.test.ts`).
+
 ## Readings
 
 The statuses are those of the Readings bullet of `docs/scenarios/haradrim.md`. Each key is the scan-read ledger line (`data/printed/haradrim.json`), `<code>:<side>:<n>`. Sources read: `hrd.search-objective`, `hrd.track`, https://lotr-lcg-quest-companion.gamersdungeon.net/haradrim-cycle-quest-beneath-the-sands.html, https://secondhandtook.wordpress.com/2017/05/30/first-impressions-beneath-the-sands/ (player reviews; no official ruling on the travel step).
