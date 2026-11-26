@@ -24,9 +24,9 @@ const LOCATION_IN_PLAY: PickSpec = { type: "location", control: "any", staging: 
 const ENGAGED_WITH_ACTOR: Condition = { kind: "engagedWithActor" };
 const HAS_OWN_ALLY: Condition = { kind: "all", conditions: [ENGAGED_WITH_ACTOR, { kind: "canPick", pick: OWN_ALLY }] };
 const HAS_READY_CHARACTER: Condition = { kind: "canPick", pick: READY_CHARACTER };
-// "Add Ancient Marsh-dweller to the staging area (from out of play or engaged with a player) and heal all damage from it" (08098:A:1 to 08101:A:1): the set-aside copy joins the staging area, a copy engaged with a player returns to it, and its damage (not its resource tokens) is healed.
+// "Add Ancient Marsh-dweller to the staging area (from out of play or engaged with a player) and heal all damage from it" (08098:A:1 to 08101:A:1): the copy out of play (set aside, in the victory display or in the encounter discard pile) joins the staging area, a copy engaged with a player returns to it, and its damage (not its resource tokens) is healed.
 const MARSH_TO_STAGING: Instruction[] = [
-  { verb: "AddSetAsideToStaging", code: MARSH_DWELLER },
+  { verb: "AddSetAsideToStaging", code: MARSH_DWELLER, outOfPlay: true },
   { verb: "Pick", pick: MARSH },
   { verb: "ReturnToStaging", target: { kind: "picked" } },
   { verb: "Heal", all: true, target: "picked" },
@@ -81,13 +81,13 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "08101:whenRevealed:1", cardCode: STAGE_4, lines: ["08101:A:1"], timing: "whenRevealed", instructions: [...MARSH_TO_STAGING, ...MARSH_ATTACKS] },
     { id: "08101:constant:1", cardCode: STAGE_4, lines: ["08101:B:1"], timing: "constant", instructions: [{ verb: "Time", amount: 2 }] },
     { id: "08101:forced:1", cardCode: STAGE_4, lines: ["08101:B:2"], timing: "forced", trigger: "lastTimeCounterRemoved", subject: "self", instructions: [...MARSH_ATTACKS, { verb: "PlaceResourceTokens", amount: 2, on: "self" }] },
-    { id: "08101:triggered:1", cardCode: STAGE_4, lines: ["08101:B:3"], timing: "triggered", trigger: "enemyDestroyed", subject: { type: "enemy", control: "any", staging: true, names: ["Ancient Marsh-dweller"] }, instructions: [{ verb: "WinGame" }] },
+    { id: "08101:triggered:1", cardCode: STAGE_4, lines: ["08101:B:3"], timing: "triggered", trigger: "enemyDestroyed", subject: MARSH, instructions: [{ verb: "WinGame" }] },
 
     // 08102 Nalir (objective ally): as in Trouble in Tharbad, the first player controls him as the first player token passes and raises his threat by the players at the beginning of the refresh phase (the build writes the loss when he leaves play).
     copyLines("08068", NALIR, "A:1", "A:2"),
 
     // 08103 Ancient Marsh-dweller. +1 Threat and +1 Attack for each resource token on it; after a removal of time counters from the current quest a token goes on it (wherever it is: staged or engaged).
-    { id: "08103:constant:2", cardCode: MARSH_DWELLER, lines: ["08103:A:2"], timing: "constant", instructions: ["threat", "attack"].map((stat): Instruction => ({ verb: "ModifyStat", stat: stat as "threat" | "attack", amount: { stat: "resources", of: "self" }, until: "whileSourceInPlay", target: "self" })) },
+    { id: "08103:constant:2", cardCode: MARSH_DWELLER, lines: ["08103:A:2"], timing: "constant", instructions: (["threat", "attack"] as const).map((stat): Instruction => ({ verb: "ModifyStat", stat, amount: { stat: "resources", of: "self" }, until: "whileSourceInPlay", target: "self" })) },
     afterTimeRemoved("08103:forced:1", MARSH_DWELLER, "08103:A:3", [{ verb: "PlaceResourceTokens", amount: 1, on: "self" }]),
 
     // 08104 Giant Swamp Adder. Engaged, it attacks the player it is engaged with after a removal of time counters (the loop reaches that player whoever acts first); staged it does nothing.

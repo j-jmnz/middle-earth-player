@@ -238,6 +238,27 @@ describe("the Ancient Marsh-dweller joins the staging area and attacks (08098:A:
     expect([done.seats[0]?.threat, done.seats[1]?.threat]).toEqual([29, 31]);
   });
 
+  it("08098:A:1 a copy defeated earlier, in the victory display or the encounter discard pile, joins the staging area healed (out of play)", () => {
+    for (const zone of ["victory", "discard"] as const) {
+      const t = table({ stage: "08098", side: "A", [zone]: [MARSH] });
+      const lying = marshOf(t.state);
+      expect(lying?.zone).toBe(zone === "victory" ? "victory" : "encounterDiscard");
+      const done = resolveRecords(t.state, t.ctx, "08098", "whenRevealed", t.state.questStage ?? "").state;
+      expect(marshOf(done)?.zone).toBe("staging");
+      expect(done.victory.includes(idOf(done, MARSH))).toBe(false);
+      expect(done.encounterDiscard.includes(idOf(done, MARSH))).toBe(false);
+    }
+  });
+
+  it("08101:A:1 a copy in the victory display or the encounter discard pile joins the staging area and attacks each player, so the game can be won after an early defeat", () => {
+    for (const zone of ["victory", "discard"] as const) {
+      const t = table({ stage: "08101", side: "A", [zone]: [MARSH], seats: 2, deck: FILLERS, threat: [20, 20] });
+      const done = fought(t, resolveRecords(t.state, t.ctx, "08101", "whenRevealed", t.state.questStage ?? ""));
+      expect(marshOf(done.state)?.zone).toBe("staging");
+      expect(attacked(done.steps)).toEqual([0, 1]);
+    }
+  });
+
   it("08099:A:1 a copy engaged with a player returns to the staging area, healed, and keeps its resource tokens", () => {
     const t = table({ stage: "08099", side: "A", engaged: [{ code: MARSH, seat: 0, damage: 4, resources: 2 }] });
     const done = resolveRecords(t.state, t.ctx, "08099", "whenRevealed", t.state.questStage ?? "").state;

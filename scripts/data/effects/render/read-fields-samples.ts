@@ -147,7 +147,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
     { verb: "PickEncounter", from: "deckAndDiscard", notType: "objective", noVictory: true, nonUnique: true },
   ],
   ChooseCards: [{ verb: "ChooseCards", codes: ["10185"], who: "eachSeat", to: "pool", optional: true, ifControls: "10110", anyHero: true, afterMulligan: true, unearned: true, only: true, leftover: "firstPlayerDeck" }],
-  AddSetAsideToStaging: [{ verb: "AddSetAsideToStaging", code: "09033", all: true }, { verb: "AddSetAsideToStaging", trait: "Orc" }],
+  AddSetAsideToStaging: [{ verb: "AddSetAsideToStaging", code: "09033", all: true }, { verb: "AddSetAsideToStaging", trait: "Orc" }, { verb: "AddSetAsideToStaging", code: "09033", outOfPlay: true }],
   DiscardFromDeck: [{ verb: "DiscardFromDeck", amount: 2, shuffle: true, count: HERO, costAtLeast: 2 }],
   MoveCard: [{ verb: "MoveCard", card: "self", from: ["discard"], to: "deckShuffle" }],
   PickDiscardTop: [{ verb: "PickDiscardTop", types: ["enemy"], trait: "Undead" }],

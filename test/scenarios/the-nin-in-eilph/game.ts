@@ -6,24 +6,23 @@ import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenar
 import type { PolicyOptions } from "../../harness/auto-player.ts";
 import { definePrinted } from "../../../src/rules/core/printed.ts";
 import { fillerLoadout, HERO_STATS, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
-import { attackAllTogether, chooseOption, commitAllBut, declineAttack, engageUpTo, undefendedLeastDamaged, policyIntent, type Policy, type Rule } from "../../harness/policy-kit.ts";
+import { attackAllTogether, chooseOption, commitAllBut, declineAttack, engageUpTo, undefendedLeastDamaged, policyIntent, type Policy } from "../../harness/policy-kit.ts";
 
 const cycle = loadCampaign("the-ring-maker");
 const eilph = loadAnyScenario("the-nin-in-eilph");
 
 // Test helper. A whole standalone game of The Nîn-in-Eilph played by the auto-player, true solo or two-handed. The heroes have a willpower of 6 and a threat of 8 (so the stages take several rounds, their Time can run out and replace them, and the
 // threat can reach the elimination level) and the decks hold free events and free allies, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no
-// Resolution. The scenario needs answers of its own, which the auto-player does not give: (1) Nalir leaves play when Neekerbreekers (08105:A:1) deal 2 damage to an ally and he is the only one, and when he quests and defends he is exhausted, so a deck
+// Resolution. The scenario needs answers of its own, which the auto-player does not give: (1) Nalir (3 hit points) leaves play when Neekerbreekers (08105:A:1) deal 2 damage to an ally twice and he is the only one, and when he quests and defends he is exhausted, so a deck
 // holds spare allies, Nalir stays home from the quest and a Choose or Pick that offers him is answered with another card; (2) two heroes of each seat stay home from the quest and nobody defends (a hero has 100 hit points), so the heroes that attack are
-// ready: Ancient Marsh-dweller (defense 4, 9 hit points) needs two of them together; (3) stage 4B ends the game when Ancient Marsh-dweller is defeated, and one defeated earlier lies in the victory display and cannot be defeated again, so the players
-// leave it alone until stage 4, engage it there by choice (its engagement cost is 45) and attack it first.
+// ready: Ancient Marsh-dweller (defense 4, 9 hit points) needs two of them together; (3) stage 4B ends the game when Ancient Marsh-dweller is defeated, so the players engage it by choice on stage 4 (its engagement cost is 45) and attack it first.
 const NALIR = "08102";
 const MARSH_DWELLER = "08103";
 export const EILPH_POLICY: PolicyOptions = { scout: "", prefer: "", protect: NALIR, play: true, act: false };
 // "strong" is the one deck: heroes with a willpower of 6 and a threat of 8 (below), so the game takes several rounds and can be won or lost.
 export type EilphDecks = "strong";
 
-// A free ally of the stand-in decks: Neekerbreekers (08105:A:1) deal 2 damage to an ally the engaged player controls, and Nalir (2 hit points) is the only one a deck of free events holds, so the players hold a spare ally to take it.
+// A free ally of the stand-in decks: Neekerbreekers (08105:A:1) deal 2 damage to an ally the engaged player controls, and Nalir (3 hit points) is the only one a deck of free events holds, so the players hold a spare ally to take it.
 export const SPARE_ALLY = "spare-ally";
 export const eilphLoadout = (seatCount: 1 | 2): LoadoutSeat[] =>
   fillerLoadout(seatCount).map((seat) => ({ ...seat, deck: seat.deck.map((code, index) => (index % 3 === 0 ? SPARE_ALLY : code)) }));
@@ -56,14 +55,10 @@ export const DEFAULT_POLICY: EilphPolicy = { choose: "first" };
 //   engageUpTo(most, options)  the optional engagement step: engage the enemy of the lowest `rank` (`allow` permits) while engaged with fewer than `most`
 //   triggerActions(effectIds, oncePerRound)  an Action or Response of the records named, each time (or once a round) the engine offers it and the seat can pay
 //   passCommitWhile(when)  the quest commit: pass without committing while `when` holds
-// Stage 4B (08101) ends the game when Ancient Marsh-dweller is defeated, and a Marsh-dweller defeated earlier goes to the victory display and cannot be defeated again, so the players leave it alone until stage 4 and then attack it first.
+// Stage 4B (08101) ends the game when Ancient Marsh-dweller is defeated. One defeated earlier lies in the victory display and comes back to the staging area when a stage 3 or the stage 4 is revealed (08098:A:1 to 08101:A:1), so the players attack it whenever it is engaged; they choose to engage it on stage 4 only (its engagement cost is 45).
 const STAGE_4 = "08101";
 const onStage4 = (state: ScenarioState) => state.cards[state.questStage ?? ""]?.code === STAGE_4;
-const sparingMarshDweller = (attack: Rule): Rule => (state, ctx, memory) => {
-  const intent = attack(state, ctx, memory);
-  return intent?.type === "DeclareAttackers" && state.cards[intent.enemyId]?.code === MARSH_DWELLER && !onStage4(state) ? { type: "DeclineAttack" } : intent;
-};
-const rules = (policy: EilphPolicy): Policy => [chooseOption((state, options) => options.find((id) => state.cards[id]?.code !== NALIR), policy.choose), commitAllBut(2, (state, id) => state.cards[id]?.code === NALIR), undefendedLeastDamaged(), engageUpTo(undefined, { allow: (state, id) => state.cards[id]?.code === MARSH_DWELLER && onStage4(state) }), sparingMarshDweller(attackAllTogether((state, id) => (state.cards[id]?.code === MARSH_DWELLER ? 0 : 1))), declineAttack()];
+const rules = (policy: EilphPolicy): Policy => [chooseOption((state, options) => options.find((id) => state.cards[id]?.code !== NALIR), policy.choose), commitAllBut(2, (state, id) => state.cards[id]?.code === NALIR), undefendedLeastDamaged(), engageUpTo(undefined, { allow: (state, id) => state.cards[id]?.code === MARSH_DWELLER && onStage4(state) }), attackAllTogether((state, id) => (state.cards[id]?.code === MARSH_DWELLER ? 0 : 1)), declineAttack()];
 
 // Every intent is one the reducer listed.
 export function eilphIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: EilphPolicy = DEFAULT_POLICY): PlayerIntent {
@@ -81,7 +76,7 @@ export const EILPH_GOLDENS: readonly EilphGolden[] = [
   { name: "solo win", seatCount: 1, seed: 30, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed win", seatCount: 2, seed: 18, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "solo loss: threat at the elimination level", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "No seats remain" },
-  { name: "two-handed loss: Nalir leaves play", seatCount: 2, seed: 8, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "Nalir left play" },
+  { name: "two-handed loss: Nalir leaves play", seatCount: 2, seed: 29, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "Nalir left play" },
 ];
 
 const game = standaloneGame<EilphDecks, EilphPolicy>({

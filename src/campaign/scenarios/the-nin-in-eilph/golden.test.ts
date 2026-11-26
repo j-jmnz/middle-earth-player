@@ -51,8 +51,6 @@ describe("The Nîn-in-Eilph golden", () => {
     lost(state, golden) {
       if (golden.lossReason === "Nalir left play") expect(cardsOf(state, "08102").every((card) => card.zone !== "play"), golden.name).toBe(true);
       else expect(state.seats.slice(0, golden.seatCount).every((seat) => seat.eliminated), golden.name).toBe(true);
-      // A game lost is a game whose Marsh-dweller was not defeated.
-      expect(cardsOf(state, "08103").every((card) => card.zone !== "victory"), golden.name).toBe(true);
     },
   });
 });
