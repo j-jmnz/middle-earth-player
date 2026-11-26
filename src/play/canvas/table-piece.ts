@@ -25,6 +25,8 @@ export type BodyProps = {
   /** The victory pile's cards fanned behind its top, each decoded or null while it loads; empty on every other slot. */
   fan: readonly (SkImage | null)[];
   name: string;
+  /** How many lines the name of a card drawn as its name may take, 3 when unset: one on a card with effect pills (they stand down the left edge from 17 pt and never cover a second line). */
+  nameLines?: number;
   /** The sphere the card prints, for the icon of a card drawn as its name and the ring of its resource token. */
   sphere: string | null;
   /** A hand card lifted by a press: its place on the table is dimmed under the lifted copy. */
@@ -136,15 +138,18 @@ export function pieceProps(slot: CardSlot, ctx: PieceContext): PieceProps {
   const card = slot.kind === "card";
   // A staging card with more than one card under it shows one peek and how many: "×2" (layout.ts, placeStaging).
   const numbered = card && !slot.faceDown && slot.zone !== "hand" && slot.zone !== "deck";
+  const info = numbered ? ctx.info(ctx.game, ctx.seat, slot.id) : handInfo(slot, ctx);
+  const pills = info ? info.effects.stats.length + info.effects.flags.length : 0;
   return {
     ...bodyProps(slot, ctx),
+    ...(pills > 0 ? { nameLines: 1 } : {}),
     motion: ctx.motions.get(slot.id) ?? AT_REST,
     clock: ctx.clock,
     dimmed: card && isDimmed(slot, ctx),
     beat: ctx.beating.has(slot.id),
     veiledHand: card && ((ctx.peeking && slot.zone === "hand") || slot.stormcaller === "apart"),
     stageMarks: slot.stormcaller === "stage" ? ctx.stageMarks : null,
-    info: numbered ? ctx.info(ctx.game, ctx.seat, slot.id) : handInfo(slot, ctx),
+    info,
     optionMark: ctx.highlight.marks.get(slot.id),
     inactive: card && !slot.faceDown && ctx.inactive(slot.picture ?? slot.code),
     owner: slot.zone === "questStage" ? ctx.owner : null,
@@ -262,6 +267,7 @@ const SAME: { readonly [K in keyof PieceProps]-?: (a: PieceProps[K], b: PiecePro
   image: same,
   fan: sameList,
   name: same,
+  nameLines: same,
   sphere: same,
   lifted: same,
   tappable: same,

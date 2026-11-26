@@ -268,7 +268,12 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   if (layout.pursuit != null) state = { ...state, pursuit: layout.pursuit };
   for (const code of layout.exhaustedCards ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { exhausted: true });
   if (layout.timeCounters != null && state.questStage) state = updateCard(state, state.questStage, { resources: layout.timeCounters });
-  if (layout.eliminationReduction != null) for (let seat = 0; seat < seats; seat += 1) state = addModifier(state, `seat:${seat}`, state.questStage ?? "", "eliminationReduction", layout.eliminationReduction, "endOfGame");
+  // `addModifier` takes card ids, so the seat's modifier is pushed as the stage's record leaves it.
+  if (layout.eliminationReduction != null) {
+    const reduction = layout.eliminationReduction;
+    const lowered = Array.from({ length: seats }, (_, seat): Modifier => ({ instanceId: `seat:${seat}`, sourceId: state.questStage ?? "", stat: "eliminationReduction", amount: reduction, until: "endOfGame" }));
+    state = { ...state, modifiers: [...state.modifiers, ...lowered] };
+  }
   for (const code of layout.heldInHand ?? []) for (const id of idsOf(state, code)) state = addModifier(state, id, id, "cannotLeaveHand", 1, "endOfGame");
   for (const code of layout.committed ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { committed: true });
   // A game that deals encounter side quests in its encounter deck reads the side quest rules, as its start notes (families/wilderland/night-quest.ts markSideQuests).
