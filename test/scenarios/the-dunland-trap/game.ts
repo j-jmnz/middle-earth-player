@@ -65,7 +65,7 @@ export const TRAP_GOLDENS: readonly TrapGolden[] = [
   { name: "solo loss: threat", seatCount: 1, seed: 2, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed loss: threat", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "solo loss: a hero destroyed by the 3B attacks", seatCount: 1, seed: 2, difficulty: "Normal", decks: "fragile", outcome: "lost", lossReason: "A hero was destroyed" },
-  { name: "two-handed loss: a hero destroyed by the 3B attacks", seatCount: 2, seed: 7, difficulty: "Normal", decks: "fragile", outcome: "lost", lossReason: "A hero was destroyed" },
+  { name: "two-handed loss: a hero destroyed by the 3B attacks", seatCount: 2, seed: 5, difficulty: "Normal", decks: "fragile", outcome: "lost", lossReason: "A hero was destroyed" },
   { name: "solo loss: every hero destroyed", seatCount: 1, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
 ];
 

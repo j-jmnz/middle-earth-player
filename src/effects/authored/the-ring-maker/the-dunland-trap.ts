@@ -43,7 +43,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [EACH_PLAYER([{ verb: "DiscardEach", pick: HAND_CARD }, { verb: "Draw", amount: 2 }]), { verb: "PlaceResourceTokens", amount: 2, on: "self" }],
   },
 
-  // 08012 A Well Laid Trap (stage 2). A: the Ravine becomes the active location (the old one returns to the staging area); each player discards each Item and each Mount attachment he controls, then keeps 1 ally of his choice and discards the others (a player with no ally picks nothing: an empty pick would leave a blank pick in the frame that stage 2B's search shares). B: each player searches the encounter deck and discard pile for a Boar Clan enemy and puts it into
+  // 08012 A Well Laid Trap (stage 2). A: the Ravine becomes the active location (the old one returns to the staging area); each player discards each Item and each Mount attachment he controls, then keeps 1 ally of his choice and discards the others (a player with no ally picks nothing). B: each player searches the encounter deck and discard pile for a Boar Clan enemy and puts it into
   // play engaged with him; the deck is shuffled; each player shuffles his discard pile into his deck and draws 1. Forced: at the end of the combat phase advance to stage 3A (stage 2B prints no Time).
   {
     id: "08012:whenRevealed:1",
