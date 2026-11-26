@@ -1,4 +1,4 @@
-// Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages (data/rules/entries.json). The Stormcaller's area on the phone table (docs/design-system-table.md, Cards, "The Stormcaller's area"): its group heads
+// Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages (data/rules/entries.json). The Stormcaller's area on the phone table (docs/design-system-table.md, The Stormcaller's area): its group heads
 // staging only in its scenario, the night veil is on while the players are at another stage, the reader labels, the fold, the pop, and the geometry on every screen down to 667 x 375 at the three UI scales.
 import { beforeAll, describe, expect, it } from "vitest";
 

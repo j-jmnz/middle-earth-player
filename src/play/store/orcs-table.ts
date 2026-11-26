@@ -1,4 +1,4 @@
-// Rules: hrd.orcs-area, hrd.orcs-area-different-stage, hrd.orcs-area-same-stage (data/rules/entries.json). What the table reads of the Orcs' area of Race Across Harad (docs/design-system-table.md, Cards, "The Orcs' area"):
+// Rules: hrd.orcs-area, hrd.orcs-area-different-stage, hrd.orcs-area-same-stage (data/rules/entries.json). What the table reads of the Orcs' area of Race Across Harad (docs/design-system-table.md, The Orcs' area):
 // which cards make its group, where each stands. The group heads the staging row as the Stormcaller's area does and the layout is the same (stormcaller-layout.ts); stormcaller-table.ts hands a game with an Orcs'
 // area to these. Pure; the words are in words/scenarios/haradrim/orcs-table.ts.
 import { memberPlace, membersStanding } from "../../rules/core/area-members.ts";

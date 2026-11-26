@@ -1,4 +1,4 @@
-// Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages, hrd.orcs-area (data/rules/entries.json). What the table reads of a quest area (docs/design-system-table.md, Cards, "The Stormcaller's area"): which cards make its group,
+// Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages, hrd.orcs-area (data/rules/entries.json). What the table reads of a quest area (docs/design-system-table.md, The Stormcaller's area): which cards make its group,
 // where each stands, and the numbers the reader labels say. The Stormcaller's area is read here; a game with the Orcs' area of Race Across Harad is handed to orcs-table.ts, and `areaKind` says which area the game has: its
 // words are the one record of words/scenarios/area-words.ts. Pure. A game with no area has no group and no role.
 import { membersStanding } from "../../rules/core/area-members.ts";

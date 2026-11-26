@@ -1,4 +1,4 @@
-// Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages (data/rules/entries.json). The Stormcaller's area in the staging row (docs/design-system-table.md, Cards, "The Stormcaller's area"): its current
+// Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages (data/rules/entries.json). The Stormcaller's area in the staging row (docs/design-system-table.md, The Stormcaller's area): its current
 // quest stage drawn sideways at a staging card's sideways footprint, and its cards over the stage's right part, stepped as a guarded pair (PAIR_STEP, and never less than a 44 pt target). The stage keeps the
 // strip, the tokens and the pops in the part the cards leave uncovered, and it never folds: when the row is crowded the area's cards fold into the row's stack first (row-fold.ts) and the stage stays.
 // Pure geometry, called by placeRow (layout.ts).
