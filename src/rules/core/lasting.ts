@@ -30,8 +30,6 @@ export const ENGINE_MARKS: ReadonlySet<ModifierStat> = new Set<ModifierStat>([
   "firstEnemyNoted",
   // "Raise your threat by the destroyed character's Willpower" (10107:A:2): the Willpower of a character as it was in play, read after it was destroyed.
   "lastWillpower",
-  // A location in the staging area that cannot leave it and was explored (core/destroy.ts): a mark, so the sweep does not explore it again.
-  "exploredHeld",
   // Aflame: how many attackers have attacked an enemy this round (families/aflame/attack.ts); a count of the round, not an effect.
   "attackersThisRound",
   // Progress counted this round or phase (the south location cap, the sponge, Angmar `progressPlacedHere`, the quest totals): counts, not effects.
@@ -68,6 +66,8 @@ export const ENGINE_MARKS: ReadonlySet<ModifierStat> = new Set<ModifierStat>([
 export const ENGINE_MADE_EFFECTS: ReadonlySet<ModifierStat> = new Set<ModifierStat>([
   // The players a per-player Time X counted when its counters were put on the stage (families/angmar/time.ts); the dial reads it while the stage is in play.
   "timePlayers",
+  // A location in the staging area that cannot leave it and was explored in place (core/destroy.ts): it ends with the card, so the sweep does not explore it again.
+  "exploredHeld",
   // Stats and bars put on a card for an effect: PreventAttacks, a Shadow card's bonus, StrikeBack, a threat lowered, an Ambush gained, a quest with Attack, a cost probe.
   "attack",
   "defense",

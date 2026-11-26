@@ -117,8 +117,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   },
   { id: "08070:forced:1", cardCode: BELLACH, lines: ["08070:A:3"], timing: "forced", trigger: "enemyDestroyed", subject: "self", instructions: [{ verb: "ShuffleSelfIntoEncounterDeck" }] },
 
-  // 08071 The Crossing at Tharbad. Immune to player card effects (the keyword). It cannot leave the staging area (`cannotLeaveStaging`: the players cannot travel to it, and exploring it is the one exit). +2 quest points for each player; explored in the staging area, the players win.
-  { id: "08071:constant:1", cardCode: CROSSING, lines: ["08071:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", target: "self" }] },
+  // 08071 The Crossing at Tharbad. Immune to player card effects (the keyword). It cannot leave the staging area (`cannotLeaveStaging`: the players cannot travel to it). By FFG's answer a location that cannot leave play cannot be explored, but this card's own text answers its exploring, so `exploresWhileHeld` lets it be explored in place, once, and win. +2 quest points for each player; explored in the staging area, the players win.
+  { id: "08071:constant:1", cardCode: CROSSING, lines: ["08071:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", target: "self" }, { verb: "ModifyStat", stat: "exploresWhileHeld", amount: 1, until: "whileSourceInPlay", target: "self" }] },
   { id: "08071:constant:2", cardCode: CROSSING, lines: ["08071:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: { players: true, times: 2 }, until: "whileSourceInPlay", target: "self" }] },
   { id: "08071:triggered:1", cardCode: CROSSING, lines: ["08071:A:3"], timing: "triggered", trigger: "locationExplored", subject: "self", instructions: [{ verb: "WinGame" }] },
 

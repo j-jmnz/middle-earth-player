@@ -438,7 +438,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 900108:A:3 (shadow): Shadow: If this attack is undefended, discard all attachment cards players control.
   900108:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - if the attack has no defender: for each attachment (any player controls) that is a player card (of any type: an event is one, heard while it resolves though it is not in play):
+    - if the attack has no defender: for each attachment (any player controls) that is a player card:
       - discard the picked card
 
 ## 900109 Glade of the Spawn

@@ -92,7 +92,7 @@ describe("148004:B:2 returning to the stage the players share", () => {
 describe("148003:B:2 a player's elimination while the areas are apart", () => {
   it("a trapped player's stage goes back to the quest deck and its staging cards to the discard pile; the others fold into one area", () => {
     const { t, state } = trap();
-    const out = clearEliminated(withSeat({ ...state, stageHeld: state.seats[1].stage }, 1, { ...state.seats[1], eliminated: true }), t.ctx.cards);
+    const out = clearEliminated(withSeat({ ...state, stageHeld: state.seats[1].stage }, 1, { ...state.seats[1], eliminated: true }), t.ctx.cards, { effects: [], cards: t.ctx.cards }, []);
     expect(out.separate).toBeUndefined();
     // A defeated 4B still held for its Forced effect is no longer held once it left with its player.
     expect(out.stageHeld).toBeUndefined();
@@ -104,7 +104,7 @@ describe("148003:B:2 a player's elimination while the areas are apart", () => {
   it("the shared stage stays in play, parked, when the player at it is eliminated", () => {
     const { t, state } = trap();
     const stage = state.seats[0].stage ?? "";
-    const out = clearEliminated(withSeat(state, 0, { ...state.seats[0], eliminated: true }), t.ctx.cards);
+    const out = clearEliminated(withSeat(state, 0, { ...state.seats[0], eliminated: true }), t.ctx.cards, { effects: [], cards: t.ctx.cards }, []);
     expect(out.separate).toBe(true);
     expect(out.cards[stage]?.zone).toBe("questStage");
     expect(parkedStage(out)).toBe(stage);

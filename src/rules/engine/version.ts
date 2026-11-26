@@ -184,9 +184,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 45, scenarios: "all", note: "A surge chain whose passes change nothing, like a lone Take Cover! shuffled back again and again, ends instead of repeating for ever." },
   { version: 46, scenarios: "all", note: "In the combat phase each engaged enemy is dealt a shadow card, also an enemy that already holds one from a card's effect, which then holds both." },
   { version: 47, scenarios: "all", note: "Damage that a Response cancels after it was placed, like Mithril Shirt's, no longer counts as damage dealt by the attack for a shadow effect that reads it." },
+  { version: 48, scenarios: ["the-tower-of-cirith-ungol", "the-lonely-mountain", "trouble-in-tharbad"], note: "A location in the staging area that cannot leave it, like the non-unique locations of The Tower of Cirith Ungol stage 1B and The Lonely Mountain, is no longer explored while it cannot leave: it stays with its progress and is explored the ordinary way once the effect that holds it has ended. The Crossing at Tharbad is explored in place, once, and wins." },
 ];
 
-export const ENGINE_VERSION = 47;
+export const ENGINE_VERSION = 48;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

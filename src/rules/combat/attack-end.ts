@@ -12,7 +12,8 @@ import type { PendingAttack } from "../windows/frame-types.ts";
 export function queueAtEnd(state: ScenarioState, instructions: readonly Instruction[], steps: EngineStep[]): ScenarioState {
   const attack = state.pendingAttack;
   if (!attack) return state;
-  return { ...state, pendingAttack: { ...attack, onEnd: [...(attack.onEnd ?? []), ...instructions], onEndCause: currentCause(steps, UNATTRIBUTED) } };
+  const cause = currentCause(steps, UNATTRIBUTED);
+  return { ...state, pendingAttack: { ...attack, onEnd: [...(attack.onEnd ?? []), ...instructions.map((instruction) => ({ instruction, cause }))] } };
 }
 
 /** What waits on `attack` runs now in a frame of the attacker's; the state itself when nothing waits. */
@@ -21,7 +22,7 @@ export function runAtEnd(state: ScenarioState, attack: PendingAttack, steps: Eng
   if (waiting.length === 0) return state;
   return pushEffectFrame(
     state,
-    { frame: "shadow", sourceId: attack.enemyId, actor: attack.seat, peril: false, effectId: `${attack.enemyId}:attackEnd`, instructions: [...leading, ...waiting], cancel: null, blockCancel: null, ...(attack.onEndCause ? { cause: attack.onEndCause } : {}) },
+    { frame: "shadow", sourceId: attack.enemyId, actor: attack.seat, peril: false, effectId: `${attack.enemyId}:attackEnd`, instructions: [...leading, ...waiting.map((one) => one.instruction)], causes: [...leading.map(() => undefined), ...waiting.map((one) => one.cause)], cancel: null, blockCancel: null },
     steps,
   );
 }

@@ -76,7 +76,7 @@ describe("AttackNalir (08067:B:2, 08083:A:1)", () => {
     const queued = run(t, atDefense.state, { verb: "AttackNalir", enemy: bellach });
     // No second attack begins in the middle of the first; it waits.
     expect(queued.pendingAttack?.enemyId).toBe(idOf(t.state, SPY));
-    expect(queued.pendingAttack?.onEnd).toEqual([{ verb: "AttackNalir", enemy: bellach }]);
+    expect(queued.pendingAttack?.onEnd?.map((one) => one.instruction)).toEqual([{ verb: "AttackNalir", enemy: bellach }]);
     let seen: ScenarioState["pendingAttack"] = null;
     fight(t, { ...atDefense, state: queued }, (state) => {
       if (state.pendingAttack?.enemyId === bellach) seen = state.pendingAttack;
@@ -309,10 +309,11 @@ describe("The Crossing at Tharbad (08071:A:1 to 08071:A:3)", () => {
     expect(done.stageCleared).toBe(true);
   });
 
-  it("08071:A:1 explored, it stays in the staging area (it cannot leave it), the exploring is heard once and wins the game, and it is not explored again", () => {
+  it("08071:A:3 explored, it stays in the staging area (it cannot leave it), its own text answers: the exploring is heard once, wins the game, and is not repeated", () => {
     const t = table({ stage: STAGE_2, staging: [CROSSING] });
     const steps: EngineStep[] = [];
-    const queued = destroyCard(t.state, idOf(t.state, CROSSING), t.ctx.cards, steps, true);
+    const begun = opened(t).state;
+    const queued = destroyCard(begun, idOf(begun, CROSSING), t.ctx.cards, steps, true);
     expect(queued.pendingEvents?.filter((event) => event.trigger === "locationExplored")).toHaveLength(1);
     expect(where(queued, CROSSING)).toBe("staging");
     const won = settle(queued, t.ctx, steps);

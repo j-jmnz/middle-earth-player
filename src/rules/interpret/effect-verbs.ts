@@ -17,7 +17,7 @@ import { questPointsOf } from "../quest/quest.ts";
 import { notePlaced, progressRoom, reducedProgress } from "../families/south/locations.ts";
 import { announceExplored } from "../quest/stage-reveal.ts";
 import type { ScenarioState } from "../core/state.ts";
-import { livingSeats, updateCard } from "../core/state.ts";
+import { inPlay, livingSeats, updateCard } from "../core/state.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 import { lastPicked, readyCard, seatOf } from "./player-verbs.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
@@ -166,5 +166,6 @@ export function placeProgress(state: ScenarioState, id: string, amount: number, 
   // Under Exploration a location with progress equal to its quest points is not explored; it remains in play (dcce.exploration).
   if (points == null || location.progress + placed < points || exploring(next)) return next;
   const explored = destroyCard(next, id, ctx.cards, steps, true);
-  return announceExplored(explored, id, ctx, steps);
+  // A location that stayed in play (held in the staging area) did not leave: nothing is announced.
+  return inPlay(explored.cards[id]?.zone ?? "discard") ? explored : announceExplored(explored, id, ctx, steps);
 }

@@ -19,7 +19,7 @@ describe("a seat eliminated in the middle of an attack on it", () => {
       pendingAttack: { enemyId: "e1", seat: 1 },
       stack: [{ id: "f1", step: 0, frame: "event" as const, cardId: null, seat: 1, peril: false, data: { kind: "resume" as const, window: { kind: "defense" as const, enemyId: "e1", seat: 1 }, seat: 1, passed: [] } }],
     };
-    const out = clearEliminated(eliminateEmpties(waiting, []), base.ctx.cards);
+    const out = clearEliminated(eliminateEmpties(waiting, []), base.ctx.cards, { effects: [], cards: base.ctx.cards }, []);
     expect(heroId).not.toBe("");
     expect(out.seats[1]?.eliminated).toBe(true);
     expect(out.pendingAttack).toBeNull();
@@ -35,7 +35,7 @@ describe("an eliminated seat's side quest in the staging area", () => {
     const base = table({ seatCount: 2, cards: [hero("a"), hero("b"), quest, grunt], effects: [], heroes: [{ code: "a", seat: 0 }, { code: "b", seat: 1 }], staging: [{ code: "psq" }, { code: "grunt" }] });
     const questId = base.ids.psq ?? "";
     const staged = updateCard(base.state, questId, { controller: 1, owner: 1 });
-    const out = clearEliminated(withSeat(staged, 1, { ...staged.seats[1], heroes: [], eliminated: true }), base.ctx.cards);
+    const out = clearEliminated(withSeat(staged, 1, { ...staged.seats[1], heroes: [], eliminated: true }), base.ctx.cards, { effects: [], cards: base.ctx.cards }, []);
     expect(out.cards[questId]?.zone).toBe("discard");
     expect(out.seats[1]?.discard).toContain(questId);
     expect(out.staging).not.toContain(questId);

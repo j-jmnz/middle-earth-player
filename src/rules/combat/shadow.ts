@@ -363,9 +363,9 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       actor: attack.seat,
       peril: false,
       effectId: `${attack.enemyId}:afterAttack`,
-      instructions: [...after, ...shadowStart, ...(attack.onEnd ?? [])],
+      instructions: [...after, ...shadowStart, ...(attack.onEnd ?? []).map((one) => one.instruction)],
       // What waited on the attack keeps the cause of the effect that queued it; the rest keeps the frame's cause (below).
-      ...(attack.onEndCause ? { causes: [...[...after, ...shadowStart].map(() => undefined), ...(attack.onEnd ?? []).map(() => attack.onEndCause)] } : {}),
+      ...(attack.onEnd ? { causes: [...[...after, ...shadowStart].map(() => undefined), ...attack.onEnd.map((one) => one.cause)] } : {}),
       cancel: null,
       blockCancel: null,
       // An attack that sends its excess damage on (excessToShip) leaves that damage (0 when there was none) for the effect; X is the characters it destroyed.

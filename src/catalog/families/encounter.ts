@@ -209,7 +209,9 @@ const FLAGS = [
   "encounterUncancelable",
   // On a card in the staging area: nothing moves it out of the staging area ("Uglúk cannot leave the staging area", 143069:B:2): moveCard refuses a move to another zone, as cannotEnterStaging refuses one into it.
   "cannotLeaveStaging",
-  // On a location in the staging area that cannot leave it and has been explored: it stays, and is not explored again (core/destroy.ts).
+  // On a location in the staging area that cannot leave it: its own text answers its exploring, so it is explored in place, once (The Crossing at Tharbad, 08071:A:3; core/destroy.ts). Without it a location that cannot leave is not explored.
+  "exploresWhileHeld",
+  // On such a location once explored in place: the mark that stops a second exploring (core/destroy.ts).
   "exploredHeld",
   // On a card in play until the end of the round: it entered play this round ("if Hunting Warg entered play this round", 900403:A:1), set by a Forced effect that hears `encounterEnteredPlay` and read by the condition `flag` with holder `self`.
   "enteredThisRound",

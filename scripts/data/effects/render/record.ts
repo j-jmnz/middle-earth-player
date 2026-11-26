@@ -110,7 +110,9 @@ export function renderCost(value: unknown, ctx: Ctx): string {
 function renderSubject(value: unknown, ctx: Ctx): string {
   if (value === "self") return "this card";
   if (value === "host") return "the host";
-  return renderPick(value, ctx);
+  // A trigger's subject that is a player card hears an event card too: an event is not in play while it resolves, and the event it plays is still about it.
+  const note = isObj(value) && value.playerCard === true ? " (an event card passes: it is heard while it resolves, though it is not in play)" : "";
+  return `${renderPick(value, ctx)}${note}`;
 }
 
 export function renderRecord(effect: Obj, ctx: Ctx): string[] {
