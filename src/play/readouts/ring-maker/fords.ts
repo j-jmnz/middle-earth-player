@@ -1,13 +1,13 @@
-// Rules: rm.time-x, rm.grima-objective-ally (data/rules/entries.json); ledger lines 07063:B:1, 07063:B:2, 07064:B:1, 07064:B:2, 07059:B:1, 07059:B:2, 07060:B:2, 07060:B:3, 07061:B:1, 07061:B:2.
-// The time dial of the quest stages of The Fords of Isen and To Catch an Orc: the counters left against the Time X the stage printed, warming as the last refresh phase gets near. The engine decided every number (`timeOf`, the counters on the card); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
+// Rules: rm.time-x, rm.grima-objective-ally (data/rules/entries.json); ledger lines 07063:B:1, 07063:B:2, 07064:B:1, 07064:B:2, 07059:B:1, 07059:B:2, 07060:B:2, 07060:B:3, 07061:B:1, 07061:B:2, 07065:B:1, 07065:B:2, 07066:B:1, 07066:B:2, 07067:B:1, 07067:B:2.
+// The time dial of the quest stages of The Fords of Isen, To Catch an Orc and Into Fangorn: the counters left against the Time X the stage printed, warming as the last refresh phase gets near. The engine decided every number (`timeOf`, the counters on the card); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
 import { timeOf } from "../../../rules/families/angmar/time.ts";
 import type { ReduceContext, ScenarioState } from "../../../rules/engine/reduce.ts";
 
 import { stageTimeLimitWords, stageTimeNearWords, stageTimeWords } from "../../words/scenarios/ring-maker/fords-table.ts";
 import { cardsOf, type TableDial } from "../dials.ts";
 
-/** The quest stages of The Fords of Isen and of To Catch an Orc (stages 2B and 3B) that print Time X. */
-export const FORDS_STAGES: readonly string[] = ["07059", "07060", "07061", "07063", "07064"];
+/** The quest stages of The Fords of Isen, of To Catch an Orc (stages 2B and 3B) and of Into Fangorn (stages 1B, 2B and 3B) that print Time X. */
+export const FORDS_STAGES: readonly string[] = ["07059", "07060", "07061", "07063", "07064", "07065", "07066", "07067"];
 
 export function ringMakerDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
   const dials: TableDial[] = [];

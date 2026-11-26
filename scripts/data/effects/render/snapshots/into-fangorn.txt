@@ -1,0 +1,331 @@
+Scenario piles that place cards with no record (quest: 07065 Into the Woods; quest: 07066 Escape from Fangorn; quest: 07067 The Angry Forest; staging: 07032 Edge of Fangorn; setAside: 07031 Mugash)
+
+## 07031 Mugash
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+07031:A:1 (front): Guarded.
+  07031:whenRevealed:1: When revealed
+    - the Guarded keyword: this objective in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
+  07031:constant:1: Constant
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
+
+07031:A:2 (front): Action: Exhaust a hero to claim this objective when it is free of encounters. Attach Mugash to that hero.
+  07031:action:1: Action (any player may use it)
+    only if all of: (this card is in the staging area) and (no encounter card is attached to this card (it is free of encounters)) and (there is a ready hero (you control) to choose)
+    who acts: any player may trigger it; the acting player is the one who does
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready hero (you control)
+    - exhaust the picked card
+    - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
+
+07031:A:3 (front): Forced: After attached hero takes damage, return Mugash to the top of the encounter deck.
+  07031:forced:1: Forced after a card takes damage (heard about the host)
+    only if its host is a hero (any player controls)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card goes on top of the encounter deck
+  07031:forced:2: Forced on the event hostDefeated
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card goes on top of the encounter deck
+
+## 07032 Edge of Fangorn
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+07032:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+07032:A:2 (front): Travel: Search the encounter deck and discard pile for a Huorn enemy and add it to the staging area to travel here (2 Huorn enemies instead if there are 3 or more players in the game).
+  07032:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one Huorn enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - then, if the number of player (any player controls) is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one Huorn enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+## 07033 Dark-Hearted Huorn
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07033:A:1 (front): Hinder. Cannot have attachments.
+  07033:constant:1: Constant
+    only if all of: (this card is engaged with a player (that player is who "you" means in this record)) and (it is the Combat phase)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotAttack 1, while this card is in play
+    - this card: stat noShadowDealt 1, while this card is in play
+  07033:constant:2: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+  07033:forced:1: Forced when a phase begins
+    only if all of: (it is the Combat phase) and (this card is engaged with a player (that player is who "you" means in this record))
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the current quest card has progress on it): remove 1 progress from the active location
+    - then, if the current quest card has progress on it (checked when this step runs, after the steps above; not tied to whether they did anything): remove 1 progress from the main quest (all of it when it holds less)
+
+07033:A:2 (front): Forced: At the beginning of each resource phase, the engaged player must raise his threat by 2.
+  07033:forced:2: Forced when a phase begins
+    only if all of: (it is the Resource phase) and (this card is engaged with a player (that player is who "you" means in this record))
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - for the player this enemy is engaged with:
+      - raise threat by 2 (the acting player)
+
+## 07034 Angry Huorn
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07034:A:1 (front): Hinder. Cannot have attachments.
+  07034:constant:1: Constant
+    only if all of: (this card is engaged with a player (that player is who "you" means in this record)) and (it is the Combat phase)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotAttack 1, while this card is in play
+    - this card: stat noShadowDealt 1, while this card is in play
+  07034:constant:2: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+  07034:forced:1: Forced when a phase begins
+    only if all of: (it is the Combat phase) and (this card is engaged with a player (that player is who "you" means in this record))
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the current quest card has progress on it): remove 1 progress from the active location
+    - then, if the current quest card has progress on it (checked when this step runs, after the steps above; not tied to whether they did anything): remove 1 progress from the main quest (all of it when it holds less)
+
+07034:A:2 (front): Forced: At the beginning of each resource phase, Angry Huorn attacks the engaged player.
+  07034:forced:2: Forced when a phase begins
+    only if all of: (it is the Resource phase) and (this card is engaged with a player (that player is who "you" means in this record))
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+## 07035 Deadly Huorn
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07035:A:1 (front): Hinder. Cannot have attachments.
+  07035:constant:1: Constant
+    only if all of: (this card is engaged with a player (that player is who "you" means in this record)) and (it is the Combat phase)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotAttack 1, while this card is in play
+    - this card: stat noShadowDealt 1, while this card is in play
+  07035:constant:2: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+  07035:forced:1: Forced when a phase begins
+    only if all of: (it is the Combat phase) and (this card is engaged with a player (that player is who "you" means in this record))
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the current quest card has progress on it): remove 1 progress from the active location
+    - then, if the current quest card has progress on it (checked when this step runs, after the steps above; not tied to whether they did anything): remove 1 progress from the main quest (all of it when it holds less)
+
+07035:A:2 (front): Forced: At the beginning of each resource phase, the engaged player must deal 3 damage to a character he controls.
+  07035:forced:2: Forced when a phase begins
+    only if all of: (it is the Resource phase) and (this card is engaged with a player (that player is who "you" means in this record))
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - for the player this enemy is engaged with:
+      - choose character (you control)
+      - deal 3 damage to the picked card
+
+## 07036 Heart of Fangorn
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07036:A:1 (front): While Heart of Fangorn is in the staging area, each player cannot refresh more than 5 characters during the refresh phase.
+  07036:forced:1: Forced when a phase begins
+    only if all of: (it is the Refresh phase) and (this card is in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - for each player, first player first:
+      - the acting player chooses, one at a time, the exhausted characters he controls beyond 5 that would ready in the refresh phase: they stay exhausted this phase (nothing with 5 or fewer)
+
+07036:A:2 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
+  07036:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
+
+## 07037 The Forest's Malice
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07037:A:1 (front): When Revealed: Each Huorn enemy engaged with a player makes an immediate attack. If no attack was made as a result of this effect, each player must search the encounter deck and discard pile for a Huorn enemy and put it into play engaged with him. This effect cannot be canceled.
+  07037:whenRevealed:1: When revealed (cannot be canceled while this card is in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy engaged with a player (not one in the staging area) with the trait Huorn makes an immediate attack, each dealt a shadow card of its own
+    - for each player, first player first:
+      - if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card): the acting player finds one Huorn enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter deck
+
+## 07050 Ancient Forest
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07050:A:1 (front): While Ancient Forest is in the staging area, each Forest location in the staging area gets +1 Threat and +3 quest points. This ability does not stack with other copies of Ancient Forest.
+  07050:constant:1: Constant
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Forest location (any player controls) in the staging area only: stat threat 1, while this card is in play (does not stack: only the oldest copy of this card in play whose condition holds gives it)
+    - each Forest location (any player controls) in the staging area only: stat questPoints 3, while this card is in play (does not stack: only the oldest copy of this card in play whose condition holds gives it)
+
+07050:A:2 (shadow): Shadow: Defending player exhausts a character he controls.
+  07050:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 07051 Tangled Woods
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07051:A:1 (front): While Tangled Woods is in the staging area, each Forest location in play gains: 'Travel: Exhaust a hero to travel here.' This ability does not stack with other copies of Tangled Woods.
+  07051:constant:1: Constant
+    only if this card is in the staging area
+    - each Forest location (any player controls) or in the staging area: stat travelExhaust 1, while this card is in play (does not stack: only the oldest copy of this card in play whose condition holds gives it)
+
+## 07052 Turned Around
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07052:A:1 (front): When Revealed: Either remove 1 time counter from a card in play, or return the active location to the staging area.
+  07052:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    - the first player chooses one of:
+      * option "time" (only if 0 is less than resources of the current quest stage):
+        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+      * option "location" (only if there is a location (any player controls) that is the active location to choose):
+        - the active location goes to the staging area (it is not revealed)
+
+07052:A:2 (shadow): Shadow: If this attack is undefended, return the active location to the staging area.
+  07052:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - if the attack has no defender: the active location goes to the staging area (it is not revealed)
+
+## 07056 Low on Provisions
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07056:A:1 (front): When Revealed: Each player must assign X damage among characters he controls where X is the number of characters that player controls.
+  07056:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player assigns the number of character (you control) damage among the character (you control), one at a time
+
+07056:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character is undamaged.)
+  07056:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the defender is a undamaged character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 07057 Off Track
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07057:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+07057:A:2 (front): When Revealed: Attach to a location in play. (Counts as a Condition attachment with the text: 'Limit 1 per location. Attached location gets +2 quest points and Gain: 'Forced: Remove an additional time counter from the current quest at the end of each refresh phase, if able.'')
+  07057:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls) or in the staging area, chosen by the first player, with no attachment named "Off Track"
+    - then, if there is a location (any player controls) or in the staging area, with no attachment named "Off Track" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this card attaches to the picked card (nowhere if that card carries one of its title already)
+  07057:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Condition attachment while it is attached
+    - this attachment may be attached to a card that is a location (any player controls) (limit 1 of it per host)
+  07057:constant:2: Constant
+    only if this card is attached to a card
+    - its host: stat questPoints 2, while this card is in play
+  07057:forced:1: Forced at the end of the phase
+    only if all of: (it is the Refresh phase) and (this card is attached to a card)
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+
+## 07058 In Need of Rest
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+07058:A:1 (front): When Revealed: Remove a hero from the quest and attach In Need of Rest to that hero. (Counts as a Condition attachment with the text: 'Limit 1 per hero. Forced: After a time counter is removed from the current quest, attached hero takes 1 damage.')
+  07058:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (any player controls) committed to the quest, with no attachment named "In Need of Rest"
+    - then, if there is a hero (any player controls) committed to the quest, with no attachment named "In Need of Rest" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked character is removed from the quest (it stays exhausted)
+    - then, if the picked card is a hero (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): this card attaches to the picked card (nowhere if that card carries one of its title already)
+  07058:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Condition attachment while it is attached
+    - this attachment may be attached to a hero (limit 1 of it per host)
+  07058:forced:1: Forced after a time counter is removed from the current quest, at the end of the refresh phase or by a card effect
+    only if this card is attached to a card
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - deal 1 damage to its host
+
+## 07065 Into the Woods
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+07065:A:1 (front): Setup: Add Edge of Fangorn to the staging area and attach Mugash to that location. Shuffle the encounter deck. Reveal X encounter cards where X equals the number of players in the game minus 1.
+  07065:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - Setup: the set-aside copy of the card with code 07031 is attached to the card in play named "Edge of Fangorn" (a card dealt on its Upgraded side stays so); it lies attached, controlled by nobody, not revealed, wherever its host lies, and in no play area; it is a claimed objective, so a host that leaves play lets it go back to the staging area when its text says so
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - if not (the actor is the last player (to the first player's right; the only player of a solo game)): the acting player reveals an encounter card
+
+07065:B:1 (back): Time 4.
+  07065:constant:1: Constant
+    - Time 4: when this card is revealed, 4 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+07065:B:2 (back): Forced: After the last time counter is removed from this stage, shuffle Mugash into the encounter deck and advance to stage 3.
+  07065:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter deck
+    - then, if there is a card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not
+    - then, if there is a card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is shuffled into the encounter deck
+    - then, if a copy of the card with code 07031 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game) (checked when this step runs, after the steps above; not tied to whether they did anything): one out-of-play copy of the card with code 07031 (set aside, in the encounter discard pile, in the victory display or under a card) joins the encounter deck, which is shuffled (when copies are out of play in more than one zone the first player chooses which; nothing with no copy left)
+    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 07067 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there); the stage left is not defeated: no 'after a quest card is defeated' effect hears it, and its attachments are not told their host was defeated
+
+07065:B:3 (back): The players cannot advance to stage 2 unless Mugash is attached to a hero.
+  07065:constant:2: Constant
+    only if not (there is a hero (any player controls) with an attachment named "Mugash" to choose)
+    - the players cannot defeat this stage while this holds
+
+## 07066 Escape from Fangorn
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+07066:A:1 (front): When Revealed: Each player searches the encounter deck and discard pile for a Huorn enemy and adds it to the staging area. Shuffle the encounter deck.
+  07066:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one Huorn enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+07066:B:1 (back): Time 4.
+  07066:constant:1: Constant
+    - Time 4: when this card is revealed, 4 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+07066:B:2 (back): Forced: After the last time counter is removed from this stage, shuffle Mugash into the encounter deck and advance to stage 3A.
+  07066:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter deck
+    - then, if there is a card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not
+    - then, if there is a card (any player controls) or in the staging area or the active location, named "Mugash", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is shuffled into the encounter deck
+    - then, if a copy of the card with code 07031 is out of play where an effect can take it from: set aside, in the encounter discard pile, in the victory display or under a card (not one removed from the game) (checked when this step runs, after the steps above; not tied to whether they did anything): one out-of-play copy of the card with code 07031 (set aside, in the encounter discard pile, in the victory display or under a card) joins the encounter deck, which is shuffled (when copies are out of play in more than one zone the first player chooses which; nothing with no copy left)
+    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 07067 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there); the stage left is not defeated: no 'after a quest card is defeated' effect hears it, and its attachments are not told their host was defeated
+
+07066:B:3 (back): The players cannot defeat this stage unless Mugash is attached to a hero.
+  07066:constant:2: Constant
+    only if not (there is a hero (any player controls) with an attachment named "Mugash" to choose)
+    - the players cannot defeat this stage while this holds
+
+07066:B:4 (back): If the players defeat this stage, they win the game.
+  07066:constant:3: Constant
+    - this card: stat holdsWin (defeating this final stage does not win the game: it stays the current quest card, defeated, and its own Forced effects win the game or reset the quest) 1, while this card is in play
+  07066:forced:2: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players win the game
+
+## 07067 The Angry Forest
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+07067:B:1 (back): Time 3.
+  07067:constant:1: Constant
+    - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+07067:B:2 (back): Forced: After the last time counter is removed from this stage, discard the top 5 cards of the encounter deck. Each player must choose an enemy or objective in the discard pile, reveal it and add it to the staging area. Place 3 time counters on this stage.
+  07067:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard 5 card(s) from the top of the encounter deck
+    - for each player, first player first:
+      - the acting player chooses a card of type enemy or objective in the encounter discard pile (whichever card lies there; a pile with none does nothing) and reveals it in full: its When Revealed effects and keywords resolve (an objective with Guarded takes its guard) and it joins the staging area; the card has left the pile for the next player
+    - place 3 resource tokens on this card
+
+07067:B:3 (back): Forced: After placing progress here, if there is at least 6 progress on this stage and Mugash is attached to a hero, advance to stage 2A.
+  07067:forced:2: Forced on the event progressPlaced (heard about this card)
+    only if all of: (5 is less than progress of this card) and (there is a hero (any player controls) with an attachment named "Mugash" to choose)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 07066 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there); the stage left is not defeated: no 'after a quest card is defeated' effect hears it, and its attachments are not told their host was defeated
+
+(rendered pieces: 251 by template, 0 as JSON)

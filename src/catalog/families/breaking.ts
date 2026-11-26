@@ -46,8 +46,8 @@ const VERBS = [
   // The acting seat's stage is left and the quest deck's card with this printed code takes its place, side B up, its When Revealed effects resolving for that seat
   // ("Forced: After Frodo's Choice is revealed at this stage, advance to stage 4A", 142063:B:2 to 142066:B:2; mec109.multiple-staging-areas). The stage left is
   // set aside with its attachments discarded, as an advanced stage is. Once stages are separate this is the acting seat's own stage; nothing happens when the code is
-  // not in the quest deck. `again`: a stage the quest left earlier, set aside, may be advanced to as well, with no tokens on it ("advance to a new stage 3 of your choice", 50902:B:1, 50931:B:2: Attack on Dol Guldur's four stage 3s).
-  z.strictObject({ verb: z.literal("AdvanceToStage"), code: z.string().min(1), again: z.literal(true).optional(), ...when }),
+  // not in the quest deck. `again`: a stage the quest left earlier, set aside, may be advanced to as well, with no tokens on it ("advance to a new stage 3 of your choice", 50902:B:1, 50931:B:2: Attack on Dol Guldur's four stage 3s). `bypassed`: the stage left was bypassed, not defeated (emce.bypassing, rr.quest-advancement): no "after a quest card is defeated" effect hears it (Into Fangorn's time-out jumps).
+  z.strictObject({ verb: z.literal("AdvanceToStage"), code: z.string().min(1), again: z.literal(true).optional(), bypassed: z.literal(true).optional(), ...when }),
   // "When there are no encounter cards left at this stage, discard it" (142062:B:1): the shared quest stage goes to the discard pile (the set-aside pile,
   // as a defeated stage does), and each living seat in player order hears `stageDiscarded` for its own stage ("After stage 2B is discarded", 142063:A:1).
   z.strictObject({ verb: z.literal("DiscardSharedStage"), ...when }),

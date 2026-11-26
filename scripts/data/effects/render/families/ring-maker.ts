@@ -14,6 +14,8 @@ export const RING_MAKER_TEMPLATES: Templates = {
   }),
   ShuffleHandCardIntoOutOfPlay: (i) => ({ text: `the acting player puts 1 ${i.random ? "random " : ""}card of his hand, not one that cannot leave it, facedown into his out-of-play deck and shuffles the deck (nothing with an empty hand)`, read: ["random"] }),
   EngageCaptiveHolder: (i) => ({ text: `(constant, does nothing when run) while this enemy is in the staging area or engaged with another player it engages the player who controls a hero with ${str(i.captive)} attached, at once and whatever its engagement cost`, read: ["captive"] }),
+  RevealChosenFromDiscard: (i) => ({ text: `the acting player chooses a card of type ${(i.types as string[]).join(" or ")} in the encounter discard pile (whichever card lies there; a pile with none does nothing) and reveals it in full: its When Revealed effects and keywords resolve (an objective with Guarded takes its guard) and it joins the staging area; the card has left the pile for the next player`, read: ["types"] }),
+  CapRefresh: (i) => ({ text: `the acting player chooses, one at a time, the exhausted characters he controls beyond ${i.amount} that would ready in the refresh phase: they stay exhausted this phase (nothing with ${i.amount} or fewer)`, read: ["amount"] }),
   ReturnAttachedEnemy: (i) => ({ text: `each enemy named ${str(i.name)} lying attached to a card goes back to the staging area as an enemy (one anywhere else stays)`, read: ["name"] }),
 };
 
@@ -25,6 +27,8 @@ export const RING_MAKER_SAMPLES: Samples = {
   ShuffleIntoOutOfPlayDecks: [{ verb: "ShuffleIntoOutOfPlayDecks", once: "07024", perOtherPlayer: "07025" }],
   RevealOutOfPlay: [{ verb: "RevealOutOfPlay", amount: 3, chooseForHand: true }],
   ShuffleHandCardIntoOutOfPlay: [{ verb: "ShuffleHandCardIntoOutOfPlay", random: true }],
+  RevealChosenFromDiscard: [{ verb: "RevealChosenFromDiscard", types: ["enemy", "objective"] }],
+  CapRefresh: [{ verb: "CapRefresh", amount: 5 }],
   ReturnAttachedEnemy: [{ verb: "ReturnAttachedEnemy", name: "Mugash" }],
   EngageCaptiveHolder: [{ verb: "EngageCaptiveHolder", captive: "Mugash" }],
 };

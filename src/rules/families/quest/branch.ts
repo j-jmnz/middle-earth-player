@@ -94,6 +94,11 @@ export function noteSkippedStage(state: ScenarioState, newId: string, leftId: st
   return prior != null && prior !== leftId && state.cards[prior]?.zone === "questDeck" ? { ...state, stageLeft: { to: newId, from: leftId } } : state;
 }
 
+// The quest left `from` for `to` without defeating it (emce.bypassing): `defeatedBefore` names no stage for `to`, so no "when this stage is defeated" effect hears the advance.
+export function noteBypassedStage(state: ScenarioState, to: string, from: string): ScenarioState {
+  return { ...state, stageLeft: { to, from, bypassed: true } };
+}
+
 // Whether a card in the game hears "After a quest card is defeated" (Mendor, 01135:A:3; "When you defeat this stage", 01120:B:1). The event
 // is queued only in a game that has such a card, so every other game's state stays as it was.
 export function questCardDefeatedHeard(state: ScenarioState, ctx: ReduceContext): boolean {

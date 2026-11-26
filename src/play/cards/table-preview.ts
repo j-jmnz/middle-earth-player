@@ -34,6 +34,8 @@ import { previewKeywords } from "./preview-keywords.ts";
 import { contractSides } from "./contract-sides.ts";
 import { LOOT_ROLE } from "../words/loot.ts";
 import { printedOf } from "../../rules/core/printed.ts";
+import { FORDS_STAGES } from "../readouts/ring-maker/fords.ts";
+import { stageTimeNearWords } from "../words/scenarios/ring-maker/fords-table.ts";
 
 // A card code as the preview draws it: its name, its picture (or null) by picture key (picture-key.ts: side B of a revealed quest
 // stage), whether it is printed sideways, its text, and the lines of it the app does not apply.
@@ -61,15 +63,27 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
   // A stage held back says what holds it, so progress past its quest points reads as the rule and not a fault (13 / 8).
   const hold = points != null ? advanceHold(game, ctx, line) : null;
   // A stage with Defense says where questing's progress goes, and a stage whose filling loses the game says so (mec112.defense, 143075:B:3).
-  const detail = stageDetail(game, ctx, stage.code, points, hold, null).join(". ");
+  const rest = stageDetail(game, ctx, stage.code, points, hold, null).join(". ");
+  // A time stage with 2 counters or fewer says what the dial warns of first, as the dial's own words do (rm.time-x): the sheet the dial opens is this preview.
+  const near = FORDS_STAGES.includes(stage.code) && stage.face === "B" && stage.resources <= 2 ? stageTimeNearWords(stage.code, stage.resources) : null;
+  const detail = near ? [near, rest].filter((part) => part !== "").join(" ") : rest;
   if (points != null) return { title: `${name} · ${stage.progress} / ${points}`, ...(detail ? { detail } : {}) };
   const objective = questObjective(game, ctx, line);
   // A stage 2 of The Old Forest has no quest points: it says what its Victory points test sends the quest to.
   const forest = forestScore(game, ctx);
   // Stages 1 and 2 of The Steward's Fear have no quest points either: their tokens against the 4 that advance them follow (06011:B:3, 06012:B:3).
   const own = amonDinWin(game) ?? osgiliathWin(game, ctx, stage.code) ?? valeWin(game, ctx) ?? (objective ? `To win: ${objective}` : forest ? forestStageWords(forest) : "No quest points");
-  return { title: name, detail: [own, ...stewardsFearStageLines(game, ctx, stage.code), ...amonDinStageLines(game, stage.code), ...osgiliathStageLines(game, stage.code), ...valeStageLines(game, ctx, stage.code)].join(". ") };
+  const lines = [own, ...stewardsFearStageLines(game, ctx, stage.code), ...amonDinStageLines(game, stage.code), ...osgiliathStageLines(game, stage.code), ...valeStageLines(game, ctx, stage.code)].join(". ");
+  return { title: name, detail: near ? `${near} ${lines}` : lines };
 }
+
+// What a card lying on another card is called in the host's preview: its own printed type line for an objective or a ship-objective ("Objective" for Mugash on Edge of Fangorn, "Objective Ally" for Gríma on The Islet), "Attachment" for the rest.
+export function hostedRole(printed: { type: string; typeName: string }): string {
+  return printed.type === "objective" || printed.type === "ship-objective" ? printed.typeName || "Objective" : "Attachment";
+}
+
+// The resource tokens on a time stage are its time counters (rm.time-x), so its sheet says "3 time counters".
+const timeUnit = (code: string): string | undefined => (FORDS_STAGES.includes(code) ? "time counter" : undefined);
 
 /**
  * What lies on the card now, one phrase a counter: its damage, progress and resource tokens, and whether it is exhausted or committed to the
@@ -123,7 +137,7 @@ export function previewCards(
     if (earlier.includes(id)) return [earlierStage(game, ctx, card.code, describe)];
     // The loot a location guards is under it, out of play, and still its player's (22024:B:2).
     const loot = game.lootDecks != null && card.zone === "under" && card.controller != null;
-    const role = index === 0 ? null : card.zone === "shadow" ? "Shadow card" : loot ? LOOT_ROLE : (underAlleywayRole(game, id) ?? guardedRole(game, id) ?? (card.host ? "Attachment" : null));
+    const role = index === 0 ? null : card.zone === "shadow" ? "Shadow card" : loot ? LOOT_ROLE : (underAlleywayRole(game, id) ?? guardedRole(game, id) ?? (card.host ? hostedRole(printedOf(ctx.cards, card.code)) : null));
     // The effects on it, then what a delayed effect will do to it (Sneak Attack's return); for the pressed hand card, why it
     // does not glow.
     const effects = [...effectLines(game, ctx, id, cardName), ...delayedLines(game, id, cardName)];
@@ -142,7 +156,7 @@ export function previewCards(
     const turned = heading ? { title: headingPreviewTitle(heading), turn: headingLook(heading).turn } : {};
     const steps = heading ? { steps: headingPreviewSteps(heading).map((row) => ({ text: row.line, current: row.current })) } : {};
     // A Battleground location's preview line says its damage against its limit, and an enemy of stage 3 its progress against its hit points, so the token line does not say them a second time.
-    const tokens = tokenLines(removalLimit(game, id) > 0 ? { ...card, damage: 0 } : enemyProgress(game, ctx, id) ? { ...card, progress: 0 } : card, flagged(game, id, "progressRedirect") ? BLIZZARD_LIMIT : undefined, villagerUnit(game, card) ?? "resource", damageUnit(game, card) ?? undefined);
+    const tokens = tokenLines(removalLimit(game, id) > 0 ? { ...card, damage: 0 } : enemyProgress(game, ctx, id) ? { ...card, progress: 0 } : card, flagged(game, id, "progressRedirect") ? BLIZZARD_LIMIT : undefined, villagerUnit(game, card) ?? timeUnit(card.code) ?? "resource", damageUnit(game, card) ?? undefined);
     const keywords = previewKeywords(game, ctx, id, described.text, options.ruleDoc ?? null);
     const sides = contractSides(printedOf(ctx.cards, card.code).type, described.text);
     if (sides) {

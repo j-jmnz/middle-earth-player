@@ -22,6 +22,7 @@ import { queueEvent } from "../../windows/queue.ts";
 import { effectData } from "../encounter/moves.ts";
 import { backIntoQuestDeck } from "./random-stage.ts";
 import { arrivalFace } from "../quest/order.ts";
+import { noteBypassedStage } from "../quest/branch.ts";
 import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -78,7 +79,7 @@ export function replaceCurrent(state: ScenarioState, nextId: string, how: Replac
   const arriving = how.shuffle ? (next.questDeck[0] ?? currentId) : nextId;
   next = moveCard(next, arriving, { zone: "questStage" });
   next = updateCard(next, arriving, { face: how.flipped ? "B" : arrivalFace(next, next.cards[arriving]?.code) });
-  next = { ...next, stageLeft: { to: arriving, from: currentId, bypassed: true } };
+  next = noteBypassedStage(next, arriving, currentId);
   steps.push({ kind: "advance", cardId: arriving });
   return afterProgress(next, before, ctx, steps);
 }

@@ -9,10 +9,11 @@ import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
 import { Badges, CardBody, HeldMark, NotAppliedMark, StackMark, SuccessMedallion, Tokens } from "./pieces.native.tsx";
 import { BLANK_WORD } from "../words/card-bars.ts";
 import { badgeReach, BlankMarkView, CombatPill, CurrentQuestMark, DelayedMark, DeterminedMarkView, EngagementMark, FireMarkView, OptionMarkView, PlaceMarkView, SeatChipView, ShipLossView, StageMarks, UnderMarkView } from "./mark-pieces.native.tsx";
+import { footStop } from "./badge-room.ts";
 import { underRect } from "./under-mark.ts";
 import { sphereIcon } from "../../ui/icon-map.ts";
 import { Pile } from "./pile-piece.native.tsx";
-import { type CardSlot } from "../layout/layout.ts";
+import { type CardSlot, type Rect } from "../layout/layout.ts";
 import { shownBounds } from "../layout/hits.ts";
 import { sphereRing } from "./table-canvas-views.ts";
 import { samePiece, type BodyProps, type PieceProps } from "./table-piece.ts";
@@ -58,6 +59,18 @@ function drawFrame(p: PieceProps) {
   return <CardMarks slot={slot} tappable={card && p.tappable} picked={card ? p.picked : 0} dimmed={p.dimmed} beat={p.beat} t={p.t} s={p.s} veiled={p.veiledHand} />;
 }
 
+// The card wears something at its foot (a stage's or active location's progress, a committed character's Willpower, a defender's or attacker's combat number, or a resource token): a pill with no count stands one row up, clear of it.
+const wearsFootNumber = (info: { questPoints: number | null; willpower: number | null; combat?: unknown }, resources: number) => info.questPoints != null || info.willpower != null || info.combat != null || resources > 0;
+
+// Where the highest pill at the card's foot stands, which the effect pills stop above (footStop in badge-room.ts).
+function footStopOf(p: PieceProps, rect: Rect): number | null {
+  const { slot, info } = p;
+  if (!info) return null;
+  const under = info.under ? { height: underRect(rect, slot.zone === "hand", p.s).h, counted: info.under.count != null, strip: wearsFootNumber(info, slot.resources) } : null;
+  const plain = info.engagement != null || info.fire != null || info.side?.loses != null || info.loss != null;
+  return footStop(rect.h, p.s, { under, lifted: slot.kind === "card" && p.optionMark != null, plain });
+}
+
 // What stays upright over the card: badges, tokens, effect pills, the check ring, the open moment's number.
 function drawOverlay(p: PieceProps) {
   const { slot, info, fonts, tokens, t, s, contrast } = p;
@@ -67,21 +80,22 @@ function drawOverlay(p: PieceProps) {
   // The veil is drawn in the card's turned group, under this upright layer, so a veiled card's tokens and marks are faded
   // here instead; the option pill stays bright.
   const veiled = p.dimmed;
+  const stop = footStopOf(p, rect);
   return (
     <Group>
       <Group opacity={veiled ? 0.55 : 1}>
-        {info ? <Badges slot={slot} rect={rect} effects={info.effects} willpower={info.willpower} commitStat={info.commitStat} questPoints={info.questPoints} stageLoses={info.stageLoses} owner={p.owner} fonts={fonts} images={tokens} t={t} s={s} contrast={contrast} /> : null}
+        {info ? <Badges slot={slot} rect={rect} effects={info.effects} willpower={info.willpower} commitStat={info.commitStat} questPoints={info.questPoints} stop={stop} stageLoses={info.stageLoses} owner={p.owner} fonts={fonts} images={tokens} t={t} s={s} contrast={contrast} /> : null}
         {info?.combat ? <CombatPill rect={rect} combat={info.combat} fonts={fonts} t={t} s={s} /> : null}
         {info?.engagement ? <EngagementMark rect={rect} cost={info.engagement.cost} engages={info.engagement.engages} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.fire ? <FireMarkView rect={rect} mark={info.fire} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.side?.loses ? <FireMarkView rect={rect} mark={info.side.loses} fonts={fonts} images={tokens} t={t} s={s} /> : null}
-        {info?.side?.current ? <CurrentQuestMark rect={rect} clear={badgeReach(info.effects, fonts, s, rect.h)} fonts={fonts} t={t} s={s} /> : null}
+        {info?.side?.current ? <CurrentQuestMark rect={rect} clear={badgeReach(info.effects, fonts, s, rect.h, stop)} fonts={fonts} t={t} s={s} /> : null}
         {info?.determined?.word === BLANK_WORD ? <BlankMarkView rect={rect} lifted={info.under != null || info.seat != null || info.engagement != null || info.combat != null || info.fire != null || info.loss != null || info.questPoints != null} fonts={fonts} t={t} s={s} /> : null}
-        {info?.determined && info.determined.word !== BLANK_WORD ? <DeterminedMarkView rect={rect} word={info.determined.word} clear={badgeReach(info.effects, fonts, s, rect.h)} fonts={fonts} t={t} s={s} /> : null}
+        {info?.determined && info.determined.word !== BLANK_WORD ? <DeterminedMarkView rect={rect} word={info.determined.word} clear={badgeReach(info.effects, fonts, s, rect.h, stop)} fonts={fonts} t={t} s={s} /> : null}
         {info?.seat ? <SeatChipView rect={rect} text={info.seat.chip} fonts={fonts} t={t} s={s} /> : null}
         {info?.loss ? <ShipLossView rect={rect} mark={info.loss} fonts={fonts} t={t} s={s} /> : null}
         {info?.place ? <PlaceMarkView rect={rect} mark={info.place} t={t} s={s} /> : null}
-        {info?.under ? <UnderMarkView rect={underRect(rect, slot.zone === "hand", s)} mark={info.under} sideways={slot.exhausted} strip={info.questPoints != null} fonts={fonts} t={t} s={s} /> : null}
+        {info?.under ? <UnderMarkView rect={underRect(rect, slot.zone === "hand", s)} mark={info.under} sideways={slot.exhausted} strip={wearsFootNumber(info, slot.resources)} fonts={fonts} t={t} s={s} /> : null}
         {info?.delayed ? <DelayedMark rect={rect} t={t} s={s} /> : null}
         {p.stageMarks ? <StageMarks rect={rect} pill={p.stageMarks.pill} apart={p.stageMarks.apart} fonts={fonts} t={t} s={s} /> : null}
         <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} t={t} s={s} ring={slot.resources > 0 ? sphereRing(p.sphere, t) : null} contrast={contrast} />

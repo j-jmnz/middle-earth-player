@@ -5,6 +5,7 @@
 // damage an attack would place and whether it destroys the card (toughness, indestructible and "cannot take damage"
 // included), whether that loses the game (The One Ring leaves play with its bearer; no seat remains) or eliminates a seat,
 // and how much more damage the card can take. Nothing here changes the game: the copy is dropped.
+import { hindersInCombat } from "../../rules/families/ring-maker/hinder.ts";
 import { ruleCause } from "../../rules/core/cause.ts";
 import { stagingOf } from "../../rules/families/breaking/areas.ts";
 import { declaredDefenders, pooledDefense, standingDefenders } from "../../rules/families/defense/defenders.ts";
@@ -148,10 +149,10 @@ export function engagesAt(game: ScenarioState, ctx: ReduceContext): ReadonlyMap<
   return forecast;
 }
 
-/** The enemies a seat will face this round: those engaged with it, and those in staging the checks would engage with it. */
+/** The enemies a seat will face this round: those engaged with it, and those in staging the checks would engage with it, less those that will make no attack in the combat phase (Hinder, rm.hinder: its flags exist only then, so the records are read). */
 export function enemiesToFace(game: ScenarioState, ctx: ReduceContext, seat: number): string[] {
   const engaging = [...engagesAt(game, ctx)].filter(([, to]) => to === seat).map(([id]) => id);
-  return [...(game.seats[seat]?.engaged ?? []), ...engaging];
+  return [...(game.seats[seat]?.engaged ?? []), ...engaging].filter((id) => !hindersInCombat(ctx, game.cards[id]?.code ?? ""));
 }
 
 /**

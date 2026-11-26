@@ -105,6 +105,7 @@ export const FIXTURE_REGISTRY = [
   { scenarioId: "the-battle-of-five-armies", kind: "standalone", names: ["armies-lost"] },
   { scenarioId: "the-fords-of-isen", kind: "standalone", names: ["isen-lost"] },
   { scenarioId: "to-catch-an-orc", kind: "standalone", names: ["orc-lost"] },
+  { scenarioId: "into-fangorn", kind: "standalone", names: ["fangorn-lost"] },
   { scenarioId: "escape-from-umbar", kind: "standalone", names: ["umbar-lost"] },
   { scenarioId: "desert-crossing", kind: "standalone", names: ["crossing-lost"] },
   { scenarioId: "the-long-arm-of-mordor", kind: "standalone", names: ["mordor-lost"] },

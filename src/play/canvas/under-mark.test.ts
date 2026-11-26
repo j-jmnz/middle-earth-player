@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 
 import { TOKEN } from "./token-spots.ts";
-import { FOOT_ROW, STRIP, underMarkBox, underRect } from "./under-mark.ts";
+import { FOOT_ROW, STRIP, underMarkBox, underMarkTop, underRect } from "./under-mark.ts";
 
 const card = (w: number) => ({ x: 100, y: 50, w, h: w * 1.4 });
 // The badge font's width: about 5.5 pt a character at Medium.
@@ -96,6 +96,21 @@ describe("the pill of a card in the hand", () => {
         expect(box.y + box.height, `w ${w} s ${s}`).toBeLessThan(rect.y + rect.h);
         expect(box.y, `w ${w} s ${s}`).toBeGreaterThanOrEqual(rect.y);
         expect(underRect(rect, false, s)).toBe(rect);
+      }
+    }
+  });
+});
+
+describe("the pill's top edge", () => {
+  it("is the box's top below the rect's, in the foot row or one row up, at every height and UI scale", () => {
+    for (const s of [0.85, 1, 1.25, 1.5]) {
+      for (const h of [34, 44, 53, 62, 70, 84, 101]) {
+        const rect = { x: 10, y: 20, w: 44 * s, h };
+        for (const [counted, lifted] of [[false, false], [false, true], [true, false]] as const) {
+          const box = underMarkBox(rect, width("1 held", s), width("1", s), s, counted, false, lifted);
+          expect(box.y - rect.y, `h ${h} s ${s}`).toBeCloseTo(underMarkTop(h, s, counted, lifted), 6);
+          expect(underMarkTop(h, s, counted, lifted)).toBeLessThanOrEqual(underMarkTop(h, s, false, false));
+        }
       }
     }
   });
