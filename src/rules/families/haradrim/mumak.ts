@@ -8,11 +8,12 @@ import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { ask, chosenOf } from "./staged.ts";
 
-/** TakeObjectiveAlly: the actor takes one of the set-aside objective allies with these codes into their play area, faceup and ready (the actor is asked when several are left). It is an ally in play by its printed combat stats (an objective ally a player controls). */
+/** TakeObjectiveAlly: the actor takes one of the set-aside objective allies with these codes into their play area, faceup and ready (the actor is asked when several different cards are left; copies of one card are one choice). It is an ally in play by its printed combat stats (an objective ally a player controls). */
 export function takeObjectiveAlly(state: ScenarioState, instruction: Extract<Instruction, { verb: "TakeObjectiveAlly" }>, focus: Focus, steps: EngineStep[]): ScenarioState {
   const options = state.setAside.filter((id) => instruction.codes.includes(state.cards[id]?.code ?? ""));
   if (options.length === 0) return state;
-  const chosen = chosenOf(options, focus);
+  // Copies of one card are one choice: the first is taken without asking.
+  const chosen = chosenOf(options, focus) ?? (new Set(options.map((id) => state.cards[id]?.code)).size === 1 ? options[0] : undefined);
   if (!chosen) return ask(state, instruction, focus.seat, options, steps);
   return updateCard(moveCard(state, chosen, { zone: "play", seat: focus.seat }), chosen, { face: "up", exhausted: false, committed: false });
 }

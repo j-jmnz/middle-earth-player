@@ -93,7 +93,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [
         { verb: "Pick", pick: WARG_HOST },
         { verb: "AttachEnemyToPicked", when: { kind: "canPick", pick: WARG_HOST } },
-        { verb: "MoveEncounterCard", card: "self", to: "discard", when: { kind: "not", condition: { kind: "canPick", pick: WARG_HOST } } },
+        { verb: "MoveEncounterCard", card: "self", to: "discard", when: { kind: "not", condition: { kind: "matches", card: "picked", pick: { type: "enemy", control: "any", trait: "Orc" } } } },
       ],
     },
     {

@@ -48,7 +48,7 @@ const VERBS = [
   z.strictObject({ verb: z.literal("OrcsProgress"), engaged: z.literal(true).optional(), ...when }),
   // "Place 2 progress on the Orcs' stage" (17045:A:3), "place 1 progress on the Orcs' stage" (17050:B:2): the Orcs' current stage takes `amount`, no more than it needs; a full stage is defeated as OrcsProgress says.
   z.strictObject({ verb: z.literal("AddOrcsProgress"), amount: positiveAmountSchema, ...when }),
-  // "Each player takes control of a Tamed Mûmak" (17047:A:1): the actor takes one of the set-aside objective allies with these codes into their play area, faceup, ready; with several left the actor is asked.
+  // "Each player takes control of a Tamed Mûmak" (17047:A:1): the actor takes one of the set-aside objective allies with these codes into their play area, faceup, ready; with several different cards left the actor is asked (copies of one card are one choice).
   verbFlags(z.strictObject({ verb: z.literal("TakeObjectiveAlly"), codes: z.array(z.string().min(1)).min(1), ...when }), { setupRuns: "inForEachPlayer" }),
 ] as const;
 
