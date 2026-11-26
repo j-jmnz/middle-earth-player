@@ -15,6 +15,15 @@ Haradrim part 4 (The Mûmakil, `M`), standalone only, on Easy and Normal (Q07.4,
 - Wild Mûmak has Indestructible, is immune to player card effects and takes no more than 3 damage a round.
 - Stage 1B cannot be advanced unless the number of Wild Mûmak in play equals the number of players.
 
+## Table
+
+What the table shows of the pieces this scenario's records create (`docs/agents/agent-brief.md`, Scenario procedure, The Table step). The engine decides each fact; no control types damage, resources, threat, progress or life. The test is `src/play/scenarios/the-mumakil-table.test.ts`; the sentences are in `src/play/words/asks/the-mumakil.ts`. No widget is declared and no readout file is added.
+
+- **The Capture objectives** (`17027:A:1`, `17027:B:2`, `17011:A:1` to `17014:A:1`). Each lies attached, faceup and controlled by nobody, on a Wild Mûmak, in the staging area or engaged. The existing attachment drawing under the host covers it, two on one Mûmak included; the table test names the zones. No new piece.
+- **The set-aside Mûmakil and Captures** (`17026:A:1`). Out of play with no zone to draw: nothing is shown, as for any set-aside card.
+- **Setup records that create nothing new.** The campaign card's Setup (`141085:setup:1`) adds a card attached to a hero, which the table already draws; The Mûmakil's Setup (`17026:setup:1`) adds locations to the staging area and sets the explored-location note, which has no mark of its own: the Territorial Ape's Shadow adds its own +1 or +2 Attack to the attack.
+- **The owner on each row of a pick that spans seats.** Overgrown's pick, the Capture pick of each player and the Wild Mûmak's end-of-round choice name the number and the player, and the Mûmak that is engaged with that player (`src/play/words/asks/the-mumakil.ts`).
+
 ## Readings
 
 The statuses are those of the Readings bullet of `docs/scenarios/haradrim.md`. Each key is the scan-read ledger line (`data/printed/haradrim.json`), `<code>:<side>:<n>`. Sources read: the Mûmakil rulesheet (`hrd.setup-the-mumakil`, no rule of its own beyond the Setup), the Sands of Harad insert, ALeP = https://alongextendedparty.com/semi-official-errata-faq-1-10/ (developer answers, each item with its source), VotP = https://visionofthepalantir.com/2019/03/07/the-mumakil/ (a play article, no rules), Forum = https://ffg-forum-archive.entropicdreams.com/topic/227249-the-m%C3%BBmakil/page/5 (members only). A line not listed here is span-settled (its basis is the printed line and the rule span it names).
