@@ -2,7 +2,7 @@
 import { describe, expect, it } from "vitest";
 
 import { sandsStart, sandsWorld } from "../../../../test/scenarios/beneath-the-sands/game.ts";
-import { flagged } from "../../../rules/core/state.ts";
+import { expireModifiers, flagged } from "../../../rules/core/state.ts";
 import { reduce, startScenario } from "../../../rules/engine/reduce.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, flag, quest, resourcesOn, respond, reveal, rowProblems, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
@@ -34,6 +34,7 @@ const ROWS: readonly Row[] = [
   { line: "17075:A:1", name: "When Revealed: the objective flips to Off Track and cannot flip while the side quest is in play", layout: { stage: "17076", side: "B", staging: [ON] }, act: reveal("17075"), expect: [count(OFF, "staging", 1), flag("table", "cannotFlipSearch")] },
   { line: "17075:A:1", name: "(Do not resolve the Track keyword) while it is in play: a Track location discards no card and flips nothing", layout: { stage: "17076", side: "B", staging: ["17070", OFF], deck: ["f0", "f0", "17066", "f3"] }, act: [reveal("17075"), announce("traveled", "17070")], expect: [count(OFF, "staging", 1), deckCount(4)] },
   { line: "17075:A:2", name: "Response when it is defeated: the objective flips to On Track and ignores its Forced effects this phase", layout: { stage: "17076", side: "B", staging: [OFF, { code: "17075", progress: 5 }] }, act: [announce("questDefeated", "17075"), respond("17075")], expect: [count(ON, "staging", 1), flag(ON, "cannotTriggerForced")] },
+  { line: "17075:A:2", name: "the Forced effects of On Track are ignored until the end of the phase: the top cards are not searched at the end of the quest phase", layout: { phase: "Quest", stage: "17076", side: "B", staging: [OFF, { code: "17075", progress: 5 }], deck: ["f0", "f0", "f3", "f0"] }, act: [announce("questDefeated", "17075"), respond("17075"), announce("endOfPhase")], expect: [count(ON, "staging", 1), deckCount(4)] },
 
   // 17079 Off Track. Forced: at the end of the quest phase it takes a resource, then the first player returns the topmost location of the discard pile to the staging area or each player raises their threat by the resources on it.
   { line: "17079:A:1", name: "end of the quest phase: a resource, and the topmost location of the discard pile returns to the staging area", layout: { phase: "Quest", stage: "17076", side: "B", staging: [OFF], discard: ["17068", "17071", "f0"] }, act: [announce("endOfPhase"), answer("location")], expect: [resourcesOn(OFF, 1), zone("17071", "staging"), zone("17068", "encounterDiscard")] },
@@ -79,4 +80,21 @@ lineSpec("17075:A:2", "the flip is the card's own text: it happens while Lost Un
   const done = resolveRecords(blocked, made.ctx, "17075", "response", idOf(state, "17075")).state;
   expect(done.cards[idOf(state, OFF)]?.code).toBe(ON);
   expect(flagged(done, idOf(state, OFF), "cannotTriggerForced")).toBe(true);
+});
+
+describe("Limit and duration lines of the Search cards", () => {
+  const read = (row: Row) => expect(rowProblems("beneath-the-sands", row, EFFECTS)).toEqual([]);
+  it("17074:A:2 Limit 1 per quest: a second copy stays unattached, and the first fires again at each flip to Off Track while a player has no ally", () => {
+    const attached = { stage: "17076", side: "B", staging: [OFF], attached: [{ code: "17074", to: "17076", encounter: true as const }] } as const;
+    read({ line: "17074:A:2", layout: { ...attached, seats: 2, play: ["ally"] }, act: [announce("searchFlippedOff", OFF), announce("searchFlippedOff", OFF)], expect: [zone("ally", "discard"), zone("17074", "attached")] });
+    read({ line: "17074:A:2", layout: { stage: "17076", side: "B", staging: [OFF] }, act: [reveal("17074"), reveal("17074")], expect: count("17074", "attached", 1) });
+  });
+  it("17075:A:2 the ignored Forced effects of On Track come back at the end of the phase", () => {
+    const made = tableFromLayout("beneath-the-sands", { stage: "17076", side: "B", staging: [OFF, { code: "17075", progress: 5 }] });
+    const state = opened(made).state;
+    const done = resolveRecords(state, made.ctx, "17075", "response", idOf(state, "17075")).state;
+    const on = idOf(done, ON);
+    expect(flagged(done, on, "cannotTriggerForced")).toBe(true);
+    expect(flagged(expireModifiers(done, ["endOfPhase"]), on, "cannotTriggerForced")).toBe(false);
+  });
 });

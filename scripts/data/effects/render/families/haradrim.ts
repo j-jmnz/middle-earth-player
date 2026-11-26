@@ -32,7 +32,7 @@ export const HARADRIM_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => M
   TakeObjectiveAlly: (i) => ({ text: `the acting player takes control of one of the set-aside objective allies (${(Array.isArray(i.codes) ? i.codes : []).map(str).join(", ")}) into their play area, ready (asked only when different cards are left, copies of one card are one choice); it is an ally in play`, read: ["codes"] }),
   EliminateAfterAttack: () => ({ text: "the acting player is eliminated from the game by a card effect; while an enemy attack on that player is in progress the elimination waits until that attack has resolved (its end-of-attack effects and the Forced effects it announces resolve first)", read: [] }),
   FlipSearchObjective: (i) => ({
-    text: `the Search objective in play flips to ${i.to === "onTrack" ? "On Track (each resource on it is discarded)" : "Off Track"}${i.despiteBlock === true ? ", even while Lost Underground stops flips (this card's own flip)" : " (nothing while Lost Underground is in play)"}; nothing changes when it already shows that side; the flip is announced as a card flipped over`,
+    text: `the Search objective in play flips to ${i.to === "onTrack" ? "On Track (each resource on it is discarded)" : i.to === "offTrack" ? "Off Track" : "no side"}${i.despiteBlock === true ? ", even while Lost Underground stops flips (this card's own flip)" : " (nothing while Lost Underground is in play)"}; nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not`,
     read: ["to", "despiteBlock"],
   }),
   ResolveTrack: (i) => ({

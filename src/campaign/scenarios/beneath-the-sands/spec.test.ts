@@ -56,9 +56,9 @@ const ROWS: readonly Row[] = [
   { line: "17073:A:2", name: "Shadow: with On Track in play the attacker attacks again after this attack", layout: { staging: [ON] }, act: attack("f0", { shadow: "17073", undefended: true }), expect: damageOn("dh1", 2) },
 
   // 17074 Grabbed by Spiders.
-  { line: "17074:A:2", name: "When Revealed: it attaches to the main quest, and a second copy stays unattached", layout: { stage: STAGE_1, side: "B", staging: [OFF] }, act: [reveal("17074"), reveal("17074")], expect: count("17074", "attached", 1) },
+  { line: "17074:A:2", name: "Limit 1 per quest: it attaches to the main quest, and a second copy is not attached", layout: { stage: STAGE_1, side: "B", staging: [OFF] }, act: [reveal("17074"), reveal("17074")], expect: count("17074", "attached", 1) },
   { line: "17074:A:2", name: "After the objective flips to Off Track each player discards an ally, then discards Grabbed by Spiders", layout: { stage: STAGE_1, side: "B", staging: [OFF], play: ["ally"], attached: [{ code: "17074", to: STAGE_1, encounter: true }] }, act: announce("searchFlippedOff", OFF), expect: [zone("ally", "discard"), zone("17074", "encounterDiscard")] },
-  { line: "17074:A:2", name: "One player short of an ally keeps it attached, the other still discards his", layout: { seats: 2, stage: STAGE_1, side: "B", staging: [OFF], play: ["ally"], attached: [{ code: "17074", to: STAGE_1, encounter: true }] }, act: announce("searchFlippedOff", OFF), expect: [zone("ally", "discard"), zone("17074", "attached")] },
+  { line: "17074:A:2", name: "One player short of an ally keeps it attached to fire again at the next flip, the other still discards his", layout: { seats: 2, stage: STAGE_1, side: "B", staging: [OFF], play: ["ally"], attached: [{ code: "17074", to: STAGE_1, encounter: true }] }, act: announce("searchFlippedOff", OFF), expect: [zone("ally", "discard"), zone("17074", "attached")] },
 
   // 17076 Searching the Caves (the Setup is in track-lines.test.ts).
   { line: "17076:B:1", name: "When Revealed: cards are discarded until X locations are discarded and each is added to the staging area", layout: { stage: STAGE_1, side: "B", deck: ["f0", "place", "f3"] }, act: resolve(STAGE_1, "whenRevealed"), expect: [zone("f0", "encounterDiscard"), zone("place", "staging"), deckCount(1)] },
