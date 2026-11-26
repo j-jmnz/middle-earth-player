@@ -1,6 +1,7 @@
 // Rules: rr.guarded, rr.attachment-cards, rr.in-play-and-out-of-play, rr.ownership-and-control (data/rules/entries.json); ledger lines 01108:A:1-2, 01107:A:1, 01123:B:1, 01105:A:1.
 // The one line a card of Escape from Dol Guldur says about itself in the card preview (table-preview.ts) when it has more to say than its text:
 // an objective's guard, the prisoner, an Orc Guard's card, Iron Shackles on a deck; and of A Storm on Cobas Haven, a tower the players control and the Ship enemy a location holds out of play. The engine decided each; nothing here changes one.
+import { mumakDetail } from "../readouts/haradrim/orcs.ts";
 import { poisonDetail } from "./poison-preview.ts";
 import { freeOfEncounters } from "../../rules/families/objectives/index.ts";
 import { captivesUnder } from "../../rules/families/captives/values.ts";
@@ -92,7 +93,7 @@ function ownDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name
   const kept = keptDetail(game, cardId, name);
   if (kept) return kept;
   // The heroes in the staging area, the heroes an Orc guards and the objective-heroes (The Long Arm of Mordor) are told before the Captives' words, which would call them Captives of The Uruk-hai.
-  const staged = stagedDetail(game, cardId, name) ?? objectiveDetail(game, ctx, cardId);
+  const staged = stagedDetail(game, cardId, name) ?? objectiveDetail(game, ctx, cardId) ?? mumakDetail(game, cardId);
   if (staged) return staged;
   const captive = captiveDetail(game, ctx, card, name);
   if (captive) return captive;
