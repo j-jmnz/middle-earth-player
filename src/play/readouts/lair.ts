@@ -45,6 +45,7 @@ export function lairDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code
       id: "cap",
       testID: "lair-cap",
       label: "This round",
+      short: "Round",
       name: "Progress placed on the quest stage this round:",
       value: cap.placed,
       limit: cap.limit,
