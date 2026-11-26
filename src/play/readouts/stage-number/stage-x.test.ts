@@ -2,10 +2,10 @@
 // A card whose stat is the stage number plus or times a number says so in its preview, and the line of another reader (a Captive, a plot) is told with it.
 import { describe, expect, it } from "vitest";
 
-import { settle } from "../../rules/engine/machine.ts";
-import { idOf, tableFromLayout } from "../../../test/harness/scene-kit.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import { idOf, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
-import { dungeonDetail } from "./dungeon-preview.ts";
+import { dungeonDetail } from "../../cards/dungeon-preview.ts";
 
 const line = (scenario: string, code: string, layout: Parameters<typeof tableFromLayout>[1]) => {
   const t = tableFromLayout(scenario, layout);

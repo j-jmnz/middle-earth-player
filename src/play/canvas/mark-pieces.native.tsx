@@ -156,6 +156,43 @@ export function DeterminedMarkView({ rect, word, clear, fonts, t, s }: { rect: R
   return <WordPill rect={rect} text={word} short={shortGlyph(word)} clear={clear} fonts={fonts} t={t} s={s} />;
 }
 
+/**
+ * A card whose text box is blank (Desert Crossing, Cold from Angmar, the heroes The Long Arm of Mordor holds): the accent "Blank" pill stands in the pill column at the card's foot, as the "1 held" pill does, never on the name at the top; where the word does not fit, a round "B".
+ * `lifted`: another mark holds the foot row (the engagement cost, a combat number, the progress strip, a held pill), so this one stands a row above it.
+ */
+export function BlankMarkView({ rect, lifted, fonts, t, s }: { rect: Rect; lifted: boolean; fonts: Fonts; t: TableTokens; s: number }) {
+  const words = fonts.badge.getTextWidth(BLANK_WORD);
+  const box = underMarkBox(rect, words, 0, s, false, false, lifted);
+  const fits = words + 10 * s <= rect.w - 4 * s;
+  const text = fits ? BLANK_WORD : "B";
+  const width = fits ? box.width : box.height;
+  const x = box.x + (box.width - width) / 2;
+  const shown = fonts.badge.getTextWidth(text);
+  return (
+    <Group>
+      <RoundedRect x={x} y={box.y} width={width} height={box.height} r={box.height / 2} color={t.accent} />
+      <RoundedRect x={x} y={box.y} width={width} height={box.height} r={box.height / 2} color={t.night} style="stroke" strokeWidth={1 * s} />
+      <Text x={x + (width - shown) / 2} y={box.y + box.height - 5 * s} text={text} font={fonts.badge} color={t.onAccent} />
+    </Group>
+  );
+}
+
+/** The owner of a hero in the staging area ("P2"): a small night chip at the card's bottom right edge, clear of the foot pills in the middle (docs/design-system-table.md, Cards). */
+export function SeatChipView({ rect, text, fonts, t, s }: { rect: Rect; text: string; fonts: Fonts; t: TableTokens; s: number }) {
+  const words = fonts.badge.getTextWidth(text);
+  const height = BADGE_H * s;
+  const width = Math.min(rect.w - 4 * s, words + 8 * s);
+  const x = rect.x + rect.w - width - 2 * s;
+  const y = rect.y + rect.h - height - 2 * s;
+  return (
+    <Group>
+      <RoundedRect x={x} y={y} width={width} height={height} r={height / 2} color={t.night} />
+      <RoundedRect x={x} y={y} width={width} height={height} r={height / 2} color={t.bone} style="stroke" strokeWidth={1 * s} />
+      <Text x={x + (width - words) / 2} y={y + height - 5 * s} text={text} font={fonts.badge} color={t.bone} />
+    </Group>
+  );
+}
+
 /** How far the widest effect badge reaches from the card's left edge, so a word pill keeps clear of the badge column (the rows are drawn by `Badges`: a stat is the icon, the number and 5 pt, a flag the pill and 4 pt (the must-commit pill is a stat's width), the "more" pill its words and 12 pt, at least 24 pt). */
 export function badgeReach(effects: CardEffects, fonts: Fonts, s: number, height: number): number {
   const widths = [

@@ -47,6 +47,14 @@ describe("the heroes in the staging area", () => {
     expect(slotNumbers(t.state, t.ctx, idOf(t.state, "dh1")).determined?.word).toBe("Blank");
   });
 
+  it("16071:A:1 gives each hero in the staging area a small chip with its owner's seat, two-handed only, and the reader says whose it is", () => {
+    const t = at(stagedLayout({ staged: [{ hero: "dh1" }, { hero: "dh2" }] }));
+    expect(slotNumbers(t.state, t.ctx, idOf(t.state, "dh1")).seat).toEqual({ chip: "P1", speech: "Player 1's hero" });
+    const solo = at({ seats: 1, staging: [ORC], staged: [{ hero: "dh1" }], modified: [MARKS("dh1")] });
+    expect(slotNumbers(solo.state, solo.ctx, idOf(solo.state, "dh1")).seat).toBeNull();
+    expect(slotNumbers(t.state, t.ctx, idOf(t.state, ORC)).seat).toBeNull();
+  });
+
   it("16071:A:1 names the owner and says in the preview that it is blank, immune and given back, exhausted, by a quest stage (16071:B:3, 16072:B:3)", () => {
     const t = at(stagedLayout());
     const text = preview(t, "dh2");

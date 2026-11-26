@@ -127,12 +127,19 @@ export function copyLabel(game: ScenarioState, names: SheetNames, id: string, op
   const seat = game.seats.findIndex((one) => one.engaged.includes(id));
   const engaged = game.seatCount > 1 && seat >= 0 ? `engaged with Player ${seat + 1}` : "engaged with you";
   const places: Partial<Record<string, string>> = { engaged, staging: "staging area", activeLocation: "active location" };
+  // The staging area tells copies apart only when another row lies elsewhere: two Orcs in the staging area differ by nothing the row can say (an engaged place stays, it says whose).
+  const placeOf = (other: string): string | undefined => {
+    const lying = game.cards[other];
+    const at = lying ? game.seats.findIndex((one) => one.engaged.includes(other)) : -1;
+    return lying == null ? undefined : lying.zone === "engaged" ? (game.seatCount > 1 && at >= 0 ? `engaged with Player ${at + 1}` : "engaged with you") : places[lying.zone];
+  };
+  const shared = new Set(options.map(placeOf)).size < 2;
   const host = card.zone === "attached" && card.host ? `on ${names.card(card.host)}` : undefined;
   const attachments = card.attachments.map((other) => names.card(other));
   const attacking = game.pendingAttack?.enemyId === id ? "attacking" : undefined;
   const damage = card.damage > 0 ? `${card.damage} damage` : undefined;
   const withAttachments = attachments.length > 0 ? `with ${attachments.join(", ")}` : undefined;
-  const parts = [attacking, places[card.zone] ?? host, damage, withAttachments].filter((part): part is string => part != null);
+  const parts = [attacking, shared && card.zone === "staging" ? host : (places[card.zone] ?? host), damage, withAttachments].filter((part): part is string => part != null);
   return parts.length > 0 ? `${name} \u00b7 ${parts.join(" \u00b7 ")}` : undefined;
 }
 

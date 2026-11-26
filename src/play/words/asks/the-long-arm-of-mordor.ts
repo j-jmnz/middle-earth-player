@@ -17,7 +17,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
 
   // 16073:A:1 (Free the Captives): each player adds an Orc enemy from the encounter deck or discard pile to the staging area, then the first player pairs each hero in the staging area with an Orc there.
   "16073:whenRevealed:1 @0.0 SearchMove": { owned: true, note: "Free the Captives: choose an Orc enemy in the encounter deck or discard pile to add to the staging area.", verb: "Add" },
-  "16073:whenRevealed:1 @2 GuardStagedHeroes": { owned: true, note: "Free the Captives: choose an Orc enemy in the staging area to guard the next hero there, first player's heroes first. The hero goes under it.", verb: "Guard" },
+  "16073:whenRevealed:1 @2 GuardStagedHeroes": { owned: true, note: "Free the Captives: choose the Orc enemy in the staging area that will guard {hero}. The hero goes under it.", verb: "Guard" },
 
   // 16061:A:3 (Uruk Chieftain): at the end of the encounter phase it engages the player engaged with the most non-unique Orc enemies; the first player picks among tied players.
   "16061:forced:1 @0 EngageSeatWithMost": {

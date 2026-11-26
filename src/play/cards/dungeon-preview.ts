@@ -22,7 +22,7 @@ import { angmarDetail } from "./angmar-preview.ts";
 import { ringMakerDetail } from "./ring-maker/preview.ts";
 import { barrowDetail } from "../readouts/standalone-scenarios/barrow-downs.ts";
 import { objectiveDetail, stagedDetail } from "../readouts/haradrim/staged.ts";
-import { stageXDetail } from "./stage-x-preview.ts";
+import { stageXDetail } from "../readouts/stage-number/stage-x.ts";
 import { ungolDetail } from "./ungol-preview.ts";
 import { stoneDetail } from "./stone-preview.ts";
 import { flameDetail } from "./flame-preview.ts";

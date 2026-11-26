@@ -61,3 +61,10 @@ export function stagedDial(game: ScenarioState, card: CardInstance, nameOf: (cod
   const host = game.cards[card.host];
   return card.guardedHero === true && host ? stagedDialWords(nameOf(card.code), nameOf(host.code)) : null;
 }
+
+/** The chip on a hero in the staging area in a game of several players: its owner, "P2", and the words the reader says ("Player 2's hero"); null for any other card and in a solo game. */
+export function stagedSeatChip(game: ScenarioState, cardId: string): { chip: string; speech: string } | null {
+  const card = game.cards[cardId];
+  if (!card || card.captive !== true || card.zone !== "captive" || card.host != null || card.owner == null || game.seatCount < 2) return null;
+  return { chip: `P${card.owner + 1}`, speech: `Player ${card.owner + 1}'s hero` };
+}

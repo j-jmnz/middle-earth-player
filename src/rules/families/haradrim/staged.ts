@@ -70,7 +70,7 @@ export function releaseStagedHero(state: ScenarioState, instruction: Instruction
 }
 
 // The heroes in the staging area, the first player's first, each seat's in the order it held them.
-function stagedInOrder(state: ScenarioState): CardInstance[] {
+export function stagedInOrder(state: ScenarioState): CardInstance[] {
   const order = livingSeats(state);
   return stagedHeroes(state)
     .filter((card) => card.owner != null && order.includes(card.owner))
