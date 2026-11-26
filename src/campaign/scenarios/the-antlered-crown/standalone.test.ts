@@ -1,9 +1,13 @@
-// Rules: TODO name the rule ids the scenario implements (data/rules/entries.json).
-import { describe, it } from "vitest";
+// Rules: rr.setup, rr.winning-the-game (data/rules/entries.json).
+import { describe, expect, it } from "vitest";
 
-// What is The Antlered Crown's own in the standalone game. The cycle checks (a part of its cycle, no campaign card, playable, scored and recorded as a standalone run with nothing earned, the loss reasons) are the golden suite's
-// (test/harness/golden-suite.ts, standalone: true).
-// TODO: turn each into a test once the scenario's records exist.
+import { loadAnyScenario } from "../../../../scripts/data/load-scenarios.ts";
+
+// The scenario is the ninth of its cycle and has no campaign card, no boon or burden and nothing from the earlier parts, so there is nothing for a campaign test to carry on. Its wins and losses are the golden suite's (golden.test.ts); the cycle checks (a part of its cycle, no campaign card, playable, scored and recorded as a standalone run) are too (test/harness/golden-suite.ts, standalone: true).
+const crown = loadAnyScenario("the-antlered-crown");
+
 describe("The Antlered Crown in the the-ring-maker cycle", () => {
-  it.todo("deals its Nightmare deck on Nightmare when every card of it has a record (src/campaign/playable.ts)");
+  it("has no Nightmare deck", () => {
+    expect(crown.nightmare).toBeUndefined();
+  });
 });
