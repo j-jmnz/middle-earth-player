@@ -14,7 +14,7 @@ const LAST_COUNTER: Readonly<Record<string, string>> = {
   "07065": "Mugash is shuffled into the encounter deck, even from a hero, and the quest advances to stage 3.",
   "07066": "Mugash is shuffled into the encounter deck, even from a hero, and the quest advances to stage 3.",
   "08011": "each player discards the hand and draws 2 cards, and 2 time counters return.",
-  "08013": "the players make engagement checks, each engaged enemy attacks, and the players win if no hero is destroyed.",
+  "08013": "the players make engagement checks and each engaged enemy attacks. The players win if no hero is destroyed, and lose if one is.",
   "07067": "5 cards from the top of the encounter deck are discarded, each player adds an enemy or objective from the discard pile to the staging area, and 3 time counters return.",
 };
 
@@ -31,7 +31,7 @@ export const stageTimeWords = (code: string, left: number): string => `${plural(
 export const stageTimeNearWords = (code: string, left: number): string => (left <= 0 ? `No time counters are left. ${withLastGone(code)}` : left === 1 ? `The next refresh phase takes the last time counter. ${withLastGone(code)}` : `${left} time counters are left.`).trim();
 
 /** What the limit of the dial says: the Time X the stage printed. */
-export const stageTimeLimitWords = (limit: number): string => `Time ${limit}: it starts with ${limit} time counters`;
+export const stageTimeLimitWords = (limit: number, players?: number): string => (players != null ? `Time 5 x ${plural(players, "player")}: it starts with ${limit} time counters` : `Time ${limit}: it starts with ${limit} time counters`);
 
 /** Gríma's line in the preview, by where he lies. */
 export const grimaOnWords = (host: string): string => `Gríma lies on ${host}, controlled by no player. When ${host} leaves play he returns to the staging area.`;

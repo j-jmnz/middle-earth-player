@@ -27,7 +27,7 @@ export function ringMakerDials(game: ScenarioState, ctx: ReduceContext, nameOf: 
         value: card.resources,
         cardId: card.id,
         limit,
-        limitWords: stageTimeLimitWords(limit),
+        limitWords: stageTimeLimitWords(limit, code === "08013" ? printed / 5 : undefined),
         ...(card.resources <= 2 ? { warn: { level, words: stageTimeNearWords(code, card.resources) } } : {}),
         note: stageTimeWords(code, card.resources),
       });

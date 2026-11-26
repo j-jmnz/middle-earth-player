@@ -1,11 +1,13 @@
 // Rules: rm.out-of-play-deck, rr.engaged, rm.grima-objective-ally, rr.cannot, rr.first-player (data/rules/entries.json); ledger lines 07024:A:2, 07025:A:1, 07016:A:1, 07016:A:3, 07023:A:1, 07059:A:1, 07059:B:3.
 // The one line a card of The Fords of Isen says about itself in the card preview (dungeon-preview.ts): Mugash held under his hero and the Guard that engages its player (To Catch an Orc), Gríma held under The Islet (wherever The Islet lies), free in the staging area, or in a player's play area, and Ill Tidings held in a hand. The engine decided each; nothing here changes one. Pure.
-import { flagged, type ScenarioState } from "../../../rules/core/state.ts";
+import { flagged, inPlay, type ScenarioState } from "../../../rules/core/state.ts";
 import type { ReduceContext } from "../../../rules/interpret/interpret.ts";
 import { captorSeat } from "../../../rules/families/ring-maker/captor.ts";
 import { GRIMA_IN_STAGING, grimaControlledWords, grimaOnWords, illTidingsWords } from "../../words/scenarios/ring-maker/fords-table.ts";
 import { guardWords, heroHoldsWords, mugashHeldWords } from "../../words/scenarios/ring-maker/orc-table.ts";
 import { hinderWords, mugashFreeWords, mugashOnEdgeWords, mugashOnHeroWords, needOfRestHostWords, offTrackHostWords } from "../../words/scenarios/ring-maker/fangorn-table.ts";
+import { hillsWords, oldSouthRoadWords, ravineOnEnemyWords, ravineWords, turchWords } from "../../words/scenarios/ring-maker/dunland-table.ts";
+import { printedOf } from "../../../rules/core/printed.ts";
 import { IN_NEED_OF_REST } from "../../readouts/ring-maker/fangorn.ts";
 import { GUARD, MUGASH, MUGASH_OBJECTIVE, mugashLyingOn } from "../../readouts/ring-maker/orc.ts";
 
@@ -42,11 +44,30 @@ function fangornDetail(game: ScenarioState, cardId: string, name: (id: string) =
   return lines.length > 0 ? lines.join(" ") : null;
 }
 
+// The Dunland Trap: Chief Turch, Hills of Dunland, the Ravine and the Road, and a Dunland enemy under the Ravine.
+const TURCH = "08014";
+const RAVINE = "08015";
+const OLD_SOUTH_ROAD = "08016";
+const HILLS = "08020";
+
+function dunlandDetail(game: ScenarioState, ctx: ReduceContext, cardId: string): string | null {
+  const card = game.cards[cardId];
+  if (!card) return null;
+  if (card.code === TURCH) return turchWords();
+  if (card.code === HILLS) return hillsWords(card.zone === "staging");
+  if (card.code === RAVINE) return ravineWords();
+  if (card.code === OLD_SOUTH_ROAD) return oldSouthRoadWords();
+  const enemy = (card.zone === "staging" || card.zone === "engaged") && printedOf(ctx.cards, card.code)?.traits.includes("Dunland") === true;
+  return enemy && Object.values(game.cards).some((other) => other.code === RAVINE && inPlay(other.zone)) ? ravineOnEnemyWords() : null;
+}
+
 export function ringMakerDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name: (id: string) => string): string | null {
   const card = game.cards[cardId];
   if (!card) return null;
   const fangorn = fangornDetail(game, cardId, name);
   if (fangorn) return fangorn;
+  const dunland = dunlandDetail(game, ctx, cardId);
+  if (dunland) return dunland;
   if (card.code === ILL_TIDINGS && card.zone === "hand" && flagged(game, cardId, "cannotLeaveHand")) return illTidingsWords(game.seatCount > 1 && card.controller != null ? `Player ${card.controller + 1}` : null);
   if (card.code === MUGASH) return card.zone === "attached" && card.host != null && game.cards[card.host] ? mugashHeldWords(name(card.host)) : null;
   if (card.code === GUARD && (card.zone === "staging" || card.zone === "engaged")) {
