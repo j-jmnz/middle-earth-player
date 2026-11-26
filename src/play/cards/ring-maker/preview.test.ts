@@ -71,3 +71,15 @@ describe("the dial's warning in the stage's sheet (rm.time-x)", () => {
     expect(questTitle(t.state, t.ctx, t.state.questStage ?? "", "Stage", ledger)?.detail).toMatch(/^The next refresh phase takes the last time counter\. With the last gone, the encounter discard pile joins the deck/);
   });
 });
+
+describe("the objective line of a stage with no quest points (The Dunland Trap's stage 3B)", () => {
+  const detail = (text: string) => {
+    const t = tableFromLayout("the-dunland-trap", { stage: "08013", timeCounters: 6 });
+    return questTitle(t.state, t.ctx, t.state.questStage ?? "", "Stage", () => text)?.detail ?? "";
+  };
+
+  it("shows no \"To win:\" before a printed line that starts with a timing word, and keeps it before any other", () => {
+    expect(detail("Forced: After the last time counter is removed from this stage, the players win.")).toBe("Forced: After the last time counter is removed from this stage, the players win.");
+    expect(detail("The players win when no hero is destroyed.")).toBe("To win: The players win when no hero is destroyed.");
+  });
+});

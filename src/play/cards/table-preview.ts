@@ -33,7 +33,7 @@ import { previewKeywords } from "./preview-keywords.ts";
 import { contractSides } from "./contract-sides.ts";
 import { LOOT_ROLE } from "../words/loot.ts";
 import { printedOf } from "../../rules/core/printed.ts";
-import { FORDS_STAGES } from "../readouts/ring-maker/fords.ts";
+import { FORDS_STAGES, timeTakes } from "../readouts/ring-maker/fords.ts";
 import { stageTimeNearWords } from "../words/scenarios/ring-maker/fords-table.ts";
 
 // A card code as the preview draws it: its name, its picture (or null) by picture key (picture-key.ts: side B of a revealed quest
@@ -53,6 +53,9 @@ function barLines(game: ScenarioState, ctx: ReduceContext, id: string): string |
   return (plain && bars.length > 0 ? `${plain}. ${bars.join(" ")}` : plain || bars.join(" ")) || null;
 }
 
+// An objective line that starts with a timing word ("Forced: After the last time counter ...") is the stage's own rule, not the way to win: it shows without "To win:".
+const TIMING_WORD = /^(Forced|Response|Action|Travel|Shadow|When Revealed|Setup|Quest Action)\b/i;
+
 export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: string, name: string, line: (id: string) => string | null): Pick<PreviewCard, "title" | "detail"> | null {
   const owner = stageSeat(whole, cardId);
   const game = viewOf(whole, owner ?? undefined);
@@ -64,14 +67,15 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
   // A stage with Defense says where questing's progress goes, and a stage whose filling loses the game says so (mec112.defense, 143075:B:3).
   const rest = stageDetail(game, ctx, stage.code, points, hold, null).join(". ");
   // A time stage with 2 counters or fewer says what the dial warns of first, as the dial's own words do (rm.time-x): the sheet the dial opens is this preview.
-  const near = FORDS_STAGES.includes(stage.code) && stage.face === "B" && stage.resources <= 2 ? stageTimeNearWords(stage.code, stage.resources) : null;
+  const facts = FORDS_STAGES.includes(stage.code) && stage.face === "B" ? timeTakes(game, stage.code) : null;
+  const near = facts != null && (stage.resources <= 2 || facts.takes >= stage.resources) ? stageTimeNearWords(stage.code, stage.resources, facts) : null;
   const detail = near ? [near, rest].filter((part) => part !== "").join(" ") : rest;
   if (points != null) return { title: `${name} · ${stage.progress} / ${points}`, ...(detail ? { detail } : {}) };
   const objective = questObjective(game, ctx, line);
   // A stage 2 of The Old Forest has no quest points: it says what its Victory points test sends the quest to.
   const forest = forestScore(game, ctx);
   // Stages 1 and 2 of The Steward's Fear have no quest points either: their tokens against the 4 that advance them follow (06011:B:3, 06012:B:3).
-  const own = amonDinWin(game) ?? osgiliathWin(game, ctx, stage.code) ?? valeWin(game, ctx) ?? (objective ? `To win: ${objective}` : forest ? forestStageWords(forest) : "No quest points");
+  const own = amonDinWin(game) ?? osgiliathWin(game, ctx, stage.code) ?? valeWin(game, ctx) ?? (objective ? (TIMING_WORD.test(objective) ? objective : `To win: ${objective}`) : forest ? forestStageWords(forest) : "No quest points");
   const lines = [own, ...stewardsFearStageLines(game, ctx, stage.code), ...amonDinStageLines(game, stage.code), ...osgiliathStageLines(game, stage.code), ...valeStageLines(game, ctx, stage.code)].join(". ");
   return { title: name, detail: near ? `${near} ${lines}` : lines };
 }

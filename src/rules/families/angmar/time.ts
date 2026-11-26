@@ -1,37 +1,48 @@
 // Rules: mec108.time-x (data/rules/entries.json); ledger lines 09024:A:1, 09024:A:3. Time X: a card with the keyword gets X resource tokens, its time counters, when it is revealed, and loses one at the end of each refresh phase; the card hears the removal of the last.
 // The keyword is a constant record with the verb `Time` (src/catalog/families/angmar.ts), found by the card's code like Deep.
-import type { Effect } from "../../../catalog/boundary.ts";
+import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
 import { effectCause } from "../../core/cause.ts";
 import { constantVerbCodes } from "../../interpret/constant-records.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { inPlay, livingSeats, updateCard, type ScenarioState } from "../../core/state.ts";
+import { addModifier } from "../../core/modified-stat.ts";
+import { heldAmount, inPlay, livingSeats, updateCard, type ScenarioState } from "../../core/state.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import { listens } from "../encounter/reveal.ts";
 import { textBlank } from "../attachments/hold.ts";
 
-/** The X of the Time X keyword the card prints, or null for a card without it. */
-export function timeOf(ctx: ReduceContext, code: string): number | null {
+type TimeInstruction = Extract<Instruction, { verb: "Time" }>;
+
+/** The Time instruction of the card's constant record, or null for a card without the keyword. */
+export function timeInstruction(ctx: ReduceContext, code: string): TimeInstruction | null {
   if (!constantVerbCodes(ctx, "Time").has(code)) return null;
   for (const effect of effectsOf(ctx, code)) {
     if (effect.timing !== "constant") continue;
-    for (const instruction of effect.instructions) if (instruction.verb === "Time") return instruction.amount;
+    for (const instruction of effect.instructions) if (instruction.verb === "Time") return instruction;
   }
   return null;
 }
 
-/** The Time X the card holds in this game: the printed number, times the living players when its record says `perPlayer` (08013:B:1). The counters are put on once, so this is read when the card is revealed. */
+/** The X of the Time X keyword the card prints, or null for a card without it. */
+export function timeOf(ctx: ReduceContext, code: string): number | null {
+  return timeInstruction(ctx, code)?.amount ?? null;
+}
+
+/** The Time X the card would hold if it were revealed now: the printed number, times the living players when its record says `perPlayer` (08013:B:1). */
 export function timeLimit(state: ScenarioState, ctx: ReduceContext, code: string): number | null {
-  const amount = timeOf(ctx, code);
-  if (amount == null) return null;
-  for (const effect of effectsOf(ctx, code)) {
-    if (effect.timing !== "constant") continue;
-    for (const instruction of effect.instructions) if (instruction.verb === "Time" && instruction.perPlayer) return amount * livingSeats(state).length;
-  }
-  return amount;
+  const time = timeInstruction(ctx, code);
+  return time == null ? null : time.perPlayer ? time.amount * livingSeats(state).length : time.amount;
+}
+
+/**
+ * The players a `perPlayer` Time X counted when its counters were put on the card (the flag `timePlayers`), or null for a card that counted none. The counters are put on once, so a player who leaves later does not change the count.
+ */
+export function timePlayersOf(state: ScenarioState, id: string): number | null {
+  const players = heldAmount(state, id, "timePlayers");
+  return players > 0 ? players : null;
 }
 
 /** A card with Time X was just revealed (the reveal frame's first step): the players put X resource tokens on it, its time counters (mec108.time-x). One that left play at once, or has its text blank, gets none. */
@@ -40,7 +51,9 @@ export function timeOnReveal(state: ScenarioState, id: string, ctx: ReduceContex
   if (!card || !inPlay(card.zone)) return state;
   const amount = timeLimit(state, ctx, card.code);
   if (amount == null || textBlank(state, id, ctx.cards)) return state;
-  return updateCard(state, id, { resources: card.resources + amount });
+  const counted = updateCard(state, id, { resources: card.resources + amount });
+  // A per-player Time X remembers the count it was made with, for the dial that shows it (08013:B:1).
+  return timeInstruction(ctx, card.code)?.perPlayer ? addModifier(counted, id, id, "timePlayers", livingSeats(state).length, "endOfGame") : counted;
 }
 
 /** The cards in play that hold the Time X keyword and at least one time counter. */

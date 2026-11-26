@@ -11,11 +11,8 @@ export const hillsWords = (staged: boolean): string =>
     ? "In the staging area: after a player draws cards, the top card of the encounter deck is discarded. A Dunland enemy there enters play engaged with that player. Copies do not stack: only one acts."
     : "The draw effect of Hills of Dunland works only in the staging area. Travel: each player draws a card to travel here.";
 
-/** Munuv Dûv Ravine in the preview: the bonus it gives to every Dunland enemy in play. */
-export const ravineWords = (): string => "Dunland enemies in play, staged or engaged, get +1 Attack and +1 Defense.";
+/** Munuv Dûv Ravine in the preview: the bonuses its record gives (`+1 Attack`, `+1 Defense`) to the enemies with a trait, in the staging area and engaged or only engaged. */
+export const ravineWords = (trait: string, staged: boolean, bonuses: readonly string[]): string => `${trait} enemies in play${staged ? ", staged or engaged," : ""} get ${bonuses.join(" and ")}.`;
 
-/** A Dunland enemy while Munuv Dûv Ravine is in play. */
-export const ravineOnEnemyWords = (): string => "Munuv Dûv Ravine gives this Dunland enemy +1 Attack and +1 Defense while it is in play.";
-
-/** Old South Road in the preview: the extra counter at the end of each refresh phase. */
-export const oldSouthRoadWords = (): string => "At the end of each refresh phase, 1 time counter comes off the current quest, besides the one the stage takes.";
+/** Old South Road in the preview: the extra counter at the end of each refresh phase, besides the stage's own when the current stage prints Time X, and none to take from a stage that prints none (stage 2). */
+export const oldSouthRoadWords = (stageHasTime: boolean): string => `At the end of each refresh phase, 1 time counter comes off the current quest${stageHasTime ? ", besides the one the stage takes." : ". The current stage has none."}`;
