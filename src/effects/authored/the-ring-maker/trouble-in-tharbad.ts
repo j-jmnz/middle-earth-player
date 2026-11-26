@@ -103,8 +103,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [{ verb: "RemoveFromGame", card: "subject" }],
   },
 
-  // 08070 Bellach. X is the players in the game (read by the other lines). While he is in play (staged or engaged) Orc and Creature enemies get -30 engagement cost and +1 Threat. When he is destroyed he is shuffled into the encounter deck, not discarded.
-  { id: "08070:constant:1", cardCode: BELLACH, lines: ["08070:A:1"], timing: "constant", instructions: [] },
+  // 08070 Bellach. Threat X, X the players in the game. While he is in play (staged or engaged) Orc and Creature enemies get -30 engagement cost and +1 Threat. When he is destroyed he is shuffled into the encounter deck, not discarded.
+  { id: "08070:constant:1", cardCode: BELLACH, lines: ["08070:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { players: true }, until: "whileSourceInPlay", target: "self" }] },
   {
     id: "08070:constant:2",
     cardCode: BELLACH,
@@ -175,7 +175,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "whenRevealed",
     instructions: [
       { verb: "ReturnToStaging", target: { kind: "engagedEnemies", who: "each", pick: "all" } },
-      { verb: "Choose", who: "firstPlayer", options: [TIME_OPTION, { id: "threat", instructions: [{ verb: "ModifyStat", stat: "threat", amount: 2, until: "endOfPhase", holders: { ...ENEMY_IN_STAGING, trait: "Spy" } }] }] },
+      { verb: "Choose", who: "firstPlayer", options: [TIME_OPTION, { id: "threat", instructions: [{ verb: "ModifyStat", stat: "threat", amount: 2, until: "endOfPhase", target: "stagingCards", trait: "Spy" }] }] },
     ],
   },
 
@@ -204,8 +204,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
           {
             id: "enemies",
             instructions: [
-              { verb: "ModifyStat", stat: "engagementCost", amount: -20, until: "endOfRound", holders: ENEMY },
-              { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfRound", holders: ENEMY },
+              { verb: "ModifyStat", stat: "engagementCost", amount: -20, until: "endOfRound", target: "enemies" },
+              { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfRound", target: "enemies" },
             ],
           },
         ],
@@ -221,10 +221,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["08083:A:1"],
     timing: "whenRevealed",
     instructions: [
+      { verb: "GainSurge", when: { kind: "not", condition: { kind: "canPick", pick: ENEMY_IN_STAGING } } },
       { verb: "Pick", pick: { ...ENEMY_IN_STAGING, highestAttack: true, who: "firstPlayer" } },
       { verb: "EngageFirstPlayer", target: "picked" },
       { verb: "AttackNalir" },
-      { verb: "GainSurge", when: { kind: "not", condition: { kind: "canPick", pick: ENEMY_IN_STAGING } } },
     ],
   },
   {

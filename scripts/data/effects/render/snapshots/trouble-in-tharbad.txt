@@ -109,7 +109,7 @@ Scenario piles that place cards with no record (quest: 08066 Double Dealings; qu
 
 08070:A:1 (front): X is the number of players in the game.
   08070:constant:1: Constant
-    (no instructions: the record only names the printed line, and the engine runs no step for it)
+    - this card: stat threat the number of players, while this card is in play
 
 08070:A:2 (front): Orc and Creature enemies get -30 engagement cost and +1 Threat.
   08070:constant:2: Constant
@@ -264,7 +264,7 @@ Scenario piles that place cards with no record (quest: 08066 Double Dealings; qu
       * option "time" (only if all of: (0 is less than resources of the current quest stage) and (the table does not hold the flag timeBarred)):
         - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
       * option "threat":
-        - each Spy enemy (any player controls) in the staging area only (only the cards that match now: one that arrives later does not get it): stat threat 2, until the end of the phase
+        - every enemy and location in the staging area, now and arriving there later while the effect lasts (Spy only): stat threat 2, until the end of the phase
 
 ## 08081 Conspicuous Lot
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -293,8 +293,8 @@ Scenario piles that place cards with no record (quest: 08066 Double Dealings; qu
       * option "time" (only if all of: (0 is less than resources of the current quest stage) and (the table does not hold the flag timeBarred)):
         - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
       * option "enemies":
-        - each enemy (any player controls) or in the staging area (only the cards that match now: one that arrives later does not get it): stat engagementCost -20, until the end of the round
-        - each enemy (any player controls) or in the staging area (only the cards that match now: one that arrives later does not get it): stat attack 1, until the end of the round
+        - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat engagementCost -20, until the end of the round
+        - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat attack 1, until the end of the round
 
 08082:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending player's threat is 20 or less).
   08082:shadow:1: Shadow
@@ -309,10 +309,10 @@ Scenario piles that place cards with no record (quest: 08066 Double Dealings; qu
 08083:A:1 (front): When Revealed: The enemy in the staging area with the highest Attack engages the first player and makes an immediate attack against Nalir. If there are no enemies in the staging area, Get That Dwarf! gains surge.
   08083:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (there is a enemy (any player controls) in the staging area only to choose): this card gains surge (one more encounter card is revealed when it has been resolved)
     - choose enemy (any player controls) in the staging area only, with the highest Attack of those, as the table shows it (ties: the chooser decides), chosen by the first player
     - the picked enemy, in the staging area, engages the first player
     - the picked enemy, in the staging area or engaged with any player, makes an immediate attack against the player who controls Nalir (it is dealt a shadow card; that player declares defenders as for any attack, and undefended damage must be assigned to Nalir); nothing happens when no player controls Nalir
-    - then, if not (there is a enemy (any player controls) in the staging area only to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 08083:A:2 (shadow): Shadow: If this attack is undefended, deal 2 damage to Nalir.
   08083:shadow:1: Shadow
@@ -321,4 +321,4 @@ Scenario piles that place cards with no record (quest: 08066 Double Dealings; qu
     - if the attack has no defender: choose character (any player controls) named "Nalir"
     - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
 
-(rendered pieces: 187 by template, 0 as JSON)
+(rendered pieces: 186 by template, 0 as JSON)
