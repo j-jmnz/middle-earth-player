@@ -101,7 +101,7 @@ import * as crossing from "../scenarios/desert-crossing/game.ts";
 import * as trap from "../scenarios/the-dunland-trap/game.ts";
 import * as mordor from "../scenarios/the-long-arm-of-mordor/game.ts";
 import * as mumakil from "../scenarios/the-mumakil/game.ts";
-// import * as harad from "../scenarios/race-across-harad/game.ts";
+import * as harad from "../scenarios/race-across-harad/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -229,5 +229,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-mines-of-moria", "The Mines of Moria", mines.MINES_GOLDENS, mines.minesWorld, mines.playGolden),
   entry("escape-from-khazad-dum", "Escape from Khazad-dûm", khazad.KHAZAD_GOLDENS, khazad.khazadWorld, khazad.playGolden),
   entry("the-hunt-for-the-dreadnaught", "The Hunt for the Dreadnaught", dreadnaught.DREADNAUGHT_GOLDENS, dreadnaught.dreadnaughtWorld, dreadnaught.playGolden),
-  // entry("race-across-harad", "Race Across Harad", harad.HARAD_GOLDENS, harad.haradWorld, harad.playGolden),
+  entry("race-across-harad", "Race Across Harad", harad.HARAD_GOLDENS, harad.haradWorld, harad.playGolden),
 ];

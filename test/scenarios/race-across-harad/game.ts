@@ -4,13 +4,13 @@ import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/ru
 import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenarios.ts";
 import type { PolicyOptions } from "../../harness/auto-player.ts";
 import { fillerLoadout, HERO_STATS, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
-import { chooseFirstOrLast, policyIntent, type Policy } from "../../harness/policy-kit.ts";
+import { archeryLeastDamaged, attackAllTogether, chooseFirstOrLast, commitAllBut, defendFirst, engageUpTo, policyIntent, type Policy } from "../../harness/policy-kit.ts";
 
 const cycle = loadCampaign("haradrim");
 const harad = loadAnyScenario("race-across-harad");
 
 // Test helper. A whole standalone game of Race Across Harad played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. TODO: say how the players travel, engage and answer the choices this scenario asks.
+// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. Every character but the last `reserve` heroes of a seat quests (those stay home and defend, the first one who may defends each attack, so the Tamed Mûmak is never undefended unless the seat has more attacks than defenders); the players engage whatever their threat lets them and attack together; a Choose window takes its first option (the Warg-rider goes to the staging area).
 export const HARAD_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type HaradDecks = "strong" | "weak" | "brittle";
@@ -24,8 +24,10 @@ export const haradStart = (seatCount: 1 | 2, seed: number, difficulty: Difficult
 export type HaradPolicy = {
   // The option a Choose window with these answers takes: the first or the last.
   choose: "first" | "last";
+  // The heroes that stay home from the quest to defend.
+  reserve: number;
 };
-export const DEFAULT_POLICY: HaradPolicy = { choose: "first" };
+export const DEFAULT_POLICY: HaradPolicy = { choose: "first", reserve: 2 };
 
 // The policy (test/harness/policy-kit.ts): a list of rules tried in order, then the auto-player's answer with HARAD_POLICY. A rule answers its own window and returns null for any other. The kit's rules:
 //   chooseFirstOrLast(which)  a Choose window takes the first or the last option
@@ -42,8 +44,8 @@ export const DEFAULT_POLICY: HaradPolicy = { choose: "first" };
 //   engageUpTo(most, options)  the optional engagement step: engage the enemy of the lowest `rank` (`allow` permits) while engaged with fewer than `most`
 //   triggerActions(effectIds, oncePerRound)  an Action or Response of the records named, each time (or once a round) the engine offers it and the seat can pay
 //   passCommitWhile(when)  the quest commit: pass without committing while `when` holds
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go in the list, before the auto-player's.
-const rules = (policy: HaradPolicy): Policy => [chooseFirstOrLast(policy.choose)];
+// Used: the Choose window, the commit, the archery, the defense, the engagement and the attack; the auto-player answers the rest (travel included).
+const rules = (policy: HaradPolicy): Policy => [chooseFirstOrLast(policy.choose), commitAllBut(policy.reserve), archeryLeastDamaged(), defendFirst(), engageUpTo(), attackAllTogether()];
 
 // Every intent is one the reducer listed.
 export function haradIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: HaradPolicy = DEFAULT_POLICY): PlayerIntent {
@@ -55,14 +57,28 @@ export type HaradGame = PlayedGame;
 // The goldens (src/campaign/scenarios/race-across-harad/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type HaradGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: HaradDecks; outcome: "won" | "lost"; policy?: Partial<HaradPolicy>; lossReason?: string };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Nightmare) and a few losses (each way the scenario can be lost), each on a fixed seed.
-export const HARAD_GOLDENS: readonly HaradGolden[] = [];
+// The games to pin (.claude/rules/code-standards.md, Test cost): wins true solo and two-handed (Easy deals the same Setup (standalone.test.ts) and the scenario has no Nightmare deck, so neither has a golden of its own) and each way to lose: the Orcs fill
+// their stage 2D, 3D or 4D (the races that the quest loses), the Tamed Mûmak leaves play (true solo and two-handed), every player's threat at 50 and every hero destroyed. The "weak" and "brittle" games keep all three heroes of a seat home (reserve 3), so
+// the Mûmak is the only character that quests and the defenders take every attack.
+const HOME: Partial<HaradPolicy> = { reserve: 3 };
+export const HARAD_GOLDENS: readonly HaradGolden[] = [
+  { name: "true solo, won, Normal", seatCount: 1, seed: 85, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed, won, Normal", seatCount: 2, seed: 10, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, lost, the Orcs fill stage 2D", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", policy: HOME, lossReason: "The Orcs defeated stage 2D while the players were at stage 2B" },
+  { name: "true solo, lost, the Orcs fill stage 3D", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "The Orcs defeated stage 3D while the players were at stage 3B" },
+  { name: "true solo, lost, the Orcs fill stage 4D", seatCount: 1, seed: 12, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "The Orcs have caught you" },
+  { name: "two-handed, lost, the Orcs fill stage 4D", seatCount: 2, seed: 13, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "The Orcs have caught you" },
+  { name: "true solo, lost, the Tamed Mûmak leaves play", seatCount: 1, seed: 6, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed, lost, both Tamed Mûmakil leave play", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "No seats remain" },
+  { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 11, difficulty: "Normal", decks: "weak", outcome: "lost", policy: HOME, lossReason: "No seats remain" },
+  { name: "two-handed, lost, threat reaches 50", seatCount: 2, seed: 34, difficulty: "Normal", decks: "weak", outcome: "lost", policy: HOME, lossReason: "No seats remain" },
+  { name: "true solo, lost, every hero destroyed", seatCount: 1, seed: 3, difficulty: "Normal", decks: "brittle", outcome: "lost", policy: HOME, lossReason: "No seats remain" },
+];
 
 const game = standaloneGame<HaradDecks, HaradPolicy>({
   campaign: cycle,
   scenario: harad,
   stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles and its Nightmare deck.
   codes: [...harad.cards.map((card) => card.code)],
   intent: haradIntent,
   policy: DEFAULT_POLICY,
