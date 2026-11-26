@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { ScenarioState } from "../../../rules/core/state.ts";
-import { drive, idOf, opened, resolveRecords, send, tableFromLayout, where, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { drive, idOf, legalIntents, opened, resolveRecords, send, tableFromLayout, where, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "trouble-in-tharbad";
 const MUG = "08069";
@@ -80,7 +80,17 @@ describe("shadow cards", () => {
     expect(done.state.seats[0]?.threat).toBe(21);
   });
 
-  // Open: the Mithril Shirt (19152) reduces the damage after it is placed, and the engine's count of the damage this attack dealt (`landed`, families/defense/excess.ts) keeps the 3, so X is 3 where the reading (R9) wants 2. The fix is in the engine's
-  // cancel (families/defense/damage.ts, cancelDealt takes the amount off `landed`) and moves other scenarios' shadow cards, so it goes back to the orchestrator.
-  it.todo("08077:A:2 X is the damage the attack dealt after a Shield reduced it: 3 Attack, 1 reduced, the threat rises by 2");
+  it("08077:A:2 X is the damage the attack dealt after a Shield reduced it: 3 Attack undefended, Mithril Shirt takes 1, the threat rises by 2", () => {
+    const t = tableFromLayout(SCENARIO, { stage: "08066", engaged: [SPY], deck: [SEEDY_INN], phase: "Encounter", threat: [20, 20], attached: [{ code: "19152", to: "dh1" }] }, { extra: ["19152"] });
+    const hero = idOf(t.state, "dh1");
+    const atDefense = drive(t, opened(t), (state) => state.window?.kind === "defense");
+    let run = send(atDefense, { type: "Undefended", heroId: hero }, t.ctx);
+    // The Shirt's Response reduces the 3 damage by 1; the shadow card then reads the 2 that were dealt.
+    for (let guard = 0; guard < 40 && run.state.phase === "Combat" && (run.state.seats[0]?.threat ?? 0) === 20; guard += 1) {
+      const shirt = legalIntents(run.state, t.ctx).find((intent) => intent.type === "Trigger");
+      run = shirt ? send(run, shirt, t.ctx) : drive(t, run, (state) => (state.seats[0]?.threat ?? 0) > 20 || legalIntents(state, t.ctx).some((intent) => intent.type === "Trigger") || state.phase !== "Combat");
+    }
+    expect(run.state.cards[hero]?.damage).toBe(2);
+    expect(run.state.seats[0]?.threat).toBe(22);
+  });
 });
