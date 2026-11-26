@@ -94,8 +94,6 @@ export function encounterPickWords(asked: Instruction, next: Instruction | undef
 
 /** One of the encounter family's instructions in words, or null when it is not one of them or adds nothing to decide on. */
 export function encounterWords(instruction: Instruction): string | null {
-  // The set aside card or cards that join the staging area (the Warg-rider of Racing North, 17048:A:1): said in a choice branch.
-  if (instruction.verb === "AddSetAsideToStaging") return instruction.all === true || instruction.trait != null ? "add the set aside cards to the staging area" : "add the set aside card to the staging area";
   const verb = instruction as EncounterVerb;
   switch (verb.verb) {
     case "LookAtTop":

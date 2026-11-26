@@ -2,7 +2,7 @@
 //
 // The attachments family's hooks in the engine's lowest layers (keywords.ts, quest.ts, listen.ts, constant-records.ts): what
 // happens to the cards attached to a host that is destroyed or defeated, a Guarded attachment whose guard leaves play, and a
-// card whose text box is blank. Kept free of engine imports beyond the state, so those modules can call it.
+// card whose text box is blank. Kept free of engine imports beyond the state, the card readers of core and the Orcs' raise of the staging area's Threat (haradrim/orcs-values.ts, a reader of the state), so those modules can call it.
 import { queueEvent } from "../../windows/queue.ts";
 import { CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, heldBy } from "../../core/holder-classes.ts";
 import { isLocationCard, printedOf, type PrintedCard } from "../../core/printed.ts";

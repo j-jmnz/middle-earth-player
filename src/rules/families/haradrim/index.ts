@@ -66,7 +66,13 @@ export const manifest: RulesFamily = {
   condition: (state, condition, _scope, ctx) => (condition.kind === "threatAboveWillpower" ? threatAboveWillpower(state, ctx.cards) : (haradrimCondition(state, condition) ?? orcsCondition(state, condition) ?? exploredCondition(state, condition) ?? temperatureCondition(state, condition))),
   amount: (state, found, scope, ctx) => (found.willpowerGap ? willpowerGap(state, scope.sourceId ?? null, ctx.cards) : temperatureAmount(state, found)),
   pick: haradrimPickMatches,
-  combat: { defense: (state, defender, cards, defenderId) => allyBelowThreat(state, defender, cards, defenderId), undefended: (state) => (undefendedMumak(state).length > 0 ? undefendedMumak(state) : undefendedStaged(state)) },
+  combat: {
+    defense: (state, defender, cards, defenderId) => allyBelowThreat(state, defender, cards, defenderId),
+    undefended: (state) => {
+      const mumak = undefendedMumak(state);
+      return mumak.length > 0 ? mumak : undefendedStaged(state);
+    },
+  },
   // The hook runs after the encounter deck is refilled: it notes the main quest card and announces a hand over the limit.
   settle: {
     after: (state, ctx, steps) => announceOverLimit(noteStage(syncOrcsArea(state), gameReads(state, ctx, '"kind":"stageInPlayWholeRound"')), steps),
