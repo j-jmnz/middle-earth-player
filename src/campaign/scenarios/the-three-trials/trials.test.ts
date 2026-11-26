@@ -136,6 +136,17 @@ describe("08043:A:1 a Key whose host leaves play", () => {
   });
 });
 
+describe("08036:B:1 to 08038:B:1 a Guardian follows the first player token", () => {
+  it("08036:B:1 the Guardian that engages the first player engages the new first player once the token passes in the refresh phase", () => {
+    const t = table({ stage: "08036", seats: 2, firstPlayer: 0, phase: "Refresh", setAside: [], engaged: [{ code: "08040", seat: 0 }] });
+    const guardian = idOf(t.state, "08040");
+    expect(t.state.seats.map((seat) => seat.engaged.includes(guardian))).toEqual([true, false]);
+    const after = settle({ ...t.state, window: null, mode: "refresh" }, t.ctx, []);
+    expect(after.firstPlayer).toBe(1);
+    expect(after.seats.map((seat) => seat.engaged.includes(guardian))).toEqual([false, true]);
+  });
+});
+
 describe("08039:A:1 the Antlered Crown", () => {
   it("08039:A:1 adds Hallowed Circle to the staging area and reveals each Guardian in the victory display again with fresh counters", () => {
     const t = table({ stage: "08039", setAside: ["08049"], victory: ["08040", "08041"] });

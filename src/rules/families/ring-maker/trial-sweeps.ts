@@ -8,9 +8,9 @@ import { printedOf } from "../../core/printed.ts";
 import { flagged, heldLeast, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../../core/state.ts";
 import { hasTrait } from "../../interpret/conditions.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { engageWith } from "../../quest/quest.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { effectsOfCard } from "../misc/text.ts";
+import { engageEnemies } from "./engage.ts";
 
 const idle = (state: ScenarioState): boolean => state.stack.length === 0 && !state.lost && !state.failure && !state.pendingAttack && !state.pendingStrike;
 
@@ -32,7 +32,7 @@ export function keyHolderSeat(state: ScenarioState, ctx: ReduceContext, enemyId:
 }
 
 /** The seat that controls the hero a Key objective lies on, or null for a Key attached to anything else (a Guardian, a Barrow) or lying elsewhere. */
-function keyHeldBy(state: ScenarioState, ctx: ReduceContext, key: CardInstance): number | null {
+export function keyHeldBy(state: ScenarioState, ctx: ReduceContext, key: CardInstance): number | null {
   if (key.zone !== "attached" || key.host == null || !hasTrait(state, key.id, "Key", ctx)) return null;
   const host = state.cards[key.host];
   return host?.zone === "heroes" ? (host.controller ?? null) : null;
@@ -46,19 +46,22 @@ export function engageSeats(state: ScenarioState, ctx: ReduceContext, steps: Eng
   if (!idle(state) || !gameReads(state, ctx, '"EngageSeat"')) return state;
   const rule = engageRule(state, ctx);
   if (!rule) return state;
-  return [...state.staging, ...state.seats.flatMap((seat) => seat.engaged)].reduce((next, id) => {
-    const card = next.cards[id];
-    if ((card?.zone !== "staging" && card?.zone !== "engaged") || !hasTrait(next, id, rule.trait, ctx)) return next;
-    const seat = rule.who === "firstPlayer" ? next.firstPlayer : keyHolderSeat(next, ctx, id);
-    return seat == null || (card.zone === "engaged" && card.controller === seat) ? next : engageWith(next, seat, id, steps);
-  }, state);
+  return engageEnemies(state, steps, (next, id) => {
+    if (!hasTrait(next, id, rule.trait, ctx)) return null;
+    return rule.who === "firstPlayer" ? next.firstPlayer : keyHolderSeat(next, ctx, id);
+  });
 }
 
-/** Whether the players control the Key the stage marked as the current trial's (`trialKey`, set by PickSetAside): it lies on a hero. */
-export function trialKeyControlled(state: ScenarioState, ctx: ReduceContext): boolean {
+/** The Key the stage in play marked as the current trial's (`trialKey`, set by PickSetAside), or null: before a trial, at stage 3 and in any game without the mark. */
+export function currentTrialKey(state: ScenarioState): CardInstance | null {
   const stage = state.questStage;
-  const mark = state.modifiers.find((modifier) => modifier.stat === "trialKey" && modifier.sourceId === stage);
-  const key = mark ? state.cards[mark.instanceId] : undefined;
+  const mark = stage == null ? undefined : state.modifiers.find((modifier) => modifier.stat === "trialKey" && modifier.sourceId === stage);
+  return mark ? (state.cards[mark.instanceId] ?? null) : null;
+}
+
+/** Whether the players control the current trial's Key: it lies on a hero. */
+export function trialKeyControlled(state: ScenarioState, ctx: ReduceContext): boolean {
+  const key = currentTrialKey(state);
   return key != null && keyHeldBy(state, ctx, key) != null;
 }
 

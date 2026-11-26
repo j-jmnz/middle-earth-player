@@ -17,13 +17,9 @@ import { AREA_APART, AREA_TOGETHER, stageLines } from "../words/scenarios/stormc
 import { shipLoss, type ShipLoss } from "../words/scenarios/grapple.ts";
 import { heldWords } from "../words/scenarios/sea.ts";
 import { BLANK_WORD, blankWords, noReadyWords, type BlankKeeps } from "../words/card-bars.ts";
-import { heldByName, ILL_TIDINGS_MARK } from "../words/scenarios/ring-maker/fords-table.ts";
+import { ILL_TIDINGS_MARK } from "../words/scenarios/ring-maker/fords-table.ts";
+import { ringMakerHeldMark } from "./ring-maker/held-mark.ts";
 import { heldInHand } from "../../rules/families/ring-maker/hand.ts";
-import { grimaLyingOn } from "../readouts/ring-maker/fords.ts";
-import { mugashLyingOn } from "../readouts/ring-maker/orc.ts";
-import { keysLyingOn } from "../readouts/ring-maker/trials.ts";
-import { restLyingOn } from "../readouts/ring-maker/fangorn.ts";
-import { REST_MARK } from "../words/scenarios/ring-maker/fangorn-table.ts";
 import { lootDeckWords, lootGuardWords } from "../words/loot.ts";
 import { lootUnder } from "../../rules/families/sidequests/loot.ts";
 import { alleywayMark, championMark, seizeMark } from "../readouts/haradrim/umbar.ts";
@@ -432,17 +428,9 @@ function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): Unde
   const allies = alliesUnder(game, cardId);
   // The count lifts the pill clear of the quest points ("0 / 15") like the other held marks (underMarkBox).
   if (allies.length > 0) return { ...heldWords(allies.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name)), count: allies.length };
-  // Gríma lying on The Islet (The Fords of Isen, 07059:A:1): "1 held".
-  const lying = grimaLyingOn(game, cardId);
-  if (lying.length > 0) return heldByName(lying.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
-  // Mugash attached to a hero (To Catch an Orc, 07024:A:2): "1 held" on the hero, wherever it lies.
-  const mugash = mugashLyingOn(game, cardId);
-  if (mugash.length > 0) return heldByName(mugash.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
-  // In Need of Rest on a hero (Into Fangorn, 07058:A:1): its strip under the card shows no name, so the pill says "Rest".
-  if (restLyingOn(game, cardId).length > 0) return REST_MARK;
-  // A Key of The Three Trials on its Guardian, its Barrow or the hero that claimed it (08043:A:1): "1 held", the Key named.
-  const keys = keysLyingOn(game, cardId);
-  if (keys.length > 0) return heldByName(keys.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
+  // Gríma, Mugash, In Need of Rest and the Keys of The Three Trials (cards/ring-maker/held-mark.ts).
+  const ringMaker = ringMakerHeldMark(game, ctx, cardId);
+  if (ringMaker) return ringMaker;
   const captives = captivesUnder(game, cardId);
   if (captives.length > 0) return heldWords(captives.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
   const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);

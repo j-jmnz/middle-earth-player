@@ -155,7 +155,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         kind: "pick",
         key: `mulligan:${game.activeSeat}`,
         step: "Setup",
-        title: game.seatCount > 1 ? `Player ${game.activeSeat + 1}: opening hand` : "Opening hand",
+        title: "Opening hand",
         note: "Keep this hand, or shuffle it back and draw a new one once.",
         verb: has(legal, "Trigger") ? "Use" : "",
         // A Response used in place of the mulligan (Galdor of the Havens).
@@ -288,7 +288,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         const askerId = xAsk?.effectId ?? written.at?.id;
         const asker = askerId ? effectById(ctx, askerId) : undefined;
         const chosen = asksChoose(written);
-        const trials = trialsChoice(choose, game.questStage ? (game.cards[game.questStage]?.code === "08035" ? "1B" : "2B") : null);
+        const trials = trialsChoice(choose, game);
         const ask = chosen?.note ?? trials?.note ?? torch?.note ?? xAsk?.note ?? smaugChooseNote(choose, game, ctx, words, window.seat) ?? wilderlandChooseNote(choose, game, ctx, words, window.seat, source, data?.subject ?? null) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? burgleChooseNote(choose, game, ctx, words, window.seat) ?? seatChoiceNote(choose, game, source ? names.card(source) : null) ?? "Choose one.";
         return {
           ...base,
@@ -307,7 +307,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
             // A branch that deals damage to each of the player's allies warns when it destroys one.
             const said = asksOption(written, id);
             const caution = said?.caution ?? branchCaution(game, ctx, choose, id, window.seat, source, names.card, data?.picked?.at(-1) ?? null);
-            return { id, label: withCount(said?.label, fordsTimeCount(game, choose, id)) ?? trials?.label(id) ?? (torch ? torch.label(id) : (xAsk?.row(id) ?? branchWords(choose, id, game, words, source, now, ctx))), code: null, ...(stats.length > 0 ? { stats } : {}), ...(caution ? { caution } : {}), intent: { type: "Choose", optionId: id } };
+            return { id, label: withCount(said?.label, fordsTimeCount(game, choose, id)) ?? trials?.label(id) ?? (torch ? torch.label(id) : (xAsk?.row(id) ?? branchWords(choose, id, game, words, source, now, ctx))), code: trials?.code(id) ?? null, ...(stats.length > 0 ? { stats } : {}), ...(caution ? { caution } : {}), intent: { type: "Choose", optionId: id } };
           }),
         };
       }
@@ -455,7 +455,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         kind: "pick",
         key: `optionalEngage:${game.round}:${game.activeSeat}`,
         step: "Encounter",
-        title: game.seatCount > 1 ? `Player ${game.activeSeat + 1}: optional engagement` : "Optional engagement",
+        title: "Optional engagement",
         note: optionalEngageNote(game, ctx, names),
         verb: "Engage",
         options: targets.map((id) => {

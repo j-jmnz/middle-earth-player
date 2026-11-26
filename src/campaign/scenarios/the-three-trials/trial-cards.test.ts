@@ -81,7 +81,12 @@ describe("08055:A:1 Wild Tenacity", () => {
     };
     expect(counters(attempt("Wolf's Guardian"), "08041")).toBe(2);
     expect(counters(attempt("Spirit of the Wild"), "08050")).toBe(3);
-    expect(removeTimeCounters(t.state, t.ctx)).toBeDefined();
+  });
+
+  it("08051:A:2 leaves the refresh phase's removal alone: one counter comes off each card with Time X, and none off a card that has no Time", () => {
+    const t = table({ engaged: [{ code: "08041", seat: 0, resources: 3 }, { code: "08050", seat: 0, resources: 3 }] });
+    const state = removeTimeCounters(t.state, t.ctx);
+    expect([counters(state, "08041"), counters(state, "08050")]).toEqual([2, 3]);
   });
 });
 

@@ -5,6 +5,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { engageWith } from "../../quest/quest.ts";
 import { hasTrait } from "../../interpret/conditions.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
@@ -15,4 +16,17 @@ export function engageTopDiscarded(state: ScenarioState, instruction: Extract<In
   const found = (effectData(state)?.looked ?? []).filter((id) => state.cards[id]?.zone === "encounterDiscard" && printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "enemy" && hasTrait(state, id, instruction.trait, ctx));
   const top = found.at(-1);
   return top == null ? state : moveEncounter(state, top, "engaged", focus.seat, ctx, steps);
+}
+
+/**
+ * The settle sweep both engaging cards share (Mugash's Guard, 07025:A:1; the Guardians, 08036:B:1 to 08039:B:1): each enemy in the staging area or engaged with a player for which `seatOf` gives a seat engages that seat at once, whatever its engagement cost. An enemy already engaged with that seat stays,
+ * one engaged with another seat moves (an enemy is engaged with one player only). `seatOf` returns null for an enemy that engages no one.
+ */
+export function engageEnemies(state: ScenarioState, steps: EngineStep[], seatOf: (state: ScenarioState, id: string) => number | null): ScenarioState {
+  return [...state.staging, ...state.seats.flatMap((seat) => seat.engaged)].reduce((next, id) => {
+    const card = next.cards[id];
+    if (card?.zone !== "staging" && card?.zone !== "engaged") return next;
+    const seat = seatOf(next, id);
+    return seat == null || (card.zone === "engaged" && card.controller === seat) ? next : engageWith(next, seat, id, steps);
+  }, state);
 }

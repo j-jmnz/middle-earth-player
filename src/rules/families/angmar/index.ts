@@ -27,7 +27,7 @@ import { noteFirstTrait, noteRevealDoomed, revealedGainDoomed } from "./weather.
 import { discardHeld, holdUnder } from "./hold.ts";
 import { chooseCurrentQuest, currentQuestHolds, hitPointsLeftHolds, questCardsAmount, questLeadsHolds } from "./quest.ts";
 import { advanceWhenFlagged, removeSideQuestsFromGame } from "./stage.ts";
-import { removeTimeCounters, timeCounterMatches, timeOnReveal } from "./time.ts";
+import { removeTimeCounters, removeTimeCountersFrom, timeCounterMatches, timeOnReveal } from "./time.ts";
 import { attachNewTo, tradeDamageForResources } from "./trade.ts";
 import { attachEnemyToPicked, destroyHighestCostAlly, discardOtherInPlay, removePickedFromGame } from "./reanimate/attached.ts";
 import { dealSourceAsShadow, resolveWhenRevealedOf } from "./reanimate/shadows.ts";
@@ -40,7 +40,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "Time":
       return state;
     case "RemoveTimeCounters":
-      return removeTimeCounters(state, ctx, instruction);
+      return instruction.target == null ? removeTimeCounters(state, ctx) : removeTimeCountersFrom(state, ctx, instruction);
     case "HoldUnder":
       return holdUnder(state, instruction, focus);
     case "DiscardHeld":

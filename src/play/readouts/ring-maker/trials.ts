@@ -2,10 +2,10 @@
 // What the table reads of The Three Trials: the current trial's Key as a top-bar dial (who controls it, or where it lies), each Guardian's time counters against its Time X (warming at the last counter), the Guardians in the victory display that stage 3A reveals again, and the Keys lying on a card. The engine decided every fact (`trialKeyControlled`, the counters on the card, the zones); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
 import type { CardInstance, ScenarioState } from "../../../rules/core/state.ts";
 import { refreshTakes, timeLimit } from "../../../rules/families/angmar/time.ts";
-import { trialKeyControlled } from "../../../rules/families/ring-maker/trial-sweeps.ts";
+import { currentTrialKey, trialKeyControlled } from "../../../rules/families/ring-maker/trial-sweeps.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 
-import { guardianLimitWords, guardianTimeWords, keyWords, trialKeyName, TRIAL_KEY_LABEL, victoryGuardianWords, type KeyPlace } from "../../words/scenarios/ring-maker/trials-table.ts";
+import { guardianLimitWords, guardianTimeLead, guardianTimeRest, guardianTimeWords, keyWords, trialAnimal, trialKeyName, TRIAL_KEY_LABEL, victoryGuardianWords, type KeyPlace } from "../../words/scenarios/ring-maker/trials-table.ts";
 import { cardsOf, type TableDial } from "../dials.ts";
 
 const SCENARIO = "the-three-trials";
@@ -21,9 +21,7 @@ export const seatWords = (game: ScenarioState, seat: number | null | undefined):
 
 /** The Key the stage in play marked as the current trial's (`trialKey`, set by the stage's 2A), or null: before a trial, at stage 3 and in any other scenario. */
 export function currentKey(game: ScenarioState): CardInstance | null {
-  if (game.scenarioId !== SCENARIO || game.questStage == null) return null;
-  const mark = game.modifiers.find((modifier) => modifier.stat === "trialKey" && modifier.sourceId === game.questStage);
-  return mark ? (game.cards[mark.instanceId] ?? null) : null;
+  return game.scenarioId === SCENARIO ? currentTrialKey(game) : null;
 }
 
 /** Where a Key lies: attached to a hero (a player controls it), attached to another card, or in a pile. */
@@ -41,6 +39,15 @@ export function keysLyingOn(game: ScenarioState, hostId: string): readonly strin
 
 /** The Guardians in the victory display, by id: stage 3A reveals each again (08039:A:1). */
 export const guardiansInVictory = (game: ScenarioState): readonly string[] => Object.values(game.cards).filter((card) => card.zone === "victory" && GUARDIANS.includes(card.code)).map((card) => card.id);
+
+/** The engaged player of a Guardian as words ("Player 2", "you"), or null while it lies in the staging area. */
+const guardianEngagedWords = (game: ScenarioState, card: CardInstance): string | null => (card.zone === "engaged" ? seatWords(game, card.controller) : null);
+
+/** The sentence a Guardian's card preview says of its time counters (the dial's note): its counters, what the refresh phase takes and what the last does. Null for a card that is not a Guardian with Time X. */
+export function guardianWords(game: ScenarioState, ctx: ReduceContext, card: CardInstance): string | null {
+  const limit = GUARDIANS.includes(card.code) ? timeLimit(game, ctx, card.code) : null;
+  return limit == null ? null : guardianTimeWords(card.code, card.resources, limit, refreshTakes(game, ctx), guardianEngagedWords(game, card));
+}
 
 export function trialDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
   if (game.scenarioId !== SCENARIO) return [];
@@ -62,25 +69,26 @@ export function trialDials(game: ScenarioState, ctx: ReduceContext, nameOf: (cod
     });
   }
   const takes = refreshTakes(game, ctx);
-  for (const code of GUARDIANS) {
-    const limit = timeLimit(game, ctx, code);
+  // The dials of the Guardians, the fewest counters first: the one nearest its last counter stands first in the row, where a row that scrolls shows it.
+  const guardians = GUARDIANS.flatMap((code) => cardsOf(game, code).map((card) => ({ code, card, limit: timeLimit(game, ctx, code) }))).sort((a, b) => a.card.resources - b.card.resources);
+  for (const { code, card, limit } of guardians) {
     if (limit == null) continue;
-    for (const card of cardsOf(game, code)) {
-      const words = guardianTimeWords(code, card.resources, limit, takes, card.zone === "engaged" ? seatWords(game, card.controller) : null);
-      dials.push({
-        id: `trial-time:${card.id}`,
-        testID: `ring-maker-trial-time:${card.id}`,
-        label: "Time",
-        name: `Time counters left on ${nameOf(card.code)}:`,
-        value: card.resources,
-        cardId: card.id,
-        limit: Math.max(limit, card.resources),
-        limitWords: guardianLimitWords(limit),
-        // The last counter hits the engaged player (08040:A:2 to 08042:A:2), so the dial warms when the next refresh phase takes it.
-        ...(card.resources <= Math.max(takes, 1) ? { warn: { level: "near" as const, words } } : {}),
-        note: words,
-      });
-    }
+    const engaged = guardianEngagedWords(game, card);
+    // The dial warms only while a player is engaged: the last counter then hits him; in the staging area it does nothing (08040:A:2 to 08042:A:2).
+    const warm = engaged != null && card.resources <= Math.max(takes, 1);
+    dials.push({
+      id: `trial-time:${card.id}`,
+      testID: `ring-maker-trial-time:${card.id}`,
+      label: trialAnimal(code) ?? "Time",
+      name: `Time counters left on ${nameOf(card.code)}:`,
+      value: card.resources,
+      cardId: card.id,
+      limit: Math.max(limit, card.resources),
+      limitWords: guardianLimitWords(limit),
+      // The warning says the lead sentence, the note the rest: a screen reader hears each once.
+      ...(warm ? { warn: { level: "near" as const, words: guardianTimeLead(card.resources, takes) } } : {}),
+      note: warm ? guardianTimeRest(code, limit, engaged) : guardianTimeWords(code, card.resources, limit, takes, engaged),
+    });
   }
   const away = guardiansInVictory(game);
   if (away.length > 0) dials.push({ id: "trial-victory", testID: "ring-maker-trial-victory", label: "Victory", name: "Guardians in the victory display", value: away.length, pile: "victory", note: victoryGuardianWords(away.map(nameId)) });
