@@ -83,10 +83,12 @@ export function stripText(slot: CardSlot, questPoints: number | null, owner?: st
 }
 
 /**
- * The x the strip's count is centred on: the middle of the card, moved right of the resource token at the card's foot (`resources`; a location with time counters wears one) and left of the progress token (`tokenLeft`, its left edge; null with none),
- * so a token never covers a digit. `half` is half the text's width; `token` the token art's size, both at the scale `s`. The progress token wins when the card is too narrow for both.
+ * The x the strip's count is centred on: the middle of the card, kept right of the resource token at the card's foot (`resources`; a location with time counters wears one), left of the progress token (`tokenLeft`, its left edge; null with none)
+ * and inside the card's right edge, so a token never covers a digit. `half` is half the text's width; `token` the token art's size, both at the scale `s`. When the count is too wide for the room, the resource token's clearance wins: the count
+ * never falls back onto it.
  */
 export function stripCenterX(x: number, w: number, half: number, tokenLeft: number | null, resources: boolean, token: number, s: number): number {
-  const clearOfResources = resources ? Math.max(x + w / 2, x + (token + 1) * s + 2 * s + half) : x + w / 2;
-  return tokenLeft == null ? clearOfResources : Math.min(clearOfResources, tokenLeft - 2 * s - half);
+  const lowest = resources ? x + (token + 1) * s + 2 * s + half : Number.NEGATIVE_INFINITY;
+  const highest = (tokenLeft ?? x + w) - 2 * s - half;
+  return Math.max(lowest, Math.min(x + w / 2, highest));
 }
