@@ -31,5 +31,5 @@ export function undefendedMumak(state: ScenarioState): readonly string[] {
 export function eliminateAfterAttack(state: ScenarioState, focus: Focus, steps: EngineStep[]): ScenarioState {
   const attack = state.pendingAttack;
   if (attack?.seat !== focus.seat) return eliminateSeat(state, focus.seat, steps);
-  return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), { verb: "EliminatePlayer" }] } };
+  return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), { verb: "EliminateAfterAttack" }] } };
 }

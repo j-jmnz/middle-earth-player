@@ -347,7 +347,10 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   if (after.length === 0 && waiting.length > 0) return startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended;
   if (after.length === 0) return ended;
   // The attack's own state decides where it was made from: an enemy that attacked from the staging area without being flagged is `fromStaging`.
-  if (!attackHere(state, attack.enemyId)) return waiting.length > 0 ? (startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended) : ended;
+  // An enemy that left the attack drops its instructions, except the elimination a destroyed Tamed Mûmak owes (EliminateAfterAttack, 17038:A:3): that seat is eliminated whatever the enemy did.
+  const here = attackHere(state, attack.enemyId);
+  const owed = here ? after : after.filter((one) => one.verb === "EliminateAfterAttack");
+  if (!here && owed.length === 0) return waiting.length > 0 ? (startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended) : ended;
   // Only the effect that searches the deck for another copy of a destroyed ally (DiscardCopiesFromDeck of "other", 10137:A:2) reads the ally the attack destroyed.
   const destroyedAlly = after.some((one) => one.verb === "DiscardCopiesFromDeck" && one.of === "other") ? destroyedAllyOf(state, attack, ctx) : undefined;
   // Only an effect that reanimates the character the attack destroyed (Unholy Crypt, 101161:A:2), or one that acts for its controller (Assault on Osgiliath, 06100:A:2), reads it.
@@ -360,7 +363,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       actor: attack.seat,
       peril: false,
       effectId: `${attack.enemyId}:afterAttack`,
-      instructions: waiting.length > 0 ? [...after, { verb: "StartShadowAttack", attackers: [...waiting] }] : after,
+      instructions: waiting.length > 0 ? [...owed, { verb: "StartShadowAttack", attackers: [...waiting] }] : owed,
       cancel: null,
       blockCancel: null,
       // An attack that sends its excess damage on (excessToShip) leaves that damage (0 when there was none) for the effect; X is the characters it destroyed.

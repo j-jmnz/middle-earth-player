@@ -5,7 +5,8 @@ import { describe, expect, it } from "vitest";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { fight, idOf, idsOf, legalTargets, opened, run as runInstruction, type Layout } from "../../../../test/harness/scene-kit.ts";
-import { spawn } from "../../core/zones.ts";
+import { moveCard, spawn } from "../../core/zones.ts";
+import { finishAttack } from "../../combat/shadow.ts";
 import { settle } from "../../engine/machine.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { matchesPick, pickCandidates } from "../../interpret/pick.ts";
@@ -150,6 +151,35 @@ describe("17038:A:3 a destroyed Tamed Mûmak still gives the progress of the att
     const done = destroyed(1, { play: [MUMAK_HURT], heroes: ["dh1"] });
     expect(done.cards[done.orcs?.stage ?? ""]?.progress).toBe(1);
     expect(done.lost).toBe(true);
+  });
+});
+
+describe("17038:A:3 the elimination a destroyed Tamed Mûmak owes is never lost", () => {
+  const SETS = ["17051", "17052", "17053", "17054", "16061"];
+  // The attack ends with the elimination of seat 0 owed (the Mûmak was destroyed by an undefended attack) and its attacker no longer engaged: the instructions of an enemy that left the attack are dropped, this one is not.
+  function ended(seats: 1 | 2, left: boolean): ScenarioState {
+    const made = table({ seats, stage: "17050", engaged: [URUK], heroes: [], setAside: SETS, play: [{ code: MUMAK, seat: 0 }, ...(seats === 2 ? [{ code: MUMAK, seat: 1 }] : [])] });
+    const state = runInstruction(made, opened(made).state, { verb: "PrepareOrcsArea", stages: SETS.slice(0, 4), number: 1 });
+    const uruk = idOf(state, URUK);
+    const attacking = { ...state, pendingAttack: { enemyId: uruk, seat: 0, undefended: true, after: [{ verb: "EliminateAfterAttack" } as const] } };
+    const steps: EngineStep[] = [];
+    const away = left ? moveCard(attacking, uruk, { zone: "staging" }) : attacking;
+    return settle(finishAttack(away, made.ctx, steps), made.ctx, steps);
+  }
+
+  it("the attacker stays engaged: the controller is eliminated at the attack's end", () => {
+    expect(ended(2, false).seats[0]?.eliminated).toBeTruthy();
+  });
+
+  it("solo: the attacker left the engagement, and the controller is still eliminated, so the game is lost", () => {
+    expect(ended(1, true).lost).toBe(true);
+  });
+
+  it("two-handed: the attacker left the engagement, and the Mûmak's controller is eliminated while the other player goes on", () => {
+    const done = ended(2, true);
+    expect(done.seats[0]?.eliminated).toBeTruthy();
+    expect(done.seats[1]?.eliminated).toBeFalsy();
+    expect(done.lost).toBeFalsy();
   });
 });
 
