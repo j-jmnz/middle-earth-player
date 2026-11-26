@@ -114,7 +114,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   DiscardUntil: [{ verb: "DiscardUntil", type: "enemy", trait: "Warg" }, { verb: "DiscardUntil", types: ["enemy", "location"] }],
   GuardObjective: [{ verb: "GuardObjective", target: "picked", types: ["enemy"] }],
   AttachGuard: [{ verb: "AttachGuard", guard: "subject", to: "host", replaceGuards: true, stayEngaged: true, detach: true }],
-  RemoveTimeCounters: [{ verb: "RemoveTimeCounters" }],
+  RemoveTimeCounters: [{ verb: "RemoveTimeCounters" }, { verb: "RemoveTimeCounters", target: "enemies", amount: 2, perPlayer: true }, { verb: "RemoveTimeCounters", target: "picked", amount: 3 }],
   HoldUnder: [{ verb: "HoldUnder", code: "09016" }],
   DiscardHeld: [{ verb: "DiscardHeld" }],
   PlaceHandUnderSelf: [{ verb: "PlaceHandUnderSelf" }],

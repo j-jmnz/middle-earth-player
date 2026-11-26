@@ -80,6 +80,7 @@ describe("effects render read fields, picks", () => {
     allInPlay: true,
     copyOfDefender: true,
     minDamage: 3,
+    timeCounter: true,
     aboveThreat: true,
     different: true,
     guardsObjectiveLocation: true,

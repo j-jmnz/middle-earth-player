@@ -269,6 +269,8 @@ export const pickSchema = z.strictObject({
   copyOfDefender: z.literal(true).optional(),
   // A card that has the Safe keyword (Across the Ettenmoors, mec108.safe; its record has the constant verb Safe): "a location with the safe keyword" (10075:A:2), for an objective-location (`type: objective`). Read by the angmar family.
   safe: z.literal(true).optional(),
+  // A card that has the Time keyword and holds at least one time counter ("an enemy with a time counter on it", 08051:A:2). Read by the angmar family.
+  timeCounter: z.literal(true).optional(),
   // A card with at least this many damage tokens on it ("while it has 3 or more damage on it", 10075:A:1). Read by the angmar family.
   minDamage: z.number().int().positive().optional(),
   // A card with at most this many hit points remaining: its hit points as modified now less the damage on it ("an Undead enemy with 2 or less remaining hit points", 10187:A:3). Read by the angmar family.

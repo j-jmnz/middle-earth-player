@@ -1,6 +1,6 @@
 // Rules: mec108.time-x (data/rules/entries.json); ledger lines 09024:A:1, 09024:A:3. Time X: a card with the keyword gets X resource tokens, its time counters, when it is revealed, and loses one at the end of each refresh phase; the card hears the removal of the last.
 // The keyword is a constant record with the verb `Time` (src/catalog/families/angmar.ts), found by the card's code like Deep.
-import type { Effect, Instruction } from "../../../catalog/boundary.ts";
+import type { Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
 import { effectCause } from "../../core/cause.ts";
@@ -14,6 +14,8 @@ import { effectsOf } from "../../windows/listen.ts";
 import { holds } from "../../interpret/conditions.ts";
 import { listens } from "../encounter/reveal.ts";
 import { textBlank } from "../attachments/hold.ts";
+import { lastPicked } from "../../interpret/player-verbs.ts";
+import { printedOf } from "../../core/printed.ts";
 
 type TimeInstruction = Extract<Instruction, { verb: "Time" }>;
 
@@ -74,19 +76,53 @@ export function refreshTakes(state: ScenarioState, ctx: ReduceContext): number {
   return takes;
 }
 
+/** The pick filter `timeCounter`: a card with the Time keyword that holds a time counter (a card with no Time loses none, mec108.time-x). True for a pick that does not ask. */
+export function timeCounterMatches(state: ScenarioState, id: string, spec: PickSpec, ctx: ReduceContext): boolean {
+  if (spec.timeCounter !== true) return true;
+  return holdsTimeCounter(state, id, ctx);
+}
+
+/** A card with the Time X keyword, at least one time counter and its text not blanked: the one test the pick filter, the refresh sweep and a picked target share. */
+function holdsTimeCounter(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
+  const card = state.cards[id];
+  return card != null && card.resources > 0 && timeOf(ctx, card.code) != null && !textBlank(state, id, ctx.cards);
+}
+
 /** The cards in play that hold the Time X keyword and at least one time counter. */
 function timeCards(state: ScenarioState, ctx: ReduceContext): string[] {
   if (constantVerbCodes(ctx, "Time").size === 0) return [];
-  return Object.values(state.cards).filter((card) => inPlay(card.zone) && card.resources > 0 && timeOf(ctx, card.code) != null && !textBlank(state, card.id, ctx.cards)).map((card) => card.id);
+  return Object.values(state.cards).filter((card) => inPlay(card.zone) && holdsTimeCounter(state, card.id, ctx)).map((card) => card.id);
 }
 
 /**
- * RemoveTimeCounters: one time counter comes off each card in play with Time X, if able; a card whose last counter is removed is announced (`lastTimeCounterRemoved`) and its Forced effect resolves ("When the last time counter is removed, there is a triggered effect that
+ * The refresh phase's RemoveTimeCounters: one time counter comes off each card in play with Time X, if able; a card whose last counter is removed is announced (`lastTimeCounterRemoved`) and its Forced effect resolves ("When the last time counter is removed, there is a triggered effect that
  * resolves on that card", mec108.time-x). A card with no counter left loses none.
  */
 export function removeTimeCounters(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+  return timeCards(state, ctx).reduce((next, id) => removeTimeCounterFrom(next, id, ctx), state);
+}
+
+/** The enemies in play that hold the Time X keyword and a time counter. */
+function timeEnemies(state: ScenarioState, ctx: ReduceContext): string[] {
+  return timeCards(state, ctx).filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "enemy");
+}
+
+/** The last picked card when it holds a time counter, as a list of one; none otherwise (a card with no Time, or its text blanked, loses no counter). */
+function pickedTimeCard(state: ScenarioState, ctx: ReduceContext): string[] {
+  const picked = lastPicked(state);
+  return picked && holdsTimeCounter(state, picked, ctx) ? [picked] : [];
+}
+
+/**
+ * A record's RemoveTimeCounters with a target: "Remove X time counters from each enemy ... with the time keyword" (08055:A:1, X the number of players with `perPlayer`) from each enemy in play, or "remove a time counter from an enemy" (08051:A:2) from the last picked card.
+ * Each card loses up to `amount` counters, one at a time, so its last counter is heard once.
+ */
+export function removeTimeCountersFrom(state: ScenarioState, ctx: ReduceContext, instruction: Extract<Instruction, { verb: "RemoveTimeCounters" }>): ScenarioState {
+  const players = instruction.perPlayer ? livingSeats(state).length : 1;
+  const amount = (instruction.amount ?? 1) * players;
+  const targets = instruction.target === "picked" ? pickedTimeCard(state, ctx) : timeEnemies(state, ctx);
   let next = state;
-  for (const id of timeCards(state, ctx)) next = removeTimeCounterFrom(next, id, ctx);
+  for (const id of targets) for (let removed = 0; removed < amount; removed += 1) next = removeTimeCounterFrom(next, id, ctx);
   return next;
 }
 

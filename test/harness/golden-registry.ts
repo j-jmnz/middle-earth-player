@@ -99,6 +99,7 @@ import * as fangorn from "../scenarios/into-fangorn/game.ts";
 import * as umbar from "../scenarios/escape-from-umbar/game.ts";
 import * as crossing from "../scenarios/desert-crossing/game.ts";
 import * as trap from "../scenarios/the-dunland-trap/game.ts";
+import * as trials from "../scenarios/the-three-trials/game.ts";
 import * as mordor from "../scenarios/the-long-arm-of-mordor/game.ts";
 import * as mumakil from "../scenarios/the-mumakil/game.ts";
 
@@ -210,6 +211,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("to-catch-an-orc", "To Catch an Orc", orc.ORC_GOLDENS, orc.orcWorld, orc.playGolden),
   entry("into-fangorn", "Into Fangorn", fangorn.FANGORN_GOLDENS, fangorn.fangornWorld, fangorn.playGolden),
   entry("the-dunland-trap", "The Dunland Trap", trap.TRAP_GOLDENS, trap.trapWorld, trap.playGolden),
+  entry("the-three-trials", "The Three Trials", trials.TRIALS_GOLDENS, trials.trialsWorld, trials.playGolden),
   entry("escape-from-umbar", "Escape from Umbar", umbar.UMBAR_GOLDENS, umbar.umbarWorld, umbar.playGolden),
   entry("desert-crossing", "Desert Crossing", crossing.CROSSING_GOLDENS, crossing.crossingWorld, crossing.playGolden),
   entry("the-long-arm-of-mordor", "The Long Arm of Mordor", mordor.MORDOR_GOLDENS, mordor.mordorWorld, mordor.playGolden),

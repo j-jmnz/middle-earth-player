@@ -125,6 +125,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["allInPlay"], pick.allInPlay === true ? "in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not" : null);
   note(["sameTitleAsDiscarded"], pick.sameTitleAsDiscarded === true ? "that shares its printed title with a card the effect discarded from the chooser's own deck" : null);
   note(["copyOfDefender"], pick.copyOfDefender === true ? "with the title of the defending character" : null);
+  note(["timeCounter"], pick.timeCounter === true ? "with the Time keyword and a time counter on it" : null);
   note(["minDamage"], typeof pick.minDamage === "number" ? `with at least ${pick.minDamage} damage on it` : null);
   note(["aboveThreat"], pick.aboveThreat === true ? "with an engagement cost higher than the chooser's threat" : null);
   note(["on"], onWords(pick.on));

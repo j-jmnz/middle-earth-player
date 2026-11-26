@@ -35,6 +35,7 @@ import { contractSides } from "./contract-sides.ts";
 import { LOOT_ROLE } from "../words/loot.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import { FORDS_STAGES, timeTakes } from "../readouts/ring-maker/fords.ts";
+import { GUARDIANS } from "../readouts/ring-maker/trials.ts";
 import { stageTimeNearWords } from "../words/scenarios/ring-maker/fords-table.ts";
 
 // A card code as the preview draws it: its name, its picture (or null) by picture key (picture-key.ts: side B of a revealed quest
@@ -86,8 +87,8 @@ export function hostedRole(printed: { type: string; typeName: string }): string 
   return printed.type === "objective" || printed.type === "ship-objective" ? printed.typeName || "Objective" : "Attachment";
 }
 
-// The resource tokens on a time stage are its time counters (rm.time-x), so its sheet says "3 time counters".
-const timeUnit = (code: string): string | undefined => (FORDS_STAGES.includes(code) ? "time counter" : undefined);
+// The resource tokens on a time stage and on a Guardian of The Three Trials are their time counters (rm.time-x), so the sheet says "3 time counters".
+const timeUnit = (code: string): string | undefined => (FORDS_STAGES.includes(code) || GUARDIANS.includes(code) ? "time counter" : undefined);
 
 /**
  * What lies on the card now, one phrase a counter: its damage, progress and resource tokens, and whether it is exhausted or committed to the
