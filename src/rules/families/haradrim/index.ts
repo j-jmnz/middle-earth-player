@@ -1,6 +1,6 @@
 // Rules: rr.constant-ability, rr.triggered-ability, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 16014:A:2, 16016:A:1, 16045:A:2, 16066:B:1, 16067:B:1.
 // The verbs, flags, triggers, conditions and amount src/catalog/families/haradrim.ts adds: the heat tracker (heat.ts), the stage that notes the round it came into play (stage.ts), the hand limit (hand.ts), the card placed faceup under a location (under.ts), The Mûmakil's Captures (capture.ts), the explored-this-round note (explored.ts) and the pick filter `sameTitleAsDiscarded` (pick.ts).
-// The flag `stageCapped` is read by putOnStage (src/rules/quest/quest.ts). The Long Arm of Mordor's heroes in the staging area are in staged.ts, its Uruks' Threat against Willpower in combat.ts, the Chieftain's engagement in engage.ts.
+// Race Across Harad: the Orcs' area (orcs-area.ts, orcs-stage.ts, orcs-values.ts, orcs-zone.ts, orcs-types.ts) and the Tamed Mûmak (mumak.ts). The flag `stageCapped` is read by putOnStage (src/rules/quest/quest.ts). The Long Arm of Mordor's heroes in the staging area are in staged.ts, its Uruks' Threat against Willpower in combat.ts, the Chieftain's engagement in engage.ts.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { gameReads } from "../../core/game-reads.ts";

@@ -1,5 +1,5 @@
 // The haradrim family (The Sands of Harad cycle, Escape from Umbar and Desert Crossing): the heat tracker (the temperature), a stage that holds no more progress than its quest points while it cannot advance, a quest card noted for the round it came into play, a hand limit
-// on the table, a card placed faceup under a location, and The Long Arm of Mordor's heroes in the staging area (staged and guarded heroes: Captives held by no card or by an Orc, objective-heroes taken by the players). The conditions `stageInPlayWholeRound` and `temperature` and the amount `temperature` are in effect-schema-conditions.ts and effect-schema-amount.ts. src/rules/families/haradrim/ runs and reads them.
+// on the table, a card placed faceup under a location, The Long Arm of Mordor's heroes in the staging area (staged and guarded heroes: Captives held by no card or by an Orc, objective-heroes taken by the players) and Race Across Harad's Orcs' area (a second quest deck, its cards in the area zone or the staging area, the Orcs' stage and its progress) with the Tamed Mûmak objective ally. The conditions `stageInPlayWholeRound` and `temperature` and the amount `temperature` are in effect-schema-conditions.ts and effect-schema-amount.ts. src/rules/families/haradrim/ runs and reads them.
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
