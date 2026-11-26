@@ -86,7 +86,7 @@ export function placeUnderHost(state: ScenarioState, id: string, host: string, c
 function toDeck(state: ScenarioState, id: string, top: boolean): ScenarioState {
   const put = moveToEncounterDeckDown(state, id);
   if (!put.moved) return put.state;
-  const moved = updateCard(put.state, id, { controller: null });
+  const moved = put.state;
   const rest = moved.encounterDeck.filter((entry) => entry !== id);
   return { ...moved, encounterDeck: top ? [id, ...rest] : [...rest, id] };
 }

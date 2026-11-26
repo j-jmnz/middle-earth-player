@@ -243,7 +243,7 @@ function finishReveal(state: ScenarioState, frame: Frame, ctx: ReduceContext, st
 // The canceled card goes back into the encounter deck; one that cannot leave the staging area stays there faceup, revealed (rr.cannot).
 function shuffleBack(state: ScenarioState, id: string): ScenarioState {
   const put = moveToEncounterDeckDown(state, id);
-  return put.moved ? shuffleEncounterDeck(updateCard(put.state, id, { controller: null })) : put.state;
+  return put.moved ? shuffleEncounterDeck(put.state) : put.state;
 }
 
 function revealAnother(state: ScenarioState, frame: Frame, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
