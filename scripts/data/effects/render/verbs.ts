@@ -108,7 +108,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   RemoveProgressFrom: (i, ctx) => ({ text: `remove ${amount(i.amount, ctx)} progress from ${i.target ? cardRef(i.target) : `"${str(i.named)}"`}`, read: ["amount", "named", "target"] }),
   DealShadow: (i, ctx) => {
     if (ctx.timing === "shadow" || ctx.attacking === true) return { text: i.additional === true ? "the attacking enemy is dealt an additional shadow card, which resolves beside the one it has" : "the attacking enemy is dealt a shadow card", read: ["additional"] };
-    // Outside an attack (a Shadow effect, or a record on the attacks trigger) the card goes to the enemy the record is on (no attack needed), and stays until that enemy's next attack.
+    // Outside an attack (neither a Shadow effect nor a record on the attacks trigger) the card goes to the enemy the record is on (no attack needed), and stays until that enemy's next attack.
     return { text: `this enemy (the card the record is on, wherever it is in play) is dealt ${i.additional === true ? "an additional shadow card, beside any it has" : "a shadow card (nothing when it has one)"}; the card stays on it until its next attack`, read: ["additional"] };
   },
   CannotPlay: (i, ctx) => ({ text: `${i.anyPlayer === true ? "no player" : "its controller"} can play, or put into play, a ${pick(i.pick, ctx)}`, read: ["pick", "anyPlayer"] }),
