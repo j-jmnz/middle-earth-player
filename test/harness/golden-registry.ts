@@ -98,6 +98,7 @@ import * as orc from "../scenarios/to-catch-an-orc/game.ts";
 import * as fangorn from "../scenarios/into-fangorn/game.ts";
 import * as umbar from "../scenarios/escape-from-umbar/game.ts";
 import * as crossing from "../scenarios/desert-crossing/game.ts";
+// import * as trap from "../scenarios/the-dunland-trap/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -222,4 +223,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-mines-of-moria", "The Mines of Moria", mines.MINES_GOLDENS, mines.minesWorld, mines.playGolden),
   entry("escape-from-khazad-dum", "Escape from Khazad-dûm", khazad.KHAZAD_GOLDENS, khazad.khazadWorld, khazad.playGolden),
   entry("the-hunt-for-the-dreadnaught", "The Hunt for the Dreadnaught", dreadnaught.DREADNAUGHT_GOLDENS, dreadnaught.dreadnaughtWorld, dreadnaught.playGolden),
+  // entry("the-dunland-trap", "The Dunland Trap", trap.TRAP_GOLDENS, trap.trapWorld, trap.playGolden),
 ];
