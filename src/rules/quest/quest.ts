@@ -39,6 +39,7 @@ import { currentSideQuest, mainQuestBarred, placeOnCurrentSideQuest } from "../f
 import { replaceStageProgress } from "./progress-replaced.ts";
 import { jointAdvance } from "../families/armies/advance.ts";
 import { familyOptionalEngageBarred, familyQuestResult } from "../interpret/family-hooks.ts";
+import type { RandomNext } from "../../catalog/random-next.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -272,7 +273,7 @@ export function putOnStage(from: ScenarioState, stageId: string, wanted: number,
 
 // The next stage arrives with no progress on it (rr.quest-advancement), side B up. A stage that prints no quest points
 // (141024, 141027) is won some other way, so the quest stops there. One with 0 quest points is checked when it next takes progress.
-export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], canAdvance: Gate): ScenarioState {
+export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], canAdvance: Gate, randomSet?: RandomNext): ScenarioState {
   let next = state;
   const guard = next.stages.length + 1;
   for (let hop = 0; hop < guard; hop += 1) {
@@ -296,7 +297,7 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     const branched = ordered ? null : branchFrom(next, current.code);
     if (branched) next = branched.state;
     // A stage that names AdvanceToRandomStage (19048:B:2) proceeds to one of the stages it lists at random, each played once.
-    const rolled = ordered || branched ? null : randomStageFrom(next, current.code);
+    const rolled = ordered || branched ? null : randomStageFrom(next, current.code, randomSet);
     if (rolled) next = rolled.state;
     // A stage that names AdvanceIfAttached (50601:B:3) proceeds to the stage its Loot condition names.
     const attached = ordered || branched || rolled ? null : attachedStageFrom(next, current.code, cards);

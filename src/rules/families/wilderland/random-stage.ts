@@ -1,5 +1,6 @@
 // Rules: rr.quest-advancement, rr.quest-cards-quest-deck, rr.winning-the-game (data/rules/entries.json); ledger lines 19047:B:2, 19048:B:2, 19049:B:2, 19050:B:2.
 // Roam Across Rhovanion's quest order: the stages 2 are played in a random order, each once, then stage 3 (AdvanceToRandomStage).
+import type { RandomNext } from "../../../catalog/random-next.ts";
 import { ruleCause, type Cause } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { shuffleIds } from "../../core/seed.ts";
@@ -12,10 +13,10 @@ import type { PrintedCard } from "../../core/printed.ts";
 
 /**
  * The stage the quest proceeds to from the stage `currentCode` when that stage names AdvanceToRandomStage: one of the stages it lists that is still in the quest deck, chosen with the game's seed, else its `otherwise`. `remove`: the stage left is removed from the game.
- * Null for a stage that names none, so every other quest is untouched; `id` is undefined when no stage is left to go to.
+ * Null for a stage that names none, so every other quest is untouched; `id` is undefined when no stage is left to go to. `own` is the set a record names for this one advance (08095:B:2); without it the stage's own set (its defeat) is read.
  */
-export function randomStageFrom(state: ScenarioState, currentCode: string): { state: ScenarioState; id: string | undefined; remove: boolean; back: boolean } | null {
-  const named = state.stages.find((stage) => stage.code === currentCode)?.randomNext;
+export function randomStageFrom(state: ScenarioState, currentCode: string, own?: RandomNext): { state: ScenarioState; id: string | undefined; remove: boolean; back: boolean } | null {
+  const named = own ?? state.stages.find((stage) => stage.code === currentCode)?.randomNext;
   if (!named) return null;
   const inDeck = (code: string): string | undefined => state.questDeck.find((candidate) => state.cards[candidate]?.code === code);
   // `different`: never the stage the quest is at, which goes back into the quest deck when it is one of the stages named (147002:B:2).

@@ -1,5 +1,5 @@
 // Rules: rm.time-x, rm.parallel-stages, rr.quest-advancement, rr.quest-cards-quest-deck, rr.forced (data/rules/entries.json); ledger lines 08094:B:1, 08095:B:2, 08095:B:4, 08098:B:2.
-// The engine The Nîn-in-Eilph adds: the stages 2 and 3 are played in a random order and come back to the quest deck (AdvanceToRandomStage with and without `onDefeat`, the quest's order skipping a set of alternatives), time counters removed announced once for a whole removal
+// The engine The Nîn-in-Eilph adds: the stages 2 and 3 are played in a random order and come back to the quest deck (AdvanceToRandomStage with and without `stageSet`, the quest's order skipping a set of alternatives), time counters removed announced once for a whole removal
 // (`timeCountersRemoved`), and the table flags that bar what player card effects give and what committing costs.
 import { describe, expect, it } from "vitest";
 

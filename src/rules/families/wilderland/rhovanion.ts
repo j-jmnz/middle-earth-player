@@ -1,6 +1,7 @@
 // Rules: rr.objective-cards, rr.guarded, rr.ownership-and-control, rr.quest-advancement, emce.campaign-pool-encounter (data/rules/entries.json); ledger lines 12184:A:2, 12184:B:1, 19036:A:1, 19037:A:1, 19044:A:1, 19047:B:2, 19051:A:1.
 // The verbs Roam Across Rhovanion adds to the wilderland family: the quest advanced to a random stage, an objective ally flipped to its enemy side, the trust put in Urdug, an objective claimed once nothing guards it, and Urdug put back under a location as a guarded objective.
 import type { Instruction, PickSpec } from "../../../catalog/boundary.ts";
+import { randomNextOf } from "../../../catalog/random-next.ts";
 
 import { currentCause, effectCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { gameReads } from "../../core/game-reads.ts";
@@ -25,17 +26,14 @@ import type { Focus } from "../index.ts";
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
 /**
- * AdvanceToRandomStage: run on the stage the quest is at, the quest advances now (19047:B:2); run on a stage already defeated, the quest has taken its random stage (advanceStage), so nothing happens. A record with `onDefeat` advances by the stage's own set; one without it names a set of its own
+ * AdvanceToRandomStage: run on the stage the quest is at, the quest advances now (19047:B:2); run on a stage already defeated, the quest has taken its random stage (advanceStage), so nothing happens. A record with `stageSet` advances by the stage's own set; one without it names a set of its own
  * (08095:B:2), which stands in for the stage's during this advance only, so the stage's defeat keeps its own.
  */
 export function advanceToRandomStage(state: ScenarioState, instruction: Verb<"AdvanceToRandomStage">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (!focus.sourceId || state.questStage !== focus.sourceId) return state;
   const before = steps.length;
-  const code = state.cards[focus.sourceId]?.code;
-  const own = instruction.onDefeat === true ? undefined : { codes: instruction.codes, ...(instruction.otherwise != null ? { otherwise: instruction.otherwise } : {}), ...(instruction.remove ? { remove: true as const } : {}), ...(instruction.different ? { different: true as const } : {}) };
-  const run = own ? { ...state, stages: state.stages.map((stage) => (stage.code === code ? { ...stage, randomNext: own } : stage)) } : state;
-  const advanced = afterProgress(advanceStage(run, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length), before, ctx, steps);
-  return own ? { ...advanced, stages: state.stages } : advanced;
+  const own = instruction.stageSet === true ? undefined : randomNextOf(instruction);
+  return afterProgress(advanceStage(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length, own), before, ctx, steps);
 }
 
 function inPlayWithCode(state: ScenarioState, code: string): string | undefined {

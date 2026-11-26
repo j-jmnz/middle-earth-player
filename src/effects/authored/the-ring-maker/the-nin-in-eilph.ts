@@ -4,7 +4,7 @@ import { AUTHORED_EFFECTS as TROUBLE } from "./trouble-in-tharbad.ts";
 
 // Records for The Nîn-in-Eilph (the-ring-maker cycle part 7, no campaign card): the eight quest stages (the stages 2 and 3 are played in a random order and come back to the quest deck, Time X), Nalir, the Ancient Marsh-dweller that attacks as the counters come off, and the encounter cards no
 // template reads. Every line is read from the scan ledger (data/printed/the-ring-maker.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here. Time X is the angmar family's; the trigger `timeCountersRemoved`, the table flags
-// `cannotGainResourcesByPlayerCard`, `cannotDrawByPlayerCard` and `commitDiscardsRandom` are in src/catalog/families/ring-maker.ts; `AdvanceToRandomStage` (wilderland family) names the stage's own set with `onDefeat` and a set of its own without it.
+// `cannotGainResourcesByPlayerCard`, `cannotDrawByPlayerCard` and `commitDiscardsRandom` are in src/catalog/families/ring-maker.ts; `AdvanceToRandomStage` (wilderland family) names the stage's own set with `stageSet` and a set of its own without it.
 // Rules: rm.time-x, rm.parallel-stages, rr.cannot, rr.effects, rr.player-deck, rr.immune, rr.forced, rr.quest-cards-quest-deck, rr.reveal, rr.search, rr.setup, rr.first-player, rr.ownership-and-control, rr.staging, rr.engaged, rr.in-play-and-out-of-play, rr.in-player-order, rr.defending-player,
 // rr.shadow-effects, rr.play-and-put-into-play, rr.explored, rr.travel, rr.current-quest, rr.modifiers, rr.destroy, rr.cancel (data/rules/entries.json).
 const STAGE_1 = "08094";
@@ -40,7 +40,7 @@ const stageTwo = (code: string, bar: Instruction[]): Effect[] => [
   { id: `${code}:constant:1`, cardCode: code, lines: [`${code}:B:1`], timing: "constant", instructions: [{ verb: "Time", amount: 3 }] },
   { id: `${code}:forced:1`, cardCode: code, lines: [`${code}:B:2`], timing: "forced", trigger: "lastTimeCounterRemoved", subject: "self", instructions: [{ verb: "AdvanceToRandomStage", codes: [...STAGE_2], different: true }] },
   { id: `${code}:constant:2`, cardCode: code, lines: [`${code}:B:3`], timing: "constant", instructions: bar },
-  { id: `${code}:forced:2`, cardCode: code, lines: [`${code}:B:4`], timing: "forced", trigger: "questCardDefeated", subject: "self", instructions: [{ verb: "AdvanceToRandomStage", codes: [...STAGE_3], onDefeat: true }] },
+  { id: `${code}:forced:2`, cardCode: code, lines: [`${code}:B:4`], timing: "forced", trigger: "questCardDefeated", subject: "self", instructions: [{ verb: "AdvanceToRandomStage", codes: [...STAGE_3], stageSet: true }] },
 ];
 
 // The three stages 3 print the same When Revealed, Time and last-counter lines (the defeat of a stage 3 goes on to stage 4: the quest's order skips the stages 3 that are alternatives).
