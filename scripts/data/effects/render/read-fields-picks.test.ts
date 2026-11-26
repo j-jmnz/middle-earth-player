@@ -130,6 +130,7 @@ describe("effects render read fields, picks", () => {
     { type: "card", control: "any", aflame: false, attackingEnemy: false, uncharted: false, doubleSided: false, noVictory: false, engagedThisRound: false, island: "secret", captured: "hosts", embassy: "encounter", sharesTrait: "activeLocation", sameTitleAs: "activeLocation" },
     { type: "card", control: "any", maxCost: { level: true, halved: true, plusChosen: true }, hasAttachment: { playerCard: true, treasure: true, trait: "Item" }, island: "adjacent", captured: "underSelf" },
     { type: "card", control: "any", hasAttachment: {}, island: "start" },
+    { type: "card", control: "you", sameTitleAsDiscarded: true },
     { type: "card", control: "any", island: "here", sharesTrait: "self" },
   ];
   const render: Render = (value, ctx) => renderPick(value, ctx);

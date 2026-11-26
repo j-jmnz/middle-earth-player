@@ -8,6 +8,7 @@ import { flagged, heldAmount } from "./state.ts";
 import { claimedDestination, discardedDetached, returnedToDeck } from "../families/objectives/claimed.ts";
 import { returnAttachedEnemy } from "../families/angmar/reanimate/attached.ts";
 import { attachmentsOn, inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
+import { noteExplored } from "../families/haradrim/explored.ts";
 import { discardedFromPlay } from "../families/play/hooks.ts";
 import { alliesToHandDestination } from "../families/deck/rules.ts";
 import { victoryOf } from "./printed-stat.ts";
@@ -149,6 +150,7 @@ export function destroyCard(
   if (explored && isLocationCard(printed) && instance.zone === "staging") next = queueEvent(next, { trigger: "locationExplored", seat: null, subject: id, amount: attachmentsOn(state, id).length });
   // A location in the staging area that is explored detaches the enemies grappled with it (dcce.grapple).
   if (explored && isLocationCard(printed) && instance.zone === "staging") next = releaseGrappled(next, id);
+  next = noteExplored(next, id, explored, cards);
   next = releaseAttachments(next, id, cards, steps);
   const latest = next.cards[id] ?? instance;
   // "Add each ally that leaves play to its owner's hand instead of placing it in the discard pile" (families/deck/rules.ts).

@@ -101,6 +101,8 @@ export const ENGINE_MADE_EFFECTS: ReadonlySet<ModifierStat> = new Set<ModifierSt
   "watchReadyHost",
   // The round the main quest card came into play, noted by the haradrim settle hook (families/haradrim/stage.ts): held by the table, source the stage; it lapses with the stage.
   "stageEntered",
+  // "If a location was explored this round" (17017:A:2, families/haradrim/explored.ts): the note is made when the location leaves play and read by an enemy's Shadow card later in the round.
+  "exploredThisRound",
   // The temperature of the heat tracker (families/haradrim/heat.ts): held by the table for the rest of the game, replaced by each verb.
   "temperature",
 ]);

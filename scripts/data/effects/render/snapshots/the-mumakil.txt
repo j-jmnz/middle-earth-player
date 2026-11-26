@@ -1,0 +1,265 @@
+Scenario piles that place cards with no record (quest: 17026 Welcome to the Jungle; quest: 17027 Capture the Oliphaunts; staging: 17020 Mûmak Trail; staging: 16056 Jungle Trail; staging: 16057 Forest Clearing; staging: 16058 Dense Jungle; setAside: 17011 Horse-hair Lasso; setAside: 17012 Poisoned Spear; setAside: 17013 Pit Trap; setAside: 17014 Noose of Vines; setAside: 17015 Wild Mûmak)
+
+## 17011 Horse-hair Lasso
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+17011:A:1 (front): Response: After the attached enemy is dealt any amount of damage, the engaged player shuffles his deck and discards the top card. If the discarded card's cost is equal to or greater than the attached enemy's remaining hit points, add Horse-hair Lasso and attached enemy to the victory display.
+  17011:response:1: Response after a card takes damage (heard about the host)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the acting player's deck
+    - the effect's X is set to 0
+    - the acting player discards the top card of their deck; its printed cost (0 with none or an X cost) is added to the effect's X
+    - then, if all of: (every draw, every discard from a deck, every discard of resources and every ready this effect ran so far resolved in full: a draw or a discard that found fewer cards or tokens than it named, and a ready that did not happen (the card was ready already, or cannot ready), did not (what follows "then" is attempted only when they all did)) and (remaining hit points of its host (its hit points less its damage, at least 0) - 1 is less than X) (checked when this step runs, after the steps above; not tied to whether they did anything): this card and its host enemy are added to the victory display, this card first (the host and its remaining hit points are read before this card leaves play)
+
+## 17012 Poisoned Spear
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+17012:A:1 (front): Response: After the players quest successfully, the player engaged with the attached enemy discards the top card of the encounter deck. If the discarded card's Threat is equal to or greater than the attached enemy's remaining hit points, add Poisoned Spear and attached enemy to the victory display.
+  17012:response:1: Response after the players quest successfully (answered by the player the event happened to)
+    only if its host is a enemy (any player controls) engaged with you
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard 1 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)
+    - then, if remaining hit points of its host (its hit points less its damage, at least 0) - 1 is less than the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0) (checked when this step runs, after the steps above; not tied to whether they did anything): this card and its host enemy are added to the victory display, this card first (the host and its remaining hit points are read before this card leaves play)
+
+## 17013 Pit Trap
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+17013:A:1 (front): Response: After the players travel to a location, if that location's printed Threat is equal to or greater than the attached enemy's remaining hit points, the engaged player adds Pit Trap and attached enemy to the victory display.
+  17013:response:1: Response after the players travel (heard about location (any player controls))
+    - if remaining hit points of its host (its hit points less its damage, at least 0) - 1 is less than printed threat of the card the event is about: this card and its host enemy are added to the victory display, this card first (the host and its remaining hit points are read before this card leaves play)
+
+## 17014 Noose of Vines
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+17014:A:1 (front): Response: After a character defends an attack against the attached enemy, if the defending character has more remaining hit points than the attached enemy, add Noose of Vines and attached enemy to the victory display.
+  17014:response:1: Response once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about the host)
+    only if the event's other card is a character (any player controls) that is in play now
+    - if remaining hit points of its host (its hit points less its damage, at least 0) is less than remaining hit points of the event's other card (its hit points less its damage, at least 0): this card and its host enemy are added to the victory display, this card first (the host and its remaining hit points are read before this card leaves play)
+
+## 17015 Wild Mûmak
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+17015:A:1: Indestructible. Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+17015:A:2 (front): Cannot take more than 3 damage each round.
+  17015:constant:1: Constant
+    - this card: stat damageCap (it takes no more than this much damage each round; damage past it is not placed) 3, while this card is in play
+
+17015:A:3 (front): Forced: At the end of the round, the engaged player must choose: either return Wild Mûmak to the staging area, or it makes an immediate attack.
+  17015:forced:1: Forced at the end of the round
+    only if this card is engaged with a player (that player is who "you" means in this record)
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - for the player this enemy is engaged with:
+      - the acting player chooses one of:
+        * option "staging":
+          - return this card to the staging area
+        * option "attack":
+          - this card (an enemy engaged with the actor) makes an immediate attack against the actor, dealt a shadow card of its own
+
+## 17016 Harad Tiger
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17016:A:1 (front): Cannot be optionally engaged.
+  17016:constant:1: Constant
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+17016:A:2 (front): Forced: After Harad Tiger attacks and destroys a character, return it to the staging area.
+  17016:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - return this card to the staging area
+
+17016:A:3 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
+  17016:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
+
+## 17017 Territorial Ape
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17017:A:1 (front): Territorial Ape gets +X Threat and +X Attack, where X is the Threat of the active location.
+  17017:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat threat of the active location, while this card is in play
+    - this card: stat attack threat of the active location, while this card is in play
+
+17017:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if a location was explored this round).
+  17017:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (a location was explored this round, the active location or one in the staging area (false unless the table holds the flag noteExplored)): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if a location was explored this round, the active location or one in the staging area (false unless the table holds the flag noteExplored) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 17018 Strangling Python
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17018:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+17018:A:2 (front): Forced: After Strangling Python damages a character, attach it to that character. (Counts as a Condition attachment with the text: "Attached character cannot ready.")
+  17018:forced:1: Forced on the event damagedByAttack (heard about character (any player controls))
+    only if the attacking enemy is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card attaches itself to the character the event is about (nobody is asked)
+  17018:constant:1: Constant
+    only if all of: (this card is attached to a card) and (its host is a character (any player controls))
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Condition attachment while it is attached
+    - its host: stat cannotReady 1, while this card is in play
+
+## 17019 Giant Centipede
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17019:A:1 (front): Forced: After Giant Centipede damages a character, treat that character's text box as if it were blank until the end of the round (except for Traits).
+  17019:forced:1: Forced on the event damagedByAttack (heard about character (any player controls))
+    only if the attacking enemy is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the card the event is about: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
+
+17019:A:2 (shadow): Shadow: Treat the defending character's text box as blank until the end of the round.
+  17019:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the defender: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
+
+## 17020 Mûmak Trail
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+17020:A:1 (front): While Mûmak Trail is the active location, it gains: "Response: When Mûmak Trail leaves play as an explored location, search the encounter deck and discard pile for a Wild Mûmak and add it to the staging area. Shuffle the encounter deck."
+  17020:response:1: Response on the event activeExplored (heard about this card; a "When" Response: offered before the Forced effects of the same event resolve)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one card with code 17015 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+17020:A:2 (front): Travel: Raise each player's threat by 1 to travel here.
+  17020:travel:1: Travel
+    - raise threat by 1 (each player)
+
+## 17021 Stampeding Oliphaunt
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17021:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+17021:A:2 (front): When Revealed: Choose a Wild Mûmak in the staging area to attack the first player. If no attacks are made this way, search the encounter deck and discard pile for a Mûmak Trail and add it to the staging area. Shuffle the encounter deck.
+  17021:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, in the staging area only, named "Wild Mûmak", chosen by the first player
+    - the last picked enemy makes an immediate attack against the first player (when it is in the staging area; counted as an attack made, like any attack an effect makes; an enemy that stays in the staging area counts for noneReturned too)
+    - then, if the running effect returned no card to the staging area (ReturnToStaging, ReturnFromDiscard) and made no attack (each attack an immediate-attack step makes counts like a returned card) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one card with code 17020 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+## 17022 The Savage South
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17022:A:1 (front): When Revealed: Each player discards the top 5 cards of his deck. Each player discards each card he controls that shares a title with any of the 5 cards he just discarded.
+  17022:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the top 5 card(s) of the acting player's deck go to their discard pile
+      - for each card (you control) that shares its printed title with a card the effect discarded from the chooser's own deck:
+        - discard the picked card
+
+17022:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, return attacking enemy to the staging area.
+  17022:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 17023 Terrible Fever
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17023:A:1 (front): When Revealed: Remove a hero from the quest and attach Terrible Fever to that hero. (Counts as a Condition attachment with the text: "Forced: At the end of the round, deal 1 damage to attached character.")
+  17023:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (any player controls) committed to the quest, chosen by the first player
+    - the last picked character is removed from the quest (it stays exhausted)
+    - this card attaches to the picked card (nowhere if that card carries one of its title already)
+  17023:constant:1: Constant
+    only if this card is attached to a card
+    - this card counts as a Condition attachment while it is attached
+  17023:forced:1: Forced at the end of the round
+    only if this card is attached to a card
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - deal 1 damage to its host
+
+17023:A:2 (shadow): Shadow: Defending character cannot ready until the end of the round.
+  17023:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the defender: stat cannotReady 1, until the end of the round
+
+## 17024 Biting Insects
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17024:A:1 (front): When Revealed: Each player discards a random card from his hand and assigns X damage among characters he controls. X is the discarded card's cost.
+  17024:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card)
+      - the acting player assigns printed cost of the picked card damage among the character (you control), one at a time
+
+17024:A:2 (shadow): Shadow: Discard a random card from your hand and assign X damage among characters you control. X is the discarded card's cost.
+  17024:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card)
+    - the acting player assigns printed cost of the picked card damage among the character (you control), one at a time
+
+## 17025 Guardians of the Jungle
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17025:A:1 (front): Each location gets +1 Threat.
+  17025:constant:1: Constant
+    - each location (any player controls): stat threat 1, while this card is in play
+
+17025:A:2 (front): Forced: When Guardians of the Jungle becomes the current quest, search the encounter deck and discard pile for a Territorial Ape and put it into play engaged with the first player.
+  17025:forced:1: Forced on the event becameCurrentQuest (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the acting player finds one card with code 17017 in the encounter deck or its discard pile and puts it into play engaged with the first player (it is not revealed)
+
+## 17026 Welcome to the Jungle
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17026:A:1 (front): Setup: Set each copy of Wild Mûmak and each Capture objective aside, out of play. Each player adds 1 different location to the staging area. Shuffle the encounter deck.
+  17026:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one location in the encounter deck and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
+    - shuffle the encounter deck
+    - the table: stat noteExplored (the table notes each location explored until the end of that round, for the condition locationExploredThisRound; the Setup sets it for the rest of the game) 1, until the end of the game
+
+17026:B:1 (back): Forced: After the active location leaves play as an explored location, shuffle 1 set aside Wild Mûmak into the encounter deck.
+  17026:forced:1: Forced on the event activeExplored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - one set-aside copy of the card with code 17015 is shuffled into the encounter deck (nothing with none set aside)
+
+17026:B:2 (back): The players cannot advance unless the number of Wild Mûmak in play is equal to the number of players.
+  17026:constant:1: Constant
+    only if any of: (the number of enemy (any player controls) or in the staging area, named "Wild Mûmak" is less than the number of players) or (the number of players is less than the number of enemy (any player controls) or in the staging area, named "Wild Mûmak")
+    - the players cannot defeat this stage while this holds
+
+## 17027 Capture the Oliphaunts
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17027:A:1 (front): When Revealed: Starting with the first player, each player attaches 1 random set aside Capture objective to a Wild Mûmak in play.
+  17027:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - choose enemy (any player controls) or in the staging area, named "Wild Mûmak"
+      - the last picked card in play receives one random set-aside card with the trait Capture (drawn by the game seed): it lies attached to it faceup, controlled by nobody and no player's card, and leaves play with its host (nothing with no host picked or no such card set aside)
+
+17027:B:1 (back): Forced: At the beginning of the quest phase, if there is no active location, reveal an additional encounter card this phase.
+  17027:forced:1: Forced when a phase begins
+    only if all of: (it is the Quest phase) and (the number of location (any player controls) that is the active location is at most 0)
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - reveal 1 additional encounter card(s) in the staging step this phase (the extra reveals go to the players in turn after the one each player makes, so the first player makes the first of them; while the stages are separate, to the player whose stage holds the effect)
+
+17027:B:2 (back): This stage cannot be defeated while there are any Capture objectives in play. If the players defeat this stage, they win the game.
+  17027:constant:1: Constant
+    only if there is a Capture card (any player controls) or in the staging area or the active location, in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not to choose
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
+    - the players cannot defeat this stage while this holds
+  17027:questResolution:1: Quest resolution
+    - the players win the game
+
+(rendered pieces: 167 by template, 0 as JSON)
