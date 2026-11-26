@@ -20,7 +20,7 @@ import type { SeatThreat } from "../store/selectors.ts";
 import { threatDelta, threatDeltaWords, threatLevel, threatMeter, threatSound, type ThreatLevel } from "../readouts/threat-level.ts";
 import { playSound } from "../../ui/sound/sound.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
-import { badgeFoot, CAPTION_LINE, CAPTION_OVER, CAPTION_PAD, CAPTION_TOP, captionOf, DIAL_PAD, DIAL_SIZE, HEADING_BADGE_OVER, HEADING_LABEL_W } from "./top-bar-layout.ts";
+import { badgeFoot, CAPTION_LINE, CAPTION_OVER, CAPTION_PAD, captionOf, DIAL_PAD, DIAL_SIZE, HEADING_BADGE_OVER, HEADING_LABEL_W } from "./top-bar-layout.ts";
 import { touch, useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
@@ -350,11 +350,11 @@ function ThreatDial({
         </View>
       </View>
       )}
-      {/* The caption: the name under the ring, over its foot, where the row has no room for it beside the ring. It takes no room in the row, never takes a tap, and gives way to the change badge, which stands in its place. */}
+      {/* The caption: the name under the ring, over its foot, where the row has no room for it beside the ring. It hangs from the row's foot as the change badge does (inside the bar), takes no room in the row, never takes a tap, and gives way to the change badge, which stands in its place. A seat's caption is its letter ("P1") in the accent while the seat is the one asked. */}
       {captioned === true && !delta ? (
-        <View testID={`${id}-caption`} pointerEvents="none" style={{ position: "absolute", top: CAPTION_TOP * s, left: (DIAL_PAD - CAPTION_OVER) * s, width: (DIAL + 2 * CAPTION_OVER) * s, alignItems: "center" }}>
-          <View style={{ maxWidth: "100%", borderRadius: 999, paddingHorizontal: CAPTION_PAD * s, backgroundColor: withAlphaHex(t.night, 0.82) }}>
-            <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} className="text-micro text-bone" style={{ lineHeight: CAPTION_LINE * s }}>
+        <View testID={`${id}-caption`} pointerEvents="none" style={{ position: "absolute", zIndex: 1, bottom: -badgeFoot(s), left: (DIAL_PAD - CAPTION_OVER) * s, width: (DIAL + 2 * CAPTION_OVER) * s, alignItems: "center" }}>
+          <View style={{ maxWidth: "100%", borderRadius: 999, paddingHorizontal: CAPTION_PAD * s, backgroundColor: withAlphaHex(t.night, 0.88) }}>
+            <Text numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} className={`text-micro ${role === "acting" ? "text-accent" : "text-bone"}`} style={{ lineHeight: CAPTION_LINE * s }}>
               {captionOf(label, short)}
             </Text>
           </View>

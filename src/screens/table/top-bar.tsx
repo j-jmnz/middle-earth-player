@@ -105,6 +105,8 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
   const [chipW, setChipW] = useState(0);
   const onChip = (event: LayoutChangeEvent) => setChipW(Math.round(event.nativeEvent.layout.width));
   const scroller = useRef<ComponentRef<typeof ScrollView>>(null);
+  // The dials row is scrolled past its start: a fade at the left edge says a dial is out of view there, as the right edge's does.
+  const [past, setPast] = useState(false);
   const onBar = (event: LayoutChangeEvent) => setBar({ width: Math.round(event.nativeEvent.layout.width), x: Math.round(event.nativeEvent.layout.x) });
   // The zones need the bar and the dials measured. Until both are, the rail is held invisible rather than drawn at a guess, so it
   // never jumps when the table opens.
@@ -161,6 +163,8 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
           testID="top-bar-scroll"
           horizontal
           scrollEnabled={zones?.scroll ?? false}
+          scrollEventThrottle={32}
+          onScroll={(event) => setPast(event.nativeEvent.contentOffset.x > 2 * s)}
           showsHorizontalScrollIndicator={false}
           style={{ height: (TOP_BAR + 20) * s, marginVertical: -10 * s }}
           contentContainerStyle={{ alignItems: "center", paddingVertical: 10 * s, paddingRight: zones?.scroll ? EDGE_FADE * s : 0 }}
@@ -186,6 +190,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
                     role={dial.role}
                     hint={dial.hint}
                     compact
+                    captioned={captioned}
                     ticks={ticks[threat.seat] ?? NO_TICKS}
                     ring={holding?.words ?? null}
                     ringMark={holding?.mark}
@@ -241,6 +246,13 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
           <View testID="top-bar-fade" pointerEvents="none" style={{ position: "absolute", top: 0, bottom: 0, right: 0, width: FADE_BANDS * FADE_BAND * s, flexDirection: "row" }}>
             {Array.from({ length: FADE_BANDS }, (_, band) => (
               <View key={band} style={{ width: FADE_BAND * s, backgroundColor: withAlphaHex(t.felt, ((band + 1) / FADE_BANDS) * 0.9) }} />
+            ))}
+          </View>
+        ) : null}
+        {zones?.scroll && past ? (
+          <View testID="top-bar-fade-start" pointerEvents="none" style={{ position: "absolute", top: 0, bottom: 0, left: 0, width: FADE_BANDS * FADE_BAND * s, flexDirection: "row" }}>
+            {Array.from({ length: FADE_BANDS }, (_, band) => (
+              <View key={band} style={{ width: FADE_BAND * s, backgroundColor: withAlphaHex(t.felt, ((FADE_BANDS - band) / FADE_BANDS) * 0.9) }} />
             ))}
           </View>
         ) : null}

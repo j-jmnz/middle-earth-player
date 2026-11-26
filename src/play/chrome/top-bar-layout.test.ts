@@ -11,6 +11,7 @@ import {
   DIAL_PAD,
   dialScale,
   DIAL_SIZE,
+  CAPTION_LINE,
   CAPTION_OVER,
   CAPTION_WORDS,
   captionOf,
@@ -318,6 +319,27 @@ describe("the scenario dials' names (dialZones)", () => {
     expect(tablet.scroll).toBe(false);
   });
 
+  it("captions the seats too, so the five-dial Crown row (two seats, three scenario dials) fits the zone at 844 pt without scrolling", () => {
+    const five = (seat: number, names: number) => 2 * seat + 3 * (dial + names) + 4 * DIAL_GAP;
+    const beside = five(SEAT_DIAL, DIAL_LABEL_GAP + 36);
+    const rings = five(dial, 0);
+    expect(barZones(bar, beside, 1, bar / 2).scroll).toBe(true);
+    const zones = dialZones(bar, rings, beside, 1, bar / 2);
+    expect(zones.captioned).toBe(true);
+    expect(zones.scroll).toBe(false);
+    // With the seat labels left beside their rings the same row would still scroll.
+    expect(dialZones(bar, 2 * SEAT_DIAL + 3 * dial + 4 * DIAL_GAP, beside, 1, bar / 2).scroll).toBe(true);
+  });
+
+  it("hangs the caption from the row's foot inside the bar, at every UI scale", () => {
+    for (const scale of [1, UI_SCALES.large, UI_SCALES.xlarge]) {
+      const row = Math.max(44 * scale, DIAL_SIZE * scale);
+      // The caption's foot is the badge's: badgeFoot below the row, which ends inside the bar's foot.
+      expect(row + badgeFoot(scale)).toBeLessThanOrEqual(row + (TOP_BAR * scale - row) / 2);
+      expect(CAPTION_LINE * scale).toBeLessThan(row / 2);
+    }
+  });
+
   it("keeps the captions on the narrowest phone, where the rings alone may scroll", () => {
     const small = dialZones(667 - 2 * 8, four(0), four(DIAL_LABEL_GAP + 30), 1, (667 - 2 * 8) / 2);
     expect(small.captioned).toBe(true);
@@ -329,7 +351,7 @@ describe("captionOf", () => {
     for (const label of ["Time", "Stage", "Village", "War-camp", "Key", "Boar"]) expect(captionOf(label)).toBe(label);
   });
   it("shows a dial's own short name first", () => {
-    expect(captionOf("Out of play", "Out")).toBe("Out");
+    expect(captionOf("Out of play", "Aside")).toBe("Aside");
     expect(captionOf("Battlefield", "Battle")).toBe("Battle");
   });
   it("cuts a name from its detail when the label is too long", () => {
@@ -338,7 +360,7 @@ describe("captionOf", () => {
     expect(captionOf("Time \u00b7 staging 1")).toBe("Time");
   });
   it("leaves the shorts the dials carry within the caption's room, and the caption within the gap between two dials", () => {
-    for (const short of ["Out", "Battle", "Round", "Losing"]) expect(Math.ceil(short.length * 5.9)).toBeLessThanOrEqual(CAPTION_WORDS);
+    for (const short of ["Aside", "Battle", "Round", "Losing"]) expect(Math.ceil(short.length * 5.9)).toBeLessThanOrEqual(CAPTION_WORDS);
     expect(2 * CAPTION_OVER).toBeLessThanOrEqual(DIAL_GAP + 2 * DIAL_PAD + 2 * DIAL_PAD);
   });
 });

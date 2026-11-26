@@ -150,8 +150,10 @@ export function dialScale(scale: number): number {
 }
 // ---- The caption: a scenario dial's name under its ring when the row has no room for it beside the ring (dialZones). All sizes are logical points at Medium. ----
 
-/** Where the caption's top edge stands on the dial's row (its disc is 46 pt tall, so the caption overlaps the ring's foot by 2 pt), its height, the padding either side of its words, and how far it reaches past the disc on each side. */
-export const CAPTION_TOP = 44;
+/**
+ * The caption's height, the padding either side of its words, and how far it reaches past the disc on each side. It hangs from the dial row's bottom edge by `badgeFoot`, as the change badge does, so it ends inside the bar's foot and never reaches the
+ * canvas under the bar: it overlaps the disc's lower part, under the number, and the ring's foot.
+ */
 export const CAPTION_LINE = 12;
 export const CAPTION_PAD = 4;
 // The caption may fill the dial's box and the gap to its neighbor, less 2 pt, so two neighbors' captions never touch: 8 pt past the disc each side.
