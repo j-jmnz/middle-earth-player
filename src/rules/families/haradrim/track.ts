@@ -1,13 +1,13 @@
 // Rules: hrd.track, hrd.track-example, hrd.search-objective, rr.running-out-of-cards (data/rules/entries.json); ledger lines 17069:A:1 to 17072:A:1, 17075:A:1, 17075:A:2, 17080:A:1.
 //
 // Beneath the Sands' Search objective: one card, Off Track (17079) on one side and On Track (17080) on the other. A flip changes the code the card shows and keeps it where it lies; the flip to On Track discards each resource on it. While the table holds
-// `cannotFlipSearch` (Lost Underground) the objective does not flip, unless the flip is the card's own text (`despiteBlock`). Every flip queues `flippedOver` about the objective, which the cards that hear "after the Search objective is flipped to Off Track" answer.
+// `cannotFlipSearch` (Lost Underground) the objective does not flip, unless the flip is the card's own text (`despiteBlock`). A flip to Off Track queues `searchFlippedOff` about the objective, which the cards that hear "after the Search objective is flipped to Off Track" answer (a flip to On Track queues nothing).
 // Track X (ResolveTrack) discards X cards from the encounter deck, shuffling the discard pile into the deck each time it runs out, and flips the objective to On Track when a discarded card is one of `marked` (the cards that print "On Track" in the lower right corner).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
 import { printedOf } from "../../core/printed.ts";
-import { flagged, inPlay, updateCard, type ScenarioState } from "../../core/state.ts";
+import { flagged, inPlay, livingSeats, updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { reshuffleDiscard } from "../../interpret/verbs.ts";
@@ -31,7 +31,7 @@ export function flipSearch(state: ScenarioState, to: "onTrack" | "offTrack", des
   const card = id ? state.cards[id] : undefined;
   if (!id || !card || (!despiteBlock && flagged(state, "table", "cannotFlipSearch"))) return state;
   const flipped = updateCard(state, id, { code: to === "onTrack" ? ON_TRACK : OFF_TRACK, other: card.code, ...(to === "onTrack" ? { resources: 0 } : {}) });
-  return queueEvent(flipped, { trigger: "flippedOver", seat: null, cardId: id });
+  return to === "offTrack" ? queueEvent(flipped, { trigger: "searchFlippedOff", seat: null, cardId: id }) : flipped;
 }
 
 export function flipSearchObjective(state: ScenarioState, instruction: Verb<"FlipSearchObjective">): ScenarioState {
@@ -40,6 +40,8 @@ export function flipSearchObjective(state: ScenarioState, instruction: Verb<"Fli
 
 /** ResolveTrack: X cards go from the top of the encounter deck to its discard pile, the discard pile coming back into an empty deck at once; a marked card among them flips the objective to On Track. */
 export function resolveTrack(state: ScenarioState, instruction: Verb<"ResolveTrack">, steps: EngineStep[]): ScenarioState {
+  // "Do not resolve the Track keyword" while Lost Underground is in play (17075:A:1).
+  if (flagged(state, "table", "cannotFlipSearch")) return state;
   let next = state;
   let found = false;
   for (let taken = 0; taken < instruction.amount; taken += 1) {
@@ -71,4 +73,15 @@ export function addTopmostFromDiscard(state: ScenarioState, instruction: Verb<"A
 export function setAsideCode(state: ScenarioState, instruction: Verb<"SetAsideCode">): ScenarioState {
   const card = Object.values(state.cards).find((candidate) => candidate.code === instruction.code && inPlay(candidate.zone));
   return card ? updateCard(moveCard(state, card.id, { zone: "setAside" }), card.id, { face: "down", controller: null, damage: 0, exhausted: false }) : state;
+}
+
+/** "The players cannot place progress on the main quest" (17079:A:2): true while the table holds `noMainQuestProgress`; a side quest that is the current quest still takes progress. */
+export function mainQuestBlocked(state: ScenarioState): boolean {
+  return flagged(state, "table", "noMainQuestProgress");
+}
+
+/** `everySeatHasAlly`: each living player controls an ally in play (an ally in the staging area has no controller). */
+export function everySeatHasAlly(state: ScenarioState, cards: ReduceContext["cards"]): boolean {
+  const owners = new Set(Object.values(state.cards).filter((card) => card.controller != null && inPlay(card.zone) && printedOf(cards, card.code).type === "ally").map((card) => card.controller));
+  return livingSeats(state).every((seat) => owners.has(seat));
 }

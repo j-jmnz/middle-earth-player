@@ -12,5 +12,5 @@ export const familyOnlyHandlers = {
   // The armies family's hook answers these.
   stagesComplete: no, stageIsCurrent: no, stageNoProgress: no,
   // The haradrim family's hook answers these.
-  stageInPlayWholeRound: no, locationExploredThisRound: no, temperature: no, threatAboveWillpower: no, orcsStage: no,
+  stageInPlayWholeRound: no, locationExploredThisRound: no, temperature: no, threatAboveWillpower: no, everySeatHasAlly: no, orcsStage: no,
 } satisfies Partial<ConditionHandlers>;

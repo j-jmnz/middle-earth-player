@@ -19,8 +19,8 @@ const OFF_TRACK_IN_PLAY: Cond = { kind: "inPlay", code: OFF_TRACK, is: true };
 // "While On Track is in play".
 const ON_TRACK_IN_PLAY: Cond = { kind: "inPlay", code: ON_TRACK, is: true };
 const NOT_ON_TRACK: Cond = { kind: "not", condition: ON_TRACK_IN_PLAY };
-// "After the Search objective is flipped to Off Track": the objective hears `flippedOver` about itself with its Off Track side up (FlipSearchObjective queues it).
-const OFF_TRACK_FLIPPED: Pick<Effect, "trigger" | "subject"> = { trigger: "flippedOver", subject: { type: "objective", control: "any", names: ["Off Track"] } };
+// "After the Search objective is flipped to Off Track": the objective hears `searchFlippedOff` about itself (FlipSearchObjective queues it on a flip to Off Track only).
+const OFF_TRACK_FLIPPED: Pick<Effect, "trigger" | "subject"> = { trigger: "searchFlippedOff", subject: { type: "objective", control: "any" } };
 const BROOD_MOTHER_IN_PLAY: PickSpec = { type: "enemy", control: "any", staging: true, names: ["Brood Mother"] };
 const STAGED_LOCATIONS: PickSpec = { type: "location", control: "any", stagingOnly: true };
 const ENEMY_FOUND: Cond = { kind: "matches", card: "picked", pick: { type: "enemy", control: "any", trait: "Creature" }, inPlay: false };
@@ -161,7 +161,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "forced",
     ...OFF_TRACK_FLIPPED,
     condition: { kind: "sourceIn", zone: "attached" },
+    // "Then, discard" (rr.then): the card goes only when each player has an ally to discard, read before the discards (a player with none keeps it attached, and it fires again at the next flip).
     instructions: [
+      { verb: "Discard", target: { kind: "self" }, when: { kind: "everySeatHasAlly" } },
       {
         verb: "ForEachPlayer",
         order: "firstFirst",
@@ -170,7 +172,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
           { verb: "Discard", target: { kind: "picked" }, when: { kind: "canPick", pick: { type: "ally", control: "you" } } },
         ],
       },
-      { verb: "Discard", target: { kind: "self" } },
     ],
   },
 
@@ -247,7 +248,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       },
     ],
   },
-  { id: "17079:constant:1", cardCode: OFF_TRACK, lines: ["17079:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "noQuestProgress", amount: 1, until: "whileSourceInPlay", target: "table" }] },
+  { id: "17079:constant:1", cardCode: OFF_TRACK, lines: ["17079:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "noMainQuestProgress", amount: 1, until: "whileSourceInPlay", target: "table" }] },
 
   // 17080 On Track. Forced: at the end of the quest phase the top 3 cards of the encounter deck are searched for a marked card, which is added to the staging area (the rest are discarded); with none the objective flips. Forced: after the players quest unsuccessfully it flips to Off Track.
   {

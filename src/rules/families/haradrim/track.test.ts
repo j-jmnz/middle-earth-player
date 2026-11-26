@@ -15,7 +15,7 @@ const flip = (to: "onTrack" | "offTrack", despiteBlock?: true): Effect["instruct
 const withBlock = (state: ScenarioState): ScenarioState => ({ ...state, modifiers: [...state.modifiers, BLOCK] });
 const discarded = (state: ScenarioState): string[] => codesIn(state, "encounterDiscard").sort();
 const side = (state: ScenarioState, id: string): string | undefined => state.cards[id]?.code;
-const flippedEvents = (state: ScenarioState): number => (state.pendingEvents ?? []).filter((event) => event.trigger === "flippedOver").length;
+const flippedEvents = (state: ScenarioState): number => (state.pendingEvents ?? []).filter((event) => event.trigger === "searchFlippedOff").length;
 
 describe("FlipSearchObjective: the Search objective shows its other side", () => {
   it("Off Track flips to On Track, discarding each resource on it, and the flip is announced", () => {
@@ -49,6 +49,17 @@ describe("FlipSearchObjective: the Search objective shows its other side", () =>
     const onBlocked = withBlock(opened(on).state);
     expect(side(run(on, onBlocked, flip("offTrack")), idOf(onBlocked, ON))).toBe(ON);
     expect(side(run(on, onBlocked, flip("offTrack", true)), idOf(onBlocked, ON))).toBe(OFF);
+  });
+});
+
+describe("17078:B:2 searchFlippedOff: only a flip to Off Track is heard", () => {
+  it("a flip to Off Track removes all progress from the stage, a flip to On Track leaves it", () => {
+    const off = table({ stage: "17078", side: "B", progress: 4, staging: [ON] });
+    const offState = opened(off).state;
+    expect(run(off, offState, flip("offTrack")).cards[off.state.questStage ?? ""]?.progress).toBe(0);
+    const on = table({ stage: "17078", side: "B", progress: 4, staging: [OFF] });
+    const onState = opened(on).state;
+    expect(run(on, onState, flip("onTrack")).cards[on.state.questStage ?? ""]?.progress).toBe(4);
   });
 });
 
@@ -91,11 +102,12 @@ describe("17069:A:1 ResolveTrack: X cards are discarded and a marked card flips 
     expect(discarded(done)).toEqual(["16047"].sort());
   });
 
-  it("a flip that Lost Underground blocks does not happen, the cards are still discarded", () => {
+  it("17075:A:1 while Lost Underground is in play the Track keyword does not resolve at all: no card is discarded", () => {
     const made = table({ staging: [OFF], deck: ["17070", "16046"] });
     const blocked = withBlock(opened(made).state);
     const done = run(made, blocked, track(1));
-    expect(discarded(done)).toEqual(["17070"].sort());
+    expect(discarded(done)).toEqual([]);
+    expect(done.encounterDeck).toHaveLength(2);
     expect(side(done, idOf(blocked, OFF))).toBe(OFF);
   });
 });

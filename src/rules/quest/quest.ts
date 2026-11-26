@@ -23,6 +23,7 @@ import { placeQuestingProgress, type QuestDamageCause } from "../families/defens
 import { travelsOverActive } from "../families/grapple/travel.ts";
 import { exploreIfFull, freeSlot, makeActiveIn, placeOnActive } from "../families/south/locations.ts";
 import { noteQuestPlaced, questRoom } from "../families/caves/progress.ts";
+import { mainQuestBlocked } from "../families/haradrim/track.ts";
 import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts";
 import { attachedStageFrom, branchFrom, holdStage, reached as reachedStage } from "../families/quest/branch.ts";
 import { leaveStage, nextInOrder, randomStageFrom } from "../families/wilderland/random-stage.ts";
@@ -222,7 +223,7 @@ export function placeQuestProgress(
     const stageId = next.questStage;
     const stage = next.cards[stageId];
     // A card in play may limit the progress the quest card takes this round, or stop it (families/caves/progress.ts).
-    remaining = Math.min(remaining, questRoom(next));
+    remaining = mainQuestBlocked(next) ? 0 : Math.min(remaining, questRoom(next));
     if (stage && remaining > 0) {
       // The explored location's Forced effect may cancel this progress (Orthanc): the stage takes what it needs and advances once those effects have resolved (families/wizardry/progress.ts).
       const waits = overflowWaits(next, steps, started, cards);
@@ -239,6 +240,7 @@ export function placeOnMainQuest(state: ScenarioState, amount: number, cards: Ca
   const stageId = state.questStage;
   const stage = stageId ? state.cards[stageId] : undefined;
   if (!stageId || !stage || state.stageCleared || currentSideQuest(state) == null) return placeQuestProgress(state, amount, cards, steps, canAdvance);
+  if (mainQuestBlocked(state)) return state;
   return putOnStage(state, stageId, amount, questPointsOf(state, stage, cards), cards, steps, canAdvance, ruleCause("mec108.side-quests-in-play"), { counted: false, reduced: false });
 }
 

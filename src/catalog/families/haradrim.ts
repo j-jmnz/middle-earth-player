@@ -53,7 +53,7 @@ const VERBS = [
   // "Each player takes control of a Tamed Mûmak" (17047:A:1): the actor takes one of the set-aside objective allies with these codes into their play area, faceup, ready; with several different cards left the actor is asked (copies of one card are one choice).
   verbFlags(z.strictObject({ verb: z.literal("TakeObjectiveAlly"), codes: z.array(z.string().min(1)).min(1), ...when }), { setupRuns: "inForEachPlayer" }),
   // "Flip the Search objective to On Track / Off Track" (17068:A:2, 17073:A:1, 17075:A:1, 17075:A:2, 17077:A:1, 17078:A:1; hrd.search-objective): the objective card in play shows its other side, keeping its place, and discards each resource when it flips to On Track. Nothing changes
-  // when it already shows that side, or while the table holds `cannotFlipSearch` (Lost Underground), unless `despiteBlock` (the side quest's own flips). A flip queues `flippedOver` about the objective.
+  // when it already shows that side, or while the table holds `cannotFlipSearch` (Lost Underground), unless `despiteBlock` (the side quest's own flips). A flip to Off Track queues `searchFlippedOff` about the objective.
   z.strictObject({ verb: z.literal("FlipSearchObjective"), to: z.enum(["onTrack", "offTrack"]), despiteBlock: z.literal(true).optional(), ...when }),
   // "Track X" (17069:A:1 to 17072:A:1; hrd.track): discards `amount` cards from the top of the encounter deck, the discard pile shuffled back into an empty deck at once (any phase); when one of them has a code in `marked` (the cards that print "On Track" in the lower right
   // corner, read from the scans) and the objective is Off Track, it flips to On Track (blocked as FlipSearchObjective says).
@@ -74,6 +74,8 @@ const TRIGGERS = [
   "temperatureChanged",
   // About an Orcs' stage that is full (17052:B:3, 17053:B:3, 17054:B:3): the record that heard it resolves when the Orcs defeat the stage, before they advance. The engine pushes it itself (families/haradrim/orcs-stage.ts); no event is queued.
   "orcsStageDefeated",
+  // About the Search objective after it is flipped to Off Track (17074:A:2, 17078:B:2): FlipSearchObjective queues it; a flip to On Track queues none (families/haradrim/track.ts).
+  "searchFlippedOff",
 ] as const;
 
 const FLAGS = [
@@ -101,6 +103,8 @@ const FLAGS = [
   "orcsInStagingThreat",
   // On the table, while Lost Underground is in play: the Search objective does not flip (families/haradrim/track.ts; 17075:A:1).
   "cannotFlipSearch",
+  // On the table, while Off Track is in play: no progress is placed on the main quest card, though a side quest that is the current quest takes it (17079:A:2; mainQuestBlocked in families/haradrim/track.ts, read by quest.ts).
+  "noMainQuestProgress",
 ] as const;
 
 export const manifest = { name: "haradrim", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

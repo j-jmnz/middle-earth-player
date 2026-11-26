@@ -83,6 +83,7 @@ export const HARADRIM_CONDITIONS: ConditionTemplates = {
     text: `${c.is === "sameStage" ? "the players' main quest stage has the same number as the Orcs' stage" : c.is === "differentStage" ? "the players' main quest stage has another number than the Orcs' stage" : "the Orcs' stage"}${typeof c.at === "number" ? ` (and the Orcs' stage is stage ${c.at})` : ""} (a side quest as the current quest changes nothing; false in a game with no Orcs' area)`,
     read: ["is", "at"],
   }),
+  everySeatHasAlly: () => ({ text: "each living player controls an ally in play (read when the instruction starts, so before any discard that follows it)", read: [] }),
   threatAboveWillpower: () => ({ text: "the attacking enemy's current Threat is greater than the defending character's current Willpower (false when the attack has no defending character)", read: [] }),
 };
 
@@ -91,5 +92,6 @@ export const HARADRIM_CONDITION_SAMPLES: Samples = {
   temperature: [{ kind: "temperature", min: 40 }, { kind: "temperature", max: 39 }],
   locationExploredThisRound: [{ kind: "locationExploredThisRound" }],
   threatAboveWillpower: [{ kind: "threatAboveWillpower" }],
+  everySeatHasAlly: [{ kind: "everySeatHasAlly" }],
   orcsStage: [{ kind: "orcsStage", is: "sameStage" }, { kind: "orcsStage", is: "differentStage" }, { kind: "orcsStage", at: 2 }],
 };
