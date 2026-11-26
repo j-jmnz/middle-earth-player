@@ -6,7 +6,7 @@ import { frameScope, hostOf, refCard, resolveAmount } from "./amounts.ts";
 import { runAttackVerb } from "../combat/attack-verbs.ts";
 import { characters } from "../combat/combat.ts";
 import { hasTrait, holds } from "./conditions.ts";
-import { outOfPlayChoices } from "./search.ts";
+import { outOfPlayChoices, outOfPlayCopies } from "./search.ts";
 import { scheduleDelayed } from "../windows/delayed.ts";
 import type { EngineStep } from "../core/intents.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -33,7 +33,7 @@ import { returnUndeadBeforeReset } from "../families/angmar/run-out.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import { encounterRaised } from "../families/quest/threat.ts";
 import { flagged, inPlay, livingSeats, updateCard, type ScenarioState } from "../core/state.ts";
-import { attachTo, cardsUnder, discardFromHand, moveCard, turnedUp } from "../core/zones.ts";
+import { attachTo, cardsUnder, discardFromHand, moveCard, moveToEncounterDeckDown, turnedUp } from "../core/zones.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "../core/cause.ts";
 import { takeProgressOff } from "../core/progress.ts";
 import { forgetCommitted } from "../families/costs/pay.ts";
@@ -102,7 +102,8 @@ export function refillEncounterDeck(state: ScenarioState, steps: EngineStep[], c
 // A card goes into the encounter deck face down, as every card in a deck is, and the deck is shuffled.
 export function shuffleIntoEncounterDeck(state: ScenarioState, id: string): ScenarioState {
   if (!state.cards[id]) return state;
-  return shuffleEncounterDeck(updateCard(moveCard(state, id, { zone: "encounterDeck" }), id, { face: "down" }));
+  const put = moveToEncounterDeckDown(state, id);
+  return put.moved ? shuffleEncounterDeck(put.state) : put.state;
 }
 
 // The card that joined the seat's discard pile between two states, or undefined when none did (a card that left the hand another way, a hand with none).
@@ -124,7 +125,8 @@ export function runExtraVerb(
     case "ShuffleEncounterDeck":
       return shuffleEncounterDeck(state);
     case "AddSetAsideToStaging": {
-      const copies = state.setAside.filter((candidate) => (instruction.code != null ? state.cards[candidate]?.code === instruction.code : instruction.trait != null && hasTrait(state, candidate, instruction.trait, ctx)));
+      const pool = instruction.outOfPlay === true && instruction.code != null ? outOfPlayCopies(state, instruction.code) : state.setAside;
+      const copies = pool.filter((candidate) => (instruction.code != null ? state.cards[candidate]?.code === instruction.code : instruction.trait != null && hasTrait(state, candidate, instruction.trait, ctx)));
       // The card is out of play, so putting it in the staging area is entering play: moveEncounter (into the acting seat's own staging area once stages are separate, mec109.multiple-staging-areas) announces it to the cards that hear it.
       return (instruction.all === true ? copies : copies.slice(0, 1)).reduce((next, id) => updateCard(moveEncounter(next, id, "staging", focus.seat, ctx, steps), id, { face: turnedUp(next, id) }), state);
     }

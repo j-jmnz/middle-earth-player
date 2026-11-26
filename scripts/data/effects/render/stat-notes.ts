@@ -1,5 +1,8 @@
 // What a stat flag means where its bare name would not say it, each read from where the engine handles it (the family's flag comment in src/catalog/families/ names the file). The amount follows the note in the text.
 export const FLAG_NOTES: Readonly<Record<string, string>> = {
+  commitDiscardsRandom: " (a player who commits characters to the quest first discards 1 card at random from his hand, once for each commit; a player with an empty hand cannot commit)",
+  cannotGainResourcesByPlayerCard: " (a player card's effect gains no resources; the resource phase still collects)",
+  cannotDrawByPlayerCard: " (a player card's effect draws no cards; the draw phase still draws)",
   // Quest, locations and progress.
   activeThreat: " (while the location is the active location its Threat counts in the staging area's total)",
   progressCap: " (no more than this much progress can be placed on this location each round)",

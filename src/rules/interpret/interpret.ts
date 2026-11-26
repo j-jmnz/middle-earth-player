@@ -32,6 +32,7 @@ import { familyWholeStateVerb } from "./family-hooks.ts";
 import { announceDraw } from "../families/dreamchaser/index.ts";
 import { heroDrawn } from "../families/deck/hero.ts";
 import { announceEnteredHand } from "../families/island/hand.ts";
+import { drawBarredByPlayerCard } from "../families/ring-maker/player-bars.ts";
 import { playerSource } from "../families/quest/threat.ts";
 import { queueHeard } from "../families/quest/events.ts";
 import { announceSetupActive } from "../families/quest/places.ts";
@@ -188,7 +189,7 @@ export function drawOpeningHand(state: ScenarioState, seat: number, steps: Engin
 // `byPlayerCard`: a player card's effect draws them, which a card that hears the draw can ask (143059:A:1). `framework`: the framework draws them (the opening hand, the resource phase's draw), which a rule about drawing "through card effects" does not
 // bar (900404:A:1).
 export function drawMany(state: ScenarioState, seat: number, count: number, steps: EngineStep[], fallback: Cause, ctx: ReduceContext, bottom = false, byPlayerCard = false, framework = false): ScenarioState {
-  if (state.seats[seat]?.eliminated || heldAmount(state, "table", "cannotDraw") > 0 || (!framework && (seatBarred(state, ctx, seat, "draw") || (state.modifiers.length > 0 && flagged(state, `seat:${seat}`, "noCardDraw"))))) return state;
+  if (state.seats[seat]?.eliminated || heldAmount(state, "table", "cannotDraw") > 0 || drawBarredByPlayerCard(state, byPlayerCard) || (!framework && (seatBarred(state, ctx, seat, "draw") || (state.modifiers.length > 0 && flagged(state, `seat:${seat}`, "noCardDraw"))))) return state;
   const drawn = drawCards(state, seat, count, (current) => drawOne(current, seat, steps, fallback, bottom));
   // A hero a card shuffled into the deck is put into play as it is drawn (families/deck/hero.ts).
   return heroDrawn(announceEnteredHand(state, announceDraw(state, drawn, seat, ctx, byPlayerCard), seat, ctx), seat);
@@ -247,15 +248,20 @@ export function dealStepShadow(state: ScenarioState, enemyId: string, steps: Eng
   return next;
 }
 
+/** Where an additional shadow card comes from when the record names it. */
+export type ShadowSource = NonNullable<Extract<Instruction, { verb: "DealShadowTo" }>["from"]>;
+
 // One more shadow card for an enemy, beside any it has (141069:A:2). With none yet it is simply its shadow card. An empty
 // encounter deck deals nothing (rr.step-6-2).
-// An enemy that holds `shadowsFromBalrog` is dealt from the Balrog deck, which is refilled from its discard pile when it is empty (901801:A:3, A:4); `fromEncounter` deals from the encounter deck whatever the enemy holds ("from the encounter deck (not the Balrog deck)", 901806:A:1).
-export function dealAdditionalShadow(given: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext, fromEncounter = false): ScenarioState {
-  const balrog = !fromEncounter && given.piles?.balrogDeck !== undefined && flagged(given, enemyId, "shadowsFromBalrog");
+// An enemy that holds `shadowsFromBalrog` is dealt from the Balrog deck, which is refilled from its discard pile when it is empty (901801:A:3, A:4); `from` "encounter" deals from the encounter deck whatever the enemy holds ("from the encounter deck (not the Balrog deck)", 901806:A:1).
+// `from` "raven" deals it from the Raven deck ("Deal attacking enemy 2 additional shadow cards from the Raven deck", 08156:A:2; rm.raven-deck), which is refilled from its own discard pile, where the shadow card goes when it is discarded.
+export function dealAdditionalShadow(given: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext, from?: ShadowSource): ScenarioState {
+  const balrog = from == null && given.piles?.balrogDeck !== undefined && flagged(given, enemyId, "shadowsFromBalrog");
+  const raven = from === "raven" && given.piles?.ravenDeck !== undefined;
   // An empty deck is refilled at once while the Nightmare setup card says so (encounterRefill, 900201:A:3); the reset is logged.
-  const state = balrog ? refillDeck(given, DECKS.balrog, steps) : refillEncounterDeck(given, steps, ctx);
+  const state = balrog ? refillDeck(given, DECKS.balrog, steps) : raven ? refillDeck(given, DECKS.raven, steps) : refillEncounterDeck(given, steps, ctx);
   const enemy = state.cards[enemyId];
-  const top = balrog ? state.piles?.balrogDeck?.[0] : state.encounterDeck[0];
+  const top = balrog ? state.piles?.balrogDeck?.[0] : raven ? state.piles?.ravenDeck?.[0] : state.encounterDeck[0];
   // "Do not deal Nazgûl enemies a shadow card" (141061:A:1).
   if (!enemy || !top || flagged(state, enemyId, "noShadowDealt")) return state;
   // Face down, or face up while the player it is engaged with holds shadowsFaceUp (07009).

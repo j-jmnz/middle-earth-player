@@ -43,7 +43,8 @@ describe("ShuffleSetAsideIntoPile (19022:A:1, 19024:A:1)", () => {
   });
 
   it("takes what is set aside when fewer copies are left, and changes nothing with none or with no such pile", () => {
-    expect(codesOf(shuffleSetAsideIntoPile(withCaves(1), { verb: "ShuffleSetAsideIntoPile", pile: "caves", code: "sign", count: 2 }), pileOf(shuffleSetAsideIntoPile(withCaves(1), { verb: "ShuffleSetAsideIntoPile", pile: "caves", code: "sign", count: 2 }), "cavesDeck")).filter((code) => code === "sign")).toHaveLength(1);
+    const one = shuffleSetAsideIntoPile(withCaves(1), { verb: "ShuffleSetAsideIntoPile", pile: "caves", code: "sign", count: 2 });
+    expect(codesOf(one, pileOf(one, "cavesDeck")).filter((code) => code === "sign")).toHaveLength(1);
     const none = withCaves(0);
     expect(shuffleSetAsideIntoPile(none, { verb: "ShuffleSetAsideIntoPile", pile: "caves", code: "sign", count: 2 })).toBe(none);
     const noPile = deal(table(), ["sign", "sign"], { zone: "setAside" }).state;

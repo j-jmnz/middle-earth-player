@@ -29,7 +29,7 @@ const stageTwoAdvance = (code: string): Effect => ({
   trigger: "questProgressPlaced",
   instructions: [
     // One X test, decided before the advance: the "Otherwise" branch comes first, so 3A's When Revealed (Swaying Without Wind returns a location from the victory display) cannot turn the test over.
-    { verb: "AdvanceToRandomStage", codes: [...STAGE_2], different: true, when: NOT_ENOUGH_VICTORY },
+    { verb: "AdvanceToRandomStage", codes: [...STAGE_2], different: true, stageSet: true, when: NOT_ENOUGH_VICTORY },
     { verb: "AdvanceToStage", code: STAGE_3, when: ENOUGH_VICTORY },
   ],
 });
@@ -42,7 +42,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     cardCode: "147001",
     lines: ["147001:B:1"],
     timing: "whenRevealed",
-    instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Draw", amount: 1 }] }, { verb: "AdvanceToRandomStage", codes: [...STAGE_2], different: true }],
+    instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Draw", amount: 1 }] }, { verb: "AdvanceToRandomStage", codes: [...STAGE_2], different: true, stageSet: true }],
   },
 
   // 147002 to 147005 The Living Forest. 2B first Forced effects: exhaust a hero each at the end of the planning phase; at the beginning of the round (the Resource phase's start) remove all progress from each location in play; at the end of the round discard a random location from the victory display;

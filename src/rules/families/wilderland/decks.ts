@@ -2,11 +2,12 @@
 // from, and the Evil Creatures deck refilled from its own discard pile when it runs out. The deck as a zone is core/piles.ts, the refill is core/decks.ts and the reveal families/encounter/named-decks.ts (the Corsair deck shares them).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
-import { refillDeck } from "../../core/decks.ts";
+import { moveIntoDeck, refillDeck, reshuffleIntoDeck } from "../../core/decks.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { DECKS, NAMED_PILES, pileDealt, pileOf, shufflePile, topOf } from "../../core/piles.ts";
+import { DECKS, NAMED_PILES, pileDealt, pileOf, shufflePile, topOf, withPile } from "../../core/piles.ts";
 import { livingSeats, updateCard } from "../../core/state.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { shuffleEncounterDeck } from "../../interpret/verbs.ts";
@@ -21,6 +22,26 @@ import { spawnIntoPile } from "./kings.ts";
 /** The Evil Creatures deck ran out: its own discard pile is shuffled back into it (emce.evil-creatures-deck). Settle keeps the game's deck refilled. */
 export function refillEvilCreatures(state: ScenarioState, steps: EngineStep[]): ScenarioState {
   return refillDeck(state, DECKS.evilCreatures, steps);
+}
+
+/** The Raven deck ran out: its own discard pile is shuffled back into it, whenever it is empty (rm.raven-deck). A game that did not deal it is left alone. */
+export function refillRaven(state: ScenarioState, steps: EngineStep[]): ScenarioState {
+  return refillDeck(state, DECKS.raven, steps);
+}
+
+/** "Create the Raven deck" (rm.raven-deck): each set-aside copy of the codes goes facedown into the pile's deck, and the pile's discard pile starts empty. */
+export function formPile(state: ScenarioState, instruction: Extract<Instruction, { verb: "FormPile" }>): ScenarioState {
+  const zones = NAMED_PILES[instruction.pile];
+  let next = withPile(state, zones.deck, pileOf(state, zones.deck));
+  if (zones.discard) next = withPile(next, zones.discard, pileOf(state, zones.discard));
+  return moveIntoDeck(next, zones, state.setAside.filter((id) => instruction.codes.includes(state.cards[id]?.code ?? "")));
+}
+
+/** "Shuffle the Raven deck discard pile into the Raven deck" (08148:A:1): the pile's discard pile joins its deck, which is shuffled; an empty discard pile still shuffles the deck, and what follows goes on (rr.then). */
+export function shuffleDiscardIntoPile(state: ScenarioState, instruction: Extract<Instruction, { verb: "ShuffleDiscardIntoPile" }>, steps: EngineStep[]): ScenarioState {
+  const zones = NAMED_PILES[instruction.pile];
+  if (!pileDealt(state, zones.deck)) return state;
+  return reshuffleIntoDeck(state, zones, zones.discard ? pileOf(state, zones.discard) : [], steps, currentCause(steps, UNATTRIBUTED));
 }
 
 /** "Create the Caves deck" and its like: the dealt cards shuffled together. A deck the scenario did not deal is left alone. */

@@ -4,6 +4,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
+import { pileOf } from "../../core/piles.ts";
 import { addModifier } from "../../core/modified-stat.ts";
 import { printedOf } from "../../core/printed.ts";
 import { shuffleIds } from "../../core/seed.ts";
@@ -68,10 +69,10 @@ export function attachPickedToPrevious(state: ScenarioState): ScenarioState {
   return queueEvent(lying, { trigger: "attached", seat: state.firstPlayer, subject: key.id, other: host.id });
 }
 
-/** AddPickedToStaging ("add it to the staging area", 08037:A:1): the last picked set-aside card enters the staging area faceup without a reveal (faq.reveal-and-add). */
+/** AddPickedToStaging ("add it to the staging area", 08037:A:1): the last picked set-aside card, or card of the Raven deck (08147:A:1, rm.raven-deck), enters the staging area faceup without a reveal (faq.reveal-and-add). */
 export function addPickedToStaging(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = lastPicked(state);
-  if (!state.cards[id] || !state.setAside.includes(id)) return state;
+  if (!state.cards[id] || !(state.setAside.includes(id) || pileOf(state, "ravenDeck").includes(id))) return state;
   return updateCard(moveEncounter(state, id, "staging", focus.seat, ctx, steps), id, { face: "up" });
 }
 

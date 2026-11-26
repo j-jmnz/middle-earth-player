@@ -1,6 +1,7 @@
 // Rules: rr.objective-cards, rr.guarded, rr.ownership-and-control, rr.quest-advancement, emce.campaign-pool-encounter (data/rules/entries.json); ledger lines 12184:A:2, 12184:B:1, 19036:A:1, 19037:A:1, 19044:A:1, 19047:B:2, 19051:A:1.
 // The verbs Roam Across Rhovanion adds to the wilderland family: the quest advanced to a random stage, an objective ally flipped to its enemy side, the trust put in Urdug, an objective claimed once nothing guards it, and Urdug put back under a location as a guarded objective.
 import type { Instruction, PickSpec } from "../../../catalog/boundary.ts";
+import { randomNextOf } from "../../../catalog/random-next.ts";
 
 import { currentCause, effectCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { gameReads } from "../../core/game-reads.ts";
@@ -12,7 +13,7 @@ import { lastPicked } from "../../interpret/player-verbs.ts";
 import { restricted } from "../../interpret/restrictions.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, updateCard } from "../../core/state.ts";
+import { hostOf, inPlay, updateCard } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import { advanceStage } from "../../quest/quest.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
@@ -24,15 +25,19 @@ import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
-/** AdvanceToRandomStage: run on the stage the quest is at, the quest advances now (19047:B:2); run on a stage already defeated, the quest has taken its random stage (advanceStage), so nothing happens. */
-export function advanceToRandomStage(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+/**
+ * AdvanceToRandomStage: run on the stage the quest is at, the quest advances now (19047:B:2); run on a stage already defeated, the quest has taken its random stage (advanceStage), so nothing happens. A record with `stageSet` advances by the stage's own set; one without it names a set of its own
+ * (08095:B:2), which stands in for the stage's during this advance only, so the stage's defeat keeps its own.
+ */
+export function advanceToRandomStage(state: ScenarioState, instruction: Verb<"AdvanceToRandomStage">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (!focus.sourceId || state.questStage !== focus.sourceId) return state;
   const before = steps.length;
-  return afterProgress(advanceStage(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length), before, ctx, steps);
+  const own = instruction.stageSet === true ? undefined : randomNextOf(instruction);
+  return afterProgress(advanceStage(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length, own), before, ctx, steps);
 }
 
 function inPlayWithCode(state: ScenarioState, code: string): string | undefined {
-  return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id;
+  return hostOf(state, code) ?? undefined;
 }
 
 /** The card `id` becomes the card `into`, faceup and ready in the staging area, controlled by no one, with its damage removed; it keeps its resources and the cards attached to it, and the card it was is kept as its other side. Shared by FlipToEnemySide and ReturnFromVictory. */

@@ -1,0 +1,12 @@
+import type { ScreenMoment } from "../../harness/screens.ts";
+
+// The table moments the screen review shoots (`pnpm browser shot --moment the-nin-in-eilph --landscape`; test/harness/screens.ts): one for each new widget of The Nîn-in-Eilph's table, a layout (the same JSON `pnpm game scene` takes) and a note that says
+// which printed line or widget it shows. `scripts/browser/scene.test.ts` builds each one in Node and fails when a layout no longer builds. The three bars that have no widget (08095:B:3, 08096:B:3, 08097:B:3) are the dial's standing words, shown with
+// the moments "time-dial-2b-last" and "time-dial-4b-last".
+export const screens: ScreenMoment[] = [
+  { name: "time-dial-2b", layout: { stage: "08095", timeCounters: 3, staging: ["08106"] }, note: "Stage 2B (08095:B:1): the Time dial, 3 time counters against Time 3, and its standing rule (no resources or draws from player cards, 08095:B:3) at the head of the dial's note." },
+  { name: "time-dial-2b-last", layout: { stage: "08095", timeCounters: 1, staging: ["08106"] }, note: "Stage 2B with 1 counter left: the dial warms and its words say that the last counter sends this stage back to the quest deck, losing its progress and counters, and that a different stage 2 chosen at random replaces it (08095:B:2)." },
+  { name: "time-dial-4b-last", layout: { stage: "08101", timeCounters: 1, staging: [{ code: "08103", resources: 2 }] }, note: "Stage 4B (08101:B:1) with 1 counter left and Ancient Marsh-dweller in the staging area: the dial's words say that the last counter makes it attack each player in player order, then 2 counters are placed on the stage (08101:B:2)." },
+  { name: "nalir-controlled", layout: { stage: "08095", seats: 2, play: ["08102"], timeCounters: 3 }, note: "08102:A:1, 08102:A:2, 08102:A:3: Nalir in the first player's play area. In the planning phase a tap opens the preview that names the controller, says that control follows the first player token, that his leaving play loses the game and the threat the refresh phase costs the first player (in the quest phase a tap commits him instead)." },
+  { name: "marsh-dweller-tokens", layout: { stage: "08101", staging: [{ code: "08103", resources: 3 }], timeCounters: 2 }, note: "08103:A:2, 08103:A:3: Ancient Marsh-dweller in the staging area with 3 resource tokens on it. A tap opens the preview that says each token is +1 Threat and +1 Attack and that time counters removed from the current quest add one." },
+];

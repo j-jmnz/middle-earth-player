@@ -44,7 +44,7 @@ import type { ChoiceNames } from "./choice.ts";
 export const PICK_NOUNS: Readonly<Record<string, string>> = { hero: "hero", ally: "ally", attachment: "attachment", enemy: "enemy", character: "character", location: "location", player: "player", objective: "objective" };
 
 // The decks beside the encounter deck a record names (src/rules/core/piles.ts NAMED_PILES), as a sentence says them.
-const PILE_NAMES = { caves: "Caves", evilCreatures: "Evil Creatures", spiders: "Spiders of Mirkwood", orcs: "Orcs", sideQuests: "side quest", harad: "Harad", greatSpider: "Great Spider", angmarOrcs: "Orc", smaug: "Smaug", investigation: "Investigation" } as const;
+const PILE_NAMES = { caves: "Caves", evilCreatures: "Evil Creatures", spiders: "Spiders of Mirkwood", orcs: "Orcs", sideQuests: "side quest", harad: "Harad", greatSpider: "Great Spider", angmarOrcs: "Orc", smaug: "Smaug", raven: "Raven", investigation: "Investigation" } as const;
 
 export function article(noun: string): string {
   return /^[aeiou]/.test(noun) ? `an ${noun}` : `a ${noun}`;
@@ -96,6 +96,11 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return `shuffle an out-of-play ${names.code(instruction.code)} into the encounter deck`;
     case "GainSurge":
       return "reveal an additional encounter card";
+    // The Antlered Crown (the asks file words the choice again for the sheet): Raven Skirmisher's counter off the active location.
+    case "RemoveTimeCounters": {
+      const amount = amountWords(instruction.amount);
+      return instruction.target === "active" ? `remove ${amount} time counter${amount === "1" ? "" : "s"} from the active location` : null;
+    }
     // The set aside card or cards that join the staging area (the Warg-rider of Racing North, 17048:A:1): said in a choice branch.
     case "AddSetAsideToStaging":
       return instruction.all === true || instruction.trait != null ? "add the set aside cards to the staging area" : "add the set aside card to the staging area";
@@ -362,7 +367,7 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? islandWords(instruction) ?? aflameWords(instruction) ?? stormcallerWords(instruction) ?? fortressWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction, names.code) ?? encounterWords(instruction) ?? attachmentWords(instruction, names.code) ?? companyWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction) ?? assaultWords(instruction) ?? pursuitWords(instruction, game) ?? pelennorWords(instruction) ?? blackGateWords(instruction) ?? angmarWords(instruction) ?? investigationWords(instruction) ?? riddlesWords(instruction) ?? villagerWords(instruction) ?? osgiliathWords(instruction) ?? hiddenWords(instruction) ?? valeWords(instruction) ?? ringMakerWords(instruction) ?? heatVerbWords(instruction, game) ?? heathWords(instruction) ?? orcsVerbWords(instruction);
+      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? islandWords(instruction) ?? aflameWords(instruction) ?? stormcallerWords(instruction) ?? fortressWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction, names.code) ?? encounterWords(instruction) ?? attachmentWords(instruction, names.code) ?? companyWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction) ?? assaultWords(instruction) ?? pursuitWords(instruction, game) ?? pelennorWords(instruction) ?? blackGateWords(instruction) ?? angmarWords(instruction) ?? investigationWords(instruction) ?? riddlesWords(instruction) ?? villagerWords(instruction) ?? osgiliathWords(instruction) ?? hiddenWords(instruction) ?? valeWords(instruction) ?? ringMakerWords(instruction, names.code) ?? heatVerbWords(instruction, game) ?? heathWords(instruction) ?? orcsVerbWords(instruction);
   }
 }
 

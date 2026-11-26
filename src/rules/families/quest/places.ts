@@ -111,7 +111,12 @@ export function removeProgressFromQuest(state: ScenarioState, instruction: Verb<
 export function removeAllProgress(state: ScenarioState, instruction: Verb<"RemoveAllProgress">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   // A card immune to card effects keeps its progress (East-gate, 03016:A:1; dwd.immune-to-card-effects).
   const ids = (instruction.pick ? pickCandidates(state, instruction.pick, focus.seat, [], focus.sourceId, ctx) : [refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId))]).filter((id) => id == null || !immuneToSource(state, id, focus.sourceId, ctx));
-  return ids.reduce((current, id) => takeProgressOff(current, id, current.cards[id ?? ""]?.progress ?? 0, steps), state);
+  const removed = ids.reduce((current, id) => takeProgressOff(current, id, current.cards[id ?? ""]?.progress ?? 0, steps), state);
+  if (instruction.remember !== true) return removed;
+  // `remember`: the effect's X is the number of tokens taken off in all (08161:A:1).
+  const total = ids.reduce((sum, id) => sum + (state.cards[id ?? ""]?.progress ?? 0) - (removed.cards[id ?? ""]?.progress ?? 0), 0);
+  const data = topFrame(removed)?.data;
+  return data?.kind === "effect" ? patchTop(removed, { data: { ...data, x: total } }) : removed;
 }
 
 // RemoveProgressEach: up to `amount` progress comes off each matching card in play; the effect's X is the total taken off (02093:A:1).

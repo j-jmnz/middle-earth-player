@@ -242,7 +242,8 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     - the acting player's hand (but this card) is shuffled into their deck; the effect's X becomes how many cards that was
     - the acting player draws 6 card(s)
     - the acting player draws 5 card(s)
-    - the actor must choose 5 of the card (you control) in hand to keep (all stay with no more than that many; nothing is asked then); for each of the others (the chosen ones get the steps in the second list):
+    - the actor must choose 5 of the card (you control) in hand (all of them when no more match; nothing is asked then); for each chosen one:
+      - the picked card goes into its owner's deck, which is shuffled (a card leaving play this way leaves play)
 
 40008:B:1: Immune to player card effects. Sentinel.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
@@ -958,4 +959,4 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     who acts: the acting player is the defending player (the player the attack is against)
     - deal 1 damage to the defender
 
-(rendered pieces: 564 by template, 0 as JSON)
+(rendered pieces: 565 by template, 0 as JSON)

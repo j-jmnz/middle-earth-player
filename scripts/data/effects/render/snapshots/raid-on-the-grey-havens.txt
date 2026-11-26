@@ -450,7 +450,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     - each player in turn may take "11184" or "11185" or "11186" or "11187" into their hand (the card joins the hand once the mulligan is over, so a mulligan cannot shuffle it into the deck) (dealt there but not earned: the scenario's Resolution decides whether it joins the pool)
 
 11182:A:3 (front): Forced: After stage 2B is revealed, remove Calphon and each attachment on him from the game, ignoring his "leaves play" ability.
-  11182:forced:1: Forced on the event afterStageRevealed
+  11182:forced:1: Forced after a quest stage is revealed and its When Revealed effects have resolved, a parallel stage that replaces the stage before fires it too; the flip of the opening stage in the Setup does not
     only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Sahír's Advance"
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card in play titled "Calphon" and the cards attached to it leave the game, and none is announced as leaving play, so no "if it leaves play" ability triggers (the campaign pool is left alone)

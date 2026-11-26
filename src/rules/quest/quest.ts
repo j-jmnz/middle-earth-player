@@ -25,10 +25,9 @@ import { exploreIfFull, freeSlot, makeActiveIn, placeOnActive } from "../familie
 import { noteQuestPlaced, questRoom } from "../families/caves/progress.ts";
 import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts";
 import { attachedStageFrom, branchFrom, holdStage, reached as reachedStage } from "../families/quest/branch.ts";
-import { leaveStage, randomStageFrom } from "../families/wilderland/random-stage.ts";
+import { leaveStage, nextInOrder, randomStageFrom } from "../families/wilderland/random-stage.ts";
 import { stagedCommitted } from "../families/pelargir/committed.ts";
 import { skippedStage } from "../families/pelargir/stage-skip.ts";
-import { skipAreaStage } from "../families/riddles/area.ts";
 import { headOf, sharing, viewOf, withView } from "../families/breaking/areas.ts";
 import { threatFromOtherAreas } from "../families/breaking/threat.ts";
 import { engagedContributors } from "./engaged-threat.ts";
@@ -40,6 +39,7 @@ import { currentSideQuest, mainQuestBarred, placeOnCurrentSideQuest } from "../f
 import { replaceStageProgress } from "./progress-replaced.ts";
 import { jointAdvance } from "../families/armies/advance.ts";
 import { familyOptionalEngageBarred, familyQuestResult } from "../interpret/family-hooks.ts";
+import type { RandomNext } from "../../catalog/random-next.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -273,7 +273,7 @@ export function putOnStage(from: ScenarioState, stageId: string, wanted: number,
 
 // The next stage arrives with no progress on it (rr.quest-advancement), side B up. A stage that prints no quest points
 // (141024, 141027) is won some other way, so the quest stops there. One with 0 quest points is checked when it next takes progress.
-export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], canAdvance: Gate): ScenarioState {
+export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineStep[], canAdvance: Gate, randomSet?: RandomNext): ScenarioState {
   let next = state;
   const guard = next.stages.length + 1;
   for (let hop = 0; hop < guard; hop += 1) {
@@ -296,14 +296,14 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     // A quest that branches (BranchStage, 01120:B:1) chooses the next stage at random and ends at a stage it led to.
     const branched = ordered ? null : branchFrom(next, current.code);
     if (branched) next = branched.state;
-    // A stage that names AdvanceToRandomStage (19048:B:2) proceeds to one of the stages it lists at random, each played once.
-    const rolled = ordered || branched ? null : randomStageFrom(next, current.code);
+    // A stage that names AdvanceToRandomStage (19048:B:2) proceeds to one of the stages it lists at random, each played once. The set a record names for this one advance (`randomSet`) is the source stage's alone: a stage reached with its quest points already filled goes on by its own.
+    const rolled = ordered || branched ? null : randomStageFrom(next, current.code, hop === 0 ? randomSet : undefined);
     if (rolled) next = rolled.state;
     // A stage that names AdvanceIfAttached (50601:B:3) proceeds to the stage its Loot condition names.
     const attached = ordered || branched || rolled ? null : attachedStageFrom(next, current.code, cards);
     if (attached) next = attached.state;
     const nextId = joint ? joint.id : ordered ? ordered.id : rolled ? rolled.id : attached ? attached.id : (() => {
-      const nextCode = branched ? branched.code : index < 0 || flagged(next, currentId, "holdsWin") ? undefined : skippedStage(next, currentId, index) ?? skipAreaStage(next, index);
+      const nextCode = branched ? branched.code : index < 0 || flagged(next, currentId, "holdsWin") ? undefined : skippedStage(next, currentId, index) ?? nextInOrder(next, index);
       return nextCode ? next.questDeck.find((id) => next.cards[id]?.code === nextCode) : undefined;
     })();
     if (!nextId) return flagged(next, currentId, "holdsWin") ? holdStage(next, currentId) : clearStage(next);

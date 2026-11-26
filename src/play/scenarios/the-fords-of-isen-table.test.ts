@@ -9,6 +9,7 @@ import { sheetFor } from "../choice/sheets.ts";
 import { idOf, resolveRecords, revealedTop, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
 import { slotNumbers } from "../cards/card-effects.ts";
 import { zoneSelector } from "../store/selectors.ts";
+import { questTitle } from "../cards/table-preview.ts";
 import { dungeonDetail } from "../cards/dungeon-preview.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
 
@@ -130,5 +131,15 @@ describe("Down from the Hills' time row (07022:A:1)", () => {
   it("07060:B:3 and 07061:B:2 name what the last counter does", () => {
     expect(timeRow("07060", 1, 1)?.caution).toBe("Tap again: the last time counter comes off, each player assigns damage for each card in his hand, and 2 time counters return.");
     expect(timeRow("07061", 1, 1)?.caution).toContain("3 time counters return");
+  });
+});
+
+describe("the preview of a time stage", () => {
+  it("07061:B:1 with 2 counters left the preview says the count once: the counter line, not the near words", () => {
+    const made = built({ stage: "07061" });
+    const state = updateCard(made.state, idOf(made.state, "07061"), { resources: 2 });
+    const detail = questTitle(state, made.ctx, idOf(state, "07061"), nameOf(made)("07061"), () => null)?.detail ?? "";
+    expect(detail).not.toContain("2 time counters are left");
+    expect(detail.match(/time counters? (are )?left/g) ?? []).toHaveLength(0);
   });
 });

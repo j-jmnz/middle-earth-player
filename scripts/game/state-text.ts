@@ -7,6 +7,7 @@ import type { ModifierStat } from "../../src/catalog/effect-schema.ts";
 import type { LegalIntent } from "../../src/rules/core/intents.ts";
 import { legalIntents, legalTargets, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 
+import { heldStage } from "../../src/play/cards/earlier-stages.ts";
 import { cardName, intentText } from "./names.ts";
 
 const STATS: readonly [ModifierStat, string, keyof PrintedStats][] = [
@@ -87,7 +88,7 @@ export function stateText(state: ScenarioState, ctx: ReduceContext, options: Sta
   lines.push(`${state.scenarioId}, round ${state.round}, ${state.phase} (mode ${state.mode}), P${state.activeSeat + 1} acting, first player P${state.firstPlayer + 1}${outcome ? `, ${outcome}` : ""}`);
   lines.push(`window: ${windowText(state, ctx)}${state.passed.length > 0 ? `; passed: ${state.passed.map((seat) => `P${seat + 1}`).join(", ")}` : ""}`);
   if (state.failure) lines.push(`failure: ${state.failure}`);
-  lines.push(`quest: ${state.questStage ? cardLine(state, ctx, state.questStage) : "none"}; ${state.questDeck.length} stages left`);
+  lines.push(`quest: ${state.questStage ? cardLine(state, ctx, state.questStage) : "none"}; ${stagesLeft(state, ctx)} stages left`);
   for (const id of [state.activeLocation, state.secondActiveLocation]) if (id) lines.push(`active location: ${cardLine(state, ctx, id)}`);
   const threat = state.staging.reduce((total, id) => total + (state.cards[id] ? modifiedStat(state, state.cards[id], "threat", ctx.cards) : 0), 0);
   lines.push(`staging (${threat} threat):`, ...state.staging.map((id) => `  ${cardLine(state, ctx, id)}`));
@@ -138,4 +139,11 @@ function fullText(state: ScenarioState, ctx: ReduceContext): string[] {
     if (seat.deck.length > 0) lines.push(`P${index + 1} deck (top first): ${seat.deck.map((id) => cardName(state, ctx, id)).join(", ")}`);
   });
   return lines;
+}
+
+// The printed stages after the current one, counted as the table numbers them (the stages that are alternatives share one place); a quest with no place for the stage counts the quest deck.
+function stagesLeft(state: ScenarioState, ctx: ReduceContext): number {
+  const code = state.questStage ? state.cards[state.questStage]?.code : undefined;
+  const place = code ? heldStage(state, ctx, code) : null;
+  return place ? place.of - place.at : state.questDeck.length;
 }

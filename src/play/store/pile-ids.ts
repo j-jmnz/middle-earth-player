@@ -6,7 +6,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 // discard pile while it deals that (emce.evil-creatures-deck), or one deck alone: the Uncharted deck (dcce.uncharted-deck), the Grotto deck (dcce.grotto-deck) or the Caves deck
 // (emce.caves-deck), the Balrog deck and its discard pile in Shadow and Flame Nightmare (the setup card's lines 901801:A:2 to A:4), or the Harad deck lying under The Cross-roads (mec112.setup-journey-to-the-cross-roads). The victory display is a pile too, at staging's right end, only while a card is in it (ltp.victory-display). Only the discard piles and the victory display open a list.
 export type BasePileId = "deck" | "discard" | "encounterDeck" | "encounterDiscard";
-export type SecondPileId = "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "grottoDeck" | "evilCreaturesDeck" | "evilCreaturesDiscard" | "balrogDeck" | "balrogDiscard" | "cavesDeck" | "haradDeck" | "angmarOrcDeck" | "investigationDeck" | "smaugDeck" | "smaugDiscard" | "sackDeck";
+export type SecondPileId = "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "grottoDeck" | "evilCreaturesDeck" | "evilCreaturesDiscard" | "balrogDeck" | "balrogDiscard" | "ravenDeck" | "ravenDiscard" | "cavesDeck" | "haradDeck" | "angmarOrcDeck" | "investigationDeck" | "smaugDeck" | "smaugDiscard" | "sackDeck";
 export type VictoryPileId = "victory";
 export type PileId = BasePileId | SecondPileId | VictoryPileId;
 
@@ -14,6 +14,7 @@ export const PILES: readonly BasePileId[] = ["deck", "discard", "encounterDeck",
 export const SECOND_PILES: readonly SecondPileId[] = ["corsairDeck", "corsairDiscard"];
 const EVIL_CREATURES_PILES: readonly SecondPileId[] = ["evilCreaturesDeck", "evilCreaturesDiscard"];
 const BALROG_PILES: readonly SecondPileId[] = ["balrogDeck", "balrogDiscard"];
+const RAVEN_PILES: readonly SecondPileId[] = ["ravenDeck", "ravenDiscard"];
 const UNCHARTED_PILES: readonly SecondPileId[] = ["unchartedDeck"];
 const GROTTO_PILES: readonly SecondPileId[] = ["grottoDeck"];
 const CAVES_PILES: readonly SecondPileId[] = ["cavesDeck"];
@@ -37,6 +38,8 @@ export const PILE_WORDS: Readonly<Record<PileId, string>> = {
   evilCreaturesDiscard: "Evil Creatures discard pile",
   balrogDeck: "Balrog deck",
   balrogDiscard: "Balrog discard pile",
+  ravenDeck: "Raven deck",
+  ravenDiscard: "Raven discard pile",
   cavesDeck: "Caves deck",
   haradDeck: "Harad deck",
   angmarOrcDeck: "Orc deck",
@@ -62,6 +65,7 @@ export function secondPilesOf(game: Pick<ScenarioState, "corsairDeck" | "unchart
   if (game.corsairDeck !== undefined) return SECOND_PILES;
   if (game.piles?.evilCreaturesDeck !== undefined) return EVIL_CREATURES_PILES;
   if (game.piles?.balrogDeck !== undefined) return BALROG_PILES;
+  if (game.piles?.ravenDeck !== undefined) return RAVEN_PILES;
   if (game.uncharted?.grotto === true) return GROTTO_PILES;
   if (game.uncharted !== undefined) return UNCHARTED_PILES;
   if (game.piles?.haradDeck !== undefined) return HARAD_PILES;
@@ -75,7 +79,7 @@ export function secondPilesOf(game: Pick<ScenarioState, "corsairDeck" | "unchart
 
 /** Whether a pile's cards are shown face up on top: a discard pile (the one on top is the last put there). A tap on one opens its list; a deck's does not (docs/design-system-table.md, Piles). */
 export function isDiscardPile(pile: PileId): boolean {
-  return pile === "discard" || pile === "encounterDiscard" || pile === "corsairDiscard" || pile === "evilCreaturesDiscard" || pile === "balrogDiscard" || pile === "smaugDiscard";
+  return pile === "discard" || pile === "encounterDiscard" || pile === "corsairDiscard" || pile === "evilCreaturesDiscard" || pile === "balrogDiscard" || pile === "ravenDiscard" || pile === "smaugDiscard";
 }
 
 /** Whether a tap on a pile opens its list: a discard pile or the victory display. */
@@ -107,6 +111,8 @@ export function pileIds(game: ScenarioState, pile: PileId, seat: number): readon
     case "evilCreaturesDiscard":
     case "balrogDeck":
     case "balrogDiscard":
+    case "ravenDeck":
+    case "ravenDiscard":
     case "cavesDeck":
     case "haradDeck":
     case "angmarOrcDeck":

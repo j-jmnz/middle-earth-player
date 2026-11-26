@@ -6,7 +6,7 @@ import { lastCounterWords, stageTimeNearWords, stageTimeWords } from "./fords-ta
 
 describe("what the last time counter does", () => {
   it("names a sentence for every stage with a time dial, and none for another card", () => {
-    expect(FORDS_STAGES).toHaveLength(12);
+    expect(FORDS_STAGES).toHaveLength(24);
     for (const code of FORDS_STAGES) expect(lastCounterWords(code), code).toMatch(/\.$/);
     expect(lastCounterWords("07058")).toBeNull();
   });

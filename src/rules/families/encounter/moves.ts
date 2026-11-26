@@ -23,9 +23,10 @@ import { flagged, heldHero, inPlay, updateCard } from "../../core/state.ts";
 import { travelNow } from "../../quest/travel.ts";
 import { shuffleEncounterDeck, shuffleIntoEncounterDeck } from "../../interpret/verbs.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
-import { moveCard } from "../../core/zones.ts";
+import { moveCard, moveToEncounterDeckDown } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { addedToStaging, announceEntered } from "./reveal.ts";
+import { timeOnReveal } from "../angmar/time.ts";
 import { stagingDest } from "../breaking/areas.ts";
 import { freeSlot, makeActiveIn } from "../south/locations.ts";
 
@@ -84,7 +85,9 @@ export function placeUnderHost(state: ScenarioState, id: string, host: string, c
 }
 
 function toDeck(state: ScenarioState, id: string, top: boolean): ScenarioState {
-  const moved = updateCard(moveCard(state, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
+  const put = moveToEncounterDeckDown(state, id);
+  if (!put.moved) return put.state;
+  const moved = put.state;
   const rest = moved.encounterDeck.filter((entry) => entry !== id);
   return { ...moved, encounterDeck: top ? [id, ...rest] : [...rest, id] };
 }
@@ -129,7 +132,9 @@ export function moveEncounter(
       const staged = updateCard(moveCard(next, id, stagingDest(next, seat)), id, { face: "up", controller: null });
       if (wasInPlay) return staged;
       // Put into the staging area from out of play: it is added to the staging area and enters play.
-      return announceEntered(addedToStaging(queueEvent(staged, { trigger: "addedToStaging", seat, cardId: id }), id, ctx), id, seat, ctx);
+      // A set-aside card with Time X that is added to the staging area gets its time counters as it enters play, without a reveal (Raven Chief's Camp, 08149:A:1; mec108.time-x).
+      const timed = card.zone === "setAside" ? timeOnReveal(staged, id, ctx) : staged;
+      return announceEntered(addedToStaging(queueEvent(timed, { trigger: "addedToStaging", seat, cardId: id }), id, ctx), id, seat, ctx);
     }
     case "engaged": {
       if (typeOf(next, id, ctx) !== "enemy") return next;

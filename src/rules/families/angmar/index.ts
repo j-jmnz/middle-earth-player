@@ -28,6 +28,7 @@ import { discardHeld, holdUnder } from "./hold.ts";
 import { chooseCurrentQuest, currentQuestHolds, hitPointsLeftHolds, questCardsAmount, questLeadsHolds } from "./quest.ts";
 import { advanceWhenFlagged, removeSideQuestsFromGame } from "./stage.ts";
 import { removeTimeCounters, removeTimeCountersFrom, timeCounterMatches, timeOnReveal } from "./time.ts";
+import { placeTimeCounters, removeTimeCountersFromLocations, timeOfActiveAmount } from "./time-locations.ts";
 import { attachNewTo, tradeDamageForResources } from "./trade.ts";
 import { attachEnemyToPicked, destroyHighestCostAlly, discardOtherInPlay, removePickedFromGame } from "./reanimate/attached.ts";
 import { dealSourceAsShadow, resolveWhenRevealedOf } from "./reanimate/shadows.ts";
@@ -40,7 +41,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "Time":
       return state;
     case "RemoveTimeCounters":
-      return instruction.target == null ? removeTimeCounters(state, ctx) : removeTimeCountersFrom(state, ctx, instruction);
+      if (instruction.target === "locations" || instruction.target === "active") return removeTimeCountersFromLocations(state, instruction, focus, ctx, steps);
+      return instruction.target == null ? removeTimeCounters(state, ctx) : removeTimeCountersFrom(state, ctx, instruction, focus);
+    case "PlaceTimeCounters":
+      return placeTimeCounters(state, ctx);
     case "HoldUnder":
       return holdUnder(state, instruction, focus);
     case "DiscardHeld":
@@ -120,7 +124,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "angmar",
-  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "RevealedGainDoomed", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed", "FlipTimeObjective", "RecordStartingThreat", "Safe", "StageRandomGuardedPair", "RevealCard", "ReleaseGuards", "RevealSetAsideForTokens", "EarnEncounterCopies", "RemoveSideQuestsFromGame", "FlipWhenDefeated", "RemoveProgressAmong", "FlipTwoSided", "DealShadowInPlay", "DiscardCopiesFromDeck", "Reanimate", "ResolveWhenRevealedOf", "DealSourceAsShadow", "AttachEnemyToPicked", "DestroyHighestCostAlly", "DiscardOtherInPlay", "RemovePickedFromGame"],
+  verbs: ["Time", "RemoveTimeCounters", "PlaceTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "RevealedGainDoomed", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed", "FlipTimeObjective", "RecordStartingThreat", "Safe", "StageRandomGuardedPair", "RevealCard", "ReleaseGuards", "RevealSetAsideForTokens", "EarnEncounterCopies", "RemoveSideQuestsFromGame", "FlipWhenDefeated", "RemoveProgressAmong", "FlipTwoSided", "DealShadowInPlay", "DiscardCopiesFromDeck", "Reanimate", "ResolveWhenRevealedOf", "DealSourceAsShadow", "AttachEnemyToPicked", "DestroyHighestCostAlly", "DiscardOtherInPlay", "RemovePickedFromGame"],
   run,
   revealed: (state, id, ctx) => noteRevealDoomed(noteFirstTrait(timeOnReveal(state, id, ctx), id, ctx), id),
   travel: { unpayable: travelUnpayable },
@@ -129,5 +133,5 @@ export const manifest: RulesFamily = {
   combat: { attack: (state, enemyId, _attacker, _target, attackerId) => attackerFacing(state, enemyId, attackerId), defense: (state, defender, _cards, defenderId) => defenderFacing(state, defender, defenderId) },
   condition: (state, condition, scope, ctx) => timeOfDayHolds(state, condition) ?? currentQuestHolds(state, condition, scope, ctx) ?? questLeadsHolds(state, condition, ctx) ?? hitPointsLeftHolds(state, condition, ctx) ?? safeActiveHolds(state, condition, ctx) ?? setAsideHasHolds(state, condition),
   settle: { sweep: advanceWhenFlagged },
-  amount: (state, found, scope, ctx) => questCardsAmount(state, found, scope.actor, ctx) ?? discardedThreatAmount(state, found, ctx) ?? destroyedWillpowerAmount(state, found, scope) ?? shadowCardsInPlayAmount(state, found, ctx) ?? discardPileMaxCostAmount(state, found, scope.actor, ctx),
+  amount: (state, found, scope, ctx) => questCardsAmount(state, found, scope.actor, ctx) ?? discardedThreatAmount(state, found, ctx) ?? destroyedWillpowerAmount(state, found, scope) ?? shadowCardsInPlayAmount(state, found, ctx) ?? discardPileMaxCostAmount(state, found, scope.actor, ctx) ?? timeOfActiveAmount(state, found, ctx),
 };

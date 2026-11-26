@@ -170,7 +170,7 @@ export type CardInstance = {
   carried?: true;
   // The named deck the card was dealt into, when that deck has a discard pile of its own (core/piles.ts): the card goes back to that discard pile, not the encounter discard pile, when it
   // leaves play (emce.evil-creatures-deck). Absent on every other card.
-  deck?: "evilCreatures" | "balrog" | "smaug" | "sack";
+  deck?: "evilCreatures" | "balrog" | "raven" | "smaug" | "sack";
 };
 
 export type Seat = {
@@ -356,7 +356,7 @@ export type ScenarioState = {
   questEnded?: readonly number[];
   // Progress a stage 3B turned into cards to discard from the encounter deck, until the progress step is over (families/breaking/progress.ts).
   progressOwed?: readonly { seat: number; amount: number }[];
-  stages: readonly { code: string; branch?: readonly string[]; look?: number; catchUp?: number; randomNext?: { codes: readonly string[]; otherwise?: string; remove?: true; different?: true }; attachedNext?: { code: string; then: string; otherwise: string }; deck?: true }[];
+  stages: readonly { code: string; branch?: readonly string[]; look?: number; catchUp?: number; randomNext?: import("../../catalog/random-next.ts").RandomNext; attachedNext?: { code: string; then: string; otherwise: string }; deck?: true }[];
   // The part number of the scenario's campaign card, in a campaign with XP (the amount `part`), and the campaign Setup instructions that resolve once the
   // quest card's Setup is done (ScenarioDefinition.afterSetup).
   part?: number;

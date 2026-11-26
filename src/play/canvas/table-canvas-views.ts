@@ -20,7 +20,7 @@ export function useViews(store: TableCanvasProps["store"], seat: number, facts: 
   const uncharted = useMemo(() => pileSelector("unchartedDeck", seat), [seat]);
   const grotto = useMemo(() => pileSelector("grottoDeck", seat), [seat]);
   // The Evil Creatures pair and the Caves deck (Ered Mithrin), only while the game has dealt them; shared, so a peek leaves them too.
-  const wilderland = useMemo(() => ({ evilDeck: pileSelector("evilCreaturesDeck", seat), evilDiscard: pileSelector("evilCreaturesDiscard", seat), caves: pileSelector("cavesDeck", seat), harad: pileSelector("haradDeck", seat), orcs: pileSelector("angmarOrcDeck", seat), investigation: pileSelector("investigationDeck", seat), sack: pileSelector("sackDeck", seat), balrogDeck: pileSelector("balrogDeck", seat), balrogDiscard: pileSelector("balrogDiscard", seat), smaugDeck: pileSelector("smaugDeck", seat), smaugDiscard: pileSelector("smaugDiscard", seat) }), [seat]);
+  const wilderland = useMemo(() => ({ evilDeck: pileSelector("evilCreaturesDeck", seat), evilDiscard: pileSelector("evilCreaturesDiscard", seat), caves: pileSelector("cavesDeck", seat), harad: pileSelector("haradDeck", seat), orcs: pileSelector("angmarOrcDeck", seat), investigation: pileSelector("investigationDeck", seat), sack: pileSelector("sackDeck", seat), balrogDeck: pileSelector("balrogDeck", seat), balrogDiscard: pileSelector("balrogDiscard", seat), ravenDeck: pileSelector("ravenDeck", seat), ravenDiscard: pileSelector("ravenDiscard", seat), smaugDeck: pileSelector("smaugDeck", seat), smaugDiscard: pileSelector("smaugDiscard", seat) }), [seat]);
   // The victory display, shared by the seats, drawn only while a card is in it.
   const victoryOf = useMemo(() => victoryPileSelector(facts.pointsOf ?? noPoints), [facts]);
   const questStage = useStore(store, (state) => zones.questStage(state.game));
@@ -42,6 +42,8 @@ export function useViews(store: TableCanvasProps["store"], seat: number, facts: 
   const evilCreaturesDiscard = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("evilCreaturesDiscard") ? wilderland.evilDiscard(state.game) : null));
   const balrogDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("balrogDeck") ? wilderland.balrogDeck(state.game) : null));
   const balrogDiscard = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("balrogDiscard") ? wilderland.balrogDiscard(state.game) : null));
+  const ravenDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("ravenDeck") ? wilderland.ravenDeck(state.game) : null));
+  const ravenDiscard = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("ravenDiscard") ? wilderland.ravenDiscard(state.game) : null));
   const cavesDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("cavesDeck") ? wilderland.caves(state.game) : null));
   const haradDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("haradDeck") ? wilderland.harad(state.game) : null));
   const angmarOrcDeck = useStore(store, (state): PileView | null => (secondPilesOf(state.game).includes("angmarOrcDeck") ? wilderland.orcs(state.game) : null));
@@ -53,9 +55,9 @@ export function useViews(store: TableCanvasProps["store"], seat: number, facts: 
   return useMemo(
     () => ({
       views: { questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand },
-      piles: { deck, discard, encounterDeck, encounterDiscard, ...(corsairDeck ? { corsairDeck } : {}), ...(corsairDiscard ? { corsairDiscard } : {}), ...(unchartedDeck ? { unchartedDeck } : {}), ...(grottoDeck ? { grottoDeck } : {}), ...(evilCreaturesDeck ? { evilCreaturesDeck } : {}), ...(evilCreaturesDiscard ? { evilCreaturesDiscard } : {}), ...(balrogDeck ? { balrogDeck } : {}), ...(balrogDiscard ? { balrogDiscard } : {}), ...(cavesDeck ? { cavesDeck } : {}), ...(angmarOrcDeck ? { angmarOrcDeck } : {}), ...(investigationDeck ? { investigationDeck } : {}), ...(haradDeck ? { haradDeck } : {}), ...(smaugDeck ? { smaugDeck } : {}), ...(smaugDiscard ? { smaugDiscard } : {}), ...(sackDeck ? { sackDeck } : {}), ...(victory ? { victory } : {}) },
+      piles: { deck, discard, encounterDeck, encounterDiscard, ...(corsairDeck ? { corsairDeck } : {}), ...(corsairDiscard ? { corsairDiscard } : {}), ...(unchartedDeck ? { unchartedDeck } : {}), ...(grottoDeck ? { grottoDeck } : {}), ...(evilCreaturesDeck ? { evilCreaturesDeck } : {}), ...(evilCreaturesDiscard ? { evilCreaturesDiscard } : {}), ...(balrogDeck ? { balrogDeck } : {}), ...(balrogDiscard ? { balrogDiscard } : {}), ...(ravenDeck ? { ravenDeck } : {}), ...(ravenDiscard ? { ravenDiscard } : {}), ...(cavesDeck ? { cavesDeck } : {}), ...(angmarOrcDeck ? { angmarOrcDeck } : {}), ...(investigationDeck ? { investigationDeck } : {}), ...(haradDeck ? { haradDeck } : {}), ...(smaugDeck ? { smaugDeck } : {}), ...(smaugDiscard ? { smaugDiscard } : {}), ...(sackDeck ? { sackDeck } : {}), ...(victory ? { victory } : {}) },
     }),
-    [questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand, deck, discard, encounterDeck, encounterDiscard, corsairDeck, corsairDiscard, unchartedDeck, grottoDeck, evilCreaturesDeck, evilCreaturesDiscard, balrogDeck, balrogDiscard, cavesDeck, haradDeck, angmarOrcDeck, investigationDeck, smaugDeck, smaugDiscard, sackDeck, victory],
+    [questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand, deck, discard, encounterDeck, encounterDiscard, corsairDeck, corsairDiscard, unchartedDeck, grottoDeck, evilCreaturesDeck, evilCreaturesDiscard, balrogDeck, balrogDiscard, ravenDeck, ravenDiscard, cavesDeck, haradDeck, angmarOrcDeck, investigationDeck, smaugDeck, smaugDiscard, sackDeck, victory],
   );
 }
 
@@ -66,14 +68,27 @@ export function sphereRing(sphere: string | null, t: TableTokens = tableTokens):
   return tint && tint !== "faint" ? t[tint] : null;
 }
 
+/** A card whose progress is past its quest points says the count in its strip and wears no progress token (stripText). */
+export const progressInStrip = (progress: number, questPoints: number | null): boolean => questPoints != null && progress > questPoints;
+
 // The "progress / quest points" strip of a quest card or location, which pops when progress is placed on it.
 // `owner`: the seat the quest card's stage belongs to once stages are separate between players ("P2 · 2 / 8").
 // The Stormcaller's stage keeps it in the part its area's cards leave uncovered, so it is set close ("12/18") to stay inside it at 24/24 (dcce.stormcallers-area).
 // `loses`: filling the stage loses the game (143075:B:3), said in a word as well as the strip's threat red ("5 / 8 · lose").
-// Progress past the quest points (a stage that cannot be defeated yet, 17027:B:2) says "12+ / 12": the progress token at the card's foot holds the full number, and a long one there would cover the strip's count.
+// Progress past the quest points (a stage that cannot be defeated yet, 17027:B:2, 08123:B:4) says its whole count ("20 / 12") and the card wears no progress token (`progressInStrip`): a token at the foot would cover the strip's count.
 export function stripText(slot: CardSlot, questPoints: number | null, owner?: string | null, loses = false): string | null {
   if (questPoints == null) return null;
-  const progress = slot.progress > questPoints ? `${questPoints}+` : `${slot.progress}`;
-  const count = `${owner ? `${owner} · ` : ""}${progress}${slot.stormcaller === "stage" ? "/" : " / "}${questPoints}`;
+  const count = `${owner ? `${owner} · ` : ""}${slot.progress}${slot.stormcaller === "stage" ? "/" : " / "}${questPoints}`;
   return loses ? `${count} · lose` : count;
+}
+
+/**
+ * The x the strip's count is centred on: the middle of the card, kept right of the resource token at the card's foot (`resources`; a location with time counters wears one), left of the progress token (`tokenLeft`, its left edge; null with none)
+ * and inside the card's right edge, so a token never covers a digit. `half` is half the text's width; `token` the token art's size, both at the scale `s`. When the count is too wide for the room, the resource token's clearance wins: the count
+ * never falls back onto it.
+ */
+export function stripCenterX(x: number, w: number, half: number, tokenLeft: number | null, resources: boolean, token: number, s: number): number {
+  const lowest = resources ? x + (token + 1) * s + 2 * s + half : Number.NEGATIVE_INFINITY;
+  const highest = (tokenLeft ?? x + w) - 2 * s - half;
+  return Math.max(lowest, Math.min(x + w / 2, highest));
 }

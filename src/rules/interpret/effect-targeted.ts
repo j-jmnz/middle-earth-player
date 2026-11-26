@@ -30,6 +30,7 @@ import { patchTop, topFrame } from "../windows/windows.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { gameReads } from "../core/game-reads.ts";
 import { listens } from "../families/encounter/reveal.ts";
+import { scourEffects } from "../families/ring-maker/scour.ts";
 import { attachTo, inPlay, moveCard, turnedUp } from "../core/zones.ts";
 
 function hasEnemyType(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
@@ -42,7 +43,11 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
   switch (instruction.verb) {
     case "ReturnToStaging": {
       const target = instruction.target;
-      if (target.kind === "self") return sourceId ? [sourceId] : [];
+      // An ability only acts on a card in play (rr.in-play-and-out-of-play): a card that left play, shuffled into the encounter deck (143049:A:2) or discarded (51049:A:1), is not returned to the staging
+      // area by an AfterAttack that is still to run. A card a Shadow effect adds to the staging area lies in the shadow zone (Thunderstruck, 11177:A:5), and a Scour card resolves from the discard pile
+      // (rm.scour, 08131:A:2): their text names the area.
+      const selfZone = sourceId ? state.cards[sourceId]?.zone : undefined;
+      if (target.kind === "self") return sourceId && selfZone != null && (inPlay(selfZone) || selfZone === "shadow" || (selfZone === "encounterDiscard" && scourEffects(state, sourceId, ctx).length > 0)) ? [sourceId] : [];
       if (target.kind === "host") return [hostOf(state, sourceId)].filter((id): id is string => id != null);
       if (target.kind === "activeLocation") {
         // The acting seat's own active location once stages are separate.

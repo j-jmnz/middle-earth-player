@@ -1,10 +1,10 @@
-// Rules: rm.out-of-play-deck, rr.engaged, rm.grima-objective-ally, rr.cannot, rr.first-player (data/rules/entries.json); ledger lines 07024:A:2, 07025:A:1, 07016:A:1, 07016:A:3, 07023:A:1, 07059:A:1, 07059:B:3, 08068:A:1, 08071:A:2.
+// Rules: rm.out-of-play-deck, rr.engaged, rm.grima-objective-ally, rr.cannot, rr.first-player (data/rules/entries.json); ledger lines 07024:A:2, 07025:A:1, 07016:A:1, 07016:A:3, 07023:A:1, 07059:A:1, 07059:B:3, 08068:A:1, 08071:A:2, 08102:A:1, 08102:A:2, 08103:A:2, 08103:A:3.
 // The one line a card of The Fords of Isen says about itself in the card preview (dungeon-preview.ts): Mugash held under his hero and the Guard that engages its player (To Catch an Orc), Gríma held under The Islet (wherever The Islet lies), free in the staging area, or in a player's play area, and Ill Tidings held in a hand. The engine decided each; nothing here changes one. Pure.
 import { flagged, livingSeats, type ScenarioState } from "../../../rules/core/state.ts";
 import type { ReduceContext } from "../../../rules/interpret/interpret.ts";
 import { captorSeat } from "../../../rules/families/ring-maker/captor.ts";
 import { GRIMA_IN_STAGING, grimaControlledWords, grimaOnWords, illTidingsWords } from "../../words/scenarios/ring-maker/fords-table.ts";
-import { crossingPointsWords, nalirControlledWords } from "../../words/scenarios/ring-maker/tharbad-table.ts";
+import { crossingPointsWords, marshDwellerWords, nalirControlledWords, ninNalirWords } from "../../words/scenarios/ring-maker/tharbad-table.ts";
 import { guardWords, heroHoldsWords, mugashHeldWords } from "../../words/scenarios/ring-maker/orc-table.ts";
 import { hinderWords, mugashFreeWords, mugashOnEdgeWords, mugashOnHeroWords, needOfRestHostWords, offTrackHostWords } from "../../words/scenarios/ring-maker/fangorn-table.ts";
 import { hillsWords, oldSouthRoadWords, ravineWords, turchWords } from "../../words/scenarios/ring-maker/dunland-table.ts";
@@ -12,11 +12,15 @@ import { questPointsOf } from "../../../rules/quest/quest.ts";
 import { timeOf } from "../../../rules/families/angmar/time.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 import { IN_NEED_OF_REST } from "../../readouts/ring-maker/fangorn.ts";
+import { crownDetail } from "./crown-preview.ts";
 import { trialsDetail } from "./trials-preview.ts";
+import { celebrimborDetail } from "./celebrimbor-preview.ts";
 import { GUARD, MUGASH, MUGASH_OBJECTIVE, mugashLyingOn } from "../../readouts/ring-maker/orc.ts";
 
 const GRIMA = "07016";
 const NALIR = "08068";
+const NIN_NALIR = "08102";
+const MARSH_DWELLER = "08103";
 const CROSSING = "08071";
 const ILL_TIDINGS = "07023";
 // The stage whose text stops the quest from advancing unless the first player controls Gríma (07059:B:3).
@@ -94,12 +98,16 @@ function crossingDetail(game: ScenarioState, ctx: ReduceContext, cardId: string)
 export function ringMakerDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name: (id: string) => string): string | null {
   const card = game.cards[cardId];
   if (!card) return null;
+  const crown = crownDetail(game, cardId);
+  if (crown) return crown;
   const fangorn = fangornDetail(game, cardId, name);
   if (fangorn) return fangorn;
   const dunland = dunlandDetail(ctx, game, cardId);
   if (dunland) return dunland;
   const trials = trialsDetail(game, ctx, cardId, name);
   if (trials) return trials;
+  const celebrimbor = celebrimborDetail(game, ctx, cardId, name);
+  if (celebrimbor) return celebrimbor;
   if (card.code === ILL_TIDINGS && card.zone === "hand" && flagged(game, cardId, "cannotLeaveHand")) return illTidingsWords(game.seatCount > 1 && card.controller != null ? `Player ${card.controller + 1}` : null);
   if (card.code === MUGASH) return card.zone === "attached" && card.host != null && game.cards[card.host] ? mugashHeldWords(name(card.host)) : null;
   if (card.code === GUARD && (card.zone === "staging" || card.zone === "engaged")) {
@@ -109,6 +117,8 @@ export function ringMakerDetail(game: ScenarioState, ctx: ReduceContext, cardId:
   }
   if (mugashLyingOn(game, cardId).length > 0) return heroHoldsWords(name(cardId));
   if (card.code === NALIR && card.controller != null && card.zone === "play") return nalirControlledWords(game.seatCount > 1 ? `Player ${card.controller + 1}` : null);
+  if (card.code === NIN_NALIR && card.controller != null && card.zone === "play") return ninNalirWords(game.seatCount > 1 ? `Player ${card.controller + 1}` : null, livingSeats(game).length);
+  if (card.code === MARSH_DWELLER && (card.zone === "staging" || card.zone === "engaged")) return marshDwellerWords(card.resources);
   if (card.code === CROSSING && card.zone === "staging") return crossingDetail(game, ctx, cardId);
   if (card.code !== GRIMA) return null;
   if (card.zone === "attached" && card.host != null && game.cards[card.host]) return grimaOnWords(name(card.host));

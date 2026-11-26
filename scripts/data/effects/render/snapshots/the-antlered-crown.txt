@@ -1,0 +1,260 @@
+Scenario piles that place cards with no record (staging: 08155 Raven War-camp; activeLocation: 08157 Dunland Battlefield; quest: 08147 Battle for Dunland; quest: 08148 The Raven Clan; quest: 08149 The Last Stage; setAside: 08150 Chief Turch; setAside: 08151 Raven Chief; setAside: 08152 Raven Chief's Camp; setAside: 07046 Dunland Tribesman; setAside: 07047 Dunland Chieftain; setAside: 07048 Dunland Berserker; setAside: 07042 Dunland Prowler; setAside: 07043 Dunlending Bandit; setAside: 07044 Dunland Raider)
+
+## 08147 Battle for Dunland
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08147:A:1 (front): Setup: The first player takes control of Chief Turch. Set Raven Chief and Raven Chief's Camp aside, out of play. Reveal 1 copy of Dunland Battlefield and make it the active location. Reveal 1 copy of Raven War-camp and add it to the staging area. Create the Raven deck (see insert) and set it next to the quest deck. Each player chooses 1 different enemy from the Raven deck and adds it to the staging area. Shuffle the encounter deck and Raven deck.
+  08147:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the set-aside card with code 08150 enters play under the first player's control, ready
+    - each location in play (staging area or active) with the Time X keyword and no time counter (locationsWithNone) gets its printed X time counters, as a revealed one does
+    - every set-aside copy of the cards with codes 07042, 07043, 07044, 07046, 07047 and 07048 goes facedown into the raven deck, and the deck's discard pile starts empty (the shuffle is a record's own)
+    - for each player, first player first:
+      - choose enemy (any player controls) in the Raven deck, of a different title from the cards this effect already picked
+      - the picked card (a card of the Raven deck) is added to the staging area, not revealed (no When Revealed, no Surge)
+    - shuffle the encounter deck
+    - shuffle the raven deck
+
+08147:B:1 (back): Time 3.
+  08147:constant:1: Constant
+    - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+08147:B:2 (back): Forced: After the last time counter is removed from this stage, remove 1 time counter from each location in play. Place 3 time counters on this stage.
+  08147:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - 1 time counter come off each location in play (staging area and active location) that holds some, one at a time, stopping when none is left; a location whose last counter goes hears it, after the effect resolves
+    - place 3 resource tokens on this card
+
+## 08148 The Raven Clan
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08148:A:1 (front): When Revealed: Shuffle the Raven deck discard pile into the Raven deck. Then, starting with the first player, each player takes the top card of the Raven deck and adds it to the staging area.
+  08148:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the discard pile of the raven deck goes back into it, facedown, and the deck is shuffled with the game's seed (with an empty discard pile too: the shuffle cannot fail, so what follows goes on)
+    - for each player, first player first:
+      - for the acting player, the top card(s) of the raven deck go to the staging area
+
+08148:B:1 (back): Time 3.
+  08148:constant:1: Constant
+    - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+08148:B:2 (back): Forced: After the last time counter is removed from this stage, reveal the top card of the Raven deck and add it to the staging area. Place 3 time counters on this stage.
+  08148:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player reveals the top card of the raven deck and resolves its staging, into the staging area, as if it was just revealed from the encounter deck (nothing with the deck empty)
+    - place 3 resource tokens on this card
+
+08148:B:3 (back): Each location in the staging area gets +2 quest points.
+  08148:constant:2: Constant
+    - each location (any player controls) in the staging area only: stat questPoints 2, while this card is in play
+
+## 08149 The Last Stage
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08149:A:1 (front): When Revealed: Add Raven Chief and Raven Chief's Camp to the staging area. Take the top X cards from the Raven deck and add them to the staging area. X is the number of players minus 1.
+  08149:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one set-aside card with code 08151 joins the staging area (it is not revealed)
+    - one set-aside card with code 08152 joins the staging area (it is not revealed; it gets its printed Time counters as it joins)
+    - for the acting player, the top the number of players - 1 card(s) of the raven deck go to the staging area
+
+08149:B:1 (back): Time 2.
+  08149:constant:1: Constant
+    - Time 2: when this card is revealed, 2 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+08149:B:2 (back): Forced: After the last time counter is removed from this stage, each engaged enemy makes an attack. Place 2 time counters on this stage.
+  08149:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy engaged with a player makes an immediate attack, each dealt a shadow card of its own
+    - place 2 resource tokens on this card
+
+08149:B:3 (back): At the end of the round, if Raven Chief is in the victory display, the players win the game.
+  08149:forced:2: Forced at the end of the round
+    only if the card with code 08151 is in the victory display
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the players win the game
+
+## 08150 Chief Turch
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08150:A:1 (front): The first player gains control of Chief Turch.
+  08150:constant:1: Constant
+    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them, and from then on it follows the first player token: it passes to the new first player each time the token moves, while it stays free of encounters
+
+08150:A:2 (front): Immune to player card effects. Chief Turch does not exhaust to defend.
+  (the keyword part is owned by the card's keywords; the records cover: Chief Turch does not exhaust to defend.)
+  08150:constant:2: Constant
+    - this card: stat noExhaustDefend 1, while this card is in play
+
+08150:A:3 (front): If Chief Turch leaves play, the players lose the game.
+  08150:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players lose the game
+
+## 08151 Raven Chief
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08151:A:1 (front): Cannot have attachments. While Raven Chief's Camp is in play, Raven Chief cannot be damaged.
+  08151:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+  08151:constant:2: Constant
+    only if the card with code 08152 is in play
+    - this card: stat cannotTakeDamage 1, while this card is in play
+
+08151:A:2 (front): Forced: When Raven Chief attacks, remove 1 time counter from the active location, if able.
+  08151:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
+    - 1 time counter come off the active location, if it holds any, one at a time, stopping when none is left; a location whose last counter goes hears it, after the effect resolves
+
+## 08152 Raven Chief's Camp
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08152:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+08152:A:2 (front): Time 3. Forced: After the last time counter is removed from this location, exhaust each damaged character. Place 3 time counters on this location.
+  08152:constant:1: Constant
+    - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+  08152:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - exhaust each damaged character (any player controls)
+    - place 3 resource tokens on this card
+
+## 08153 Raven Warrior
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08153:A:1 (front): Forced: After Raven Warrior engages a player, remove X time counters from locations in play. X is the number of cards in the engaged player's hand.
+  08153:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    - the cards in your hand time counters come off the locations in play (staging area and active location) that hold some, the first player choosing the location one counter at a time (a single location is taken without asking), stopping when none is left; a location whose last counter goes hears it
+
+08153:A:2 (shadow): Shadow: Defending player discards an attachment he controls.
+  08153:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control) that a player controls (not an encounter attachment)
+    - discard the picked card
+
+## 08154 Raven Skirmisher
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08154:A:1 (front): When Revealed: Either remove 1 time counter from the active location, or reveal an additional encounter card.
+  08154:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    - the first player chooses one of:
+      * option "time" (only if there is a location (any player controls) that is the active location, with the Time keyword and a time counter on it to choose):
+        - 1 time counter come off the active location, if it holds any, one at a time, stopping when none is left; a location whose last counter goes hears it, after the effect resolves
+      * option "reveal":
+        - the acting player reveals an encounter card
+
+08154:A:2 (shadow): Shadow: Attacking enemy gets +X Attack, where X is the Time X value on the active location.
+  08154:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack the printed Time X value of the active location (0 with none), until the end of the attack
+
+## 08155 Raven War-camp
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+08155:A:1 (front): Time 3. Forced: After the last time counter is removed from this location, starting with the first player, each player draws the top card of the Raven deck and puts it into play engaged with him.
+  08155:constant:1: Constant
+    - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+  08155:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - for each player, the first player first, the top card of the raven deck is drawn and put into play engaged with that player (a draw, not a reveal: no staging step, no Surge, no When Revealed)
+
+## 08156 Raven Village
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08156:A:1 (front): Time 2. Forced: After the last time counter is removed from this location, reveal the top card of the Raven deck and add it to the staging area.
+  08156:constant:1: Constant
+    - Time 2: when this card is revealed, 2 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+  08156:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the acting player reveals the top card of the raven deck and resolves its staging, into the staging area, as if it was just revealed from the encounter deck (nothing with the deck empty)
+
+08156:A:2 (shadow): Shadow: Deal attacking enemy 2 additional shadow cards from the Raven deck.
+  08156:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy is dealt a shadow card from the Raven deck (it goes to the Raven discard pile when discarded)
+    - the attacking enemy is dealt a shadow card from the Raven deck (it goes to the Raven discard pile when discarded)
+
+## 08157 Dunland Battlefield
+(the scenario deals it into the activeLocation pile; the piles place it, no record does)
+
+08157:A:1 (front): Time 3. Forced: After the last time counter is removed from this location, each player assigns X damage among characters he controls, where X is the number of cards in his hand.
+  08157:constant:1: Constant
+    - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+  08157:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - for each player, first player first:
+      - the acting player assigns the cards in your hand damage among the character (you control), one at a time
+
+08157:A:2 (shadow): Shadow: Deal 1 damage to the defending character.
+  08157:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - deal 1 damage to the defender
+
+## 08158 Raven Country
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08158:A:1 (front): Time 4. Forced: After the last time counter is removed from this location, each player raises his threat by the number of cards in his hand.
+  08158:constant:1: Constant
+    - Time 4: when this card is revealed, 4 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+  08158:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - for each player, first player first:
+      - raise threat by the cards in your hand (the acting player)
+
+08158:A:2 (shadow): Shadow: Defending player assigns X damage among characters he controls. X is the Time X value on the active location.
+  08158:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player assigns the printed Time X value of the active location (0 with none) damage among the character (you control), one at a time
+
+## 08159 Raising the Cry
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08159:A:1 (front): When Revealed: Remove 1 time counter from each location in play. Place X time counters on each location in play with no time counters on it. X is the 'Time X' value on that location. If there are no locations in the staging area, Raising the Cry gains surge.
+  08159:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - 1 time counter come off each location in play (staging area and active location) that holds some, one at a time, stopping when none is left; a location whose last counter goes hears it, after the effect resolves
+    - each location in play (staging area or active) with the Time X keyword and no time counter (locationsWithNone) gets its printed X time counters, as a revealed one does
+    - then, if not (there is a location (any player controls) in the staging area only to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+## 08160 Fierce Folk
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08160:A:1: Doomed 3.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+08160:A:2 (front): When Revealed: Each player draws 3 cards. Until the end of the round, players cannot play events.
+  08160:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player draws 3 card(s)
+    - the table: stat cannotPlayEvents (no player can play an event) 1, until the end of the round
+
+08160:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, remove 1 time counter from the active location.
+  08160:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): 1 time counter come off the active location, if it holds any, one at a time, stopping when none is left; a location whose last counter goes hears it, after the effect resolves
+
+## 08161 Driven Back
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08161:A:1 (front): When Revealed: Remove all progress from each location in the staging area. Increase the total Threat in the staging area by 1 for each progress removed this way. If no progress was removed by this effect, Driven Back gains surge.
+  08161:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - remove all the progress from each location (any player controls) in the staging area only; the effect's X is the progress removed in all
+    - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the total Threat in the staging area is X higher until the end of the phase
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+(rendered pieces: 132 by template, 0 as JSON)

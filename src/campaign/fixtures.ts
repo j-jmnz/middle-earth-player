@@ -107,6 +107,9 @@ import mordorFixtures from "./fixtures/the-long-arm-of-mordor.json";
 import trialsFixtures from "./fixtures/the-three-trials.json";
 import mumakilFixtures from "./fixtures/the-mumakil.json";
 import tharbadFixtures from "./fixtures/trouble-in-tharbad.json";
+import eilphFixtures from "./fixtures/the-nin-in-eilph.json";
+import secretFixtures from "./fixtures/celebrimbors-secret.json";
+import crownFixtures from "./fixtures/the-antlered-crown.json";
 import haradFixtures from "./fixtures/race-across-harad.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
@@ -229,6 +232,9 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-dunland-trap": trapFixtures,
   "the-three-trials": trialsFixtures,
   "trouble-in-tharbad": tharbadFixtures,
+  "the-nin-in-eilph": eilphFixtures,
+  "celebrimbors-secret": secretFixtures,
+  "the-antlered-crown": crownFixtures,
   "escape-from-umbar": umbarFixtures,
   "desert-crossing": crossingFixtures,
   "the-long-arm-of-mordor": mordorFixtures,

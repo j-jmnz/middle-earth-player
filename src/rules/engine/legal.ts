@@ -32,6 +32,7 @@ import { islandMayTravel, islandReach } from "../families/island/travel.ts";
 import { freeSlot, mustTravel } from "../families/south/locations.ts";
 import { viewOf } from "../families/breaking/areas.ts";
 import { commitLimitReason } from "../families/play/commit-limit.ts";
+import { commitBarredByEmptyHand } from "../families/ring-maker/player-bars.ts";
 import { askingToCommit, sailingBlocks, sailingCommitReason, sailingCommitters, sailingIntents } from "../families/sea/sailing-legal.ts";
 import { flaggedByClass } from "../core/holder-classes.ts";
 import { hasTrait } from "../interpret/conditions.ts";
@@ -274,7 +275,7 @@ function committers(state: ScenarioState, seat: number, ctx: ReduceContext): str
   // "Do not commit characters to the quest" (143078:B:1).
   if (state.modifiers.length > 0 && flagged(state, "table", "cannotCommit")) return [];
   // "Any player who does not control a hero with at least 1 Clue objective attached cannot commit characters to this quest" (02013:B:1).
-  if (seatBarred(state, ctx, seat, "commit")) return [];
+  if (seatBarred(state, ctx, seat, "commit") || commitBarredByEmptyHand(state, seat)) return [];
   return characters(state, seat, ctx.cards).filter((id) => {
     const instance = state.cards[id];
     // "Can commit to quests while exhausted" (11009:A:1).

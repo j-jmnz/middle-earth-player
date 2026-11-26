@@ -1,7 +1,7 @@
 // A record's header: its timing, trigger, limit, cost, subject and condition, then its instructions. `src/catalog/effect-schema.ts` owns the fields.
 import { travelNote } from "./travel-note.ts";
 import { renderCondition } from "./conditions.ts";
-import { done, isObj, jsonOf, str, type Ctx, type Obj } from "./kit.ts";
+import { done, isObj, objOrNone, jsonOf, str, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
 import { actorNote } from "./actor.ts";
 import { barNote } from "./bars.ts";
@@ -38,6 +38,7 @@ const TRIGGER: Readonly<Record<string, string>> = {
   questDefeated: "after a side quest is defeated (its progress reached its quest points)",
   lastTimeCounterRemoved: "after the last time counter is removed from a card, at the end of the refresh phase or by a card effect",
   timeCounterRemoved: "after a time counter is removed from the current quest, at the end of the refresh phase or by a card effect",
+  afterStageRevealed: "after a quest stage is revealed and its When Revealed effects have resolved, a parallel stage that replaces the stage before fires it too; the flip of the opening stage in the Setup does not",
   flipped: "after a card is flipped over (the FlipCard verb)",
   questSucceeded: "after the players quest successfully",
   enemyDestroyed: "after an enemy is destroyed",
@@ -158,6 +159,6 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   if (printedWin) lines.push("  note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule");
   if (instructions.length > 1) lines.push("  (steps run in order; a step depends on an earlier one only through its own condition)");
   const inner = { ...ctx, timing: typeof effect.timing === "string" ? effect.timing : undefined, ...(effect.trigger === "engaged" ? { engagedSeat: true } : {}), ...(effect.trigger === "attacks" ? { attacking: true } : {}) };
-  instructions.forEach((instruction, at) => lines.push(...renderInstruction(instruction, inner, 1, at > 0)));
+  instructions.forEach((instruction, at) => lines.push(...renderInstruction(instruction, { ...inner, before: objOrNone(instructions[at - 1]) }, 1, at > 0)));
   return lines;
 }

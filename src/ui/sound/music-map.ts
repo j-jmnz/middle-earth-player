@@ -162,6 +162,9 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "the-long-arm-of-mordor": { calm: "shadow", combat: "uruk" },
   "the-three-trials": { calm: "fangorn", combat: UNDEAD },
   "trouble-in-tharbad": { calm: "crossroads", combat: "uruk" },
+  "the-nin-in-eilph": { calm: "marshes", combat: "chase" },
+  "celebrimbors-secret": { calm: "moria", combat: "uruk" },
+  "the-antlered-crown": { calm: "rohan", combat: "isengard" },
   "the-mumakil": { calm: "fangorn", combat: "pelennor" },
   "race-across-harad": { calm: "rohan", combat: "uruk" },
 };

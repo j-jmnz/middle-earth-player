@@ -13,7 +13,7 @@ import { pickSchema } from "./effect-schema-pick.ts";
 export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "other", "attacker", "defender", "activeLocation", "previous", "discardTop", "questStage", "smaug", "lakeTown"]);
 
 // The decks beside the encounter deck a record names (emce.caves-deck, emce.evil-creatures-deck, mec112.setup-journey-to-the-cross-roads; src/rules/core/piles.ts NAMED_PILES): the one list `pile` of a wilderland verb, the amount `pile` and the condition `pileHas` share.
-export const pileNameSchema = z.enum(["caves", "evilCreatures", "spiders", "orcs", "sideQuests", "harad", "greatSpider", "angmarOrcs", "smaug", "investigation"]);
+export const pileNameSchema = z.enum(["caves", "evilCreatures", "spiders", "orcs", "sideQuests", "harad", "greatSpider", "angmarOrcs", "smaug", "investigation", "raven"]);
 
 export const amountExprSchema = z.strictObject({
   // How many cards match, from the actor's side ("each enemy engaged with you", "each side quest in the victory display").
@@ -57,6 +57,8 @@ export const amountExprSchema = z.strictObject({
   // The cards attached facedown to the source (Eagles of the Misty Mountains), and the resource tokens other copies of the
   // source card hold above the number on this one (Keeping Count; the most any copy holds), read by src/rules/families/misc/amounts.ts.
   facedown: z.literal(true).optional(),
+  // The cards facedown under the card in play with this code ("X is the number of cards underneath The Orcs' Search", 08124:A:1); 0 with no such card in play. Read by src/rules/families/misc/amounts.ts.
+  facedownUnder: z.string().min(1).optional(),
   // The poison under the card the reference names ("equal to the number of poison it has", 132034:A:1; hob.venom-poison). Read by the poison family (src/rules/families/poison/amounts.ts).
   poison: cardRefSchema.optional(),
   resourcesAboveCopies: z.literal(true).optional(),
@@ -119,6 +121,8 @@ export const amountExprSchema = z.strictObject({
   questCards: z.literal(true).optional(),
   // The quest stages in play with no progress token on them: stages 2 to 4 in play together, the only stage before them and stage 5 after them ("for each quest stage in play with no progress on it", 132054:A:2; 132057:A:1). Read by the armies family.
   stagesNoProgress: z.literal(true).optional(),
+  // The printed Time X value of the active location, 0 with none or one with no Time ("X is the Time X value on the active location", 08154:A:2, 08158:A:2; mec108.time-x). Read by the angmar family.
+  timeOfActive: z.literal(true).optional(),
   // Every shadow card dealt to an enemy in play, the staging area's and the engaged ones, added up ("where X is the number of shadow cards in play", 10126:A:1). Read by the angmar family.
   shadowCardsInPlay: z.literal(true).optional(),
   // The highest printed cost among the cards in the actor's discard pile, 0 for an empty pile, a card with a printed X cost or no cost (a hero) counting 0 ("the printed cost of the highest cost card in that player's discard pile", 10137:A:1). Read by the angmar family.

@@ -20,7 +20,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
       * option "place":
         - place 1 resource tokens on this card
       * option "attack":
-        - this card attacks the first player now, from the staging area, dealt a shadow card (or engaged)
+        - this card attacks the first player now, from where it is (the staging area, or engaged with a player; it does not move), dealt a shadow card
 
 ## 144041 Morgul Orc
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -137,7 +137,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Shelob"
-    - then, if there is a enemy (any player controls) or in the staging area, named "Shelob" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area, dealt a shadow card (or engaged)
+    - then, if there is a enemy (any player controls) or in the staging area, named "Shelob" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from where it is (the staging area, or engaged with a player; it does not move), dealt a shadow card
 
 ## 144047 The Under-way
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -289,7 +289,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
         - place 1 resource tokens on the picked card
       * option "attack" (only if there is a enemy (any player controls) or in the staging area, named "Shelob" to choose):
         - choose enemy (any player controls) or in the staging area, named "Shelob"
-        - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card (or engaged)
+        - the picked enemy attacks the acting player now, from where it is (the staging area, or engaged with a player; it does not move), dealt a shadow card
 
 144061:A:3 (shadow): Shadow: If attacking enemy is Shelob, place 1 resource on her. Then, she gets +1 Attack for each resource on her.
   144061:shadow:1: Shadow
@@ -307,7 +307,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     - each enemy (any player controls) or in the staging area, named "Shelob" (only the cards that match now: one that arrives later does not get it): stat attack 2, until the end of the phase
     - choose enemy (any player controls) or in the staging area, named "Shelob"
     - for each player, first player first:
-      - if there is a enemy (any player controls) or in the staging area, named "Shelob" to choose: the picked enemy attacks the acting player now, from the staging area, dealt a shadow card (or engaged)
+      - if there is a enemy (any player controls) or in the staging area, named "Shelob" to choose: the picked enemy attacks the acting player now, from where it is (the staging area, or engaged with a player; it does not move), dealt a shadow card
 
 144062:A:2 (shadow): Shadow: If attacking enemy is Shelob, she makes an additional attack against you after this one.
   144062:shadow:1: Shadow

@@ -16,6 +16,8 @@ import { listens } from "../encounter/reveal.ts";
 import { textBlank } from "../attachments/hold.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import { printedOf } from "../../core/printed.ts";
+import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
+import type { Focus } from "../index.ts";
 
 type TimeInstruction = Extract<Instruction, { verb: "Time" }>;
 
@@ -84,7 +86,7 @@ export function timeCounterMatches(state: ScenarioState, id: string, spec: PickS
 }
 
 /** A card with the Time X keyword, at least one time counter and its text not blanked: the one test the pick filter, the refresh sweep and a picked target share. */
-function holdsTimeCounter(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
+export function holdsTimeCounter(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
   const card = state.cards[id];
   return card != null && card.resources > 0 && timeOf(ctx, card.code) != null && !textBlank(state, id, ctx.cards);
 }
@@ -100,7 +102,17 @@ function timeCards(state: ScenarioState, ctx: ReduceContext): string[] {
  * resolves on that card", mec108.time-x). A card with no counter left loses none.
  */
 export function removeTimeCounters(state: ScenarioState, ctx: ReduceContext): ScenarioState {
-  return timeCards(state, ctx).reduce((next, id) => removeTimeCounterFrom(next, id, ctx), state);
+  return countersRemoved(state, timeCards(state, ctx).reduce((next, id) => removeTimeCounterFrom(next, id, ctx), state), ctx);
+}
+
+/**
+ * "After any number of time counters are removed from the current quest" (08103:A:3, 08104:A:2, 08105:A:1): one removal action took counters off the current quest stage (`before` and `after` are the game around it), so the event is announced once, not once for each counter. It is
+ * announced only while a record hears it, and not when nothing came off (a stage with none, `timeBarred`).
+ */
+export function countersRemoved(before: ScenarioState, after: ScenarioState, ctx: ReduceContext): ScenarioState {
+  const id = before.questStage;
+  if (!id || (after.cards[id]?.resources ?? 0) >= (before.cards[id]?.resources ?? 0) || !listens(after, ctx, "timeCountersRemoved")) return after;
+  return queueEvent(after, { trigger: "timeCountersRemoved", seat: null });
 }
 
 /** The enemies in play that hold the Time X keyword and a time counter. */
@@ -116,15 +128,15 @@ function pickedTimeCard(state: ScenarioState, ctx: ReduceContext): string[] {
 
 /**
  * A record's RemoveTimeCounters with a target: "Remove X time counters from each enemy ... with the time keyword" (08055:A:1, X the number of players with `perPlayer`) from each enemy in play, or "remove a time counter from an enemy" (08051:A:2) from the last picked card.
- * Each card loses up to `amount` counters, one at a time, so its last counter is heard once.
+ * Each card loses up to `amount` counters, one at a time, so its last counter is heard once. The targets `locations` and `active` are time-locations.ts's.
  */
-export function removeTimeCountersFrom(state: ScenarioState, ctx: ReduceContext, instruction: Extract<Instruction, { verb: "RemoveTimeCounters" }>): ScenarioState {
+export function removeTimeCountersFrom(state: ScenarioState, ctx: ReduceContext, instruction: Extract<Instruction, { verb: "RemoveTimeCounters" }>, focus: Focus): ScenarioState {
   const players = instruction.perPlayer ? livingSeats(state).length : 1;
-  const amount = (instruction.amount ?? 1) * players;
+  const amount = (instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx)) * players;
   const targets = instruction.target === "picked" ? pickedTimeCard(state, ctx) : timeEnemies(state, ctx);
   let next = state;
   for (const id of targets) for (let removed = 0; removed < amount; removed += 1) next = removeTimeCounterFrom(next, id, ctx);
-  return next;
+  return countersRemoved(state, next, ctx);
 }
 
 /** "Time counters cannot be removed from the current quest" (08075:A:2, the table flag `timeBarred` of Tharbad Hideout while it is the active location): nothing takes a counter off the current quest stage, and a Forced effect that waits for the removal does not run. */

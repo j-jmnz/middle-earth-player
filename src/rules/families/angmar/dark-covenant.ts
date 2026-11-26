@@ -2,16 +2,14 @@
 // play, one token at a time from the quest card they choose; with fewer than X on them all of it comes off. Traitorous Wight's removal comes off every quest card in play.
 import type { Amount, Instruction } from "../../../catalog/boundary.ts";
 
-import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { takeProgressOff } from "../../core/progress.ts";
-import { askTarget } from "../../windows/choices.ts";
 import { effectData } from "../encounter/moves.ts";
-import { queueFront } from "../play/refs.ts";
+import { distributeOneAtATime } from "./distribute.ts";
 import { questCardPool } from "../quest/quest-card.ts";
 import type { Focus } from "../index.ts";
 
@@ -31,10 +29,5 @@ function loaded(state: ScenarioState, seat: number, ctx: ReduceContext): string[
 /** RemoveProgressAmong: the actor removes `amount` progress from among the quest cards in play, a token at a time from the card they choose, until `amount` is gone or none is left. A single card is taken without asking. */
 export function removeProgressAmong(state: ScenarioState, instruction: Verb<"RemoveProgressAmong">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const left = instruction.left ?? resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
-  const options = loaded(state, focus.seat, ctx);
-  if (left <= 0 || options.length === 0) return state;
-  const chosen = focus.chosen && options.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;
-  if (!chosen) return effectData(state) ? askTarget(state, { instruction: { ...instruction, left }, seat: focus.seat, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, options) : state;
-  const removed = takeProgressOff(state, chosen, 1, steps);
-  return left > 1 ? queueFront(removed, [{ instruction: { ...instruction, left: left - 1 }, seat: focus.seat, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }]) : removed;
+  return distributeOneAtATime(state, { instruction, left, seat: focus.seat, options: loaded(state, focus.seat, ctx), focus, steps, takeOne: (from, id) => takeProgressOff(from, id, 1, steps) });
 }

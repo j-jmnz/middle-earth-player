@@ -477,6 +477,16 @@ export function turnedUpCode(state: Pick<ScenarioState, "campaignFacts">, code: 
   return dealtFace(state, code, "up");
 }
 
+/**
+ * A card goes into the encounter deck facedown, held by no one. A card that cannot leave the staging area stays where it is and keeps the face it has (a revealed location
+ * that Frodo's cancel shuffles back, 141001:A:1, on a stage that holds its locations there, 146066:B:1): `moved` tells whether it went.
+ */
+export function moveToEncounterDeckDown(state: ScenarioState, id: string): { state: ScenarioState; moved: boolean } {
+  const placed = moveCard(state, id, { zone: "encounterDeck" });
+  if (placed.cards[id]?.zone !== "encounterDeck") return { state: placed, moved: false };
+  return { state: updateCard(placed, id, { face: "down", controller: null }), moved: true };
+}
+
 export { inPlay } from "./state.ts";
 
 /** A card of a hand goes to `owner`'s discard pile and "discarded from your hand" is queued for `eventSeat` (the owner unless a card's own wording says otherwise). */

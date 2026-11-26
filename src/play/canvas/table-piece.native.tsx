@@ -15,7 +15,7 @@ import { sphereIcon } from "../../ui/icon-map.ts";
 import { Pile } from "./pile-piece.native.tsx";
 import { type CardSlot, type Rect } from "../layout/layout.ts";
 import { shownBounds } from "../layout/hits.ts";
-import { sphereRing } from "./table-canvas-views.ts";
+import { progressInStrip, sphereRing } from "./table-canvas-views.ts";
 import { samePiece, type BodyProps, type PieceProps } from "./table-piece.ts";
 
 /**
@@ -98,7 +98,7 @@ function drawOverlay(p: PieceProps) {
         {info?.under ? <UnderMarkView rect={underRect(rect, slot.zone === "hand", s)} mark={info.under} sideways={slot.exhausted} strip={wearsFootNumber(info, slot.resources)} fonts={fonts} t={t} s={s} /> : null}
         {info?.delayed ? <DelayedMark rect={rect} t={t} s={s} /> : null}
         {p.stageMarks ? <StageMarks rect={rect} pill={p.stageMarks.pill} apart={p.stageMarks.apart} fonts={fonts} t={t} s={s} /> : null}
-        <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} t={t} s={s} ring={slot.resources > 0 ? sphereRing(p.sphere, t) : null} contrast={contrast} />
+        <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} t={t} s={s} ring={slot.resources > 0 ? sphereRing(p.sphere, t) : null} contrast={contrast} progressInStrip={progressInStrip(slot.progress, info?.questPoints ?? null)} />
         {p.inactive ? <NotAppliedMark rect={rect} t={t} s={s} /> : null}
         {slot.kind === "card" && slot.faceDown && slot.held ? <HeldMark rect={rect} icon="hero" t={t} s={s} /> : null}
         {slot.kind === "card" && slot.faceDown && slot.dead ? <HeldMark rect={rect} icon="threat" t={t} s={s} /> : null}

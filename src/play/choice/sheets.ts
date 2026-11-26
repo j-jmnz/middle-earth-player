@@ -63,6 +63,7 @@ import { gundabadOptionLabel, gundabadPassCaution } from "../words/scenarios/gun
 import { captureRow } from "./capture-sheets.ts";
 import { gundabadRow } from "./gundabad-sheets.ts";
 import { mordorRow } from "./mordor-sheets.ts";
+import { crownRow } from "./crown-sheets.ts";
 import { fordsTimeCount, withCount } from "./ring-maker-sheets.ts";
 import { TIMING_WORDS, type SheetStat, type PickOption, type Sheet, type SheetNames, type TriggerOption } from "./sheet-types.ts";
 
@@ -349,12 +350,13 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const fire = wait?.kind === "target" ? (fireRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names, amountNow, source) ?? gundabadRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names.card(id)) ?? mordorRow(wait.item.instruction, id, window.options, game, ctx, names.card)) : null;
           // A Ship objective that is exhausted or attached to: whose it is when the options hold more than one player's, and the damage a card on it would deal.
           const ship = wait?.kind === "target" ? shipRow(wait.item.instruction, data?.queue[0]?.instruction, id, window.options, game, ctx, words) : null;
+          const crown = wait?.kind === "target" ? crownRow(wait.item.instruction, id, game, names.card) : null;
           const kingsCaution = wait?.kind === "target" ? discardCaution(game, ctx, source, wait.item.instruction, data?.queue[0]?.instruction, id, names.card) : undefined;
           // An asks entry's warning is the row's own (asks.ts): it arms the confirm on that row only.
-          const rowCaution = asked.cautions?.[id] ?? fire?.caution ?? ship?.caution ?? kingsCaution;
+          const rowCaution = asked.cautions?.[id] ?? fire?.caution ?? ship?.caution ?? crown?.caution ?? kingsCaution;
           // A plain card row that shares its name with another row says what tells the copies apart (Mr. Underhill's two Black Riders).
           const plainLabel = card.label === names.card(id) ? (copyLabel(game, names, id, window.options) ?? card.label) : card.label;
-          const label = (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? stagedAllyLabel(game, ctx, names, id, window.options) ?? seatedLabel(game, ctx, names, id, window.options) ?? orcsLabel(game, names, id, window.options) ?? tiedLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : plainLabel);
+          const label = (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? crown?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? stagedAllyLabel(game, ctx, names, id, window.options) ?? seatedLabel(game, ctx, names, id, window.options) ?? orcsLabel(game, names, id, window.options) ?? tiedLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : plainLabel);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
           return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction) || isBoonCode(wait.item.instruction, id)) ? { code: id } : {}), ...(willpower.length > 0 || eyes.length > 0 || tied.length > 0 ? { stats: [...willpower, ...eyes, ...tied] } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };

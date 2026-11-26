@@ -56,6 +56,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (expr.pursuit === true) return { text: "the pursuit value", read: ["pursuit"] };
   if (expr.questCards === true) return { text: "the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1)", read: ["questCards"] };
   if (expr.stagesNoProgress === true) return { text: "the number of quest stages in play with no progress on them (stages 2 to 4 in play together, the only stage before them, stage 5 after)", read: ["stagesNoProgress"] };
+  if (expr.timeOfActive === true) return { text: "the printed Time X value of the active location (0 with none)", read: ["timeOfActive"] };
   if (expr.shadowCardsInPlay === true) return { text: "the number of shadow cards dealt to the enemies in play (in the staging area and engaged)", read: ["shadowCardsInPlay"] };
   if (expr.discardPileMaxCost === true) return { text: "the highest printed cost among the cards in the acting player's discard pile (0 for none, a hero or an X cost)", read: ["discardPileMaxCost"] };
   if (expr.discarded === "cost") return { text: "the combined printed cost of the cards this effect has discarded from decks (a card with no printed cost counts 0)", read: ["discarded"] };
@@ -65,6 +66,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (isObj(expr.discardedMatching)) return { text: `the number of cards this effect discarded from the top of the encounter deck, still in the discard pile, that are ${pick(expr.discardedMatching, ctx)}`, read: ["discardedMatching"] };
   if (expr.destroyedWillpower === true) return { text: "the Willpower the destroyed character had in play (last known)", read: ["destroyedWillpower"] };
   if (expr.facedown === true) return { text: "the number of cards attached facedown to this card", read: ["facedown"] };
+  if (typeof expr.facedownUnder === "string") return { text: `the number of cards facedown underneath the card in play with code ${expr.facedownUnder} (0 when it is not in play)`, read: ["facedownUnder"] };
   if (expr.firstPlayerTens === true) return { text: "the tens digit of the first player's threat, whoever the actor is", read: ["firstPlayerTens"] };
   if (isObj(expr.mostPerPlayer)) return { text: `the most ${pick(expr.mostPerPlayer, ctx)} any one player controls, each player counted from their own side`, read: ["mostPerPlayer"] };
   if (expr.guardedCost === true) return { text: "the printed cost of the card this card guards (one under it, or the host it guards as a guard; 0 for a card with no printed cost)", read: ["guardedCost"] };
