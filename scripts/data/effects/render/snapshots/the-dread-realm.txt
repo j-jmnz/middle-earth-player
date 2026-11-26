@@ -194,7 +194,7 @@ Scenario piles that place cards with no record (quest: 10150 The Catacombs of Ca
 10152:B:2 (back): Progress that would be placed on this quest is instead placed on locations in the staging area, divided as you choose.
   10152:constant:1: Constant
     - this card: stat progressToStaging 1, while this card is in play
-  10152:forced:1: Forced on the event progressReplaced
+  10152:forced:1: Forced after progress that would be placed on the current quest is replaced by the stage's flag (X is that progress: the amount that would have gone on the quest)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the first player divides the progress left as they choose among the locations in the staging area, choosing a location and then how much of it goes on that location (no more than it still needs), again and again, until none is left or no location can take any more (they may not keep the rest on the stage)
 

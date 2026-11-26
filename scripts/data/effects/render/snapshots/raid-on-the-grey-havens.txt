@@ -36,7 +36,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11037:B:1 (back): Any time players would place progress on this quest, remove an equal amount of damage from locations in play instead. (Progress is placed on the active location before triggering this effect.)
   11037:constant:1: Constant
     - this card: stat progressHeals 1, while this card is in play
-  11037:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressReplaced
+  11037:triggered:1: Triggered (mandatory, not printed as Forced) after progress that would be placed on the current quest is replaced by the stage's flag (X is that progress: the amount that would have gone on the quest)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players remove X damage from the locations in play, one damage at a time from the location the first player chooses (the amount is the progress a stage replaced with healing)
 

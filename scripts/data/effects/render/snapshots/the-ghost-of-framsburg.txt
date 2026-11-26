@@ -185,7 +185,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
   19100:forced:1: Forced after an enemy is destroyed (heard about this card)
     only if the active location is a Dark location (any player controls)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - this card (a shadow card) is shuffled into the encounter deck instead of being discarded
+    - this card (a shadow card, or an enemy that was destroyed) is shuffled into the encounter deck instead of being discarded
 
 19100:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the active location has the Dark trait.)
   19100:shadow:1: Shadow

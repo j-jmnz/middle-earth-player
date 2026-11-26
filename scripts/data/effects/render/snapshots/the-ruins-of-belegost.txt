@@ -1,4 +1,4 @@
-Scenario piles that place cards with no record (quest: 50601 Ruins of the First Age; quest: 50602 Ancient Evils Disturbed; quest: 50603 Deeper into the Past; quest: 50604 The Servants of Morgoth; quest: 50605 The Roots of Ered Luin; quest: 50606 The Mines of Belegost; quest: 50607 The Beast of Belegost; staging: 50608 Stalking the Ruins; staging: 50622 Abandoned Mine; setAside: 50609 Sword of Belegost; setAside: 50610 Map of Ered Luin; setAside: 50611 Keys of Belegost; setAside: 50612 Book of Aulë's Children; setAside: 50613 Dwarven Torch; setAside: 50614 Blue Mountain Gem; setAside: 50615 Naurlhûg; setAside: 50616 Lurker of the Depths; setAside: 50621 Naurlhûg's Lair)
+Scenario piles that place cards with no record (quest: 50601 Ruins of the First Age; quest: 50602 Ancient Evils Disturbed; quest: 50603 Deeper into the Past; quest: 50604 The Servants of Morgoth; quest: 50605 The Roots of Ered Luin; quest: 50606 The Mines of Belegost; quest: 50607 The Beast of Belegost; staging: 50608 Stalking the Ruins; staging: 50622 Abandoned Mine (1 per player); setAside: 50609 Sword of Belegost; setAside: 50610 Map of Ered Luin; setAside: 50611 Keys of Belegost; setAside: 50612 Book of Aulë's Children; setAside: 50613 Dwarven Torch; setAside: 50614 Blue Mountain Gem; setAside: 50615 Naurlhûg; setAside: 50616 Lurker of the Depths; setAside: 50621 Naurlhûg's Lair)
 
 ## 50601 Ruins of the First Age
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -452,7 +452,7 @@ RECORD NAMING NO LINE OF THIS CARD (50621:A:2)
     - this card: stat immuneToPlayerCards 1, while this card is in play
 
 ## 50622 Abandoned Mine
-(the scenario deals it into the staging pile; the piles place it, no record does)
+(the scenario deals it into the staging pile, 1 copy for each player, the other copies stay in the encounter deck; the piles place it, no record does)
 
 50622:A:1 (front): Discover 2.
   50622:forced:1: Forced after this location becomes the active location (heard about this card)

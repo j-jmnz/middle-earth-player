@@ -1,4 +1,4 @@
-Scenario piles that place cards with no record (quest: 08066 Double Dealings; quest: 08067 Escape from Tharbad; staging: 08072 Spy from Mordor; activeLocation: 08069 The Empty Mug; setAside: 08068 Nalir; setAside: 08070 Bellach; setAside: 08071 The Crossing at Tharbad)
+Scenario piles that place cards with no record (quest: 08066 Double Dealings; quest: 08067 Escape from Tharbad; staging: 08072 Spy from Mordor (1 per player); activeLocation: 08069 The Empty Mug; setAside: 08068 Nalir; setAside: 08070 Bellach; setAside: 08071 The Crossing at Tharbad)
 
 ## 08066 Double Dealings
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -24,8 +24,8 @@ Scenario piles that place cards with no record (quest: 08066 Double Dealings; qu
 
 08066:B:3 (back): Forced: After 1 or more progress is placed on this quest, cancel all progress and reduce each player's threat by an equal amount.
   08066:constant:2: Constant
-    - this card: stat progressCanceled 1, while this card is in play
-  08066:forced:2: Forced on the event progressReplaced
+    - this card: stat progressCanceled (progress that would be placed on this stage is canceled: none is placed, and the stage's Forced effect for it hears the canceled amount as X) 1, while this card is in play
+  08066:forced:2: Forced after progress that would be placed on the current quest is replaced by the stage's flag (X is that progress: the amount that would have gone on the quest)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - lower threat by X (each player)
 
@@ -63,8 +63,8 @@ Scenario piles that place cards with no record (quest: 08066 Double Dealings; qu
 
 08067:B:3 (back): Progress that would be placed on this quest are instead placed on The Crossing at Tharbad.
   08067:constant:2: Constant
-    - this card: stat progressToCrossing 1, while this card is in play
-  08067:forced:2: Forced on the event progressReplaced
+    - this card: stat progressToCrossing (progress that would be placed on this stage is not placed: the stage's Forced effect for it puts the amount, X, on The Crossing at Tharbad; a player card effect's progress goes nowhere, the Crossing being immune to it) 1, while this card is in play
+  08067:forced:2: Forced after progress that would be placed on the current quest is replaced by the stage's flag (X is that progress: the amount that would have gone on the quest)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - X progress token(s) are placed on the card in play with the title The Crossing at Tharbad (the staging area counts as play), in one placement: the cards that hear progress placed hear it once; with no such card in play nothing happens
 
@@ -99,7 +99,7 @@ Scenario piles that place cards with no record (quest: 08066 Double Dealings; qu
     - each player: stat threatReductionBarred 1, while this card is in play
 
 08069:A:2 (front): While The Empty Mug is in the victory display, the current quest gains 'Forced: After a player card effect reduces a player's threat, remove it from the game.'
-  08069:forced:1: Forced on the event threatLowered (heard about card (any player controls) or in the staging area or the active location, that is a player card; used from the victory display)
+  08069:forced:1: Forced on the event threatLowered (heard about card (any player controls) or in the staging area or the active location, that is a player card (of any type: an event is one, heard while it resolves though it is not in play); used from the victory display)
     only if this card is in the victory display
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card the event is about is removed from the game
@@ -122,7 +122,7 @@ Scenario piles that place cards with no record (quest: 08066 Double Dealings; qu
 08070:A:3 (front): Forced: When Bellach is destroyed, shuffle him into the encounter deck.
   08070:forced:1: Forced after an enemy is destroyed (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - this card (a shadow card) is shuffled into the encounter deck instead of being discarded
+    - this card (a shadow card, or an enemy that was destroyed) is shuffled into the encounter deck instead of being discarded
 
 ## 08071 The Crossing at Tharbad
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -142,7 +142,7 @@ Scenario piles that place cards with no record (quest: 08066 Double Dealings; qu
     - the players win the game
 
 ## 08072 Spy from Mordor
-(the scenario deals it into the staging pile; the piles place it, no record does)
+(the scenario deals it into the staging pile, 1 copy for each player, the other copies stay in the encounter deck; the piles place it, no record does)
 
 08072:A:1 (front): Forced: When Spy From Mordor attacks, remove 1 time counter from the current quest.
   08072:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
@@ -264,7 +264,7 @@ Scenario piles that place cards with no record (quest: 08066 Double Dealings; qu
       * option "time" (only if all of: (0 is less than resources of the current quest stage) and (the table does not hold the flag timeBarred)):
         - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
       * option "threat":
-        - every enemy and location in the staging area, now and arriving there later while the effect lasts (Spy only): stat threat 2, until the end of the phase
+        - every enemy and location in the staging area, now and arriving there later while the effect lasts (Spy only: an enemy or a location that holds the Trait): stat threat 2, until the end of the phase
 
 ## 08081 Conspicuous Lot
 (the scenario deals it into the encounter pile; the piles place it, no record does)

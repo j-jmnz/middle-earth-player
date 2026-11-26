@@ -175,7 +175,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
 12067:B:2 (back): For each progress that would be placed on Searching the Island, you may place it on a location in the staging area, instead.
   12067:constant:2: Constant
     - this card: stat progressToStaging 1, while this card is in play
-  12067:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressReplaced
+  12067:triggered:1: Triggered (mandatory, not printed as Forced) after progress that would be placed on the current quest is replaced by the stage's flag (X is that progress: the amount that would have gone on the quest)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the first player chooses a location in the staging area that can take progress and it takes all it can of the progress left, again and again, until none is left or no location can take any more, or they keep the rest on the stage
 
