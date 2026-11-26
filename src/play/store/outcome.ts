@@ -1,9 +1,7 @@
-// Rules: rr.step-3-4, rr.quest-advancement, rr.travel, rr.step-6-4-3, rr.step-6-8-3, rr.damage, rr.step-7-3
-// (data/rules/entries.json).
+// Rules: rr.step-3-4, rr.quest-advancement, rr.travel, rr.step-6-4-3, rr.step-6-8-3, rr.damage, rr.step-7-3 (data/rules/entries.json).
 //
 // What the last accepted intent did, in a few words, for the banner over the table: the quest's result (willpower against
-// threat, then the threat raised or the progress placed and the stage it advanced to), each attack's numbers and damage,
-// travel, the cards revealed and the enemies that engaged. Every number is one the engine put in a step. The log keeps
+// threat, then the threat raised or the progress placed and the stage it advanced to), each attack's numbers and damage, travel, the cards revealed and the enemies that engaged. Every number is one the engine put in a step. The log keeps
 // the whole round; the banner keeps what changed the table.
 import { askingToCommit } from "../../rules/families/sea/sailing-legal.ts";
 import type { EngineStep, PlayerIntent } from "../../rules/core/intents.ts";
@@ -13,6 +11,7 @@ import type { LogMark } from "./log.ts";
 import { plural } from "../words/list.ts";
 import { reshuffleWords } from "./pile-ids.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
+import { captureAttachedLine, mumakPlace } from "../words/scenarios/haradrim/capture.ts";
 import { boardingWords } from "../words/scenarios/sea.ts";
 import type { FateNames } from "../words/scenarios/fate-beats.ts";
 import { ignoredRevealNote } from "../readouts/ettenmoors.ts";
@@ -35,8 +34,7 @@ import { HIDDEN_TITLE } from "../words/scenarios/against-the-shadow/blood.ts";
 import { NO_HERO_DAMAGE, VILLAGERS_TITLE } from "../words/scenarios/against-the-shadow/amon-din.ts";
 import { releasedWords, UNDERWORLD_TITLE } from "../words/scenarios/against-the-shadow/stewards-fear.ts";
 
-// `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
-// is at that line (resolve in beats).
+// `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner is at that line (resolve in beats).
 export type MomentLine = { text: string; mark: LogMark; cards?: readonly string[] };
 export type MomentTone = "good" | "bad" | "plain";
 export type Moment = { title: string; tone: MomentTone; lines: readonly MomentLine[] };
@@ -89,6 +87,11 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   const line = (text: string, mark: LogMark = null, cards: readonly string[] = []) => {
     (current ?? open(9, "", "plain")).lines.push({ text, mark, ...(cards.length > 0 ? { cards } : {}) });
   };
+  // A line of the Staging beat that the staging step's own cards share.
+  const staging = (text: string, cards: readonly string[]) => {
+    if (!current || current.rank !== 3 || current.whole) open(3, "Staging", "plain");
+    line(text, null, cards);
+  };
 
   // Boarding (dcce.boarding): the Corsair cards a ship-enemy's Boarding revealed engage after it in the same steps (the engine names the ship on each: `boarding`). They are one beat of
   // the ship's own, "Boarding 2 · Corsair Warship: 2 Corsairs engage Player 1", not a beat each; a Corsair card another effect revealed keeps its own engage beat.
@@ -118,8 +121,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         return;
       }
       case "push": {
-        // A shadow card turned up for an attack: its effect, in its printed words.
-        // (A frame of an enemy's own after-attack instructions is also a "shadow" frame; its card is not a shadow card.)
+        // A shadow card turned up for an attack: its effect, in its printed words. (A frame of an enemy's own after-attack instructions is also a "shadow" frame; its card is not a shadow card.)
         const dealt = step.cardId != null && (before.cards[step.cardId]?.zone === "shadow" || after.cards[step.cardId]?.zone === "shadow");
         if (step.frame !== "shadow" || !step.cardId || !dealt) return;
         const text = names.shadow?.(step.cardId);
@@ -164,8 +166,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
           const text = names.revealed?.(step.cardId);
           if (text) line(text, null, [step.cardId]);
         }
-        // A stage a branch led to ("proceed to one of the 2 A Chosen Path stages, at random", 01120:B:1): the stages share a
-        // name, so the banner says the pick was the shuffle's and what the stage asks of the players.
+        // A stage a branch led to ("proceed to one of the 2 A Chosen Path stages, at random", 01120:B:1): the stages share a name, so the banner says the pick was the shuffle's and what the stage asks of the players.
         const code = after.cards[step.cardId]?.code;
         if (code != null && after.stages.some((stage) => stage.branch?.includes(code))) {
           line("The path was chosen at random");
@@ -259,10 +260,12 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         const raised = names.fate?.revealed(after, step.cardId, before.phase === "Quest" && !steps.slice(0, index).some((earlier) => earlier.kind === "quest"));
         if (raised) line(raised, null, [step.cardId]);
         return;
-      // The enemy was faceup when it was revealed: the line names it and the location it is facedown under now (dcce.grapple).
+      // The enemy was faceup when it was revealed: the line names it and the location it is facedown under now (dcce.grapple). A random Capture lies on a Wild Mûmak (17027:A:1): the Capture, the Mûmak and where it stands.
       case "grapple":
-        if (!current || current.rank !== 3 || current.whole) open(3, "Staging", "plain");
-        line(grappleLine(names.card(step.enemyId), names.card(step.locationId)), null, [step.locationId]);
+        staging(grappleLine(names.card(step.enemyId), names.card(step.locationId)), [step.locationId]);
+        return;
+      case "attachDrawn":
+        staging(captureAttachedLine(names.card(step.cardId), names.card(step.hostId), mumakPlace(step.seat, after.seatCount)), [step.cardId, step.hostId]);
         return;
       // The enemies grappled with a location that became the active location or was explored come out from under it, faceup, into the staging area (dcce.grapple).
       case "detach":
@@ -353,8 +356,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   // The locations a player took control of or lost in this intent (Assault on Osgiliath): the location is moved by the engine without a step.
   const control = controlChanges(before, after).map((change) => changeWords(change, after.seatCount, names.card(change.id)));
   if (control.length > 0) groups.push({ rank: 8, title: "", tone: "plain", lines: control.map((text) => ({ text, mark: null })), firm: true });
-  // The hidden cards of The Blood of Gondor taken or turned in this intent: a count and a name only once a card is faceup, never a facedown card.
-  // It leads the banner (rank 3, before the engage and damage lines), and tells each enemy it turned under its own turn line.
+  // The hidden cards of The Blood of Gondor taken or turned in this intent: a count and a name only once a card is faceup, never a facedown card. It leads the banner (rank 3, before the engage and damage lines), and tells each enemy it turned under its own turn line.
   if (hidden) groups.push({ rank: 3, title: HIDDEN_TITLE, tone: "plain", lines: hiddenLines(hidden, names.card).map((text) => ({ text, mark: null })) });
   const held = heldBeat(before, after);
   if (held) groups.push({ rank: 8, title: held.title, tone: "plain", lines: held.lines.map((text) => ({ text, mark: null })) });
@@ -366,8 +368,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   // Where the objective of The Fate of Wilderland stands after progress moved on it, and the resources on the card that counts them.
   for (const beat of names.fate?.beats(before, after) ?? []) groups.push({ rank: beat.rank, title: beat.title, tone: "plain", lines: beat.lines.map((text) => ({ text, mark: null })) });
 
-  // Travel leaves no step of its own: the location that became active from staging. Once stages are separate each seat has an active location of its
-  // own (`Seat.active`), and in two-handed play the line names the seat that traveled.
+  // Travel leaves no step of its own: the location that became active from staging. Once stages are separate each seat has an active location of its own (`Seat.active`), and in two-handed play the line names the seat that traveled.
   if (after.separate === true && before.separate === true) {
     for (let seat = 0; seat < after.seatCount; seat += 1) {
       const arrived = after.seats[seat]?.active;

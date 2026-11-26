@@ -44,6 +44,8 @@ export type EngineStep =
   | { kind: "cancel"; cardId: string; by?: string }
   // An enemy attached itself facedown to a location in the staging area (dcce.grapple): the enemy is not named, it is facedown now.
   | { kind: "grapple"; enemyId: string; locationId: string }
+  // A random set-aside card was attached to a host in play (a Capture objective on a Wild Mûmak, 17027:A:1): `seat` is the player the host is engaged with, null while it is in the staging area.
+  | { kind: "attachDrawn"; cardId: string; hostId: string; seat: number | null }
   // A grappled enemy came out from under its location, faceup, into the staging area (dcce.grapple): named, it was seen faceup when it was revealed.
   | { kind: "detach"; enemyId: string; locationId: string }
   // A Stormcaller Elite card turned to its objective ally side and a player took it (dcce.stormcaller-elite); the card is the same instance.

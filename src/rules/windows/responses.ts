@@ -20,12 +20,50 @@ import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { announceAbility, announcePlayerAbility } from "../families/deck/pressure.ts";
 import { isPlayerCardEffect } from "../core/keywords.ts";
 import { guardianSeat } from "../families/guardian/seats.ts";
+import { hostEngagedSeat } from "../families/haradrim/capture.ts";
+import type { Effect } from "../../catalog/boundary.ts";
 
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
+export type ResponseOrder = "when" | "rest";
+
+// Whether any record of the list is a "When" Response (`whenFirst`), found once for each effect list: the list is never changed after the reducer is handed it.
+const WHEN_FIRST = new WeakMap<readonly Effect[], boolean>();
+function anyWhenFirst(ctx: ReduceContext): boolean {
+  let found = WHEN_FIRST.get(ctx.effects);
+  if (found == null) {
+    found = ctx.effects.some((effect) => effect.whenFirst === true);
+    WHEN_FIRST.set(ctx.effects, found);
+  }
+  return found;
+}
+
+// Whether a Response belongs to the pass `only` asks for: "when" takes the `whenFirst` records, "rest" the others, unset takes all.
+function inPass(effect: Effect, only?: ResponseOrder): boolean {
+  return only == null || (effect.whenFirst === true) === (only === "when");
+}
+
+// The seat that answers a Response, or null when none can: `seat` is the card's own (its controller, else the first player).
+// `eventSeat`: the seat the event happened to (12125:A:3). `guardian`: the player guarding Gollum (02134:A:1). `hostEngaged`: the player the source's host enemy is engaged with, none while it is in the staging area (the Captures, 17011:A:1).
+// `defender`: the controller of the character the event names as `other`, the defender of an attack (17014:A:1).
+function answeredSeat(state: ScenarioState, effect: Effect, event: GameEvent, sourceId: string, seat: number): number | null {
+  switch (effect.answeredBy) {
+    case "eventSeat":
+      return event.seat ?? null;
+    case "guardian":
+      return guardianSeat(state);
+    case "hostEngaged":
+      return hostEngagedSeat(state, sourceId);
+    case "defender":
+      return state.cards[event.other ?? ""]?.controller ?? null;
+    default:
+      return seat;
+  }
+}
 
 // Responses are optional. After an event, each Response that applies is offered to the seat that
 // controls its card (the first player, for an encounter or quest card). A seat may use it or pass.
-function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): ResponseOffer[] {
+// `only` narrows the records by `whenFirst`: "when" takes those that resolve before the event's Forced effects, "rest" the others; unset takes all.
+function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, only?: ResponseOrder): ResponseOffer[] {
   const offers: ResponseOffer[] = [];
   const order = livingSeats(state);
   // Only the cards with a Response to this trigger are sorted and looked at.
@@ -37,7 +75,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
     // An event card in the hand hears every event; a card in play hears the events about itself or about the table. The
     // top card of a deck its controller may play as if it were in the hand (Gandalf, 142002) is in the hand for this.
     const inHand = instance.zone === "hand" || (instance.zone === "deck" && instance.controller != null && playableFromDeck(state, instance.id, instance.controller, ctx));
-    const records = effectsOfCard(state, ctx, instance).filter((effect) => effect.timing === "response" && hears(state, effect, instance, event, ctx));
+    const records = effectsOfCard(state, ctx, instance).filter((effect) => effect.timing === "response" && inPass(effect, only) && hears(state, effect, instance, event, ctx));
     if (records.length === 0) continue;
     // A card nobody controls (a quest or encounter card) is answered by the first player, or, while a Peril card's
     // staging resolves, by the revealing player: the other players are the ones Peril keeps out (mec109.peril).
@@ -51,7 +89,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
       const fromHand = costOfKind(effect, "playEvent") != null || effect.fromHand === true;
       if (fromHand ? !inHand : !(inPlay(instance.zone) || hearsFromAnywhere(effect, instance, event))) continue;
       // "The engaged player may ...": the seat the event happened to answers it, whoever controls the card (12125:A:3).
-      const answering = effect.answeredBy === "eventSeat" ? event.seat : effect.answeredBy === "guardian" ? guardianSeat(state) : seat;
+      const answering = answeredSeat(state, effect, event, instance.id, seat);
       if (answering == null || !order.includes(answering) || (locked != null && answering !== locked)) continue;
       // `other`: the second card the event names ("After a Trap card you control is attached to an enemy": the new host).
       const scope = { actor: answering, sourceId: instance.id, returned: 0, eventSeat: event.seat, ...(event.phase ? { phase: event.phase } : {}), ...(aboutCard(event) ? { subject: aboutCard(event) } : {}), ...(event.explored ? { explored: true } : {}), ...(event.exhaustedToDefend ? { exhaustedToDefend: true } : {}), ...(event.other ? { other: event.other } : {}) };
@@ -71,12 +109,12 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext): Re
  * cannot be paid yet waits in the window and is listed once it can (Théodred adds the resource Aragorn spends, the video's
  * combo). With nothing usable now, no window opens.
  */
-export function offerResponses(state: ScenarioState, event: GameEvent, ctx: ReduceContext, steps: EngineStep[], also: readonly GameEvent[] = []): ScenarioState {
-  if (ctx.effects.length === 0) return state;
+export function offerResponses(state: ScenarioState, event: GameEvent, ctx: ReduceContext, steps: EngineStep[], also: readonly GameEvent[] = [], only?: ResponseOrder): ScenarioState {
+  if (ctx.effects.length === 0 || (only === "when" && !anyWhenFirst(ctx))) return state;
   const order = livingSeats(state);
   const seen = new Set<string>();
   const offers = [event, ...also]
-    .flatMap((each) => collect(state, each, ctx))
+    .flatMap((each) => collect(state, each, ctx, only))
     .filter((offer) => !barred(state, offer, ctx))
     .filter((offer) => {
       // Each event of the occurrence is its own triggering condition: a card that hears two of them is offered twice.

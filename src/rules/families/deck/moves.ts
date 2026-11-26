@@ -200,6 +200,12 @@ function actingSeat(state: ScenarioState, actor: number, who: Verb<"ActAs">["who
   }
 }
 
+/** The instructions still queued in the running effect resolve for `seat` from now on (the effect's other data stays). Nothing changes outside an effect frame. */
+export function reseatQueue(state: ScenarioState, seat: number): ScenarioState {
+  const data = effectData(state);
+  return data ? patchTop(state, { data: { ...data, queue: data.queue.map((item) => ({ ...item, seat })) } }) : state;
+}
+
 // ActAs: the rest of the effect resolves for the last picked player, the first player (rr.first-player), or the effect's actor again.
 export function actAs(state: ScenarioState, instruction: Verb<"ActAs">): ScenarioState {
   const data = effectData(state);
@@ -207,5 +213,5 @@ export function actAs(state: ScenarioState, instruction: Verb<"ActAs">): Scenari
   const player = [...(data.picked ?? [])].reverse().find((entry) => seatOf(entry) != null);
   const seat = actingSeat(state, data.actor, instruction.who, player);
   if (seat == null || !state.seats[seat] || state.seats[seat]?.eliminated) return state;
-  return patchTop(state, { data: { ...data, queue: data.queue.map((item) => ({ ...item, seat })) } });
+  return reseatQueue(state, seat);
 }

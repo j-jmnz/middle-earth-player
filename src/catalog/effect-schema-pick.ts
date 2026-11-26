@@ -263,6 +263,8 @@ export const pickSchema = z.strictObject({
   reanimated: z.literal(true).optional(),
   // With `type: card`: every card in play of any kind, the attachments on quest cards, enemies and characters included, and the cards of the staging area, the active location and the quest card ("Sorcery cards in play", 10153:A:2). Read by the angmar family.
   allInPlay: z.literal(true).optional(),
+  // A card the chooser's seat controls whose printed title is that of a card the running effect discarded from the chooser's own deck ("each card he controls that shares a title with any of the 5 cards he just discarded", 17022:A:1). Read by the haradrim family.
+  sameTitleAsDiscarded: z.literal(true).optional(),
   // A card with the printed title of the defending character in the attack in progress ("a copy of the defending character in your discard pile", 101160:A:2). Read by the angmar family.
   copyOfDefender: z.literal(true).optional(),
   // A card that has the Safe keyword (Across the Ettenmoors, mec108.safe; its record has the constant verb Safe): "a location with the safe keyword" (10075:A:2), for an objective-location (`type: objective`). Read by the angmar family.

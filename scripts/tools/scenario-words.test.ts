@@ -54,6 +54,17 @@ describe("scenario words stubs", () => {
     expect(() => extendAsks("asks.ts", "export const ASKS: Readonly<Record<string, Ask>> = {\n", STUBS)).toThrow(/asks\.ts/);
   });
 
+  it("opens the one-line table `pnpm scenario new` writes, empty or with shared tables, before it adds the stubs", () => {
+    for (const table of ["{}", "{ ...ONE, ...TWO }"]) {
+      const source = `import type { Ask } from "../asks.ts";\n\n// words\nexport const ASKS: Readonly<Record<string, Ask>> = ${table};\n`;
+      const text = extendAsks("asks.ts", source, STUBS);
+      expect(valid(text.replace(/^ {2}\.\.\.\w+,\n/gm, ""))).toBe(true);
+      expect(text).toContain('"1:forced:1 @0 Pick"');
+      expect(text.endsWith("},\n};\n")).toBe(true);
+      expect(text.includes("...ONE,\n  ...TWO,\n") || table === "{}").toBe(true);
+    }
+  });
+
   it("makes a new file for a scenario with none", () => {
     expect(valid(newAsksFile("id", "Name", STUBS))).toBe(true);
   });

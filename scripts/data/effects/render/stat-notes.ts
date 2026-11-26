@@ -12,6 +12,8 @@ export const FLAG_NOTES: Readonly<Record<string, string>> = {
   temperature: " (the heat tracker: the temperature, one modifier of the table for the rest of the game, set at Setup and replaced by each verb)",
   undefendedToStaged: " (the damage of undefended attacks goes to a hero in the staging area, the attacked player naming which, while one can take it; with none it goes to the player's own heroes)",
   defendersBelowThreat: " (an ally with less Willpower than this enemy's current Threat cannot be declared as a defender against it; heroes are never barred)",
+  noteExplored: " (the table notes each location explored until the end of that round, for the condition locationExploredThisRound; the Setup sets it for the rest of the game)",
+  exploredThisRound: " (a location was explored; noted by the engine until the end of the round)",
   stageEntered: " (the round the current main quest card was first seen in play, noted by the engine; round 0 is Setup)",
   progressToQuest: " (progress that a card effect would place on this location goes on the current quest instead, and it is never explored)",
   advancesWhenFreed: " (a stage with no progress and no quest points advances at once when nothing holds it back, with no progress needed)",

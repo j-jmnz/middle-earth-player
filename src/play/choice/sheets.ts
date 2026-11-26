@@ -58,6 +58,7 @@ import { nightActionNote } from "../words/scenarios/night.ts";
 import { framsburgActionCaution, framsburgActionNote } from "../words/scenarios/framsburg.ts";
 import { fatePassCaution } from "../words/scenarios/fate.ts";
 import { gundabadOptionLabel, gundabadPassCaution } from "../words/scenarios/gundabad.ts";
+import { captureRow } from "./capture-sheets.ts";
 import { gundabadRow } from "./gundabad-sheets.ts";
 import { mordorRow } from "./mordor-sheets.ts";
 import { fordsTimeCount, withCount } from "./ring-maker-sheets.ts";
@@ -91,14 +92,15 @@ export function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: r
     const card = game.cards[intent.cardId];
     if (!effect || !card) continue;
     const caution = framsburgActionCaution(game, effect);
+    const capture = captureRow(game, ctx, names.card, intent.cardId);
     options.push({
       id: `${intent.cardId}|${intent.effectId}`,
-      label: triggerLabel(game, names, intent.cardId),
+      label: capture?.label ?? triggerLabel(game, names, intent.cardId),
       code: pictureKey(card),
       effectId: intent.effectId,
       cardId: intent.cardId,
       timing: TIMING_WORDS[effect.timing],
-      text: [lineOf(effect, names), nightActionNote(game, effect), framsburgActionNote(game, ctx, effect, names, intent.cardId)].filter((part) => part != null).join(" ") || null,
+      text: [capture?.numbers, lineOf(effect, names), nightActionNote(game, effect), framsburgActionNote(game, ctx, effect, names, intent.cardId)].filter((part) => part != null).join(" ") || null,
       pay: game.window?.kind === "cancelOffer" ? cancelRequest(game, ctx, intent.cardId) : triggerRequest(game, ctx, intent.cardId, effect),
       ...(caution ? { caution } : {}),
     });
