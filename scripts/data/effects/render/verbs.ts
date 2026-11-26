@@ -424,9 +424,9 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     children: Array.isArray(i.options) ? (i.options as readonly Obj[]) : [],
   }),
   Each: (i, ctx) => ({
-    text: Array.isArray(i.rest) ? `the actor must choose ${amount(i.upTo, ctx)} of the ${pick(i.pick, ctx)} to keep (all stay with no more than that many; nothing is asked then); for each of the others${Array.isArray(i.instructions) && i.instructions.length > 0 ? " (the chosen ones get the steps in the second list)" : ""}:` : `for each ${pick(i.pick, ctx)}${eachLimits(i, ctx)}:`,
+    text: Array.isArray(i.rest) && i.rest.length === 0 && Array.isArray(i.instructions) && i.instructions.length > 0 ? `the actor must choose ${amount(i.upTo, ctx)} of the ${pick(i.pick, ctx)} (all of them when no more match; nothing is asked then); for each chosen one:` : Array.isArray(i.rest) ? `the actor must choose ${amount(i.upTo, ctx)} of the ${pick(i.pick, ctx)} to keep (all stay with no more than that many; nothing is asked then); for each of the others${Array.isArray(i.instructions) && i.instructions.length > 0 ? " (the chosen ones get the steps in the second list)" : ""}:` : `for each ${pick(i.pick, ctx)}${eachLimits(i, ctx)}:`,
     read: ["pick", "upTo", "instructions", "totalCost", "taken", "rest"],
-    children: Array.isArray(i.rest) ? (i.rest as readonly Obj[]) : Array.isArray(i.instructions) ? (i.instructions as readonly Obj[]) : [],
+    children: Array.isArray(i.rest) && i.rest.length > 0 ? (i.rest as readonly Obj[]) : Array.isArray(i.instructions) ? (i.instructions as readonly Obj[]) : [],
   }),
   Delay: (i, ctx) => ({
     text: `later, ${i.phase === "Quest" ? "at the end of the quest phase (the next one, when this is not the quest phase)" : (DELAY_UNTIL[str(i.until)] ?? `at ${str(i.until)}`)}${i.subject === "picked" ? ", acting on the card last picked" : ""}${isObj(i.uncancelable) ? ` (cannot be canceled while ${renderCondition(i.uncancelable, ctx)})` : ""}:`,

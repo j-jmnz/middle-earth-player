@@ -2,13 +2,13 @@
 // Celebrimbor's Mould and the two stages that hold it: the Setup's attachment, the claim once nothing holds it, the loss when its hero leaves play, the attack that comes before the Mould passes to Bellach and the stages that wait for it.
 import { describe, expect, it } from "vitest";
 
-import { settle } from "../../engine/machine.ts";
-import type { ScenarioState } from "../../core/state.ts";
-import { updateCard } from "../../core/state.ts";
-import { attachTo, moveCard } from "../../core/zones.ts";
-import { holds } from "../../interpret/conditions.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import type { ScenarioState } from "../../../rules/core/state.ts";
+import { updateCard } from "../../../rules/core/state.ts";
+import { attachTo, moveCard } from "../../../rules/core/zones.ts";
+import { holds } from "../../../rules/interpret/conditions.ts";
 import { finish, idOf, opened, resolveRecords, run, send, type Run, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
-import { modifiedStat } from "../../core/modified-stat.ts";
+import { modifiedStat } from "../../../rules/core/modified-stat.ts";
 
 const SCENARIO = "celebrimbors-secret";
 const MOULD = "08127";
@@ -88,7 +88,7 @@ describe("The stages that wait for the Mould (08122:B:4, 08123:B:4)", () => {
 
 describe("The Enemy's Servant (08123:A:1, 08123:B:3)", () => {
   it("08123:A:1 Bellach attacks the player who controls the Mould, and the Mould is attached to Bellach once that attack is over", () => {
-    const t = table({ seats: 1, stage: "08123", side: "A", staging: [BELLACH], attached: [{ code: MOULD, to: "dh1" }] });
+    const t = table({ seats: 1, stage: "08123", side: "A", staging: [BELLACH], attached: [{ code: MOULD, to: "dh1", encounter: true }] });
     const start = opened(t).state;
     expect(hostCode(start)).toBe("dh1");
     const revealed = resolveRecords(start, t.ctx, "08123", "whenRevealed", start.questStage ?? "");
@@ -101,6 +101,14 @@ describe("The Enemy's Servant (08123:A:1, 08123:B:3)", () => {
     }
     expect(current.state.pendingAttack).toBeNull();
     expect(hostCode(current.state)).toBe(BELLACH);
+  });
+
+  it("08123:A:1 with no hero holding the Mould no attack is made and the Mould stays where it is (\"Then\" depends on the attack)", () => {
+    const t = table({ seats: 1, stage: "08123", side: "A", staging: [BELLACH, CHAMBER], attached: [{ code: MOULD, to: CHAMBER, encounter: true }] });
+    const start = opened(t).state;
+    const revealed = resolveRecords(start, t.ctx, "08123", "whenRevealed", start.questStage ?? "");
+    expect(revealed.state.pendingAttack).toBeNull();
+    expect(hostCode(revealed.state)).toBe(CHAMBER);
   });
 
   it("08123:B:3 Bellach is immune and cannot be engaged until the stage holds 12 progress", () => {

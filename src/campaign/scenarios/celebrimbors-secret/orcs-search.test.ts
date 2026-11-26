@@ -2,10 +2,10 @@
 // location, the amount that counts the cards there, the card from each hand, the character a Shadow effect destroyed and the excess damage a Shadow effect sends to the active location.
 import { describe, expect, it } from "vitest";
 
-import { settle } from "../../engine/machine.ts";
-import type { ScenarioState } from "../../core/state.ts";
-import { updateCard } from "../../core/state.ts";
-import { moveCard } from "../../core/zones.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import type { ScenarioState } from "../../../rules/core/state.ts";
+import { updateCard } from "../../../rules/core/state.ts";
+import { moveCard } from "../../../rules/core/zones.ts";
 import { fightEnemy, idOf, idsOf, opened, run, statOf, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "celebrimbors-secret";
@@ -50,7 +50,7 @@ describe("BuryDamagedLocations (08125:A:1)", () => {
 });
 
 describe("the amount facedownUnder (08124:A:1)", () => {
-  it("Bellach's Threat is the number of cards underneath The Orcs' Search, 0 with none or with the objective out of play", () => {
+  it("08124:A:1 Bellach's Threat is the number of cards underneath The Orcs' Search, 0 with none or with the objective out of play", () => {
     const t = table({ staging: [BELLACH, ORCS] });
     expect(statOf(opened(t).state, t.cards, BELLACH, "threat")).toBe(0);
     const two = table({ staging: [BELLACH, ORCS, { code: PLAZA, damage: 2 }, { code: TOWER, damage: 4 }] });
@@ -63,7 +63,7 @@ describe("the amount facedownUnder (08124:A:1)", () => {
 });
 
 describe("PlaceRandomHandUnder (08134:A:1)", () => {
-  it("each player puts one random card of his hand facedown underneath the objective, still his own", () => {
+  it("08134:A:1 each player puts one random card of his hand facedown underneath the objective, still his own", () => {
     const t = table({ seats: 2, staging: [ORCS], hand: ["filler", "ally"] });
     const state = run(t, t.state, { verb: "PlaceRandomHandUnder", code: ORCS });
     const buried = Object.values(state.cards).filter((card) => card.zone === "under");
@@ -74,7 +74,7 @@ describe("PlaceRandomHandUnder (08134:A:1)", () => {
     expect((state.seats[1]?.hand ?? []).length).toBe(1);
   });
 
-  it("a player with an empty hand places nothing, and nothing is placed with the objective out of play", () => {
+  it("08134:A:1 a player with an empty hand places nothing, and nothing is placed with the objective out of play", () => {
     const empty = table({ seats: 1, staging: [ORCS] });
     expect(under(run(empty, empty.state, { verb: "PlaceRandomHandUnder", code: ORCS }))).toEqual([]);
     const none = table({ seats: 1, hand: ["filler"] });

@@ -18,6 +18,7 @@ const LOCATION_IN_PLAY: PickSpec = { type: "location", control: "any", staging: 
 // "The cards underneath The Orcs' Search", read live where a card says X.
 const UNDER_SEARCH = { facedownUnder: ORCS_SEARCH } as const;
 const MOULD_NOT_ON_A_HERO: Condition = { kind: "attachedToHero", code: MOULD, is: false };
+const MOULD_ON_A_HERO: Condition = { kind: "attachedToHero", code: MOULD, is: true };
 const ACTIVE_LOCATION: Condition = { kind: "canPick", pick: { type: "location", control: "any", active: true } };
 // "If this attack destroys a character": the attack's X is the characters it destroyed; "an ally": and the defender, out of play, was one.
 const DESTROYED_A_CHARACTER: Condition = { kind: "x", min: 1 };
@@ -62,7 +63,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: STAGE_2,
     lines: ["08123:A:1"],
     timing: "whenRevealed",
-    instructions: [TRIGGER_EACH_SCOUR, { verb: "Pick", pick: BELLACH_ENEMY }, { verb: "AttackScrollHolder", code: MOULD, card: "picked" }, { verb: "AttachObjectiveTo", code: MOULD, card: "picked" }],
+    instructions: [TRIGGER_EACH_SCOUR, { verb: "Pick", pick: BELLACH_ENEMY }, { verb: "AttackScrollHolder", code: MOULD, card: "picked" }, { verb: "AttachObjectiveTo", code: MOULD, card: "picked", when: MOULD_ON_A_HERO }],
   },
   ...stage(STAGE_2, "08123:B:1", "08123:B:2"),
   {
@@ -154,8 +155,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   },
   { id: "08134:shadow:1", cardCode: "08134", lines: ["08134:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "PlaceDestroyedUnder", code: ORCS_SEARCH, when: DESTROYED_A_CHARACTER }] }] },
 
-  // 08135 Desecrated Ruins. When Revealed: 3 damage on the active location; with no active location it gains surge. Shadow: +1 Attack; if the attack destroys an ally, X damage on the active location, X that ally's cost.
-  { id: "08135:whenRevealed:1", cardCode: "08135", lines: ["08135:A:1"], timing: "whenRevealed", instructions: [DAMAGE_ACTIVE(3), { verb: "GainSurge", when: { kind: "not", condition: ACTIVE_LOCATION } }] },
+  // 08135 Desecrated Ruins. When Revealed: with no active location it gains surge, checked before the 3 damage on the active location (a location the damage sends under The Orcs' Search gives no surge; recommended reading). Shadow: +1 Attack; if the attack destroys an ally, X damage on the active location, X that ally's cost.
+  { id: "08135:whenRevealed:1", cardCode: "08135", lines: ["08135:A:1"], timing: "whenRevealed", instructions: [{ verb: "GainSurge", when: { kind: "not", condition: ACTIVE_LOCATION } }, DAMAGE_ACTIVE(3)] },
   {
     id: "08135:shadow:1",
     cardCode: "08135",
