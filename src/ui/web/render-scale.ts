@@ -372,7 +372,7 @@ function startMeter(): void {
         log = [...log, second].slice(-LOG_SECONDS);
         unsent = [...unsent, second];
         if (unsent.length >= SEND_EVERY_S) {
-          // With the state of what describes itself now (the music's elements), so a slow second can be set beside it.
+          // With the state of what describes itself now (the music's pieces), so a slow second can be set beside it.
           send(unsent, [...described(), fault.textContent ?? ""].filter((text) => text !== "").join("\n"));
           unsent = [];
         }

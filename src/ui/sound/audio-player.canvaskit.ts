@@ -5,8 +5,7 @@
 import { createAudioPlayer as createPlayer, setAudioModeAsync, type AudioPlayer } from "./audio-player.native";
 import { Asset } from "expo-asset";
 
-import { browserBuffers, bufferAudio } from "../web/buffer-audio.ts";
-import { browserHost, pooledAudio, type PooledPlayer } from "../web/pooled-audio.ts";
+import { browserBuffers, bufferAudio, type BufferPlayer } from "../web/buffer-audio.ts";
 import { bundledSounds } from "./bundled";
 import { browserPage, webAudio, type Media, type Player } from "../web/web-audio.ts";
 
@@ -17,6 +16,12 @@ const page = typeof window === "undefined" ? null : browserPage(window);
 // `media` is private in expo-audio's types; it is the element the player plays.
 const wrap = webAudio(page, process.env.EXPO_PUBLIC_DESKTOP !== "1", (player) => (player as unknown as { media: Media }).media);
 
+// The web app's build (EXPO_PUBLIC_WEBAPP=1) makes no audio element: its sound effects and its music play from decoded buffers of one AudioContext
+// (src/ui/web/buffer-audio.ts), since an element holds the page's thread on Safari's engine. The page's wrapper is the same.
+const buffers = page && process.env.EXPO_PUBLIC_WEBAPP === "1" ? bufferAudio(browserBuffers(window)) : null;
+const wrapBuffered = webAudio(page, true, (player) => (player as unknown as BufferPlayer).media);
+const effects = new Set<unknown>(Object.values(bundledSounds));
+
 // A bundled file as the web gives it: its URL, an object that holds it, or an asset number.
 function uriOf(source: unknown): string {
   if (typeof source === "string") return source;
@@ -24,19 +29,7 @@ function uriOf(source: unknown): string {
   return (source as { uri: string }).uri;
 }
 
-// The web app's build (EXPO_PUBLIC_WEBAPP=1) plays through elements it keeps and blesses in each gesture (src/ui/web/pooled-audio.ts), since Safari refuses
-// an element that has had none; the page's wrapper is the same.
-const host = page && process.env.EXPO_PUBLIC_WEBAPP === "1" ? browserHost(window) : null;
-// A spare element is blessed with a sound effect, a file of a few kilobytes, never with a piece of music (pooled-audio.ts).
-const firstEffect = Object.values(bundledSounds)[0];
-const pool = host ? pooledAudio(host, undefined, firstEffect === undefined ? null : uriOf(firstEffect)) : null;
-// A sound effect plays from a decoded buffer, not an element: an element's play holds an iPad's page at each tap (src/ui/web/buffer-audio.ts).
-const buffers = host ? bufferAudio(browserBuffers(host.context)) : null;
-const effects = new Set<unknown>(Object.values(bundledSounds));
-const wrapPooled = webAudio(page, true, (player) => (player as unknown as PooledPlayer).media);
-
 export function createAudioPlayer(source: number): AudioPlayer {
-  if (buffers && effects.has(source)) return wrapPooled(buffers.create(uriOf(source)) as unknown as Player) as unknown as AudioPlayer;
-  if (pool) return wrapPooled(pool.create(uriOf(source)) as unknown as Player) as unknown as AudioPlayer;
+  if (buffers) return wrapBuffered(buffers.create(uriOf(source), effects.has(source) ? "effect" : "music") as unknown as Player) as unknown as AudioPlayer;
   return wrap(createPlayer(source) as unknown as Player) as unknown as AudioPlayer;
 }

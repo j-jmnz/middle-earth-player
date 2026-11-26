@@ -16,8 +16,7 @@ export function headersFile(): string {
     "Cross-Origin-Opener-Policy: same-origin",
     "Cross-Origin-Embedder-Policy: require-corp",
     "Cross-Origin-Resource-Policy: same-origin",
-    // The desktop's policy, with the copies of the music the page holds (blob:; src/ui/web/pooled-audio.ts) allowed as media.
-    `Content-Security-Policy: ${CSP.replace("media-src 'self'", "media-src 'self' blob:")}`,
+    `Content-Security-Policy: ${CSP}`,
     "X-Content-Type-Options: nosniff",
     "X-Robots-Tag: noindex",
   ];

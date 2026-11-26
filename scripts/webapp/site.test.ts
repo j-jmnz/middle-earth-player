@@ -52,8 +52,4 @@ describe("what the web app adds to the export for Cloudflare", () => {
     expect(script).toContain('build: "abc1234 2026-11-26T01:30 alert1 "');
     expect(() => new Function(script)).not.toThrow();
   });
-
-  it("allows the page's copies of the music as media", () => {
-    expect(headersFile()).toContain("media-src 'self' blob:");
-  });
 });

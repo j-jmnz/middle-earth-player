@@ -18,7 +18,7 @@ export function onSpan(hook: Hook): void {
 type Notes = Map<string, () => string>;
 const noted = globalThis as { __middleEarthNotes?: Notes };
 
-/** Gives the meter a line to add to each second of its log under `name` (the state of the music's elements, for one). */
+/** Gives the meter a line to add to each second of its log under `name` (the state of the music's pieces, for one). */
 export function describeTo(name: string, describe: () => string): void {
   (noted.__middleEarthNotes ??= new Map()).set(name, describe);
 }

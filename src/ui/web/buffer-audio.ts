@@ -1,31 +1,40 @@
-// The web app's sound effects (src/ui/sound/audio-player.canvaskit.ts; docs/design-system-table.md, Sound). A sound effect played through an audio element costs
-// an iPad's page over a tenth of a second at each tap: the element's play, pause and seek are answered by the system's media player while the page waits, and the
-// sound is late or lost. So a short sound is fetched and decoded once into a buffer of an AudioContext, and each play is a new source node on it, which the page
-// does not wait for. The music stays on elements (pooled-audio.ts): a piece is minutes long, and decoded it would be tens of megabytes.
+// The web app's audio (src/ui/sound/audio-player.canvaskit.ts; docs/design-system-table.md, Sound): every sound effect and every piece of music is fetched and
+// decoded into a buffer of one AudioContext, and each play is a new source node on it. No audio element is made. On Safari's engine, which every browser on an
+// iPhone and an iPad uses, an element costs the page its thread: its play, pause and seek are answered by the system's media player while the page waits (over a
+// tenth of a second at each tap for a sound effect), and while an element loads a piece of music the browser holds the thread for most of a minute with no
+// script running. A buffer's play is not waited for. A piece of music is decoded at MUSIC_RATE, not the context's rate, and dropped when its last player goes,
+// since decoded audio is large (a quarter of a megabyte a second at that rate).
 // No browser here: `BufferHost` is the page (browserBuffers), so a test runs the rest.
-import { span } from "./meter-span.ts";
+import { describeTo, span } from "./meter-span.ts";
 
 /** A decoded sound. */
 export type Decoded = { readonly duration: number };
-/** A sound that is playing: `stop` ends it, and `ended` is called when it ends by itself. */
+/** A sound that is playing: `stop` ends it. */
 export type Playing = { stop(): void };
+/** A sound effect is short, kept for good, and lost when it cannot sound at once; a piece of music is long, dropped with its last player, and starts when it can. */
+export type Kind = "effect" | "music";
+
+/** The sample rate a piece of music is decoded at: 16 kHz of sound, at two thirds of the memory of an iPad's 48 kHz. */
+export const MUSIC_RATE = 32_000;
 
 export type BufferHost = {
-  /** The sound at `uri`, fetched and decoded; rejects when it cannot be. */
-  decode(uri: string): Promise<Decoded>;
+  /** The sound at `uri`, fetched and decoded at `rate` samples a second (the context's own when null); rejects when it cannot be. */
+  decode(uri: string, rate: number | null): Promise<Decoded>;
   /** A volume control of its own for one player. */
   newGain(): { gain: { value: number } };
   /** Plays `sound` through `gain` from `offset` seconds in; `ended` runs when it reaches its end. */
   start(sound: Decoded, gain: { gain: { value: number } }, offset: number, ended: () => void): Playing;
   /** The context's clock, in seconds. */
   now(): number;
-  /** Whether the context sounds: before the page's first gesture it does not, and a sound started then is lost, not played late. */
+  /** Whether the context sounds: before the page's first gesture it does not. */
   running(): boolean;
   /** Starts the context, or starts it again after the system stopped it; only a gesture's call counts. */
   resume(): void;
+  /** Calls `listener` each time the context begins to sound. */
+  onRunning(listener: () => void): void;
 };
 
-/** What the sound code calls on a player (the part of expo-audio's AudioPlayer it uses), and the element-like `media` the page's wrapper reads (web-audio.ts). */
+/** What the sound and music code calls on a player (the part of expo-audio's AudioPlayer it uses), and the element-like `media` the page's wrapper reads (web-audio.ts). */
 export type BufferPlayer = {
   readonly playing: boolean;
   readonly currentTime: number;
@@ -39,32 +48,43 @@ export type BufferPlayer = {
   remove(): void;
 };
 
-export function bufferAudio(host: BufferHost): { create(uri: string): BufferPlayer } {
+type Entry = { sound: Promise<Decoded | null>; users: number };
+
+export function bufferAudio(host: BufferHost): { create(uri: string, kind: Kind): BufferPlayer } {
   // One decode for each file, shared by every player of it.
-  const sounds = new Map<string, Promise<Decoded | null>>();
-  const decoded = (uri: string): Promise<Decoded | null> => {
-    let sound = sounds.get(uri);
-    if (!sound) {
-      sound = host.decode(uri).catch(() => null);
-      sounds.set(uri, sound);
+  const sounds = new Map<string, Entry>();
+  const entryOf = (uri: string, kind: Kind): Entry => {
+    let entry = sounds.get(uri);
+    if (!entry) {
+      entry = { sound: host.decode(uri, kind === "music" ? MUSIC_RATE : null).catch(() => null), users: 0 };
+      sounds.set(uri, entry);
     }
-    return sound;
+    return entry;
   };
+  // The pieces of music that wait for the context to sound, and every piece's state for the test meter.
+  const waiting = new Set<() => void>();
+  const pieces = new Set<() => string>();
+  host.onRunning(() => {
+    for (const begin of [...waiting]) begin();
+  });
+  describeTo("music", () => [host.running() ? "sounding" : "silent", ...[...pieces].map((say) => say())].join(" | "));
 
   return {
-    create(uri) {
+    create(uri, kind) {
       const gain = host.newGain();
+      const entry = entryOf(uri, kind);
+      entry.users += 1;
       let sound: Decoded | null = null;
       let playing: Playing | null = null;
       // Where the sound stands when it is not playing, and the clock's time its start would have had when it is.
       let offset = 0;
       let startedAt = 0;
-      // A play asked for before the decode is done starts when it is.
+      // A play asked for before the sound can start (its decode is not done, or music before the page's first gesture) starts when it can.
       let wanted = false;
       let removed = false;
 
       const start = (): void => {
-        if (!sound || removed) return;
+        if (!sound || removed || !host.running()) return;
         const started = performance.now();
         playing?.stop();
         if (offset >= sound.duration) offset = 0;
@@ -72,6 +92,7 @@ export function bufferAudio(host: BufferHost): { create(uri: string): BufferPlay
         const mine = host.start(sound, gain, offset, () => {
           if (playing !== mine) return;
           playing = null;
+          wanted = false;
           offset = sound?.duration ?? 0;
         });
         playing = mine;
@@ -84,10 +105,18 @@ export function bufferAudio(host: BufferHost): { create(uri: string): BufferPlay
         playing = null;
         was.stop();
       };
+      const begin = (): void => {
+        if (wanted && !playing) start();
+      };
+      const say = (): string => `${sound ? Math.round(sound.duration) : "?"}s t${player.currentTime.toFixed(1)}${playing ? "*" : ""}`;
+      if (kind === "music") {
+        waiting.add(begin);
+        pieces.add(say);
+      }
 
-      void decoded(uri).then((ready) => {
+      void entry.sound.then((ready) => {
         sound = ready;
-        if (wanted) start();
+        begin();
       });
 
       const player: BufferPlayer = {
@@ -123,8 +152,8 @@ export function bufferAudio(host: BufferHost): { create(uri: string): BufferPlay
         },
         play() {
           host.resume();
-          // A context that does not sound yet (no gesture so far) would hold the sound and play it at the first tap: its moment has gone.
-          if (!host.running()) return;
+          // A sound effect asked for while the context does not sound would be held and played at the first tap: its moment has gone.
+          if (kind === "effect" && !host.running()) return;
           wanted = true;
           start();
         },
@@ -140,9 +169,15 @@ export function bufferAudio(host: BufferHost): { create(uri: string): BufferPlay
           return Promise.resolve();
         },
         remove() {
+          if (removed) return;
           wanted = false;
-          removed = true;
           stop();
+          removed = true;
+          waiting.delete(begin);
+          pieces.delete(say);
+          entry.users -= 1;
+          // A piece no player holds is dropped, so its memory goes back; a sound effect is a few kilobytes and stays.
+          if (kind === "music" && entry.users === 0 && sounds.get(uri) === entry) sounds.delete(uri);
         },
       };
       return player;
@@ -150,13 +185,40 @@ export function bufferAudio(host: BufferHost): { create(uri: string): BufferPlay
   };
 }
 
-/** The page as a BufferHost on `context` (the one the music's elements play through, so one gesture starts both). */
-export function browserBuffers(context: () => AudioContext): BufferHost {
+// The gestures that can give a user activation (the HTML standard's activation-triggering events).
+const GESTURES = ["pointerup", "touchend", "click", "keydown"] as const;
+
+/** The page as a BufferHost: one AudioContext, made when first asked for, started by the window's gestures and again when the page comes back to the front. */
+export function browserBuffers(win: Window & typeof globalThis): BufferHost {
+  let made: AudioContext | null = null;
+  const listeners: (() => void)[] = [];
+  const context = (): AudioContext => {
+    if (!made) {
+      made = new win.AudioContext();
+      made.addEventListener("statechange", () => {
+        if (made?.state === "running") for (const listener of listeners) listener();
+      });
+    }
+    return made;
+  };
+  const resume = (): void => {
+    if (context().state !== "running") void context().resume().catch(() => undefined);
+  };
+  // A gesture is what lets the context start, and what starts it again after the system stopped it.
+  for (const gesture of GESTURES) win.addEventListener(gesture, resume, true);
+  win.document.addEventListener("visibilitychange", () => {
+    if (win.document.visibilityState === "visible" && made) resume();
+  });
   return {
-    async decode(uri) {
-      const response = await fetch(uri);
+    async decode(uri, rate) {
+      const response = await win.fetch(uri);
       if (!response.ok) throw new Error(`${uri}: ${response.status}`);
-      return context().decodeAudioData(await response.arrayBuffer());
+      const bytes = await response.arrayBuffer();
+      if (rate !== null && rate < context().sampleRate && typeof win.OfflineAudioContext === "function") {
+        // A context of another rate decodes to that rate; it renders nothing.
+        return new win.OfflineAudioContext(2, 1, rate).decodeAudioData(bytes);
+      }
+      return context().decodeAudioData(bytes);
     },
     newGain() {
       const gain = context().createGain();
@@ -182,9 +244,10 @@ export function browserBuffers(context: () => AudioContext): BufferHost {
       };
     },
     now: () => context().currentTime,
-    running: () => context().state === "running",
-    resume() {
-      if (context().state !== "running") void context().resume().catch(() => undefined);
+    running: () => made !== null && made.state === "running",
+    resume,
+    onRunning(listener) {
+      listeners.push(listener);
     },
   };
 }
