@@ -46,7 +46,7 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
   08037:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json PickSetAside {"verb":"PickSetAside","cardType":"location","trait":"Barrow"}]
-    - [json AddPickedToStaging {"verb":"AddPickedToStaging"}]
+    - the picked card (a set-aside card or a card of the Raven deck) is added to the staging area, not revealed (no When Revealed, no Surge)
     - [json PickSetAside {"verb":"PickSetAside","cardType":"objective","trait":"Key","trialKey":true}]
     - [json AttachPickedToPrevious {"verb":"AttachPickedToPrevious"}]
     - [json PickSetAside {"verb":"PickSetAside","cardType":"enemy","trait":"Guardian","sharesTraitWithPicked":true}]
@@ -385,4 +385,4 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
     - if the attacking enemy is a Guardian enemy (any player controls): the attacking enemy is dealt a shadow card
     - then, if the attacking enemy is a Guardian enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy is dealt a shadow card
 
-(rendered pieces: 188 by template, 28 as JSON)
+(rendered pieces: 189 by template, 27 as JSON)

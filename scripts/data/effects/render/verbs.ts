@@ -195,6 +195,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   ChooseCurrentQuest: (i) => ({ text: i.until === "endOfRound" ? "the first player chooses a quest card other than the current quest (the main quest card, a quest stage in play together, or a side quest in the staging area) to be the current quest until the end of the round" : "the first player chooses a quest card other than the current quest (the main quest card, or an encounter side quest in the staging area) to be the current quest until the end of the phase", read: ["until"] }),
   AttachNewTo: (i) => ({ text: `a copy of the card with code ${str(i.code)} from the supply is put into play attached to the card titled "${str(i.to)}"`, read: ["code", "to"] }),
   TradeDamageForResources: (i) => ({ text: `starting with the first player, each player may place ${str(i.damage)} damage on the card with code ${str(i.code)} to add ${str(i.resources)} resource to each of their heroes' pools`, read: ["code", "damage", "resources"] }),
+  AddPickedToStaging: () => ({ text: "the picked card (a set-aside card or a card of the Raven deck) is added to the staging area, not revealed (no When Revealed, no Surge)", read: [] }),
   AddSetAsideToStaging: (i) => ({ text: `${i.all === true ? "every" : "one"} ${i.outOfPlay === true ? "out-of-play" : "set-aside"} card ${typeof i.code === "string" ? `with code ${i.code}` : `with the trait ${str(i.trait)}`} joins the staging area (it is not revealed${typeof i.code === "string" && timedCodes().has(i.code) ? "; it gets its printed Time counters as it joins" : ""})`, read: ["code", "trait", "all", "outOfPlay"] }),
   PlayFromHand: (i, ctx) => ({
     text: `the acting player plays ${i.picked === true ? `each card picked so far (a ${pick(i.pick, ctx)}) that is in its owner's hand` : `a ${pick(i.pick, ctx)} from their hand`} as part of the effect${i.free === true ? ", at no cost (no payment at all)" : ""}${typeof i.reduce === "number" ? `, its cost reduced by ${i.reduce}${typeof i.min === "number" ? ` (not below ${i.min})` : ""}` : ""}${i.noMatch === true ? ", needing no resource match" : ""}${i.onSelf === true ? ", an attachment played on this card" : ""}`,
@@ -278,7 +279,9 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   AddFromPile: (i, ctx) => ({
     text: i.reveal === true
       ? `${who(i.who ?? "actor")} reveals the top card of the ${str(i.pile)} deck and resolves its staging, into the ${i.to === "engaged" ? "engaged area" : "staging area"}, as if it was just revealed from the encounter deck (nothing with the deck empty)`
-      : `for ${who(i.who ?? "actor")}, the top ${i.count === undefined ? "" : `${amount(i.count, ctx)} `}card(s) of the ${str(i.pile)} deck go to ${i.to === "engaged" ? "the engaged area" : "the staging area"}${i.attachSource === true ? ", attached to this card" : ""}`,
+      : i.to === "engaged" && i.who === "eachSeat" && i.count === undefined
+        ? `for each player, the first player first, the top card of the ${str(i.pile)} deck is drawn and put into play engaged with that player (a draw, not a reveal: no staging step, no Surge, no When Revealed)${i.attachSource === true ? ", attached to this card" : ""}`
+        : `for ${who(i.who ?? "actor")}, the top ${i.count === undefined ? "" : `${amount(i.count, ctx)} `}card(s) of the ${str(i.pile)} deck go to ${i.to === "engaged" ? "the engaged area" : "the staging area"}${i.attachSource === true ? ", attached to this card" : ""}`,
     read: ["pile", "to", "count", "who", "attachSource", "reveal"],
   }),
   ShufflePileIntoEncounterDeck: (i) => ({ text: `shuffle the ${str(i.pile)} deck into the encounter deck`, read: ["pile"] }),

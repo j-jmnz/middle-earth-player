@@ -11,7 +11,7 @@ Scenario piles that place cards with no record (staging: 08155 Raven War-camp; a
     - every set-aside copy of the cards with codes 07042, 07043, 07044, 07046, 07047 and 07048 goes facedown into the raven deck, and the deck's discard pile starts empty (the shuffle is a record's own)
     - for each player, first player first:
       - choose enemy (any player controls) in the Raven deck, of a different title from the cards this effect already picked
-      - [json AddPickedToStaging {"verb":"AddPickedToStaging"}]
+      - the picked card (a set-aside card or a card of the Raven deck) is added to the staging area, not revealed (no When Revealed, no Surge)
     - shuffle the encounter deck
     - shuffle the raven deck
 
@@ -165,7 +165,7 @@ Scenario piles that place cards with no record (staging: 08155 Raven War-camp; a
     - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
   08155:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - for each player, the top card(s) of the raven deck go to the engaged area
+    - for each player, the first player first, the top card of the raven deck is drawn and put into play engaged with that player (a draw, not a reveal: no staging step, no Surge, no When Revealed)
 
 ## 08156 Raven Village
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -257,4 +257,4 @@ Scenario piles that place cards with no record (staging: 08155 Raven War-camp; a
     - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the total Threat in the staging area is X higher until the end of the phase
     - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
-(rendered pieces: 131 by template, 1 as JSON)
+(rendered pieces: 132 by template, 0 as JSON)
