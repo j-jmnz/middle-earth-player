@@ -1,0 +1,385 @@
+Scenario piles that place cards with no record (quest: 08035 The Trials Begin; quest: 08036 The Trial of Strength; quest: 08037 The Trial of Perseverance; quest: 08038 The Trial of Intuition; quest: 08039 The Antlered Crown; setAside: 08040 Boar's Guardian; setAside: 08041 Wolf's Guardian; setAside: 08042 Raven's Guardian; setAside: 08043 Key of the Boar; setAside: 08044 Key of the Wolf; setAside: 08045 Key of the Raven; setAside: 08046 Hill Barrow; setAside: 08047 Cave Barrow; setAside: 08048 Stone Barrow; setAside: 08049 Hallowed Circle)
+
+## 08035 The Trials Begin
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08035:A:1 (front): Setup: Set aside all 3 Guardian enemies, all 3 Key objectives, all 3 Barrow locations, and Hallowed Circle.
+  08035:setup:1: Setup
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
+
+08035:B:1 (back): When Revealed: The players advance to a stage 2A quest of their choice.
+  08035:whenRevealed:1: When revealed
+    - [json AdvanceToChosenStage {"verb":"AdvanceToChosenStage","codes":["08036","08037","08038"],"otherwise":"08039"}]
+
+## 08036 The Trial of Strength
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08036:A:1 (front): When Revealed: Randomly choose 1 of the remaining set aside Guardian enemies and 1 of the remaining set aside Barrow locations, reveal them, and add them to the staging area. Find the set aside Key objective that shares a Trait with the just revealed Guardian enemy and attach it to that enemy.
+  08036:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PickSetAside {"verb":"PickSetAside","cardType":"enemy","trait":"Guardian"}]
+    - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
+    - [json PickSetAside {"verb":"PickSetAside","cardType":"objective","trait":"Key","sharesTraitWithPicked":true,"trialKey":true}]
+    - [json AttachPickedToPrevious {"verb":"AttachPickedToPrevious"}]
+    - [json PickSetAside {"verb":"PickSetAside","cardType":"location","trait":"Barrow"}]
+    - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
+
+08036:B:1 (back): Each Guardian enemy engages the first player. Barrow locations cannot be the active location and are immune to player card effects.
+  08036:constant:1: Constant
+    - [json EngageSeat {"verb":"EngageSeat","who":"firstPlayer","trait":"Guardian"}]
+  08036:constant:2: Constant
+    - the players cannot travel to locations with the trait Barrow while this holds
+  08036:constant:3: Constant
+    - each Barrow location (any player controls) or in the staging area: stat immuneToPlayerCards 1, while this card is in play
+
+08036:B:2 (back): When the players control the current trial's Key objective, add all Barrow locations in play to the victory display and immediately advance to a stage 2A of the players' choice. If all stage 2 quests have been defeated, advance to stage 3A, instead.
+  08036:triggered:1: Triggered (mandatory, not printed as Forced) on the event trialKeyControlled
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddInPlayToVictory {"verb":"AddInPlayToVictory","cardType":"location","trait":"Barrow"}]
+    - [json AdvanceToChosenStage {"verb":"AdvanceToChosenStage","codes":["08036","08037","08038"],"otherwise":"08039"}]
+
+## 08037 The Trial of Perseverance
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08037:A:1 (front): When Revealed: Randomly choose 1 of the remaining set aside Barrow locations and add it to the staging area. Then, randomly choose 1 of the remaining set aside Key objectives and attach it to that Barrow location. Find the set aside Guardian enemy that shares a Trait with the Key objective in play and reveal it, adding it to the staging area.
+  08037:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PickSetAside {"verb":"PickSetAside","cardType":"location","trait":"Barrow"}]
+    - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
+    - [json PickSetAside {"verb":"PickSetAside","cardType":"objective","trait":"Key","trialKey":true}]
+    - [json AttachPickedToPrevious {"verb":"AttachPickedToPrevious"}]
+    - [json PickSetAside {"verb":"PickSetAside","cardType":"enemy","trait":"Guardian","sharesTraitWithPicked":true}]
+    - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
+
+08037:B:1 (back): Each Guardian enemy engages the first player. Guardian enemies cannot be damaged or leave play except by quest effect.
+  08037:constant:1: Constant
+    - [json EngageSeat {"verb":"EngageSeat","who":"firstPlayer","trait":"Guardian"}]
+  08037:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Guardian enemy (any player controls) or in the staging area: stat cannotTakeDamage 1, while this card is in play
+    - each Guardian enemy (any player controls) or in the staging area: stat cannotLeavePlay (held by a Captain enemy while its stage is current: it cannot leave play unless destroyed; a pick that feeds a discard, a shuffle, a return to a hand or deck, the victory display or a removal from the game does not offer it, the staging area shuffled into the encounter deck leaves it where it is, and a settle sweep puts it back in the staging area if an effect with no pick moved it out of play) 1, while this card is in play
+
+08037:B:2 (back): When the players control the current trial's Key objective, add all Guardian enemies in play to the victory display and immediately advance to a stage 2A of the players' choice. If all stage 2 quests have been defeated, advance to stage 3A, instead.
+  08037:triggered:1: Triggered (mandatory, not printed as Forced) on the event trialKeyControlled
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddInPlayToVictory {"verb":"AddInPlayToVictory","cardType":"enemy","trait":"Guardian"}]
+    - [json AdvanceToChosenStage {"verb":"AdvanceToChosenStage","codes":["08036","08037","08038"],"otherwise":"08039"}]
+
+## 08038 The Trial of Intuition
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08038:A:1 (front): When Revealed: Randomly choose 1 of the remaining set aside Guardian enemies and 1 of the remaining set aside Barrow locations, reveal them, and add them to the staging area. Shuffle the encounter discard pile into the encounter deck. Find the set aside Key objective that shares a Trait with the just revealed Guardian enemy and shuffle it into the bottom 10 cards of the encounter deck.
+  08038:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PickSetAside {"verb":"PickSetAside","cardType":"location","trait":"Barrow"}]
+    - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
+    - shuffle the encounter discard pile into the encounter deck
+    - [json PickSetAside {"verb":"PickSetAside","cardType":"enemy","trait":"Guardian"}]
+    - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
+    - [json PickSetAside {"verb":"PickSetAside","cardType":"objective","trait":"Key","sharesTraitWithPicked":true,"trialKey":true}]
+    - [json ShufflePickedIntoBottom {"verb":"ShufflePickedIntoBottom","count":10}]
+
+08038:B:1 (back): Each Guardian enemy engages the first player. Any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead. (Progress is placed on the active location before triggering this effect.)
+  08038:constant:1: Constant
+    - [json EngageSeat {"verb":"EngageSeat","who":"firstPlayer","trait":"Guardian"}]
+  08038:constant:2: Constant
+    - currentQuest: stat progressDiscards 1, while this card is in play
+
+08038:B:2 (back): When the players control the current trial's Key objective, add all Guardian enemies and Barrow locations in play to the victory display and immediately advance to a stage 2A of the players' choice. If all stage 2 quests have been defeated, advance to stage 3A, instead.
+  08038:triggered:1: Triggered (mandatory, not printed as Forced) on the event trialKeyControlled
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddInPlayToVictory {"verb":"AddInPlayToVictory","cardType":"enemy","trait":"Guardian"}]
+    - [json AddInPlayToVictory {"verb":"AddInPlayToVictory","cardType":"location","trait":"Barrow"}]
+    - [json AdvanceToChosenStage {"verb":"AdvanceToChosenStage","codes":["08036","08037","08038"],"otherwise":"08039"}]
+
+## 08039 The Antlered Crown
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08039:A:1 (front): When Revealed: Add Hallowed Circle to the staging area. Reveal each Guardian enemy in the victory display, adding them to the staging area.
+  08039:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one set-aside card with code 08049 joins the staging area (it is not revealed)
+    - [json RevealFromVictory {"verb":"RevealFromVictory","trait":"Guardian"}]
+
+08039:B:1 (back): Each Guardian enemy engages the player who controls the Key objective with a Trait shared by that enemy.
+  08039:constant:1: Constant
+    - [json EngageSeat {"verb":"EngageSeat","who":"keyHolder","trait":"Guardian"}]
+
+08039:B:2 (back): Players cannot defeat this stage unless Hallowed Circle is in the victory display. If the players defeat this stage, they win the game.
+  08039:constant:2: Constant
+    only if the card with code 08049 is not in the victory display
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
+    - the players cannot defeat this stage while this holds
+
+## 08040 Boar's Guardian
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08040:A:1 (front): Cannot have non-Key attachments.
+  08040:constant:1: Constant
+    only if this card is in play
+    - no card can be attached to this card except a card with the trait Key
+
+08040:A:2 (front): Time 2. Forced: After the last time counter is removed from Boar's Guardian, the engaged player must discard an ally he controls. Place 2 time counters on Boar's Guardian.
+  08040:constant:2: Constant
+    - Time 2: when this card is revealed, 2 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+  08040:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for the player this enemy is engaged with:
+      - if there is a ally (you control) to choose: choose ally (you control)
+      - then, if there is a ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+    - place 2 resource tokens on this card
+
+## 08041 Wolf's Guardian
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08041:A:1 (front): Cannot have non-Key attachments.
+  08041:constant:1: Constant
+    only if this card is in play
+    - no card can be attached to this card except a card with the trait Key
+
+08041:A:2 (front): Time 3. Forced: After the last time counter is removed from Wolf's Guardian, it makes an immediate attack against the engaged player. Place 3 time counters on Wolf's Guardian.
+  08041:constant:2: Constant
+    - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+  08041:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+    - place 3 resource tokens on this card
+
+## 08042 Raven's Guardian
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08042:A:1 (front): Cannot have non-Key attachments.
+  08042:constant:1: Constant
+    only if this card is in play
+    - no card can be attached to this card except a card with the trait Key
+
+08042:A:2 (front): Time 4. Forced: After the last time counter is removed from Raven's Guardian, deal 1 damage to each character controlled by the engaged player. Place 4 time counters on Raven's Guardian.
+  08042:constant:2: Constant
+    - Time 4: when this card is revealed, 4 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+  08042:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for the player this enemy is engaged with:
+      - deal 1 damage to each character (you control)
+    - place 4 resource tokens on this card
+
+## 08043 Key of the Boar
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08043:A:1 (front): If unattached, the first player must claim Key of the Boar and attach it to a hero he controls.
+  08043:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
+
+08043:A:2 (front): If Key of the Boar is discarded, add it to the staging area.
+  08043:forced:1: Forced after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card goes to the staging area (it is not revealed)
+  08043:forced:2: Forced on the event encounterDiscarded (heard about this card)
+    only if this card is in encounterDiscard
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card goes to the staging area (it is not revealed)
+
+08043:A:3 (shadow): Shadow: Shuffle Key of the Boar back into the encounter deck.
+  08043:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - this card (a shadow card) is shuffled into the encounter deck instead of being discarded
+
+## 08044 Key of the Wolf
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08044:A:1 (front): If unattached, the first player must claim Key of the Wolf and attach it to a hero he controls.
+  08044:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
+
+08044:A:2 (front): If Key of the Wolf is discarded, add it to the staging area.
+  08044:forced:1: Forced after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card goes to the staging area (it is not revealed)
+  08044:forced:2: Forced on the event encounterDiscarded (heard about this card)
+    only if this card is in encounterDiscard
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card goes to the staging area (it is not revealed)
+
+08044:A:3 (shadow): Shadow: Shuffle Key of the Wolf back into the encounter deck.
+  08044:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - this card (a shadow card) is shuffled into the encounter deck instead of being discarded
+
+## 08045 Key of the Raven
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08045:A:1 (front): If unattached, the first player must claim Key of the Raven and attach it to a hero he controls.
+  08045:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - (marker, does nothing when run) while this objective in the staging area is free of encounters, the settle sweep claims it: the first player chooses one of their heroes to attach it to; the claim is announced
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
+
+08045:A:2 (front): If Key of the Raven is discarded, add it to the staging area.
+  08045:forced:1: Forced after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card goes to the staging area (it is not revealed)
+  08045:forced:2: Forced on the event encounterDiscarded (heard about this card)
+    only if this card is in encounterDiscard
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card goes to the staging area (it is not revealed)
+
+08045:A:3 (shadow): Shadow: Shuffle Key of the Raven back into the encounter deck.
+  08045:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - this card (a shadow card) is shuffled into the encounter deck instead of being discarded
+
+## 08046 Hill Barrow
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08046:A:1 (front): Forced: When a Guardian enemy attacks, deal it 1 additional shadow card.
+  08046:forced:1: Forced when this enemy attacks, before the defender is declared (heard about Guardian enemy (any player controls) or in the staging area)
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the card the event is about is dealt a shadow card
+
+## 08047 Cave Barrow
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08047:A:1 (front): The players, as a group, cannot have more than 5 allies in play. (If there are more than 5 allies in play, discard allies until only 5 remain.)
+  08047:constant:1: Constant
+    - the table: stat alliesLimit 5, while this card is in play
+  08047:triggered:1: Triggered (mandatory, not printed as Forced) on the event alliesOverLimit
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the actor must choose 5 of the ally (any player controls) to keep (all stay with no more than that many; nothing is asked then); for each of the others:
+      - discard the picked card
+
+## 08048 Stone Barrow
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08048:A:1 (front): Forced: After a Guardian enemy attacks, raise each player's threat by X, where X is that enemy's Threat.
+  08048:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about Guardian enemy (any player controls) or in the staging area)
+    who acts: the acting player is the defending player (the player the attack is against)
+    - for each player, first player first:
+      - raise threat by threat of the card the event is about (the acting player)
+
+## 08049 Hallowed Circle
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08049:A:1 (front): Immune to player card effects. X is the number of players in the game.
+  (the keyword part is owned by the card's keywords; the records cover: X is the number of players in the game.)
+  08049:constant:1: Constant
+    - this card: stat threat the number of players, while this card is in play
+
+08049:A:2 (front): Travel: The players must exhaust 3 Key objectives.
+  08049:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the line's choose step finds fewer cards than it must exhaust
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready Key objective (any player controls) that is claimed (attached to a character a player controls)
+    - exhaust the picked card
+    - choose ready Key objective (any player controls) that is claimed (attached to a character a player controls)
+    - exhaust the picked card
+    - choose ready Key objective (any player controls) that is claimed (attached to a character a player controls)
+    - exhaust the picked card
+
+08049:A:3 (front): Forced: After the players travel here, each engaged Guardian enemy makes an immediate attack.
+  08049:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - each enemy engaged with a player (not one in the staging area) with the trait Guardian makes an immediate attack, each dealt a shadow card of its own
+
+## 08050 Spirit of the Wild
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08050:A:1 (front): Cannot have attachments.
+  08050:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+08050:A:2 (front): Spirit of the Wild gets +1 Threat and +1 Attack for each Key objective the players control.
+  08050:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat the number of Key objective (any player controls) that is claimed (attached to a character a player controls), while this card is in play
+    - this card: stat attack the number of Key objective (any player controls) that is claimed (attached to a character a player controls), while this card is in play
+
+08050:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack for each Key objective the players control.
+  08050:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack the number of Key objective (any player controls) that is claimed (attached to a character a player controls), until the end of the attack
+
+## 08051 Cursed Forest
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08051:A:1 (front): Travel: Search the encounter deck and discard pile for a Spirit enemy and add it to the staging area.
+  08051:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one Spirit enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+08051:A:2 (shadow): Shadow: If this attack destroys a character, remove a time counter from an enemy, if able.
+  08051:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose enemy (any player controls) or in the staging area, with resources on it
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): 1 time counter come off the last picked card (an enemy with Time X; a card with no Time loses none), one at a time, stopping when none is left; a card whose last counter goes hears it once
+
+## 08052 Grim Foothills
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08052:A:1: Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+08052:A:2 (front): X is the number of players in the game.
+  08052:constant:1: Constant
+    - this card: stat threat the number of players, while this card is in play
+
+08052:A:3 (front): While Grim Foothills is in the staging area, progress must be placed on Grim Foothills before it can be placed on the active location.
+  08052:constant:2: Constant
+    only if this card is in the staging area
+    - this card: stat progressFirstRequired 1, while this card is in play
+
+## 08053 Curse of the Wild Men
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08053:A:1 (front): When Revealed: Deal 1 damage to each non-unique character in play. If the players control 3 Key objectives, Curse of the Wild Men gains surge.
+  08053:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - deal 1 damage to each character (any player controls) (unique: false filters nothing: the engine reads only unique: true)
+    - then, if the number of Key objective (any player controls) that is claimed (attached to a character a player controls) is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+08053:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each Key objective the players control.
+  08053:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack the number of Key objective (any player controls) that is claimed (attached to a character a player controls), until the end of the attack
+
+## 08054 The Guardian's Fury
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08054:A:1 (front): When Revealed: Each Guardian enemy makes an attack. If there are no Guardian enemies in play, reveal a random Guardian enemy from the victory display, and add it to the staging area.
+  08054:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy engaged with a player (not one in the staging area) with the trait Guardian makes an immediate attack, each dealt a shadow card of its own
+    - for each Guardian enemy (any player controls) in the staging area only:
+      - the picked enemy attacks the first player now, from the staging area, dealt a shadow card
+    - [json RevealFromVictory {"verb":"RevealFromVictory","trait":"Guardian","random":true,"when":{"kind":"not","condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","staging":true,"trait":"Guardian"}}}}]
+
+08054:A:2 (shadow): Shadow: If attacking enemy is a Guardian, it makes an additional attack after this one.
+  08054:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - if the attacking enemy is a Guardian enemy (any player controls): the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
+
+## 08055 Wild Tenacity
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08055:A:1 (front): When Revealed: Remove X time counters from each enemy in play with the time keyword, where X is the number of players.
+  08055:whenRevealed:1: When revealed
+    - 1 time counter for each player still in the game come off each enemy in play with Time X, one at a time, stopping when none is left; a card whose last counter goes hears it once
+
+08055:A:2 (shadow): Shadow: If attacking enemy is a Guardian, deal it 2 additional shadow cards for this attack.
+  08055:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the attacking enemy is a Guardian enemy (any player controls): the attacking enemy is dealt a shadow card
+    - then, if the attacking enemy is a Guardian enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy is dealt a shadow card
+
+(rendered pieces: 185 by template, 26 as JSON)
