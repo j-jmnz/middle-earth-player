@@ -46,7 +46,7 @@ export function drawBody(p: BodyProps, slot: CardSlot, dim: boolean) {
   return (
     <Group opacity={dim ? 0.35 : 1}>
       {glows ? <Glow slot={slot} picked={picked} t={t} s={s} /> : null}
-      <CardBody slot={slot} image={image} name={name} sphere={sphereIcon(p.sphere)} fonts={fonts} encounterBack={encounterBack} backs={backs} t={t} s={s} />
+      <CardBody slot={slot} image={image} name={name} sphere={sphereIcon(p.sphere)} fonts={fonts} encounterBack={encounterBack} backs={backs} nameLines={p.nameLines} t={t} s={s} />
     </Group>
   );
 }

@@ -552,7 +552,7 @@ describe("player elimination", () => {
       activeSeat: 1,
       passed: [],
     };
-    const cleared = clearEliminated(state, cards);
+    const cleared = clearEliminated(state, cards, { effects: [], cards: cards }, []);
     expect(cleared.pendingAttack).toBeNull();
     expect(cleared.window).toBeNull();
     expect(cleared.perilSeat).toBeNull();

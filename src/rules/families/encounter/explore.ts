@@ -21,7 +21,7 @@ export function exploreFull(state: ScenarioState, ctx: ReduceContext, steps: Eng
   for (const card of holding) {
     const explored = exploreIfFull(next, card.id, ctx.cards, steps);
     // The location left play explored: its questResolution records and the cards that answer its leaving resolve as when progress explores it.
-    next = explored === next ? next : announceExplored(explored, card.id, ctx, steps);
+    next = explored === next || inPlay(explored.cards[card.id]?.zone ?? "discard") ? explored : announceExplored(explored, card.id, ctx, steps);
   }
   return next;
 }

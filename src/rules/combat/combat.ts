@@ -5,6 +5,7 @@ import { familyAttackReason, familyDefenseReason, familyUndefendedTargets } from
 import { announceEnemyAttacked, attackerLimitReached } from "../families/aflame/attack.ts";
 import { attackBarred } from "../interpret/constants.ts";
 import type { EngineStep } from "../core/intents.ts";
+import { runAtEnd } from "./attack-end.ts";
 import { hasKeyword, modifiedStat, placeDamage } from "../core/keywords.ts";
 import { heldAmountByClass } from "../core/holder-classes.ts";
 import { isAllyLike, isCharacterType, printedOf, type PrintedCard } from "../core/printed.ts";
@@ -166,12 +167,13 @@ function toDefense(state: ScenarioState, ctx: ReduceContext): ScenarioState {
 }
 
 // The Forced effects of the attack's start are done: the defender is declared next.
-export function openDefense(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+export function openDefense(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const attack = state.pendingAttack;
   if (!attack?.defenseWaits) return state;
   const { defenseWaits: _done, ...rest } = attack;
   // The enemy left play while they resolved: the attack is over.
-  if (!attackHere(state, attack.enemyId)) return { ...state, pendingAttack: null };
+  // What waited on the attack still happens (combat/attack-end.ts).
+  if (!attackHere(state, attack.enemyId)) return runAtEnd({ ...state, pendingAttack: null }, attack, steps);
   return toDefense({ ...state, pendingAttack: rest }, ctx);
 }
 

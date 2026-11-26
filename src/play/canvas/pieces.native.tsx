@@ -149,6 +149,7 @@ export function CardBody({
   fonts,
   encounterBack,
   backs,
+  nameLines,
   t,
   s,
 }: {
@@ -159,6 +160,8 @@ export function CardBody({
   fonts: Fonts;
   encounterBack: boolean;
   backs: BackImages;
+  // How many lines the placeholder name may take (3 by default): one when effect pills stand down the left edge from 17 pt, so they never cover a second line of the name.
+  nameLines?: number;
   t: TableTokens;
   s: number;
 }) {
@@ -177,7 +180,7 @@ export function CardBody({
         <Group>
           <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={t.raised} />
           <Group clip={{ x: x + 3 * s, y: y + 3 * s, width: w - 6 * s, height: h - 6 * s }}>
-            {wrapName(name, w - 10 * s, (text) => fonts.names.getTextWidth(text)).map((line, index) => (
+            {wrapName(name, w - 10 * s, (text) => fonts.names.getTextWidth(text), nameLines).map((line, index) => (
               <Text key={index} x={x + 5 * s} y={y + (15 + index * LINE) * s} text={line} font={fonts.names} color={t.bone} />
             ))}
           </Group>

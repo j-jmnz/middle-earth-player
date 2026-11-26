@@ -159,7 +159,7 @@ describe("FollowFirstPlayer (144075:A:1)", () => {
 });
 
 describe("the first player is eliminated (144075:A:1, 144076:A:1, agent recommendation)", () => {
-  const out = (state: ScenarioState): ScenarioState => clearEliminated(eliminateSeat(state, 0, []), ctxOf().cards);
+  const out = (state: ScenarioState): ScenarioState => clearEliminated(eliminateSeat(state, 0, []), ctxOf().cards, { effects: [], cards: ctxOf().cards }, []);
 
   it("Gollum is engaged with the new first player, damage kept", () => {
     const base = twoSeats();

@@ -172,7 +172,7 @@ describe("an eliminated seat with separate staging", () => {
     const table = make({ areas: [["grunt"], ["brute", "scout"]], engaged: [{ code: "archer", seat: 1 }] });
     const stage = table.state.seats[1].stage ?? "";
     const eliminated = withSeat(withThreat(table.state, 1, 50), 1, { ...table.state.seats[1], threat: 50, eliminated: true });
-    const after = clearEliminated(eliminated, world.cards);
+    const after = clearEliminated(eliminated, world.cards, { effects: [], cards: world.cards }, []);
     expect(after.seats[1].staging).toEqual([]);
     expect(after.seats[1].stage).toBeUndefined();
     expect(codes(after, after.encounterDiscard).sort()).toEqual(["archer", "brute", "scout"]);

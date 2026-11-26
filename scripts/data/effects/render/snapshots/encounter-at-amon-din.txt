@@ -19,7 +19,7 @@ Scenario piles that place cards with no record (activeLocation: 06075 Burning Fa
 06066:B:2 (back): When progress would be placed on Savagery of the Orcs, move an equal number of villager tokens from this quest onto Rescued Villagers instead.
   06066:constant:1: Constant
     - this card: stat progressToVillagers (held by the current quest stage: the progress that would be placed on it is not placed; its record hears the amount and moves that many villager tokens from the quest card to Rescued Villagers, the rest of the progress is lost) 1, while this card is in play
-  06066:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressReplaced
+  06066:triggered:1: Triggered (mandatory, not printed as Forced) after progress that would be placed on the current quest is replaced by the stage's flag (X is that progress: the amount that would have gone on the quest)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - move up to X villager token(s) from this card to the card in play with code 06068, a card in play (a move is no discard: nothing hears it); the number moved is added to the effect's X
 

@@ -10,8 +10,8 @@ import { renderRecord } from "./record.ts";
 
 export type CardRender = { text: string; tally: Tally };
 
-// `rawLines`: every printed ledger line of the card in order (the ones generate.ts drops as keyword-only included). `pile`: where the scenario deals the card (encounter, quest, staging...), which places it with no record.
-export type CardExtras = { rawLines?: readonly { lineId: string; line: string }[]; pile?: string; finalStage?: boolean; checks?: boolean };
+// `rawLines`: every printed ledger line of the card in order (the ones generate.ts drops as keyword-only included). `pile`: where the scenario deals the card (encounter, quest, staging...), which places it with no record. `perPlayer`: the pile places that many copies for each player (the other copies stay in the encounter deck).
+export type CardExtras = { rawLines?: readonly { lineId: string; line: string }[]; pile?: string; perPlayer?: number; finalStage?: boolean; checks?: boolean };
 
 // `checks`: print under each line the checks that apply to it (checks.ts), which the reading judge answers.
 // `inert`: the ledger line ids marked inert (a reminder or keyword the engine applies by rule), which need no record.
@@ -22,7 +22,10 @@ export function renderCard(card: Card, segments: readonly Segment[], effects: re
   const known = new Set(segments.map((segment) => segment.lineId));
   const bySegment = new Map(segments.map((segment) => [segment.lineId, segment]));
   const out: string[] = [`## ${card.code} ${card.name}`];
-  if (extras.pile) out.push(`(the scenario deals it into the ${extras.pile} pile; the piles place it, no record does)`);
+  if (extras.pile) {
+    const each = extras.perPlayer != null ? `, ${extras.perPlayer} cop${extras.perPlayer === 1 ? "y" : "ies"} for each player, the other copies stay in the encounter deck` : "";
+    out.push(`(the scenario deals it into the ${extras.pile} pile${each}; the piles place it, no record does)`);
+  }
   for (const row of rows) {
     const segment = bySegment.get(row.lineId);
     out.push("", `${row.lineId}${segment ? ` (${segment.side})` : ""}: ${row.line}`);

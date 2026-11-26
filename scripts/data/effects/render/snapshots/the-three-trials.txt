@@ -190,7 +190,7 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
 08043:A:3 (shadow): Shadow: Shuffle Key of the Boar back into the encounter deck.
   08043:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - this card (a shadow card) is shuffled into the encounter deck instead of being discarded
+    - this card (a shadow card, or an enemy that was destroyed) is shuffled into the encounter deck instead of being discarded
 
 ## 08044 Key of the Wolf
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -214,7 +214,7 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
 08044:A:3 (shadow): Shadow: Shuffle Key of the Wolf back into the encounter deck.
   08044:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - this card (a shadow card) is shuffled into the encounter deck instead of being discarded
+    - this card (a shadow card, or an enemy that was destroyed) is shuffled into the encounter deck instead of being discarded
 
 ## 08045 Key of the Raven
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -238,7 +238,7 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
 08045:A:3 (shadow): Shadow: Shuffle Key of the Raven back into the encounter deck.
   08045:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - this card (a shadow card) is shuffled into the encounter deck instead of being discarded
+    - this card (a shadow card, or an enemy that was destroyed) is shuffled into the encounter deck instead of being discarded
 
 ## 08046 Hill Barrow
 (the scenario deals it into the setAside pile; the piles place it, no record does)

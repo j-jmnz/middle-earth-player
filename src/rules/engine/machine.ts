@@ -112,7 +112,7 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
     // The Stormcaller Elite whose indestructible lapsed with the stage (12039:B:1) wait, lethal, for the When Revealed that flips them (12040:B:1), and Cold-Drake for the one that sets it aside (19024:A:1): advancing is immediate.
     const held = (candidate: ScenarioState, id: string): boolean => ((answerable || resolving) && damageHeld(candidate, id)) || heldByLapsedStage(candidate, id, ctx) || heldBySettingAside(candidate, id, ctx);
     // The play family's constants (families/play/sweep.ts): hero card type, first player control, discard at a stat.
-    const swept = current.lost || current.failure ? current : runSettle("sweep", destroyOverwhelmed(playSweep(clearEliminated(eliminateHeroless(current, ctx.cards, steps), ctx.cards, ctx), ctx, steps), ctx.cards, steps, held), ctx, steps);
+    const swept = current.lost || current.failure ? current : runSettle("sweep", destroyOverwhelmed(playSweep(clearEliminated(eliminateHeroless(current, ctx.cards, steps), ctx.cards, ctx, steps), ctx, steps), ctx.cards, steps, held), ctx, steps);
     if (swept !== current) {
       // A seat a sweep eliminated (an empty hand on stage 3B) hands its open window on at once, as one eliminated by an intent does.
       current = handoffEliminated(swept);
@@ -208,7 +208,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
   if (stepWindowResumes(state)) return strikeResumes(state) ? continueStrike(state, ctx, steps) : resumeAttack(state, ctx, steps);
   if (state.stack.length > 0) return advanceFrame(state, ctx, steps);
   // The Forced effects of an attack's start are done: the defender is declared (141069:A:2).
-  if (state.pendingAttack?.defenseWaits) return openDefense(state, ctx);
+  if (state.pendingAttack?.defenseWaits) return openDefense(state, ctx, steps);
   // The Responses to a shadow effect, or a shadow effect that asked a player, are done: the attack goes on.
   if (attackResumes(state)) return resolveAttack(state, ctx, steps);
   // "End the current phase" (09070:A:1): once the effect has finished, the round goes to the end of the phase in progress.

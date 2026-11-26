@@ -1,11 +1,27 @@
-// Rules: rm.time-x, rm.grima-objective-ally, rr.cannot, rr.first-player (data/rules/entries.json); ledger lines 08011:B:2, 08013:B:3, 07016:A:1, 07016:A:3, 07023:A:1, 07059:A:1, 07059:B:1, 07059:B:2, 07059:B:3, 07060:B:2, 07060:B:3, 07061:B:1, 07061:B:2, 07061:B:3, 07065:B:1, 07065:B:2, 07066:B:1, 07066:B:2, 07067:B:1, 07067:B:2.
+// Rules: rm.time-x, rm.grima-objective-ally, rr.cannot, rr.first-player (data/rules/entries.json); ledger lines 08011:B:2, 08013:B:3, 07016:A:1, 07016:A:3, 07023:A:1, 07059:A:1, 07059:B:1, 07059:B:2, 07059:B:3, 07060:B:2, 07060:B:3, 07061:B:1, 07061:B:2, 07061:B:3, 08066:B:1, 08066:B:2, 08067:B:1, 08067:B:2, 07065:B:1, 07065:B:2, 07066:B:1, 07066:B:2, 07067:B:1, 07067:B:2.
 // What the table says of The Fords of Isen's pieces (src/play/readouts/ring-maker/fords.ts, src/play/cards/ring-maker/preview.ts): the time counters on the current stage against the Time X it printed, Gríma on The Islet and in a player's play area, and Ill Tidings in a hand.
 // The engine decided every number; these only say it. Each sentence stays at about 25 words (docs/design-system-table.md, Choice tray, Plain words).
 import type { Instruction } from "../../../../catalog/boundary.ts";
 import { plural } from "../../list.ts";
 
-/** What the last time counter does on each stage, as a clause with no lead: the dial's notes and the Choose's caution put their own words before it. */
-const LAST_COUNTER: Readonly<Record<string, string>> = {
+/** What stage 1B's last counter takes off each seat's threat elimination level (08066:B:2); a test holds it equal to the record's amount. */
+export const ELIMINATION_DROP = 10;
+/** The stage whose last counter lowers the level. */
+export const LEVEL_STAGE = "08066";
+
+/** The threat elimination level each living seat will have once the stage's last counter has lowered it (`seat` is 0-based): read from the engine for each seat, never a fixed number. */
+export type NewLevels = readonly { seat: number; level: number }[];
+
+/** "to 40" when every seat has the same new level, else "to 40 for Player 1, 38 for Player 2"; empty when the levels are not known. */
+function newLevelWords(levels: NewLevels): string {
+  const first = levels[0];
+  if (first == null) return "";
+  if (levels.every((one) => one.level === first.level)) return ` (to ${first.level})`;
+  return ` (to ${levels.map((one) => `${one.level} for Player ${one.seat + 1}`).join(", ")})`;
+}
+
+/** What the last time counter does on each stage, as a clause with no lead: the dial's notes and the Choose's caution put their own words before it. A clause that reads the table is a function of what it reads. */
+const LAST_COUNTER: Readonly<Record<string, string | ((levels: NewLevels) => string)>> = {
   "07059": "Gríma is discarded and the players lose.",
   "07060": "each player assigns damage for each card in his hand, and 2 time counters return.",
   "07061": "cards from the top of the encounter deck are discarded, each enemy among them joins the staging area, and 3 time counters return.",
@@ -15,29 +31,38 @@ const LAST_COUNTER: Readonly<Record<string, string>> = {
   "07066": "Mugash is shuffled into the encounter deck, even from a hero, and the quest advances to stage 3.",
   "08011": "each player discards the hand and draws 2 cards, and 2 time counters return.",
   "08013": "the players make engagement checks and each engaged enemy attacks. The players win if no hero is destroyed, and lose if one is.",
+  "08066": (levels) => `each player's threat elimination level goes down by ${ELIMINATION_DROP} for the rest of the game${newLevelWords(levels)}, a player whose threat is at or above his new level is eliminated at once, and 4 time counters return.`,
+  "08067": "the first player chooses: each player raises their threat by 3, or Bellach attacks Nalir. Then 3 time counters return.",
   "07067": "5 cards from the top of the encounter deck are discarded, each player adds an enemy or objective from the discard pile to the staging area, and 3 time counters return.",
 };
 
 /** What the last counter does on the stage, or null for a card with no time dial. */
-export const lastCounterWords = (code: string): string | null => LAST_COUNTER[code] ?? null;
+export function lastCounterWords(code: string, levels: NewLevels = []): string | null {
+  const words = LAST_COUNTER[code];
+  return words == null ? null : typeof words === "string" ? words : words(levels);
+}
 
 /** The sentence under the count on the dial: "With the last gone, ...". */
-const withLastGone = (code: string): string => (LAST_COUNTER[code] != null ? `With the last gone, ${LAST_COUNTER[code]}` : "");
+const withLastGone = (code: string, levels: NewLevels): string => {
+  const words = lastCounterWords(code, levels);
+  return words != null ? `With the last gone, ${words}` : "";
+};
 
 /** What the next refresh phase and the table take from a time stage: `takes` counters at the end of the refresh phase (the stage's own, Old South Road's, Off Track's) and whether an enemy that engages a player also takes one (Chief Turch). */
-export type TimeTakes = { takes: number; engages?: boolean };
+export type TimeTakes = { takes: number; engages?: boolean; levels?: NewLevels };
 const ONE: TimeTakes = { takes: 1 };
 
 /** The note of the stage's time dial: the counters left, the refresh phase that takes some and what the last one does. */
-export const stageTimeWords = (code: string, left: number, facts: TimeTakes = ONE): string => `${plural(left, "time counter")} left. ${facts.takes === 1 ? "One comes off" : `${facts.takes} come off`} at the end of each refresh phase. ${withLastGone(code)}`.trim();
+export const stageTimeWords = (code: string, left: number, facts: TimeTakes = ONE): string => `${plural(left, "time counter")} left. ${facts.takes === 1 ? "One comes off" : `${facts.takes} come off`} at the end of each refresh phase. ${withLastGone(code, facts.levels ?? [])}`.trim();
 
 /** The warning once the next refresh phase takes the last counters, or two are left: what the refresh phase takes, any engagement that takes one too, and what the last one does. */
 export function stageTimeNearWords(code: string, left: number, facts: TimeTakes = ONE): string {
-  if (left <= 0) return `No time counters are left. ${withLastGone(code)}`.trim();
+  const levels = facts.levels ?? [];
+  if (left <= 0) return `No time counters are left. ${withLastGone(code, levels)}`.trim();
   const engages = facts.engages === true && left <= 2 ? "Any enemy that engages a player also takes one." : "";
   if (facts.takes < left && left > 1) return [`${left} time counters are left.`, engages].filter((part) => part !== "").join(" ");
   const taken = left === 1 ? "the last time counter" : `the last ${left} time counters`;
-  return [`The next refresh phase takes ${taken}.`, engages, withLastGone(code)].filter((part) => part !== "").join(" ");
+  return [`The next refresh phase takes ${taken}.`, engages, withLastGone(code, levels)].filter((part) => part !== "").join(" ");
 }
 
 /** What the limit of the dial says: the Time X the stage printed, and for a Time X for each player the amount and the players counted. */

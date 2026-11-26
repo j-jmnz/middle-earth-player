@@ -338,6 +338,8 @@ export type PendingAttack = {
   // Shadow cards that are enemies and say "attacks the defending player" (Wolf Rider, 01081:A:2): each attacks once this attack has ended
   // (families/defense/shadow-attack.ts).
   shadowAttackers?: readonly string[];
+  // Instructions an effect left to run once this attack has ended, after the shadow attackers: an attack an effect makes while one is in progress waits here (one attack is in progress at a time), each with the cause of the effect that queued it (combat/attack-end.ts).
+  onEnd?: readonly { instruction: Instruction; cause: Cause }[];
   // Extra defenders, damage marks and the attack's end, kept by the defense family (src/rules/families/defense/types.ts).
   defense?: AttackDefense;
 };

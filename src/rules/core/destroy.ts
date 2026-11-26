@@ -15,7 +15,7 @@ import { victoryOf } from "./printed-stat.ts";
 import { eliminateEmpties, markLoss } from "./eliminate.ts";
 import { announceAllyLeft } from "./ally-left.ts";
 import { indestructible } from "./keyword-flags.ts";
-import { modifiedStat } from "./modified-stat.ts";
+import { addModifier, modifiedStat } from "./modified-stat.ts";
 
 // A hero, ally or enemy whose damage reached its hit points: the cards attached to it hear it ("When attached enemy is destroyed", families/attachments/hold.ts), it is
 // destroyed, and Responses and Forced effects hear that a hero or ally (rr.destroy) or an enemy was destroyed. Damage and the sweep below both end this way.
@@ -143,6 +143,11 @@ export function destroyCard(
   const printed = printedOf(cards, instance.code);
   if (printed.keywords.permanent && heroHostInPlay(state, instance)) return state;
   // The cards attached to a leaving location or destroyed enemy hear about it, with whether the location was explored decided here (announceHostLeaving).
+  // A location that cannot leave the staging area cannot be explored while it cannot (rr.cannot is absolute, rr.explored places it in the discard pile; FFG's answer: docs/brief.md, Core round): nothing happens, and the sweep that finds its progress at its quest points
+  // explores it the ordinary way, once, when the effect that holds it has ended. A card whose own text answers its exploring (`exploresWhileHeld`, The Crossing at Tharbad 08071:A:3) is explored in place, once: `exploredHeld` stops a second exploring.
+  const held = explored && isLocationCard(printed) && instance.zone === "staging" && flagged(state, id, "cannotLeaveStaging");
+  if (held && (!flagged(state, id, "exploresWhileHeld") || flagged(state, id, "exploredHeld"))) return state;
+  const stays = held;
   let next = announceHostLeaving(state, id, cards, explored);
   // The active location explored: every card hears it, with the number of attachments it had (10006:A:1, 19026:A:2).
   if (explored && isLocationCard(printed) && (state.activeLocation === id || state.secondActiveLocation === id)) next = queueEvent(next, { trigger: "activeExplored", seat: null, subject: id, amount: attachmentsOn(state, id).length });
@@ -151,6 +156,7 @@ export function destroyCard(
   // A location in the staging area that is explored detaches the enemies grappled with it (dcce.grapple).
   if (explored && isLocationCard(printed) && instance.zone === "staging") next = releaseGrappled(next, id);
   next = noteExplored(next, id, explored, cards);
+  if (stays) return addModifier(next, id, id, "exploredHeld", 1, "whileSourceInPlay");
   next = releaseAttachments(next, id, cards, steps);
   const latest = next.cards[id] ?? instance;
   // "Add each ally that leaves play to its owner's hand instead of placing it in the discard pile" (families/deck/rules.ts).

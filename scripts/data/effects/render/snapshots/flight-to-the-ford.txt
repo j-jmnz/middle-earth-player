@@ -1,4 +1,4 @@
-Scenario piles that place cards with no record (quest: 141028 Pursued by the Enemy; quest: 141029 Race to Rivendell; staging: 141058 The Last Bridge; staging: 141063 Fell Rider; setAside: 141059 Ford of Bruinen; setAside: 141068 The Witch-king; attached: 141057 An Evil Wound; burden: 141080 Weight of the Ring; burden: 141081 Fear of Discovery; burden: 141082 Eaten Alive!; burden: 141083 Panicked; burden: 141084 Overcome by Terror)
+Scenario piles that place cards with no record (quest: 141028 Pursued by the Enemy; quest: 141029 Race to Rivendell; staging: 141058 The Last Bridge; staging: 141063 Fell Rider (1 per player); setAside: 141059 Ford of Bruinen; setAside: 141068 The Witch-king; attached: 141057 An Evil Wound; burden: 141080 Weight of the Ring; burden: 141081 Fear of Discovery; burden: 141082 Eaten Alive!; burden: 141083 Panicked; burden: 141084 Overcome by Terror)
 
 ## 141028 Pursued by the Enemy
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -145,7 +145,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
     - place 4 progress on this card
 
 ## 141063 Fell Rider
-(the scenario deals it into the staging pile; the piles place it, no record does)
+(the scenario deals it into the staging pile, 1 copy for each player, the other copies stay in the encounter deck; the piles place it, no record does)
 
 141063:A:1 (front): Cannot have non-Morgul attachments.
   141063:constant:1: Constant

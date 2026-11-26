@@ -1,4 +1,4 @@
-Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors; quest: 10065 A Miserable Journey; quest: 10066 Journey's End; staging: 10072 Savage Trollspawn; setAside: 10067 Amarthiúl; setAside: 10068 Secluded Cave; setAside: 10069 The Hoarwell; setAside: 10070 Abandoned Camp; setAside: 10071 Patch of Woods; setAside: 10081 Lie Low; setAside: 10082 Forage for Food; setAside: 10083 Scavenge for Supplies)
+Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors; quest: 10065 A Miserable Journey; quest: 10066 Journey's End; staging: 10072 Savage Trollspawn (1 per player); setAside: 10067 Amarthiúl; setAside: 10068 Secluded Cave; setAside: 10069 The Hoarwell; setAside: 10070 Abandoned Camp; setAside: 10071 Patch of Woods; setAside: 10081 Lie Low; setAside: 10082 Forage for Food; setAside: 10083 Scavenge for Supplies)
 
 ## 10064 Into the Ettenmoors
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -217,7 +217,7 @@ Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors
       - each hero the acting player controls gains 1 resource(s)
 
 ## 10072 Savage Trollspawn
-(the scenario deals it into the staging pile; the piles place it, no record does)
+(the scenario deals it into the staging pile, 1 copy for each player, the other copies stay in the encounter deck; the piles place it, no record does)
 
 10072:A:1 (front): Savage Trollspawn gets +1 Attack for each damaged character the engaged player controls.
   10072:constant:1: Constant

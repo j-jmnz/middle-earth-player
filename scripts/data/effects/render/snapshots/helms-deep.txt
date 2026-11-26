@@ -1,4 +1,4 @@
-Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; quest: 143072 The King of the Golden Hall; quest: 143073 Assault on Helm's Deep; quest: 143074 The Hosts of Isengard; quest: 143075 The Wall is Breached!; quest: 143076 The King Rides Out; setAside: 143033 The Defense of Helm's Deep; setAside: 143036 Soldier of Isengard)
+Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; quest: 143072 The King of the Golden Hall; quest: 143073 Assault on Helm's Deep; quest: 143074 The Hosts of Isengard; quest: 143075 The Wall is Breached!; quest: 143076 The King Rides Out; setAside: 143033 The Defense of Helm's Deep; setAside: 143036 Soldier of Isengard (1 per player))
 
 ## 143021 Poisoned Counsels
 
@@ -69,7 +69,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     - place 3 progress on the active location
 
 ## 143036 Soldier of Isengard
-(the scenario deals it into the setAside pile; the piles place it, no record does)
+(the scenario deals it into the setAside pile, 1 copy for each player, the other copies stay in the encounter deck; the piles place it, no record does)
 
 143036:A:1: Toughness 1. Archery 1.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)

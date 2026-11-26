@@ -26,6 +26,7 @@ const ENEMY_ZONE: Readonly<Record<string, string>> = {
   "51339:forced:1": "The line says \"each engaged enemy\": a shadow card is dealt only to an enemy engaged with a player.",
   "16019:constant:1": "The line (16019:A:1) says \"X is the number of engaged enemies\": the staging area's enemies are not counted.",
   "16019:travel:1": "The travel (16019:A:2) assigns X damage, X the number of engaged enemies (16019:A:1): the staging area's enemies are not counted.",
+  "08076:forced:1": "The line (08076:A:2) says \"deal engaged enemies 1 additional shadow card\": a shadow card is dealt only to an enemy engaged with a player.",
   "12185:whenRevealed:1": "The enemies counted are the cards this effect discarded from the encounter deck, not cards in play.",
 };
 
