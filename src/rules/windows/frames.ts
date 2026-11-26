@@ -18,7 +18,7 @@ import { flagged, heldAmount, inPlay, livingSeats, updateCard, withMode, type Fr
 import { eventStep, fireForced } from "./triggers.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { resetEncounterDeck, shuffleEncounterDeck } from "../interpret/verbs.ts";
-import { attachTo, moveCard, turnedUp } from "../core/zones.ts";
+import { attachTo, moveCard, moveToEncounterDeckDown, turnedUp } from "../core/zones.ts";
 import { announceEntered, listens, noteEncounterThreat, revealSeat, revealSkipped, revealsAllowed, spendSkippedReveal, watchReveal } from "../families/encounter/reveal.ts";
 import { discardsAfterReveal } from "../families/sidequests/encounter.ts";
 import { engageWith } from "../quest/quest.ts";
@@ -240,6 +240,12 @@ function finishReveal(state: ScenarioState, frame: Frame, ctx: ReduceContext, st
   return resetEncounterDeck(popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps), steps, ctx);
 }
 
+// The canceled card goes back into the encounter deck; one that cannot leave the staging area stays there faceup, revealed (rr.cannot).
+function shuffleBack(state: ScenarioState, id: string): ScenarioState {
+  const put = moveToEncounterDeckDown(state, id);
+  return put.moved ? shuffleEncounterDeck(put.state) : put.state;
+}
+
 function revealAnother(state: ScenarioState, frame: Frame, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = frame.cardId ?? "";
   const popped = popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps);
@@ -247,7 +253,7 @@ function revealAnother(state: ScenarioState, frame: Frame, ctx: ReduceContext, s
   const returned = state.cards[id]
     ? discarded
       ? moveCard(popped, id, { zone: "encounterDiscard" })
-      : shuffleEncounterDeck(updateCard(moveCard(popped, id, { zone: "encounterDeck" }), id, { face: "down", controller: null }))
+      : shuffleBack(popped, id)
     : popped;
   if (returned.seats[frame.seat]?.eliminated) return returned;
   return startReveal(returned, frame.seat, ctx, steps, undefined, frame.data.kind === "reveal" ? frame.data.guards : undefined);

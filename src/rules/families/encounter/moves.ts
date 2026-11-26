@@ -23,7 +23,7 @@ import { flagged, heldHero, inPlay, updateCard } from "../../core/state.ts";
 import { travelNow } from "../../quest/travel.ts";
 import { shuffleEncounterDeck, shuffleIntoEncounterDeck } from "../../interpret/verbs.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
-import { moveCard } from "../../core/zones.ts";
+import { moveCard, moveToEncounterDeckDown } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { addedToStaging, announceEntered } from "./reveal.ts";
 import { stagingDest } from "../breaking/areas.ts";
@@ -84,7 +84,9 @@ export function placeUnderHost(state: ScenarioState, id: string, host: string, c
 }
 
 function toDeck(state: ScenarioState, id: string, top: boolean): ScenarioState {
-  const moved = updateCard(moveCard(state, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
+  const put = moveToEncounterDeckDown(state, id);
+  if (!put.moved) return put.state;
+  const moved = put.state;
   const rest = moved.encounterDeck.filter((entry) => entry !== id);
   return { ...moved, encounterDeck: top ? [id, ...rest] : [...rest, id] };
 }
