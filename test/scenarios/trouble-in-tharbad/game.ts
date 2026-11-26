@@ -55,19 +55,15 @@ export function tharbadIntent(state: ScenarioState, ctx: ReduceContext, memory: 
 export type TharbadGame = PlayedGame;
 
 // The goldens (src/campaign/scenarios/trouble-in-tharbad/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
-export type TharbadGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: TharbadDecks; outcome: "won" | "lost"; policy?: Partial<TharbadPolicy>; lossReason?: string };
+export type TharbadGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: TharbadDecks; outcome: "won" | "lost"; policy?: Partial<TharbadPolicy>; lossReason?: string; lowered?: true };
 
-// The games to pin (about 600 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and Easy (one solo win with the elimination level lowered to 40 by stage 1B's Time), each ending when the
-// progress that stage 2B redirects explores The Crossing at Tharbad. The ways to lose are a threat at the elimination level (50, or 30 once stage 1B has run out of Time twice) and Nalir leaving play, each true solo and two-handed.
+// The games to pin (.claude/rules/code-standards.md, Test cost): a standalone scenario has no Resolution, so Easy mode adds no game. Wins true solo and two-handed, and a solo win with the elimination level lowered to 40 by stage 1B's Time (`lowered`),
+// each ending when the progress that stage 2B redirects explores The Crossing at Tharbad. The ways to lose are a threat at the lowered elimination level (40) and Nalir leaving play (two-handed).
 export const THARBAD_GOLDENS: readonly TharbadGolden[] = [
   { name: "solo win", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "solo win, elimination level lowered", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed win", seatCount: 2, seed: 8, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "Easy solo win", seatCount: 1, seed: 7, difficulty: "Easy", decks: "strong", outcome: "won" },
-  { name: "Easy two-handed win", seatCount: 2, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
-  { name: "solo loss: threat at the lowered level", seatCount: 1, seed: 3, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "No seats remain" },
-  { name: "solo loss: Nalir leaves play", seatCount: 1, seed: 5, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "Nalir left play" },
-  { name: "two-handed loss: threat", seatCount: 2, seed: 4, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "No seats remain" },
+  { name: "solo win, elimination level lowered", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", lowered: true },
+  { name: "solo loss: threat at the lowered level", seatCount: 1, seed: 3, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "No seats remain", lowered: true },
   { name: "two-handed loss: Nalir leaves play", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "Nalir left play" },
 ];
 
