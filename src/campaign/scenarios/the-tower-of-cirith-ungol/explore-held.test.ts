@@ -1,4 +1,4 @@
-// Rules: rr.explored, rr.cannot (data/rules/entries.json); ledger line 146066:B:1; docs/brief.md, Core round.
+// Rules: rr.explored, rr.cannot (data/rules/entries.json); ledger line 146066:B:1; docs/brief.md, Core round
 // A location that cannot leave the staging area is not explored while it cannot (FFG: "if a location cannot leave play, then it cannot be explored"); once stage 1B has gone it is explored the ordinary way, once.
 import { describe, expect, it } from "vitest";
 
