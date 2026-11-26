@@ -44,6 +44,9 @@ describe("The Dunland Trap golden", () => {
     won(state, golden) {
       expect(codeOf(state, state.questStage), golden.name).toBe("08013");
       expect(state.cards[state.questStage ?? ""]?.resources, golden.name).toBe(0);
+      // The three stages, Chief Turch, the Ravine and Old South Road are dealt once on every difficulty, and the Ravine came out of the set-aside pile.
+      for (const code of ["08011", "08012", "08013", "08014", "08015", "08016"]) expect(cardsOf(state, code).length, `${golden.name} ${code}`).toBe(1);
+      expect(cardsOf(state, "08015")[0]?.zone, golden.name).not.toBe("setAside");
       // Chief Turch came in at stage 3A and lies engaged with the first player.
       expect(cardsOf(state, "08014").map((card) => card.zone), golden.name).toEqual(["engaged"]);
       // No hero was destroyed: every seat still holds its three heroes.
@@ -55,6 +58,7 @@ describe("The Dunland Trap golden", () => {
       if (golden.decks === "fragile") {
         // A hero was destroyed on stage 3B: the loss is the stage's own, after its last counter left.
         expect(codeOf(state, state.questStage), golden.name).toBe("08013");
+        expect(state.cards[state.questStage ?? ""]?.resources, golden.name).toBe(0);
         expect(seats.some((seat) => seat.heroes.length < 3), golden.name).toBe(true);
       } else expect(seats.every((seat) => seat.eliminated), golden.name).toBe(true);
       if (golden.decks === "brittle") expect(seats.every((seat) => seat.heroes.length === 0), golden.name).toBe(true);
