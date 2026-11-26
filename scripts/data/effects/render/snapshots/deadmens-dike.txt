@@ -15,7 +15,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - heal 3 damage from this card
-    - this card attacks the first player now, from the staging area, dealt a shadow card (or engaged)
+    - this card attacks the first player now, from where it is (the staging area, or engaged with a player; it does not move), dealt a shadow card
 
 ## 09034 Thaurdir's Damned
 (the scenario deals it into the encounter pile; the piles place it, no record does)

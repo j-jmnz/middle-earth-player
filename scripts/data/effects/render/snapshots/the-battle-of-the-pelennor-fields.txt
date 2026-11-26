@@ -77,7 +77,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145044:travel:1: Travel
     - for each player, first player first:
       - choose enemy (any player controls) or in the staging area, named "The Witch-king"
-      - then, if there is a enemy (any player controls) or in the staging area, named "The Witch-king" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area, dealt a shadow card (or engaged)
+      - then, if there is a enemy (any player controls) or in the staging area, named "The Witch-king" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from where it is (the staging area, or engaged with a player; it does not move), dealt a shadow card
 
 ## 145045 Gate of Gondor
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -556,7 +556,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - Campaign Setup: the pool's burdens of the burden sets "A Shadow of the Past", "Flight to the Ford", "The Ring Goes South", "The Passage of the Marshes", "Shelob's Lair" are not dealt this scenario; they stay in the pool, only left out of the decks the setup builds (the encounter deck)
 
 145078:B:1 (back): Forced: When the players advance to stage 5B, add each set aside Harad enemy to the staging area.
-  145078:forced:1: Forced on the event afterStageRevealed
+  145078:forced:1: Forced after a quest stage is revealed and its When Revealed effects have resolved, a parallel stage that replaces the stage before fires it too; the flip of the opening stage in the Setup does not
     only if the card the event is about is a card (any player controls) or in the staging area or the active location, named "Fighting in the Fields"
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - every set-aside card with the trait Harad joins the staging area (it is not revealed)

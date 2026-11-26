@@ -34,8 +34,8 @@ Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; sta
 08095:B:3 (back): Player card effects cannot be used to gain resources or draw cards.
   08095:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the table: stat cannotGainResourcesByPlayerCard 1, while this card is in play
-    - the table: stat cannotDrawByPlayerCard 1, while this card is in play
+    - the table: stat cannotGainResourcesByPlayerCard (a player card's effect gains no resources; the resource phase still collects) 1, while this card is in play
+    - the table: stat cannotDrawByPlayerCard (a player card's effect draws no cards; the draw phase still draws) 1, while this card is in play
 
 08095:B:4 (back): Forced: When the players defeat this stage, advance to a random stage 3A.
   08095:forced:2: Forced on the event questCardDefeated (heard about this card)
@@ -60,7 +60,7 @@ Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; sta
 
 08096:B:3 (back): In order to commit characters to the quest, a player must first discard a card at random from his hand.
   08096:constant:2: Constant
-    - the table: stat commitDiscardsRandom 1, while this card is in play
+    - the table: stat commitDiscardsRandom (a player who commits characters to the quest first discards 1 card at random from his hand, once for each commit; a player with an empty hand cannot commit) 1, while this card is in play
 
 08096:B:4 (back): Forced: When the players defeat this stage, advance to a random stage 3A.
   08096:forced:2: Forced on the event questCardDefeated (heard about this card)
@@ -99,7 +99,7 @@ Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; sta
   08098:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 1 (each player)
-    - one set-aside card with code 08103 joins the staging area (it is not revealed)
+    - one out-of-play card with code 08103 joins the staging area (it is not revealed)
     - choose enemy (any player controls) or in the staging area, named "Ancient Marsh-dweller"
     - return the picked card to the staging area
     - heal all damage from the picked card
@@ -124,7 +124,7 @@ Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; sta
   08099:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 1 (each player)
-    - one set-aside card with code 08103 joins the staging area (it is not revealed)
+    - one out-of-play card with code 08103 joins the staging area (it is not revealed)
     - choose enemy (any player controls) or in the staging area, named "Ancient Marsh-dweller"
     - return the picked card to the staging area
     - heal all damage from the picked card
@@ -152,7 +152,7 @@ Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; sta
   08100:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 1 (each player)
-    - one set-aside card with code 08103 joins the staging area (it is not revealed)
+    - one out-of-play card with code 08103 joins the staging area (it is not revealed)
     - choose enemy (any player controls) or in the staging area, named "Ancient Marsh-dweller"
     - return the picked card to the staging area
     - heal all damage from the picked card
@@ -176,13 +176,13 @@ Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; sta
 08101:A:1 (front): When Revealed: Add Ancient Marsh-dweller to the staging area (from out of play or engaged with a player) and heal all damage from it. Then, Ancient Marsh-dweller makes an attack against each player in player order.
   08101:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - one set-aside card with code 08103 joins the staging area (it is not revealed)
+    - one out-of-play card with code 08103 joins the staging area (it is not revealed)
     - choose enemy (any player controls) or in the staging area, named "Ancient Marsh-dweller"
     - return the picked card to the staging area
     - heal all damage from the picked card
     - choose enemy (any player controls) or in the staging area, named "Ancient Marsh-dweller"
     - for each player, first player first:
-      - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card (or engaged)
+      - the picked enemy attacks the acting player now, from where it is (the staging area, or engaged with a player; it does not move), dealt a shadow card
 
 08101:B:1 (back): Time 2.
   08101:constant:1: Constant
@@ -194,7 +194,7 @@ Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; sta
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "Ancient Marsh-dweller"
     - for each player, first player first:
-      - the picked enemy attacks the acting player now, from the staging area, dealt a shadow card (or engaged)
+      - the picked enemy attacks the acting player now, from where it is (the staging area, or engaged with a player; it does not move), dealt a shadow card
     - place 2 resource tokens on this card
 
 08101:B:3 (back): When Ancient Marsh-dweller is defeated, the players win the game.
@@ -272,7 +272,7 @@ Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; sta
 (the scenario deals it into the staging pile; the piles place it, no record does)
 
 08106:A:1 (front): While Fen of Reeds is in the staging area, it gains: 'Forced: After the players advance to a quest stage, each player must exhaust a character he controls.'
-  08106:forced:1: Forced on the event afterStageRevealed
+  08106:forced:1: Forced after a quest stage is revealed and its When Revealed effects have resolved, a parallel stage that replaces the stage before fires it too; the flip of the opening stage in the Setup does not
     only if this card is in the staging area
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - for each player, first player first:

@@ -65,7 +65,7 @@ Scenario piles that place cards with no record (quest: 50201 Terror from the Mou
 50204:A:2 (front): When Revealed: Smaug the Mighty makes an immediate attack against each player (deal and resolve a shadow card for each attack).
   50204:whenRevealed:1: When revealed
     - for each player, first player first:
-      - this card attacks the acting player now, from the staging area, dealt a shadow card (or engaged)
+      - this card attacks the acting player now, from where it is (the staging area, or engaged with a player; it does not move), dealt a shadow card
 
 ## 50205 Smaug the Terrible
 (the scenario deals it into the smaugDeck pile; the piles place it, no record does)
