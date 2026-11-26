@@ -3,6 +3,7 @@
 // (an iPad's 2 is four times the pixels of 1), `?fps=1` shows the frame rate, a log of the last minute (a tap on the meter stops it and copies the log) and the first error the page reports, with where it was thrown, and sends the log to the site (`/_meter`, webapp/meter.ts) when the site keeps one; `?scale=0` and `?fps=0` turn each off, and `?pics=0` leaves out every picture element of the screens (`?pics=1` brings them back), so a run says what the pictures cost; the log's head counts the loaded ones and their megapixels. All are kept in localStorage, since they are read
 // before any database opens. Skia's web views read window.devicePixelRatio when they are made, so the scale is set before CanvasKit loads (skia-web-load.ts).
 import { described, onSpan, type SpanName } from "./meter-span.ts";
+import { startSlowProbe } from "./slow-probe.ts";
 
 const SCALE_KEY = "middle-earth-player.render-scale";
 const FPS_KEY = "middle-earth-player.frame-meter";
@@ -430,6 +431,8 @@ export function applyRenderControls(): void {
   if (params.has("fps")) write(FPS_KEY, meter ? "1" : null);
   metering = meter;
   if (meter) startMeter();
+  // The slow-state probe (slow-probe.ts) runs with the meter, for this page only: it is not stored, since it makes the screen flicker.
+  if (meter && params.get("probe") === "1") startSlowProbe();
   // No picture element is drawn or decoded (the table's canvases load theirs another way): a device run with and without them says what the pictures cost.
   const noPictures = picturesHidden(search, read(PICS_KEY));
   if (params.has("pics")) write(PICS_KEY, noPictures ? "1" : null);
