@@ -14,6 +14,7 @@ import { momentOf } from "../store/outcome.ts";
 import { zoneSelector } from "../store/selectors.ts";
 import { ORCS_APART, ORCS_SAME_STAGE, ORCS_STAGE_LOSS, ORCS_TOGETHER, orcsStageTitle, orcsTell, orcsVerbWords } from "../words/scenarios/haradrim/orcs-table.ts";
 import { orcsBeats } from "../readouts/haradrim/orcs.ts";
+import { stateBeats } from "../readouts/state-beats.ts";
 import { previewCards } from "../cards/table-preview.ts";
 
 const ROAD = "17042";
@@ -114,6 +115,15 @@ describe("17052:B:2 the Orcs' progress and advance in the banner", () => {
     expect(orcsBeats(t.state, t.state, name)).toEqual([]);
     const moment = momentOf(t.state, full, [], { card: name });
     expect(moment?.lines.map((line) => line.text).join("\n")).toContain("The Orcs advance to stage 2 of 4");
+  });
+
+  it("the advance beat is firm, so the banner's cut never hides it behind \"more in the log\"", () => {
+    const t = prepared(APART);
+    const full = runInstruction(t.made, t.state, { verb: "AddOrcsProgress", amount: points(t) });
+    const beats = stateBeats(t.state, full, (id) => id);
+    expect(beats).toHaveLength(1);
+    expect(beats[0]?.firm).toBe(true);
+    expect(stateBeats(t.state, t.state, (id) => id)).toEqual([]);
   });
 
   it("17054:B:3 the last stage's advance says that filling it loses", () => {

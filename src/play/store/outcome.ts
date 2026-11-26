@@ -15,20 +15,20 @@ import { captureAttachedLine, mumakPlace } from "../words/scenarios/haradrim/cap
 import { boardingWords } from "../words/scenarios/sea.ts";
 import type { FateNames } from "../words/scenarios/fate-beats.ts";
 import { ignoredRevealNote } from "../readouts/ettenmoors.ts";
-import { raiseSource, returnLines, trapLine } from "../readouts/standalone-scenarios/barrow-downs.ts";
+import { raiseSource, trapLine } from "../readouts/standalone-scenarios/barrow-downs.ts";
 import { firstTreacheryNote, stageArrivalNote, stageBeats } from "../words/scenarios/gundabad-beats.ts";
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
 import { locateResultTitle } from "../words/scenarios/locate.ts";
-import { BACK_TITLE, TRAPPED_TITLE } from "../readouts/standalone-scenarios/barrow-downs-words.ts";
+import { TRAPPED_TITLE } from "../readouts/standalone-scenarios/barrow-downs-words.ts";
 import { discoverLines, discoverTitle, POOL_COPY } from "../words/scenarios/wilderland.ts";
 import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poison.ts";
 import { hostName, playWords, type PlayInto } from "../cards/host-words.ts";
 import { STAT_WORD } from "../cards/card-effects.ts";
 import { progressAttack, willpowerAttack } from "../readouts/against-the-shadow/druadan.ts";
 import { controlChanges, changeWords } from "../readouts/against-the-shadow/osgiliath.ts";
-import { orcsBeats } from "../readouts/haradrim/orcs.ts";
+import { stateBeats } from "../readouts/state-beats.ts";
 import { deadVillagers, heldBeat, onVillagers, villagerLines } from "../readouts/against-the-shadow/amon-din.ts";
-import { stackTakes, underHost } from "../readouts/against-the-shadow/stewards-fear.ts";
+import { underHost } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { hiddenChanges, hiddenLines } from "../readouts/against-the-shadow/blood-steps.ts";
 import { valeFrom, valeOf, valeQuiet, valeStepWords } from "../readouts/against-the-shadow/vale-steps.ts";
 import { HIDDEN_TITLE } from "../words/scenarios/against-the-shadow/blood.ts";
@@ -346,9 +346,6 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         return;
     }
   });
-  // The cards an Underworld location took from the underworld deck in this intent (The Steward's Fear): no step of their own.
-  const takes = stackTakes(before, after, names.card);
-  if (takes.length > 0) groups.push({ rank: 9, title: UNDERWORLD_TITLE, tone: "plain", lines: takes.map((text) => ({ text, mark: null })) });
 
   // The villager tokens of Encounter at Amon Dîn that moved or were discarded in this intent, and the defeat of stage 2B that Ghulat holds: no step of their own.
   const villagers = villagerLines(before, after, names.card);
@@ -388,10 +385,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
     groups.push({ rank: 1, title: `Traveled to ${names.card(after.activeLocation)}`, tone: "plain", lines: [{ text: "It is the active location now", mark: null }] });
   }
 
-  // The Orcs' advance has no step: the beat reads the two states (readouts/haradrim/orcs.ts).
-  for (const beat of orcsBeats(before, after, names.card)) groups.push({ ...beat, lines: beat.lines.map((text) => ({ text, mark: null })) });
-  // A player came back from stage 4B to stage 3B at the beginning of the travel phase (148004:B:2): no step of its own, so the beat reads the two states.
-  for (const text of returnLines(before, after, names.card)) groups.push({ rank: 1, title: BACK_TITLE, tone: "good", lines: [{ text, mark: null }] });
+  // The beats no step tells (the Underworld's takes, the Orcs' advance, a return to stage 3B) read the two states (readouts/state-beats.ts).
+  groups.push(...stateBeats(before, after, names.card));
+
   const shown = groups.filter((group) => group.lines.length > 0 || group.title !== "");
   if (shown.length === 0) return null;
   // A whole group (Discover's) comes last and is never cut: its last line is the one that holds the look strip until the banner is dismissed, and the only one drawn under reduced motion.
