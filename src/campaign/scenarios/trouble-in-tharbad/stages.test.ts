@@ -15,7 +15,7 @@ import { replaceStageProgress } from "../../../rules/quest/progress-replaced.ts"
 import { addModifier } from "../../../rules/core/modified-stat.ts";
 import { removeTimeCounterFrom } from "../../../rules/families/angmar/time.ts";
 import { travelBlocked } from "../../../rules/interpret/restrictions.ts";
-import { drive, fight, idOf, opened, run, statOf, tableFromLayout, where, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { drive, fight, finish, idOf, opened, run, send, statOf, tableFromLayout, where, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "trouble-in-tharbad";
 const STAGE_1 = "08066";
@@ -204,6 +204,14 @@ describe("The Empty Mug (08069:A:1, 08069:A:2)", () => {
     const done = lower(t.state, t.ctx, ally);
     expect(done.seats[0]?.threat).toBe(8);
     expect(done.cards[ally]?.zone).toBe("removed");
+  });
+
+  it("08069:A:2 an event card that lowers a threat is removed from the game too, though it is not in play while it resolves (Island Amid Perils, 08090: return a Silvan ally, reduce your threat by its cost)", () => {
+    const t = tableFromLayout(SCENARIO, { stage: STAGE_1, victory: ["08069"], hand: ["08090"], play: ["01044"], heroes: ["01007"], phase: "Planning", threat: [10, 10] }, { extra: ["08090", "01044", "01007"] });
+    const event = idOf(t.state, "08090");
+    const done = finish(send(opened(t), { type: "PlayCard", cardId: event, payments: [] }, t.ctx), t.ctx);
+    expect(done.state.seats[0]?.threat).toBe(7);
+    expect(done.state.cards[event]?.zone).toBe("removed");
   });
 
   it("08069:A:2 the stage's own lowering is no player card effect, so nothing is removed", () => {
