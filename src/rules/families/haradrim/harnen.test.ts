@@ -3,12 +3,26 @@
 import { describe, expect, it } from "vitest";
 
 import { idOf, opened, run as runInstruction, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { pickCandidates } from "../../interpret/pick.ts";
 import { restricted, travelBlocked } from "../../interpret/restrictions.ts";
+import { spawn } from "../../core/zones.ts";
 import { flagged } from "../../core/state.ts";
 import { advancedTo, CHIEFTAIN, prepared, raceTable, record } from "./race-kit.ts";
 
 const HARNEN = "17039";
 const table = (layout: Layout = {}) => raceTable({ stage: "17050", setAside: [], staging: [HARNEN], ...layout });
+
+describe("17039:A:1 River Harnen is immune to player card effects", () => {
+  it("a player card cannot choose it among the locations in the staging area, an encounter card can", () => {
+    const made = table({ progress: 20, staging: [HARNEN, "17040"] });
+    const state = opened(made).state;
+    const harnen = idOf(state, HARNEN);
+    const spec = { type: "location", control: "any", staging: true } as const;
+    expect(pickCandidates(state, spec, 0, [], idOf(state, "dh1"), made.ctx)).toEqual([idOf(state, "17040")]);
+    const encounter = spawn(state, "16052", { zone: "staging" });
+    expect(pickCandidates(encounter.state, spec, 0, [], encounter.id, made.ctx)).toContain(harnen);
+  });
+});
 
 describe("17039:A:2 the players cannot travel to River Harnen unless there are 20 progress on stage 4B", () => {
   it("with fewer than 20 progress the location cannot be traveled to, with 20 or more it can", () => {

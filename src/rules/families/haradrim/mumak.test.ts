@@ -5,9 +5,10 @@ import { describe, expect, it } from "vitest";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { fight, idOf, idsOf, legalTargets, opened, run as runInstruction, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { spawn } from "../../core/zones.ts";
 import { settle } from "../../engine/machine.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
-import { matchesPick } from "../../interpret/pick.ts";
+import { matchesPick, pickCandidates } from "../../interpret/pick.ts";
 import { undefendedMumak } from "./mumak.ts";
 import { MUMAK, raceTable, URUK } from "./race-kit.ts";
 
@@ -53,6 +54,20 @@ describe("17047:A:1 the Setup gives each player a Tamed Mûmak", () => {
     expect(matchesPick(state, id, { type: "ally", control: "you" }, { seat: 0, sourceId: null }, made.ctx)).toBe(true);
     expect(matchesPick(state, id, { type: "character", control: "you" }, { seat: 0, sourceId: null }, made.ctx)).toBe(true);
     expect(made.cards.get(MUMAK)).toMatchObject({ willpower: 2, attack: 5, defense: 2, health: 8 });
+  });
+});
+
+describe("17038:A:1 the Tamed Mûmak is immune to player card effects", () => {
+  it("a player card cannot choose it, an encounter card can, and an ordinary ally is open to both", () => {
+    const made = table({ play: [MUMAK, "ally"] });
+    const state = opened(made).state;
+    const mumak = idOf(state, MUMAK);
+    const ally = idOf(state, "ally");
+    const player = idOf(state, "dh1");
+    const spec = { type: "ally", control: "you" } as const;
+    expect(pickCandidates(state, spec, 0, [], player, made.ctx)).toEqual([ally]);
+    const encounter = spawn(state, "16052", { zone: "staging" });
+    expect(pickCandidates(encounter.state, spec, 0, [], encounter.id, made.ctx).sort()).toEqual([ally, mumak].sort());
   });
 });
 

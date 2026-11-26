@@ -3,6 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import { modifiedStat } from "../../core/keywords.ts";
+import { expireModifiers } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
 import { idOf, opened, run as runInstruction } from "../../../../test/harness/scene-kit.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
@@ -27,6 +28,19 @@ describe("17046:A:1 Howling at their Heels: at another stage the Orcs' area adds
     expect(withStagingThreat(joined, 0, made.cards)).toBe(4 + 5);
     const left = runInstruction(made, joined, { verb: "Discard", target: { kind: "self" } }, { sourceId: road });
     expect(withStagingThreat(left, 0, made.cards)).toBe(4);
+  });
+
+  it("17046:A:1 both lasting effects end at the end of the phase: the staging total and the enemies' Threat are as they were", () => {
+    const apart = prepared({ staging: ["17040"], engaged: [URUK] });
+    const raised = record(apart.made, apart.state, "17046:whenRevealed:1", idOf(apart.state, "17040"), "whenRevealed");
+    expect(withStagingThreat(expireModifiers(raised, ["endOfPhase"]), 2, apart.made.cards)).toBe(2);
+    const same = prepared({ stage: "17047", engaged: [URUK], staging: ["17040"] });
+    const uruk = idOf(same.state, URUK);
+    const before = modifiedStat(same.state, same.state.cards[uruk]!, "threat", same.made.cards);
+    const boosted = record(same.made, same.state, "17046:whenRevealed:1", idOf(same.state, "17040"), "whenRevealed");
+    expect(modifiedStat(boosted, boosted.cards[uruk]!, "threat", same.made.cards)).toBe(before + 1);
+    const over = expireModifiers(boosted, ["endOfPhase"]);
+    expect(modifiedStat(over, over.cards[uruk]!, "threat", same.made.cards)).toBe(before);
   });
 
   it("once the players reach the Orcs' stage the cards are in the staging area and count there already: they are not added twice", () => {

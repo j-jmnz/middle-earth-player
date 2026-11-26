@@ -63,6 +63,16 @@ describe("17044:A:2 Racing Warg attaches to an Orc enemy, the Orcs' area include
     expect(done.cards[chieftain]?.zone).toBe("orcsArea");
   });
 
+  it("17044:A:2 a second Racing Warg finds no host on the Orc that already carries one (limit 1 per enemy) and is discarded", () => {
+    const { made, state } = prepared({ staging: ["17044", "17044"] });
+    const [first, second] = idsOf(state, "17044");
+    const one = record(made, state, "17044:whenRevealed:1", first ?? "", "whenRevealed");
+    expect(one.cards[first ?? ""]?.host).toBe(idOf(one, CHIEFTAIN));
+    const again = record(made, one, "17044:whenRevealed:1", second ?? "", "whenRevealed");
+    expect(again.cards[second ?? ""]?.zone).toBe("encounterDiscard");
+    expect(again.cards[idOf(again, CHIEFTAIN)]?.attachments).toEqual([first]);
+  });
+
   it("with no Orc enemy in play it is discarded", () => {
     const made = raceTable({ staging: ["17044"], setAside: [] });
     const state = opened(made).state;

@@ -21,7 +21,7 @@ const ON_STAGE = (stage: number): Cond => ({ kind: "onStage", stage });
 // "If the players have already defeated stage NB": the players' quest deck has passed it (their stage number is above it), read when the C side is revealed.
 const DEFEATED = (stage: number): Cond => ({ kind: "less", left: stage, right: { stage: true } });
 // Uruk Chieftain wherever he stands in play: engaged, in the staging area or in the Orcs' area.
-const CHIEFTAIN_ANY: PickSpec = { type: "enemy", control: "any", allInPlay: true, names: ["Uruk Chieftain"] };
+const CHIEFTAIN_ANY: PickSpec = { type: "enemy", control: "any", staging: true, allInPlay: true, names: ["Uruk Chieftain"] };
 const CHIEFTAIN_IN_PLAY: Cond = { kind: "canPick", pick: CHIEFTAIN_ANY };
 // "Add that enemy to the Orcs' area": the Orc enemy the encounter deck's discards found, when one was found (out of play, in the discard pile).
 const FOUND_ORC: Cond = { kind: "matches", card: "picked", pick: { type: "enemy", control: "any", trait: "Orc" }, inPlay: false };
@@ -30,7 +30,7 @@ const ADD_AN_ORC: Instruction[] = [{ verb: "DiscardUntil", type: "enemy", trait:
 // "Shuffle the encounter discard pile into the encounter deck and discard cards from the top until an Orc enemy is discarded. Add that enemy to the Orcs' area."
 const SHUFFLE_AND_ADD_AN_ORC: Instruction[] = [{ verb: "ShuffleEncounterDiscard" }, ...ADD_AN_ORC];
 // The Orc enemies a Racing Warg may attach to: any Orc in play without one, the first player choosing; the Orcs' area counts (a card there is in play).
-const WARG_HOST: PickSpec = { type: "enemy", control: "any", allInPlay: true, trait: "Orc", who: "firstPlayer", hasAttachment: { names: ["Racing Warg"], none: true } };
+const WARG_HOST: PickSpec = { type: "enemy", control: "any", staging: true, allInPlay: true, trait: "Orc", who: "firstPlayer", hasAttachment: { names: ["Racing Warg"], none: true } };
 // A Tamed Mûmak in play that is not committed to the quest: "if each Tamed Mûmak in play is committed" holds while none is such.
 const MUMAK_NOT_COMMITTED: PickSpec = { type: "ally", control: "any", names: ["Tamed Mûmak"], committed: false };
 // "Forced: After characters are committed to the quest, no more than 5 progress can be placed here this round (10 progress instead if each Tamed Mûmak in play is committed to the quest)": the trigger is the start of the staging step, after the commitment (reading of
@@ -211,7 +211,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["17053:B:1"],
       timing: "constant",
       condition: ON_STAGE(4),
-      instructions: [{ verb: "ModifyStat", stat: "threat", amount: 1, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", allInPlay: true, inOrcsArea: true } }],
+      instructions: [{ verb: "ModifyStat", stat: "threat", amount: 1, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", staging: true, allInPlay: true, inOrcsArea: true } }],
     },
     copyLine("17052:B:2", "17053:B:2"),
     { id: "17053:forced:2", cardCode: "17053", lines: ["17053:B:3"], ...LOSES("The Orcs defeated stage 3D while the players were at stage 3B", ON_STAGE(3)) },
