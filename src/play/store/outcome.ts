@@ -26,6 +26,7 @@ import { hostName, playWords, type PlayInto } from "../cards/host-words.ts";
 import { STAT_WORD } from "../cards/card-effects.ts";
 import { progressAttack, willpowerAttack } from "../readouts/against-the-shadow/druadan.ts";
 import { controlChanges, changeWords } from "../readouts/against-the-shadow/osgiliath.ts";
+import { orcsBeats } from "../readouts/haradrim/orcs.ts";
 import { deadVillagers, heldBeat, onVillagers, villagerLines } from "../readouts/against-the-shadow/amon-din.ts";
 import { stackTakes, underHost } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { hiddenChanges, hiddenLines } from "../readouts/against-the-shadow/blood-steps.ts";
@@ -345,7 +346,6 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         return;
     }
   });
-
   // The cards an Underworld location took from the underworld deck in this intent (The Steward's Fear): no step of their own.
   const takes = stackTakes(before, after, names.card);
   if (takes.length > 0) groups.push({ rank: 9, title: UNDERWORLD_TITLE, tone: "plain", lines: takes.map((text) => ({ text, mark: null })) });
@@ -388,9 +388,10 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
     groups.push({ rank: 1, title: `Traveled to ${names.card(after.activeLocation)}`, tone: "plain", lines: [{ text: "It is the active location now", mark: null }] });
   }
 
+  // The Orcs' advance has no step: the beat reads the two states (readouts/haradrim/orcs.ts).
+  for (const beat of orcsBeats(before, after, names.card)) groups.push({ ...beat, lines: beat.lines.map((text) => ({ text, mark: null })) });
   // A player came back from stage 4B to stage 3B at the beginning of the travel phase (148004:B:2): no step of its own, so the beat reads the two states.
   for (const text of returnLines(before, after, names.card)) groups.push({ rank: 1, title: BACK_TITLE, tone: "good", lines: [{ text, mark: null }] });
-
   const shown = groups.filter((group) => group.lines.length > 0 || group.title !== "");
   if (shown.length === 0) return null;
   // A whole group (Discover's) comes last and is never cut: its last line is the one that holds the look strip until the banner is dismissed, and the only one drawn under reduced motion.

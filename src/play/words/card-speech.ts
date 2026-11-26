@@ -24,6 +24,7 @@ import { seatTag } from "./scenarios/area.ts";
 import { REANIMATED_DEAD } from "./scenarios/angmar/dread-realm-table.ts";
 import { grappleDetail } from "./scenarios/grapple.ts";
 import { areaTell } from "./scenarios/stormcaller.ts";
+import { orcsTell } from "./scenarios/haradrim/orcs-table.ts";
 import { islandTell } from "./scenarios/uncharted.ts";
 
 /** Everything the speech reads besides the state, so the function stays pure: the table's lookups, the engine's numbers, what the open moment marks. */
@@ -182,7 +183,7 @@ function labelOf(game: ScenarioState, seat: number, card: CardInstance, deps: Ca
   // The sentences a card whose number or place is only drawn on the canvas has always said.
   const role = areaRoleOf(game, card.id);
   const said = [
-    stage == null && role != null && role !== "stage" ? areaTell(role) : null,
+    stage == null && role != null && role !== "stage" ? (game.orcs ? orcsTell(role) : areaTell(role)) : null,
     island,
     info.under?.speech,
     grappleDetail(game, card.id),

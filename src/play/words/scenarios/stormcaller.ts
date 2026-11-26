@@ -14,7 +14,7 @@ export const AREA_TOGETHER = "In the Stormcaller's area, at the Stormcaller's st
 export const STAGE_LOSS = "When this stage is full the players lose: Captain Sahír has gotten away with the key";
 
 /** The numbers of the Stormcaller's current quest stage: its number of the last, its progress against its quest points (null for a stage without), the players' stage number and whether it is theirs. */
-export type StageFacts = { number: number; last: number; progress: number; points: number | null; playersAt: number; together: boolean };
+export type StageFacts = { who?: "orcs"; number: number; last: number; progress: number; points: number | null; playersAt: number; together: boolean };
 
 const progressOf = (facts: Pick<StageFacts, "progress" | "points">): string => (facts.points == null ? `${facts.progress}` : `${facts.progress}/${facts.points}`);
 

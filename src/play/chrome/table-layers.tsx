@@ -37,6 +37,7 @@ import { WAITING, islandFit, islandPanelWidth, islandReadout, standingWords } fr
 import { foldTitle } from "../layout/row-fold.ts";
 import { areaRoleOf } from "../store/stormcaller-table.ts";
 import { AREA_LIST_TITLE } from "../words/scenarios/stormcaller.ts";
+import { ORCS_LIST_TITLE } from "../words/scenarios/haradrim/orcs-table.ts";
 import { facedownSplitWords } from "../words/scenarios/against-the-shadow/stewards-fear.ts";
 import { alwaysRows } from "./settings-words.ts";
 import { useReaderMode, useScreenReader } from "../../ui/screen-reader.ts";
@@ -111,12 +112,13 @@ function RowReading({ store, ctx, row, names, picture, onRead, onClose }: { stor
   );
   // A stack that holds only the Stormcaller's area's cards is titled for it (stormcaller-table.ts); its stage never folds.
   const areaOnly = useStore(store, (state) => row === "staging" && ids.length > 0 && ids.every((id) => areaRoleOf(state.game, id) != null));
+  const orcsList = useStore(store, (state) => state.game.orcs != null);
   const rows = rowsKey.split("\n");
   const cards = ids.map((id, at) => {
     const [code = "", key = "", grapple = ""] = (rows[at] ?? "").split("\t");
     return listCard(id, code, key, names, picture, ctx.cards, grapple || null);
   });
-  return <RowList title={areaOnly ? AREA_LIST_TITLE : foldTitle(row)} cards={cards} onRead={onRead} onClose={onClose} />;
+  return <RowList title={areaOnly ? (orcsList ? ORCS_LIST_TITLE : AREA_LIST_TITLE) : foldTitle(row)} cards={cards} onRead={onRead} onClose={onClose} />;
 }
 
 // The set-aside cards the players may read, the copies of one card as one row, and the count of the facedown ones (store/set-aside.ts). The panel subscribes to the list as one string,
