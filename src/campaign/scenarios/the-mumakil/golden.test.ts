@@ -1,5 +1,7 @@
-// Rules: TODO name the rule ids the scenario implements (data/rules/entries.json).
+// Rules: rr.setup, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, hrd.setup-the-mumakil (data/rules/entries.json).
 import { describe, expect } from "vitest";
+
+import type { ScenarioState } from "../../../rules/core/state.ts";
 
 import { MUMAKIL_GOLDENS, playGolden, mumakilWorld, type MumakilDecks, type MumakilGolden } from "../../../../test/scenarios/the-mumakil/game.ts";
 import { loadAnyScenario, loadCampaign } from "../../../../scripts/data/load-scenarios.ts";
@@ -7,13 +9,15 @@ import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
 
 const cycle = loadCampaign("haradrim");
 const mumakil = loadAnyScenario("the-mumakil");
+const MUMAK = "17015";
+const CAPTURES = ["17011", "17012", "17013", "17014"];
+const cardsOf = (state: ScenarioState, codes: readonly string[]) => Object.values(state.cards).filter((card) => codes.includes(card.code));
 
 // A permanent golden: whole standalone games of The Mûmakil played by the auto-player (test/scenarios/the-mumakil/game.ts) on fixed seeds, through a win and through each way to lose.
-// A cycle has no Campaign Mode, so a win settles at once with a score and nothing earned. TODO: say what the games cover. Update the snapshot only when the change is meant.
-//
-// Open until the goldens are chosen: the suite is skipped, so it writes no golden.json. To finish it, fill MUMAKIL_GOLDENS, change `describe.skip` to `describe`, fill the TODOs below, run this file
-// (it writes golden.json) and uncomment this scenario's two lines in test/harness/golden-registry.ts (its test fails on a golden.json that is not listed).
-describe.skip("The Mûmakil golden (open: scaffold)", () => {
+// A cycle has no Campaign Mode, so a win settles at once with a score and nothing earned. The wins are true solo and two-handed: the players explore until their Wild Mûmak are in play (stage 1B), reach stage 2 where each player
+// attaches a random Capture to a Mûmak, engage the Mûmakil (their engagement cost is 40, so the heroes start at a threat of 10 each) and use the Captures until none is in play. The losses are every player's threat at 50 and every player eliminated
+// by destroyed heroes. Update the snapshot only when the change is meant.
+describe("The Mûmakil golden", () => {
   goldenSuite<MumakilGolden, MumakilDecks>({
     title: "The Mûmakil",
     file: new URL("./golden.json", import.meta.url).pathname,
@@ -24,16 +28,33 @@ describe.skip("The Mûmakil golden (open: scaffold)", () => {
     world: mumakilWorld,
     play: playGolden,
     opening: {
-      title: "TODO: starts with (the staging area, the cards set aside, the encounter deck, the quest stage)",
+      title: "starts on stage 1B with the four Wild Mûmak and the four Captures set aside and one different location in the staging area for each player",
       check(state, golden) {
-        // TODO: the opening the Setup leaves.
-        expect(state.questStage, golden.name).toBeTruthy();
+        expect(state.cards[state.questStage ?? ""], golden.name).toMatchObject({ code: "17026", zone: "questStage" });
+        expect(cardsOf(state, [MUMAK]).map((card) => card.zone), golden.name).toEqual(["setAside", "setAside", "setAside", "setAside"]);
+        expect(cardsOf(state, CAPTURES).map((card) => card.zone), golden.name).toEqual(["setAside", "setAside", "setAside", "setAside"]);
+        const locations = Object.values(state.cards).filter((card) => card.zone === "staging" && ["17020", "16056", "16057", "16058"].includes(card.code));
+        expect(locations, golden.name).toHaveLength(golden.seatCount);
+        expect(new Set(locations.map((card) => card.code)).size, golden.name).toBe(golden.seatCount);
       },
     },
-    wins: "TODO: wins when ..., settles with a score and earns nothing",
-    won(state) {
-      // TODO: the stage the game ended on.
-      expect(state.stageCleared).toBe(true);
+    wins: "ends when stage 2B is defeated with no Capture in play, every Capture used, settles at once with a score and earns nothing",
+    won(state, golden) {
+      // Stage 2B cannot be defeated while a Capture is in play: each Capture is in the victory display with its Wild Mûmak, or in the encounter discard pile with a Mûmak that left.
+      expect(state.stageCleared, golden.name).toBe(true);
+      const captures = cardsOf(state, CAPTURES).filter((card) => card.zone !== "setAside");
+      expect(captures.length, golden.name).toBe(golden.seatCount);
+      expect(captures.every((card) => card.zone === "victory" || card.zone === "encounterDiscard"), golden.name).toBe(true);
+      expect(captures.some((card) => card.zone === "victory"), golden.name).toBe(true);
+      expect(cardsOf(state, [MUMAK]).some((card) => card.zone === "victory"), golden.name).toBe(true);
+      expect(state.seats.slice(0, golden.seatCount).some((seat) => !seat.eliminated), golden.name).toBe(true);
+    },
+    lost(state, golden) {
+      const seats = state.seats.slice(0, golden.seatCount);
+      expect(seats.every((seat) => seat.eliminated), golden.name).toBe(true);
+      if (golden.decks === "bold") expect(seats.every((seat) => seat.threat >= 50), golden.name).toBe(true);
+      // The brittle heroes die: no seat reached a threat of 50.
+      else expect(seats.every((seat) => seat.threat < 50), golden.name).toBe(true);
     },
   });
 });
