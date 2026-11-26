@@ -3,6 +3,7 @@
 // The engine decided every number (the counters on the quest, the Choose still to come in the effect's queue); nothing here changes one.
 import type { Instruction } from "../../catalog/boundary.ts";
 import type { ScenarioState } from "../../rules/engine/reduce.ts";
+import { newLevels } from "../readouts/ring-maker/fords.ts";
 import { lastCounterWords } from "../words/scenarios/ring-maker/fords-table.ts";
 
 type Choose = Extract<Instruction, { verb: "Choose" }>;
@@ -34,7 +35,7 @@ export function fordsTimeCount(game: ScenarioState, choose: Choose, optionId: st
 export function fordsTimeCaution(game: ScenarioState, choose: Choose, optionId: string): string | null {
   const stage = takesTime(choose, optionId) ? stageOf(game) : null;
   if (!stage || stage.left <= 0 || stage.left > choosersLeft(game)) return null;
-  const last = lastCounterWords(stage.code) ?? "";
+  const last = lastCounterWords(stage.code, newLevels(game)) ?? "";
   return stage.left === 1 ? `Tap again: the last time counter comes off, ${last}` : `Tap again: ${stage.left} counters are left, and the players still to choose can take them all. With the last counter gone, ${last}`;
 }
 

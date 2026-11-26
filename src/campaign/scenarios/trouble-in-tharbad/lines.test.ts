@@ -3,7 +3,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { ScenarioState } from "../../../rules/core/state.ts";
-import { drive, idOf, opened, send, tableFromLayout, where, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { drive, idOf, opened, resolveRecords, send, tableFromLayout, where, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "trouble-in-tharbad";
 const MUG = "08069";
@@ -32,6 +32,24 @@ describe("quest resolution on the stages", () => {
     expect(where(done.state, STREETS)).not.toBe("activeLocation");
     expect(progressOn(done.state, CROSSING)).toBe(1);
     expect(where(done.state, CROSSING)).toBe("staging");
+  });
+});
+
+describe("picks with one candidate resolve without a tap", () => {
+  it("08067:B:2 the attack branch picks Bellach, the one enemy that can, and the attack begins at once", () => {
+    const t = table({ stage: "08067", play: ["08068"], staging: ["08070"], timeCounters: 0 });
+    const run = resolveRecords(t.state, t.ctx, "08067", "forced", idOf(t.state, "08067"), (state) => (state.window?.kind === "choose" ? "attack" : ""), true);
+    expect(run.state.pendingAttack?.enemyId).toBe(idOf(t.state, "08070"));
+    expect(run.state.window?.kind).toBe("defense");
+  });
+
+  it("08083:A:2 an undefended attack with the shadow card deals 2 damage to Nalir, the one character it can name, with no pick to tap", () => {
+    const t = table({ stage: "08066", play: ["08068"], engaged: [SPY], deck: ["08083"], phase: "Encounter" });
+    const nalir = idOf(t.state, "08068");
+    const atDefense = drive(t, opened(t), (state) => state.window?.kind === "defense");
+    const undefended = send(atDefense, { type: "Undefended", heroId: idOf(t.state, "dh1") }, t.ctx);
+    const done = drive(t, undefended, (state) => state.phase !== "Combat" || (state.cards[nalir]?.damage ?? 0) > 0);
+    expect(done.state.cards[nalir]?.damage).toBe(2);
   });
 });
 

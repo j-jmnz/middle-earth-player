@@ -4,9 +4,15 @@ import type { Ask } from "../asks.ts";
 // `pnpm test scenario trouble-in-tharbad --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=trouble-in-tharbad` prints each sentence.
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 08067:forced:1 (Escape from Tharbad, forced): Forced: After the last time counter is removed from the quest, either raise each player's threat by 3 or Bellach makes an immediate attack against Nalir. Then, place 3 time counters on this stage.
-  "08067:forced:1 @0 Choose": { owned: true, note: "Escape from Tharbad: the last time counter is gone. As first player, choose for the group: each player raises their threat by 3, or Bellach attacks Nalir." },
+  // The first player answers for the group (R1), as at The Three Trials' stage choice: solo no lead, two-handed "Player 1, for the group:". Not owned, so the sheet adds no second "Player N chooses.".
+  "08067:forced:1 @0 Choose": {
+    note: [
+      { when: { kind: "otherPlayer" }, text: "{owner}, for the group: Escape from Tharbad, the last time counter is gone. Choose: each player raises their threat by 3, or Bellach attacks Nalir." },
+      { text: "Escape from Tharbad: the last time counter is gone. Choose: each player raises their threat by 3, or Bellach attacks Nalir." },
+    ],
+  },
   "08067:forced:1 @0 threat": { label: "Each player raises their threat by 3" },
-  "08067:forced:1 @0 attack": { label: "Bellach makes an immediate attack against Nalir" },
+  "08067:forced:1 @0 attack": { label: "Bellach makes an immediate attack against Nalir: damage no defender takes goes to Nalir, and the players lose if he leaves play" },
   "08067:forced:1 @0.attack.0 Pick": { note: "Escape from Tharbad: Bellach makes an immediate attack against Nalir. Choose Bellach.", verb: "Attack" },
   // 08083:whenRevealed:1 (Get That Dwarf!, whenRevealed): When Revealed: The enemy in the staging area with the highest Attack engages the first player and makes an immediate attack against Nalir. If there are no enemies in the staging area, Get That Dwarf! gains surge.
   "08083:whenRevealed:1 @1 Pick": { note: "Get That Dwarf!: choose the enemy in the staging area with the highest Attack. It engages the first player and makes an immediate attack against Nalir.", verb: "Engage" },

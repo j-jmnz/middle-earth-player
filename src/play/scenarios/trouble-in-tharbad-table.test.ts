@@ -29,6 +29,17 @@ describe("the time dial of the stages", () => {
     expect(last?.warn?.words).toContain("threat elimination level goes down by 10");
   });
 
+  it("08066:B:2 the last counter says that a player at or above the new level is eliminated at once, with the level read for each seat", () => {
+    const words = (reductionOfSecond: number): string => {
+      const made = built({ stage: "08066", seats: 2 });
+      const held = [{ instanceId: "seat:1", sourceId: "08066", stat: "eliminationReduction" as const, amount: reductionOfSecond, until: "endOfGame" as const }];
+      const state = updateCard({ ...made.state, modifiers: [...made.state.modifiers, ...(reductionOfSecond > 0 ? held : [])] }, idOf(made.state, "08066"), { resources: 1 });
+      return scenarioDials(state, made.ctx, nameOf(made)).find((dial) => dial.testID?.startsWith("ring-maker-time:"))?.warn?.words ?? "";
+    };
+    expect(words(0)).toContain("goes down by 10 for the rest of the game (to 40), a player whose threat is at or above his new level is eliminated at once");
+    expect(words(5)).toContain("(to 40 for Player 1, 35 for Player 2)");
+  });
+
   it("08067:B:1 reads Time 3; 08067:B:2 its last counter names the first player's choice and the 3 counters that return", () => {
     expect(timeDial("08067", 3)).toMatchObject({ value: 3, limit: 3 });
     const words = timeDial("08067", 1)?.warn?.words ?? "";
@@ -65,5 +76,14 @@ describe("Nalir held by the first player (08068:A:1)", () => {
   it("08068:A:1 solo he is yours; two-handed the player is named", () => {
     expect(detail(built({ play: [NALIR] }))).toBe("You control Nalir. He passes to the first player each round, and if he leaves play the players lose. An attack against Nalir sends undefended damage to him.");
     expect(detail(built({ seats: 2, play: [NALIR] }))).toContain("Player 1 controls Nalir.");
+  });
+});
+
+describe("The Crossing at Tharbad (08071:A:2)", () => {
+  const detail = (made: Made) => dungeonDetail(made.state, made.ctx, idOf(made.state, "08071"), (id) => made.cards.get(made.state.cards[id]?.code ?? "")?.name ?? id);
+
+  it("08071:A:2 the preview states the total quest points and how they are made up, for each count of players", () => {
+    expect(detail(built({ stage: "08067", staging: ["08071"] }))).toBe("12 quest points (10, +2 for each player)");
+    expect(detail(built({ stage: "08067", seats: 2, staging: ["08071"] }))).toBe("14 quest points (10, +2 for each player)");
   });
 });

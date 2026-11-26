@@ -4,8 +4,9 @@ import { inPlay, livingSeats } from "../../../rules/core/state.ts";
 import { refreshTakes, timeInstruction, timeLimit, timePlayersOf } from "../../../rules/families/angmar/time.ts";
 import type { ReduceContext, ScenarioState } from "../../../rules/engine/reduce.ts";
 
-import { stageTimeLimitWords, stageTimeNearWords, stageTimeWords, type TimeTakes } from "../../words/scenarios/ring-maker/fords-table.ts";
+import { stageTimeLimitWords, stageTimeNearWords, stageTimeWords, type NewLevels, type TimeTakes } from "../../words/scenarios/ring-maker/fords-table.ts";
 import { cardsOf, type TableDial } from "../dials.ts";
+import { seatLevel } from "../threat-level.ts";
 
 /** The quest stages of The Fords of Isen, of To Catch an Orc (stages 2B and 3B), of Into Fangorn (stages 1B, 2B and 3B) and of The Dunland Trap (stages 1B and 3B; 2B prints none) and of Trouble in Tharbad (stages 1B and 2B) that print Time X. */
 export const FORDS_STAGES: readonly string[] = ["07059", "07060", "07061", "07063", "07064", "07065", "07066", "07067", "08011", "08013", "08066", "08067"];
@@ -13,10 +14,13 @@ export const FORDS_STAGES: readonly string[] = ["07059", "07060", "07061", "0706
 const TURCH = "08014";
 const NO_WAY_OUT = "08013";
 
+/** The threat elimination level of each living seat once a stage that lowers it by 10 (08066:B:2) has done so, as the engine reads each seat's level now. */
+export const newLevels = (game: ScenarioState): NewLevels => livingSeats(game).map((seat) => ({ seat, level: seatLevel(game, seat) - 10 }));
+
 /** What the next refresh phase takes from this time stage, and whether Chief Turch makes an engagement take one more (stage 3B of The Dunland Trap). */
 export function timeTakes(game: ScenarioState, ctx: ReduceContext, code: string): TimeTakes {
   // The count comes from the records in play (refreshTakes: Old South Road 08016, Off Track 07057), not from card codes.
-  return { takes: refreshTakes(game, ctx), engages: code === NO_WAY_OUT && Object.values(game.cards).some((card) => inPlay(card.zone) && card.code === TURCH) };
+  return { takes: refreshTakes(game, ctx), engages: code === NO_WAY_OUT && Object.values(game.cards).some((card) => inPlay(card.zone) && card.code === TURCH), levels: newLevels(game) };
 }
 
 export function ringMakerDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
