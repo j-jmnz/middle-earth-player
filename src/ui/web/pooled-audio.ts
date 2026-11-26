@@ -57,10 +57,13 @@ const HAVE_DATA = 2;
 
 const swallow = (): void => undefined;
 
-export function pooledAudio(host: AudioHost, spares: number = SPARES): { create(uri: string): PooledPlayer } {
+/**
+ * `sample` is the file a spare is given to be blessed with, since an element needs something to play: a short sound effect. It must not be a piece of music.
+ * An element loads what it is given, and a spare that was given the first player's file, the menu's music, buffered minutes of audio for nothing, each spare
+ * with a media player of its own; on an iPad that held the page's thread for most of a minute after each new piece. With no sample there are no spares.
+ */
+export function pooledAudio(host: AudioHost, spares: number = SPARES, sample: string | null = null): { create(uri: string): PooledPlayer } {
   const slots: Slot[] = [];
-  // Any file a player was made for: a spare needs something to play to be blessed.
-  let sample: string | null = null;
 
   const add = (): Slot => {
     const slot: Slot = { ...host.newElement(), blessed: false, used: false, wanted: false };
@@ -98,7 +101,6 @@ export function pooledAudio(host: AudioHost, spares: number = SPARES): { create(
   return {
     create(uri) {
       const started = performance.now();
-      sample ??= uri;
       const slot = slots.find((each) => !each.used && each.blessed) ?? slots.find((each) => !each.used) ?? add();
       slot.used = true;
       slot.wanted = false;

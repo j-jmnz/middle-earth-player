@@ -6,7 +6,7 @@ import { pooledAudio, type AudioHost, type PoolElement } from "./pooled-audio.ts
 
 type Fake = PoolElement & { plays: number; allowed: boolean; gain: { gain: { value: number } }; heard: number[] };
 
-function setup(spares = 2) {
+function setup(spares = 2, sample: string | null = "/tick.m4a") {
   const elements: Fake[] = [];
   let gesture: () => void = () => undefined;
   let resumes = 0;
@@ -57,7 +57,7 @@ function setup(spares = 2) {
     gesture();
     inGesture = false;
   };
-  return { pool: pooledAudio(host, spares), elements, tap, resumes: () => resumes };
+  return { pool: pooledAudio(host, spares, sample), elements, tap, resumes: () => resumes };
 }
 
 const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
@@ -118,6 +118,18 @@ describe("the web app's audio players", () => {
     expect(elements.filter((each) => each.allowed)).toHaveLength(4);
     tap();
     expect(elements).toHaveLength(4);
+  });
+
+  it("gives a spare the sample, never a player's own file, and makes no spare with no sample", () => {
+    const withSample = setup(2, "/tick.m4a");
+    withSample.pool.create("/menu-music.m4a");
+    withSample.tap();
+    expect(withSample.elements.map((each) => each.src)).toEqual(["/menu-music.m4a", "/tick.m4a"]);
+    const none = setup(2, null);
+    none.pool.create("/menu-music.m4a");
+    none.tap();
+    none.tap();
+    expect(none.elements).toHaveLength(1);
   });
 
   it("uses a removed player's element again, at full volume", () => {
