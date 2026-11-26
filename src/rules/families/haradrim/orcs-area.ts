@@ -12,8 +12,10 @@ import { orcsOf } from "./orcs-zone.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
-/** PrepareOrcsArea: the set-aside quest cards named become the Orcs' quest deck in order, the top one its current stage with its D side up, and each set-aside card named by `place` joins the area. */
+/** PrepareOrcsArea (once for a game): the set-aside quest cards named become the Orcs' quest deck in order, the top one its current stage with its D side up, and each set-aside card named by `place` joins the area. */
 export function prepareOrcsArea(state: ScenarioState, instruction: Verb<"PrepareOrcsArea">): ScenarioState {
+  // The area is prepared once: a Setup run again on a game that has begun leaves it as it is.
+  if (state.orcs) return state;
   const stages = instruction.stages.map((code) => state.setAside.find((id) => state.cards[id]?.code === code));
   const [top, ...rest] = stages;
   if (!top || rest.some((id) => id == null)) return { ...state, failure: "The Orcs' area needs its quest stages set aside" };

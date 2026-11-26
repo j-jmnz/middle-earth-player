@@ -14,11 +14,12 @@ export function atOrcsStage(state: ScenarioState): boolean {
   return area != null && state.questStage != null && stageNumber(state) === area.number;
 }
 
-/** The condition `orcsStage`: the players are at the Orcs' stage, or not. False in a game with no Orcs' area. */
+/** The condition `orcsStage`: the players are at the Orcs' stage, or not (`is`), and the Orcs' stage has this number (`at`). False in a game with no Orcs' area. */
 export function orcsCondition(state: ScenarioState, condition: Condition): boolean | null {
   if (condition.kind !== "orcsStage") return null;
-  if (orcsOf(state) == null) return false;
-  return condition.is === "sameStage" ? atOrcsStage(state) : !atOrcsStage(state);
+  const area = orcsOf(state);
+  if (area == null || (condition.at != null && area.number !== condition.at)) return false;
+  return condition.is == null || (condition.is === "sameStage") === atOrcsStage(state);
 }
 
 /** The cards of the area wherever they stand now: in the area zone while the players are at another stage, in the staging area at the Orcs' stage. */

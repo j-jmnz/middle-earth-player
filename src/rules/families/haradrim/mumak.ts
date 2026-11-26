@@ -1,4 +1,4 @@
-// Rules: hrd.immune-to-player-card-effects, rr.player-elimination, rr.undefended (data/rules/entries.json); ledger lines 17047:A:1, 17038:A:2, 17038:A:3. The Tamed Mûmak, an objective ally each player takes at Setup: the take, and the damage of an undefended attack
+// Rules: hrd.immune-to-player-card-effects, rr.player-elimination, ltp.undefended-attack (data/rules/entries.json); ledger lines 17047:A:1, 17038:A:2, 17038:A:3. The Tamed Mûmak, an objective ally each player takes at Setup: the take, and the damage of an undefended attack
 // that must be assigned to it. Its elimination of the controller is a record (`leftPlay`, EliminatePlayer).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
