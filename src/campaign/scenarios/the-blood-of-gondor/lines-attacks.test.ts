@@ -118,10 +118,10 @@ lineSpec("06120:A:1", "Forced: engaged in the encounter phase the ordinary way, 
   expect(done.state.seats[0]?.play).toEqual([]);
 });
 
-lineSpec("06117:B:2", "turning engages Orc Arsonist in the middle of the combat phase: its Forced effect deals 1 shadow card to each enemy engaged with that player, itself included, before the combat phase deals its cards, which then deal none more (the engine turns first)", (effects) => {
+lineSpec("06117:B:2", "turning engages Orc Arsonist in the middle of the combat phase: its Forced effect deals 1 shadow card to each enemy engaged with that player, itself included, before the combat phase deals its cards, which then deal one more to each (rr.step-6-2; the engine turns first)", (effects) => {
   const made = table({ phase: "Encounter", engaged: [rabble], deck: [arsonist, ...fillers(8)] }, effects);
   const at = drive(made, opened(made, takes(made, made.state, 0)), (state) => state.window?.kind === "choose");
   const turned = send(at, { type: "Choose", optionId: "turn" }, made.ctx);
   expect(engagedCodes(turned.state)).toEqual([rabble, arsonist]);
-  expect([shadowsOn(turned.state, rabble), shadowsOn(turned.state, arsonist)]).toEqual([1, 1]);
+  expect([shadowsOn(turned.state, rabble), shadowsOn(turned.state, arsonist)]).toEqual([2, 2]);
 });
