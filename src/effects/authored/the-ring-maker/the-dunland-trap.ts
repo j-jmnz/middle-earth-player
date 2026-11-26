@@ -14,8 +14,8 @@ const ACTIVE: Condition = { kind: "sourceIn", zone: "activeLocation" };
 const REFRESH: Condition = { kind: "phase", is: "Refresh" };
 // Dunland enemies in play, staged or engaged (the Ravine's +1 Attack and +1 Defense).
 const DUNLAND: PickSpec = { type: "enemy", control: "any", staging: true, trait: "Dunland" };
-// Each player searches the encounter deck and (unless the Setup) its discard pile for a Boar Clan enemy and puts it into play engaged with him; a card taken is gone for the next player (`different`).
-const boarClan = (deckOnly: boolean): Instruction => EACH_PLAYER([{ verb: "SearchMove", type: "enemy", trait: "Boar Clan", to: "engaged", different: true, ...(deckOnly ? { deckOnly: true as const } : {}) }]);
+// Each player searches the encounter deck and (unless the Setup) its discard pile for a Boar Clan enemy and puts it into play engaged with him; a card taken is gone for the next player, and the printed line says no "different", so a second player may take a second copy of a title.
+const boarClan = (deckOnly: boolean): Instruction => EACH_PLAYER([{ verb: "SearchMove", type: "enemy", trait: "Boar Clan", to: "engaged", ...(deckOnly ? { deckOnly: true as const } : {}) }]);
 // "Each player discards each Item attachment and each Mount attachment he controls" (08012:A:1): the attachments he controls on any card.
 const OWN_ATTACHMENT = (trait: string): PickSpec => ({ type: "attachment", control: "you", controlled: true, trait });
 const OWN_ALLY: PickSpec = { type: "ally", control: "you" };

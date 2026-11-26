@@ -21,11 +21,12 @@ const NOTHING = announce("endOfRound");
 
 const ROWS: readonly Row[] = [
   // 08011 The Road to Tharbad.
-  { line: "08011:A:1", name: "Setup: each player searches the encounter deck for a different Boar Clan enemy and puts it into play engaged with him", layout: { seats: 2, stage: STAGE_1, side: "A", deck: [WARRIOR, "f0", STALKER, "f0"] }, act: resolve(STAGE_1, "setup"), expect: [count(WARRIOR, "engaged", 1), count(STALKER, "engaged", 1)] },
+  { line: "08011:A:1", name: "Setup: each player searches the encounter deck for a Boar Clan enemy and puts it into play engaged with him", layout: { seats: 2, stage: STAGE_1, side: "A", deck: [WARRIOR, "f0", STALKER, "f0"] }, act: resolve(STAGE_1, "setup"), expect: [count(WARRIOR, "engaged", 1), count(STALKER, "engaged", 1)] },
+  { line: "08011:A:1", name: "Setup: the printed line says no \"different\", so the second player can take a second Boar Clan Warrior", layout: { seats: 2, stage: STAGE_1, side: "A", deck: [WARRIOR, "f0", WARRIOR, "f0"] }, act: resolve(STAGE_1, "setup"), expect: [count(WARRIOR, "engaged", 2)] },
   { line: "08011:A:1", name: "Setup: a solo player searches for one", layout: { stage: STAGE_1, side: "A", deck: [WARRIOR, "f0", STALKER, "f0"] }, act: resolve(STAGE_1, "setup"), expect: [count(WARRIOR, "engaged", 1), count(STALKER, "engaged", 0)] },
 
   // 08012 A Well Laid Trap (the Forced effect of the end of the combat phase and side A are in stages.test.ts).
-  { line: "08012:B:1", name: "When Revealed: each player searches for a different Boar Clan enemy and puts it into play engaged, shuffles his discard pile into his deck and draws 1", layout: { seats: 2, stage: "08012", active: ROAD, setAside: [RAVINE], deck: [WARRIOR, "f0", STALKER, "f0"], deckOf: [{ code: "filler", seat: 0 }, { code: "filler", seat: 1 }] }, act: resolve("08012", "whenRevealed"), expect: [count(WARRIOR, "engaged", 1), count(STALKER, "engaged", 1), handCount(1), handCount(1, 1)] },
+  { line: "08012:B:1", name: "When Revealed: each player searches for a Boar Clan enemy and puts it into play engaged, shuffles his discard pile into his deck and draws 1", layout: { seats: 2, stage: "08012", active: ROAD, setAside: [RAVINE], deck: [WARRIOR, "f0", STALKER, "f0"], deckOf: [{ code: "filler", seat: 0 }, { code: "filler", seat: 1 }] }, act: resolve("08012", "whenRevealed"), expect: [count(WARRIOR, "engaged", 1), count(STALKER, "engaged", 1), handCount(1), handCount(1, 1)] },
 
   // 08015 Munuv Dûv Ravine.
   { line: "08015:A:1", name: "Dunland enemies in the staging area and engaged get +1 Attack and +1 Defense while the Ravine is the active location", layout: { active: RAVINE, staging: [TRIBESMAN], engaged: [STALKER] }, act: NOTHING, expect: [stat(TRIBESMAN, "attack", 5), stat(TRIBESMAN, "defense", 3), stat(STALKER, "attack", 1), stat(STALKER, "defense", 1)] },
