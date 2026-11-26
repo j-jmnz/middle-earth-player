@@ -10,7 +10,8 @@ Haradrim part 6 (Beneath the Sands, `BtS`), standalone only, on Easy and Normal 
 
 ## Data
 
-- Track is in the `keywords` of `data/cards` as "Track 2", "Track 3", "Track 4" tokens; the build lists it among the unknown keyword tokens until the family reads it.
+- Track is in the Hall of Beorn keyword tokens ("Track 2", "Track 3", "Track 4"); the build lists them among the unknown keyword tokens and `data/cards` holds no `keywords` for them. The ledger lines "Track X." are owned by a record of the haradrim family, not by the keyword reader.
+- The On Track marker ("On Track" in the lower right corner, `hrd.track`) is on no data field. Read from the scans: Hive Guardian 17066, Spider Broodling 17067, Pitch Black Tunnel 17069, Nest of Vermin 17070 and Blocked Passage 17072 print it (3 + 5 + 2 + 2 + 3 = 15 of the 39 Normal cards of the encounter deck); Spider Burrow, Cobwebbed Cavern, Forced Off Track, Grabbed by Spiders, Lost Underground and the Desert Creatures and Harad Territory cards print none.
 - Stage 1B discards cards until X locations are discarded and stages them; stage 2A flips Off Track and stages X enemies; stage 3A adds Brood Mother.
 - Quest 17078 is "The Spiders' Hive", as printed on the card and spelled by Hall of Beorn. DragnCards spells it "The Spider's Hive"; no source of `data/cards` reads that spelling.
 
@@ -24,3 +25,26 @@ The statuses are those of the Readings bullet of `docs/scenarios/haradrim.md`. E
 - Track and the quest phase (span-settled). The Forced effect of On Track at the end of the quest phase searches the top 3 cards; the Track keyword is not resolved while On Track. Not taken: Track resolves in both states. Basis: `hrd.track` ("if they are off track"). Sources: the review above states the same; no official ruling.
 - Flip resources (span-settled). Flipping from Off Track to On Track discards all resources on the objective. Basis: `hrd.track`.
 - Valour (span-settled). `bts.valour`.
+
+Scan-read (span-settled):
+
+- On Track marker. The five codes above; the family holds them as a list, cited to the scans. Basis: the scans of 17066 to 17075 and 16045 to 16055.
+- Pitch Black Tunnel (`17069:A:1`, `17069:A:2`) (span-settled). The scan prints Threat X in the threat box and "Track 4." in the text; "X is the number of characters controlled by the first player" gives the Threat, not the Track value. Sources: the scan, https://hallofbeorn.com/LotR/Details/Pitch-Black-Tunnel-BtS.
+
+Researched or recommended (no FFG or designer ruling and no agreed forum answer exists; play reports read: https://visionofthepalantir.com/2020/07/28/beneath-the-sands/, https://visionofthepalantir.com/2025/08/27/qotw-beneath-the-sands, https://cardtalk2018.com/category/scenario/beneath-the-sands/, https://masteroflore.wordpress.com/2018/06/26/quest-profile-081-beneath-the-sands/, https://hallofbeorn.com/LotR/Details/Pitch-Black-Tunnel-BtS):
+
+- `17065:A:2` (recommended). Brood Mother moves to the first player's play area at once when it enters the staging area, by any add. Not taken: it waits for the engagement step.
+- `17065:A:3` (recommended). Search the deck and the discard pile for one Spider Broodling; none found adds nothing; the deck is shuffled in every case; the discard pile is not shuffled in.
+- `17067:A:2` (recommended). If On Track is in play when the shadow resolves, Broodling goes into play engaged with the defending player, is dealt a shadow card and does not attack this phase.
+- `17068:A:2` (recommended). The flip happens only if Off Track; Brood Mother is added in every case, also when Lost Underground blocks the flip.
+- `17068:A:3` (recommended). Brood Mother is set aside from any zone unless the main quest is stage 3B.
+- `17070:A:2` (recommended). The discard pile is shuffled in even if the deck is not empty; no Creature found when the deck is empty stops the search and adds nothing.
+- `17073:A:1` (recommended). The first player chooses; the flip option is legal when already Off Track and then does nothing.
+- `17074:A:2` (recommended). A second copy is not attached and is discarded (Limit 1 per quest); the Forced effect runs after a flip to Off Track, each player discards an ally of their choice, then the card is discarded.
+- `17075:A:1`, `17075:A:2` (recommended for the response). The reveal flip is allowed; while Lost Underground is in play the objective cannot flip in either direction. The Response resolves while it is still in play and is not blocked by its own text; On Track then ignores its Forced effects until the end of the phase. Source: cardtalk2018 (a play report).
+- `17076:B:1` (recommended). The deck running out stops the discard (no shuffle: only Track shuffles). `17077:A:1`: the discard pile is shuffled in first, then the discard stops if the deck runs out.
+- `17078:A:1` (recommended). The first player adds Brood Mother, then each other player reveals one encounter card, then the flip to Off Track.
+- `17079:A:1` (recommended). With no location in the encounter discard pile only the threat option is legal.
+- `17080:A:1` (recommended). The first card with the marker among the top 3 is added to the staging area (it is not revealed); the rest are discarded; none found flips the objective to Off Track; fewer than 3 cards are looked at without a shuffle.
+- `17080:A:2` (span-settled). Unsuccessful means threat higher than willpower; a tie is not (`rr.step-3-4`).
+- Other lines read as printed (span-settled): 17065:A:1 (the text returns when the stage falls below 5 progress), 17066, 17067:A:1, 17071, 17072, 17073:A:2 (`faq.additional-attacks`), 17077:B:1, 17078:B:1 to B:3, 17079:A:2.
