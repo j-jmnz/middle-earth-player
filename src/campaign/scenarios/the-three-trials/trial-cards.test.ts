@@ -31,6 +31,12 @@ describe("08040:A:2 to 08042:A:2 the Guardians' Time effect", () => {
     expect([cardsOf(state, "ally")[0]?.zone, counters(state, "08040")]).toEqual(["play", 2]);
   });
 
+  it("08041:A:2 makes no attack when no player is engaged with it, and the counters are still placed", () => {
+    const t = table({ staging: [{ code: "08041", resources: 0 }] });
+    const { state } = forced(t, "08041");
+    expect([state.pendingAttack, counters(state, "08041")]).toEqual([null, 3]);
+  });
+
   it("08042:A:2 deals 1 damage to each character the engaged player controls and puts 4 counters on again", () => {
     const t = engagedWith("08042", 0, { play: [{ code: "ally", seat: 0 }, { code: "ally", seat: 1 }] });
     const { state } = forced(t, "08042");

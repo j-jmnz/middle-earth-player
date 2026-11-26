@@ -53,6 +53,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("RevealFromVictory"), trait: z.string().min(1), random: z.literal(true).optional(), ...when }),
   // "Add all Barrow locations in play to the victory display" (08036:B:2), "add all Guardian enemies in play" (08037:B:2): each card in play (the staging area, an engagement area, the active location) of this printed `cardType` with this Trait goes to the victory display, a card that cannot leave play for a player card too (a quest effect).
   z.strictObject({ verb: z.literal("AddInPlayToVictory"), cardType: z.enum(["enemy", "location"]), trait: z.string().min(1), ...when }),
+  // "After a Key objective is placed in the discard pile" (08043:A:2), run by the Setup of the stage that holds such a card: the table notes each card placed in the encounter discard pile from now on to the end of the game, so a record that hears `encounterDiscarded` is called (the Keys discarded from the encounter deck by 08038:B:1).
+  verbFlags(z.strictObject({ verb: z.literal("NoteEncounterDiscards"), ...when }), { setupRuns: "top" }),
   // "Each Guardian enemy engages the first player" (08036:B:1 to 08038:B:1), "Each Guardian enemy engages the player who controls the Key objective with a Trait shared by that enemy" (08039:B:1), a constant marker on the stage: while it is the stage in play, each enemy with this Trait in the staging area or engaged
   // with another player engages that player at once, whatever its engagement cost, and follows the first player token (the settle sweep, families/ring-maker/trial-sweeps.ts; the run does nothing). A Guardian whose Key no player controls stays where it is.
   z.strictObject({ verb: z.literal("EngageSeat"), who: z.enum(["firstPlayer", "keyHolder"]), trait: z.string().min(1) }),

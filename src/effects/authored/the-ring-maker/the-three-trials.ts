@@ -24,6 +24,7 @@ const ANY_ALLY: PickSpec = { type: "ally", control: "any" };
 const TIME_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true, timeCounter: true };
 const ENGAGED_PLAYER = (instructions: Extract<Instruction, { verb: "ForEachPlayer" }>["instructions"]): Instruction => ({ verb: "ForEachPlayer", order: "firstFirst", seats: "engaged", instructions });
 const IN_STAGING: Condition = { kind: "sourceIn", zone: "staging" };
+const SELF_ENGAGED: Condition = { kind: "sourceIn", zone: "engaged" };
 const ATTACKER_IS_GUARDIAN: Condition = { kind: "matches", card: "attacker", pick: { type: "enemy", control: "any", trait: "Guardian" } };
 const KEYS_COUNT = { count: KEYS } as const;
 
@@ -53,8 +54,8 @@ const key = (code: string): Effect[] => [
 ];
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
-  // 08035 The Trials Begin. Setup: the ten cards are set aside by the piles. 1B: the players advance to a stage 2A of their choice.
-  { id: "08035:setup:1", cardCode: STAGE_1, lines: ["08035:A:1"], timing: "setup", instructions: [] },
+  // 08035 The Trials Begin. Setup: the ten cards are set aside by the piles, and the table notes the cards placed in the encounter discard pile (the Keys hear their own discard from the deck, 08043:A:2). 1B: the players advance to a stage 2A of their choice.
+  { id: "08035:setup:1", cardCode: STAGE_1, lines: ["08035:A:1"], timing: "setup", instructions: [{ verb: "NoteEncounterDiscards" }] },
   stage("08035:whenRevealed:1", "08035:B:1", "whenRevealed", [ADVANCE]),
 
   // 08036 The Trial of Strength. 2A: a random Guardian and Barrow are revealed (staging); the Key that shares a Trait with the Guardian lies on it. 2B: Guardians engage the first player; Barrows cannot be the active location and are immune to player card effects.
@@ -86,7 +87,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 08040 to 08042 The Guardians. Cannot have non-Key attachments (the build writes it). Time X; the Forced effect on the engaged player.
   ...guardian("08040", 2, [ENGAGED_PLAYER([{ verb: "Pick", pick: OWN_ALLY, when: { kind: "canPick", pick: OWN_ALLY } }, { verb: "Discard", target: { kind: "picked" }, when: { kind: "canPick", pick: OWN_ALLY } }])]),
-  ...guardian("08041", 3, [{ verb: "ImmediateAttack" }]),
+  // An attack needs a defending player: a Guardian in the staging area (no player engaged) makes none, as the Boar and the Raven hit no one.
+  ...guardian("08041", 3, [{ verb: "ImmediateAttack", when: SELF_ENGAGED }]),
   ...guardian("08042", 4, [ENGAGED_PLAYER([{ verb: "DamageEach", amount: 1, pick: OWN_CHARACTER }])]),
 
   // 08043 to 08045 The Keys of the Boar, the Wolf and the Raven.

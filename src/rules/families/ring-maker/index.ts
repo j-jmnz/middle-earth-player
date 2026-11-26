@@ -54,6 +54,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return revealFromVictory(state, instruction, focus, ctx, steps);
     case "AddInPlayToVictory":
       return addInPlayToVictory(state, instruction, ctx);
+    case "NoteEncounterDiscards":
+      return { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: focus.sourceId ?? "table", stat: "noteEncounterDiscards", amount: 1, until: "endOfGame" }] };
     case "EngageCaptiveHolder":
     case "EngageSeat":
       return state;
@@ -62,4 +64,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "ring-maker", verbs: ["RemoveTimeFromQuest", "DrawSelfIntoHand", "EngageTopDiscarded", "CreateOutOfPlayDecks", "ShuffleIntoOutOfPlayDecks", "RevealOutOfPlay", "ShuffleHandCardIntoOutOfPlay", "ReturnAttachedEnemy", "RevealChosenFromDiscard", "CapRefresh", "EngageCaptiveHolder", "AdvanceToChosenStage", "PickSetAside", "AttachPickedToPrevious", "AddPickedToStaging", "ShufflePickedIntoBottom", "RevealFromVictory", "AddInPlayToVictory", "EngageSeat"], run, settle: { sweep: (state, ctx, steps) => announceAlliesOverLimit(announceTrialKey(engageSeats(discardEliminatedDecks(engageCaptiveHolders(state, ctx, steps)), ctx, steps), ctx), ctx) }, deckReset: { hold: inOwnSurgeChain } };
+export const manifest: RulesFamily = { name: "ring-maker", verbs: ["NoteEncounterDiscards", "RemoveTimeFromQuest", "DrawSelfIntoHand", "EngageTopDiscarded", "CreateOutOfPlayDecks", "ShuffleIntoOutOfPlayDecks", "RevealOutOfPlay", "ShuffleHandCardIntoOutOfPlay", "ReturnAttachedEnemy", "RevealChosenFromDiscard", "CapRefresh", "EngageCaptiveHolder", "AdvanceToChosenStage", "PickSetAside", "AttachPickedToPrevious", "AddPickedToStaging", "ShufflePickedIntoBottom", "RevealFromVictory", "AddInPlayToVictory", "EngageSeat"], run, settle: { sweep: (state, ctx, steps) => announceAlliesOverLimit(announceTrialKey(engageSeats(discardEliminatedDecks(engageCaptiveHolders(state, ctx, steps)), ctx, steps), ctx), ctx) }, deckReset: { hold: inOwnSurgeChain } };
