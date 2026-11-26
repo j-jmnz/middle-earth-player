@@ -25,7 +25,7 @@ const ENGINE_ASKING = [
   "PlaceProgressInStaging", "PlayFrom", "PlayRevealedFree", "PrepareFleet", "PutCapturedIntoPlay", "PutIntoPlay", "PutIntoPlayFromHand", "PutSetAsideInPlay",
   "RaiseThreatToAttach", "ReleaseStagedHero", "RemoveProgressAmong", "RemoveWillpowerFromQuest", "ResolveBurn", "ResolveDiscover", "ResolveGrapple",
   "RevealChosenFromDiscard", "RiddleStep", "SearchAflame", "SearchNemesis", "SearchQuestDeck", "SearchShips", "ShuffleHighestCostIntoDeck", "ShuffleIntoPlayerDeck",
-  "ShuffleOutOfPlayIntoEncounterDeck", "SplitProgress", "StageLooked", "SwapHero", "TakeCardFromCollection", "TakeObjectiveHero", "TradeDamageForResources",
+  "ShuffleOutOfPlayIntoEncounterDeck", "SplitProgress", "StageLooked", "SwapHero", "TakeCardFromCollection", "TakeObjectiveAlly", "TakeObjectiveHero", "TradeDamageForResources",
   "TradeDamageForThreat", "TradeShipDamage", "TriggerLost"
 ] as const satisfies readonly Instruction["verb"][];
 for (const verb of ENGINE_ASKING) ASKING.add(verb);
