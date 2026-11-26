@@ -46,7 +46,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "forced",
     trigger: "lastTimeCounterRemoved",
     subject: "self",
-    instructions: [{ verb: "ModifyStat", stat: "eliminationReduction", amount: 10, until: "endOfGame", target: "eachSeat" }, { verb: "EliminateAtLevel" }, { verb: "PlaceResourceTokens", amount: 4, on: "self" }],
+    instructions: [EACH_PLAYER([{ verb: "ModifyStat", stat: "eliminationReduction", amount: 10, until: "endOfGame", target: "actorSeat" }]), { verb: "EliminateAtLevel" }, { verb: "PlaceResourceTokens", amount: 4, on: "self" }],
   },
   { id: "08066:constant:2", cardCode: STAGE_1, lines: ["08066:B:3"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "progressCanceled", amount: 1, until: "whileSourceInPlay", target: "self" }] },
   { id: "08066:forced:2", cardCode: STAGE_1, lines: ["08066:B:3"], timing: "forced", trigger: "progressReplaced", instructions: [{ verb: "LowerThreat", amount: { x: true }, who: "eachSeat" }] },
@@ -117,8 +117,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   },
   { id: "08070:forced:1", cardCode: BELLACH, lines: ["08070:A:3"], timing: "forced", trigger: "enemyDestroyed", subject: "self", instructions: [{ verb: "ShuffleSelfIntoEncounterDeck" }] },
 
-  // 08071 The Crossing at Tharbad. Immune to player card effects (the keyword) and cannot leave the staging area. +2 quest points for each player; explored in the staging area, the players win.
-  { id: "08071:constant:1", cardCode: CROSSING, lines: ["08071:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", target: "self" }] },
+  // 08071 The Crossing at Tharbad. Immune to player card effects (the keyword). It cannot leave the staging area: the players cannot travel to it (the flag `cannotLeaveStaging` would keep it there when it is explored, and exploring it wins). +2 quest points for each player; explored in the staging area, the players win.
+  { id: "08071:constant:1", cardCode: CROSSING, lines: ["08071:A:1"], timing: "constant", instructions: [{ verb: "Restrict", what: "travel", location: CROSSING }] },
   { id: "08071:constant:2", cardCode: CROSSING, lines: ["08071:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: { players: true, times: 2 }, until: "whileSourceInPlay", target: "self" }] },
   { id: "08071:triggered:1", cardCode: CROSSING, lines: ["08071:A:3"], timing: "triggered", trigger: "locationExplored", subject: "self", instructions: [{ verb: "WinGame" }] },
 
