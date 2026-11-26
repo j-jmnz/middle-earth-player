@@ -16,7 +16,7 @@ import { revealChosenFromDiscard } from "./reveal-chosen.ts";
 import { inOwnSurgeChain } from "./surge-chain.ts";
 import { removeTimeFromQuest } from "./time.ts";
 import { announceAlliesOverLimit, announceTrialKey, engageSeats } from "./trial-sweeps.ts";
-import { addInPlayToVictory, advanceToChosenStage, attachPickedToPrevious, pickSetAside, revealFromVictory, shufflePickedIntoBottom } from "./trials.ts";
+import { addInPlayToVictory, addPickedToStaging, advanceToChosenStage, attachPickedToPrevious, pickSetAside, revealFromVictory, shufflePickedIntoBottom } from "./trials.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
@@ -46,6 +46,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return pickSetAside(state, instruction, focus, ctx);
     case "AttachPickedToPrevious":
       return attachPickedToPrevious(state);
+    case "AddPickedToStaging":
+      return addPickedToStaging(state, focus, ctx, steps);
     case "ShufflePickedIntoBottom":
       return shufflePickedIntoBottom(state, instruction);
     case "RevealFromVictory":
@@ -60,4 +62,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "ring-maker", verbs: ["RemoveTimeFromQuest", "DrawSelfIntoHand", "EngageTopDiscarded", "CreateOutOfPlayDecks", "ShuffleIntoOutOfPlayDecks", "RevealOutOfPlay", "ShuffleHandCardIntoOutOfPlay", "ReturnAttachedEnemy", "RevealChosenFromDiscard", "CapRefresh", "EngageCaptiveHolder", "AdvanceToChosenStage", "PickSetAside", "AttachPickedToPrevious", "ShufflePickedIntoBottom", "RevealFromVictory", "AddInPlayToVictory", "EngageSeat"], run, settle: { sweep: (state, ctx, steps) => announceAlliesOverLimit(announceTrialKey(engageSeats(discardEliminatedDecks(engageCaptiveHolders(state, ctx, steps)), ctx, steps), ctx), ctx) }, deckReset: { hold: inOwnSurgeChain } };
+export const manifest: RulesFamily = { name: "ring-maker", verbs: ["RemoveTimeFromQuest", "DrawSelfIntoHand", "EngageTopDiscarded", "CreateOutOfPlayDecks", "ShuffleIntoOutOfPlayDecks", "RevealOutOfPlay", "ShuffleHandCardIntoOutOfPlay", "ReturnAttachedEnemy", "RevealChosenFromDiscard", "CapRefresh", "EngageCaptiveHolder", "AdvanceToChosenStage", "PickSetAside", "AttachPickedToPrevious", "AddPickedToStaging", "ShufflePickedIntoBottom", "RevealFromVictory", "AddInPlayToVictory", "EngageSeat"], run, settle: { sweep: (state, ctx, steps) => announceAlliesOverLimit(announceTrialKey(engageSeats(discardEliminatedDecks(engageCaptiveHolders(state, ctx, steps)), ctx, steps), ctx), ctx) }, deckReset: { hold: inOwnSurgeChain } };

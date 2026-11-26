@@ -21,7 +21,7 @@ const READY_KEY: PickSpec = { type: "objective", control: "any", trait: "Key", c
 const OWN_ALLY: PickSpec = { type: "ally", control: "you" };
 const OWN_CHARACTER: PickSpec = { type: "character", control: "you" };
 const ANY_ALLY: PickSpec = { type: "ally", control: "any" };
-const TIME_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true, hasResources: true };
+const TIME_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true, timeCounter: true };
 const ENGAGED_PLAYER = (instructions: Extract<Instruction, { verb: "ForEachPlayer" }>["instructions"]): Instruction => ({ verb: "ForEachPlayer", order: "firstFirst", seats: "engaged", instructions });
 const IN_STAGING: Condition = { kind: "sourceIn", zone: "staging" };
 const ATTACKER_IS_GUARDIAN: Condition = { kind: "matches", card: "attacker", pick: { type: "enemy", control: "any", trait: "Guardian" } };
@@ -47,7 +47,7 @@ const guardian = (code: string, time: number, hit: Instruction[]): Effect[] => [
 // A Key (08043 to 08045): it is claimed by the first player the moment it lies unattached in the staging area, and goes back there when it is discarded; the Shadow line shuffles it into the encounter deck. Attached to a Guardian or a Barrow by a stage 2A it lies claimed on its host: the claim text works only unattached.
 const key = (code: string): Effect[] => [
   { id: `${code}:constant:1`, cardCode: code, lines: [`${code}:A:1`], timing: "constant", instructions: [{ verb: "ClaimWhenFree" }, { verb: "ModifyStat", stat: "returnsToStagingArea", amount: 1, until: "whileSourceInPlay", target: "self" }] },
-  { id: `${code}:forced:1`, cardCode: code, lines: [`${code}:A:2`], timing: "forced", trigger: "leftPlay", subject: "self", instructions: [{ verb: "MoveEncounterCard", card: "self", to: "staging" }] },
+  { id: `${code}:forced:1`, cardCode: code, lines: [`${code}:A:2`], timing: "forced", trigger: "leftPlay", subject: "self", condition: { kind: "sourceIn", zone: "encounterDiscard" }, instructions: [{ verb: "MoveEncounterCard", card: "self", to: "staging" }] },
   { id: `${code}:forced:2`, cardCode: code, lines: [`${code}:A:2`], timing: "forced", trigger: "encounterDiscarded", subject: "self", condition: { kind: "sourceIn", zone: "encounterDiscard" }, instructions: [{ verb: "MoveEncounterCard", card: "self", to: "staging" }] },
   { id: `${code}:shadow:1`, cardCode: code, lines: [`${code}:A:3`], timing: "shadow", instructions: [{ verb: "ShuffleSelfIntoEncounterDeck" }] },
 ];
@@ -58,14 +58,14 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   stage("08035:whenRevealed:1", "08035:B:1", "whenRevealed", [ADVANCE]),
 
   // 08036 The Trial of Strength. 2A: a random Guardian and Barrow are revealed (staging); the Key that shares a Trait with the Guardian lies on it. 2B: Guardians engage the first player; Barrows cannot be the active location and are immune to player card effects.
-  stage("08036:whenRevealed:1", "08036:A:1", "whenRevealed", [pickSetAside("enemy", "Guardian"), { verb: "RevealCard" }, PICK_KEY, { verb: "AttachPickedToPrevious" }, pickSetAside("location", "Barrow"), { verb: "RevealCard" }]),
+  stage("08036:whenRevealed:1", "08036:A:1", "whenRevealed", [pickSetAside("location", "Barrow"), { verb: "RevealCard" }, pickSetAside("enemy", "Guardian"), { verb: "RevealCard" }, PICK_KEY, { verb: "AttachPickedToPrevious" }]),
   stage("08036:constant:1", "08036:B:1", "constant", [engages]),
   stage("08036:constant:2", "08036:B:1", "constant", [{ verb: "Restrict", what: "travel", trait: "Barrow" }]),
   stage("08036:constant:3", "08036:B:1", "constant", [{ verb: "ModifyStat", stat: "immuneToPlayerCards", amount: 1, until: "whileSourceInPlay", holders: { type: "location", control: "any", staging: true, trait: "Barrow" } }]),
   trialEnd("08036", "08036:B:2", [{ verb: "AddInPlayToVictory", cardType: "location", trait: "Barrow" }]),
 
   // 08037 The Trial of Perseverance. 2A: a random Barrow is staged, a random Key lies on it, the Guardian that shares a Trait with the Key is revealed. 2B: Guardians engage the first player, cannot be damaged and cannot leave play except by a quest effect.
-  stage("08037:whenRevealed:1", "08037:A:1", "whenRevealed", [pickSetAside("location", "Barrow"), { verb: "RevealCard" }, PICK_RANDOM_KEY, { verb: "AttachPickedToPrevious" }, { verb: "PickSetAside", cardType: "enemy", trait: "Guardian", sharesTraitWithPicked: true }, { verb: "RevealCard" }]),
+  stage("08037:whenRevealed:1", "08037:A:1", "whenRevealed", [pickSetAside("location", "Barrow"), { verb: "AddPickedToStaging" }, PICK_RANDOM_KEY, { verb: "AttachPickedToPrevious" }, { verb: "PickSetAside", cardType: "enemy", trait: "Guardian", sharesTraitWithPicked: true }, { verb: "RevealCard" }]),
   stage("08037:constant:1", "08037:B:1", "constant", [engages]),
   stage("08037:constant:2", "08037:B:1", "constant", [
     { verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "whileSourceInPlay", holders: GUARDIAN_ENEMY },
@@ -74,7 +74,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   trialEnd("08037", "08037:B:2", [{ verb: "AddInPlayToVictory", cardType: "enemy", trait: "Guardian" }]),
 
   // 08038 The Trial of Intuition. 2A: a random Guardian and Barrow are revealed, the discard pile is shuffled in and the matching Key goes into the bottom 10 cards (the picks are made in the order that keeps the Guardian the card the Key is matched to; nothing between them reads the deck). 2B: Guardians engage the first player; progress is turned into discards from the encounter deck (the active location took its share first).
-  stage("08038:whenRevealed:1", "08038:A:1", "whenRevealed", [pickSetAside("location", "Barrow"), { verb: "RevealCard" }, { verb: "ShuffleEncounterDiscard" }, pickSetAside("enemy", "Guardian"), { verb: "RevealCard" }, PICK_KEY, { verb: "ShufflePickedIntoBottom", count: 10 }]),
+  stage("08038:whenRevealed:1", "08038:A:1", "whenRevealed", [pickSetAside("location", "Barrow"), { verb: "RevealCard" }, pickSetAside("enemy", "Guardian"), { verb: "RevealCard" }, { verb: "ShuffleEncounterDiscard" }, PICK_KEY, { verb: "ShufflePickedIntoBottom", count: 10 }]),
   stage("08038:constant:1", "08038:B:1", "constant", [engages]),
   stage("08038:constant:2", "08038:B:1", "constant", [{ verb: "ModifyStat", stat: "progressDiscards", amount: 1, until: "whileSourceInPlay", target: "currentQuest" }]),
   trialEnd("08038", "08038:B:2", [{ verb: "AddInPlayToVictory", cardType: "enemy", trait: "Guardian" }, { verb: "AddInPlayToVictory", cardType: "location", trait: "Barrow" }]),
@@ -114,7 +114,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "08052:constant:1", cardCode: "08052", lines: ["08052:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { players: true }, until: "whileSourceInPlay", target: "self" }] },
   { id: "08052:constant:2", cardCode: "08052", lines: ["08052:A:3"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "ModifyStat", stat: "progressFirstRequired", amount: 1, until: "whileSourceInPlay" }] },
   // 08053 Curse of the Wild Men. When Revealed: 1 damage to each non-unique character in play; surge with 3 Keys controlled. Shadow: +1 Attack for each Key.
-  { id: "08053:whenRevealed:1", cardCode: "08053", lines: ["08053:A:1"], timing: "whenRevealed", instructions: [{ verb: "DamageEach", amount: 1, pick: { type: "character", control: "any", unique: false } }, { verb: "GainSurge", when: { kind: "count", pick: KEYS, min: 3 } }] },
+  { id: "08053:whenRevealed:1", cardCode: "08053", lines: ["08053:A:1"], timing: "whenRevealed", instructions: [{ verb: "DamageEach", amount: 1, pick: { type: "character", control: "any", nonUnique: true } }, { verb: "GainSurge", when: { kind: "count", pick: KEYS, min: 3 } }] },
   { id: "08053:shadow:1", cardCode: "08053", lines: ["08053:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "attack", amount: KEYS_COUNT, until: "endOfAttack", target: "attacker" }] },
   // 08054 The Guardian's Fury. When Revealed: each Guardian makes an attack (a Guardian still staged attacks the first player); with none in play a random Guardian from the victory display is revealed. Shadow: a Guardian attacker makes one more attack.
   {

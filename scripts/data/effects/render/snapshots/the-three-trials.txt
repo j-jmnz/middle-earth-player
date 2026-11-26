@@ -17,12 +17,12 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
 08036:A:1 (front): When Revealed: Randomly choose 1 of the remaining set aside Guardian enemies and 1 of the remaining set aside Barrow locations, reveal them, and add them to the staging area. Find the set aside Key objective that shares a Trait with the just revealed Guardian enemy and attach it to that enemy.
   08036:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PickSetAside {"verb":"PickSetAside","cardType":"location","trait":"Barrow"}]
+    - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
     - [json PickSetAside {"verb":"PickSetAside","cardType":"enemy","trait":"Guardian"}]
     - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
     - [json PickSetAside {"verb":"PickSetAside","cardType":"objective","trait":"Key","sharesTraitWithPicked":true,"trialKey":true}]
     - [json AttachPickedToPrevious {"verb":"AttachPickedToPrevious"}]
-    - [json PickSetAside {"verb":"PickSetAside","cardType":"location","trait":"Barrow"}]
-    - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
 
 08036:B:1 (back): Each Guardian enemy engages the first player. Barrow locations cannot be the active location and are immune to player card effects.
   08036:constant:1: Constant
@@ -46,7 +46,7 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
   08037:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json PickSetAside {"verb":"PickSetAside","cardType":"location","trait":"Barrow"}]
-    - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
+    - [json AddPickedToStaging {"verb":"AddPickedToStaging"}]
     - [json PickSetAside {"verb":"PickSetAside","cardType":"objective","trait":"Key","trialKey":true}]
     - [json AttachPickedToPrevious {"verb":"AttachPickedToPrevious"}]
     - [json PickSetAside {"verb":"PickSetAside","cardType":"enemy","trait":"Guardian","sharesTraitWithPicked":true}]
@@ -75,9 +75,9 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json PickSetAside {"verb":"PickSetAside","cardType":"location","trait":"Barrow"}]
     - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
-    - shuffle the encounter discard pile into the encounter deck
     - [json PickSetAside {"verb":"PickSetAside","cardType":"enemy","trait":"Guardian"}]
     - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
+    - shuffle the encounter discard pile into the encounter deck
     - [json PickSetAside {"verb":"PickSetAside","cardType":"objective","trait":"Key","sharesTraitWithPicked":true,"trialKey":true}]
     - [json ShufflePickedIntoBottom {"verb":"ShufflePickedIntoBottom","count":10}]
 
@@ -179,6 +179,7 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
 
 08043:A:2 (front): If Key of the Boar is discarded, add it to the staging area.
   08043:forced:1: Forced after a card leaves play (heard about this card)
+    only if this card is in encounterDiscard
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card goes to the staging area (it is not revealed)
   08043:forced:2: Forced on the event encounterDiscarded (heard about this card)
@@ -202,6 +203,7 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
 
 08044:A:2 (front): If Key of the Wolf is discarded, add it to the staging area.
   08044:forced:1: Forced after a card leaves play (heard about this card)
+    only if this card is in encounterDiscard
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card goes to the staging area (it is not revealed)
   08044:forced:2: Forced on the event encounterDiscarded (heard about this card)
@@ -225,6 +227,7 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
 
 08045:A:2 (front): If Key of the Raven is discarded, add it to the staging area.
   08045:forced:1: Forced after a card leaves play (heard about this card)
+    only if this card is in encounterDiscard
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this card goes to the staging area (it is not revealed)
   08045:forced:2: Forced on the event encounterDiscarded (heard about this card)
@@ -320,7 +323,7 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
   08051:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose enemy (any player controls) or in the staging area, with resources on it
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose enemy (any player controls) or in the staging area, with the Time keyword and a time counter on it
       - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): 1 time counter come off the last picked card (an enemy with Time X; a card with no Time loses none), one at a time, stopping when none is left; a card whose last counter goes hears it once
 
 ## 08052 Grim Foothills
@@ -344,7 +347,7 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
 08053:A:1 (front): When Revealed: Deal 1 damage to each non-unique character in play. If the players control 3 Key objectives, Curse of the Wild Men gains surge.
   08053:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - deal 1 damage to each character (any player controls) (unique: false filters nothing: the engine reads only unique: true)
+    - deal 1 damage to each non-unique character (any player controls)
     - then, if the number of Key objective (any player controls) that is claimed (attached to a character a player controls) is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 08053:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each Key objective the players control.
@@ -382,4 +385,4 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
     - if the attacking enemy is a Guardian enemy (any player controls): the attacking enemy is dealt a shadow card
     - then, if the attacking enemy is a Guardian enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy is dealt a shadow card
 
-(rendered pieces: 185 by template, 26 as JSON)
+(rendered pieces: 187 by template, 27 as JSON)

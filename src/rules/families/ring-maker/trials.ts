@@ -14,7 +14,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lastPicked, pickedList } from "../../interpret/player-verbs.ts";
 import { startReveal } from "../../windows/frames.ts";
 import { queueEvent } from "../../windows/queue.ts";
-import { pushPicked } from "../encounter/moves.ts";
+import { moveEncounter, pushPicked } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 import { queueFront } from "../play/refs.ts";
 import { addToVictory } from "../sidequests/victory.ts";
@@ -66,6 +66,13 @@ export function attachPickedToPrevious(state: ScenarioState): ScenarioState {
   if (!key || !host || key.id === host.id) return state;
   const lying = updateCard(attachTo(moveCard(state, key.id, { zone: "attached" }), key.id, host.id), key.id, { face: "up", exhausted: false, claimed: true });
   return queueEvent(lying, { trigger: "attached", seat: state.firstPlayer, subject: key.id, other: host.id });
+}
+
+/** AddPickedToStaging ("add it to the staging area", 08037:A:1): the last picked set-aside card enters the staging area faceup without a reveal (faq.reveal-and-add). */
+export function addPickedToStaging(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const id = lastPicked(state);
+  if (!state.cards[id] || !state.setAside.includes(id)) return state;
+  return updateCard(moveEncounter(state, id, "staging", focus.seat, ctx, steps), id, { face: "up" });
 }
 
 /**

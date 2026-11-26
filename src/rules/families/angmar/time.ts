@@ -1,6 +1,6 @@
 // Rules: mec108.time-x (data/rules/entries.json); ledger lines 09024:A:1, 09024:A:3. Time X: a card with the keyword gets X resource tokens, its time counters, when it is revealed, and loses one at the end of each refresh phase; the card hears the removal of the last.
 // The keyword is a constant record with the verb `Time` (src/catalog/families/angmar.ts), found by the card's code like Deep.
-import type { Effect, Instruction } from "../../../catalog/boundary.ts";
+import type { Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
 import { effectCause } from "../../core/cause.ts";
@@ -74,6 +74,13 @@ export function refreshTakes(state: ScenarioState, ctx: ReduceContext): number {
     }
   }
   return takes;
+}
+
+/** The pick filter `timeCounter`: a card with the Time keyword that holds a time counter (a card with no Time loses none, mec108.time-x). True for a pick that does not ask. */
+export function timeCounterMatches(state: ScenarioState, id: string, spec: PickSpec, ctx: ReduceContext): boolean {
+  if (spec.timeCounter !== true) return true;
+  const card = state.cards[id];
+  return card != null && card.resources > 0 && timeOf(ctx, card.code) != null && !textBlank(state, id, ctx.cards);
 }
 
 /** The cards in play that hold the Time X keyword and at least one time counter. */
