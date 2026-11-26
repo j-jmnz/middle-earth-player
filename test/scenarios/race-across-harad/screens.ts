@@ -6,9 +6,9 @@ import type { Layout } from "../../harness/layout.ts";
 // the goldens (`pnpm game show race-across-harad/<n> --at <n> --legal`; `pnpm browser shot --fixture` takes only a fixture, so the review reads these as text, and shoots the fixture `harad-lost` for the end of a lost game). The golden numbers are the order of
 // HARAD_GOLDENS (test/scenarios/race-across-harad/game.ts):
 //   1 --at 2     the Warg-rider Choose (17048:A:1), solo: the first player chooses `staging` or `orcsArea`; 4 --at 4 is the same window of the second golden of two players (race-across-harad/2 --at 4).
-//   4 --at 25    the Racing Warg pick (17044:A:2), solo: the Orc enemy that carries it, in the staging area, engaged, or in the Orcs' area; 9 --at 32 is the same window of the threat loss, 2 --at 133 of the two-handed win.
+//   4 --at 25    the Racing Warg pick (17044:A:2), solo: the Orc enemy that carries it, in the staging area, engaged, or in the Orcs' area; 8 --at 32 is the same window of the threat loss, 2 --at 133 of the two-handed win.
 //   2 --at 22    the Uruk Chieftain's pick (16061, two players): the player it engages; 2 --at 56 is the Mordor Warg (16064:A:1) choice of a host.
-//   1 --at 72    the Tamed Mûmak with its first damage of an undefended attack (17038:A:2), two enemies engaged and no defender ready; 7 --at 38 is the last of it: the Mûmak destroyed and the player eliminated (17038:A:3).
+//   1 --at 72    the Tamed Mûmak with its first damage of an undefended attack (17038:A:2), two enemies engaged and no defender ready; 6 --at 38 is the last of it: the Mûmak destroyed and the player eliminated (17038:A:3).
 //   1 --at 16    the Orcs' advance banner (the Orcs go from stage 1 to stage 2 at the end of the quest phase, 17051:B:2); 1 --at 25 and 1 --at 41 are the next two advances, 3 --at 46 the loss at stage 2D (17052:B:3).
 const STAGES = ["17051", "17052", "17053", "17054"];
 const AREA = { stages: STAGES, place: ["16061"] };
