@@ -209,6 +209,8 @@ const FLAGS = [
   "encounterUncancelable",
   // On a card in the staging area: nothing moves it out of the staging area ("Uglúk cannot leave the staging area", 143069:B:2): moveCard refuses a move to another zone, as cannotEnterStaging refuses one into it.
   "cannotLeaveStaging",
+  // On a location in the staging area that cannot leave it and has been explored: it stays, and is not explored again (core/destroy.ts).
+  "exploredHeld",
   // On a card in play until the end of the round: it entered play this round ("if Hunting Warg entered play this round", 900403:A:1), set by a Forced effect that hears `encounterEnteredPlay` and read by the condition `flag` with holder `self`.
   "enteredThisRound",
   // On an enemy until the end of the round: a card gave it the ambush keyword (`FirstEnemyGains`, Goblin Gate 04043:A:1), read as the keyword by hasKeyword.

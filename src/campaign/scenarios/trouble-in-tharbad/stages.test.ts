@@ -263,16 +263,17 @@ describe("The Crossing at Tharbad (08071:A:1 to 08071:A:3)", () => {
     expect(done.stageCleared).toBe(true);
   });
 
-  it("08071:A:1 explored, it leaves the staging area although it cannot leave it, and the game is won once, not at every settle", () => {
+  it("08071:A:1 explored, it stays in the staging area (it cannot leave it), the exploring is heard once and wins the game, and it is not explored again", () => {
     const t = table({ stage: STAGE_2, staging: [CROSSING] });
-    let explored = 0;
     const steps: EngineStep[] = [];
-    const first = settle(destroyCard(t.state, idOf(t.state, CROSSING), t.ctx.cards, steps, true), t.ctx, steps);
-    explored += first.pendingEvents?.filter((event) => event.trigger === "locationExplored").length ?? 0;
-    expect(where(first, CROSSING)).not.toBe("staging");
-    const after = settle(first, t.ctx, steps);
-    expect(explored).toBeLessThanOrEqual(1);
-    expect(after.pendingEvents?.filter((event) => event.trigger === "locationExplored").length ?? 0).toBe(0);
+    const queued = destroyCard(t.state, idOf(t.state, CROSSING), t.ctx.cards, steps, true);
+    expect(queued.pendingEvents?.filter((event) => event.trigger === "locationExplored")).toHaveLength(1);
+    expect(where(queued, CROSSING)).toBe("staging");
+    const won = settle(queued, t.ctx, steps);
+    expect(won.stageCleared).toBe(true);
+    expect(where(won, CROSSING)).toBe("staging");
+    // A second sweep that finds it at its quest points explores nothing.
+    expect(destroyCard(won, idOf(won, CROSSING), t.ctx.cards, steps, true)).toBe(won);
   });
 
   it("08071:A:1 the players cannot travel to it", () => {
