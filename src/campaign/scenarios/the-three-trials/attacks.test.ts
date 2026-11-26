@@ -1,4 +1,4 @@
-// Rules: rm.time-x, rr.attacks-outside-the-combat-phase, rr.enemy-attacks, rr.engaged, rr.shadow-effects, rr.travel, rr.forced (data/rules/entries.json).
+// Rules: rm.time-x, rr.attacks-outside-the-combat-phase, faq.enemy-attacks-outside-combat, rr.engaged, rr.shadow-effects, rr.travel, rr.forced (data/rules/entries.json).
 // The attacks the Guardians make in The Three Trials: Stone Barrow's threat for each attack (also an immediate or a canceled one), the Wolf's Guardian's counters after its immediate attack, The Guardian's Fury on a Guardian in the staging area and Hallowed Circle's attacks.
 // The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; the filler enemy has 1 Attack.
 import { describe, expect, it } from "vitest";

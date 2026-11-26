@@ -1,4 +1,4 @@
-// Rules: rm.current-trial, rm.time-x, rr.forced, rr.attacks-outside-the-combat-phase, rr.shadow-effects, rr.travel, rr.cost, rr.objective-cards, rr.search, rr.surge, rr.enemy-attacks (data/rules/entries.json).
+// Rules: rm.current-trial, rm.time-x, rr.forced, rr.attacks-outside-the-combat-phase, rr.shadow-effects, rr.travel, rr.cost, rr.objective-cards, rr.search, rr.surge, faq.enemy-attacks-outside-combat (data/rules/entries.json).
 import { describe, it } from "vitest";
 
 import { announce, attack, cardSpecs, damageOn, deckCount, flag, offers, reveal, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
