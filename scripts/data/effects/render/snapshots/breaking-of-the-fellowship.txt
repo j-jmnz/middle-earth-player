@@ -275,7 +275,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142073:A:3 (front): While Parth Galen is in play, the players cannot win the game.
   142073:constant:1: Constant
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat the main quest stage while this holds
 
 ## 142074 Seat of Seeing
 (the scenario deals it into the setAside pile; the piles place it, no record does)

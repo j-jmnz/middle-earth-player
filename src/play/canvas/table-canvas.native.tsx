@@ -27,7 +27,7 @@ import { tableLayout, type CardSlot, type Rect } from "../layout/layout.ts";
 import { slotBounds } from "../layout/hits.ts";
 import { rowFeet } from "../layout/column-reach.ts";
 import { areaFacts } from "../store/stormcaller-table.ts";
-import { stagePill } from "../words/scenarios/stormcaller.ts";
+import { areaWordsOf } from "../words/area-words.ts";
 import { NO_DRAG, NO_HIGHLIGHT, NO_TARGETS } from "../store/peek.ts";
 import { actingSeat, lookedOf, shownSeat, stacksUnder } from "../store/selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
@@ -159,7 +159,7 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
 
   // The Stormcaller's stage wears its number and, while the players are at another stage, the Apart plate.
   const stageFacts = areaFacts(game);
-  const stageMarks = stageFacts ? { pill: stagePill(stageFacts), apart: !stageFacts.together } : null;
+  const stageMarks = stageFacts ? { pill: areaWordsOf(stageFacts.who).pill(stageFacts), apart: !stageFacts.together } : null;
   // Everything a card's drawing reads, for this render; a card whose props did not change is not drawn again (table-piece.ts).
   const ctx: PieceContext = { stageMarks, highlight, targetIds, looking, peeking, beating, liftedId: lifted?.id ?? null, motions: moves.motions, clock, images, game, seat, owner, contrast, nameOf, sphereOf, inactive, info, fonts, backs, tokens, t, s };
   // The lifted copy draws the same picture, name and sphere as its card on the table.

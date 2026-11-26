@@ -12,8 +12,8 @@ import { cellOf, islandOf } from "../../rules/families/island/map.ts";
 
 import { aflameLine, aflameMark, burnLine, burnMark } from "../words/scenarios/aflame.ts";
 import type { PlaceMark } from "../store/island-place.ts";
-import { areaRoleOf, stageFactsOf } from "../store/stormcaller-table.ts";
-import { AREA_APART, AREA_TOGETHER, stageLines } from "../words/scenarios/stormcaller.ts";
+import { areaKind, areaRoleOf, stageFactsOf } from "../store/stormcaller-table.ts";
+import { areaWordsOf } from "../words/area-words.ts";
 import { shipLoss, type ShipLoss } from "../words/scenarios/grapple.ts";
 import { heldWords } from "../words/scenarios/sea.ts";
 import { BLANK_WORD, blankWords, noReadyWords, type BlankKeeps } from "../words/card-bars.ts";
@@ -28,7 +28,6 @@ import { stackMark } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { capturedPill } from "../words/scenarios/angmar/gram-table.ts";
 import { capturedOwners } from "../readouts/gram.ts";
 import { hiddenMark, isHeldFaceup, keptMark } from "../readouts/standalone-scenarios/wizards-quest.ts";
-import { areaStanding } from "../../rules/families/stormcaller/values.ts";
 import { placedLimit } from "../../rules/families/uncharted/limit.ts";
 import { modifiedStat, printedStat } from "../../rules/core/keywords.ts";
 import { heldBy } from "../../rules/core/holder-classes.ts";
@@ -228,13 +227,15 @@ export function effectLines(game: ScenarioState, ctx: ReduceContext, cardId: str
   if (aflame && inPlay(card.zone)) lines.push(aflameLine(aflame));
   const burn = burnTally(game, cardId, ctx);
   if (burn) lines.push(burnLine(burn));
-  // A card of the Stormcaller's area says where it stands (dcce.stormcallers-area-stages).
-  const standing = areaStanding(game, cardId);
-  if (standing === "apart") lines.push(AREA_APART);
-  else if (standing === "together") lines.push(AREA_TOGETHER);
-  else if (standing === "stage" || standing === "stageApart") {
+  // A card of a quest area says where it stands (dcce.stormcallers-area-stages, hrd.orcs-area), in the words of its area (words/area-words.ts).
+  const kind = areaKind(game);
+  const words = areaWordsOf(kind);
+  const standing = areaRoleOf(game, cardId);
+  if (standing === "apart") lines.push(words.apart);
+  else if (standing === "together") lines.push(words.together);
+  else if (standing === "stage") {
     const facts = stageFactsOf(game, questPointsOf(game, card, ctx.cards));
-    if (facts) lines.push(...stageLines(facts));
+    if (facts) lines.push(...words.stageLines(facts));
   }
   for (const modifier of game.modifiers) {
     if (!heldBy(modifier, card, printed) || !modifierActive(game, modifier)) continue;

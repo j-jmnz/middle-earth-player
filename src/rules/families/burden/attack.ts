@@ -64,20 +64,28 @@ export function immediateAttackEach(state: ScenarioState, instruction: Each, foc
 }
 
 // The characters an attack destroyed, once it is over: its defenders and the hero an undefended attack landed on (or the character their
-// damage was redirected to) that are in the discard pile with as much damage as they have hit points ("If this attack destroys a
+// damage was redirected to) that are in the discard pile (an objective ally in the encounter discard pile) with as much damage as they have hit points ("If this attack destroys a
 // character", 141065:A:2, 141066:A:2; "After a character is destroyed by a Hill Troll", 01130:A:4).
 export function destroyedByAttack(state: ScenarioState, attack: PendingAttack, ctx: ReduceContext): string[] {
   const hit = new Set([...declaredDefenders(attack), ...(attack.heroId ? [attack.heroId] : [])].flatMap((id) => [id, damageGoesTo(state, id, "combat")]));
   return [...hit].filter((id) => {
     const card = state.cards[id];
-    if (!card || card.zone !== "discard") return false;
+    if (!card || (card.zone !== "discard" && card.zone !== "encounterDiscard")) return false;
     const health = printedOf(ctx.cards, card.code).health;
     return health != null && card.damage >= health;
   });
 }
 
-export function charactersDestroyed(state: ScenarioState, attack: PendingAttack, ctx: ReduceContext): number {
-  return destroyedByAttack(state, attack, ctx).length;
+// Whether an effect's instructions read the effect's X: an amount of X, a count per X, an X condition, a pick on a cost of X, a reveal less X, or the progress left to place.
+const READS_X = /"x":true|"per":"x"|"kind":"x"|"costIsX"|"lessX"|"verb":"PlaceProgressInStaging"|"verb":"AddToX"/;
+export function readsX(instructions: readonly unknown[]): boolean {
+  return READS_X.test(JSON.stringify(instructions));
+}
+
+// The X of an effect an attack leaves for its end: the characters it destroyed. An objective ally in the encounter discard pile counts only for an effect that reads X (`reads`),
+// so the frame of a record that does not read it (Fog Bank's) holds the same X it held before objective allies counted.
+export function charactersDestroyed(state: ScenarioState, attack: PendingAttack, ctx: ReduceContext, reads: boolean): number {
+  return destroyedByAttack(state, attack, ctx).filter((id) => reads || state.cards[id]?.zone === "discard").length;
 }
 
 // Queues `characterDestroyedByAttack` for each character the attack destroyed, when some card in the game hears it (so no other game

@@ -120,7 +120,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   encounterCanReveal: () => ({ text: "an encounter card can be revealed: the encounter deck holds one, or it is the quest phase and the discard pile can reset an empty deck", read: [] }),
   firstTreachery: () => ({ text: "the card the event is about is the first treachery the encounter deck revealed this quest phase", read: [] }),
   victoryPoints: (c) => ({ text: `the victory display holds at least ${str(c.min)} Victory points`, read: ["min"] }),
-  stageProgress: (c) => ({ text: `the current quest stage holds at least ${str(c.min)} progress${c.perStartedPlayer === true ? " for each player who started the game" : ""}`, read: ["min", "perStartedPlayer"] }),
+  stageProgress: (c) => ({ text: `the main quest stage (the main quest card, also while a side quest is the current quest) holds at least ${str(c.min)} progress${c.perStartedPlayer === true ? " for each player who started the game" : ""}`, read: ["min", "perStartedPlayer"] }),
   questLeads: () => ({ text: "the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area", read: [] }),
   soleAttacker: () => ({ text: "exactly one character was declared as an attacker in this attack", read: [] }),
   captives: (c) => ({ text: `the number of Captives in play${c.of === "actor" ? " that belong to the acting seat" : ""} is ${range(c.min, c.max)}`, read: ["min", "max", "of"] }),

@@ -26,7 +26,7 @@ const CHIEFTAIN_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true
 // An objective-hero is the defending character (Southron Boma's Shadow).
 const DEFENDER_OBJECTIVE: Cond = { kind: "matches", card: "defender", pick: { type: "hero", control: "any", names: ["Kahliel", "Firyal", "Yazan", "Jubayr"] } };
 // The Mordor Warg: an Orc in play that carries none.
-const WARG_HOST: PickSpec = { type: "enemy", control: "any", staging: true, trait: "Orc", who: "firstPlayer", hasAttachment: { names: ["Mordor Warg"], none: true } };
+const WARG_HOST: PickSpec = { type: "enemy", control: "any", staging: true, allInPlay: true, trait: "Orc", who: "firstPlayer", hasAttachment: { names: ["Mordor Warg"], none: true } };
 const THREAT_ABOVE: Cond = { kind: "threatAboveWillpower" };
 // "Each player ... chooses a hero he owns in the staging area, takes control of that hero, and exhausts it" (16071:B:3, 16072:B:3).
 const EACH_TAKES_A_HERO: Instruction = { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "ReleaseStagedHero" }] };

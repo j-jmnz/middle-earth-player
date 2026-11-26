@@ -15,6 +15,7 @@ import { questSeat } from "../store/selectors.ts";
 import { viewOf } from "../../rules/families/breaking/areas.ts";
 import { committedWillpower, failQuest, questPointsOf, questStatOf, stagingThreat } from "../../rules/quest/quest.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
+import { NO_SEATS_REMAIN } from "../../rules/core/eliminate.ts";
 import { livingSeats } from "../../rules/core/state.ts";
 import { topFrame } from "../../rules/windows/windows.ts";
 
@@ -152,7 +153,8 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const tokens = hit ? undefendedVillagersReadout(game, hit, strength, shadowNext) : null;
     if (hit && tokens) return { kind: "defense", stats: [ATTACK(strength)], result: tokens };
     if (hit) {
-      const lost = destroyedWords(game, ctx, hit, strength, cardName, shadowNext);
+      // The line names the hero or ally it lands on once ("3 damage on Tamed Mûmak"), so what follows says "it": the name twice does not fit the dock's three lines on a short phone.
+      const lost = destroyedWords(game, ctx, hit, strength, () => "it", shadowNext);
       return { kind: "defense", stats: [ATTACK(strength)], result: `Undefended: ${strength} damage on ${cardName(hit)}${undefendedRemoves(game, hit, strength)}${shadowNote}${lost}${lost ? bloodDockClause(game, hit) : ""}${undefendedLocationsReadout(game, ctx)}` };
     }
     // The one hero the damage may go on (Gollum's attack from the riddle area, a shadow effect that names the hero) is named before it is picked.
@@ -269,14 +271,14 @@ function eliminationWords(game: ScenarioState, ctx: ReduceContext, shortfall: nu
   const level = seatLevel(game, out[0] ?? only ?? livingSeats(game)[0] ?? 0);
   // Fog on the Barrow-downs' stage 3B hears an elimination: the players at it raise their threat by 10, which can end the game (148003:B:2).
   const raise = downsRaise(game, ctx, after, level);
-  const raised = raise ? `; ${raise.text}${raise.ends ? `: ${lossWords("No seats remain")}` : ""}` : "";
+  const raised = raise ? `; ${raise.text}${raise.ends ? `: ${lossWords(NO_SEATS_REMAIN)}` : ""}` : "";
   // Stages are separate: only the seat that quests raises its threat, so only it can be eliminated by this quest (mec109.multiple-staging-areas).
   if (only != null) {
     if (livingSeats(after).includes(only)) return "";
-    if (livingSeats(game).length === 1 && after.lost && !game.lost) return `; threat reaches ${level}: ${lossWords(after.lossReason ?? "No seats remain")}`;
+    if (livingSeats(game).length === 1 && after.lost && !game.lost) return `; threat reaches ${level}: ${lossWords(after.lossReason ?? NO_SEATS_REMAIN)}`;
     return `; threat reaches ${level}: Player ${only + 1} is eliminated${raised}`;
   }
-  if (after.lost && !game.lost) return `; threat reaches ${level}: ${lossWords(after.lossReason ?? "No seats remain")}`;
+  if (after.lost && !game.lost) return `; threat reaches ${level}: ${lossWords(after.lossReason ?? NO_SEATS_REMAIN)}`;
   if (out.length === 0) return "";
   return `; threat reaches ${level}: ${out.map((seat) => `Player ${seat + 1}`).join(" and ")} is eliminated${raised}`;
 }

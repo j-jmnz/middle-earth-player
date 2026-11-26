@@ -410,9 +410,10 @@ export function PaperSheet({ step, title, children, footer, maxHeight }: { step?
 export function OutcomeTitle({ won, scenario, testID, ended }: { won: boolean; scenario: string; testID: string; ended?: boolean }) {
   const palette = usePalette();
   const t = useTableTokens();
-  const { size, s } = useSizeClass();
-  const big = size === "compact" ? 50 : 72;
-  const ring = (size === "compact" ? 240 : 330) * s;
+  const { size, s, short } = useSizeClass();
+  // A short window (a phone in landscape) gets a smaller title, so the lines under it (the loss reason) are in view without a scroll.
+  const big = short ? 36 : size === "compact" ? 50 : 72;
+  const ring = (short ? 130 : size === "compact" ? 240 : 330) * s;
   const light = t.depth === "light";
   // The win or loss sting plays once, as the title first shows; an end plays none, and a screen shown again by Activity does not
   // play it again (docs/design-system-table.md, Sound).

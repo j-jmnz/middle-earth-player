@@ -22,7 +22,6 @@ import {
 // Sections over SECTION_BYTES today, at their size. None may grow; one split or cut below the limit leaves the list and
 // fails here as stale. A new section may not join it: split it under `###` headings (docs-standards.md, The index).
 const LARGE_SECTIONS: Readonly<Record<string, number>> = {
-  "docs/design-system-table.md#Cards": 100985,
   "docs/scenarios/dream-chaser.md#Dream-chaser": 64878,
 };
 

@@ -195,7 +195,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142051:A:2 (front): The players cannot advance to the next stage.
   142051:constant:1: Constant
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat the main quest stage while this holds
 
 142051:A:3 (front): Travel: Each player searches the encounter deck and discard pile for a different enemy and adds it to the staging area to travel here. One of those enemies must be Orc-chieftain, if able.
   142051:travel:1: Travel

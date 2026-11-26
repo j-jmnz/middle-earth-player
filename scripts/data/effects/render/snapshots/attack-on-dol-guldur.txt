@@ -87,10 +87,10 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player chooses (each option once) one of:
-      * option "progress" (only if the current quest stage holds at least 5 progress):
+      * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 5 progress):
         - remove 5 progress from the main quest (all of it when it holds less)
         - the first player chooses one of:
-          * option "extra" (only if the current quest stage holds at least 5 progress):
+          * option "extra" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 5 progress):
             - remove 5 progress from the main quest (all of it when it holds less)
             - up to 3 resource token(s) come off the card with code 50907 in play
           * option "decline":
@@ -120,10 +120,10 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player chooses (each option once) one of:
-      * option "progress" (only if the current quest stage holds at least 5 progress):
+      * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 5 progress):
         - remove 5 progress from the main quest (all of it when it holds less)
         - the first player chooses one of:
-          * option "extra" (only if the current quest stage holds at least 5 progress):
+          * option "extra" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 5 progress):
             - remove 5 progress from the main quest (all of it when it holds less)
             - choose player (any player controls) chosen by the first player
             - the rest of the effect is carried out by the last player picked
@@ -159,10 +159,10 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player chooses (each option once) one of:
-      * option "progress" (only if the current quest stage holds at least 5 progress):
+      * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 5 progress):
         - remove 5 progress from the main quest (all of it when it holds less)
         - the first player chooses one of:
-          * option "extra" (only if all of: (the current quest stage holds at least 5 progress) and (there is a non-unique enemy (any player controls) or in the staging area, chosen by the first player to choose)):
+          * option "extra" (only if all of: (the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 5 progress) and (there is a non-unique enemy (any player controls) or in the staging area, chosen by the first player to choose)):
             - remove 5 progress from the main quest (all of it when it holds less)
             - choose non-unique enemy (any player controls) or in the staging area, chosen by the first player
             - the picked card is destroyed (not discarded: rr.destroy)
@@ -195,10 +195,10 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player chooses (each option once) one of:
-      * option "progress" (only if the current quest stage holds at least 5 progress):
+      * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 5 progress):
         - remove 5 progress from the main quest (all of it when it holds less)
         - the first player chooses one of:
-          * option "extra" (only if the current quest stage holds at least 5 progress):
+          * option "extra" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 5 progress):
             - remove 5 progress from the main quest (all of it when it holds less)
             - choose player (any player controls) chosen by the first player
             - the rest of the effect is carried out by the last player picked
@@ -339,7 +339,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
   50915:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - the acting player chooses one of:
-      * option "progress" (only if the current quest stage holds at least 1 progress):
+      * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 1 progress):
         - remove 2 progress from the main quest (all of it when it holds less)
       * option "staging":
         - when the attack in progress ends:
@@ -358,7 +358,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
   50916:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
     who acts: the acting player is the defending player (the player the attack is against)
     - the first player chooses one of:
-      * option "progress" (only if the current quest stage holds at least 1 progress):
+      * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 1 progress):
         - remove 2 progress from the main quest (all of it when it holds less)
       * option "shadow":
         - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
@@ -373,7 +373,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
   50917:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
-      * option "progress" (only if the current quest stage holds at least 1 progress):
+      * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 1 progress):
         - remove 2 progress from the main quest (all of it when it holds less)
       * option "damage" (only if there is a ally (you control) to choose):
         - choose ally (you control)
@@ -399,7 +399,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
   50918:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
     who acts: the acting player is the defending player (the player the attack is against)
     - the first player chooses one of:
-      * option "progress" (only if the current quest stage holds at least 1 progress):
+      * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 1 progress):
         - remove 1 progress from the main quest (all of it when it holds less)
       * option "resource":
         - place 1 resource tokens on this card
@@ -414,7 +414,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
   50919:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - the acting player chooses one of:
-      * option "progress" (only if the current quest stage holds at least 1 progress):
+      * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 1 progress):
         - remove 1 progress from the main quest (all of it when it holds less)
       * option "attachment" (only if there is a attachment (you control) to choose):
         - choose attachment (you control)

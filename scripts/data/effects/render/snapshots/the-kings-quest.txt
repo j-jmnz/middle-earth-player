@@ -453,7 +453,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18079:B:2 (back): Response: After placing progress here from questing successfully, remove 5 progress from this stage to look at the top 2 cards of the Caves deck. Put one on top of the Caves deck and put the other on the bottom.
   18079:response:1: Response on the event progressPlaced (heard about this card)
-    only if all of: (it is the Quest phase) and (the quest succeeded) and (the current quest stage holds at least 5 progress) and (the Caves deck holds at least 1 card(s) (a game with no Caves deck holds none))
+    only if all of: (it is the Quest phase) and (the quest succeeded) and (the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 5 progress) and (the Caves deck holds at least 1 card(s) (a game with no Caves deck holds none))
     (steps run in order; a step depends on an earlier one only through its own condition)
     - remove 5 progress from the main quest (all of it when it holds less)
     - the first player looks at the top 2 cards of the Caves deck and chooses the one that stays on top; the rest go to the bottom of the deck, in their order (nothing changes with fewer in the deck)

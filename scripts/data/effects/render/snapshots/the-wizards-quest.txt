@@ -39,7 +39,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51003:B:2 (back): The location with a resource on it is immune to player card effects and the players cannot travel to it while this stage has any quest points remaining. This stage cannot be defeated while the location with a resource on it is in play.
   51003:constant:1: Constant
-    only if not (the current quest stage holds at least 5 progress)
+    only if not (the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 5 progress)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each location (any player controls) with resources on it: stat immuneToPlayerCards 1, while this card is in play
     - the players cannot travel to a location that holds resource tokens while this holds
@@ -144,10 +144,10 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51009:B:2 (back): The number of damage tokens on Rider of Mirkwood cannot exceed the number of progress tokens on this stage.
   51009:constant:2: Constant
-    only if not (the current quest stage holds at least 1 progress)
+    only if not (the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 1 progress)
     - each enemy (any player controls) or in the staging area, named "Rider of Mirkwood": stat cannotTakeDamage 1, while this card is in play
   51009:constant:3: Constant
-    only if the current quest stage holds at least 1 progress
+    only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 1 progress
     - each enemy (any player controls) or in the staging area, named "Rider of Mirkwood": stat damageCeiling progress of this card, while this card is in play
 
 51009:B:3 (back): Players cannot defeat this stage while Rider of Mirkwood is in play. If the players defeat this stage, they win the game.

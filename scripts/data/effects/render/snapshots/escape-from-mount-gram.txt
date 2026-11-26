@@ -57,7 +57,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10040:B:1 (back): The players cannot travel to Southern Gate unless there is at least 16 progress on this stage.
   10040:constant:1: Constant
-    only if not (the current quest stage holds at least 16 progress)
+    only if not (the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 16 progress)
     - the players cannot travel to the location with code 10042 while this holds
 
 10040:B:2 (back): The players cannot defeat this stage while Southern Gate is in play. If the players defeat this stage, they have escaped Mount Gram and win the game.

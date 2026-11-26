@@ -1,0 +1,242 @@
+// Rules: hrd.orcs-area, hrd.orcs-area-different-stage, hrd.orcs-area-same-stage, hrd.prepare-the-orcs-area, rr.immune, rr.quest-advancement (data/rules/entries.json); ledger lines 17047:A:1, 17038:A:3, 17048:A:1, 17052:B:3, 17054:B:3
+// (docs/scenarios/haradrim/race-across-harad.md, Table). What the table says of Race Across Harad's pieces: the Orcs' stage at the head of the staging row with its cards, where each card stands against the players' stage and what the
+// same stage switches, the stage's progress against its quest points, the banner of the Orcs' advance and the words of the verbs. The engine decided each fact; nothing here changes one. No control types damage, resources, threat, progress or life.
+import { describe, expect, it } from "vitest";
+
+import { settle } from "../../rules/engine/machine.ts";
+import { stagingThreat } from "../../rules/quest/quest.ts";
+import { screensOf } from "../../../test/harness/screens.ts";
+import { modifiedStat } from "../../rules/core/modified-stat.ts";
+import { fight, idOf, opened, run as runInstruction, tableFromLayout } from "../../../test/harness/scene-kit.ts";
+import type { ScenarioState } from "../../rules/core/state.ts";
+import { advancedTo, CHIEFTAIN, prepared, stageId } from "../../rules/families/haradrim/race-kit.ts";
+
+import { effectLines } from "../cards/card-effects.ts";
+import { areaFacts, areaGroup, areaKind, areaRoleOf, areaSpeech, stageFactsOf } from "../store/stormcaller-table.ts";
+import { readoutFor } from "../readouts/readout.ts";
+import { damageOutcome, outcomeWords } from "../store/foresight.ts";
+import { momentOf } from "../store/outcome.ts";
+import { zoneSelector } from "../store/selectors.ts";
+import { ORCS_APART, ORCS_SAME_STAGE, ORCS_STAGE_LOSS, ORCS_TOGETHER, orcsStageTitle, orcsTell, orcsVerbWords } from "../words/scenarios/haradrim/orcs-table.ts";
+import { orcsBeats } from "../readouts/haradrim/orcs.ts";
+import { stateBeats } from "../store/state-beats.ts";
+import { areaWordsOf } from "../words/area-words.ts";
+import { pileSpeech } from "../canvas/pile-speech.ts";
+import { previewCards } from "../cards/table-preview.ts";
+
+const ROAD = "17042";
+const APART = { staging: [ROAD], stage: "17048" };
+const TOGETHER = { staging: [ROAD], stage: "17047" };
+const lines = (t: ReturnType<typeof prepared>, id: string): readonly string[] => effectLines(settle(t.state, t.made.ctx, []), t.made.ctx, id, (card) => t.made.ctx.cards.get(t.state.cards[card]?.code ?? "")?.name ?? card);
+const points = (t: ReturnType<typeof prepared>) => modifiedStat(t.state, t.state.cards[stageId(t.state)]!, "questPoints", t.made.ctx.cards);
+
+describe("17047:A:1 the Orcs' area heads the staging row", () => {
+  it("lists the Orcs' stage first and then the Uruk Chieftain, before the rest of the staging area", () => {
+    const { made, state } = prepared(APART);
+    const settled = settle(state, made.ctx, []);
+    const group = areaGroup(settled);
+    expect(group[0]).toBe(stageId(settled));
+    expect(group[1]).toBe(idOf(settled, CHIEFTAIN));
+    const entries = zoneSelector("staging", 0)(settled).entries;
+    expect(entries.map((entry) => entry.card.id).slice(0, 2)).toEqual([group[0], group[1]]);
+    expect(entries.map((entry) => entry.area)).toEqual(["stage", "apart", undefined]);
+  });
+
+  it("17047:A:1 marks the cards apart at another stage and together at the Orcs' stage, with no veil change in a game with no Orcs' area", () => {
+    const apart = settle(prepared(APART).state, prepared(APART).made.ctx, []);
+    expect(areaRoleOf(apart, idOf(apart, CHIEFTAIN))).toBe("apart");
+    const same = prepared(TOGETHER);
+    const together = settle(same.state, same.made.ctx, []);
+    expect(areaRoleOf(together, idOf(together, CHIEFTAIN))).toBe("together");
+    expect(areaRoleOf(together, idOf(together, ROAD))).toBeNull();
+    const none = tableFromLayout("race-across-harad", { stage: "17048", staging: [ROAD] });
+    expect(areaGroup(none.state)).toEqual([]);
+    expect(areaFacts(none.state)).toBeNull();
+  });
+
+  it("17047:A:1 reads the Orcs' stage number of the last, the players' stage and whether they share it", () => {
+    const t = prepared(APART);
+    expect(areaFacts(settle(t.state, t.made.ctx, []))).toMatchObject({ who: "orcs", number: 1, last: 4, playersAt: 2, together: false });
+    const same = prepared(TOGETHER);
+    expect(areaFacts(settle(same.state, same.made.ctx, []))).toMatchObject({ number: 1, playersAt: 1, together: true });
+  });
+});
+
+describe("hrd.orcs-area-same-stage what the same stage switches, said on the stage and its cards", () => {
+  it("the Orcs' stage says its number, its progress against its quest points, where the players are, and what the same stage switches", () => {
+    const t = prepared(APART);
+    const text = lines(t, stageId(t.state));
+    expect(text[0]).toBe(`The Orcs' stage 1 of 4 · 0/${points(t)} · the players are at stage 2: its cards are out of reach`);
+    expect(text).toContain(ORCS_SAME_STAGE);
+    expect(text.at(-1)).toBe("When this stage is full the Orcs advance");
+  });
+
+  it("the Orcs' stage at the same stage says its cards are in the staging area, and stage 3 and 4 say what filling them loses", () => {
+    const t = prepared(TOGETHER);
+    expect(lines(t, stageId(t.state))[0]).toMatch(/the players are at its stage: its cards are in the staging area$/);
+    const third = advancedTo(t.made, t.state, 3);
+    const later = { made: t.made, state: third };
+    expect(lines(later, stageId(third)).at(-1)).toBe("When this stage is full the players lose if they are at stage 3; at another stage the Orcs advance");
+    const last = { made: t.made, state: advancedTo(t.made, t.state, 4) };
+    expect(lines(last, stageId(last.state)).at(-1)).toBe(ORCS_STAGE_LOSS);
+  });
+
+  it("a card of the area says it is apart and immune at another stage, and in the staging area at the Orcs' stage", () => {
+    const apart = prepared(APART);
+    expect(lines(apart, idOf(apart.state, CHIEFTAIN))).toContain(ORCS_APART);
+    const same = prepared(TOGETHER);
+    expect(lines(same, idOf(same.state, CHIEFTAIN))).toContain(ORCS_TOGETHER);
+  });
+
+  it("the facts the labels read carry the progress and the quest points of the stage", () => {
+    const t = prepared(APART);
+    const progress = runInstruction(t.made, t.state, { verb: "AddOrcsProgress", amount: 3 });
+    expect(stageFactsOf(progress, points(t))).toMatchObject({ who: "orcs", progress: 3, points: points(t) });
+    expect(orcsStageTitle(stageFactsOf(progress, 10)!)).toBe("Orcs · stage 1 of 4 · 3/10");
+  });
+});
+
+describe("reader labels and list words", () => {
+  it("the stage reads its numbers, its cards and its reach; a card reads where it is", () => {
+    const t = prepared(APART);
+    const settled = settle(t.state, t.made.ctx, []);
+    const name = (card: { code: string }) => t.made.ctx.cards.get(card.code)?.name ?? card.code;
+    const label = areaSpeech(settled, stageId(settled), name, 10);
+    expect(label).toContain("Orcs · stage 1 of 4 · 0/10");
+    expect(label).toContain("In the area: Uruk Chieftain");
+    expect(label).toContain("Out of reach: the players are at another stage");
+    expect(areaSpeech(settled, idOf(settled, CHIEFTAIN), name, 10)).toBe("Uruk Chieftain, in the Orcs' area, out of reach");
+    expect(orcsTell("together")).toBe("in the Orcs' area, in the staging area");
+  });
+});
+
+describe("17047:A:1 hrd.orcs-area-same-stage the scenes stand the Orcs' cards as a played game does", () => {
+  it("the together scene has the area's cards in the staging area, counted in its Threat, and the apart scene keeps them in the area", async () => {
+    const moments = await screensOf("race-across-harad");
+    const built = (name: string) => {
+      const layout = moments.find((moment) => moment.name === name)!.layout;
+      const t = tableFromLayout("race-across-harad", layout);
+      const zones = [CHIEFTAIN, "17042", "16062"].map((code) => t.state.cards[idOf(t.state, code)]?.zone);
+      return { zones, threat: stagingThreat(t.state, t.ctx.cards) };
+    };
+    const together = built("orcs-together");
+    const apart = built("orcs-apart");
+    expect(together.zones).toEqual(["staging", "staging", "staging"]);
+    expect(apart.zones).toEqual(["orcsArea", "orcsArea", "orcsArea"]);
+    expect(together.threat).toBeGreaterThan(apart.threat);
+  });
+});
+
+describe("17047:A:1 one key says which area the game has, and every site reads its words", () => {
+  it("areaKind is the Orcs' for this game, the same as the facts' who, and its words say the Orcs' area everywhere", () => {
+    const { made, state } = prepared(APART);
+    const settled = settle(state, made.ctx, []);
+    expect(areaKind(settled)).toBe("orcs");
+    expect(areaFacts(settled)?.who).toBe("orcs");
+    const words = areaWordsOf(areaKind(settled));
+    expect([words.apart, words.together, words.listTitle, words.foldWhere].join(" ")).not.toContain("Stormcaller");
+    expect(pileSpeech({ zone: "staging", count: 3, fold: "staging", areaFold: true, points: undefined }, false, null, false, areaKind(settled)).label).toBe("3 more cards in the Orcs' area");
+  });
+});
+
+describe("17052:B:3 17053:B:3 17054:B:3 the Orcs' stage pill says whose stage it is and warns when filling it loses", () => {
+  it("\"Orcs 2\" while filling the stage only advances them, red \"Orcs 2/4\" when the players are at its stage, and always red at the last stage", () => {
+    const pill = areaWordsOf("orcs").pill;
+    expect(pill({ number: 1, last: 4, together: true })).toEqual({ text: "Orcs 1", short: "1", danger: false });
+    expect(pill({ number: 2, last: 4, together: false })).toEqual({ text: "Orcs 2", short: "2", danger: false });
+    expect(pill({ number: 2, last: 4, together: true })).toEqual({ text: "Orcs 2/4", short: "2/4", danger: true });
+    expect(pill({ number: 3, last: 4, together: true })).toEqual({ text: "Orcs 3/4", short: "3/4", danger: true });
+    expect(pill({ number: 3, last: 4, together: false }).danger).toBe(false);
+    expect(pill({ number: 4, last: 4, together: false })).toEqual({ text: "Orcs 4/4", short: "4/4", danger: true });
+  });
+});
+
+describe("17052:B:2 the Orcs' progress and advance in the banner", () => {
+  it("the progress is told as the quest's is, and the advance of the Orcs is a beat of its own with no advance step", () => {
+    const t = prepared(APART);
+    const full = runInstruction(t.made, t.state, { verb: "AddOrcsProgress", amount: points(t) });
+    const name = (id: string) => t.made.ctx.cards.get(full.cards[id]?.code ?? "")?.name ?? id;
+    const beats = orcsBeats(t.state, full, name);
+    expect(beats).toHaveLength(1);
+    expect(beats[0]?.title).toBe("The Orcs advance");
+    expect(beats[0]?.lines[0]).toBe(`The Orcs advance to stage 2 of 4: ${name(stageId(full))}`);
+    expect(orcsBeats(t.state, t.state, name)).toEqual([]);
+    const moment = momentOf(t.state, full, [], { card: name });
+    expect(moment?.lines.map((line) => line.text).join("\n")).toContain("The Orcs advance to stage 2 of 4");
+  });
+
+  it("the advance beat is firm, so the banner's cut never hides it behind \"more in the log\"", () => {
+    const t = prepared(APART);
+    const full = runInstruction(t.made, t.state, { verb: "AddOrcsProgress", amount: points(t) });
+    const beats = stateBeats(t.state, full, (id) => id);
+    expect(beats).toHaveLength(1);
+    expect(beats[0]?.firm).toBe(true);
+    expect(stateBeats(t.state, t.state, (id) => id)).toEqual([]);
+  });
+
+  it("17054:B:3 the last stage's advance says that filling it loses", () => {
+    // The players are at stage 4B, so the Orcs' defeats of 2D and 3D only advance them.
+    const t = prepared({ staging: [ROAD], stage: "17050" });
+    const third = advancedTo(t.made, t.state, 3);
+    const last = runInstruction(t.made, third, { verb: "AddOrcsProgress", amount: 20 });
+    const beats = orcsBeats(third, last, (id) => id);
+    expect(beats[0]?.lines.at(-1)).toBe(ORCS_STAGE_LOSS);
+  });
+});
+
+describe("17038:A:1 to 17038:A:3 the Tamed Mûmak says what it takes and what its loss costs", () => {
+  const preview = (seats: 1 | 2, damage = 0) => {
+    const t = tableFromLayout("race-across-harad", { seats, stage: "17048", play: [{ code: "17038", damage }] });
+    const id = idOf(t.state, "17038");
+    return JSON.stringify(previewCards(t.state, t.ctx, id, (one) => ({ name: t.ctx.cards.get(one)?.name ?? one, source: null, text: "" }), (card) => t.ctx.cards.get(card)?.name ?? card));
+  };
+
+  it("solo it says all undefended damage goes to it and that its loss eliminates you", () => {
+    const text = preview(1);
+    expect(text).toContain("Your Tamed Mûmak, an objective ally immune to player card effects");
+    expect(text).toContain("All damage of an undefended attack on you goes to it: 0 damage of 8 hit points, 8 more eliminates you");
+    expect(text).toContain("you are eliminated from the game");
+    expect(text).not.toContain("past its hit points");
+  });
+
+  it("with damage on it says how much more eliminates its controller", () => {
+    expect(preview(1, 6)).toContain("6 damage of 8 hit points, 2 more eliminates you");
+    expect(preview(2, 6)).toMatch(/6 damage of 8 hit points, 2 more eliminates Player \d\./);
+  });
+
+  it("17038:A:3 the dock names the elimination of the destroyed Mûmak, and the loss when it is the last seat", () => {
+    const solo = tableFromLayout("race-across-harad", { seats: 1, stage: "17048", play: [{ code: "17038", damage: 6 }] });
+    expect(outcomeWords(damageOutcome(solo.state, solo.ctx, idOf(solo.state, "17038"), 2), "Tamed Mûmak", false)).toBe("Tamed Mûmak is destroyed: Player 1 is eliminated and the game is lost");
+    const two = tableFromLayout("race-across-harad", { seats: 2, stage: "17048", play: [{ code: "17038", damage: 6, seat: 0 }, { code: "17038", seat: 1 }] });
+    expect(outcomeWords(damageOutcome(two.state, two.ctx, idOf(two.state, "17038"), 2), "Tamed Mûmak", false)).toBe("Tamed Mûmak is destroyed: Player 1 is eliminated");
+    expect(outcomeWords(damageOutcome(solo.state, solo.ctx, idOf(solo.state, "17038"), 1), "Tamed Mûmak", true)).toBe("1 more damage destroys Tamed Mûmak");
+  });
+
+  it("two-handed it names the player", () => {
+    expect(preview(2)).toMatch(/Player \d's Tamed Mûmak/);
+  });
+});
+
+describe("17038:A:2 the undefended readout names the Mûmak once", () => {
+  it("\"3 damage on Tamed Mûmak, shadow card next; 1 more damage destroys it\": the name twice does not fit three lines on a short phone", () => {
+    const made = tableFromLayout("race-across-harad", { seats: 1, phase: "Combat", stage: "17048", engaged: ["16062"], heroes: [], play: [{ code: "17038", damage: 4 }] });
+    const arrived = fight(made, opened(made), (current) => current.window?.kind === "defense");
+    const mumak = idOf(arrived.state, "17038");
+    const uruk = idOf(arrived.state, "16062");
+    const game: ScenarioState = { ...arrived.state, pendingAttack: arrived.state.pendingAttack ? { ...arrived.state.pendingAttack, undefended: true, heroId: mumak } : null, cards: { ...arrived.state.cards, [uruk]: { ...arrived.state.cards[uruk]!, shadowId: "shadow" } } };
+    const result = readoutFor(game, made.ctx, null, null, (id) => made.ctx.cards.get(game.cards[id]?.code ?? "")?.name ?? id)?.result ?? "";
+    expect(result).toBe("Undefended: 4 damage on Tamed Mûmak, shadow card next; it is destroyed: Player 1 is eliminated and the game is lost");
+    const spare = readoutFor({ ...game, cards: { ...game.cards, [mumak]: { ...game.cards[mumak]!, damage: 0 } } }, made.ctx, null, null, (id) => made.ctx.cards.get(game.cards[id]?.code ?? "")?.name ?? id)?.result ?? "";
+    expect(spare).toBe("Undefended: 4 damage on Tamed Mûmak, shadow card next; 4 more damage destroys it");
+  });
+});
+
+describe("the words of the verbs", () => {
+  it("17047:A:1, 17042:A:1, 17038:A:3 each verb of the Orcs' area and the Mûmak has a sentence", () => {
+    expect(orcsVerbWords({ verb: "MoveToOrcsArea" })).toBe("add this card to the Orcs' area");
+    expect(orcsVerbWords({ verb: "AddOrcsProgress", amount: 2 })).toBe("place 2 progress on the Orcs' stage");
+    expect(orcsVerbWords({ verb: "TakeObjectiveAlly", codes: ["17038"] })).toBe("take control of a Tamed Mûmak");
+    expect(orcsVerbWords({ verb: "EliminateAfterAttack" })).toMatch(/eliminate/);
+    expect(orcsVerbWords({ verb: "Pass" } as never)).toBeNull();
+  });
+});

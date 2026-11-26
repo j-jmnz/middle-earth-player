@@ -31,7 +31,7 @@ import { announceShadowRaise, noteShadowStart } from "../families/defense/shadow
 import { announceShadowResolved } from "../families/dungeon/shadow.ts";
 import { announceShadowsResolved } from "../families/angmar/reanimate/shadows.ts";
 import { announceShadowWizardry } from "../families/wizardry/shadow.ts";
-import { announceDestroyed, charactersDestroyed, destroyedByAttack } from "../families/burden/attack.ts";
+import { announceDestroyed, charactersDestroyed, destroyedByAttack, readsX } from "../families/burden/attack.ts";
 import { printedOf } from "../core/printed.ts";
 import { attackHere, attackKey, countsEachAttack, locationDamage } from "../families/south/watcher.ts";
 import { pillageAfter } from "../families/sea/pillage.ts";
@@ -322,7 +322,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   // The characters this attack destroyed are the X of the effect it leaves for its end ("If this attack destroys a character").
   // Cave-troll's excess damage (excessToDamage) is one more instruction for the attack's end.
   const troll = excessDamageAfter(state, attack, ctx);
-  const destroyed = (attack.after ?? []).length > 0 ? charactersDestroyed(state, attack, ctx) : 0;
+  const destroyed = (attack.after ?? []).length > 0 ? charactersDestroyed(state, attack, ctx, readsX(attack.after ?? [])) : 0;
   const sendsExcess = flagged(state, attack.enemyId, "excessToShip");
   const done = expireModifiers(state, ["endOfAttack"]);
   const resolvedAttacks =
@@ -348,9 +348,10 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   // What an effect left to run once this attack has ended (attack-end.ts) follows the shadow attackers, in a frame of its own.
   const shadowStart: readonly Instruction[] = waiting.length > 0 ? [{ verb: "StartShadowAttack", attackers: [...waiting] }] : [];
   // The attack's own state decides where it was made from: an enemy that attacked from the staging area without being flagged is `fromStaging`.
-  const own = after.length > 0 && attackHere(state, attack.enemyId);
-  if (!own && (attack.onEnd ?? []).length > 0) return runAtEnd(ended, attack, steps, shadowStart);
-  if (!own) return waiting.length > 0 ? (startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended) : ended;
+  // An enemy that left the attack drops its instructions, except the elimination a destroyed Tamed Mûmak owes (EliminateAfterAttack, 17038:A:3): that seat is eliminated whatever the enemy did.
+  const owed = attackHere(state, attack.enemyId) ? after : after.filter((one) => one.verb === "EliminateAfterAttack");
+  if (owed.length === 0 && (attack.onEnd ?? []).length > 0) return runAtEnd(ended, attack, steps, shadowStart);
+  if (owed.length === 0) return waiting.length > 0 ? (startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended) : ended;
   // Only the effect that searches the deck for another copy of a destroyed ally (DiscardCopiesFromDeck of "other", 10137:A:2) reads the ally the attack destroyed.
   const destroyedAlly = after.some((one) => one.verb === "DiscardCopiesFromDeck" && one.of === "other") ? destroyedAllyOf(state, attack, ctx) : undefined;
   // Only an effect that reanimates the character the attack destroyed (Unholy Crypt, 101161:A:2), or one that acts for its controller (Assault on Osgiliath, 06100:A:2), reads it.
@@ -363,9 +364,9 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       actor: attack.seat,
       peril: false,
       effectId: `${attack.enemyId}:afterAttack`,
-      instructions: [...after, ...shadowStart, ...(attack.onEnd ?? []).map((one) => one.instruction)],
+      instructions: [...owed, ...shadowStart, ...(attack.onEnd ?? []).map((one) => one.instruction)],
       // What waited on the attack keeps the cause of the effect that queued it; the rest keeps the frame's cause (below).
-      ...(attack.onEnd ? { causes: [...[...after, ...shadowStart].map(() => undefined), ...attack.onEnd.map((one) => one.cause)] } : {}),
+      ...(attack.onEnd ? { causes: [...[...owed, ...shadowStart].map(() => undefined), ...attack.onEnd.map((one) => one.cause)] } : {}),
       cancel: null,
       blockCancel: null,
       // An attack that sends its excess damage on (excessToShip) leaves that damage (0 when there was none) for the effect; X is the characters it destroyed.

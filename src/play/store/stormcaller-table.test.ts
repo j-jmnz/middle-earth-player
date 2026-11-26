@@ -1,4 +1,4 @@
-// Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages (data/rules/entries.json). The Stormcaller's area on the phone table (docs/design-system-table.md, Cards, "The Stormcaller's area"): its group heads
+// Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages (data/rules/entries.json). The Stormcaller's area on the phone table (docs/design-system-table.md, The Stormcaller's area): its group heads
 // staging only in its scenario, the night veil is on while the players are at another stage, the reader labels, the fold, the pop, and the geometry on every screen down to 667 x 375 at the three UI scales.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -189,15 +189,15 @@ describe("what a screen reader hears", () => {
   });
 
   it("says what a stage with no quest points or no cards in the area reads, and that the last stage loses the game", () => {
-    const last = { number: 4, last: 4, progress: 2, points: null, playersAt: 2, together: false };
+    const last = { who: "stormcaller" as const, number: 4, last: 4, progress: 2, points: null, playersAt: 2, together: false };
     expect(stageSpeech({ ...last, name: "Cape", names: [] })).toBe(`Stormcaller · stage 4 of 4 · 2, Cape. No cards in the area. Out of reach: the players are at another stage, so its cards are immune and not in the staging area. ${STAGE_LOSS}`);
     expect(stageTitle({ ...last, number: 3, points: 18, progress: 12 })).toBe("Stormcaller · stage 3 of 4 · 12/18");
   });
 
   it("pills the stage with its number, and \"4/4\" in threat red at the last stage", () => {
-    expect(stagePill({ number: 2, last: 4 })).toEqual({ text: "2", danger: false });
-    expect(stagePill({ number: 3, last: 4 })).toEqual({ text: "3", danger: false });
-    expect(stagePill({ number: 4, last: 4 })).toEqual({ text: "4/4", danger: true });
+    expect(stagePill({ number: 2, last: 4 })).toEqual({ text: "2", short: "2", danger: false });
+    expect(stagePill({ number: 3, last: 4 })).toEqual({ text: "3", short: "3", danger: false });
+    expect(stagePill({ number: 4, last: 4 })).toEqual({ text: "4/4", short: "4/4", danger: true });
   });
 
   it("knows the last stage and the players' stage", () => {
@@ -290,7 +290,7 @@ describe("every phone size and scale", () => {
           else {
             expect(folded.area, scene).toBe(true);
             expect(stack?.areaFold, scene).toBe(true);
-            expect(pileSpeech(stack as CardSlot).label, scene).toBe(`${folded.cards.length} more cards in ${AREA_FOLD_WHERE}`);
+            expect(pileSpeech(stack as CardSlot, false, null, false, "stormcaller").label, scene).toBe(`${folded.cards.length} more cards in ${AREA_FOLD_WHERE}`);
             expect(stack?.code, scene).toBe(made.state.cards[folded.top]?.code);
           }
           expect(hitBounds(stack as CardSlot).w, scene).toBeGreaterThanOrEqual(44);

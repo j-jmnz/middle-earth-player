@@ -1427,6 +1427,30 @@
     },
     {
       "match": {
+        "code": "17038"
+      },
+      "set": {
+        "keywords": {
+          "immune": true
+        }
+      },
+      "reason": "Tamed Mûmak prints \"Immune to player card effects.\" as its first line; Hall of Beorn lists no keyword for it, so the engine would read no immunity.",
+      "source": "scan 17038.A (data/printed/haradrim.json)"
+    },
+    {
+      "match": {
+        "code": "17039"
+      },
+      "set": {
+        "keywords": {
+          "immune": true
+        }
+      },
+      "reason": "River Harnen prints \"Immune to player card effects.\" as its first line; Hall of Beorn lists no keyword for it, so the engine would read no immunity.",
+      "source": "scan 17039.A (data/printed/haradrim.json)"
+    },
+    {
+      "match": {
         "code": "146071"
       },
       "set": {

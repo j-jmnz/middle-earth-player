@@ -110,6 +110,7 @@ import tharbadFixtures from "./fixtures/trouble-in-tharbad.json";
 import eilphFixtures from "./fixtures/the-nin-in-eilph.json";
 import secretFixtures from "./fixtures/celebrimbors-secret.json";
 import crownFixtures from "./fixtures/the-antlered-crown.json";
+import haradFixtures from "./fixtures/race-across-harad.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -238,6 +239,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "desert-crossing": crossingFixtures,
   "the-long-arm-of-mordor": mordorFixtures,
   "the-mumakil": mumakilFixtures,
+  "race-across-harad": haradFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

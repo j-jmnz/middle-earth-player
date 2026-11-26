@@ -38,7 +38,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09017:A:3 (front): The players cannot win the game while Orc War Party is in play.
   09017:constant:3: Constant
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat the main quest stage while this holds
 
 ## 09018 Chetwood Forest
 (the scenario deals it into the encounter pile; the piles place it, no record does)

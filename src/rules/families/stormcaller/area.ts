@@ -7,6 +7,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
+import { sameMembers, syncMembers } from "../../core/area-members.ts";
 import { moveCard } from "../../core/zones.ts";
 import { atStormcallersStage } from "./values.ts";
 import { areaOf } from "./zone.ts";
@@ -46,20 +47,8 @@ export function moveToStormcallerArea(state: ScenarioState, id: string | null | 
 export function syncStormcallerArea(state: ScenarioState): ScenarioState {
   const area = areaOf(state);
   if (!area || !state.sea) return state;
-  const same = atStormcallersStage(state);
-  let next = state;
-  const kept: string[] = [];
-  for (const id of area.members) {
-    const zone = next.cards[id]?.zone;
-    if (zone === "stormcallerArea") {
-      kept.push(id);
-      if (same) next = moveCard(next, id, { zone: "staging" });
-    } else if (zone === "staging") {
-      kept.push(id);
-      if (!same) next = moveCard(next, id, { zone: "stormcallerArea" });
-    }
-  }
+  const { state: next, kept } = syncMembers(state, area.members, "stormcallerArea", atStormcallersStage(state));
   const now = areaOf(next);
   if (!now || !next.sea) return next;
-  return kept.length === now.members.length && kept.every((id, at) => id === now.members[at]) ? next : { ...next, sea: { ...next.sea, stormcaller: { ...now, members: kept } } };
+  return sameMembers(kept, now.members) ? next : { ...next, sea: { ...next.sea, stormcaller: { ...now, members: kept } } };
 }

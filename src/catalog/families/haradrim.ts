@@ -1,5 +1,5 @@
 // The haradrim family (The Sands of Harad cycle, Escape from Umbar and Desert Crossing): the heat tracker (the temperature), a stage that holds no more progress than its quest points while it cannot advance, a quest card noted for the round it came into play, a hand limit
-// on the table, a card placed faceup under a location, and The Long Arm of Mordor's heroes in the staging area (staged and guarded heroes: Captives held by no card or by an Orc, objective-heroes taken by the players). The conditions `stageInPlayWholeRound` and `temperature` and the amount `temperature` are in effect-schema-conditions.ts and effect-schema-amount.ts. src/rules/families/haradrim/ runs and reads them.
+// on the table, a card placed faceup under a location, The Long Arm of Mordor's heroes in the staging area (staged and guarded heroes: Captives held by no card or by an Orc, objective-heroes taken by the players) and Race Across Harad's Orcs' area (a second quest deck, its cards in the area zone or the staging area, the Orcs' stage and its progress) with the Tamed Mûmak objective ally. The conditions `stageInPlayWholeRound` and `temperature` and the amount `temperature` are in effect-schema-conditions.ts and effect-schema-amount.ts. src/rules/families/haradrim/ runs and reads them.
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
@@ -37,6 +37,21 @@ const VERBS = [
   z.strictObject({ verb: z.literal("AttachRandomSetAside"), trait: z.string().min(1), ...when }),
   // "Add [the Capture] and attached enemy to the victory display" (17011:A:1 to 17014:A:1): the source goes to the victory display and then its host enemy, the host read before the source leaves play (its own `when` is read once, with the host still attached). The host's other attachments leave with it. No host: only the source goes.
   z.strictObject({ verb: z.literal("AddWithHostToVictory"), ...when }),
+  // "Create the Orcs' area with a second quest deck consisting of stage 1C, 2C, 3C, and 4C. Place Uruk Chieftain in the Orcs' area" (17047:A:1, hrd.prepare-the-orcs-area): the set-aside quest cards with these codes become the Orcs' quest deck in this order, the top one the Orcs' current stage
+  // with its D side up (the C side is passed through only by an advance), `number` its stage number (1); each set-aside card with a code of `place` goes into the area. The Orcs' area has no ship behaviour: it sets no `state.sea`.
+  z.strictObject({ verb: z.literal("PrepareOrcsArea"), stages: z.array(z.string().min(1)).min(1), number: z.number().int().positive(), place: z.array(z.string().min(1)).optional(), ...when }),
+  // "Add ~ to the Orcs' area" (17042:A:1, 17043:A:1), "move attacking enemy to the Orcs' area" (17042:A:2), "return Uruk Chieftain to the Orcs' area" (17052:B:2), "add the set aside Uruk Warg-rider to the chosen area" (17048:A:1):
+  // the source card (`self`, in an AfterAttack the attacking enemy), the last picked card or the set-aside card with `code` goes into the Orcs' area from wherever it is, an engaged enemy loses its engagement. Nothing changes with no such card or no Orcs' area.
+  z.strictObject({ verb: z.literal("MoveToOrcsArea"), target: z.enum(["self", "picked"]).optional(), code: z.string().min(1).optional(), ...when }),
+  // "Discard the top card of the encounter deck. Place X progress on this stage, where X is the discarded card's Threat plus the total Threat in the Orcs' area" (17051:B:2 to 17053:B:2; `engaged`: "plus the total Threat of each engaged enemy", 17054:B:2):
+  // the top card is discarded, the Orcs' current stage takes X, and a full stage is defeated: its loss (`orcsStageDefeated`) is resolved and the Orcs advance to the next stage, C side first, then D side (hrd.orcs-area).
+  z.strictObject({ verb: z.literal("OrcsProgress"), engaged: z.literal(true).optional(), ...when }),
+  // "Place 2 progress on the Orcs' stage" (17045:A:3), "place 1 progress on the Orcs' stage" (17050:B:2): the Orcs' current stage takes `amount`, no more than it needs; a full stage is defeated as OrcsProgress says.
+  z.strictObject({ verb: z.literal("AddOrcsProgress"), amount: positiveAmountSchema, ...when }),
+  // "If this card leaves play, its controller is eliminated" when the card is a Tamed Mûmak (17038:A:3): the actor is eliminated at once, but while an enemy attack on that seat is in progress the elimination waits until that attack has resolved (the Orcs' progress the attack gives resolves first).
+  z.strictObject({ verb: z.literal("EliminateAfterAttack"), ...when }),
+  // "Each player takes control of a Tamed Mûmak" (17047:A:1): the actor takes one of the set-aside objective allies with these codes into their play area, faceup, ready; with several different cards left the actor is asked (copies of one card are one choice).
+  verbFlags(z.strictObject({ verb: z.literal("TakeObjectiveAlly"), codes: z.array(z.string().min(1)).min(1), ...when }), { setupRuns: "inForEachPlayer" }),
 ] as const;
 
 const TRIGGERS = [
@@ -44,6 +59,8 @@ const TRIGGERS = [
   "handOverLimit",
   // The temperature changed by a Raise or a Lower (a table event, no seat): the stages' "If the temperature is 60 or higher" loss answers it (16068:B:3, 16069:B:2, 16070:B:3).
   "temperatureChanged",
+  // About an Orcs' stage that is full (17052:B:3, 17053:B:3, 17054:B:3): the record that heard it resolves when the Orcs defeat the stage, before they advance. The engine pushes it itself (families/haradrim/orcs-stage.ts); no event is queued.
+  "orcsStageDefeated",
 ] as const;
 
 const FLAGS = [
@@ -63,6 +80,12 @@ const FLAGS = [
   "noteExplored",
   // On the table, until the end of the round: a location was explored (the note `noteExplored` makes; condition `locationExploredThisRound`).
   "exploredThisRound",
+  // On an enemy: it cannot leave the Orcs' area ("Uruk Chieftain cannot leave the Orcs' area", 17051:B:1); read by EngageSeatWithMost (families/haradrim/engage.ts).
+  "cannotLeaveOrcsArea",
+  // On the Tamed Mûmak: the damage of an undefended attack against its controller must be assigned to it (17038:A:2); the `combat.undefended` hook sends it there (families/haradrim/mumak.ts).
+  "undefendedToMumak",
+  // On the table, until the end of the phase: the total Threat in the Orcs' area is added to the total Threat in the staging area, read live (17046:A:1; families/haradrim/orcs-values.ts orcsStagingRaise).
+  "orcsInStagingThreat",
 ] as const;
 
 export const manifest = { name: "haradrim", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

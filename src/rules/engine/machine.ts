@@ -52,7 +52,7 @@ import { runSettle } from "../interpret/family-hooks.ts";
 import { heldByLapsedStage } from "../families/grapple/values.ts";
 import { heldBySettingAside } from "../families/wilderland/heath.ts";
 import { damageHeld, destroyOverwhelmed } from "../core/keywords.ts";
-import { clearEliminated, eliminateHeroless } from "../core/eliminate.ts";
+import { NO_SEATS_REMAIN, clearEliminated, eliminateHeroless } from "../core/eliminate.ts";
 import { effectsOf } from "../windows/listen.ts";
 import { engagesAgain, optionallyEngaged } from "../families/quest/engage.ts";
 import { noteOptionalEngage } from "../families/pelargir/optional-engage.ts";
@@ -252,7 +252,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
         if (state.separate && livingSeats(state).length > 0) return travelTaken({ ...state, travelDone: areaSeats(state) });
         return state.lost
           ? state
-          : { ...state, lost: true, lossReason: "No seats remain", window: null };
+          : { ...state, lost: true, lossReason: NO_SEATS_REMAIN, window: null };
       }
       // Each seat in player order may travel to a location of its own staging area, to its own active location (mec109.multiple-staging-areas).
       if (state.separate) return { ...state, travelDone: [...(state.travelDone ?? []), seat], window: { kind: "travel" }, activeSeat: seat };
