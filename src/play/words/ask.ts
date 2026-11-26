@@ -1,5 +1,5 @@
 // The one order a pick's words are built in: the sheet (src/play/choice/sheets.ts) and the scenario words test both ask this function, so a sentence a later function
-// would say is never worded by one and shown by the other. The record's asks entry (asks.ts) first, the grapple family, the wilderland family, the sea family (which reads the table), then `pickWords`.
+// would say is never worded by one and shown by the other. The record's asks entry (asks.ts) first (after a trade or a Discover that name what they hold), the grapple family, the wilderland family, the sea family (which reads the table), then `pickWords`.
 import type { Instruction } from "../../catalog/boundary.ts";
 import type { Cause } from "../../rules/core/cause.ts";
 import { restrictedLimit } from "../../rules/player/attach.ts";
@@ -12,6 +12,7 @@ import { pickWords, type ChoiceNames } from "./choice.ts";
 import { grappleAsk, grappleFactsOf } from "./scenarios/grapple.ts";
 import { seaAsk } from "./scenarios/sea.ts";
 import { tradeWords } from "./scenarios/uncharted.ts";
+import { framsburgAsk } from "./scenarios/framsburg.ts";
 import { wilderlandAsk } from "./scenarios/wilderland.ts";
 import { lootLeaveOutWords } from "./loot.ts";
 import { burglePickWords } from "./scenarios/the-hobbit/burgle.ts";
@@ -53,6 +54,11 @@ export function askWords(a: {
   if (instruction.verb === "TradeDamageForThreat" && traded) {
     const loses = effectsOf(ctx, traded.code).some((item) => item.trigger === "leftPlay" && item.instructions.some((step) => step.verb === "LoseGame"));
     return { verb: "Trade", prompt: tradeWords(game, ctx.cards, instruction, names.card(traded.id), loses) };
+  }
+  // A Discover that has looked at cards says which Loot objectives, which Hazard and what becomes of the rest, which no entry can: the record's entry words the same pick before anything is looked at.
+  if (instruction.verb === "Discover" || instruction.verb === "ResolveDiscover") {
+    const looked = framsburgAsk(instruction, source, names, queue[0], { game, ctx, options });
+    if (looked) return looked;
   }
   const written = asksPick({ game, ctx, names, instruction: asked, source, amountNow, options, ...(again ? { again } : {}), ...(effectId ? { effectId } : {}), ...(cause ? { cause } : {}) });
   if (written) return a.place ? withPlace(written, a.place) : written;

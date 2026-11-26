@@ -82,7 +82,8 @@ function checkChoose(state: ScenarioState, sheet: PickSheet, seen: Seen): void {
   } else if (data?.wait?.kind === "target") {
     seen.targets.add(`${data.wait.item.instruction.verb}`);
     // A pick of Redhorn Pass's damage names the card and the damage still to place ("Redhorn Pass: assign 1 damage to a character you control (2 of 3 left).").
-    expect(sheet.note ?? "").toMatch(/^(Choose |[^:]+: assign 1 damage )/);
+    // The asks entries of the scenario's picks (The Council of Elrond's faceup cards, Storm of Howls' tied Wargs) lead with the card's name (the Choice tray), as the damage pick does.
+    expect(sheet.note ?? "").toMatch(/^(Choose |[^:]+: )/);
     for (const option of sheet.options) expect(option.label).not.toBe(option.id);
   }
   if (state.seatCount > 1) expect(sheet.note ?? "").toContain(`Player ${window.seat + 1} chooses.`);
