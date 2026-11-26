@@ -5,7 +5,9 @@ import { describe, expect, it } from "vitest";
 import type { Instruction } from "../../../catalog/boundary.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import { settle } from "../../engine/machine.ts";
-import { pileOf } from "../../core/piles.ts";
+import { reshuffleIntoDeck } from "../../core/decks.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { DECKS, pileOf } from "../../core/piles.ts";
 import { moveCard, shadowCards, spawn } from "../../core/zones.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { codesOf, ctxOf, deal, record, table } from "./fixture.ts";
@@ -58,6 +60,15 @@ describe("the Raven deck's shuffles (rm.raven-deck)", () => {
     expect(codesOf(next, pileOf(next, "ravenDeck")).sort()).toEqual(["ec1", "ec1", "ec1", "ec2", "orc", "orc"]);
     expect(next.seedCursor).toBeGreaterThan(state.seedCursor);
     for (const id of pileOf(state, "ravenDiscard")) expect(next.cards[id]?.face).toBe("down");
+  });
+
+  it("the shuffle of the discard pile is logged as a reshuffleDeck step, as the refill is", () => {
+    const steps: EngineStep[] = [];
+    reshuffleIntoDeck(withRaven(["ec1"], ["ec2", "orc"]), DECKS.raven, pileOf(withRaven(["ec1"], ["ec2", "orc"]), "ravenDiscard"), steps);
+    expect(steps.map((step) => (step.kind === "reshuffleDeck" ? [step.deck, step.count] : step.kind))).toEqual([["ravenDeck", 2]]);
+    const none: EngineStep[] = [];
+    reshuffleIntoDeck(withRaven(["ec1"]), DECKS.raven, [], none);
+    expect(none).toEqual([]);
   });
 
   it("rr.then: with an empty discard pile the shuffle cannot fail, so each player still takes the top card after it", () => {

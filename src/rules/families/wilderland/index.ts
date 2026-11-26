@@ -65,7 +65,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "FormPile":
       return formPile(state, instruction);
     case "ShuffleDiscardIntoPile":
-      return shuffleDiscardIntoPile(state, instruction);
+      return shuffleDiscardIntoPile(state, instruction, steps);
     case "ShuffleIntoPile":
       return shuffleIntoNamed(state, instruction);
     case "AddFromPile":
@@ -140,7 +140,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "CancelStrike":
       return cancelStrike(state);
     case "ShuffleSetAsideIntoPile":
-      return shuffleSetAsideIntoPile(state, instruction);
+      return shuffleSetAsideIntoPile(state, instruction, steps);
     case "RemoveSetAsideDamage":
       return removeSetAsideDamage(state, instruction);
     case "AttachGuardedFromPile":

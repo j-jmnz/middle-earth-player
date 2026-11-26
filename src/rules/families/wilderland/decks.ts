@@ -3,7 +3,7 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
-import { refillDeck } from "../../core/decks.ts";
+import { moveIntoDeck, refillDeck, reshuffleIntoDeck } from "../../core/decks.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { DECKS, NAMED_PILES, pileDealt, pileOf, shufflePile, topOf, withPile } from "../../core/piles.ts";
@@ -33,17 +33,14 @@ export function formPile(state: ScenarioState, instruction: Extract<Instruction,
   const zones = NAMED_PILES[instruction.pile];
   let next = withPile(state, zones.deck, pileOf(state, zones.deck));
   if (zones.discard) next = withPile(next, zones.discard, pileOf(state, zones.discard));
-  for (const id of state.setAside) if (instruction.codes.includes(state.cards[id]?.code ?? "")) next = updateCard(moveCard(next, id, { zone: zones.deck }), id, { face: "down" });
-  return next;
+  return moveIntoDeck(next, zones, state.setAside.filter((id) => instruction.codes.includes(state.cards[id]?.code ?? "")));
 }
 
 /** "Shuffle the Raven deck discard pile into the Raven deck" (08148:A:1): the pile's discard pile joins its deck, which is shuffled; an empty discard pile still shuffles the deck, and what follows goes on (rr.then). */
-export function shuffleDiscardIntoPile(state: ScenarioState, instruction: Extract<Instruction, { verb: "ShuffleDiscardIntoPile" }>): ScenarioState {
+export function shuffleDiscardIntoPile(state: ScenarioState, instruction: Extract<Instruction, { verb: "ShuffleDiscardIntoPile" }>, steps: EngineStep[]): ScenarioState {
   const zones = NAMED_PILES[instruction.pile];
   if (!pileDealt(state, zones.deck)) return state;
-  let next = state;
-  if (zones.discard) for (const id of [...pileOf(state, zones.discard)]) next = updateCard(moveCard(next, id, { zone: zones.deck }), id, { face: "down" });
-  return shufflePile(next, zones.deck);
+  return reshuffleIntoDeck(state, zones, zones.discard ? pileOf(state, zones.discard) : [], steps);
 }
 
 /** "Create the Caves deck" and its like: the dealt cards shuffled together. A deck the scenario did not deal is left alone. */
