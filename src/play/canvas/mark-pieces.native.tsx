@@ -297,19 +297,20 @@ export function StagingTag({ rect, text, font, t, s }: { rect: Rect; text: strin
  */
 export function StageMarks({ rect, pill, apart, fonts, t, s }: { rect: Rect; pill: StagePill; apart: boolean; fonts: Fonts; t: TableTokens; s: number }) {
   const height = 11 * s;
-  // The pill says whose stage it is when it fits the uncovered width, and only its number when it does not.
   const room = rect.w - 6 * s;
-  const text = fonts.small.getTextWidth(pill.text) + 8 * s <= room ? pill.text : pill.short;
-  const words = fonts.small.getTextWidth(text);
-  const pillW = Math.min(room, words + 8 * s);
-  const pillX = rect.x + 3 * s;
-  const pillY = rect.y + rect.h - STRIP * s - height - 2 * s;
   const plate = fonts.small.getTextWidth(STAGE_APART_WORD);
   const plateW = Math.min(room, plate + 8 * s);
-  // The plate stands under the picture's title band, clear of the pill when the card is tall enough for both and beside it when it is not.
+  const pillX = rect.x + 3 * s;
+  const pillY = rect.y + rect.h - STRIP * s - height - 2 * s;
+  // The plate stands under the picture's title band, clear of the pill when the card is tall enough for both; when it is not, the pill keeps only its number and the plate stands beside it.
   const below = rect.y + BADGE_TOP * s + 1 * s;
   const roomBelow = below + height + 1 * s <= pillY;
-  const plateX = roomBelow ? rect.x + (rect.w - plateW) / 2 : Math.min(pillX + pillW + 2 * s, rect.x + rect.w - plateW - 3 * s);
+  const beside = apart && !roomBelow;
+  // The pill says whose stage it is when it fits the uncovered width, and only its number when it does not.
+  const text = !beside && fonts.small.getTextWidth(pill.text) + 8 * s <= room ? pill.text : pill.short;
+  const words = fonts.small.getTextWidth(text);
+  const pillW = Math.min(room, words + 8 * s);
+  const plateX = roomBelow ? rect.x + (rect.w - plateW) / 2 : Math.min(pillX + pillW + 2 * s, rect.x + rect.w - plateW - 1 * s);
   const plateY = roomBelow ? below : pillY;
   return (
     <Group>
