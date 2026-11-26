@@ -5,14 +5,13 @@ import { describe, expect, it } from "vitest";
 
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import type { EngineStep } from "../../core/intents.ts";
-import { UNATTRIBUTED } from "../../core/cause.ts";
 import { settle } from "../../engine/machine.ts";
 import { legalTargets } from "../../engine/legal.ts";
 import { reduce } from "../../engine/reduce.ts";
 import { syncConstants } from "../../interpret/constants.ts";
 import { drawMany } from "../../interpret/interpret.ts";
 import { mayGainResources } from "../misc/guards.ts";
-import { ruleCause } from "../../core/cause.ts";
+import { ruleCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { placeDamage } from "../../core/keywords.ts";
 import { codesIn, fight, idOf, resolveRecords, run, statOf, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
@@ -23,6 +22,7 @@ const codeOf = (state: ScenarioState, id: string | null | undefined): string | u
 const inDeck = (state: ScenarioState, code: string): boolean => state.questDeck.some((id) => state.cards[id]?.code === code);
 // A modifier of the table, held while the stage is in play.
 const hold = (state: ScenarioState, stat: ScenarioState["modifiers"][number]["stat"]): ScenarioState => ({ ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: state.questStage ?? "", stat, amount: 1, until: "whileSourceInPlay" }] });
+const flaggedNotReady = (state: ScenarioState, id: string): boolean => state.modifiers.some((modifier) => modifier.instanceId === id && modifier.stat === "doesNotReady");
 const SEEDS = [1, 2, 3, 4, 5, 6, 7, 8] as const;
 
 describe("the stages 2 and 3 take a random stage and come back (AdvanceToRandomStage)", () => {
@@ -219,7 +219,7 @@ describe("the Ancient Marsh-dweller joins the staging area and attacks (08098:A:
   const MARSH = "08103";
   const FILLERS = ["f0", "f0", "f0", "f0"];
   // The attacks are fought out: every defense window is answered with an undefended hero, every other window passed, until nothing resolves.
-  const fought = (t: ReturnType<typeof table>, from: ReturnType<typeof resolveRecords>) => fight(t, from, (state) => state.pendingAttack == null && state.stack.length === 0 && state.window?.kind !== "defense");
+  const fought = (t: ReturnType<typeof table>, from: { state: ScenarioState; steps: EngineStep[] }) => fight(t, from, (state) => state.pendingAttack == null && state.stack.length === 0 && state.window?.kind !== "defense");
   const attacked = (steps: readonly { kind: string }[]): number[] => steps.flatMap((step) => (step.kind === "attack" ? [(step as unknown as { seat: number }).seat] : []));
   const marshOf = (state: ScenarioState) => state.cards[idOf(state, MARSH)];
 
@@ -285,5 +285,46 @@ describe("the Ancient Marsh-dweller joins the staging area and attacks (08098:A:
       expect(statOf(t.state, t.ctx.cards, MARSH, "attack")).toBe(6 + tokens);
       expect(statOf(t.state, t.ctx.cards, MARSH, "threat")).toBe(3 + tokens);
     }
+  });
+});
+
+describe("the stage rules that read the table (08097:B:3, 08098:B:3, 08099:B:3, 08100:B:3)", () => {
+  it("08097:B:3 a player plays 1 card each round and no more, whichever card it is", () => {
+    const t = table({ stage: "08097", phase: "Planning", hand: ["ally", "ally"], heroResources: 4 });
+    const [first, second] = t.state.seats[0]?.hand ?? [];
+    const played = reduce(t.state, { type: "PlayCard", cardId: first ?? "", payments: [{ heroId: t.hero, amount: 1 }] }, t.ctx);
+    expect(played.ok).toBe(true);
+    expect(reduce(played.state, { type: "PlayCard", cardId: second ?? "", payments: [{ heroId: t.hero, amount: 1 }] }, t.ctx).ok).toBe(false);
+    const free = table({ stage: "08098", phase: "Planning", hand: ["ally", "ally"], heroResources: 4 });
+    const open = reduce(free.state, { type: "PlayCard", cardId: free.state.seats[0]?.hand[0] ?? "", payments: [{ heroId: free.hero, amount: 1 }] }, free.ctx);
+    expect(reduce(open.state, { type: "PlayCard", cardId: free.state.seats[0]?.hand[1] ?? "", payments: [{ heroId: free.hero, amount: 1 }] }, free.ctx).ok).toBe(true);
+  });
+
+  it("08098:B:3 each location in play gets +1 Threat, the staging area's and the active location", () => {
+    const threats = (stage: string): number[] => {
+      const t = table({ stage, staging: ["08106"], active: "08107" });
+      return [statOf(t.state, t.ctx.cards, "08106", "threat"), statOf(t.state, t.ctx.cards, "08107", "threat")];
+    };
+    const [a, b] = threats("08098");
+    const [c, d] = threats("08099");
+    expect([a - c, b - d]).toEqual([1, 1]);
+  });
+
+  it("08099:B:3 at the beginning of the refresh phase a player readies at most 5 characters", () => {
+    const allies = ["ally", "ally", "ally", "ally", "ally", "ally", "ally"];
+    const t = table({ stage: "08099", phase: "Refresh", play: allies, exhaustedCards: ["ally", "dh1", "dh2"] });
+    const done = resolveRecords(syncConstants(t.state, t.ctx), t.ctx, "08099", "forced", t.state.questStage ?? "").state;
+    const held = Object.values(done.cards).filter((card) => card.exhausted && flaggedNotReady(done, card.id));
+    const characters = Object.values(done.cards).filter((card) => card.exhausted && (card.zone === "heroes" || card.zone === "play")).length;
+    expect(characters - held.length).toBe(5);
+  });
+
+  it("08100:B:3 each enemy in the staging area gets -20 engagement cost, an engaged enemy does not", () => {
+    const cost = (stage: string, layout: Layout): number => {
+      const t = table({ stage, ...layout });
+      return statOf(t.state, t.ctx.cards, "08104", "engagementCost");
+    };
+    expect(cost("08099", { staging: ["08104"] }) - cost("08100", { staging: ["08104"] })).toBe(20);
+    expect(cost("08099", { engaged: [{ code: "08104", seat: 0 }] })).toBe(cost("08100", { engaged: [{ code: "08104", seat: 0 }] }));
   });
 });
