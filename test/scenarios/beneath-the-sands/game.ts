@@ -4,16 +4,16 @@ import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/ru
 import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenarios.ts";
 import type { PolicyOptions } from "../../harness/auto-player.ts";
 import { fillerLoadout, HERO_STATS, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
-import { chooseFirstOrLast, policyIntent, type Policy } from "../../harness/policy-kit.ts";
+import { archeryLeastDamaged, attackAllTogether, chooseFirstOrLast, commitAllBut, policyIntent, travelFewestQuestPoints, undefendedLeastDamaged, type Policy } from "../../harness/policy-kit.ts";
 
 const cycle = loadCampaign("haradrim");
 const sands = loadAnyScenario("beneath-the-sands");
 
 // Test helper. A whole standalone game of Beneath the Sands played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. TODO: say how the players travel, engage and answer the choices this scenario asks.
+// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. The players commit every hero but one to the quest (the one that stays home attacks), travel to the location with the fewest quest points, nobody defends (the hero with the least damage takes an attack), the first Distribute puts all the archery damage on the least damaged character, the heroes attack together every enemy they reach and every choice takes its first option.
 export const SANDS_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
-// "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
-export type SandsDecks = "strong" | "weak" | "brittle";
+// "strong": big-number heroes that win; "weak": heroes too small to quest; "brittle": strong questers that die to an attack; "tense": strong heroes that start at a threat of 14, so the threat reaches 50.
+export type SandsDecks = "strong" | "weak" | "brittle" | "tense";
 
 export const sandsLoadout = fillerLoadout;
 
@@ -42,8 +42,7 @@ export const DEFAULT_POLICY: SandsPolicy = { choose: "first" };
 //   engageUpTo(most, options)  the optional engagement step: engage the enemy of the lowest `rank` (`allow` permits) while engaged with fewer than `most`
 //   triggerActions(effectIds, oncePerRound)  an Action or Response of the records named, each time (or once a round) the engine offers it and the seat can pay
 //   passCommitWhile(when)  the quest commit: pass without committing while `when` holds
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go in the list, before the auto-player's.
-const rules = (policy: SandsPolicy): Policy => [chooseFirstOrLast(policy.choose)];
+const rules = (policy: SandsPolicy): Policy => [chooseFirstOrLast(policy.choose), commitAllBut(1), travelFewestQuestPoints(), archeryLeastDamaged(), undefendedLeastDamaged(), attackAllTogether()];
 
 // Every intent is one the reducer listed.
 export function sandsIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: SandsPolicy = DEFAULT_POLICY): PlayerIntent {
@@ -55,18 +54,26 @@ export type SandsGame = PlayedGame;
 // The goldens (src/campaign/scenarios/beneath-the-sands/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type SandsGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: SandsDecks; outcome: "won" | "lost"; policy?: Partial<SandsPolicy>; lossReason?: string };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Nightmare) and a few losses (each way the scenario can be lost), each on a fixed seed.
-export const SANDS_GOLDENS: readonly SandsGolden[] = [];
+// The games to pin (.claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and true solo on Easy, and the two ways to lose (the scenario prints no loss of its own: every hero destroyed or every player at a threat of 50, both the engine's "No seats remain"), each true solo and two-handed.
+export const SANDS_GOLDENS: readonly SandsGolden[] = [
+  { name: "true solo, won, Normal", seatCount: 1, seed: 6, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed, won, Normal", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, won, Easy", seatCount: 1, seed: 5, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "tense", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed, lost, threat reaches 50 after a long game", seatCount: 2, seed: 3, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "No seats remain" },
+  { name: "true solo, lost, every hero destroyed", seatCount: 1, seed: 5, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed, lost, every hero destroyed", seatCount: 2, seed: 5, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+];
 
 const game = standaloneGame<SandsDecks, SandsPolicy>({
   campaign: cycle,
   scenario: sands,
   stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles and its Nightmare deck.
-  codes: [...sands.cards.map((card) => card.code)],
+  // The Search objective's two sides: the staged card is one code and its back another.
+  codes: [...sands.cards.map((card) => card.code), "17079", "17080"],
   intent: sandsIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,
 });
 
-export const playGolden = (golden: SandsGolden, ctx: ReduceContext): SandsGame => game.playGolden(golden, ctx);
+export const playGolden = (golden: SandsGolden, ctx: ReduceContext): SandsGame => game.playGolden(golden, ctx, { trail: true });
