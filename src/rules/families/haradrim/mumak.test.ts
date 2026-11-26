@@ -172,7 +172,10 @@ describe("17038:A:3 the elimination a destroyed Tamed Mûmak owes is never lost"
   });
 
   it("solo: the attacker left the engagement, and the controller is still eliminated, so the game is lost", () => {
-    expect(ended(1, true).lost).toBe(true);
+    const done = ended(1, true);
+    expect(done.lost).toBe(true);
+    // The deferred elimination runs in the attacker's frame, but the reason names the Mûmak, not the attacker.
+    expect(done.lossReason).toBe("Tamed Mûmak left play: Player 1 is eliminated");
   });
 
   it("two-handed: the attacker left the engagement, and the Mûmak's controller is eliminated while the other player goes on", () => {

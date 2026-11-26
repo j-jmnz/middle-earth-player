@@ -36,11 +36,13 @@ export function eliminateAfterAttack(state: ScenarioState, focus: Focus, ctx: Re
   return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), { verb: "EliminateAfterAttack" }] } };
 }
 
-// The loss that ends the game when this was the last seat names the card and the seat instead of "No seats remain" (the loss any elimination of the last seat gives).
+// The loss that ends the game when this was the last seat names the Mûmak and the seat instead of "No seats remain" (the loss any elimination of the last seat gives). A deferred elimination runs in the attacking enemy's frame, so the Mûmak is found by its code.
+const MUMAK = "17038";
 function named(before: ScenarioState, after: ScenarioState, focus: Focus, ctx: ReduceContext): ScenarioState {
-  const card = focus.sourceId ? after.cards[focus.sourceId] : undefined;
-  if (before.lost || !after.lost || after.lossReason !== "No seats remain" || !card) return after;
-  const printed = printedOf(ctx.cards, card.code);
-  const how = printed.health != null && card.damage >= printed.health ? "was destroyed" : "left play";
-  return { ...after, lossReason: `${printed.name} ${how}: Player ${focus.seat + 1} is eliminated` };
+  if (before.lost || !after.lost || after.lossReason !== "No seats remain") return after;
+  const printed = printedOf(ctx.cards, MUMAK);
+  const mine = Object.values(after.cards).filter((card) => card.code === MUMAK);
+  // A Mûmak in the encounter discard pile was destroyed (its damage is cleared when it leaves play); one anywhere else left play another way.
+  const destroyed = mine.some((card) => card.zone === "encounterDiscard");
+  return { ...after, lossReason: `${printed.name} ${destroyed ? "was destroyed" : "left play"}: Player ${focus.seat + 1} is eliminated` };
 }
