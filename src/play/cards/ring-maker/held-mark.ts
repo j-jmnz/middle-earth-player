@@ -6,8 +6,10 @@ import { printedOf } from "../../../rules/core/printed.ts";
 import { grimaLyingOn } from "../../readouts/ring-maker/fords.ts";
 import { restLyingOn } from "../../readouts/ring-maker/fangorn.ts";
 import { mugashLyingOn } from "../../readouts/ring-maker/orc.ts";
+import { mouldLyingOn } from "../../readouts/ring-maker/celebrimbor.ts";
 import { keysLyingOn } from "../../readouts/ring-maker/trials.ts";
 import { REST_MARK } from "../../words/scenarios/ring-maker/fangorn-table.ts";
+import { MOULD_MARK } from "../../words/scenarios/ring-maker/celebrimbor-table.ts";
 import { heldByName } from "../../words/scenarios/ring-maker/fords-table.ts";
 import { keyMark } from "../../words/scenarios/ring-maker/trials-table.ts";
 import type { UnderMark } from "../card-effects.ts";
@@ -21,6 +23,8 @@ export function ringMakerHeldMark(game: ScenarioState, ctx: ReduceContext, cardI
   // Mugash attached to a hero (To Catch an Orc, 07024:A:2): "1 held" on the hero, wherever it lies.
   const mugash = mugashLyingOn(game, cardId);
   if (mugash.length > 0) return heldByName(mugash.map(nameOf));
+  // Celebrimbor's Mould on a hero, The Secret Chamber or Bellach (08127:A:1): the pill says it is held.
+  if (mouldLyingOn(game, cardId).length > 0) return MOULD_MARK;
   // In Need of Rest on a hero (Into Fangorn, 07058:A:1): its strip under the card shows no name, so the pill says "Rest".
   if (restLyingOn(game, cardId).length > 0) return REST_MARK;
   // A Key of The Three Trials on its Guardian or Barrow (08043:A:1): the pill says its animal; a hero shows the Key as an attachment, so it wears no pill.

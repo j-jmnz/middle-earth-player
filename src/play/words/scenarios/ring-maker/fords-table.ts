@@ -1,4 +1,4 @@
-// Rules: rm.time-x, rm.grima-objective-ally, rr.cannot, rr.first-player (data/rules/entries.json); ledger lines 08011:B:2, 08013:B:3, 07016:A:1, 07016:A:3, 07023:A:1, 07059:A:1, 07059:B:1, 07059:B:2, 07059:B:3, 07060:B:2, 07060:B:3, 07061:B:1, 07061:B:2, 07061:B:3, 08066:B:1, 08066:B:2, 08067:B:1, 08067:B:2, 08095:B:1, 08095:B:2, 08095:B:3, 08096:B:1, 08096:B:2, 08096:B:3, 08097:B:1, 08097:B:2, 08097:B:3, 08098:B:1, 08098:B:2, 08099:B:1, 08099:B:2, 08099:B:3, 08100:B:1, 08100:B:2, 08101:B:1, 08101:B:2, 07065:B:1, 07065:B:2, 07066:B:1, 07066:B:2, 07067:B:1, 07067:B:2.
+// Rules: rm.time-x, rm.grima-objective-ally, rr.cannot, rr.first-player (data/rules/entries.json); ledger lines 08122:B:2, 08122:B:3, 08123:B:2, 08123:B:3, 08011:B:2, 08013:B:3, 07016:A:1, 07016:A:3, 07023:A:1, 07059:A:1, 07059:B:1, 07059:B:2, 07059:B:3, 07060:B:2, 07060:B:3, 07061:B:1, 07061:B:2, 07061:B:3, 08066:B:1, 08066:B:2, 08067:B:1, 08067:B:2, 08095:B:1, 08095:B:2, 08095:B:3, 08096:B:1, 08096:B:2, 08096:B:3, 08097:B:1, 08097:B:2, 08097:B:3, 08098:B:1, 08098:B:2, 08099:B:1, 08099:B:2, 08099:B:3, 08100:B:1, 08100:B:2, 08101:B:1, 08101:B:2, 07065:B:1, 07065:B:2, 07066:B:1, 07066:B:2, 07067:B:1, 07067:B:2.
 // What the table says of The Fords of Isen's pieces (src/play/readouts/ring-maker/fords.ts, src/play/cards/ring-maker/preview.ts): the time counters on the current stage against the Time X it printed, Gríma on The Islet and in a player's play area, and Ill Tidings in a hand.
 // The engine decided every number; these only say it. Each sentence stays at about 25 words (docs/design-system-table.md, Choice tray, Plain words).
 import type { Instruction } from "../../../../catalog/boundary.ts";
@@ -24,6 +24,9 @@ function newLevelWords(levels: NewLevels): string {
 const STAGE_2_LAST = "this stage goes back to the quest deck, losing its progress and counters, and a different stage 2 chosen at random replaces it.";
 const STAGE_3_LAST = "this stage goes back to the quest deck, losing its progress and counters, and a different stage 3 chosen at random replaces it.";
 
+// Celebrimbor's Secret: both stages trigger every Scour effect in play when the last counter goes, and put 3 counters back (08122:B:2, 08123:B:2).
+const SCOUR_LAST = "each Scour effect in play is triggered, and 3 time counters return.";
+
 /** The standing rule of each stage of The Nîn-in-Eilph, said first on its dial so the three stages with one name read apart (08095:B:3, 08096:B:3, 08097:B:3, 08098:B:3, 08099:B:3, 08100:B:3). */
 const STANDING: Readonly<Record<string, string>> = {
   "08095": "Player card effects cannot gain resources or draw cards.",
@@ -32,6 +35,8 @@ const STANDING: Readonly<Record<string, string>> = {
   "08098": "Each location in play gets +1 Threat.",
   "08099": "Each player readies at most 5 characters in the refresh phase.",
   "08100": "Each enemy in the staging area gets -20 engagement cost.",
+  "08122": "Bellach is immune to player card effects and cannot be engaged.",
+  "08123": "Until this stage has 12 progress, Bellach is immune to player card effects and cannot be engaged.",
 };
 
 /** The words of a table flag that a stage of this cycle holds (`commitDiscardsRandom`, 08096:B:3), for the sheets the flag changes. */
@@ -61,6 +66,8 @@ const LAST_COUNTER: Readonly<Record<string, string | ((levels: NewLevels) => str
   "08099": STAGE_3_LAST,
   "08100": STAGE_3_LAST,
   "08101": "Ancient Marsh-dweller attacks each player in player order, and 2 time counters are placed on this stage.",
+  "08122": SCOUR_LAST,
+  "08123": SCOUR_LAST,
   "07067": "5 cards from the top of the encounter deck are discarded, each player adds an enemy or objective from the discard pile to the staging area, and 3 time counters return.",
 };
 
