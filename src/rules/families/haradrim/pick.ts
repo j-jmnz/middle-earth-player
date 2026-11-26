@@ -7,9 +7,11 @@ import type { ScenarioState } from "../../core/state.ts";
 import type { PickContext } from "../../interpret/pick.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { effectData } from "../deck/moves.ts";
+import { orcsPickMatches } from "./orcs-values.ts";
 
 /** False when the pick asks for `sameTitleAsDiscarded` and the card shares no title with a card the effect discarded from the chooser's deck; true leaves the other filters to decide. */
 export function haradrimPickMatches(state: ScenarioState, id: string, spec: PickSpec, at: PickContext, ctx: ReduceContext): boolean {
+  if (!orcsPickMatches(state, id, spec)) return false;
   if (!spec.sameTitleAsDiscarded) return true;
   const card = state.cards[id];
   if (!card) return false;

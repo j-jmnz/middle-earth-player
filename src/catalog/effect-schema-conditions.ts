@@ -431,6 +431,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("stageInPlayWholeRound") }),
   // A location was explored this round, active or in the staging area ("+2 Attack instead if a location was explored this round", 17017:A:2); false unless the table holds the flag `noteExplored`. Read by the haradrim family.
   z.strictObject({ kind: z.literal("locationExploredThisRound") }),
+  // The players' main quest stage and the Orcs' stage have the same number (`sameStage`), or not (`differentStage`): "While the players are not at the same stage as the Orcs" (17040:A:1; hrd.orcs-area-different-stage). False in a game with no Orcs' area. Read by the haradrim family.
+  z.strictObject({ kind: z.literal("orcsStage"), is: z.enum(["sameStage", "differentStage"]) }),
   // The active location prints a Wizardry line ("If no Wizardry effect is triggered this way", 143062:A:1, read with `not`; false with no active location). Read by the wizardry family.
   z.strictObject({ kind: z.literal("hasWizardry") }),
   // The player guarding Gollum may choose a new player now: no card says the guard cannot change and another player is still in the game ("must choose a new player to guard Gollum, if able", 02135:A:1; the option is offered only then, rr.effects). Read by the guardian family.

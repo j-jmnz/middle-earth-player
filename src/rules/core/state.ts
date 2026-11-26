@@ -245,7 +245,7 @@ export function inPlay(zone: ZoneName): boolean {
     zone === "staging" ||
     zone === "seatStaging" ||
     zone === "activeLocation" ||
-    zone === "secondActiveLocation" || zone === "stormcallerArea" || zone === "islandMap" ||
+    zone === "secondActiveLocation" || zone === "stormcallerArea" || zone === "orcsArea" || zone === "islandMap" ||
     zone === "questStage" ||
     zone === "attached" ||
     zone === "campaign" ||

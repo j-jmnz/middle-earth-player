@@ -13,6 +13,7 @@ import { rescueUnder } from "../families/captured/rescue.ts";
 import { attachmentLeaves } from "../families/angmar/reanimate/attached.ts";
 import { areaHeadOf } from "../families/breaking/areas.ts";
 import { discardedFromDeck, joinStormcallerArea } from "../families/stormcaller/zone.ts";
+import { joinOrcsArea } from "../families/haradrim/orcs-zone.ts";
 import { joinUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "../families/uncharted/zone.ts";
 import { deckRoute, isDeckZone, joinPile, leavePile, shufflePile, type PileZone } from "./piles.ts";
 import { isReanimatedCode, ORC_GUARD_CODE, reanimatedBase } from "./printed.ts";
@@ -22,7 +23,7 @@ export type Destination =
   | { zone: "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "seatStaging"; seat: number }
   // `area`: with `staging`, once stages are separate, the seat whose staging area the card goes into (families/breaking/areas.ts); the card is in
   // `staging` and in that seat's list.
-  | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" | "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "stormcallerArea" | "islandMap" | PileZone; area?: number }
+  | { zone: "staging" | "encounterDeck" | "encounterDiscard" | "burdenDeck" | "victory" | "setAside" | "removed" | "questDeck" | "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "stormcallerArea" | "orcsArea" | "islandMap" | PileZone; area?: number }
   // `seat`: once stages are separate, the seat whose active location or stage the card becomes (`Seat.active`, `Seat.stage`; the shared slots mirror them).
   // Without it the card takes the state's own slot, which on a seat's view (families/breaking/areas.ts) is that seat's.
   | { zone: "activeLocation" | "secondActiveLocation" | "questStage"; seat?: number }
@@ -274,6 +275,8 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
       return { ...stamped, burdenDeck: append(stamped.burdenDeck ?? [], id) };
     case "stormcallerArea":
       return joinStormcallerArea(stamped, id);
+    case "orcsArea":
+      return joinOrcsArea(stamped, id);
     case "victory":
       return { ...unchartedWon(stamped, id), victory: append(stamped.victory, id) };
     case "setAside":

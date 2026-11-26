@@ -8,6 +8,7 @@ import { CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, heldBy } from "../../core/h
 import { isLocationCard, printedOf, type PrintedCard } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { heldAmount, inPlay, modifierActive, updateCard } from "../../core/state.ts";
+import { orcsStagingRaise } from "../haradrim/orcs-values.ts";
 
 // The cards attached to a host that an enemy's destruction or a quest card's defeat is announced to: the player cards in play
 // (a Guarded attachment it guarded hears `unguarded` instead; an encounter card attached to it has no such ability).
@@ -71,8 +72,8 @@ export function textBlank(state: ScenarioState, id: string, cards: ReadonlyMap<s
 // area by X"), not below 0.
 export function withStagingThreat(state: ScenarioState, total: number, cards: ReadonlyMap<string, PrintedCard>): number {
   const less = heldAmount(state, "table", "lessStagingThreat");
-  // "Raise the total Threat in the staging area by X" (moreStagingThreat, families/dungeon.ts); one counting the allies in a discard pile is read live (faq.lasting-effects).
-  const more = heldAmount(state, "table", "moreStagingThreat") + liveAllyRaise(state, cards) + liveScoutRaise(state, cards);
+  // "Raise the total Threat in the staging area by X" (moreStagingThreat, families/dungeon.ts); one counting the allies in a discard pile is read live (faq.lasting-effects), as is the Orcs' area's total Threat (orcsInStagingThreat, 17046:A:1).
+  const more = heldAmount(state, "table", "moreStagingThreat") + liveAllyRaise(state, cards) + liveScoutRaise(state, cards) + orcsStagingRaise(state, cards);
   return less === 0 && more === 0 ? total : Math.max(0, total + more - less);
 }
 
