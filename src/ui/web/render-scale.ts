@@ -1,6 +1,6 @@
 // The web app's drawing scale and frame meter (docs/plans/pwa-iphone-ipad.md, Risks only a device can answer): test controls a player turns on from the address,
 // so a device says what a headless browser cannot. `?scale=1` (or 1.5) makes the table's canvases draw at that many pixels for each CSS pixel in place of the device's
-// (an iPad's 2 is four times the pixels of 1), `?fps=1` shows the frame rate, a log of the last minute (a tap on the meter stops it and copies the log) and the first error the page reports, with where it was thrown, and sends the log to the site (`/_meter`, webapp/meter.ts) when the site keeps one; `?scale=0` and `?fps=0` turn each off, and `?pics=0` leaves out every picture element of the screens (`?pics=1` brings them back), so a run says what the pictures cost; the log's head counts the loaded ones and their megapixels. All are kept in localStorage, since they are read
+// (an iPad's 2 is four times the pixels of 1), `?fps=1` shows the frame rate, a log of the last minute (a tap on the meter stops it and copies the log) and the first error the page reports, with where it was thrown, and sends the log to the site (`/_meter`, webapp/meter.ts) when the site keeps one; `?scale=0` and `?fps=0` turn each off, and `?pics=0` leaves out every picture element of the screens (`?pics=1` brings them back), so a run says what the pictures cost, and `?blend=0` turns off every blend of the screens (`?blend=1` brings them back); the log's head counts the loaded ones and their megapixels. All are kept in localStorage, since they are read
 // before any database opens. Skia's web views read window.devicePixelRatio when they are made, so the scale is set before CanvasKit loads (skia-web-load.ts).
 import { described, onSpan, type SpanName } from "./meter-span.ts";
 import { startSlowProbe } from "./slow-probe.ts";
@@ -8,6 +8,7 @@ import { startSlowProbe } from "./slow-probe.ts";
 const SCALE_KEY = "middle-earth-player.render-scale";
 const FPS_KEY = "middle-earth-player.frame-meter";
 const PICS_KEY = "middle-earth-player.no-pictures";
+const BLEND_KEY = "middle-earth-player.no-blend";
 
 /**
  * The scale to draw at: the address's `scale` when it has one, else the stored one; null for the device's own. A scale under 1, at or over the device's,
@@ -28,6 +29,12 @@ export function meterChosen(search: string, stored: string | null): boolean {
 /** Whether the screens' pictures are left out: the address's `pics` when it has one (`0` leaves them out), else the stored choice. */
 export function picturesHidden(search: string, stored: string | null): boolean {
   const asked = new URLSearchParams(search).get("pics");
+  return asked === null ? stored === "1" : asked === "0";
+}
+
+/** Whether the screens' blends are off: the address's `blend` when it has one (`0` turns them off), else the stored choice. */
+export function blendsOff(search: string, stored: string | null): boolean {
+  const asked = new URLSearchParams(search).get("blend");
   return asked === null ? stored === "1" : asked === "0";
 }
 
@@ -437,4 +444,9 @@ export function applyRenderControls(): void {
   const noPictures = picturesHidden(search, read(PICS_KEY));
   if (params.has("pics")) write(PICS_KEY, noPictures ? "1" : null);
   if (noPictures) document.head.appendChild(document.createElement("style")).textContent = "img{display:none!important}";
+  // No element blends with what is under it (the backdrop's grit, wash and light, the hero art's veil): the slow-state probe (slow-probe.ts) found the page fast
+  // on Safari's engine while the blends were off, and a whole run without them confirms or clears them.
+  const noBlend = blendsOff(search, read(BLEND_KEY));
+  if (params.has("blend")) write(BLEND_KEY, noBlend ? "1" : null);
+  if (noBlend) document.head.appendChild(document.createElement("style")).textContent = "*{mix-blend-mode:normal!important}";
 }
