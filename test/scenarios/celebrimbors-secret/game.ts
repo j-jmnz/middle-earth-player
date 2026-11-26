@@ -68,7 +68,7 @@ export const SECRET_GOLDENS: readonly SecretGolden[] = [
   { name: "two-handed win", seatCount: 2, seed: 6, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "solo loss: threat at the elimination level", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", policy: { reserve: 0 }, outcome: "lost", lossReason: "No seats remain" },
   { name: "solo loss: the Mould's hero leaves play", seatCount: 1, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "q1 left play" },
-  { name: "solo loss: The Secret Chamber goes under The Orcs' Search", seatCount: 1, seed: 7, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "The Secret Chamber left play" },
+  { name: "solo loss: The Secret Chamber goes under The Orcs' Search", seatCount: 1, seed: 7, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "The Secret Chamber was placed underneath The Orcs' Search" },
 ];
 
 const game = standaloneGame<SecretDecks, SecretPolicy>({

@@ -51,7 +51,7 @@ describe("Celebrimbor's Secret golden", () => {
     lost(state, golden) {
       const mould = cardsOf(state, "08127");
       if (golden.lossReason === "No seats remain") expect(state.seats.slice(0, golden.seatCount).every((seat) => seat.eliminated), golden.name).toBe(true);
-      else if (golden.lossReason === "The Secret Chamber left play") {
+      else if (golden.lossReason === "The Secret Chamber was placed underneath The Orcs' Search") {
         const chamber = cardsOf(state, "08126");
         expect(chamber.map((card) => card.zone), golden.name).toEqual(["under"]);
         expect(state.cards[chamber[0]?.host ?? ""]?.code, golden.name).toBe("08125");
