@@ -21,6 +21,11 @@ const ROWS: readonly Row[] = [
   { line: "08044:A:3", name: "Shadow: it is shuffled back into the encounter deck", layout: { engaged: ["f0"], deck: ["f0", "f0", "f0"] }, act: attack("f0", { shadow: "08044", undefended: true }), expect: zone("08044", "encounterDeck") },
   { line: "08045:A:3", name: "Shadow: it is shuffled back into the encounter deck", layout: { engaged: ["f0"], deck: ["f0", "f0", "f0"] }, act: attack("f0", { shadow: "08045", undefended: true }), expect: zone("08045", "encounterDeck") },
 
+  // 08036 The Trial of Strength (the Key and the next trial are in trials.test.ts).
+  { line: "08036:B:1", name: "Each Guardian enemy engages the first player", layout: { stage: "08036", staging: [GUARDIAN] }, act: NOTHING, expect: zone(GUARDIAN, "engaged") },
+  { line: "08036:B:1", name: "Barrow locations are immune to player card effects", layout: { stage: "08036", staging: ["08046"] }, act: NOTHING, expect: flag("08046", "immuneToPlayerCards") },
+  { line: "08036:B:1", name: "Barrow locations cannot be the active location: the players cannot travel to one", layout: { stage: "08036", phase: "Travel", staging: ["08046"] }, act: [], expect: offers("Travel", undefined, false) },
+
   // 08046 Hill Barrow and 08048 Stone Barrow.
   { line: "08046:A:1", name: "Forced: when a Guardian attacks it is dealt 1 additional shadow card", layout: { staging: ["08046"], engaged: [GUARDIAN], deck: ["f0", "f0", "f0", "f0"] }, act: attack(GUARDIAN, { undefended: true }), expect: deckCount(2) },
   { line: "08048:A:1", name: "Forced: after a Guardian attacks each player raises his threat by that enemy's Threat", layout: { staging: ["08048"], engaged: [GUARDIAN], threat: [20, 20] }, act: attack(GUARDIAN, { undefended: true }), expect: threat(21) },

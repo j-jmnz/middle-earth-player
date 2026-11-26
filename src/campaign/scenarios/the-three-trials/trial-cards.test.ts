@@ -3,11 +3,11 @@
 import { describe, expect, it } from "vitest";
 
 import { idOf, resolveRecords, run, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
-import { effectCause } from "../../core/cause.ts";
-import type { ScenarioState } from "../../core/state.ts";
-import { settle } from "../../engine/machine.ts";
-import { pushEffectFrame } from "../../interpret/effect-frames.ts";
-import { removeTimeCounters } from "../angmar/time.ts";
+import { effectCause } from "../../../rules/core/cause.ts";
+import type { ScenarioState } from "../../../rules/core/state.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import { pushEffectFrame } from "../../../rules/interpret/effect-frames.ts";
+import { removeTimeCounters } from "../../../rules/families/angmar/time.ts";
 
 const SCENARIO = "the-three-trials";
 const table = (layout: Layout) => tableFromLayout(SCENARIO, layout);
@@ -53,7 +53,7 @@ describe("08040:A:2 to 08042:A:2 the Guardians' Time effect", () => {
 });
 
 describe("08055:A:1 Wild Tenacity", () => {
-  it("takes X counters, X the players, off each enemy with Time, stops at 0, and the Guardian hears its last counter go once", () => {
+  it("08055:A:1 takes X counters, X the players, off each enemy with Time, stops at 0, and the Guardian hears its last counter go once", () => {
     const t = table({ seats: 2, engaged: [{ code: "08040", seat: 1, resources: 2 }, { code: "08042", seat: 0, resources: 4 }], play: [{ code: "ally", seat: 1 }] });
     const { state } = resolveRecords(t.state, t.ctx, "08055", "whenRevealed");
     // The Boar's Guardian lost both, its Forced effect discarded the ally once and placed 2 counters again; the Raven's lost 2 of 4.
@@ -90,6 +90,14 @@ describe("08037:B:1 and 08037:B:2 the Guardians at Perseverance", () => {
     expect(state.victory.map((id) => state.cards[id]?.code).sort()).toEqual(["08040", "08041"]);
   });
 
+  it("08037:B:2 adds only the Guardians in play to the victory display, no Barrow and no card out of play, and the quest advances to the one trial left", () => {
+    const t = table({ stage: "08037", staging: ["08046"], engaged: [{ code: "08040", seat: 0 }] });
+    const { state } = resolveRecords(t.state, t.ctx, "08037", "triggered", idOf(t.state, "08037"));
+    expect(state.victory.map((id) => state.cards[id]?.code)).toEqual(["08040"]);
+    expect(cardsOf(state, "08046")[0]?.zone).toBe("staging");
+    expect(state.questStage && state.cards[state.questStage]?.code).toBe("08038");
+  });
+
   it("08037:B:1 a Guardian takes damage when this stage is not current", () => {
     const t = table({ stage: "08036", engaged: [{ code: "08040", seat: 0 }] });
     const hurt = run(t, t.state, { verb: "DamageEach", amount: 2, pick: { type: "enemy", control: "any", staging: true, trait: "Guardian" } });
@@ -107,7 +115,7 @@ describe("08037:B:1 and 08037:B:2 the Guardians at Perseverance", () => {
 });
 
 describe("08047:A:1 Cave Barrow", () => {
-  it("makes the first player discard allies, all seats counted together, until 5 remain, as soon as a sixth enters play", () => {
+  it("08047:A:1 makes the first player discard allies, all seats counted together, until 5 remain, as soon as a sixth enters play", () => {
     const allies = Array.from({ length: 6 }, (_, index) => ({ code: "ally", seat: index % 2 }));
     const t = table({ seats: 2, staging: ["08047"], play: allies });
     const settled = settle({ ...t.state, window: null, mode: "stopped" }, t.ctx, []);
@@ -128,7 +136,7 @@ describe("08047:A:1 Cave Barrow", () => {
 });
 
 describe("08054:A:1 The Guardian's Fury", () => {
-  it("reveals one Guardian from the victory display, with fresh counters, when none is in play", () => {
+  it("08054:A:1 reveals one Guardian from the victory display, with fresh counters, when none is in play", () => {
     const t = table({ victory: ["08040", "08041", "08042"], seed: 7 });
     const { state } = resolveRecords(t.state, t.ctx, "08054", "whenRevealed");
     const back = ["08040", "08041", "08042"].flatMap((code) => cardsOf(state, code)).filter((card) => card.zone !== "victory");

@@ -3,10 +3,10 @@
 import { describe, expect, it } from "vitest";
 
 import { HERO, idOf, resolveRecords, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
-import { attachTo, moveCard, spawn } from "../../core/zones.ts";
-import { destroyCard } from "../../core/keywords.ts";
-import { settle } from "../../engine/machine.ts";
-import { updateCard, type ScenarioState } from "../../core/state.ts";
+import { attachTo, moveCard, spawn } from "../../../rules/core/zones.ts";
+import { destroyCard } from "../../../rules/core/keywords.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 
 const SCENARIO = "the-three-trials";
 const GUARDIANS = ["08040", "08041", "08042"];
@@ -22,7 +22,7 @@ const stageRecords = (made: ReturnType<typeof table>, code: string, pick?: (stat
 const animal = (code: string) => Number(code) - (GUARDIANS.includes(code) ? 8040 : 8043);
 
 describe("08036:A:1 the Trial of Strength", () => {
-  it("reveals one Guardian and one Barrow, lies the Key that shares a Trait with the Guardian on it and marks it as the trial's Key", () => {
+  it("08036:A:1 reveals one Guardian and one Barrow, lies the Key that shares a Trait with the Guardian on it and marks it as the trial's Key", () => {
     const t = table({ stage: "08036", seed: 3 });
     const { state } = stageRecords(t, "08036");
     const guardians = outOfSetAside(state, GUARDIANS);
@@ -52,7 +52,7 @@ describe("08036:A:1 the Trial of Strength", () => {
 });
 
 describe("08037:A:1 the Trial of Perseverance", () => {
-  it("stages a random Barrow, lies a random Key on it and reveals the Guardian that shares a Trait with the Key", () => {
+  it("08037:A:1 stages a random Barrow, lies a random Key on it and reveals the Guardian that shares a Trait with the Key", () => {
     const t = table({ stage: "08037", seed: 4 });
     const { state } = stageRecords(t, "08037");
     const barrow = outOfSetAside(state, BARROWS)[0]!;
@@ -65,7 +65,7 @@ describe("08037:A:1 the Trial of Perseverance", () => {
 });
 
 describe("08038:A:1 the Trial of Intuition", () => {
-  it("reveals a Guardian and a Barrow, shuffles the discard pile into the deck and the matching Key into its bottom 10 cards", () => {
+  it("08038:A:1 reveals a Guardian and a Barrow, shuffles the discard pile into the deck and the matching Key into its bottom 10 cards", () => {
     const deck = Array.from({ length: 14 }, () => "08050");
     const t = table({ stage: "08038", seed: 2, deck, discard: ["08053", "08053"] });
     const { state } = stageRecords(t, "08038");
@@ -81,7 +81,7 @@ describe("08038:A:1 the Trial of Intuition", () => {
 });
 
 describe("08035:B:1 the players choose a trial", () => {
-  it("offers the three trials, advances to the one chosen and defeats the stage it leaves", () => {
+  it("08035:B:1 offers the three trials, advances to the one chosen and defeats the stage it leaves", () => {
     const t = table({ stage: "08035", seed: 1 });
     const asked = resolveRecords(t.state, t.ctx, "08035", "whenRevealed", idOf(t.state, "08035"), (state) => {
       expect(state.window?.kind === "choose" && state.window.options).toEqual(["08036", "08037", "08038"]);
@@ -102,7 +102,7 @@ function claimed(made: ReturnType<typeof table>, state: ScenarioState, key: stri
 }
 
 describe("08036:B:2 the players control the current trial's Key", () => {
-  it("waits while the Key lies on its Guardian, and once a hero holds it adds the Barrows in play to the victory display and offers the next trial", () => {
+  it("08036:B:2 waits while the Key lies on its Guardian, and once a hero holds it adds the Barrows in play to the victory display and offers the next trial", () => {
     const t = table({ stage: "08036", seed: 3 });
     const staged = stageRecords(t, "08036").state;
     expect(staged.pendingEvents ?? []).toHaveLength(0);
@@ -120,7 +120,7 @@ describe("08036:B:2 the players control the current trial's Key", () => {
 });
 
 describe("08043:A:1 a Key whose host leaves play", () => {
-  it("08036:B:2 goes back to the staging area, is claimed by the first player at once, and the stage hears that a hero holds it", () => {
+  it("08043:A:1 goes back to the staging area (08036:B:2), is claimed by the first player at once, and the stage hears that a hero holds it", () => {
     const t = table({ stage: "08036", seed: 3 });
     const staged = stageRecords(t, "08036").state;
     const guardian = outOfSetAside(staged, GUARDIANS)[0]!;
@@ -137,7 +137,7 @@ describe("08043:A:1 a Key whose host leaves play", () => {
 });
 
 describe("08039:A:1 the Antlered Crown", () => {
-  it("adds Hallowed Circle to the staging area and reveals each Guardian in the victory display again with fresh counters", () => {
+  it("08039:A:1 adds Hallowed Circle to the staging area and reveals each Guardian in the victory display again with fresh counters", () => {
     const t = table({ stage: "08039", setAside: ["08049"], victory: ["08040", "08041"] });
     const withCounters = updateCard(t.state, idOf(t.state, "08040"), { resources: 1 });
     const { state } = resolveRecords(withCounters, t.ctx, "08039", "whenRevealed", idOf(t.state, "08039"));
