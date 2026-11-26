@@ -167,7 +167,9 @@ export function TableDock({
   // The readout's result (one line while the rows are open) and the refusal (three lines) are fixed slots on a dense dock; a cut one is whole behind the "i".
   const chars = labelChars(room.text, s, fontScale);
   const cutWords = (dense && trayOpen && readout?.result != null && lineCount(readout.result, chars) > 1) || (dense && refusal != null && lineCount(refusal, chars) > 3);
-  const plan = planWords({ space, dense, clamp: trayOpen, title: lead + title, textWidth: room.text, hasLine: !trayOpen && lines.first != null, foldable: lines.foldable || (trayOpen && lines.first != null) || cutWords, text: fontScale }, s);
+  // The lines the folded line takes: its words at the width of a label line, at most the cap.
+  const lineRows = lines.first ? Math.min(cap, lineCount(lines.first.text, labelChars(room.text - PILL_PT * s, s, fontScale))) : 1;
+  const plan = planWords({ space, dense, clamp: trayOpen, title: lead + title, textWidth: room.text, hasLine: !trayOpen && lines.first != null, foldable: lines.foldable || (trayOpen && lines.first != null) || cutWords, text: fontScale, lineRows }, s);
   const pill = plan.pill ? (
     // The "i" button (`dock-more`) opens the full title and every line; the More pill (`dock-more-actions`) folds the reading aids.
     // 26 pt round with a 44 pt target that stays clear of the line's words (6 pt gap) and inside the dock's padding.
