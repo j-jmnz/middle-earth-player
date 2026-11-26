@@ -27,7 +27,7 @@ import { readyBarred, readyPatch } from "../core/holder-classes.ts";
 import { titleBarred } from "../families/nightmare/guards.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
 import { attachTo, discardFromHand, moveCard } from "../core/zones.ts";
-import { afterCancel } from "../families/defense/damage.ts";
+import { cancelDealt } from "../families/defense/damage.ts";
 import { healBlocked } from "../families/burden/life.ts";
 import { healDamage } from "../families/dreamchaser/heal-cap.ts";
 import { mayGainResources } from "../families/misc/guards.ts";
@@ -158,12 +158,8 @@ export function runPlayerVerb(
       if (!card || dealt <= 0) return state;
       const amount = Math.min(dealt, card.damage, instruction.all ? dealt : resolveAmount(state, instruction.amount ?? 1, scope, ctx));
       if (amount <= 0) return state;
-      const data = topFrame(state)?.data;
-      const canceled = updateCard(state, id, { damage: card.damage - amount });
-      // What is left of the damage is what a later cancel of the same damage can take.
-      const patched = data?.kind === "effect" ? patchTop(canceled, { data: { ...data, dealt: dealt - amount } }) : canceled;
-      // Damage canceled is not taken: the "took damage" events that follow it lose that much (defense family).
-      return afterCancel(patched, id, amount, dealt - amount, ctx);
+      // What is left of the damage is what a later cancel of the same damage can take; the "took damage" events that follow lose that much (defense family).
+      return cancelDealt(state, id, amount, dealt, ctx);
     }
     case "SetThreat":
       return withThreat(state, focus.seat, instruction.value);
