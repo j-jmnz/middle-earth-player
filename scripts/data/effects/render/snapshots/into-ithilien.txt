@@ -1,4 +1,4 @@
-Scenario piles that place cards with no record (activeLocation: 05028 Ithilien Road; quest: 05068 Ambush in Ithilien; quest: 05069 Southron Counter-attack; quest: 05070 The Hidden Way; quest: 05071 Approaching Cair Andros; staging: 05025 Celador; staging: 05027 Southron Company)
+Scenario piles that place cards with no record (activeLocation: 05028 Ithilien Road; quest: 05068 Ambush in Ithilien; quest: 05069 Southron Counter-attack; quest: 05070 The Hidden Way; quest: 05071 Approaching Cair Andros; staging: 05025 Celador; staging: 05027 Southron Company (1 per player))
 
 ## 05025 Celador
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -47,7 +47,7 @@ Scenario piles that place cards with no record (activeLocation: 05028 Ithilien R
     - deal 2 damage to the attacking enemy
 
 ## 05027 Southron Company
-(the scenario deals it into the staging pile; the piles place it, no record does)
+(the scenario deals it into the staging pile, 1 copy for each player, the other copies stay in the encounter deck; the piles place it, no record does)
 
 05027:A:1 (front): Southron Company gets +2 Threat and +2 Attack while the current quest card has the battle or siege keyword.
   05027:constant:1: Constant

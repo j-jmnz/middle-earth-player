@@ -1,4 +1,4 @@
-Scenario piles that place cards with no record (quest: 16068 The Desert of Harad; quest: 16069 Under the Merciless Sun; quest: 16070 Beasts of Legend; staging: 16025 Burnt Sands)
+Scenario piles that place cards with no record (quest: 16068 The Desert of Harad; quest: 16069 Under the Merciless Sun; quest: 16070 Beasts of Legend; staging: 16025 Burnt Sands (1 per player))
 
 ## 16022 Mirage
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -42,7 +42,7 @@ Scenario piles that place cards with no record (quest: 16068 The Desert of Harad
     - discard the picked card
 
 ## 16025 Burnt Sands
-(the scenario deals it into the staging pile; the piles place it, no record does)
+(the scenario deals it into the staging pile, 1 copy for each player, the other copies stay in the encounter deck; the piles place it, no record does)
 
 16025:A:1 (front): While the temperature is 40 or higher, Burnt Sands gets +2 Threat.
   16025:constant:1: Constant

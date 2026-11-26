@@ -500,7 +500,7 @@ Scenario piles that place cards with no record (quest: 03064 Entering the Mines;
 901005:A:3 (shadow): Shadow: Shuffle Shadow Dweller back into the encounter deck.
   901005:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - this card (a shadow card) is shuffled into the encounter deck instead of being discarded
+    - this card (a shadow card, or an enemy that was destroyed) is shuffled into the encounter deck instead of being discarded
 
 ## 901006 Twisting Shadows
 

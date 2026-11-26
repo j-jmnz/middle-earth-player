@@ -279,7 +279,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51118:A:2 (shadow): Shadow: Shuffle Black Forest Bats into the encounter deck.
   51118:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - this card (a shadow card) is shuffled into the encounter deck instead of being discarded
+    - this card (a shadow card, or an enemy that was destroyed) is shuffled into the encounter deck instead of being discarded
 
 ## 51119 Enchanted Stream
 (the scenario deals it into the encounter pile; the piles place it, no record does)

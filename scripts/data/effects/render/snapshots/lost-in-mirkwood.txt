@@ -1,4 +1,4 @@
-Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; quest: 18072 Spiders of Mirkwood; quest: 18073 Dol Guldur Orcs; quest: 18074 Carried Away; quest: 18075 Truly Lost; quest: 18076 The Forest of Great Fear; quest: 18077 Escape from Taur-nu-fuin; staging: 18028 Searching for a Way Out; staging: 01096 Forest Spider; setAside: 18070 Haldan; spidersDeck: 01074 King Spider; spidersDeck: 01075 Hummerhorns; spidersDeck: 01076 Ungoliant's Spawn; spidersDeck: 01077 Great Forest Web; spidersDeck: 01078 Mountains of Mirkwood; spidersDeck: 01079 Eyes of the Forest; spidersDeck: 01080 Caught in a Web; orcsDeck: 01089 Dol Guldur Orcs; orcsDeck: 01090 Chieftan Ufthak; orcsDeck: 01091 Dol Guldur Beastmaster; orcsDeck: 01092 Driven by Shadow; orcsDeck: 01093 The Necromancer's Reach; orcsDeck: 01094 Necromancer's Pass; orcsDeck: 01095 Enchanted Stream)
+Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; quest: 18072 Spiders of Mirkwood; quest: 18073 Dol Guldur Orcs; quest: 18074 Carried Away; quest: 18075 Truly Lost; quest: 18076 The Forest of Great Fear; quest: 18077 Escape from Taur-nu-fuin; staging: 18028 Searching for a Way Out; staging: 01096 Forest Spider (1 per player); setAside: 18070 Haldan; spidersDeck: 01074 King Spider; spidersDeck: 01075 Hummerhorns; spidersDeck: 01076 Ungoliant's Spawn; spidersDeck: 01077 Great Forest Web; spidersDeck: 01078 Mountains of Mirkwood; spidersDeck: 01079 Eyes of the Forest; spidersDeck: 01080 Caught in a Web; orcsDeck: 01089 Dol Guldur Orcs; orcsDeck: 01090 Chieftan Ufthak; orcsDeck: 01091 Dol Guldur Beastmaster; orcsDeck: 01092 Driven by Shadow; orcsDeck: 01093 The Necromancer's Reach; orcsDeck: 01094 Necromancer's Pass; orcsDeck: 01095 Enchanted Stream)
 
 ## 12168 Lost in Mirkwood
 
@@ -36,7 +36,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     - currentQuest: stat progressDiscards 1, while this card is in play
 
 18028:A:2 (front): Forced: When progress would be placed on the main quest, if there are no objective-locations in play, discard an equal number of cards from the top of the encounter deck instead. Then, put the topmost objective-location in the encounter discard pile into play.
-  18028:forced:1: Forced on the event progressReplaced
+  18028:forced:1: Forced after progress that would be placed on the current quest is replaced by the stage's flag (X is that progress: the amount that would have gone on the quest)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - (marker, does nothing when run) after the cards that progress was turned into are discarded, the topmost Objective-Location in the encounter discard pile enters play in the staging area, its Guarded keyword resolved
 

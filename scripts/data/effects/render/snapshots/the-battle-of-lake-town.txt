@@ -30,7 +30,7 @@ Scenario piles that place cards with no record (quest: 50201 Terror from the Mou
 50202:B:2 (back): When the players quest successfully, any number of progress tokens that would be placed on this quest may instead be discarded to remove the same amount of damage from Lake-town.
   50202:constant:2: Constant
     - this card: stat progressHealsLakeTown (progress that questing would place on this stage is not placed; the stage's record hears it and may discard it to remove damage from Lake-town) 1, while this card is in play
-  50202:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressReplaced
+  50202:triggered:1: Triggered (mandatory, not printed as Forced) after progress that would be placed on the current quest is replaced by the stage's flag (X is that progress: the amount that would have gone on the quest)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the first player chooses how many of the replaced progress tokens (the event's X) to discard, at most the damage on Lake-town: that much damage comes off Lake-town and the rest of the progress is placed on the quest card
 

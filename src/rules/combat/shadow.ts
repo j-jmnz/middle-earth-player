@@ -1,7 +1,7 @@
 // Rules: rr.step-6-2, rr.step-6-4-2, rr.step-6-4-3, rr.shadow-effects, rr.cancel, rr.attacks-outside-the-combat-phase,
 // faq.enemy-attacks-outside-combat, faq.additional-attacks, ltp.shadow-discard (data/rules/entries.json).
 import { undefendedToCity } from "../families/pelennor/combat.ts";
-import { verbsRunningInFrame, type Effect } from "../../catalog/boundary.ts";
+import { verbsRunningInFrame, type Effect, type Instruction } from "../../catalog/boundary.ts";
 
 import { pushEffectFrame } from "../interpret/effect-frames.ts";
 import { holdsNow } from "../interpret/verbs.ts";
@@ -26,6 +26,7 @@ import { attackCanceled, defendersDeclared, holdAttackEnd, specialStrike } from 
 import { attackSwitched } from "../families/pelargir/vale/switch.ts";
 import { holdAttack } from "../families/defense/listen.ts";
 import { startShadowAttack } from "../families/defense/shadow-attack.ts";
+import { runAtEnd } from "./attack-end.ts";
 import { announceShadowRaise, noteShadowStart } from "../families/defense/shadow.ts";
 import { announceShadowResolved } from "../families/dungeon/shadow.ts";
 import { announceShadowsResolved } from "../families/angmar/reanimate/shadows.ts";
@@ -344,13 +345,13 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   const base = troll ? [...(attack.after ?? []), ...troll.instructions] : (attack.after ?? []);
   const after = pillage ? [...base, pillage] : base;
   const waiting = attack.shadowAttackers ?? [];
-  if (after.length === 0 && waiting.length > 0) return startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended;
-  if (after.length === 0) return ended;
+  // What an effect left to run once this attack has ended (attack-end.ts) follows the shadow attackers, in a frame of its own.
+  const shadowStart: readonly Instruction[] = waiting.length > 0 ? [{ verb: "StartShadowAttack", attackers: [...waiting] }] : [];
   // The attack's own state decides where it was made from: an enemy that attacked from the staging area without being flagged is `fromStaging`.
   // An enemy that left the attack drops its instructions, except the elimination a destroyed Tamed Mûmak owes (EliminateAfterAttack, 17038:A:3): that seat is eliminated whatever the enemy did.
-  const here = attackHere(state, attack.enemyId);
-  const owed = here ? after : after.filter((one) => one.verb === "EliminateAfterAttack");
-  if (!here && owed.length === 0) return waiting.length > 0 ? (startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended) : ended;
+  const owed = attackHere(state, attack.enemyId) ? after : after.filter((one) => one.verb === "EliminateAfterAttack");
+  if (owed.length === 0 && (attack.onEnd ?? []).length > 0) return runAtEnd(ended, attack, steps, shadowStart);
+  if (owed.length === 0) return waiting.length > 0 ? (startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended) : ended;
   // Only the effect that searches the deck for another copy of a destroyed ally (DiscardCopiesFromDeck of "other", 10137:A:2) reads the ally the attack destroyed.
   const destroyedAlly = after.some((one) => one.verb === "DiscardCopiesFromDeck" && one.of === "other") ? destroyedAllyOf(state, attack, ctx) : undefined;
   // Only an effect that reanimates the character the attack destroyed (Unholy Crypt, 101161:A:2), or one that acts for its controller (Assault on Osgiliath, 06100:A:2), reads it.
@@ -363,7 +364,9 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       actor: attack.seat,
       peril: false,
       effectId: `${attack.enemyId}:afterAttack`,
-      instructions: waiting.length > 0 ? [...owed, { verb: "StartShadowAttack", attackers: [...waiting] }] : owed,
+      instructions: [...owed, ...shadowStart, ...(attack.onEnd ?? []).map((one) => one.instruction)],
+      // What waited on the attack keeps the cause of the effect that queued it; the rest keeps the frame's cause (below).
+      ...(attack.onEnd ? { causes: [...[...owed, ...shadowStart].map(() => undefined), ...attack.onEnd.map((one) => one.cause)] } : {}),
       cancel: null,
       blockCancel: null,
       // An attack that sends its excess damage on (excessToShip) leaves that damage (0 when there was none) for the effect; X is the characters it destroyed.

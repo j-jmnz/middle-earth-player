@@ -1,4 +1,4 @@
-Scenario piles that place cards with no record (quest: 00016 Beyond Expectations; quest: 00017 Through the Ruins; quest: 00018 Anduin Crossing; quest: 00019 Race to Minas Tirith; staging: 00002 Snaga Scouts; staging: 00003 Wolves from Mordor; staging: 00004 Wainriders; setAside: 00001 The Witch-king)
+Scenario piles that place cards with no record (quest: 00016 Beyond Expectations; quest: 00017 Through the Ruins; quest: 00018 Anduin Crossing; quest: 00019 Race to Minas Tirith; staging: 00002 Snaga Scouts (1 per player); staging: 00003 Wolves from Mordor (1 per player); staging: 00004 Wainriders (1 per player); setAside: 00001 The Witch-king)
 
 ## 00001 The Witch-king
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -22,7 +22,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
         - return this card to the staging area
 
 ## 00002 Snaga Scouts
-(the scenario deals it into the staging pile; the piles place it, no record does)
+(the scenario deals it into the staging pile, 1 copy for each player, the other copies stay in the encounter deck; the piles place it, no record does)
 
 00002:A:1 (front): Forced: At the beginning of the encounter phase, all copies of Snaga Scouts engage the player with the lowest threat. (The first player chooses in case of a tie.)
   00002:forced:1: Forced when a phase begins
@@ -31,7 +31,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
     - every copy of this enemy, in the staging area or engaged with a player, engages the player with the lowest threat (the first player chooses among tied players)
 
 ## 00003 Wolves from Mordor
-(the scenario deals it into the staging pile; the piles place it, no record does)
+(the scenario deals it into the staging pile, 1 copy for each player, the other copies stay in the encounter deck; the piles place it, no record does)
 
 00003:A:1 (front): Forced: After Wolves from Mordor attack and destroy a character, shuffle Wolves from Mordor into the encounter deck.
   00003:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
@@ -45,7 +45,7 @@ Scenario piles that place cards with no record (quest: 00016 Beyond Expectations
     - deal 2 damage to the defender
 
 ## 00004 Wainriders
-(the scenario deals it into the staging pile; the piles place it, no record does)
+(the scenario deals it into the staging pile, 1 copy for each player, the other copies stay in the encounter deck; the piles place it, no record does)
 
 00004:A:1 (front): Each damage dealt by Wainriders raises the defending player's threat by 1.
   00004:constant:1: Constant

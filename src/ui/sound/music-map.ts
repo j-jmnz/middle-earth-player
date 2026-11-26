@@ -161,6 +161,7 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "desert-crossing": { calm: "rohan", combat: "chase" },
   "the-long-arm-of-mordor": { calm: "shadow", combat: "uruk" },
   "the-three-trials": { calm: "fangorn", combat: UNDEAD },
+  "trouble-in-tharbad": { calm: "crossroads", combat: "uruk" },
   "the-mumakil": { calm: "fangorn", combat: "pelennor" },
   "race-across-harad": { calm: "rohan", combat: "uruk" },
 };

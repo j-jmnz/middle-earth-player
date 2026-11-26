@@ -125,7 +125,8 @@ describe("effect coverage", () => {
 
   // A constant record that is no replacement effect: it raises the table flag that makes the engine announce an event, so the card's own Forced record can hear it. 05023:constant:1 is the other half of Harbor Storehouse's Forced line (05023:A:1):
   // the flag `noteDeckDiscards` makes the engine announce a card that leaves the top of the encounter deck (families/stormcaller/zone.ts, discardedFromDeck), held while the card is in play.
-  const ANNOUNCEMENT_FLAG_RECORDS: ReadonlySet<string> = new Set(["05023:constant:1"]);
+  // 08066:constant:2 is the same for stage 1B's Forced line (08066:B:3): the flag `progressCanceled` makes the engine announce the progress placed on the stage as `progressReplaced` (quest/progress-replaced.ts), which its Forced record hears.
+  const ANNOUNCEMENT_FLAG_RECORDS: ReadonlySet<string> = new Set(["05023:constant:1", "08066:constant:2"]);
 
   // A constant record that is the other half of a When Revealed line whose lasting effect is recalculated as the game changes (faq.lasting-effects): 05049:whenRevealed:1 sets the flag `attackForUncommitted` until the end of the round and 05049:constant:1 counts
   // "+1 Attack for each character not currently committed" while the flag holds, because a modifier made by the When Revealed effect fixes its amount when it resolves.

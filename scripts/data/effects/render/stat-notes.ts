@@ -15,6 +15,8 @@ export const FLAG_NOTES: Readonly<Record<string, string>> = {
   noteExplored: " (the table notes each location explored until the end of that round, for the condition locationExploredThisRound; the Setup sets it for the rest of the game)",
   exploredThisRound: " (a location was explored; noted by the engine until the end of the round)",
   stageEntered: " (the round the current main quest card was first seen in play, noted by the engine; round 0 is Setup)",
+  progressCanceled: " (progress that would be placed on this stage is canceled: none is placed, and the stage's Forced effect for it hears the canceled amount as X)",
+  progressToCrossing: " (progress that would be placed on this stage is not placed: the stage's Forced effect for it puts the amount, X, on The Crossing at Tharbad; a player card effect's progress goes nowhere, the Crossing being immune to it)",
   progressToQuest: " (progress that a card effect would place on this location goes on the current quest instead, and it is never explored)",
   advancesWhenFreed: " (a stage with no progress and no quest points advances at once when nothing holds it back, with no progress needed)",
   assault: " (Assault: questing and player cards place no progress on this stage; a failed quest raises no threat and deals the shortfall as damage to Minas Tirith; a destroyed enemy's total Threat is kept for the progress its destruction places)",

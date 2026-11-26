@@ -99,7 +99,7 @@ export const STAT_TEMPLATES: Readonly<Record<string, Template>> = {
     const lasting = i.until === "endOfPhase" || i.until === "endOfRound" || i.until === "endOfAttack";
     const holders = isObj(i.holders) ? `each ${pick(i.holders, ctx)}${lasting ? " (only the cards that match now: one that arrives later does not get it)" : ""}` : typeof i.target === "string" ? targetStat(i.target) : "this card";
     const per = typeof i.per === "string" ? ` for each ${i.per}` : "";
-    const trait = typeof i.trait === "string" ? ` (${i.trait} only)` : "";
+    const trait = typeof i.trait === "string" ? (i.target === "stagingCards" ? ` (${i.trait} only: an enemy or a location that holds the Trait)` : ` (${i.trait} only)`) : "";
     const sign = i.subtract === true ? "minus " : "";
     const resources = `${i.eachResource === true ? " for each resource on the holder" : ""}${isObj(i.eachAttached) ? ` for each ${pick(i.eachAttached, ctx)} attached to the holder${i.eachAttached.facedownUnder === true ? " (here: each facedown player card under the holder)" : ""}` : ""}`;
     const stacking = i.doesNotStack === true ? " (does not stack: only the oldest copy of this card in play whose condition holds gives it)" : "";

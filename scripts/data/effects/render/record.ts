@@ -41,6 +41,7 @@ const TRIGGER: Readonly<Record<string, string>> = {
   flipped: "after a card is flipped over (the FlipCard verb)",
   questSucceeded: "after the players quest successfully",
   enemyDestroyed: "after an enemy is destroyed",
+  progressReplaced: "after progress that would be placed on the current quest is replaced by the stage's flag (X is that progress: the amount that would have gone on the quest)",
   attacks: "when this enemy attacks, before the defender is declared",
   revealed: "after a card is revealed",
   engaged: "after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it)",
@@ -110,7 +111,9 @@ export function renderCost(value: unknown, ctx: Ctx): string {
 function renderSubject(value: unknown, ctx: Ctx): string {
   if (value === "self") return "this card";
   if (value === "host") return "the host";
-  return renderPick(value, ctx);
+  // A trigger's subject that is a player card hears an event card too: an event is not in play while it resolves, and the event it plays is still about it.
+  const note = isObj(value) && value.playerCard === true ? " (an event card passes: it is heard while it resolves, though it is not in play)" : "";
+  return `${renderPick(value, ctx)}${note}`;
 }
 
 export function renderRecord(effect: Obj, ctx: Ctx): string[] {

@@ -333,7 +333,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141069:A:3 (shadow): Shadow: Shuffle this card into the encounter deck.
   141069:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - this card (a shadow card) is shuffled into the encounter deck instead of being discarded
+    - this card (a shadow card, or an enemy that was destroyed) is shuffled into the encounter deck instead of being discarded
 
 ## 141070 Pale Blade
 (the scenario deals it into the encounter pile; the piles place it, no record does)

@@ -1,4 +1,4 @@
-Scenario piles that place cards with no record (quest: 16071 Surprise Attack; quest: 16072 Find the Others; quest: 16073 Free the Captives; quest: 16074 Escape into the Jungle; staging: 16035 Sauron's Enforcers; setAside: 16061 Uruk Chieftain; setAside: 16031 Kahliel; setAside: 16032 Firyal; setAside: 16033 Yazan; setAside: 16034 Jubayr)
+Scenario piles that place cards with no record (quest: 16071 Surprise Attack; quest: 16072 Find the Others; quest: 16073 Free the Captives; quest: 16074 Escape into the Jungle; staging: 16035 Sauron's Enforcers (1 per player); setAside: 16061 Uruk Chieftain; setAside: 16031 Kahliel; setAside: 16032 Firyal; setAside: 16033 Yazan; setAside: 16034 Jubayr)
 
 ## 16031 Kahliel
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -69,7 +69,7 @@ Scenario piles that place cards with no record (quest: 16071 Surprise Attack; qu
     - the acting player is eliminated from the game by a card effect
 
 ## 16035 Sauron's Enforcers
-(the scenario deals it into the staging pile; the piles place it, no record does)
+(the scenario deals it into the staging pile, 1 copy for each player, the other copies stay in the encounter deck; the piles place it, no record does)
 
 16035:A:1 (front): X is the stage number on the main quest.
   16035:constant:1: Constant

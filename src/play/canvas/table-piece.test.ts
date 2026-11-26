@@ -150,3 +150,19 @@ describe("sameNumbers", () => {
     expect(sameNumbers(null, null)).toBe(true);
   });
 });
+
+describe("the placeholder name of a card with effect pills", () => {
+  const { views, piles } = crowdedTable();
+  const slots = laidOut(views, piles).slots;
+  const staged = slots.find((slot) => slot.kind === "card" && !slot.faceDown && slot.zone === "staging") as CardSlot;
+  const withPills = (stats: number): PieceContext => ({
+    ...contextOf(),
+    info: () => ({ ...numbersOf(null), effects: { stats: Array.from({ length: stats }, () => ({})), flags: [] } as unknown as SlotNumbers["effects"] }),
+  });
+
+  it("keeps to one line above the pills, and takes the default lines with none", () => {
+    expect(staged).toBeDefined();
+    expect(pieceProps(staged, withPills(1)).nameLines).toBe(1);
+    expect(pieceProps(staged, withPills(0)).nameLines).toBeUndefined();
+  });
+});

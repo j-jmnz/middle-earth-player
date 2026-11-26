@@ -1,0 +1,326 @@
+Scenario piles that place cards with no record (quest: 08066 Double Dealings; quest: 08067 Escape from Tharbad; staging: 08072 Spy from Mordor (1 per player); activeLocation: 08069 The Empty Mug; setAside: 08068 Nalir; setAside: 08070 Bellach; setAside: 08071 The Crossing at Tharbad)
+
+## 08066 Double Dealings
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08066:A:1 (front): Setup: Set Bellach and The Crossing at Tharbad aside, out of play. Search the encounter deck for 1 copy of Spy From Mordor per player, and add them to the staging area. Make The Empty Mug the active location. The first player takes control of Nalir, as an ally. Shuffle the encounter deck.
+  08066:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the set-aside card with code 08068 enters play under the first player's control, ready
+    - shuffle the encounter deck
+
+08066:B:1 (back): Time 4.
+  08066:constant:1: Constant
+    - Time 4: when this card is revealed, 4 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+08066:B:2 (back): Forced: After the last time counter is removed from this quest, reduce each player's threat elimination level by 10 for the remainder of the game. Then, place 4 time counters on this stage.
+  08066:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - actorSeat: stat eliminationReduction 10, until the end of the game
+    - each player whose threat is at or above his threat elimination level now (50, less what the effects before this one took off) is eliminated at once
+    - place 4 resource tokens on this card
+
+08066:B:3 (back): Forced: After 1 or more progress is placed on this quest, cancel all progress and reduce each player's threat by an equal amount.
+  08066:constant:2: Constant
+    - this card: stat progressCanceled (progress that would be placed on this stage is canceled: none is placed, and the stage's Forced effect for it hears the canceled amount as X) 1, while this card is in play
+  08066:forced:2: Forced after progress that would be placed on the current quest is replaced by the stage's flag (X is that progress: the amount that would have gone on the quest)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - lower threat by X (each player)
+
+08066:B:4 (back): When all players have 0 threat, immediately proceed to stage 2.
+  08066:triggered:1: Triggered (mandatory, not printed as Forced) on the event allThreatZero
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - advance to the next quest stage
+
+## 08067 Escape from Tharbad
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+08067:A:1 (front): When Revealed: Add Bellach and The Crossing at Tharbad to the staging area. Then, shuffle the encounter discard pile into the encounter deck and discard cards from the encounter deck until X Orc enemies have been discarded, where X is the number of players in the game. Add all discarded Orc enemies to the staging area.
+  08067:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one set-aside card with code 08070 joins the staging area (it is not revealed)
+    - one set-aside card with code 08071 joins the staging area (it is not revealed)
+    - shuffle the encounter discard pile into the encounter deck
+    - discard from the top of the encounter deck until 1 Orc enemy for each player is discarded; add those enemies to the staging area
+
+08067:B:1 (back): Time 3.
+  08067:constant:1: Constant
+    - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+08067:B:2 (back): Forced: After the last time counter is removed from the quest, either raise each player's threat by 3 or Bellach makes an immediate attack against Nalir. Then, place 3 time counters on this stage.
+  08067:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player chooses one of:
+      * option "threat":
+        - raise threat by 3 (each player)
+      * option "attack" (only if there is a enemy (any player controls) or in the staging area, named "Bellach" to choose):
+        - choose enemy (any player controls) or in the staging area, named "Bellach"
+        - the picked enemy, in the staging area or engaged with any player, makes an immediate attack against the player who controls Nalir (it is dealt a shadow card; that player declares defenders as for any attack, and undefended damage must be assigned to Nalir); nothing happens when no player controls Nalir
+    - place 3 resource tokens on this card
+
+08067:B:3 (back): Progress that would be placed on this quest are instead placed on The Crossing at Tharbad.
+  08067:constant:2: Constant
+    - this card: stat progressToCrossing (progress that would be placed on this stage is not placed: the stage's Forced effect for it puts the amount, X, on The Crossing at Tharbad; a player card effect's progress goes nowhere, the Crossing being immune to it) 1, while this card is in play
+  08067:forced:2: Forced after progress that would be placed on the current quest is replaced by the stage's flag (X is that progress: the amount that would have gone on the quest)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - X progress token(s) are placed on the card in play with the title The Crossing at Tharbad (the staging area counts as play), in one placement: the cards that hear progress placed hear it once; with no such card in play nothing happens
+
+08067:B:4 (back): Forced: After a character leaves play, raise its controller's threat by 2.
+  08067:forced:3: Forced after a card leaves play (heard about character (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - raise threat by 2 (the player the event is about)
+
+## 08068 Nalir
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08068:A:1 (front): The first player gains control of Nalir.
+  08068:constant:1: Constant
+    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them, and from then on it follows the first player token: it passes to the new first player each time the token moves, while it stays free of encounters
+
+08068:A:2 (front): Forced: At the beginning of the refresh phase, raise your threat by 1 for each player in the game.
+  08068:forced:1: Forced when a phase begins
+    only if it is the Refresh phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - raise threat by the number of players (the acting player)
+
+08068:A:3 (front): If Nalir leaves play, the players lose the game.
+  08068:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players lose the game
+
+## 08069 The Empty Mug
+(the scenario deals it into the activeLocation pile; the piles place it, no record does)
+
+08069:A:1 (front): Players cannot reduce their threat.
+  08069:constant:1: Constant
+    - each player: stat threatReductionBarred 1, while this card is in play
+
+08069:A:2 (front): While The Empty Mug is in the victory display, the current quest gains 'Forced: After a player card effect reduces a player's threat, remove it from the game.'
+  08069:forced:1: Forced on the event threatLowered (heard about card (any player controls) or in the staging area or the active location, that is a player card (an event card passes: it is heard while it resolves, though it is not in play); used from the victory display)
+    only if this card is in the victory display
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the card the event is about is removed from the game
+
+## 08070 Bellach
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08070:A:1 (front): X is the number of players in the game.
+  08070:constant:1: Constant
+    - this card: stat threat the number of players, while this card is in play
+
+08070:A:2 (front): Orc and Creature enemies get -30 engagement cost and +1 Threat.
+  08070:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Orc enemy (any player controls) or in the staging area: stat engagementCost -30, while this card is in play
+    - each Orc enemy (any player controls) or in the staging area: stat threat 1, while this card is in play
+    - each Creature enemy (any player controls) or in the staging area: stat engagementCost -30, while this card is in play
+    - each Creature enemy (any player controls) or in the staging area: stat threat 1, while this card is in play
+
+08070:A:3 (front): Forced: When Bellach is destroyed, shuffle him into the encounter deck.
+  08070:forced:1: Forced after an enemy is destroyed (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this card (a shadow card, or an enemy that was destroyed) is shuffled into the encounter deck instead of being discarded
+
+## 08071 The Crossing at Tharbad
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+08071:A:1 (front): Immune to player card effects. Cannot leave the staging area.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot leave the staging area.)
+  08071:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+    - this card: stat exploresWhileHeld 1, while this card is in play
+
+08071:A:2 (front): The Crossing at Tharbad gets +2 quest points for each player in the game.
+  08071:constant:2: Constant
+    - this card: stat questPoints the number of players x 2, while this card is in play
+
+08071:A:3 (front): When The Crossing at Tharbad is explored, the players win the game.
+  08071:triggered:1: Triggered (mandatory, not printed as Forced) on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players win the game
+
+## 08072 Spy from Mordor
+(the scenario deals it into the staging pile, 1 copy for each player, the other copies stay in the encounter deck; the piles place it, no record does)
+
+08072:A:1 (front): Forced: When Spy From Mordor attacks, remove 1 time counter from the current quest.
+  08072:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
+    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+
+## 08073 Bellach's Marauder
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08073:A:1 (front): While Bellach's Marauder is engaged with a player, it gains: 'Forced: After a time counter is removed from the current quest, deal Bellach's Marauder 2 shadow cards.'
+  08073:forced:1: Forced after a time counter is removed from the current quest, at the end of the refresh phase or by a card effect
+    only if this card is engaged with a player (that player is who "you" means in this record)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this enemy (the card the record is on, wherever it is in play) is dealt an additional shadow card, beside any it has; the card stays on it until its next attack
+    - this enemy (the card the record is on, wherever it is in play) is dealt an additional shadow card, beside any it has; the card stays on it until its next attack
+
+08073:A:2 (shadow): Shadow: Remove 1 time counter from the current quest.
+  08073:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+
+## 08074 Streets of Tharbad
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08074:A:1 (front): Progress cannot be placed on Streets of Tharbad while it is in the staging area.
+  08074:constant:1: Constant
+    only if this card is in the staging area
+    - this card: stat noProgressPlaced 1, while this card is in play
+
+08074:A:2 (front): While Streets of Tharbad is the active location, enemies get -20 engagement cost.
+  08074:constant:2: Constant
+    only if this card is the active location
+    - each enemy (any player controls) or in the staging area: stat engagementCost -20, while this card is in play
+
+## 08075 Tharbad Hideout
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08075:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+08075:A:2 (front): While Tharbad Hideout is the active location, time counters cannot be removed from the current quest.
+  08075:constant:1: Constant
+    only if this card is the active location
+    - the table: stat timeBarred 1, while this card is in play
+
+08075:A:3 (front): Forced: At the beginning of the quest phase, place 1 progress on Tharbad Hideout.
+  08075:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - place 1 progress on this card
+
+## 08076 Ruins of the Second Age
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08076:A:1 (front): While Ruins of the Second Age is in the staging area, City locations get +1 Threat.
+  08076:constant:1: Constant
+    only if this card is in the staging area
+    - each City location (any player controls) or in the staging area: stat threat 1, while this card is in play
+
+08076:A:2 (front): While Ruins of the Second Age is the active location, deal engaged enemies 1 additional shadow card at the beginning of the combat phase.
+  08076:forced:1: Forced when a phase begins
+    only if all of: (this card is the active location) and (it is the Combat phase)
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - for each enemy (any player controls):
+      - the picked card is dealt a shadow card
+
+## 08077 Seedy Inn
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08077:A:1 (front): Travel: Search the encounter deck and discard pile for a Spy enemy and add it to the staging area. Shuffle the encounter deck.
+  08077:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one Spy enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+08077:A:2 (shadow): Shadow: Raise the defending player's threat by X, where X is the amount of damage dealt by this attack.
+  08077:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - raise threat by the damage just dealt (the acting player)
+
+## 08078 Hidden Alleyway
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08078:A:1 (front): Travel: Raise each player's threat by X to travel here. X is the number of enemies in play.
+  08078:travel:1: Travel
+    - raise threat by the number of enemy (any player controls) or in the staging area (each player)
+
+08078:A:2 (front): Forced: After traveling to Hidden Alleyway, add 1 time counter to the current quest.
+  08078:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 1 resource tokens on the current quest stage
+
+## 08079 Decrepit Rooftops
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08079:A:1 (front): While Decrepit Rooftops is the active location, enemies get +1 Threat and do not make engagement checks.
+  08079:constant:1: Constant
+    only if this card is the active location
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) or in the staging area: stat threat 1, while this card is in play
+    - the table: stat noEngagementChecks (no engagement check engages it; held by the table, no engagement check is made at all and Ambush does nothing) 1, while this card is in play
+
+08079:A:2 (front): Forced: After traveling to Decrepit Rooftops, return all engaged enemies to the staging area.
+  08079:forced:1: Forced after the players travel (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - return every enemy engaged with a player to the staging area
+
+## 08080 Constant Tail
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08080:A:1 (front): When Revealed: Return all engaged enemies to the staging area. Then, the first player either removes 1 time counter from the current quest or each Spy enemy in the staging area gets +2 Threat until the end of the phase.
+  08080:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - return every enemy engaged with a player to the staging area
+    - the first player chooses one of:
+      * option "time" (only if all of: (0 is less than resources of the current quest stage) and (the table does not hold the flag timeBarred)):
+        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+      * option "threat":
+        - every enemy and location in the staging area, now and arriving there later while the effect lasts (Spy only: an enemy or a location that holds the Trait): stat threat 2, until the end of the phase
+
+## 08081 Conspicuous Lot
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08081:A:1 (front): When Revealed: Each player raises his threat by 1 for each ally he controls. Then, if any player's threat is 20 or less, this card gains surge.
+  08081:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - raise threat by the number of ally (you control) (the acting player)
+    - then, if some living player's threat is 20 or less, whichever player the effect runs for (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+08081:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if the defending player's threat is 20 or less).
+  08081:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the actor's threat is at most 20): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the actor's threat is at most 20 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 08082 Cornered
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08082:A:1 (front): When Revealed: The first player either removes 1 time counter from the current quest or each enemy gets -20 engagement cost and +1 Attack until the end of the round.
+  08082:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    - the first player chooses one of:
+      * option "time" (only if all of: (0 is less than resources of the current quest stage) and (the table does not hold the flag timeBarred)):
+        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+      * option "enemies":
+        - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat engagementCost -20, until the end of the round
+        - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat attack 1, until the end of the round
+
+08082:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending player's threat is 20 or less).
+  08082:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the actor's threat is at most 20): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the actor's threat is at most 20 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 08083 Get That Dwarf!
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+08083:A:1 (front): When Revealed: The enemy in the staging area with the highest Attack engages the first player and makes an immediate attack against Nalir. If there are no enemies in the staging area, Get That Dwarf! gains surge.
+  08083:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (there is a enemy (any player controls) in the staging area only to choose): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - choose enemy (any player controls) in the staging area only, with the highest Attack of those, as the table shows it (ties: the chooser decides), chosen by the first player
+    - the picked enemy, in the staging area, engages the first player
+    - the picked enemy, in the staging area or engaged with any player, makes an immediate attack against the player who controls Nalir (it is dealt a shadow card; that player declares defenders as for any attack, and undefended damage must be assigned to Nalir); nothing happens when no player controls Nalir
+
+08083:A:2 (shadow): Shadow: If this attack is undefended, deal 2 damage to Nalir.
+  08083:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the attack has no defender: choose character (any player controls) named "Nalir"
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
+
+(rendered pieces: 187 by template, 0 as JSON)

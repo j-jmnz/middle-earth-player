@@ -1,4 +1,5 @@
 // Elimination (rr.player-elimination): a seat out of heroes or at the threat elimination level leaves the game, and the cards it held go with it.
+import { runAtEnd } from "../combat/attack-end.ts";
 import { threatSaved } from "../families/quest/threat.ts";
 import { GOLLUM, SMEAGOL, isGollum } from "../families/gollum/index.ts";
 import { DIRE_ELIMINATION_LEVEL } from "../families/black-gate/dire.ts";
@@ -42,8 +43,8 @@ export function loseWhenLeftPlay(before: ScenarioState, after: ScenarioState, ca
 // An eliminated seat leaves the game (rr.player-elimination): its hand, its deck and every card it controls go to their
 // owners' discard piles (a player side quest in the staging area is one it controls, and goes to its owner's pile, not the encounter discard pile), and the enemies engaged with it
 // return to the staging area with their damage. An attack on that seat ends, and a Peril lock it held is released. If it held the first player token, the token passes clockwise at once (rr.first-player,
-// faq.first-player-elimination). Nothing is cleared once the game is lost. With `ctx`, an enemy that returns to the staging area queues "returnedToStaging" in a game whose records name it (146017:A:1).
-export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, ctx?: ReduceContext): ScenarioState {
+// faq.first-player-elimination). Nothing is cleared once the game is lost. An enemy that returns to the staging area queues "returnedToStaging" in a game whose records name it (146017:A:1).
+export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.lost) return state;
   let next = state;
   // Gollum is engaged with the first player and Sméagol is controlled by them (144075:A:1, 144076:A:1): when that seat leaves they pass to the new first player, keeping their exhaustion and damage (agent recommendation, docs/scenarios/the-two-towers/the-passage-of-the-marshes.md, The Passage of the Marshes).
@@ -63,7 +64,7 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
       }
       next = moveCard(next, enemyId, { zone: "staging" });
       next = updateCard(next, enemyId, { controller: null });
-      if (ctx && gameReads(next, ctx, '"trigger":"returnedToStaging"')) next = queueEvent(next, { trigger: "returnedToStaging", seat: index, cardId: enemyId });
+      if (gameReads(next, ctx, '"trigger":"returnedToStaging"')) next = queueEvent(next, { trigger: "returnedToStaging", seat: index, cardId: enemyId });
     }
     if (smeagol && heir != null) next = moveCard(next, smeagol.id, { zone: "play", seat: heir });
     for (const card of controlled) {
@@ -78,7 +79,10 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
     // The action window between two steps of that attack closes with it.
     if (next.pendingAttack?.seat === index) {
       const between = next.pendingAttack.awaiting != null && next.window?.kind === "frameAction";
+      const ended = next.pendingAttack;
       next = { ...next, pendingAttack: null, window: next.window?.kind === "defense" || between ? null : next.window };
+      // What waited on the attack still happens: it is an effect that resolves, not part of the attack on the seat (combat/attack-end.ts).
+      next = runAtEnd(next, ended, steps);
       // A defense window an event frame holds aside (the Forced effect that eliminated the seat ran after the attack began: Muck Adder's discard of the last hero, 02042:A:1, with a Wolf Rider shadow attack already begun) is dropped, not given back.
       next = { ...next, stack: next.stack.filter((frame) => !(frame.data.kind === "resume" && frame.data.window.kind === "defense" && frame.data.window.seat === index)) };
     }

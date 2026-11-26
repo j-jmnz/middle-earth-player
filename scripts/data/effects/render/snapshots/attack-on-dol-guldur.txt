@@ -1,4 +1,4 @@
-Scenario piles that place cards with no record (quest: 50901 Assault on the Golden Wood; quest: 50902 Crossing the Anduin; quest: 50903 The Siege of Dol Guldur; quest: 50904 The Tower of Sorcery; quest: 50905 Battle Under the Trees; quest: 50906 Dungeons of the Necromancer; staging: 50907 Dol Guldur; staging: 50908 Power of Lórien; staging: 50918 Dol Guldur Marauder; setAside: 50909 Host of Lórien; setAside: 50910 Bane of Amon Lanc; setAside: 50911 Sorcerer of Dol Guldur; setAside: 50912 Chieftain Morlug; setAside: 50913 Dungeon Dweller)
+Scenario piles that place cards with no record (quest: 50901 Assault on the Golden Wood; quest: 50902 Crossing the Anduin; quest: 50903 The Siege of Dol Guldur; quest: 50904 The Tower of Sorcery; quest: 50905 Battle Under the Trees; quest: 50906 Dungeons of the Necromancer; staging: 50907 Dol Guldur; staging: 50908 Power of Lórien; staging: 50918 Dol Guldur Marauder (1 per player); setAside: 50909 Host of Lórien; setAside: 50910 Bane of Amon Lanc; setAside: 50911 Sorcerer of Dol Guldur; setAside: 50912 Chieftain Morlug; setAside: 50913 Dungeon Dweller)
 
 ## 50901 Assault on the Golden Wood
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -387,7 +387,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     - exhaust the picked card
 
 ## 50918 Dol Guldur Marauder
-(the scenario deals it into the staging pile; the piles place it, no record does)
+(the scenario deals it into the staging pile, 1 copy for each player, the other copies stay in the encounter deck; the piles place it, no record does)
 
 50918:A:1 (front): Dol Guldur Marauder gets +1 Attack and +1 Defense for each resource on it.
   50918:constant:1: Constant

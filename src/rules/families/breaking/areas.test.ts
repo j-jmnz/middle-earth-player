@@ -192,7 +192,7 @@ describe("an area whose head is eliminated (mec108.joining-another-player, rr.pl
     const { stage: _stage, ...own } = state.seats[0];
     const joined = withSeat(withSeat(state, 0, { ...own, staging: [], joined: 1 }), 1, { ...state.seats[1], threat: 50, eliminated: true });
     const area = joined.seats[1];
-    const after = clearEliminated(joined, world.cards);
+    const after = clearEliminated(joined, world.cards, { effects: [], cards: world.cards }, []);
     expect(headOf(after, 0)).toBe(0);
     expect(after.seats[0].joined).toBeUndefined();
     expect(after.seats[0].staging).toEqual(area.staging);
@@ -209,7 +209,7 @@ describe("an area whose head is eliminated (mec108.joining-another-player, rr.pl
   it("still discards the area of an eliminated seat that nobody joined", () => {
     const split = make({ seats: 2, stage: "separate", staging: [], areas: [["grunt"], ["scout"]] });
     const gone = withSeat(split.state, 1, { ...split.state.seats[1], eliminated: true });
-    const after = clearEliminated(gone, world.cards);
+    const after = clearEliminated(gone, world.cards, { effects: [], cards: world.cards }, []);
     expect(after.seats[1].staging).toEqual([]);
     expect(after.cards[first(split.state, "scout")]?.zone).toBe("encounterDiscard");
     expect(after.seats[0].staging).toEqual(split.state.seats[0].staging);
@@ -221,7 +221,7 @@ describe("an area whose head is eliminated (mec108.joining-another-player, rr.pl
     const spawned = spawn(split.state, "psq", { zone: "staging", area: 1 });
     const quest = updateCard(spawned.state, spawned.id, { controller: 1, owner: 1 });
     const gone = withSeat(quest, 1, { ...quest.seats[1], eliminated: true });
-    const after = clearEliminated(gone, cards);
+    const after = clearEliminated(gone, cards, { effects: [], cards: cards }, []);
     expect(after.cards[spawned.id]?.zone).toBe("discard");
     expect(after.seats[1].discard).toContain(spawned.id);
     expect(after.cards[first(split.state, "scout")]?.zone).toBe("encounterDiscard");

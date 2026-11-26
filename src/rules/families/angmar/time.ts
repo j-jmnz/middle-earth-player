@@ -8,7 +8,7 @@ import { constantVerbCodes } from "../../interpret/constant-records.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { addModifier } from "../../core/modified-stat.ts";
-import { heldAmount, inPlay, livingSeats, updateCard, type ScenarioState } from "../../core/state.ts";
+import { flagged, heldAmount, inPlay, livingSeats, updateCard, type ScenarioState } from "../../core/state.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import { holds } from "../../interpret/conditions.ts";
@@ -64,6 +64,7 @@ export function timeOnReveal(state: ScenarioState, id: string, ctx: ReduceContex
  * Off Track 07057:forced:1) whose condition holds now (Off Track only while it is attached). The records are read, so a card with that record counts with no change here. Counters come off "if able", so the dial compares this with the counters left.
  */
 export function refreshTakes(state: ScenarioState, ctx: ReduceContext): number {
+  if (timeBarred(state)) return 0;
   let takes = 1;
   for (const card of Object.values(state.cards)) {
     if (!inPlay(card.zone) || textBlank(state, card.id, ctx.cards)) continue;
@@ -126,13 +127,18 @@ export function removeTimeCountersFrom(state: ScenarioState, ctx: ReduceContext,
   return next;
 }
 
+/** "Time counters cannot be removed from the current quest" (08075:A:2, the table flag `timeBarred` of Tharbad Hideout while it is the active location): nothing takes a counter off the current quest stage, and a Forced effect that waits for the removal does not run. */
+export function timeBarred(state: ScenarioState): boolean {
+  return state.modifiers.length > 0 && flagged(state, "table", "timeBarred");
+}
+
 /**
  * One time counter comes off this card, if it holds any; the card hears it when that was its last (`lastTimeCounterRemoved`). The refresh phase and the cards that remove a counter (Down from the Hills, Gap of Rohan) share it. A counter that comes off the current quest is also announced
  * (`timeCounterRemoved`, "After a time counter is removed from the current quest", 07058:A:1; an event about no card, so every record that hears it does), only in a game that deals a card whose record hears it, so no other game queues it.
  */
 export function removeTimeCounterFrom(state: ScenarioState, id: string, ctx: ReduceContext): ScenarioState {
   const card = state.cards[id];
-  if (!card || card.resources <= 0) return state;
+  if (!card || card.resources <= 0 || (id === state.questStage && timeBarred(state))) return state;
   let next = updateCard(state, id, { resources: card.resources - 1 });
   if (id === state.questStage && listens(state, ctx, "timeCounterRemoved")) next = queueEvent(next, { trigger: "timeCounterRemoved", seat: null });
   return card.resources === 1 ? queueEvent(next, { trigger: "lastTimeCounterRemoved", seat: null, cardId: id, subject: id }) : next;
