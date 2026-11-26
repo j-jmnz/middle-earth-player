@@ -249,7 +249,7 @@ export function dealStepShadow(state: ScenarioState, enemyId: string, steps: Eng
 }
 
 /** Where an additional shadow card comes from when the record names it. */
-export type ShadowSource = "encounter" | "raven";
+export type ShadowSource = NonNullable<Extract<Instruction, { verb: "DealShadowTo" }>["from"]>;
 
 // One more shadow card for an enemy, beside any it has (141069:A:2). With none yet it is simply its shadow card. An empty
 // encounter deck deals nothing (rr.step-6-2).

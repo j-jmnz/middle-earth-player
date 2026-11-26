@@ -170,8 +170,8 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
   const hostId = hostOf(a.game, a.source);
   // An AssignDamage not yet split into steps holds all of its amount.
   if (a.instruction.verb === "AssignDamage") values.left = a.instruction.left ?? resolveAmount(a.game, a.instruction.amount, scope, a.ctx);
-  // A RemoveTimeCounters that divides its total (08153:A:1): the counters still to take off, counting the one asked.
-  else if (a.instruction.verb === "RemoveTimeCounters" && a.instruction.distribute != null) values.left = a.instruction.left ?? (a.instruction.amount == null ? 1 : resolveAmount(a.game, a.instruction.amount, scope, a.ctx));
+  // A RemoveTimeCounters that divides its total (08153:A:1): the counters still to take off, counting the one asked (the engine sets `left` on the pick it asks).
+  else if (a.instruction.verb === "RemoveTimeCounters" && a.instruction.distribute != null) values.left = a.instruction.left ?? 1;
   // A Prowl's discard: the resources the players still have to discard, counting the step asked (group-steps.ts).
   // Heart of Fangorn's cap: the characters that would still ready, and how many of them must stay exhausted, counting the one asked.
   else if (a.instruction.verb === "CapRefresh") {

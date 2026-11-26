@@ -4,7 +4,7 @@ import { cardRef, renderAmount, topUpTo } from "./amounts.ts";
 import { renderCondition } from "./conditions.ts";
 import { who } from "./family-kit.ts";
 import { FAMILY_TEMPLATES } from "./families.ts";
-import { compact, done, isObj, jsonOf, joinAnd, joinOr, quoted, str, withArticle, type Ctx, type Obj } from "./kit.ts";
+import { compact, done, isObj, objOrNone, jsonOf, joinAnd, joinOr, quoted, str, withArticle, type Ctx, type Obj } from "./kit.ts";
 import { EFFECTS } from "../../../../src/effects/index.ts";
 import { renderPick } from "./picks.ts";
 import { ANGMAR_TEMPLATES } from "./families/angmar.ts";
@@ -195,7 +195,8 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   ChooseCurrentQuest: (i) => ({ text: i.until === "endOfRound" ? "the first player chooses a quest card other than the current quest (the main quest card, a quest stage in play together, or a side quest in the staging area) to be the current quest until the end of the round" : "the first player chooses a quest card other than the current quest (the main quest card, or an encounter side quest in the staging area) to be the current quest until the end of the phase", read: ["until"] }),
   AttachNewTo: (i) => ({ text: `a copy of the card with code ${str(i.code)} from the supply is put into play attached to the card titled "${str(i.to)}"`, read: ["code", "to"] }),
   TradeDamageForResources: (i) => ({ text: `starting with the first player, each player may place ${str(i.damage)} damage on the card with code ${str(i.code)} to add ${str(i.resources)} resource to each of their heroes' pools`, read: ["code", "damage", "resources"] }),
-  AddPickedToStaging: () => ({ text: "the picked card (a set-aside card or a card of the Raven deck) is added to the staging area, not revealed (no When Revealed, no Surge)", read: [] }),
+  // The source is the one the pick before it reads: the Raven deck for a Pick whose spec reads `from: ravenDeck`, else the set-aside pile.
+  AddPickedToStaging: (_i, ctx) => ({ text: `the picked card (${(objOrNone(ctx.before?.pick)?.from === "ravenDeck") ? "a card of the Raven deck" : "the set-aside card"}) is added to the staging area, not revealed (no When Revealed, no Surge)`, read: [] }),
   AddSetAsideToStaging: (i) => ({ text: `${i.all === true ? "every" : "one"} ${i.outOfPlay === true ? "out-of-play" : "set-aside"} card ${typeof i.code === "string" ? `with code ${i.code}` : `with the trait ${str(i.trait)}`} joins the staging area (it is not revealed${typeof i.code === "string" && timedCodes().has(i.code) ? "; it gets its printed Time counters as it joins" : ""})`, read: ["code", "trait", "all", "outOfPlay"] }),
   PlayFromHand: (i, ctx) => ({
     text: `the acting player plays ${i.picked === true ? `each card picked so far (a ${pick(i.pick, ctx)}) that is in its owner's hand` : `a ${pick(i.pick, ctx)} from their hand`} as part of the effect${i.free === true ? ", at no cost (no payment at all)" : ""}${typeof i.reduce === "number" ? `, its cost reduced by ${i.reduce}${typeof i.min === "number" ? ` (not below ${i.min})` : ""}` : ""}${i.noMatch === true ? ", needing no resource match" : ""}${i.onSelf === true ? ", an attachment played on this card" : ""}`,
@@ -472,8 +473,9 @@ export function renderInstruction(value: unknown, ctx: Ctx, depth = 0, later = f
     const inner = value.verb === "AfterAttack" ? { ...ctx, attacker: true } : ctx;
     // An EngageNextPlayer step makes the attacks after it, in the same list, against the player just engaged.
     let engagedNext = ctx.engagedNext === true;
-    childrenOf(value, made).forEach((child, at) => {
-      lines.push(...renderInstruction(child, { ...inner, engagedNext }, depth + 1, at > 0));
+    const children = childrenOf(value, made);
+    children.forEach((child, at) => {
+      lines.push(...renderInstruction(child, { ...inner, engagedNext, before: objOrNone(children[at - 1]) }, depth + 1, at > 0));
       if (isObj(child) && child.verb === "EngageNextPlayer") engagedNext = true;
     });
   }

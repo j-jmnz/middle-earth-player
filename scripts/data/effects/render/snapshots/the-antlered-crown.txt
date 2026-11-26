@@ -11,7 +11,7 @@ Scenario piles that place cards with no record (staging: 08155 Raven War-camp; a
     - every set-aside copy of the cards with codes 07042, 07043, 07044, 07046, 07047 and 07048 goes facedown into the raven deck, and the deck's discard pile starts empty (the shuffle is a record's own)
     - for each player, first player first:
       - choose enemy (any player controls) in the Raven deck, of a different title from the cards this effect already picked
-      - the picked card (a set-aside card or a card of the Raven deck) is added to the staging area, not revealed (no When Revealed, no Surge)
+      - the picked card (a card of the Raven deck) is added to the staging area, not revealed (no When Revealed, no Surge)
     - shuffle the encounter deck
     - shuffle the raven deck
 
