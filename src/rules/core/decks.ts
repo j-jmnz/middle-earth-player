@@ -20,4 +20,4 @@ export function refillDeck(state: ScenarioState, zones: DeckZones, steps: Engine
 }
 
 // The rule each deck's refill cites; the others run out as any deck does.
-const REFILL_RULE: Readonly<Record<string, string>> = { corsairDeck: "dcce.corsair-deck", evilCreaturesDeck: "emce.evil-creatures-deck" };
+const REFILL_RULE: Readonly<Record<string, string>> = { corsairDeck: "dcce.corsair-deck", evilCreaturesDeck: "emce.evil-creatures-deck", ravenDeck: "rm.raven-deck" };

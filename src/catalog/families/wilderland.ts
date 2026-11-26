@@ -40,6 +40,10 @@ const VERBS = [
   z.strictObject({ verb: z.literal("RemoveFromEncounterDeckIfLogged"), line: z.enum(ALLY_LINES), count: z.number().int().positive(), cardType: z.enum(["enemy", "location", "treachery"]), nonUnique: z.boolean().optional(), except: z.array(z.string().min(1)).optional() }),
   // Setup: "Create the Caves deck" / "Create the Evil Creatures deck" (emce.caves-deck, emce.evil-creatures-deck): the cards the scenario dealt to the deck are shuffled together with the game's seed. Run by the quest card's Setup, like PrepareUnchartedDeck.
   verbFlags(z.strictObject({ verb: z.literal("ShufflePile"), pile, ...when }), { setupRuns: "top" }),
+  // Setup: "Create the Raven deck" (The Antlered Crown 08147:A:1, rm.raven-deck): each set-aside copy of these `codes` goes facedown into the pile's deck, and the pile's discard pile exists (empty). The shuffle is the record's (ShufflePile). A game with no such copy has the deck, empty.
+  verbFlags(z.strictObject({ verb: z.literal("FormPile"), pile, codes: z.array(code).min(1), ...when }), { setupRuns: "top" }),
+  // "Shuffle the Raven deck discard pile into the Raven deck" (08148:A:1; rm.raven-deck): every card of the pile's discard pile goes facedown back into its deck, which is shuffled. With an empty discard pile the deck is still shuffled: the instruction cannot fail, so what follows it (rr.then) goes on.
+  z.strictObject({ verb: z.literal("ShuffleDiscardIntoPile"), pile, ...when }),
   // "Shuffle Abandoned Ruin into the Caves deck" (12170:A, 12174:A:1): the copy of the card the game already has (dealt into the encounter deck, or set aside) joins the deck, which is shuffled; with no such deck it is removed from the game. A campaign card's Setup verb the engine resolves after the quest card's Setup shuffled the deck.
   // With `placed` (the campaign card's own line, 12170:A:2: the game has no such card in the pool) a copy the campaign card brings is spawned into a dealt pile; with no such pile it is not in the game.
   verbFlags(z.strictObject({ verb: z.literal("ShuffleIntoPile"), pile, code, placed: z.literal(true).optional(), ...when }), { setupRole: "afterSetup" }),
