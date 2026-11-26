@@ -104,7 +104,7 @@ import * as mordor from "../scenarios/the-long-arm-of-mordor/game.ts";
 import * as mumakil from "../scenarios/the-mumakil/game.ts";
 import * as tharbad from "../scenarios/trouble-in-tharbad/game.ts";
 import * as eilph from "../scenarios/the-nin-in-eilph/game.ts";
-// import * as secret from "../scenarios/celebrimbors-secret/game.ts";
+import * as secret from "../scenarios/celebrimbors-secret/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -235,5 +235,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-mines-of-moria", "The Mines of Moria", mines.MINES_GOLDENS, mines.minesWorld, mines.playGolden),
   entry("escape-from-khazad-dum", "Escape from Khazad-dûm", khazad.KHAZAD_GOLDENS, khazad.khazadWorld, khazad.playGolden),
   entry("the-hunt-for-the-dreadnaught", "The Hunt for the Dreadnaught", dreadnaught.DREADNAUGHT_GOLDENS, dreadnaught.dreadnaughtWorld, dreadnaught.playGolden),
-  // entry("celebrimbors-secret", "Celebrimbor's Secret", secret.SECRET_GOLDENS, secret.secretWorld, secret.playGolden),
+  entry("celebrimbors-secret", "Celebrimbor's Secret", secret.SECRET_GOLDENS, secret.secretWorld, secret.playGolden),
 ];

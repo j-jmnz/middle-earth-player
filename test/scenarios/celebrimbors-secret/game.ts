@@ -4,15 +4,18 @@ import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/ru
 import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenarios.ts";
 import type { PolicyOptions } from "../../harness/auto-player.ts";
 import { fillerLoadout, HERO_STATS, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
-import { chooseFirstOrLast, policyIntent, type Policy } from "../../harness/policy-kit.ts";
+import { attackAllTogether, chooseFirstOrLast, commitAllBut, declineAttack, engageUpTo, travelFewestQuestPoints, undefendedLeastDamaged, policyIntent, type Policy } from "../../harness/policy-kit.ts";
 
 const cycle = loadCampaign("the-ring-maker");
 const secret = loadAnyScenario("celebrimbors-secret");
 
-// Test helper. A whole standalone game of Celebrimbor's Secret played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. TODO: say how the players travel, engage and answer the choices this scenario asks.
+// Test helper. A whole standalone game of Celebrimbor's Secret played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks hold free events, so the outcome depends on the
+// engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. The scenario needs answers of its own, which the auto-player does not give: (1) the quest commit keeps one hero home, so a
+// ready hero can attack Bellach (a hero that quested is exhausted, and the 08123 stage cannot be won while Celebrimbor's Mould lies on Bellach: 08123:A:1 attaches it, 08123:B:4); (2) the players engage Bellach by choice as soon as it can be engaged (08123:B:3, 12
+// progress on the stage), and only Bellach (the encounter deck's other enemies engage by their engagement checks), and every ready hero attacks it first, so that the Mould returns to the staging area, is claimed again and the stage can be defeated; (3) nobody defends
+// (a hero has 100 hit points), so the heroes that attack stay ready. `reserve: 0` is the one way the policy loses on purpose: every hero quests, nobody attacks, Bellach is never defeated and the threat rises (08125:A:2) to the elimination level.
 export const SECRET_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
-// "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
+// "strong": big-number heroes that win; "weak": heroes too small to quest (unused by the goldens: threat only rises through The Orcs' Search); "brittle": strong questers that die to an attack, so the hero that holds the Mould can leave play.
 export type SecretDecks = "strong" | "weak" | "brittle";
 
 export const secretLoadout = fillerLoadout;
@@ -24,8 +27,10 @@ export const secretStart = (seatCount: 1 | 2, seed: number, difficulty: Difficul
 export type SecretPolicy = {
   // The option a Choose window with these answers takes: the first or the last.
   choose: "first" | "last";
+  // The heroes that stay home from the quest, ready to attack.
+  reserve: number;
 };
-export const DEFAULT_POLICY: SecretPolicy = { choose: "first" };
+export const DEFAULT_POLICY: SecretPolicy = { choose: "first", reserve: 1 };
 
 // The policy (test/harness/policy-kit.ts): a list of rules tried in order, then the auto-player's answer with SECRET_POLICY. A rule answers its own window and returns null for any other. The kit's rules:
 //   chooseFirstOrLast(which)  a Choose window takes the first or the last option
@@ -42,8 +47,9 @@ export const DEFAULT_POLICY: SecretPolicy = { choose: "first" };
 //   engageUpTo(most, options)  the optional engagement step: engage the enemy of the lowest `rank` (`allow` permits) while engaged with fewer than `most`
 //   triggerActions(effectIds, oncePerRound)  an Action or Response of the records named, each time (or once a round) the engine offers it and the seat can pay
 //   passCommitWhile(when)  the quest commit: pass without committing while `when` holds
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go in the list, before the auto-player's.
-const rules = (policy: SecretPolicy): Policy => [chooseFirstOrLast(policy.choose)];
+// Bellach (08124) is engaged and attacked by choice; the other enemies come by their engagement checks.
+const BELLACH = "08124";
+const rules = (policy: SecretPolicy): Policy => [chooseFirstOrLast(policy.choose), commitAllBut(policy.reserve), travelFewestQuestPoints(), undefendedLeastDamaged(), engageUpTo(99, { allow: (state, id) => state.cards[id]?.code === BELLACH }), attackAllTogether((state, id) => (state.cards[id]?.code === BELLACH ? 0 : 1)), declineAttack()];
 
 // Every intent is one the reducer listed.
 export function secretIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: SecretPolicy = DEFAULT_POLICY): PlayerIntent {
@@ -55,14 +61,20 @@ export type SecretGame = PlayedGame;
 // The goldens (src/campaign/scenarios/celebrimbors-secret/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type SecretGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: SecretDecks; outcome: "won" | "lost"; policy?: Partial<SecretPolicy>; lossReason?: string };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Nightmare) and a few losses (each way the scenario can be lost), each on a fixed seed.
-export const SECRET_GOLDENS: readonly SecretGolden[] = [];
+// The games to pin (.claude/rules/code-standards.md, Test cost): a standalone scenario has no Resolution, so Easy mode adds no game, and it has no Nightmare deck. Wins true solo and two-handed (the Mould is claimed from The Secret Chamber, attached to Bellach on stage 2 and
+// claimed again once Bellach is defeated). The ways to lose: the threat at the elimination level, the hero that holds the Mould leaving play (08127:A:2) and The Secret Chamber going under The Orcs' Search (08126:A:3).
+export const SECRET_GOLDENS: readonly SecretGolden[] = [
+  { name: "solo win", seatCount: 1, seed: 6, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed win", seatCount: 2, seed: 6, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "solo loss: threat at the elimination level", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", policy: { reserve: 0 }, outcome: "lost", lossReason: "No seats remain" },
+  { name: "solo loss: the Mould's hero leaves play", seatCount: 1, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "q1 left play" },
+  { name: "solo loss: The Secret Chamber goes under The Orcs' Search", seatCount: 1, seed: 7, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "The Secret Chamber left play" },
+];
 
 const game = standaloneGame<SecretDecks, SecretPolicy>({
   campaign: cycle,
   scenario: secret,
   stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles and its Nightmare deck.
   codes: [...secret.cards.map((card) => card.code)],
   intent: secretIntent,
   policy: DEFAULT_POLICY,
