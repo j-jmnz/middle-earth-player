@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { settle } from "../../rules/engine/machine.ts";
 import { modifiedStat } from "../../rules/core/modified-stat.ts";
-import { idOf, run as runInstruction } from "../../../test/harness/scene-kit.ts";
+import { idOf, run as runInstruction, tableFromLayout } from "../../../test/harness/scene-kit.ts";
 import { advancedTo, CHIEFTAIN, prepared, stageId } from "../../rules/families/haradrim/race-kit.ts";
 
 import { effectLines } from "../cards/card-effects.ts";
@@ -15,7 +15,6 @@ import { zoneSelector } from "../store/selectors.ts";
 import { ORCS_APART, ORCS_SAME_STAGE, ORCS_STAGE_LOSS, ORCS_TOGETHER, orcsStageTitle, orcsTell, orcsVerbWords } from "../words/scenarios/haradrim/orcs-table.ts";
 import { orcsBeats } from "../readouts/haradrim/orcs.ts";
 import { previewCards } from "../cards/table-preview.ts";
-import { tableFromLayout } from "../../../test/harness/scene-kit.ts";
 
 const ROAD = "17042";
 const APART = { staging: [ROAD], stage: "17048" };
@@ -127,7 +126,7 @@ describe("17052:B:2 the Orcs' progress and advance in the banner", () => {
 });
 
 describe("17038:A:1 to 17038:A:3 the Tamed Mûmak says what it takes and what its loss costs", () => {
-  const preview = (seats: number) => {
+  const preview = (seats: 1 | 2) => {
     const t = tableFromLayout("race-across-harad", { seats, stage: "17048", play: ["17038"] });
     const id = idOf(t.state, "17038");
     return JSON.stringify(previewCards(t.state, t.ctx, id, (one) => ({ name: t.ctx.cards.get(one)?.name ?? one, source: null, text: "" }), (card) => t.ctx.cards.get(card)?.name ?? card));
