@@ -12,6 +12,7 @@ import { questPointsOf } from "../../../rules/quest/quest.ts";
 import { timeOf } from "../../../rules/families/angmar/time.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 import { IN_NEED_OF_REST } from "../../readouts/ring-maker/fangorn.ts";
+import { crownDetail } from "./crown-preview.ts";
 import { trialsDetail } from "./trials-preview.ts";
 import { celebrimborDetail } from "./celebrimbor-preview.ts";
 import { GUARD, MUGASH, MUGASH_OBJECTIVE, mugashLyingOn } from "../../readouts/ring-maker/orc.ts";
@@ -97,6 +98,8 @@ function crossingDetail(game: ScenarioState, ctx: ReduceContext, cardId: string)
 export function ringMakerDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name: (id: string) => string): string | null {
   const card = game.cards[cardId];
   if (!card) return null;
+  const crown = crownDetail(game, cardId);
+  if (crown) return crown;
   const fangorn = fangornDetail(game, cardId, name);
   if (fangorn) return fangorn;
   const dunland = dunlandDetail(ctx, game, cardId);

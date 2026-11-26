@@ -4,14 +4,18 @@ import { inPlay, livingSeats } from "../../../rules/core/state.ts";
 import { refreshTakes, timeInstruction, timeLimit, timePlayersOf } from "../../../rules/families/angmar/time.ts";
 import type { ReduceContext, ScenarioState } from "../../../rules/engine/reduce.ts";
 
+import { CROWN_STAGE_LABEL } from "../../words/scenarios/ring-maker/crown-table.ts";
 import { ELIMINATION_DROP, LEVEL_STAGE, stageTimeLimitWords, stageTimeNearWords, stageTimeWords, timeDialWarms, type NewLevels, type TimeTakes } from "../../words/scenarios/ring-maker/fords-table.ts";
 import { cardsOf, type TableDial } from "../dials.ts";
 import { mouldGateWords } from "../../words/scenarios/ring-maker/celebrimbor-table.ts";
 import { mouldState, STAGE_1, STAGE_2 } from "./celebrimbor.ts";
 import { seatLevel } from "../threat-level.ts";
 
-/** The quest stages of The Fords of Isen, of To Catch an Orc (stages 2B and 3B), of Into Fangorn (stages 1B, 2B and 3B) and of The Dunland Trap (stages 1B and 3B; 2B prints none) of Trouble in Tharbad (stages 1B and 2B) and of Celebrimbor's Secret (stages 1B and 2B) and of The Nîn-in-Eilph (the three stages 2B, the three stages 3B and stage 4B) that print Time X. */
-export const FORDS_STAGES: readonly string[] = ["07059", "07060", "07061", "07063", "07064", "07065", "07066", "07067", "08011", "08013", "08066", "08067", "08095", "08096", "08097", "08098", "08099", "08100", "08101", "08122", "08123"];
+/** The quest stages of The Fords of Isen, of To Catch an Orc (stages 2B and 3B), of Into Fangorn (stages 1B, 2B and 3B) and of The Dunland Trap (stages 1B and 3B; 2B prints none) of Trouble in Tharbad (stages 1B and 2B) and of Celebrimbor's Secret (stages 1B and 2B) and of The Antlered Crown (stages 1B, 2B and 3B) and of The Nîn-in-Eilph (the three stages 2B, the three stages 3B and stage 4B) that print Time X. */
+export const FORDS_STAGES: readonly string[] = ["07059", "07060", "07061", "07063", "07064", "07065", "07066", "07067", "08011", "08013", "08066", "08067", "08095", "08096", "08097", "08098", "08099", "08100", "08101", "08122", "08123", "08147", "08148", "08149"];
+
+/** The three stages of The Antlered Crown: its dial says "Stage", as the location dials say their own names. */
+const CROWN_STAGES: readonly string[] = ["08147", "08148", "08149"];
 
 const TURCH = "08014";
 const NO_WAY_OUT = "08013";
@@ -45,7 +49,7 @@ export function ringMakerDials(game: ScenarioState, ctx: ReduceContext, nameOf: 
       dials.push({
         id: `time:${card.id}`,
         testID: `ring-maker-time:${card.id}`,
-        label: "Time",
+        label: CROWN_STAGES.includes(code) ? CROWN_STAGE_LABEL : "Time",
         name: `Time counters left on ${nameOf(card.code)}:`,
         value: card.resources,
         cardId: card.id,

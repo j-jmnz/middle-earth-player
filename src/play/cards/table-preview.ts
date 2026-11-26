@@ -35,6 +35,8 @@ import { contractSides } from "./contract-sides.ts";
 import { LOOT_ROLE } from "../words/loot.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import { FORDS_STAGES, timeTakes } from "../readouts/ring-maker/fords.ts";
+import { crownStageLines } from "./ring-maker/crown-preview.ts";
+import { isTimeLocation } from "../words/scenarios/ring-maker/crown-table.ts";
 import { GUARDIANS } from "../readouts/ring-maker/trials.ts";
 import { stageTimePreviewWords, timeDialWarms } from "../words/scenarios/ring-maker/fords-table.ts";
 
@@ -78,7 +80,7 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
   const forest = forestScore(game, ctx);
   // Stages 1 and 2 of The Steward's Fear have no quest points either: their tokens against the 4 that advance them follow (06011:B:3, 06012:B:3).
   const own = amonDinWin(game) ?? osgiliathWin(game, ctx, stage.code) ?? valeWin(game, ctx) ?? (objective ? (TIMING_WORD.test(objective) ? objective : `To win: ${objective}`) : forest ? forestStageWords(forest) : "No quest points");
-  const lines = [own, ...stewardsFearStageLines(game, ctx, stage.code), ...amonDinStageLines(game, stage.code), ...osgiliathStageLines(game, stage.code), ...valeStageLines(game, ctx, stage.code)].join(". ");
+  const lines = [own, ...stewardsFearStageLines(game, ctx, stage.code), ...amonDinStageLines(game, stage.code), ...osgiliathStageLines(game, stage.code), ...valeStageLines(game, ctx, stage.code), ...crownStageLines(game, stage.code)].join(". ");
   return { title: name, detail: near ? `${near} ${lines}` : lines };
 }
 
@@ -88,7 +90,7 @@ export function hostedRole(printed: { type: string; typeName: string }): string 
 }
 
 // The resource tokens on a time stage and on a Guardian of The Three Trials are their time counters (rm.time-x), so the sheet says "3 time counters".
-const timeUnit = (code: string): string | undefined => (FORDS_STAGES.includes(code) || GUARDIANS.includes(code) ? "time counter" : undefined);
+const timeUnit = (code: string): string | undefined => (FORDS_STAGES.includes(code) || GUARDIANS.includes(code) || isTimeLocation(code) ? "time counter" : undefined);
 
 /**
  * What lies on the card now, one phrase a counter: its damage, progress and resource tokens, and whether it is exhausted or committed to the

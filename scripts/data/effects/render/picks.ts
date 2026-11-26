@@ -6,7 +6,7 @@ import { done, isObj, joinAnd, jsonOf, quoted, str, type Ctx, type Obj } from ".
 export type PickRenderer = (pick: unknown, ctx: Ctx) => string;
 
 const CONTROL: Readonly<Record<string, string>> = { you: "you control", any: "any player controls", other: "another player controls" };
-const FROM: Readonly<Record<string, string>> = { play: "in play", hand: "in hand", discard: "in the discard pile", deck: "in the deck", victory: "in the victory display", loot: "in the loot pile", encounterDeck: "in the encounter deck" };
+const FROM: Readonly<Record<string, string>> = { play: "in play", hand: "in hand", discard: "in the discard pile", deck: "in the deck", victory: "in the victory display", loot: "in the loot pile", encounterDeck: "in the encounter deck", ravenDeck: "in the Raven deck" };
 const ENGAGED: Readonly<Record<string, string>> = { you: "engaged with you", other: "engaged with another player" };
 
 // Each entry reads some keys and says one qualifier; the order is the order the phrase reads in. A key whose value says nothing (`committed: false` before it had words) is not claimed, so it prints after the text as `[also {...}]`.
@@ -131,7 +131,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["on"], onWords(pick.on));
   note(["other"], pick.other === true ? "other than this card" : null);
   note(["takesSource"], pick.takesSource === true ? "that this card can be attached to (one that cannot have attachments is left out)" : null);
-  note(["different"], pick.different === true ? "other than the cards this effect already picked" : null);
+  note(["different"], pick.different === true ? (pick.from === "ravenDeck" ? "of a different title from the cards this effect already picked" : "other than the cards this effect already picked") : null);
   note(["guardsObjectiveLocation"], pick.guardsObjectiveLocation === true ? "attached to an objective-location as its guard" : null);
   note(["copyInDiscard"], pick.copyInDiscard === true ? "with a copy of it (the same title) in its controller's discard pile" : pick.copyInDiscard === "owner" ? "with a card of its title in its owner's discard pile" : null);
   // A Captive is in play but no player controls it (families/captives owns "Captives are in play but are not under any player's control", 143022:A:1).

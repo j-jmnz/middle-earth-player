@@ -1,12 +1,12 @@
-// Rules: dcce.corsair-deck, dcce.uncharted-deck, emce.caves-deck, emce.evil-creatures-deck (data/rules/entries.json). The decks that lie beside the encounter deck as zones of their own: where
+// Rules: dcce.corsair-deck, dcce.uncharted-deck, emce.caves-deck, emce.evil-creatures-deck, rm.raven-deck (data/rules/entries.json). The decks that lie beside the encounter deck as zones of their own: where
 // each keeps its card list, which discard pile goes with it, and the pure list operations moveCard (zones.ts) and the deck helpers (decks.ts) share. The Corsair deck and the Uncharted deck of the
 // Dream-chaser box and the decks of `piles` (Ered Mithrin's, the Harad deck, The Weather Hills' Orc deck) read and write their lists through one accessor, so a deck is a row in DECKS and not another copy of the code. Types and pure helpers only.
 import { shuffleIds } from "./seed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { updateCard } from "./state.ts";
 
-/** The zones of the decks beside the encounter deck that are kept in `ScenarioState.piles` (the Caves, Evil Creatures, Balrog, Smaug, Spiders, Orc, Side Quest, Harad, Great Spider, Angmar Orc and Investigation decks, and the two seats' out-of-play decks of To Catch an Orc). The one list the zone types (`PileZone`, `ZoneName`, `Destination`, the dealt zones of the Setup) and the zone guard derive from. */
-export const PILE_ZONES = ["cavesDeck", "evilCreaturesDeck", "evilCreaturesDiscard", "balrogDeck", "balrogDiscard", "smaugDeck", "smaugDiscard", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "investigationDeck", "sackDeck", "outOfPlay0", "outOfPlay1"] as const;
+/** The zones of the decks beside the encounter deck that are kept in `ScenarioState.piles` (the Caves, Evil Creatures, Balrog, Raven, Smaug, Spiders, Orc, Side Quest, Harad, Great Spider, Angmar Orc and Investigation decks, and the two seats' out-of-play decks of To Catch an Orc). The one list the zone types (`PileZone`, `ZoneName`, `Destination`, the dealt zones of the Setup) and the zone guard derive from. */
+export const PILE_ZONES = ["cavesDeck", "evilCreaturesDeck", "evilCreaturesDiscard", "balrogDeck", "balrogDiscard", "ravenDeck", "ravenDiscard", "smaugDeck", "smaugDiscard", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "investigationDeck", "sackDeck", "outOfPlay0", "outOfPlay1"] as const;
 export type PileZone = (typeof PILE_ZONES)[number];
 /** A zone that holds a list of card ids apart from the encounter deck: the Dream-chaser box's keep theirs in `corsairDeck`, `corsairDiscard` and `uncharted.deck`. */
 const DECK_ZONES = [...PILE_ZONES, "corsairDeck", "corsairDiscard", "unchartedDeck"] as const;
@@ -22,6 +22,8 @@ export const DECKS = {
   evilCreatures: { deck: "evilCreaturesDeck", discard: "evilCreaturesDiscard" },
   // The Balrog deck of Shadow and Flame's Nightmare deck (901801:A:2 to A:4): the shadow cards of Durin's Bane come from it and go to its discard pile.
   balrog: { deck: "balrogDeck", discard: "balrogDiscard" },
+  // The Antlered Crown's Raven deck (rm.raven-deck): the six Dunland enemies the Setup creates, with a discard pile of its own. A Raven enemy that would leave play goes to it, and the deck is shuffled from it when it runs out.
+  raven: { deck: "ravenDeck", discard: "ravenDiscard" },
   // The Battle of Lake-town's Smaug deck: nine cards shuffled apart from the encounter deck, with a discard pile of its own (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town).
   smaug: { deck: "smaugDeck", discard: "smaugDiscard" },
   // We Must Away, Ere Break of Day's Sack deck (hob.sack-deck): a Sack card that leaves play for any reason goes back into it, and the deck is shuffled. It is its own discard pile.
@@ -46,10 +48,10 @@ const PLAIN_PILES = {
 } as const satisfies Record<string, DeckZones>;
 
 /** The piles a record names (`pile` of the wilderland verbs): every deck of `piles`. */
-export const NAMED_PILES = { evilCreatures: DECKS.evilCreatures, smaug: DECKS.smaug, ...PLAIN_PILES } as const;
+export const NAMED_PILES = { evilCreatures: DECKS.evilCreatures, raven: DECKS.raven, smaug: DECKS.smaug, ...PLAIN_PILES } as const;
 
 /** The decks a card remembers it was dealt into (CardInstance.deck), so it goes back to that deck's own discard pile. */
-const MARK: Readonly<Partial<Record<DeckZone, CardInstance["deck"]>>> = { evilCreaturesDeck: "evilCreatures", evilCreaturesDiscard: "evilCreatures", balrogDeck: "balrog", balrogDiscard: "balrog", smaugDeck: "smaug", smaugDiscard: "smaug", sackDeck: "sack" };
+const MARK: Readonly<Partial<Record<DeckZone, CardInstance["deck"]>>> = { evilCreaturesDeck: "evilCreatures", evilCreaturesDiscard: "evilCreatures", balrogDeck: "balrog", balrogDiscard: "balrog", ravenDeck: "raven", ravenDiscard: "raven", smaugDeck: "smaug", smaugDiscard: "smaug", sackDeck: "sack" };
 
 const NONE: readonly string[] = [];
 

@@ -29,6 +29,7 @@ describe("effects render read fields, amounts", () => {
     { questCards: true },
     { stagesNoProgress: true },
     { shadowCardsInPlay: true },
+    { timeOfActive: true },
     { discardPileMaxCost: true },
     { investigateValue: true },
     { pile: "harad" },

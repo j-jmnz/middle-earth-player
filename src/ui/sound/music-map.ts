@@ -164,6 +164,7 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "trouble-in-tharbad": { calm: "crossroads", combat: "uruk" },
   "the-nin-in-eilph": { calm: "marshes", combat: "chase" },
   "celebrimbors-secret": { calm: "moria", combat: "uruk" },
+  "the-antlered-crown": { calm: "rohan", combat: "isengard" },
   "the-mumakil": { calm: "fangorn", combat: "pelennor" },
 };
 

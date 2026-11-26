@@ -82,8 +82,8 @@ const VERBS = [
   // ("remove 2 progress from each quest card in play", 10100:A:1).
   z.strictObject({ verb: z.literal("RemoveProgressFromQuest"), amount: positiveAmountSchema, each: z.literal(true).optional(), ...when }),
   // Removes all the progress tokens from the card `target` (the picked card by default), or from each card in play that matches `pick`, read from the actor's side ("Remove all progress tokens from all Riverland locations", 02023:A:2; "remove all progress from that
-  // location", 900409:A:1). A card with none is left as it is.
-  z.strictObject({ verb: z.literal("RemoveAllProgress"), target: cardRefSchema.optional(), pick: pickSchema.optional(), ...when }),
+  // location", 900409:A:1). A card with none is left as it is. With `remember` the effect's X becomes the number of tokens removed in all, so a later instruction can count them ("for each progress removed this way", 08161:A:1).
+  z.strictObject({ verb: z.literal("RemoveAllProgress"), target: cardRefSchema.optional(), pick: pickSchema.optional(), remember: z.literal(true).optional(), ...when }),
   // Removes up to `amount` progress tokens from each card in play that matches `pick` (the staging area and the active location are in play), read from the actor's side, and the effect's X becomes the number of tokens removed in all, so a later instruction can count them
   // ("Remove 1 progress token from each location in play. Then ... for each progress token removed by this effect", 02093:A:1). A card with none loses none.
   z.strictObject({ verb: z.literal("RemoveProgressEach"), amount: positiveAmountSchema, pick: pickSchema, ...when }),

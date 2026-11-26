@@ -2,7 +2,7 @@
 // The strip at a stage card's foot says its progress and its quest points. Progress past the points shows the whole count in the strip, and the card wears no progress token (progressInStrip).
 import { describe, expect, it } from "vitest";
 
-import { progressInStrip, stripText } from "./table-canvas-views.ts";
+import { progressInStrip, stripCenterX, stripText } from "./table-canvas-views.ts";
 import type { CardSlot } from "../layout/layout.ts";
 
 const slot = (progress: number) => ({ progress }) as CardSlot;
@@ -27,5 +27,26 @@ describe("progressInStrip", () => {
     expect(progressInStrip(12, 12)).toBe(false);
     expect(progressInStrip(3, 12)).toBe(false);
     expect(progressInStrip(3, null)).toBe(false);
+  });
+});
+
+describe("stripCenterX", () => {
+  it("a wide count stays inside the card's right edge, and with a resource token never falls back onto it", () => {
+    expect(stripCenterX(0, 46, 20, null, false, 18, 1)).toBe(23);
+    expect(stripCenterX(0, 40, 20, null, false, 18, 1)).toBe(18);
+    expect(stripCenterX(0, 46, 20, null, true, 18, 1)).toBe(41);
+    expect(stripCenterX(0, 46, 20, 28, true, 18, 1)).toBe(41);
+  });
+
+  // A location 46 wide with a count 24 wide: the resource token (time counters, 08157:A:1) stands bottom left, 19 wide with its edge.
+  it("08157:A:1 moves the count right of the resource token a location wears, so the token never covers the digit", () => {
+    expect(stripCenterX(0, 46, 12, null, false, 18, 1)).toBe(23);
+    expect(stripCenterX(0, 46, 12, null, true, 18, 1)).toBe(33);
+  });
+
+  it("a wide card keeps the count in the middle, and the progress token still wins on a narrow one", () => {
+    expect(stripCenterX(0, 120, 12, null, true, 18, 1)).toBe(60);
+    expect(stripCenterX(0, 46, 12, 28, true, 18, 1)).toBe(33);
+    expect(stripCenterX(0, 46, 12, 28, false, 18, 1)).toBe(14);
   });
 });

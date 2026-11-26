@@ -1,4 +1,5 @@
 // Rules: rr.in-play-and-out-of-play, mec109.immune-to-player-card-effects, mec109.permanent (data/rules/entries.json).
+import { pileOf } from "../core/piles.ts";
 import { consideredEngagedSeats } from "../core/engaged.ts";
 import { discardLockedFor } from "../families/angmar/lock.ts";
 import { captiveIds } from "../families/captives/values.ts";
@@ -129,6 +130,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   else if (from === "victory") raw.push(...state.victory);
   // The encounter discard pile, the most recently discarded card first ("the opposing team chooses a card in the encounter discard pile", 51116:A:1).
   else if (from === "encounterDiscard") raw.push(...[...state.encounterDiscard].reverse());
+  // The Raven deck of The Antlered Crown, top first (rm.raven-deck).
+  else if (from === "ravenDeck") raw.push(...pileOf(state, "ravenDeck"));
   else if (from === "loot") raw.push(...Object.values(state.cards).filter((card) => card.zone === "under" && card.controller != null && seats.includes(card.controller)).map((card) => card.id));
   else if (from === "discard") {
     for (const index of seats) {
@@ -220,6 +223,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   const picked = at.picked ?? [];
   const from = spec.from ?? "play";
   if ((id === at.sourceId && (from !== "play" || spec.other)) || (spec.different && picked.includes(id))) return false;
+  // A different enemy of the Raven deck is a different title, as a different search is (rm.raven-deck).
+  if (spec.different && from === "ravenDeck" && picked.some((other) => state.cards[other]?.code === instance.code)) return false;
   if (spec.type !== "card" && spec.type !== "player") {
     // A card among a player's heroes is a hero: an ally that gained the hero card type sits there (heroType, families/play/sweep.ts).
     // An ally attached to another card (Wild Stallion) is an attachment while it is.

@@ -32,7 +32,7 @@ export type Text = string | readonly { when?: Condition; text: string }[];
 
 /**
  * One entry of an asks file. Templates hold `{card}` (the card the record is on), `{owner}` ("Player N", the seat asked), `{picked}` (the card an Each or an earlier Pick of the record chose, in a note too; in a caution, the card of the row it is about), `{host}` (the card the record's card lies on), `{subject}` (the card that triggered the record: the ally that entered play), `{pair}` (the Embassy's pair being decided: the player card with its owner and the encounter card it is paired with) and `{ringBearer}` (the hero with the Ring-bearer trait), `{hero}` (the hero in the staging area the Orc chosen now will guard), `{n}` (what the instruction after a Pick deals or places, read now: a Pick's entry only, a Choose
- * has none), `{left}` (the damage an AssignDamage still has to place, the resources a Prowl still has to discard, or the characters a CapRefresh still keeps exhausted, counting the step asked: its note only), `{ready}` (a CapRefresh's characters that would still ready), `{forced}` (a Prowl's hero Pick: the words that say no Stop row was offered because later players cannot discard the rest, or nothing), `{countdown}` (an entry with `countdown`: "2 of 4"), `{pursuitLimit}` (the value at which the players lose, in a scenario with a pursuit tracker) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
+ * has none), `{left}` (the damage an AssignDamage still has to place, the time counters a RemoveTimeCounters with `distribute` still has to take off, the resources a Prowl still has to discard, or the characters a CapRefresh still keeps exhausted, counting the step asked: its note only), `{ready}` (a CapRefresh's characters that would still ready), `{forced}` (a Prowl's hero Pick: the words that say no Stop row was offered because later players cannot discard the rest, or nothing), `{countdown}` (an entry with `countdown`: "2 of 4"), `{pursuitLimit}` (the value at which the players lose, in a scenario with a pursuit tracker) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
  * - `note`: the sentence over a Pick or a Choose (the entry keyed with the instruction's verb).
  * - `why`: the reason the window opened. It is said after the card's title and before the note, "Card: why note" ("Player 1, Card: why note" when owned and two-handed).
  * - `bare`: the sheet says the entry's sentence alone, with no printed line of the record after it (a keyword line that holds other keywords, "Surge. Prowl 1.", is no use there).
@@ -170,6 +170,8 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
   const hostId = hostOf(a.game, a.source);
   // An AssignDamage not yet split into steps holds all of its amount.
   if (a.instruction.verb === "AssignDamage") values.left = a.instruction.left ?? resolveAmount(a.game, a.instruction.amount, scope, a.ctx);
+  // A RemoveTimeCounters that divides its total (08153:A:1): the counters still to take off, counting the one asked (the engine sets `left` on the pick it asks).
+  else if (a.instruction.verb === "RemoveTimeCounters" && a.instruction.distribute != null) values.left = a.instruction.left ?? 1;
   // A Prowl's discard: the resources the players still have to discard, counting the step asked (group-steps.ts).
   // Heart of Fangorn's cap: the characters that would still ready, and how many of them must stay exhausted, counting the one asked.
   else if (a.instruction.verb === "CapRefresh") {

@@ -105,6 +105,7 @@ import * as mumakil from "../scenarios/the-mumakil/game.ts";
 import * as tharbad from "../scenarios/trouble-in-tharbad/game.ts";
 import * as eilph from "../scenarios/the-nin-in-eilph/game.ts";
 import * as secret from "../scenarios/celebrimbors-secret/game.ts";
+import * as crown from "../scenarios/the-antlered-crown/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -218,6 +219,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("trouble-in-tharbad", "Trouble in Tharbad", tharbad.THARBAD_GOLDENS, tharbad.tharbadWorld, tharbad.playGolden),
   entry("the-nin-in-eilph", "The Nîn-in-Eilph", eilph.EILPH_GOLDENS, eilph.eilphWorld, eilph.playGolden),
   entry("celebrimbors-secret", "Celebrimbor's Secret", secret.SECRET_GOLDENS, secret.secretWorld, secret.playGolden),
+  entry("the-antlered-crown", "The Antlered Crown", crown.CROWN_GOLDENS, crown.crownWorld, crown.playGolden),
   entry("escape-from-umbar", "Escape from Umbar", umbar.UMBAR_GOLDENS, umbar.umbarWorld, umbar.playGolden),
   entry("desert-crossing", "Desert Crossing", crossing.CROSSING_GOLDENS, crossing.crossingWorld, crossing.playGolden),
   entry("the-long-arm-of-mordor", "The Long Arm of Mordor", mordor.MORDOR_GOLDENS, mordor.mordorWorld, mordor.playGolden),

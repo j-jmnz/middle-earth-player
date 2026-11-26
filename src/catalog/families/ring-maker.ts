@@ -44,7 +44,7 @@ const VERBS = [
   z.strictObject({ verb: z.literal("PickSetAside"), cardType: z.enum(["enemy", "location", "objective"]), trait: z.string().min(1), sharesTraitWithPicked: z.literal(true).optional(), trialKey: z.literal(true).optional(), ...when }),
   // "Attach it to that enemy" (08036:A:1, 08037:A:1): the last picked card, a set-aside Key, lies attached to the card picked before it as a claimed objective that no player controls; when its host leaves play it goes to the staging area (its own text). `attached` is announced.
   z.strictObject({ verb: z.literal("AttachPickedToPrevious"), ...when }),
-  // "Add it to the staging area" (08037:A:1): the last picked card, a set-aside Barrow, joins the staging area without being revealed (no reveal Response, no When Revealed; faq.reveal-and-add).
+  // "Add it to the staging area" (08037:A:1, 08147:A:1): the last picked card, a set-aside Barrow or a card of the Raven deck, joins the staging area without being revealed (no reveal Response, no When Revealed; faq.reveal-and-add).
   z.strictObject({ verb: z.literal("AddPickedToStaging"), ...when }),
   // "Shuffle it into the bottom 10 cards of the encounter deck" (08038:A:1): the last picked card joins the last `count` cards of the encounter deck (all of them when fewer) and those are shuffled.
   z.strictObject({ verb: z.literal("ShufflePickedIntoBottom"), count: z.number().int().positive(), ...when }),
