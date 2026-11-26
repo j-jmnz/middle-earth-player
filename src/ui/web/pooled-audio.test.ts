@@ -2,7 +2,7 @@
 // player's element is used again, and a refused loop starts at the next gesture.
 import { describe, expect, it } from "vitest";
 
-import { pooledAudio, type AudioHost, type PoolElement } from "./pooled-audio.ts";
+import { musicMode, pooledAudio, type AudioHost, type PoolElement } from "./pooled-audio.ts";
 
 type Fake = PoolElement & { plays: number; allowed: boolean; gain: { gain: { value: number } }; heard: number[] };
 
@@ -45,6 +45,8 @@ function setup(spares = 2, sample: string | null = "/tick.m4a") {
       elements.push(element);
       return { element, gain };
     },
+    // The file's own address, as soon as asked.
+    source: async (uri) => uri,
     resume() {
       resumes += 1;
     },
@@ -57,7 +59,7 @@ function setup(spares = 2, sample: string | null = "/tick.m4a") {
     gesture();
     inGesture = false;
   };
-  return { pool: pooledAudio(host, spares, sample), elements, tap, resumes: () => resumes };
+  return { pool: pooledAudio(host, spares, sample), host, elements, tap, resumes: () => resumes };
 }
 
 const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
@@ -67,6 +69,7 @@ describe("the web app's audio players", () => {
     const { pool, elements, tap } = setup();
     const sound = pool.create("/tick.m4a");
     sound.volume = 0.8;
+    await settle();
     tap();
     expect(elements[0]!.allowed).toBe(true);
     expect(elements[0]!.paused).toBe(true);
@@ -101,6 +104,7 @@ describe("the web app's audio players", () => {
   it("keeps blessed spares, so a player made between gestures plays at once", async () => {
     const { pool, elements, tap } = setup(2);
     pool.create("/tick.m4a");
+    await settle();
     tap();
     // One new spare for each gesture.
     expect(elements).toHaveLength(2);
@@ -109,6 +113,7 @@ describe("the web app's audio players", () => {
     expect(elements.slice(1).every((each) => each.allowed && each.paused && each.src === "/tick.m4a")).toBe(true);
     const next = pool.create("/shire.m4a");
     expect(next.media).toBe(elements[1]);
+    await settle();
     expect(elements[1]!.src).toBe("/shire.m4a");
     next.play();
     await settle();
@@ -120,9 +125,10 @@ describe("the web app's audio players", () => {
     expect(elements).toHaveLength(4);
   });
 
-  it("gives a spare the sample, never a player's own file, and makes no spare with no sample", () => {
+  it("gives a spare the sample, never a player's own file, and makes no spare with no sample", async () => {
     const withSample = setup(2, "/tick.m4a");
     withSample.pool.create("/menu-music.m4a");
+    await settle();
     withSample.tap();
     expect(withSample.elements.map((each) => each.src)).toEqual(["/menu-music.m4a", "/tick.m4a"]);
     const none = setup(2, null);
@@ -132,10 +138,11 @@ describe("the web app's audio players", () => {
     expect(none.elements).toHaveLength(1);
   });
 
-  it("uses a removed player's element again, at full volume", () => {
+  it("uses a removed player's element again, at full volume", async () => {
     const { pool, elements, tap } = setup(0);
     const first = pool.create("/a.m4a");
     first.volume = 0.2;
+    await settle();
     tap();
     first.remove();
     expect(elements[0]!.src).toBe("");
@@ -154,10 +161,51 @@ describe("the web app's audio players", () => {
     expect(player.volume).toBe(0);
     expect(player.duration).toBe(0);
     expect(player.isLoaded).toBe(false);
+    await settle();
     await player.seekTo(2);
     expect(elements[0]!.currentTime).toBe(2);
     player.play();
     await settle();
     expect(resumes()).toBe(1);
+  });
+
+  it("waits for its file before it plays, and gives a late file to no later player of the element", async () => {
+    let arrive: (address: string) => void = () => undefined;
+    const elements: Fake[] = [];
+    const base = setup(0);
+    // A host whose file comes when the test says.
+    const pool = pooledAudio(
+      {
+        newElement: () => {
+          const made = base.host.newElement() as { element: Fake; gain: { gain: { value: number } } };
+          elements.push(made.element);
+          return made;
+        },
+        source: () => new Promise<string>((resolve) => (arrive = resolve)),
+        resume: () => undefined,
+        onGesture: () => undefined,
+      },
+      0,
+    );
+    const first = pool.create("/menu.m4a");
+    first.play();
+    expect(elements[0]!.src).toBe("");
+    const late = arrive;
+    first.remove();
+    const second = pool.create("/shire.m4a");
+    late("blob:menu");
+    await settle();
+    expect(elements[0]!.src).toBe("");
+    arrive("blob:shire");
+    await settle();
+    expect(second.media.src).toBe("blob:shire");
+  });
+
+  it("reads the music's mode from the address before the stored one, and takes any other word as blob", () => {
+    expect(musicMode("?music=stream", null)).toBe("stream");
+    expect(musicMode("", "direct")).toBe("direct");
+    expect(musicMode("?music=blob", "direct")).toBe("blob");
+    expect(musicMode("?music=loud", null)).toBe("blob");
+    expect(musicMode("", null)).toBe("blob");
   });
 });

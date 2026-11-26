@@ -2,6 +2,7 @@
 // export (EXPO_PUBLIC_DESKTOP=1: every picture bundled, none fetched) with EXPO_PUBLIC_WEBAPP=1 (src/screens/nav/webapp.ts), until the web app's own pictures rule
 // (docs/plans/pwa-iphone-ipad.md, Phase 1: the web app build).
 // `--skip-assets` leaves the packs as they are, `--optional` lets a pack fail, `--skip-export` stages the export that is there.
+import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
@@ -10,7 +11,7 @@ import sharp from "sharp";
 import { exportDesktopWeb, packAssets } from "../desktop/shell.ts";
 import { bytes, runScript, type Log } from "../log.ts";
 import { ROUTES_PATH } from "../../webapp/routes.ts";
-import { ASSET_COUNT_LIMIT, assetsIgnore, dynamicPages, EARLY_FILE, EARLY_SCRIPT, headersFile, oversize, TOUCH_ICON, withEarlyMeter, withHomeScreenTags, type SiteFile } from "./site.ts";
+import { ASSET_COUNT_LIMIT, assetsIgnore, dynamicPages, EARLY_FILE, earlyScript, headersFile, oversize, TOUCH_ICON, withEarlyMeter, withHomeScreenTags, type SiteFile } from "./site.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
 export const WEB_DIR = path.join(ROOT, "webapp", "build", "web");
@@ -26,6 +27,17 @@ function filesIn(dir: string, root: string, out: SiteFile[] = []): SiteFile[] {
     else out.push({ path: path.relative(root, file).split(path.sep).join("/"), size: stat.size });
   }
   return out;
+}
+
+// What the test meter's logs call this build: the commit it was made from and when (docs/development.md, The web app on Cloudflare).
+function buildName(): string {
+  let commit = "no-git";
+  try {
+    commit = execFileSync("git", ["rev-parse", "--short", "HEAD"], { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+  } catch {
+    // Not a checkout: the time alone names the build.
+  }
+  return `${commit} ${new Date().toISOString().slice(0, 16)}`;
 }
 
 async function main(log: Log): Promise<void> {
@@ -44,7 +56,7 @@ async function main(log: Log): Promise<void> {
     const tagged = withEarlyMeter(withHomeScreenTags(html));
     if (tagged !== html) writeFileSync(at, tagged);
   }
-  writeFileSync(path.join(WEB_DIR, EARLY_FILE), EARLY_SCRIPT);
+  writeFileSync(path.join(WEB_DIR, EARLY_FILE), earlyScript(buildName()));
   const pages = dynamicPages(files.map((file) => file.path));
   writeFileSync(path.join(WEB_DIR, "_headers"), headersFile());
   writeFileSync(path.join(WEB_DIR, ROUTES_FILE), `${JSON.stringify(pages)}\n`);

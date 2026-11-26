@@ -2,7 +2,7 @@
 // so a device says what a headless browser cannot. `?scale=1` (or 1.5) makes the table's canvases draw at that many pixels for each CSS pixel in place of the device's
 // (an iPad's 2 is four times the pixels of 1), `?fps=1` shows the frame rate, a log of the last minute (a tap on the meter stops it and copies the log) and the first error the page reports, with where it was thrown, and sends the log to the site (`/_meter`, webapp/meter.ts) when the site keeps one; `?scale=0` and `?fps=0` turn each off. Both are kept in localStorage, since they are read
 // before any database opens. Skia's web views read window.devicePixelRatio when they are made, so the scale is set before CanvasKit loads (skia-web-load.ts).
-import { onSpan, type SpanName } from "./meter-span.ts";
+import { described, onSpan, type SpanName } from "./meter-span.ts";
 
 const SCALE_KEY = "middle-earth-player.render-scale";
 const FPS_KEY = "middle-earth-player.frame-meter";
@@ -302,7 +302,8 @@ function sender(): (log: readonly Second[], fault: string) => void {
   return (log, fault) => {
     if (!sending || log.length === 0) return;
     part += 1;
-    const head = `session ${session} part ${part}  ${new Date().toISOString()}  ${window.location.pathname}  ${window.innerWidth}x${window.innerHeight}  saves ${(savedBytes / 1048576).toFixed(1)} MB\n${navigator.userAgent}`;
+    const build = (window as { __early?: { build?: string } }).__early?.build ?? "no early script";
+    const head = `session ${session} part ${part}  ${new Date().toISOString()}  ${window.location.pathname}  ${window.innerWidth}x${window.innerHeight}  saves ${(savedBytes / 1048576).toFixed(1)} MB\n${navigator.userAgent}\nbuild ${build}`;
     const body = [head, logText(log, window.devicePixelRatio), fault].filter((text) => text !== "").join("\n");
     void fetch("/_meter", { method: "POST", body, headers: { "content-type": "text/plain" }, keepalive: true }).then(
       (response) => {
@@ -371,7 +372,8 @@ function startMeter(): void {
         log = [...log, second].slice(-LOG_SECONDS);
         unsent = [...unsent, second];
         if (unsent.length >= SEND_EVERY_S) {
-          send(unsent, fault.textContent ?? "");
+          // With the state of what describes itself now (the music's elements), so a slow second can be set beside it.
+          send(unsent, [...described(), fault.textContent ?? ""].filter((text) => text !== "").join("\n"));
           unsent = [];
         }
         rate.textContent = `${meterLine(gaps, window.devicePixelRatio)}  saves ${(savedBytes / 1048576).toFixed(1)} MB  (tap to stop)`;

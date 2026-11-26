@@ -14,3 +14,16 @@ export function span(name: SpanName, ms: number, bytes?: number): void {
 export function onSpan(hook: Hook): void {
   holder.__middleEarthMeter = hook;
 }
+
+type Notes = Map<string, () => string>;
+const noted = globalThis as { __middleEarthNotes?: Notes };
+
+/** Gives the meter a line to add to each second of its log under `name` (the state of the music's elements, for one). */
+export function describeTo(name: string, describe: () => string): void {
+  (noted.__middleEarthNotes ??= new Map()).set(name, describe);
+}
+
+/** Every line given with describeTo, as `name: text`, for the meter. */
+export function described(): string[] {
+  return [...(noted.__middleEarthNotes ?? new Map<string, () => string>())].map(([name, describe]) => `${name}: ${describe()}`).filter((line) => !line.endsWith(": "));
+}

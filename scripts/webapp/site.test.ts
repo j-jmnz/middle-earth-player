@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ASSET_FILE_LIMIT, assetsIgnore, dynamicPages, headersFile, oversize, withEarlyMeter, withHomeScreenTags } from "./site.ts";
+import { ASSET_FILE_LIMIT, assetsIgnore, dynamicPages, headersFile, earlyScript, oversize, withEarlyMeter, withHomeScreenTags } from "./site.ts";
 
 describe("what the web app adds to the export for Cloudflare", () => {
   it("isolates every page with require-corp, which Safari supports", () => {
@@ -45,5 +45,15 @@ describe("what the web app adds to the export for Cloudflare", () => {
     expect(page).toBe('<html><head><script src="/meter-early.js"></script><title>x</title></head><body></body></html>');
     expect(withEarlyMeter(page)).toBe(page);
     expect(withEarlyMeter("no head")).toBe("no head");
+  });
+
+  it("names the build in the early script, and the script parses", () => {
+    const script = earlyScript('abc1234 2026-11-26T01:30"; alert(1); "');
+    expect(script).toContain('build: "abc1234 2026-11-26T01:30 alert1 "');
+    expect(() => new Function(script)).not.toThrow();
+  });
+
+  it("allows the page's copies of the music as media", () => {
+    expect(headersFile()).toContain("media-src 'self' blob:");
   });
 });

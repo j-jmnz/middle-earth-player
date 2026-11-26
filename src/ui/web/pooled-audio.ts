@@ -4,7 +4,7 @@
 // elements are kept and used again. Every gesture gives each element that has not had one its play() ("blessed": a play and a pause in the same breath, which sounds
 // nothing), and a few blessed spares are kept for the players made between gestures. Each element plays through a gain node of one AudioContext, because iOS ignores
 // an element's own volume, and the music's fades need one. No browser here: `AudioHost` is the page (browserHost), so a test runs the rest.
-import { span } from "./meter-span.ts";
+import { describeTo, span } from "./meter-span.ts";
 
 /** The part of an audio element the players use. */
 export type PoolElement = {
@@ -14,6 +14,9 @@ export type PoolElement = {
   currentTime: number;
   readonly duration: number;
   readonly readyState: number;
+  /** How far the file is loaded, for the test meter's line; an element that cannot say leaves them out. */
+  readonly networkState?: number;
+  readonly buffered?: { readonly length: number; end(index: number): number };
   play(): Promise<void>;
   pause(): void;
   load(): void;
@@ -23,6 +26,11 @@ export type PoolElement = {
 export type AudioHost = {
   /** A new element that plays through a gain node of its own. */
   newElement(): { element: PoolElement; gain: { gain: { value: number } } };
+  /**
+   * What an element is given to play the file at `uri`: the address itself, or the address of a copy of the whole file the page holds (browserHost says why).
+   * It resolves once the element can be given it.
+   */
+  source(uri: string): Promise<string>;
   /** Starts the AudioContext, or starts it again after the system stopped it; only a gesture's call counts. */
   resume(): void;
   /** Calls `handler` inside every gesture that can let audio play. */
@@ -44,7 +52,8 @@ export type PooledPlayer = {
   remove(): void;
 };
 
-type Slot = { element: PoolElement; gain: { gain: { value: number } }; blessed: boolean; used: boolean; wanted: boolean };
+// `turn` counts the players a slot has had, so a file that arrives late is not given to the next player of the element. `ready`: the player's file is in the element.
+type Slot = { element: PoolElement; gain: { gain: { value: number } }; blessed: boolean; used: boolean; wanted: boolean; ready: boolean; turn: number };
 
 // The web app's test meter is told how long a gesture's blessing and a new player took (meter-span.ts).
 
@@ -66,7 +75,7 @@ export function pooledAudio(host: AudioHost, spares: number = SPARES, sample: st
   const slots: Slot[] = [];
 
   const add = (): Slot => {
-    const slot: Slot = { ...host.newElement(), blessed: false, used: false, wanted: false };
+    const slot: Slot = { ...host.newElement(), blessed: false, used: false, wanted: false, ready: false, turn: 0 };
     slots.push(slot);
     return slot;
   };
@@ -76,6 +85,9 @@ export function pooledAudio(host: AudioHost, spares: number = SPARES, sample: st
     if (!slot.used) {
       if (sample === null) return;
       slot.element.src = sample;
+    } else if (!slot.ready) {
+      // Its file has not come yet, and an element with nothing to play cannot be blessed: the next gesture does it.
+      return;
     }
     slot.blessed = true;
     if (slot.wanted) {
@@ -98,15 +110,46 @@ export function pooledAudio(host: AudioHost, spares: number = SPARES, sample: st
     span("audio", performance.now() - started);
   });
 
+  // The state of each element for the test meter (meter-span.ts): used or spare, blessed, how ready, how far loaded of how long, where it stands, playing or not.
+  describeTo("music", () =>
+    slots
+      .map((slot) => {
+        const { element } = slot;
+        const loaded = element.buffered && element.buffered.length > 0 ? element.buffered.end(element.buffered.length - 1) : 0;
+        const long = Number.isFinite(element.duration) ? element.duration : 0;
+        return `${slot.used ? "U" : "s"}${slot.blessed ? "b" : "-"} r${element.readyState} n${element.networkState ?? "?"} ${Math.round(loaded)}/${Math.round(long)} t${element.currentTime.toFixed(1)}${element.paused ? "" : "*"}`;
+      })
+      .join(" | "),
+  );
+
   return {
     create(uri) {
       const started = performance.now();
       const slot = slots.find((each) => !each.used && each.blessed) ?? slots.find((each) => !each.used) ?? add();
       slot.used = true;
       slot.wanted = false;
+      slot.ready = false;
+      slot.turn += 1;
       slot.gain.gain.value = 1;
-      slot.element.src = uri;
       const { element, gain } = slot;
+      const turn = slot.turn;
+      const start = (): void => {
+        element.play().catch(() => {
+          // Refused: this element has had no gesture after all. The next gesture starts a loop; a short sound's moment has gone.
+          slot.blessed = false;
+          const seconds = length();
+          if (seconds > 0 && seconds <= LOOP_SECONDS) slot.wanted = false;
+        });
+      };
+      void host.source(uri).then(
+        (address) => {
+          if (!slot.used || slot.turn !== turn) return;
+          element.src = address;
+          slot.ready = true;
+          if (slot.wanted) start();
+        },
+        () => undefined,
+      );
       const length = () => (Number.isFinite(element.duration) ? element.duration : 0);
       span("audio", performance.now() - started);
       return {
@@ -132,24 +175,22 @@ export function pooledAudio(host: AudioHost, spares: number = SPARES, sample: st
         play() {
           slot.wanted = true;
           host.resume();
-          element.play().catch(() => {
-            // Refused: this element has had no gesture after all. The next gesture starts a loop; a short sound's moment has gone.
-            slot.blessed = false;
-            const seconds = length();
-            if (seconds > 0 && seconds <= LOOP_SECONDS) slot.wanted = false;
-          });
+          // Before its file has come, the play waits for it.
+          if (slot.ready) start();
         },
         pause() {
           slot.wanted = false;
           element.pause();
         },
         seekTo(seconds) {
-          element.currentTime = seconds;
+          // An element with no file yet cannot seek; the music seeks only a copy it starts at once, a moment before the seam.
+          if (slot.ready) element.currentTime = seconds;
           return Promise.resolve();
         },
         remove() {
           slot.wanted = false;
           slot.used = false;
+          slot.ready = false;
           element.pause();
           element.removeAttribute("src");
           element.load();
@@ -162,8 +203,37 @@ export function pooledAudio(host: AudioHost, spares: number = SPARES, sample: st
 // The gestures that can give a user activation (the HTML standard's activation-triggering events).
 const GESTURES = ["pointerup", "touchend", "click", "keydown"] as const;
 
-/** The page as an AudioHost: one AudioContext, made when first asked for, and the window's gestures in the capture phase. `context` hands it to the sound effects (buffer-audio.ts). */
+/**
+ * How the music's elements get their files, for tests on a device: `blob` (the default) fetches the whole file and gives the element the address of that copy,
+ * `stream` gives it the file's own address, and `direct` does that too and plays the element straight, with no gain node (its volume is then the element's own,
+ * which iOS ignores). `?music=<mode>` sets it and it is kept in localStorage.
+ */
+export type MusicMode = "blob" | "stream" | "direct";
+const MODE_KEY = "middle-earth-player.music-mode";
+
+export function musicMode(search: string, stored: string | null): MusicMode {
+  const asked = new URLSearchParams(search).get("music") ?? stored;
+  return asked === "stream" || asked === "direct" ? asked : "blob";
+}
+
+function chosenMode(win: Window): MusicMode {
+  try {
+    const mode = musicMode(win.location.search, win.localStorage.getItem(MODE_KEY));
+    if (new URLSearchParams(win.location.search).has("music")) win.localStorage.setItem(MODE_KEY, mode);
+    return mode;
+  } catch {
+    return "blob";
+  }
+}
+
+/**
+ * The page as an AudioHost: one AudioContext, made when first asked for, and the window's gestures in the capture phase. `context` hands it to the sound effects
+ * (buffer-audio.ts). An element is given a copy of its whole file, fetched first: on Safari's engine an element that loads a piece of music from its address held
+ * the page's thread for most of a minute while it loaded, with no script running.
+ */
 export function browserHost(win: Window & typeof globalThis): AudioHost & { context(): AudioContext } {
+  const mode = chosenMode(win);
+  const copies = new Map<string, Promise<string>>();
   let context: AudioContext | null = null;
   const audio = (): AudioContext => {
     context ??= new win.AudioContext();
@@ -178,9 +248,38 @@ export function browserHost(win: Window & typeof globalThis): AudioHost & { cont
     newElement() {
       const element = new win.Audio();
       element.preload = "auto";
+      if (mode === "direct") {
+        return {
+          element,
+          gain: {
+            gain: {
+              get value() {
+                return element.volume;
+              },
+              set value(level: number) {
+                element.volume = level;
+              },
+            },
+          },
+        };
+      }
       const gain = audio().createGain();
       audio().createMediaElementSource(element).connect(gain).connect(audio().destination);
       return { element, gain };
+    },
+    source(uri) {
+      if (mode !== "blob") return Promise.resolve(uri);
+      let copy = copies.get(uri);
+      if (!copy) {
+        copy = win
+          .fetch(uri)
+          .then((response) => (response.ok ? response.blob() : Promise.reject(new Error(`${uri}: ${response.status}`))))
+          .then((blob) => win.URL.createObjectURL(blob));
+        // A file that did not come is asked for again by the next player of it.
+        copy.catch(() => copies.delete(uri));
+        copies.set(uri, copy);
+      }
+      return copy;
     },
     resume() {
       // Made here if nothing has made it: a page whose first sound is an effect has no element yet, and the gesture must start the context.

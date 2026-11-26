@@ -16,7 +16,8 @@ export function headersFile(): string {
     "Cross-Origin-Opener-Policy: same-origin",
     "Cross-Origin-Embedder-Policy: require-corp",
     "Cross-Origin-Resource-Policy: same-origin",
-    `Content-Security-Policy: ${CSP}`,
+    // The desktop's policy, with the copies of the music the page holds (blob:; src/ui/web/pooled-audio.ts) allowed as media.
+    `Content-Security-Policy: ${CSP.replace("media-src 'self'", "media-src 'self' blob:")}`,
     "X-Content-Type-Options: nosniff",
     "X-Robots-Tag: noindex",
   ];
@@ -70,9 +71,15 @@ export const EARLY_FILE = "meter-early.js";
  * What the test meter cannot time from inside the bundle: by the time the app's code runs, React has made the channel its work comes through and the page's
  * listeners are set. This script is the first the page runs. Only while the meter is on (`?fps=1`, or its stored choice: src/ui/web/render-scale.ts), it times
  * each outermost task by what started it and sums them in `window.__early.work`, which the meter reads each second: `sched` is a message of a channel (React's
- * rendering and commits), `timer` a timeout or interval, `worker` a worker's message (the database's answers), and `ev.<type>` an event's listeners.
+ * rendering and commits), `timer` a timeout or interval, `worker` a worker's message (the database's answers), and `ev.<type>` an event's listeners. It also
+ * says which build the page is (`window.__early.build`), and ten seconds after the page's start it posts one note to the site's log on its own: what the page
+ * shows, the files that failed and the first errors. A page whose app never starts (no saves, no canvas) is read from that note.
  */
-export const EARLY_SCRIPT = `(function () {
+export function earlyScript(build: string): string {
+  return EARLY_SCRIPT.replace("__BUILD__", build.replace(/[^\w .:-]/g, ""));
+}
+
+const EARLY_SCRIPT = `(function () {
   try {
     var asked = new URLSearchParams(location.search).get("fps");
     var on = asked !== null ? asked !== "0" : localStorage.getItem("middle-earth-player.frame-meter") === "1";
@@ -80,7 +87,40 @@ export const EARLY_SCRIPT = `(function () {
   } catch (error) {
     return;
   }
-  var early = (window.__early = { work: {} });
+  var early = (window.__early = { work: {}, build: "__BUILD__" });
+  var errors = [];
+  function keep(error) {
+    if (errors.length < 5) errors.push(String((error && (error.stack || error.message)) || error).slice(0, 500));
+  }
+  window.addEventListener("error", function (event) {
+    keep(event.error || event.message);
+  });
+  window.addEventListener("unhandledrejection", function (event) {
+    keep(event.reason);
+  });
+  var logged = console.error;
+  console.error = function () {
+    for (var i = 0; i < arguments.length; i += 1) if (arguments[i] instanceof Error) keep(arguments[i]);
+    return logged.apply(console, arguments);
+  };
+  setTimeout(function () {
+    var failed = [];
+    try {
+      performance.getEntriesByType("resource").forEach(function (entry) {
+        if (entry.responseStatus >= 400) failed.push(entry.responseStatus + " " + entry.name.split("/").pop());
+      });
+    } catch (error) {}
+    var shown = document.body ? document.body.innerText.replace(/\\s+/g, " ").slice(0, 500) : "";
+    var note = [
+      "early " + early.build + "  " + new Date().toISOString() + "  " + location.pathname,
+      navigator.userAgent,
+      "isolated " + self.crossOriginIsolated + "  canvases " + document.querySelectorAll("canvas").length,
+      "page: " + shown,
+    ];
+    if (failed.length) note.push("failed: " + failed.slice(0, 12).join(", "));
+    if (errors.length) note.push("errors: " + errors.join(" || "));
+    fetch("/_meter", { method: "POST", body: note.join("\\n"), keepalive: true }).catch(function () {});
+  }, 10000);
   var depth = 0;
   function timed(name, run) {
     return function () {
