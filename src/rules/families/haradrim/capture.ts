@@ -13,6 +13,7 @@ import { lastPicked } from "../../interpret/player-verbs.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { patchTop } from "../../windows/windows.ts";
 import { effectData } from "../deck/moves.ts";
+import { addToVictory } from "../sidequests/victory.ts";
 import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -43,4 +44,12 @@ export function actAsEngagedWithHost(state: ScenarioState, focus: Focus): Scenar
   const seat = hostEngagedSeat(state, focus.sourceId);
   if (seat == null || state.seats[seat]?.eliminated) return patchTop(state, { data: { ...data, queue: [] } });
   return patchTop(state, { data: { ...data, queue: data.queue.map((item) => ({ ...item, seat })) } });
+}
+
+/** AddWithHostToVictory: the source and then its host enemy go to the victory display; the host is taken before the source leaves play, which clears its host. */
+export function addWithHostToVictory(state: ScenarioState, focus: Focus, ctx: ReduceContext): ScenarioState {
+  const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
+  if (!source) return state;
+  const moved = addToVictory(state, source.id, ctx);
+  return source.host && moved.cards[source.host] ? addToVictory(moved, source.host, ctx) : moved;
 }

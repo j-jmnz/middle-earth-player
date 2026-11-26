@@ -38,6 +38,8 @@ const VERBS = [
   // "the engaged player ..." for a card that lies attached to an enemy and is controlled by nobody (the Captures, 17011:A:1 to 17014:A:1): the instructions after it resolve for the player the source's host enemy is engaged with. With the host in the staging area, or not an enemy, the
   // rest of the effect is dropped (no player is engaged with it).
   z.strictObject({ verb: z.literal("ActAsEngagedWithHost"), ...when }),
+  // "Add [the Capture] and attached enemy to the victory display" (17011:A:1 to 17014:A:1): the source goes to the victory display and then its host enemy, the host read before the source leaves play (its own `when` is read once, with the host still attached). The host's other attachments leave with it. No host: only the source goes.
+  z.strictObject({ verb: z.literal("AddWithHostToVictory"), ...when }),
 ] as const;
 
 const TRIGGERS = [

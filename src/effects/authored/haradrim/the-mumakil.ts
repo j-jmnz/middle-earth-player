@@ -21,11 +21,8 @@ const HOST_ENGAGED: Extract<Cond, { kind: "matches" }> = { kind: "matches", card
 const HOST_REMAINING = { stat: "hitPoints", of: "host", remaining: true } as const;
 // "If X is equal to or greater than the attached enemy's remaining hit points": one less than the remaining hit points is less than X, read when the step runs.
 const REACHES = (amount: Extract<Cond, { kind: "less" }>["left"]): Extract<Cond, { kind: "less" }> => ({ kind: "less", left: { ...HOST_REMAINING, plus: -1 }, right: amount });
-// "Add [the Capture] and attached enemy to the victory display": the Capture first, so a Mûmak that leaves play first cannot take it along twice.
-const CAPTURE_AND_MUMAK = (when?: Cond): Instruction[] => [
-  { verb: "AddToVictory", target: "self", ...(when ? { when } : {}) },
-  { verb: "AddToVictory", target: "host", ...(when ? { when } : {}) },
-];
+// "Add [the Capture] and attached enemy to the victory display": one step, so the test of `when` reads the host's remaining hit points before the Capture leaves play and clears its host.
+const CAPTURE_AND_MUMAK = (when?: Cond): Instruction[] => [{ verb: "AddWithHostToVictory", ...(when ? { when } : {}) }];
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   [
@@ -103,7 +100,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
 
     // 17016 Harad Tiger. A:1: it cannot be optionally engaged. A:2: after it attacks and destroys a character it returns to the staging area. Shadow: the attacker makes an additional attack against you after this one.
-    { id: "17016:constant:1", cardCode: "17016", lines: ["17016:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", target: "self" }] },
+    { id: "17016:constant:1", cardCode: "17016", lines: ["17016:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotBeOptionallyEngaged", amount: 1, until: "whileSourceInPlay", target: "self" }] },
     { id: "17016:forced:1", cardCode: "17016", lines: ["17016:A:2"], timing: "forced", ...DESTROYS_A_CHARACTER, instructions: [{ verb: "ReturnToStaging", target: { kind: "self" } }] },
     { id: "17016:shadow:1", cardCode: "17016", lines: ["17016:A:3"], timing: "shadow", instructions: [{ verb: "ImmediateAttack", afterThis: true }] },
 
