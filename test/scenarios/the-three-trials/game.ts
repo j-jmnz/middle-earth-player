@@ -12,8 +12,8 @@ const trials = loadAnyScenario("the-three-trials");
 
 // Test helper. A whole standalone game of The Three Trials played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
 // events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. Each seat quests with all but one hero and keeps that one home to attack. The players take the first stage 2 offered
-// (a Choose window), never travel except to Hallowed Circle or to the Barrow that carries the trial's Key (Perseverance: the Guardian cannot be hurt, so exploring the Barrow frees the Key; a travel to any other location would exhaust the home hero), engage every enemy, attack a Guardian first (a defeated
-// Guardian leaves its Key free, so the first player claims it) and defend with nobody.
+// (a Choose window), engage every enemy, attack a Guardian first (a defeated Guardian leaves its Key free, so the first player claims it) and defend with nobody. They travel only to Hallowed Circle (stage 3 needs it in the victory display) or to the Barrow that carries the trial's Key (at Perseverance the Guardian
+// cannot be hurt, so exploring its Barrow is the way to free the Key); a travel anywhere else brings no trial nearer, and Tangled Woods (07051:A:1, in the staging area) makes every Forest location cost "Exhaust a hero". A policy that travels to the location with the fewest quest points instead wins less often.
 export const TRIALS_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type TrialsDecks = "strong" | "weak" | "brittle";
@@ -47,7 +47,7 @@ export const DEFAULT_POLICY: TrialsPolicy = { choose: "first" };
 //   passCommitWhile(when)  the quest commit: pass without committing while `when` holds
 const KEYS = ["08043", "08044", "08045"];
 const HALLOWED_CIRCLE = "08049";
-// A travel window: Hallowed Circle once the players can pay its cost, else the Barrow that carries the trial's Key (at Perseverance the Guardian cannot be hurt, so exploring the Barrow frees the Key), else the location with the fewest quest points.
+// A travel window: Hallowed Circle once the players can pay its cost, else the Barrow that carries the trial's Key, else no rule answers and the next one declines.
 const travelToKey: Rule = (state, ctx) => {
   if (state.window?.kind !== "travel") return null;
   const targets = legalTargets(state, { type: "Travel" }, ctx);
@@ -74,9 +74,9 @@ export type TrialsGolden = { name: string; seatCount: 1 | 2; seed: number; diffi
 // a player's threat reaches 50 (heroes too weak to quest, solo and two-handed) and every hero destroyed (solo and two-handed, heroes with 7 hit points and no defense).
 export const TRIALS_GOLDENS: readonly TrialsGolden[] = [
   { name: "solo win", seatCount: 1, seed: 3, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "two-handed win", seatCount: 2, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed win", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "Easy solo win", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
-  { name: "Easy two-handed win", seatCount: 2, seed: 5, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "Easy two-handed win", seatCount: 2, seed: 3, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "solo loss: threat", seatCount: 1, seed: 4, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed loss: threat", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "solo loss: every hero destroyed", seatCount: 1, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
