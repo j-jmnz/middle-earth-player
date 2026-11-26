@@ -280,7 +280,7 @@ Scenario piles that place cards with no record (activeLocation: 10132 Accursed B
 ## 10189 Elrond's Champion
 
 10189:A:1 (front): Response: After an enemy engages you, ready Elrond's Champion.
-  10189:response:1: Response after an enemy engages a player (event happened to the controller)
+  10189:response:1: Response after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (event happened to the controller)
     only if this card is a exhausted character (any player controls)
     - ready this card
 

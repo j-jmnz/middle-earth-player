@@ -106,7 +106,11 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   PlaceTokensOnCampaignCard: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} resource tokens on the campaign card (kept in the game)`, read: ["amount"] }),
   PlaceProgressOn: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} progress on ${cardRef(i.target)}`, read: ["amount", "target"] }),
   RemoveProgressFrom: (i, ctx) => ({ text: `remove ${amount(i.amount, ctx)} progress from ${i.target ? cardRef(i.target) : `"${str(i.named)}"`}`, read: ["amount", "named", "target"] }),
-  DealShadow: (i) => ({ text: i.additional === true ? "the attacking enemy is dealt an additional shadow card, which resolves beside the one it has" : "the attacking enemy is dealt a shadow card", read: ["additional"] }),
+  DealShadow: (i, ctx) => {
+    if (ctx.timing === "shadow" || ctx.attacking === true) return { text: i.additional === true ? "the attacking enemy is dealt an additional shadow card, which resolves beside the one it has" : "the attacking enemy is dealt a shadow card", read: ["additional"] };
+    // Outside an attack (neither a Shadow effect nor a record on the attacks trigger) the card goes to the enemy the record is on (no attack needed), and stays until that enemy's next attack.
+    return { text: `this enemy (the card the record is on, wherever it is in play) is dealt ${i.additional === true ? "an additional shadow card, beside any it has" : "a shadow card (nothing when it has one)"}; the card stays on it until its next attack`, read: ["additional"] };
+  },
   CannotPlay: (i, ctx) => ({ text: `${i.anyPlayer === true ? "no player" : "its controller"} can play, or put into play, a ${pick(i.pick, ctx)}`, read: ["pick", "anyPlayer"] }),
   UncancelableWhenRevealed: (i) => ({ text: `while this card is in play (under its condition), the When Revealed effects of ${typeof i.trait === "string" ? `${i.trait} cards` : i.cardType === "treachery" ? "treachery cards" : i.firstRevealedEachRound === true ? "the first treachery revealed each round" : "cards"} cannot be canceled${i.doomed != null ? `, and that treachery gains doomed ${str(i.doomed)} as it is revealed` : ""}${i.surge === true ? ", and that treachery gains surge as it is revealed" : ""}`, read: ["trait", "cardType", "firstRevealedEachRound", "doomed", "surge"] }),
   DamageOncePerRound: (i) => ({ text: `deal ${str(i.amount)} damage to ${cardRef(i.target ?? "subject")} unless a card with this card's title has dealt it damage this round (it is marked for the round once the damage is dealt)`, read: ["amount", "target"] }),
@@ -167,7 +171,9 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   SetPursuit: (i) => ({ text: `set the pursuit value to ${str(i.value)}`, read: ["value"] }),
   RaisePursuit: (i, ctx) => ({ text: `increase the pursuit value by ${amount(i.amount, ctx)}`, read: ["amount"] }),
   LowerPursuit: (i, ctx) => ({ text: `reduce the pursuit value by ${amount(i.amount, ctx)} (never below 0)`, read: ["amount"] }),
-  Time: (i) => ({ text: `Time ${str(i.amount)}: when this card is revealed, ${str(i.amount)} resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase`, read: ["amount"] }),
+  Time: (i) => (i.perPlayer === true
+    ? { text: `Time ${str(i.amount)} for each player: when this card is revealed, ${str(i.amount)} times the players still in the game resource tokens (time counters) are put on it, counted once, and one comes off at the end of each refresh phase`, read: ["amount", "perPlayer"] }
+    : { text: `Time ${str(i.amount)}: when this card is revealed, ${str(i.amount)} resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase`, read: ["amount"] }),
   RemoveTimeCounters: () => ({ text: "one time counter comes off each card in play with Time X (the end of the refresh phase, after its Forced effects); a card whose last counter goes hears it", read: [] }),
   HoldUnder: (i) => ({ text: `the card with code ${str(i.code)} that a player controls lies facedown under this card, still in play, controlled by no one, with what is attached to it; when this card is defeated it returns under the first player, exhausted`, read: ["code"] }),
   DiscardHeld: () => ({ text: "the card held under this card is discarded from where it lies, and leaves play", read: [] }),

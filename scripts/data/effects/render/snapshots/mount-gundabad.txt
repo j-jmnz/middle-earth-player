@@ -143,7 +143,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 19128:A:1 (front): Forced: When Deep-dweller engages you, it makes an immediate attack.
-  19128:forced:1: Forced after an enemy engages a player (heard about this card)
+  19128:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 

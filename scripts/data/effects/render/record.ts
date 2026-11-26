@@ -43,7 +43,7 @@ const TRIGGER: Readonly<Record<string, string>> = {
   enemyDestroyed: "after an enemy is destroyed",
   attacks: "when this enemy attacks, before the defender is declared",
   revealed: "after a card is revealed",
-  engaged: "after an enemy engages a player",
+  engaged: "after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it)",
   traveled: "after the players travel",
   leftPlay: "after a card leaves play",
   played: "after this card is played",
@@ -153,7 +153,7 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   const printedWin = ctx.finalStage === true && effect.timing === "constant" && instructions.length > 0 && Array.isArray(effect.lines) && effect.lines.some((id) => typeof id === "string" && /they win the game/i.test(ctx.lineTexts?.get(id) ?? ""));
   if (printedWin) lines.push("  note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule");
   if (instructions.length > 1) lines.push("  (steps run in order; a step depends on an earlier one only through its own condition)");
-  const inner = { ...ctx, timing: typeof effect.timing === "string" ? effect.timing : undefined, ...(effect.trigger === "engaged" ? { engagedSeat: true } : {}) };
+  const inner = { ...ctx, timing: typeof effect.timing === "string" ? effect.timing : undefined, ...(effect.trigger === "engaged" ? { engagedSeat: true } : {}), ...(effect.trigger === "attacks" ? { attacking: true } : {}) };
   instructions.forEach((instruction, at) => lines.push(...renderInstruction(instruction, inner, 1, at > 0)));
   return lines;
 }

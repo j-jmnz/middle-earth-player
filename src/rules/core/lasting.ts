@@ -62,6 +62,8 @@ export const ENGINE_MARKS: ReadonlySet<ModifierStat> = new Set<ModifierStat>([
 // Effects of an ability that engine code makes under a name of its own. Each ends when its holder leaves play; one held by the table or a seat is no
 // card's, so this step never meets it.
 export const ENGINE_MADE_EFFECTS: ReadonlySet<ModifierStat> = new Set<ModifierStat>([
+  // The players a per-player Time X counted when its counters were put on the stage (families/angmar/time.ts); the dial reads it while the stage is in play.
+  "timePlayers",
   // Stats and bars put on a card for an effect: PreventAttacks, a Shadow card's bonus, StrikeBack, a threat lowered, an Ambush gained, a quest with Attack, a cost probe.
   "attack",
   "defense",

@@ -51,7 +51,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 03057:A:1 (front): While Knees of the Mountain is in the staging area, it gains: "Forced: After an enemy engages a player, it gets +1 Attack until the end of the round."
-  03057:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls))
+  03057:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about enemy (any player controls))
     only if this card is in the staging area
     who acts: the acting player is the player the enemy engaged
     - the card the event is about: stat attack 1, until the end of the round
@@ -396,7 +396,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 901302:A:2 (front): Forced: After engaging Wolfpelt Goblin, the engaged player must deal X damage to 1 character he controls, where X is the active location's remaining quest points. Then, remove 2 progress from the active location, if able.
-  901302:forced:1: Forced after an enemy engages a player (heard about this card)
+  901302:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control)
@@ -423,7 +423,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
     - this card attacks the first player now, from the staging area, dealt a shadow card
 
 901304:A:2 (front): Forced: After Snow-Giant engages you, discard the ally you control with the highest Willpower.
-  901304:forced:2: Forced after an enemy engages a player (heard about this card)
+  901304:forced:2: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ally (you control) with the highest current Willpower of those (ties: the chooser decides)

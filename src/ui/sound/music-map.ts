@@ -156,6 +156,7 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "the-fords-of-isen": { calm: "rohan", combat: "isengard" },
   "to-catch-an-orc": { calm: "rohan", combat: "uruk" },
   "into-fangorn": { calm: "fangorn", combat: "ents" },
+  "the-dunland-trap": { calm: "rohan", combat: "isengard" },
   "escape-from-umbar": { calm: "havens", combat: "chase" },
   "desert-crossing": { calm: "rohan", combat: "chase" },
   "the-long-arm-of-mordor": { calm: "shadow", combat: "uruk" },

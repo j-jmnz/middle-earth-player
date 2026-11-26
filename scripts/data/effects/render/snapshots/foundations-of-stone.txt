@@ -232,7 +232,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
 
 04125:A:1 (front): Forced: After Nameless Thing engages a player, attach the top 2 cards of that player's deck to it.
-  04125:forced:1: Forced after an enemy engages a player (heard about this card)
+  04125:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - attach the top 2 cards of the acting player's deck (the player the event is about, in a Forced effect; the defending player, in a Shadow effect) to this enemy, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play); the cards attached together are one event
 
@@ -246,7 +246,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
 
 04126:A:1 (front): Forced: After Elder Nameless Thing engages a player, attach the top 3 cards of that player's deck to it.
-  04126:forced:1: Forced after an enemy engages a player (heard about this card)
+  04126:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - attach the top 3 cards of the acting player's deck (the player the event is about, in a Forced effect; the defending player, in a Shadow effect) to this enemy, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play); the cards attached together are one event
 
@@ -355,7 +355,7 @@ Scenario piles that place cards with no record (quest: 04111 The Dripping Walls;
 ## 901704 Unspeakable Thing
 
 901704:A:1 (front): Forced: When Unspeakable Thing engages a player or attacks a player, attach the top card of that player's deck to it.
-  901704:forced:1: Forced after an enemy engages a player (heard about this card)
+  901704:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - attach the top card of the acting player's deck (the player the event is about, in a Forced effect; the defending player, in a Shadow effect) to this enemy, faceup, as attachments with no title and no game text (a deck with fewer cards attaches fewer; each goes to its owner's discard pile when the enemy leaves play); the cards attached together are one event
   901704:forced:2: Forced when this enemy attacks, before the defender is declared (heard about this card)

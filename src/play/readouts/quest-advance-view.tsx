@@ -77,6 +77,8 @@ export function QuestAdvanceView({
   });
   const sheet = choice.sheet;
   const tiles = asks ? trayTiles(sheet) : [];
+  // A bare choice (words/asks.ts `bare`) says its sentence alone and the stage sheet carries the printed paragraph, so a short screen drops the stage detail line.
+  const bare = sheet.kind === "pick" && sheet.bare === true;
   const marks = new Set(choice.choice.ids);
   const reads = tiles.some((tile) => tile.readId);
   const note = choice.header.note;
@@ -110,7 +112,7 @@ export function QuestAdvanceView({
               {words.title}
             </Text>
           </View>
-          {words.detail ? (
+          {words.detail && !(asks && short && bare) ? (
             <Text testID="quest-advance-detail" className="mt-1 text-label text-muted">
               {words.detail}
             </Text>

@@ -305,7 +305,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     - this card: stat defense resources of this card, while this card is in play
 
 11066:A:2 (front): Forced: When Raid Leader engages you, move 1 resource from each of your heroes' resource pools to Raid Leader.
-  11066:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+  11066:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card; event happened to the controller)
     who acts: the acting player is the player the enemy engaged
     - 1 resource moves from the pool of each hero the acting player controls that has one to this card
 
@@ -381,7 +381,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     - the source enemy engages the last player
 
 11078:A:2 (front): Forced: When Na'asiyah engages you, discard each event in your hand. Add 1 resource to Na'asiyah for each event discarded in this way.
-  11078:forced:2: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+  11078:forced:2: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card; event happened to the controller)
     who acts: the acting player is the player the enemy engaged
     - for each card (you control) in hand, of card type event:
       - discard the picked card
