@@ -16,7 +16,7 @@ import type { Focus } from "../index.ts";
 type Scour = Extract<Instruction, { verb: "TriggerScour" }>;
 
 /** The records of a card that are its scour effect (the effect that follows the Scour keyword). */
-function scourEffects(state: ScenarioState, id: string, ctx: ReduceContext): readonly Effect[] {
+export function scourEffects(state: ScenarioState, id: string, ctx: ReduceContext): readonly Effect[] {
   const card = state.cards[id];
   return card ? effectsOfCard(state, ctx, card).filter((effect) => effect.trigger === "scour") : [];
 }
