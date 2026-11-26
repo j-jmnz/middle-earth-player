@@ -107,11 +107,10 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   PlaceProgressOn: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} progress on ${cardRef(i.target)}`, read: ["amount", "target"] }),
   RemoveProgressFrom: (i, ctx) => ({ text: `remove ${amount(i.amount, ctx)} progress from ${i.target ? cardRef(i.target) : `"${str(i.named)}"`}`, read: ["amount", "named", "target"] }),
   DealShadow: (i, ctx) => {
-    if (ctx.timing === "shadow") return { text: i.additional === true ? "the attacking enemy is dealt an additional shadow card, which resolves beside the one it has" : "the attacking enemy is dealt a shadow card", read: ["additional"] };
-    // Outside a Shadow effect the card goes to the enemy the record is on (no attack needed), and stays until that enemy's next attack.
+    if (ctx.timing === "shadow" || ctx.attacking === true) return { text: i.additional === true ? "the attacking enemy is dealt an additional shadow card, which resolves beside the one it has" : "the attacking enemy is dealt a shadow card", read: ["additional"] };
+    // Outside an attack (a Shadow effect, or a record on the attacks trigger) the card goes to the enemy the record is on (no attack needed), and stays until that enemy's next attack.
     return { text: `this enemy (the card the record is on, wherever it is in play) is dealt ${i.additional === true ? "an additional shadow card, beside any it has" : "a shadow card (nothing when it has one)"}; the card stays on it until its next attack`, read: ["additional"] };
   },
-
   CannotPlay: (i, ctx) => ({ text: `${i.anyPlayer === true ? "no player" : "its controller"} can play, or put into play, a ${pick(i.pick, ctx)}`, read: ["pick", "anyPlayer"] }),
   UncancelableWhenRevealed: (i) => ({ text: `while this card is in play (under its condition), the When Revealed effects of ${typeof i.trait === "string" ? `${i.trait} cards` : i.cardType === "treachery" ? "treachery cards" : i.firstRevealedEachRound === true ? "the first treachery revealed each round" : "cards"} cannot be canceled${i.doomed != null ? `, and that treachery gains doomed ${str(i.doomed)} as it is revealed` : ""}${i.surge === true ? ", and that treachery gains surge as it is revealed" : ""}`, read: ["trait", "cardType", "firstRevealedEachRound", "doomed", "surge"] }),
   DamageOncePerRound: (i) => ({ text: `deal ${str(i.amount)} damage to ${cardRef(i.target ?? "subject")} unless a card with this card's title has dealt it damage this round (it is marked for the round once the damage is dealt)`, read: ["amount", "target"] }),

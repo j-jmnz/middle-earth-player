@@ -328,7 +328,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   141069:forced:1: Forced when this enemy attacks, before the defender is declared
     only if the card with code 141085 in play is exhausted
     who acts: the acting player is the defending player (the player the attack is against)
-    - this enemy (the card the record is on, wherever it is in play) is dealt an additional shadow card, beside any it has; the card stays on it until its next attack
+    - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
 
 141069:A:3 (shadow): Shadow: Shuffle this card into the encounter deck.
   141069:shadow:1: Shadow

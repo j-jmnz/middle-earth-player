@@ -289,7 +289,7 @@ Scenario piles that place cards with no record (quest: 02105 Into the Marshes; q
 ## 900805 Marsh-wight
 
 900805:A:1 (front): Forced: After Marsh-wight engages a player, that player makes an escape test, dealing 3 cards from the encounter deck. If this test is failed, place 2 resource tokens on Gollum and Marsh-wight makes an immediate attack.
-  900805:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
+  900805:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player makes an escape test: each commits any ready characters it controls (exhausting them), the players take actions once, then 3 cards are dealt from the encounter deck, each counting its Escape value; the committed Willpower must be higher than the Escape counted (a tie fails)

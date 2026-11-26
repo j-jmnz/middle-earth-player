@@ -4,7 +4,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 09025:A:1 (front): Forced: After Cornered Orc engages a player, it makes an immediate attack.
-  09025:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
+  09025:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 

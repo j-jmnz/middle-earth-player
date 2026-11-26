@@ -52,7 +52,7 @@ Scenario piles that place cards with no record (quest: 132075 The Gathering of t
   132054:forced:1: Forced when this enemy attacks, before the defender is declared
     who acts: the acting player is the defending player (the player the attack is against)
     - repeat the number of quest stages in play with no progress on them (stages 2 to 4 in play together, the only stage before them, stage 5 after) times:
-      - this enemy (the card the record is on, wherever it is in play) is dealt an additional shadow card, beside any it has; the card stays on it until its next attack
+      - the attacking enemy is dealt an additional shadow card, which resolves beside the one it has
 
 ## 132055 Gundabad Wolf Rider
 (the scenario deals it into the encounter pile; the piles place it, no record does)

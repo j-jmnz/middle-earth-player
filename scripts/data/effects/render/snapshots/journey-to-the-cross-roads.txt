@@ -60,7 +60,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 144028:A:2 (front): Forced: After Man of Harad engages you, discard 1 random card from your hand.
-  144028:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
+  144028:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - the acting player discards 1 random card(s) from hand
 
@@ -73,7 +73,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 144029:A:1 (front): Forced: After Captain of Harad engages you, each Harad enemy gets +1 Attack and -10 engagement cost until the end of the round.
-  144029:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
+  144029:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - every enemy in play, staged or engaged, now and entering later while the effect lasts (Harad only): stat attack 1, until the end of the round
@@ -148,7 +148,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 144034:A:1 (front): While Ithilien Woods is the active location, it gains: "Forced: After a player engages a Harad enemy, he readies a character he controls."
-  144034:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about Harad enemy (any player controls))
+  144034:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about Harad enemy (any player controls))
     only if this card is the active location
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
@@ -163,7 +163,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 144035:A:1 (front): While Hills of Ithilien is the active location, it gains: "Forced: After a player engages a Harad enemy, deal 1 damage to that enemy."
-  144035:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about Harad enemy (any player controls))
+  144035:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about Harad enemy (any player controls))
     only if this card is the active location
     who acts: the acting player is the player the enemy engaged
     - deal 1 damage to the card the event is about
@@ -253,7 +253,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
     - this card: stat damageCap (it takes no more than this much damage each round; damage past it is not placed) 3, while this card is in play
 
 144056:A:2 (front): Forced: After Oliphaunt engages you, exhaust each ally you control.
-  144056:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
+  144056:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - for each ally (you control):
       - exhaust the picked card
@@ -267,7 +267,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 (the scenario deals it into the haradDeck pile; the piles place it, no record does)
 
 144057:A:1 (front): Forced: After Haradrim Soldier engages you, it makes an immediate attack.
-  144057:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
+  144057:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
@@ -286,7 +286,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
     - this card: stat archery the number of players, while this card is in play
 
 144058:A:2 (front): Forced: After Haradrim Archer engages you, assign X damage among characters you control.
-  144058:forced:1: Forced after an enemy engages a player (by an engagement check, or put into play engaged or moved to a player by an effect) (heard about this card)
+  144058:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
     who acts: the acting player is the player the enemy engaged
     - the acting player assigns the number of players damage among the character (you control), one at a time
 
