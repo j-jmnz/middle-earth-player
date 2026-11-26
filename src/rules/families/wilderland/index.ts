@@ -140,7 +140,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "CancelStrike":
       return cancelStrike(state);
     case "ShuffleSetAsideIntoPile":
-      return shuffleSetAsideIntoPile(state, instruction, steps);
+      return shuffleSetAsideIntoPile(state, instruction);
     case "RemoveSetAsideDamage":
       return removeSetAsideDamage(state, instruction);
     case "AttachGuardedFromPile":

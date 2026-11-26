@@ -12,8 +12,8 @@ import { printedOf } from "../../core/printed.ts";
 import { frameScope, refCard } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { hasTrait } from "../../interpret/conditions.ts";
-import { reshuffleIntoDeck } from "../../core/decks.ts";
-import { NAMED_PILES, pileDealt, pileOf } from "../../core/piles.ts";
+import { moveIntoDeck } from "../../core/decks.ts";
+import { NAMED_PILES, pileDealt, pileOf, shufflePile } from "../../core/piles.ts";
 import type { GameEvent, ScenarioState } from "../../core/state.ts";
 import { distinctChoices, flagged, updateCard, withSeat } from "../../core/state.ts";
 import { askTarget } from "../../windows/choices.ts";
@@ -31,12 +31,12 @@ import type { Focus } from "../index.ts";
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
 /** ShuffleSetAsideIntoPile: up to `count` set-aside copies of the card join the pile, facedown, and the pile is shuffled with the game's seed. A game that dealt no such pile, or has no copy set aside, changes nothing. */
-export function shuffleSetAsideIntoPile(state: ScenarioState, instruction: Verb<"ShuffleSetAsideIntoPile">, steps: EngineStep[]): ScenarioState {
+export function shuffleSetAsideIntoPile(state: ScenarioState, instruction: Verb<"ShuffleSetAsideIntoPile">): ScenarioState {
   const zones = NAMED_PILES[instruction.pile];
   if (!pileDealt(state, zones.deck)) return state;
   const copies = state.setAside.filter((id) => state.cards[id]?.code === instruction.code).slice(0, instruction.count);
   if (copies.length === 0) return state;
-  return reshuffleIntoDeck(state, zones, copies, steps);
+  return shufflePile(moveIntoDeck(state, zones, copies), zones.deck);
 }
 
 /**

@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import type { Instruction } from "../../../catalog/boundary.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import { settle } from "../../engine/machine.ts";
+import { shuffleDiscardIntoPile } from "./decks.ts";
 import { reshuffleIntoDeck } from "../../core/decks.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { DECKS, pileOf } from "../../core/piles.ts";
@@ -66,6 +67,9 @@ describe("the Raven deck's shuffles (rm.raven-deck)", () => {
     const steps: EngineStep[] = [];
     reshuffleIntoDeck(withRaven(["ec1"], ["ec2", "orc"]), DECKS.raven, pileOf(withRaven(["ec1"], ["ec2", "orc"]), "ravenDiscard"), steps);
     expect(steps.map((step) => (step.kind === "reshuffleDeck" ? [step.deck, step.count] : step.kind))).toEqual([["ravenDeck", 2]]);
+    const run2: EngineStep[] = [];
+    shuffleDiscardIntoPile(withRaven(["ec1"], ["ec2"]), { verb: "ShuffleDiscardIntoPile", pile: "raven" }, run2);
+    expect(run2[0]).toMatchObject({ kind: "reshuffleDeck", cause: { rule: "rr.effects" } });
     const none: EngineStep[] = [];
     reshuffleIntoDeck(withRaven(["ec1"]), DECKS.raven, [], none);
     expect(none).toEqual([]);

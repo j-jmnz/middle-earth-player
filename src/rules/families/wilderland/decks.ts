@@ -2,6 +2,7 @@
 // from, and the Evil Creatures deck refilled from its own discard pile when it runs out. The deck as a zone is core/piles.ts, the refill is core/decks.ts and the reveal families/encounter/named-decks.ts (the Corsair deck shares them).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import { moveIntoDeck, refillDeck, reshuffleIntoDeck } from "../../core/decks.ts";
 import type { EngineStep } from "../../core/intents.ts";
@@ -40,7 +41,7 @@ export function formPile(state: ScenarioState, instruction: Extract<Instruction,
 export function shuffleDiscardIntoPile(state: ScenarioState, instruction: Extract<Instruction, { verb: "ShuffleDiscardIntoPile" }>, steps: EngineStep[]): ScenarioState {
   const zones = NAMED_PILES[instruction.pile];
   if (!pileDealt(state, zones.deck)) return state;
-  return reshuffleIntoDeck(state, zones, zones.discard ? pileOf(state, zones.discard) : [], steps);
+  return reshuffleIntoDeck(state, zones, zones.discard ? pileOf(state, zones.discard) : [], steps, currentCause(steps, UNATTRIBUTED));
 }
 
 /** "Create the Caves deck" and its like: the dealt cards shuffled together. A deck the scenario did not deal is left alone. */
