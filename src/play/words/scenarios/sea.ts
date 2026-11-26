@@ -61,8 +61,9 @@ function seaPickThenWords(pick: Extract<Instruction, { verb: "Pick" }>, next: In
       return { verb: "Guard", prompt: "Choose a Ship enemy to attach to an unguarded objective as its guard. An engaged enemy returns to the staging area first." };
     case "ConsiderOutOfPlay":
       return { verb: "Out of play", prompt: `Choose a Ship enemy that is not guarding an objective. While ${source ?? "this location"} is the active location, it is considered to be out of play.` };
+    // Ramming Speed!'s pick (12131:A:1) is the Ship enemies engaged with you; another card's pick that an attack follows (the Dreadnaught's, Stampeding Oliphaunt's) is worded by its own entry or the generic sentence.
     case "AttackWithPicked":
-      return { verb: "Attack", prompt: "Choose which of the Ship enemies engaged with you, tied for the highest Attack, makes an immediate attack." };
+      return pick.pick.trait === "Ship" ? { verb: "Attack", prompt: "Choose which of the Ship enemies engaged with you, tied for the highest Attack, makes an immediate attack." } : null;
     case "DamageCard":
       return pick.pick.type === "enemy" && pick.pick.trait === "Ship" && typeof next.amount === "number" ? { verb: "Assign", prompt: `Choose ${article(`${pick.pick.nonUnique === true ? "non-unique " : ""}Ship enemy`)} to take ${next.amount} damage.` } : null;
     case "Exhaust": {

@@ -249,6 +249,12 @@ export function Tokens({ slot, rect, images, fonts, t, s, ring = null, contrast 
   );
 }
 
+// The strip's count stands in the middle of the card, or just left of the progress token at the card's foot when the card wears one (`tokenLeft`, its left edge; null with none), so the token never covers a digit.
+function stripCenter(x: number, w: number, tokenLeft: number | null, label: string, font: Fonts["numbers"], s: number): number {
+  const half = font.getTextWidth(label) / 2;
+  return tokenLeft == null ? x + w / 2 : Math.min(x + w / 2, tokenLeft - 2 * s - half);
+}
+
 /**
  * The effects on a card, stacked down its left edge under the top: each changed number as its icon and the change ("+2"),
  * an accent pill when raised and a night pill with danger text when lowered; each "cannot" as its icon struck through; "+n" when
@@ -293,6 +299,7 @@ export function Badges({
   const { x, y, w, h } = rect;
   const pill = BADGE_H * s;
   const strip = 15 * s;
+  const label = questPoints != null ? (stripText(slot, questPoints, owner, stageLoses ?? false) ?? "") : "";
   // Rows that fit between the title band (or the top edge of a short card) and the resource token and the foot pills (badgeLayout).
   const { top: first, rows: room } = badgeLayout(h, s, pill, stop);
   const items = [...effects.stats.map((badge) => ({ kind: "stat" as const, badge })), ...effects.flags.map((flag) => ({ kind: "flag" as const, flag }))];
@@ -364,7 +371,7 @@ export function Badges({
       {questPoints != null ? (
         <Group>
           <RoundedRect x={x} y={y + h - strip} width={w} height={strip} r={0} color={stripOf(t)} />
-          <Outlined x={x + w / 2} y={y + h - 3 * s} text={stripText(slot, questPoints, owner, stageLoses ?? false) ?? ""} font={fonts.numbers} t={t} s={s} {...(stageLoses ? { color: t.threat } : {})} />
+          <Outlined x={stripCenter(x, w, slot.progress > 0 ? x + w - TOKEN * s : null, label, fonts.numbers, s)} y={y + h - 3 * s} text={label} font={fonts.numbers} t={t} s={s} {...(stageLoses ? { color: t.threat } : {})} />
         </Group>
       ) : null}
     </Group>

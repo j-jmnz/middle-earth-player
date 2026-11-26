@@ -13,7 +13,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
-import { patchTop, topFrame } from "../../windows/windows.ts";
+import { reseatQueue } from "../deck/moves.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { isolatedAreas, sharing } from "../breaking/areas.ts";
@@ -73,9 +73,7 @@ export function changeControl(state: ScenarioState, instruction: ChangeControl, 
 // SwitchActor: the instructions still queued in the running effect are the picked player's.
 export function switchActor(state: ScenarioState): ScenarioState {
   const seat = lastPickedSeat(state);
-  const data = topFrame(state)?.data;
-  if (seat == null || data?.kind !== "effect") return state;
-  return patchTop(state, { data: { ...data, queue: data.queue.map((item) => ({ ...item, seat })) } });
+  return seat == null ? state : reseatQueue(state, seat);
 }
 
 // TakeFirstPlayer: the actor holds the first player token from now on.

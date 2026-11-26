@@ -11,6 +11,12 @@ export function consideredEngagedSeats(state: ScenarioState, id: string, among: 
   return among.filter((seat) => flagged(state, id, "engagedWithAll") || (flagged(state, id, "engagedWithFirst") && seat === state.firstPlayer) || engagedWithThreatening(state, id, seat));
 }
 
+// The seat an enemy is engaged with, or null while it is in the staging area, gone or no enemy (rr.engaged). Only an enemy in an engagement area has one: `considered` engagement of a staging enemy names no seat here.
+export function engagedSeat(state: ScenarioState, id: string): number | null {
+  const card = state.cards[id];
+  return card?.zone === "engaged" ? card.controller : null;
+}
+
 // An enemy engaged with the seat (`you`) or with another player (`other`): one in an engagement area, or one in the staging area that is considered engaged with that player (rr.engaged; a pick's and a condition's `engaged`).
 export function engagedAs(state: ScenarioState, id: string, engaged: "you" | "other", seat: number): boolean {
   const card = state.cards[id];

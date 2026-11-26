@@ -3,6 +3,7 @@
 import type { Instruction } from "../../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../../core/intents.ts";
+import { engagedSeat } from "../../../core/engaged.ts";
 import { DEAD_SUFFIX, isReanimatedCode, printedOf } from "../../../core/printed.ts";
 import { updateCard, type ScenarioState } from "../../../core/state.ts";
 import { moveCard } from "../../../core/zones.ts";
@@ -26,8 +27,7 @@ function seatFor(state: ScenarioState, instruction: Verb<"Reanimate">, focus: Fo
   }
   if (instruction.who === "defending") {
     const source = focus.sourceId;
-    const engagedWith = source ? state.seats.findIndex((one) => one.engaged.includes(source)) : -1;
-    return engagedWith >= 0 ? engagedWith : focus.seat;
+    return (source ? engagedSeat(state, source) : null) ?? focus.seat;
   }
   return focus.seat;
 }

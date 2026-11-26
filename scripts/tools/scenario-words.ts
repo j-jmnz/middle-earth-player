@@ -77,8 +77,14 @@ export function renderWordsStubs(rows: readonly { key: string; kind: AskRow["kin
   return out.join("\n");
 }
 
-/** The asks file's text with `block` added before the closing `};` of its ASKS table. Throws, naming `file`, when the file has no `export const ASKS ... = {` table or the table does not end with a line `};` (the first line that starts in column 0 after the opening). */
+/** The asks file's text with `block` added before the closing `};` of its ASKS table. A table on one line, as `pnpm scenario new` writes it (`= {};` or `= { ...SHARED };`), is opened first. Throws, naming `file`, when the file has no `export const ASKS ... = {` table or the table does not end with a line `};` (the first line that starts in column 0 after the opening). */
 export function extendAsks(file: string, source: string, block: string): string {
+  const oneLine = /^(export const ASKS\b[^\n]*= )\{([^\n]*)\};$/m.exec(source);
+  if (oneLine) {
+    const spread = (oneLine[2] ?? "").split(",").map((part) => part.trim()).filter((part) => part !== "");
+    const opened = `${oneLine[1]}{\n${spread.map((part) => `  ${part},\n`).join("")}};`;
+    return extendAsks(file, `${source.slice(0, oneLine.index)}${opened}${source.slice(oneLine.index + oneLine[0].length)}`, block);
+  }
   const start = /^export const ASKS\b[^\n]*= \{$/m.exec(source);
   if (!start) throw new Error(`${file} has no \`export const ASKS ... = {\` table to extend: add the entries by hand`);
   const from = start.index + start[0].length;
