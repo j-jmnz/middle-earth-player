@@ -80,13 +80,24 @@ const ONE: TimeTakes = { takes: 1 };
 export const stageTimeWords = (code: string, left: number, facts: TimeTakes = ONE): string => `${stageStandingWords(code)} ${plural(left, "time counter")} left. ${facts.takes === 1 ? "One comes off" : `${facts.takes} come off`} at the end of each refresh phase. ${withLastGone(code, facts.levels ?? [])}`.trim();
 
 /** The warning once the next refresh phase takes the last counters, or two are left: what the refresh phase takes, any engagement that takes one too, and what the last one does. */
-export function stageTimeNearWords(code: string, left: number, facts: TimeTakes = ONE): string {
+export function stageTimeNearWords(code: string, left: number, facts: TimeTakes = ONE, counted = true): string {
   const levels = facts.levels ?? [];
   if (left <= 0) return `No time counters are left. ${withLastGone(code, levels)}`.trim();
   const engages = facts.engages === true && left <= 2 ? "Any enemy that engages a player also takes one." : "";
-  if (facts.takes < left && left > 1) return [`${left} time counters are left.`, engages].filter((part) => part !== "").join(" ");
+  if (facts.takes < left && left > 1) return [counted ? `${left} time counters are left.` : "", engages].filter((part) => part !== "").join(" ");
   const taken = left === 1 ? "the last time counter" : `the last ${left} time counters`;
   return [`The next refresh phase takes ${taken}.`, engages, withLastGone(code, levels)].filter((part) => part !== "").join(" ");
+}
+
+/** Stage 4B of The Nîn-in-Eilph puts 2 counters back on itself, so it holds 2 most of the game: its dial warms only when the next refresh phase takes the last counter (the attack), not for the count. */
+const WARMS_AT_LAST_ONLY: ReadonlySet<string> = new Set(["08101"]);
+
+/** Whether the time dial of a stage warms: two counters or fewer are left, or the next refresh phase takes the rest (a stage in WARMS_AT_LAST_ONLY warms only for the second). */
+export const timeDialWarms = (code: string, left: number, takes: number): boolean => takes >= left || (left <= 2 && !WARMS_AT_LAST_ONLY.has(code));
+
+/** The time words of a stage's preview: its standing rule first, then what the dial warns of once two counters or fewer are left. The count is not said: the preview's counter line says it. */
+export function stageTimePreviewWords(code: string, left: number, facts: TimeTakes, warms: boolean): string {
+  return [stageStandingWords(code), warms ? stageTimeNearWords(code, left, facts, false) : ""].filter((part) => part !== "").join(" ");
 }
 
 /** What the limit of the dial says: the Time X the stage printed, and for a Time X for each player the amount and the players counted. */

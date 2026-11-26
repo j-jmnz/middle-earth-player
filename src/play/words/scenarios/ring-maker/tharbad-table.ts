@@ -11,4 +11,4 @@ export const crossingPointsWords = (total: number, printed: number, each: number
 export const ninNalirWords = (owner: string | null, players: number): string => `${owner ? `${owner} controls` : "You control"} Nalir. He passes to the first player each round, and if he leaves play the players lose. At the start of each refresh phase the first player raises their threat by ${players}.`;
 
 /** The Ancient Marsh-dweller's resource tokens (08103:A:2, A:3): each is +1 Threat and +1 Attack, and one is added each time time counters come off the current quest. */
-export const marshDwellerWords = (tokens: number): string => `Ancient Marsh-dweller has ${tokens === 1 ? "1 resource token" : `${tokens} resource tokens`}: +${tokens} Threat and +${tokens} Attack. It gets one more each time time counters come off the current quest.`;
+export const marshDwellerWords = (tokens: number): string => `Ancient Marsh-dweller has ${tokens === 1 ? "1 resource token" : `${tokens} resource tokens`}: +${tokens} Threat and +${tokens} Attack. It gets one more whenever time counters come off the current quest.`;

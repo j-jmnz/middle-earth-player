@@ -13,7 +13,7 @@ Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; sta
 
 08094:B:1 (back): When Revealed: Advance to a random stage 2A.
   08094:whenRevealed:1: When revealed
-    - the quest proceeds to one of the stages with codes 08095, 08096 and 08097, each played once in a random order (the game's seed): one still in the quest deck (the quest advances at once, by this set alone: the stage's own set for its defeat is not changed)
+    - the quest proceeds to one of the stages with codes 08095, 08096 and 08097, each played once in a random order (the game's seed): one still in the quest deck (the scenario definition copies it onto the stage and the quest takes it when the stage is defeated; run on the stage the quest is at, it advances the quest at once)
 
 ## 08095 Through the Marsh
 (the scenario deals it into the quest pile; the piles place it, no record does)

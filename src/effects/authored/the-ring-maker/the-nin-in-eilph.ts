@@ -57,7 +57,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   [
     // 08094 Fleeing from Tharbad (stage 1). Setup: the first player controls Nalir, the Ancient Marsh-dweller lies aside (the pile), each player searches for a different location and adds it to the staging area, the deck is shuffled. B: the quest advances to a random stage 2A.
     { id: "08094:setup:1", cardCode: STAGE_1, lines: ["08094:A:1"], timing: "setup", instructions: [{ verb: "TakeControlOfSetAside", code: NALIR }, EACH_PLAYER([{ verb: "SearchMove", type: "location", to: "staging", different: true }]), { verb: "ShuffleEncounterDeck" }] },
-    { id: "08094:whenRevealed:1", cardCode: STAGE_1, lines: ["08094:B:1"], timing: "whenRevealed", instructions: [{ verb: "AdvanceToRandomStage", codes: [...STAGE_2] }] },
+    { id: "08094:whenRevealed:1", cardCode: STAGE_1, lines: ["08094:B:1"], timing: "whenRevealed", instructions: [{ verb: "AdvanceToRandomStage", codes: [...STAGE_2], stageSet: true }] },
 
     // 08095 to 08097 Through the Marsh (stages 2). Time 3; after the last counter the quest advances to a different stage 2A and this stage returns to the quest deck; when the players defeat it, to a random stage 3A. B:3: no player card effect gains resources or draws; a player
     // discards a card at random from his hand to commit characters; each player plays at most 1 card each round.

@@ -36,7 +36,7 @@ import { LOOT_ROLE } from "../words/loot.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import { FORDS_STAGES, timeTakes } from "../readouts/ring-maker/fords.ts";
 import { GUARDIANS } from "../readouts/ring-maker/trials.ts";
-import { stageTimeNearWords } from "../words/scenarios/ring-maker/fords-table.ts";
+import { stageTimePreviewWords, timeDialWarms } from "../words/scenarios/ring-maker/fords-table.ts";
 
 // A card code as the preview draws it: its name, its picture (or null) by picture key (picture-key.ts: side B of a revealed quest
 // stage), whether it is printed sideways, its text, and the lines of it the app does not apply.
@@ -70,7 +70,7 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
   const rest = stageDetail(game, ctx, stage.code, points, hold, null).join(". ");
   // A time stage with 2 counters or fewer says what the dial warns of first, as the dial's own words do (rm.time-x): the sheet the dial opens is this preview.
   const facts = FORDS_STAGES.includes(stage.code) && stage.face === "B" ? timeTakes(game, ctx, stage.code) : null;
-  const near = facts != null && (stage.resources <= 2 || facts.takes >= stage.resources) ? stageTimeNearWords(stage.code, stage.resources, facts) : null;
+  const near = facts != null ? stageTimePreviewWords(stage.code, stage.resources, facts, timeDialWarms(stage.code, stage.resources, facts.takes)) : null;
   const detail = near ? [near, rest].filter((part) => part !== "").join(" ") : rest;
   if (points != null) return { title: `${name} · ${stage.progress} / ${points}`, ...(detail ? { detail } : {}) };
   const objective = questObjective(game, ctx, line);

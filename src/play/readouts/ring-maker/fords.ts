@@ -4,7 +4,7 @@ import { inPlay, livingSeats } from "../../../rules/core/state.ts";
 import { refreshTakes, timeInstruction, timeLimit, timePlayersOf } from "../../../rules/families/angmar/time.ts";
 import type { ReduceContext, ScenarioState } from "../../../rules/engine/reduce.ts";
 
-import { ELIMINATION_DROP, LEVEL_STAGE, stageTimeLimitWords, stageTimeNearWords, stageTimeWords, type NewLevels, type TimeTakes } from "../../words/scenarios/ring-maker/fords-table.ts";
+import { ELIMINATION_DROP, LEVEL_STAGE, stageTimeLimitWords, stageTimeNearWords, stageTimeWords, timeDialWarms, type NewLevels, type TimeTakes } from "../../words/scenarios/ring-maker/fords-table.ts";
 import { cardsOf, type TableDial } from "../dials.ts";
 import { seatLevel } from "../threat-level.ts";
 
@@ -36,7 +36,7 @@ export function ringMakerDials(game: ScenarioState, ctx: ReduceContext, nameOf: 
       const limit = Math.max(counted != null ? time.amount * counted : printed, card.resources);
       // Only stage 1B's last counter is a loss; the other two return counters, so their dials warm near and are never critical.
       const level = card.resources <= 1 && code === "07059" ? ("critical" as const) : ("near" as const);
-      const warms = card.resources <= 2 || facts.takes >= card.resources;
+      const warms = timeDialWarms(code, card.resources, facts.takes);
       dials.push({
         id: `time:${card.id}`,
         testID: `ring-maker-time:${card.id}`,

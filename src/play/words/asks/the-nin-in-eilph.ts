@@ -14,6 +14,9 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "08099:whenRevealed:1 @2 Pick": { note: "Lost in the Swanfleet: choose Ancient Marsh-dweller to return to the staging area. Its damage is healed.", verb: "Return" },
   "08100:whenRevealed:1 @2 Pick": { note: "Lost in the Swanfleet: choose Ancient Marsh-dweller to return to the staging area. Its damage is healed.", verb: "Return" },
 
+  // 08099:B:3 (Lost in the Swanfleet): each player readies at most 5 characters in the refresh phase; he chooses which exhausted characters stay exhausted.
+  "08099:forced:2 @0.0 CapRefresh": { owned: true, why: "only 5 of your characters ready this refresh phase.", note: "{ready} would ready. Choose {left} to stay exhausted.", verb: "Keep exhausted" },
+
   // 08101:A:1 (Out of the Swamp): it joins the staging area healed, then attacks each player in player order.
   "08101:whenRevealed:1 @1 Pick": { note: "Out of the Swamp: choose Ancient Marsh-dweller to return to the staging area. Its damage is healed.", verb: "Return" },
   "08101:whenRevealed:1 @4 Pick": { note: "Out of the Swamp: choose Ancient Marsh-dweller to attack each player in player order, from the first player. It stays where it is.", verb: "Attack" },

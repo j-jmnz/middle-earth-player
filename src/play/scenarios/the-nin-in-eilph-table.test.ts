@@ -4,6 +4,9 @@ import { describe, expect, it } from "vitest";
 
 import { updateCard } from "../../rules/core/state.ts";
 import { idOf, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
+import { questTitle } from "../cards/table-preview.ts";
+import { heldStage } from "../cards/earlier-stages.ts";
+import { commitSheet } from "../choice/bar-sheets.ts";
 import { dungeonDetail } from "../cards/dungeon-preview.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
 
@@ -54,6 +57,45 @@ describe("Nalir and the Ancient Marsh-dweller", () => {
   it("08103:A:2 and 08103:A:3 say the resource tokens are Threat and Attack and that time counters removed add one", () => {
     const made = built({ staging: ["08103"] });
     const held = updateCard(made.state, idOf(made.state, "08103"), { resources: 2 });
-    expect(dungeonDetail(held, made.ctx, idOf(held, "08103"), (id) => id)).toBe("Ancient Marsh-dweller has 2 resource tokens: +2 Threat and +2 Attack. It gets one more each time time counters come off the current quest.");
+    expect(dungeonDetail(held, made.ctx, idOf(held, "08103"), (id) => id)).toBe("Ancient Marsh-dweller has 2 resource tokens: +2 Threat and +2 Attack. It gets one more whenever time counters come off the current quest.");
+  });
+});
+
+describe("the commit sheet under stage 08096", () => {
+  it("08096:B:3 says a random card is discarded before the commit, and only while 08096 is current", () => {
+    const sheetNote = (stage: string): string | null => {
+      const made = built({ stage, deck: [], hand: ["ally"] });
+      return commitSheet(made.state, made.ctx, { card: nameOf(made), line: () => null }).note;
+    };
+    expect(sheetNote("08096")).toContain("discards a card at random from his hand");
+    expect(sheetNote("08095")).not.toContain("at random");
+  });
+});
+
+describe("the stage preview and the 4B dial", () => {
+  const preview = (stage: string, left: number) => {
+    const made = built({ stage });
+    const state = updateCard(made.state, idOf(made.state, stage), { resources: left });
+    return questTitle(state, made.ctx, idOf(state, stage), nameOf(made)(stage), () => null);
+  };
+
+  it("08096:B:3 the preview of the stage leads with its standing rule and says the count once", () => {
+    expect(preview("08096", 3)?.detail).toMatch(/^Before committing characters to the quest, a player discards a card at random/);
+    const two = preview("08095", 2)?.detail ?? "";
+    expect(two).toMatch(/^Player card effects cannot gain resources or draw cards\./);
+    expect(two).not.toContain("time counters are left");
+  });
+
+  it("08101:B:1 the 4B dial warms only when the next refresh phase takes the last counter", () => {
+    expect(timeDial("08101", 2)?.warn).toBeUndefined();
+    expect(timeDial("08101", 1)?.warn?.words).toContain("Ancient Marsh-dweller attacks");
+  });
+});
+
+describe("the stage numbers", () => {
+  it("08094:B:1 the printed stages are 1 to 4 of 4: the three stages 2 share a place, and so do the three stages 3", () => {
+    const made = built({ stage: "08096" });
+    const places = ["08094", "08095", "08096", "08097", "08098", "08099", "08100", "08101"].map((code) => heldStage(made.state, made.ctx, code));
+    expect(places.map((place) => `${place?.at}/${place?.of}`)).toEqual(["1/4", "2/4", "2/4", "2/4", "3/4", "3/4", "3/4", "4/4"]);
   });
 });

@@ -4,6 +4,7 @@
 import { legalAttackEnemies } from "../../rules/combat/combat.ts";
 import { playsOntoHost, printedOf } from "../../rules/core/printed.ts";
 import { flagged } from "../../rules/core/state.ts";
+import { stageStandingWords } from "../words/scenarios/ring-maker/fords-table.ts";
 import { questSeat } from "../store/selectors.ts";
 import { questStatOf, stagingThreat } from "../../rules/quest/quest.ts";
 import type { PlayerIntent, LegalIntent, ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
@@ -26,13 +27,18 @@ function commitTitle(game: ScenarioState, names: SheetNames): string {
   return current ? `Commit to ${names.card(current)} (current quest until the end of the phase)` : "Commit to the quest";
 }
 
+// The stage that makes a commit cost a card (08096:B:3, `commitDiscardsRandom`) says so on the sheet, in the words of its dial.
+function commitDiscardWords(game: ScenarioState): string {
+  return flagged(game, "table", "commitDiscardsRandom") ? stageStandingWords("08096") : "";
+}
+
 export function commitSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames): MultiSheet {
   return {
     kind: "multi",
     key: `commit:${game.round}`,
     step: "Quest",
     title: commitTitle(game, names),
-    note: `Committed characters exhaust and add their ${questStatWord(questStatNow(game, ctx)).toLowerCase()} against the threat in staging.`,
+    note: [`Committed characters exhaust and add their ${questStatWord(questStatNow(game, ctx)).toLowerCase()} against the threat in staging.`, commitDiscardWords(game)].filter((part) => part !== "").join(" "),
     verb: "Commit",
     options: legalTargets(game, { type: "Commit" }, ctx).map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, questStatOf(game, id, ctx.cards)) })),
     build: { kind: "Commit" },
