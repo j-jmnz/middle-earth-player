@@ -298,7 +298,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   40010:action:1: Action (limit once per round)
     only if all of: (the actor's heroes that can pay for a card of any sphere hold at least 2 resource(s) in all) and (there is a exhausted character (any player controls) to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player spend 2 resource(s) from any hero they control, an objective-hero included (no resource icon is matched), choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
+    - the acting player spend 2 resource(s) from any hero they control (no resource icon is matched), choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
     - choose exhausted character (any player controls)
     - ready the picked card
 
@@ -317,7 +317,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   40010:action:2: Action (limit once per round)
     only if all of: (the actor's heroes that can pay for a card of any sphere hold at least 1 resource(s) in all) and (there is a exhausted card (any player controls) or in the staging area or the active location to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player spend 1 resource(s) from any hero they control, an objective-hero included (no resource icon is matched), choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
+    - the acting player spend 1 resource(s) from any hero they control (no resource icon is matched), choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
     - choose exhausted card (any player controls) or in the staging area or the active location
     - ready the picked card
 
@@ -740,7 +740,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
   40034:response:1: Response on the event activeExplored (heard about this card)
     only if all of: (the living players' heroes that can pay for a card of any sphere hold at least 5 resource(s) in all) and (there is a Ship character (any player controls) to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the players as a group spend 5 resource(s) from any hero they control, an objective-hero included (no resource icon is matched), choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
+    - the players as a group spend 5 resource(s) from any hero they control (no resource icon is matched), choosing a hero for each resource (any player's) (with fewer resources than that, nothing is spent)
     - choose Ship character (any player controls) chosen by the first player
     - heal 5 damage from the picked card
     - ready the picked card

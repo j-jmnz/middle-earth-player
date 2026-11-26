@@ -94,7 +94,7 @@ Scenario piles that place cards with no record (quest: 16071 Surprise Attack; qu
   16036:travel:1: Travel
     note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player's heroes hold fewer resources than they must spend (read by the investigation family)
     - for each player, first player first:
-      - the acting player spend 1 resource(s) from any hero they control, an objective-hero included (no resource icon is matched), choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
+      - the acting player spend 1 resource(s) from any hero they control (no resource icon is matched), choosing a hero for each resource (their own) (with fewer resources than that, nothing is spent)
 
 16036:A:3 (shadow): Shadow: If the defending character is an objective-hero, ready it and cancel all damage from this attack.
   16036:shadow:1: Shadow

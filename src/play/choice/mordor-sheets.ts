@@ -7,6 +7,7 @@ import { printedOf } from "../../rules/core/printed.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
 import { damageOutcome } from "../store/foresight.ts";
+import { captivePlace, ownerTag } from "./sheet-parts.ts";
 import { destroyedCaution, type FireRow } from "./aflame-sheets.ts";
 
 /** The row for `id` in an AssignDamage of The Long Arm of Mordor, or null for any other pick and game. `options` are the rows of the pick (the owner is named when they hold more than one player's cards). */
@@ -17,12 +18,9 @@ export function mordorRow(pick: Instruction, id: string, options: readonly strin
   const amount = pick.single === true ? (pick.left ?? 1) : 1;
   const outcome = damageOutcome(game, ctx, id, amount);
   const printed = printedOf(ctx.cards, card.code);
-  const guard = card.guardedHero === true && card.host != null ? game.cards[card.host] : undefined;
-  const kind = card.captive === true ? (guard ? `guarded by ${name(guard.id)}` : "staging area") : card.zone === "heroes" && printed.type === "objective" ? "objective-hero" : null;
+  const kind = card.captive === true ? captivePlace(game, card, name) : card.zone === "heroes" && printed.type === "objective" ? "objective-hero" : null;
   const hitPoints = printed.health;
   const standing = hitPoints == null ? `${card.damage + amount} damage` : `${Math.min(card.damage + amount, hitPoints)} of ${hitPoints} damage`;
-  const owner = card.owner ?? card.controller;
-  const owners = new Set(options.map((other) => game.cards[other]?.owner ?? game.cards[other]?.controller).filter((seat) => seat != null));
-  const parts = [name(id), kind, standing, outcome.destroyed ? "destroyed" : null, owner != null && owners.size > 1 ? `Player ${owner + 1}` : null].filter((part): part is string => part != null);
+  const parts = [name(id), kind, standing, outcome.destroyed ? "destroyed" : null, ownerTag(game, card, options)].filter((part): part is string => part != null);
   return { label: parts.join(" · "), mark: { icon: "damage", value: amount, danger: outcome.destroyed }, ...(outcome.destroyed ? { caution: destroyedCaution(outcome, name(id)) } : {}) };
 }

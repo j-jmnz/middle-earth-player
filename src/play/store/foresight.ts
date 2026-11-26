@@ -14,6 +14,7 @@ import type { EngineStep, ReduceContext, ScenarioState } from "../../rules/engin
 import { flagged, inPlay, livingSeats } from "../../rules/core/state.ts";
 import { effectsOf } from "../../rules/windows/listen.ts";
 
+import { eliminatesWhenLeaving } from "../readouts/haradrim/staged.ts";
 import { lossWaits } from "../readouts/against-the-shadow/amon-din.ts";
 import { alcaronHeldWords } from "../words/scenarios/against-the-shadow/amon-din.ts";
 
@@ -69,8 +70,7 @@ export function discardLoss(game: ScenarioState, ctx: ReduceContext, cardId: str
 function eliminatedWhenLeaving(game: ScenarioState, ctx: ReduceContext, cardId: string): number | null {
   const card = game.cards[cardId];
   if (card?.controller == null) return null;
-  const eliminates = effectsOf(ctx, card.code).some((effect) => effect.trigger === "leftPlay" && effect.subject === "self" && effect.instructions.some((instruction) => instruction.verb === "EliminatePlayer"));
-  return eliminates ? card.controller : null;
+  return eliminatesWhenLeaving(ctx, card.code) ? card.controller : null;
 }
 
 /** What placing `damage` combat damage on a card would do now. */

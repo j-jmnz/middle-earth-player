@@ -14,9 +14,9 @@ const line = (scenario: string, code: string, layout: Parameters<typeof tableFro
 };
 
 describe("a stat that is the stage number plus or times a number", () => {
-  it("51011:A:2 says Rider of Mirkwood's Threat is the stage number plus 1, never the bare stage number", () => {
+  it("51011:A:2 says Rider of Mirkwood's Threat is 1 more than the stage number, never the bare stage number", () => {
     const said = line("the-wizards-quest", "51011", { phase: "Quest", staging: ["51011"] }) ?? "";
-    expect(said).toContain("Threat is the stage number plus 1 of the main quest");
+    expect(said).toContain("Threat is 1 more than the stage number of the main quest");
     expect(said).not.toContain("X is the stage number");
   });
 

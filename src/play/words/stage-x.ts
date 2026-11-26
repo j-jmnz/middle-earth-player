@@ -3,10 +3,10 @@
 /** One stat the stage number sets: its name, the number it has now, and how the record builds it from the stage number. */
 export type StageStat = { readonly name: string; readonly value: number; readonly times: number; readonly plus: number };
 
-// How a stat is built from the stage number: "the stage number", "twice the stage number", "the stage number plus 1".
+// How a stat is built from the stage number: "the stage number", "twice the stage number", "1 more than the stage number".
 const howWords = (one: StageStat): string => {
   const base = one.times === 1 ? "the stage number" : one.times === 2 ? "twice the stage number" : `the stage number times ${one.times}`;
-  return one.plus === 0 ? base : `${base}${one.plus > 0 ? " plus " : " minus "}${Math.abs(one.plus)}`;
+  return one.plus === 0 ? base : `${Math.abs(one.plus)} ${one.plus > 0 ? "more" : "less"} than ${base}`;
 };
 
 /** The preview line: "X is the stage number" for a bare stat, the sum for any other, and each number now. */
