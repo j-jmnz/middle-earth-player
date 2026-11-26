@@ -5,14 +5,13 @@ Scenario piles that place cards with no record (quest: 17026 Welcome to the Jung
 
 17011:A:1 (front): Response: After the attached enemy is dealt any amount of damage, the engaged player shuffles his deck and discards the top card. If the discarded card's cost is equal to or greater than the attached enemy's remaining hit points, add Horse-hair Lasso and attached enemy to the victory display.
   17011:response:1: Response after a card takes damage (heard about the host)
-    only if all of: (its host is a enemy (any player controls) that is in play now and not in the staging area) and (the attack that left this effect for its end, or the damage the answered event placed, dealt at least 1 damage)
+    only if its host is a enemy (any player controls) that is in play now and not in the staging area
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the steps after this one resolve for the player this card's host enemy is engaged with; with the host in the staging area, or not an enemy, the rest of the effect is dropped
+    - the engaged player (the player this card's host enemy is engaged with) resolves the steps after this one; with the host in the staging area, or not an enemy, the rest of the effect is dropped
     - shuffle the acting player's deck
     - the effect's X is set to 0
     - the acting player discards the top card of their deck; its printed cost (0 with none or an X cost) is added to the effect's X
-    - then, if all of: (every draw, every discard from a deck, every discard of resources and every ready this effect ran so far resolved in full: a draw or a discard that found fewer cards or tokens than it named, and a ready that did not happen (the card was ready already, or cannot ready), did not (what follows "then" is attempted only when they all did)) and (remaining hit points of its host (its hit points less its damage, at least 0) - 1 is less than X) (checked when this step runs, after the steps above; not tied to whether they did anything): this card is added to the victory display
-    - then, if all of: (every draw, every discard from a deck, every discard of resources and every ready this effect ran so far resolved in full: a draw or a discard that found fewer cards or tokens than it named, and a ready that did not happen (the card was ready already, or cannot ready), did not (what follows "then" is attempted only when they all did)) and (remaining hit points of its host (its hit points less its damage, at least 0) - 1 is less than X) (checked when this step runs, after the steps above; not tied to whether they did anything): its host is added to the victory display
+    - then, if all of: (every draw, every discard from a deck, every discard of resources and every ready this effect ran so far resolved in full: a draw or a discard that found fewer cards or tokens than it named, and a ready that did not happen (the card was ready already, or cannot ready), did not (what follows "then" is attempted only when they all did)) and (remaining hit points of its host (its hit points less its damage, at least 0) - 1 is less than X) (checked when this step runs, after the steps above; not tied to whether they did anything): this card and its host enemy are added to the victory display, this card first (the host and its remaining hit points are read before this card leaves play)
 
 ## 17012 Poisoned Spear
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -22,8 +21,7 @@ Scenario piles that place cards with no record (quest: 17026 Welcome to the Jung
     only if its host is a enemy (any player controls) engaged with you
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard 1 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)
-    - then, if remaining hit points of its host (its hit points less its damage, at least 0) - 1 is less than the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0) (checked when this step runs, after the steps above; not tied to whether they did anything): this card is added to the victory display
-    - then, if remaining hit points of its host (its hit points less its damage, at least 0) - 1 is less than the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0) (checked when this step runs, after the steps above; not tied to whether they did anything): its host is added to the victory display
+    - then, if remaining hit points of its host (its hit points less its damage, at least 0) - 1 is less than the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0) (checked when this step runs, after the steps above; not tied to whether they did anything): this card and its host enemy are added to the victory display, this card first (the host and its remaining hit points are read before this card leaves play)
 
 ## 17013 Pit Trap
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -32,9 +30,8 @@ Scenario piles that place cards with no record (quest: 17026 Welcome to the Jung
   17013:response:1: Response after the players travel (heard about location (any player controls))
     only if its host is a enemy (any player controls) that is in play now and not in the staging area
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the steps after this one resolve for the player this card's host enemy is engaged with; with the host in the staging area, or not an enemy, the rest of the effect is dropped
-    - then, if remaining hit points of its host (its hit points less its damage, at least 0) - 1 is less than printed threat of the card the event is about (checked when this step runs, after the steps above; not tied to whether they did anything): this card is added to the victory display
-    - then, if remaining hit points of its host (its hit points less its damage, at least 0) - 1 is less than printed threat of the card the event is about (checked when this step runs, after the steps above; not tied to whether they did anything): its host is added to the victory display
+    - the engaged player (the player this card's host enemy is engaged with) resolves the steps after this one; with the host in the staging area, or not an enemy, the rest of the effect is dropped
+    - then, if remaining hit points of its host (its hit points less its damage, at least 0) - 1 is less than printed threat of the card the event is about (checked when this step runs, after the steps above; not tied to whether they did anything): this card and its host enemy are added to the victory display, this card first (the host and its remaining hit points are read before this card leaves play)
 
 ## 17014 Noose of Vines
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -43,9 +40,8 @@ Scenario piles that place cards with no record (quest: 17026 Welcome to the Jung
   17014:response:1: Response once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about the host)
     only if its host is a enemy (any player controls) that is in play now and not in the staging area
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the steps after this one resolve for the player this card's host enemy is engaged with; with the host in the staging area, or not an enemy, the rest of the effect is dropped
-    - then, if all of: (the event's other card is a character (any player controls) that is in play now) and (remaining hit points of its host (its hit points less its damage, at least 0) is less than remaining hit points of the event's other card (its hit points less its damage, at least 0)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card is added to the victory display
-    - then, if all of: (the event's other card is a character (any player controls) that is in play now) and (remaining hit points of its host (its hit points less its damage, at least 0) is less than remaining hit points of the event's other card (its hit points less its damage, at least 0)) (checked when this step runs, after the steps above; not tied to whether they did anything): its host is added to the victory display
+    - the engaged player (the player this card's host enemy is engaged with) resolves the steps after this one; with the host in the staging area, or not an enemy, the rest of the effect is dropped
+    - then, if all of: (the event's other card is a character (any player controls) that is in play now) and (remaining hit points of its host (its hit points less its damage, at least 0) is less than remaining hit points of the event's other card (its hit points less its damage, at least 0)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card and its host enemy are added to the victory display, this card first (the host and its remaining hit points are read before this card leaves play)
 
 ## 17015 Wild Mûmak
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -73,7 +69,7 @@ Scenario piles that place cards with no record (quest: 17026 Welcome to the Jung
 
 17016:A:1 (front): Cannot be optionally engaged.
   17016:constant:1: Constant
-    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
 
 17016:A:2 (front): Forced: After Harad Tiger attacks and destroys a character, return it to the staging area.
   17016:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
@@ -208,14 +204,14 @@ Scenario piles that place cards with no record (quest: 17026 Welcome to the Jung
   17024:whenRevealed:1: When revealed
     - for each player, first player first:
       - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card)
-      - then, if the picked card is a card (you control) in the discard pile (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player assigns printed cost of the picked card damage among the character (you control), one at a time
+      - then, if the picked card is a card (you control) controlled by the player this effect runs for (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player assigns printed cost of the picked card damage among the character (you control), one at a time
 
 17024:A:2 (shadow): Shadow: Discard a random card from your hand and assign X damage among characters you control. X is the discarded card's cost.
   17024:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card)
-    - then, if the picked card is a card (you control) in the discard pile (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player assigns printed cost of the picked card damage among the character (you control), one at a time
+    - then, if the picked card is a card (you control) controlled by the player this effect runs for (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player assigns printed cost of the picked card damage among the character (you control), one at a time
 
 ## 17025 Guardians of the Jungle
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -273,4 +269,4 @@ Scenario piles that place cards with no record (quest: 17026 Welcome to the Jung
   17027:questResolution:1: Quest resolution
     - the players win the game
 
-(rendered pieces: 204 by template, 0 as JSON)
+(rendered pieces: 181 by template, 0 as JSON)

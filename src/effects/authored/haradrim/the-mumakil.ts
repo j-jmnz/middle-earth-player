@@ -9,6 +9,8 @@ import { withCopies } from "../reprint.ts";
 type Cond = NonNullable<Effect["condition"]>;
 type Instruction = Effect["instructions"][number];
 
+// The card the step discarded from the actor's hand is the picked card; with an empty hand nothing was discarded and the picked card is an earlier one (another player's), which the actor does not control: no damage.
+const DISCARDED_BY_ME: Cond = { kind: "matches", card: "picked", pick: { type: "card", control: "you", controlledBy: "actor" } };
 const WILD_MUMAK: PickSpec = { type: "enemy", control: "any", staging: true, names: ["Wild Mûmak"] };
 const A_CHARACTER: PickSpec = { type: "character", control: "any" };
 const THIS_ENEMY: PickSpec = { type: "enemy", control: "any", isSource: true };
@@ -26,7 +28,7 @@ const CAPTURE_AND_MUMAK = (when?: Cond): Instruction[] => [{ verb: "AddWithHostT
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   [
-    // 17011 Horse-hair Lasso. After the attached enemy is dealt damage (any amount, cancelled damage is none), the engaged player shuffles his deck and discards the top card; its printed cost (X or none is 0) at or above the enemy's remaining hit points captures it. An empty deck discards nothing.
+    // 17011 Horse-hair Lasso. After the attached enemy is dealt damage (the `damaged` event only exists for damage dealt: damage the cap or a cancel takes away is none, so the offer needs no `dealt` condition, which the offer's scope does not hold), the engaged player shuffles his deck and discards the top card; its printed cost (X or none is 0) at or above the enemy's remaining hit points captures it. An empty deck discards nothing.
     {
       id: "17011:response:1",
       cardCode: "17011",
@@ -34,7 +36,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "response",
       trigger: "damaged",
       subject: "host",
-      condition: { kind: "all", conditions: [HOST_ENGAGED, { kind: "dealt", min: 1 }] },
+      condition: HOST_ENGAGED,
       instructions: [
         { verb: "ActAsEngagedWithHost" },
         { verb: "ShuffleDeck" },
@@ -231,7 +233,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [
         EACH_PLAYER([
           { verb: "DiscardRandomFromHand", remember: true },
-          { verb: "AssignDamage", amount: { stat: "cost", of: "picked", printed: true }, pick: { type: "character", control: "you" }, when: { kind: "matches", card: "picked", pick: { type: "card", control: "you", from: "discard" } } },
+          { verb: "AssignDamage", amount: { stat: "cost", of: "picked", printed: true }, pick: { type: "character", control: "you" }, when: DISCARDED_BY_ME },
         ]),
       ],
     },
@@ -240,7 +242,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "17024",
       lines: ["17024:A:2"],
       timing: "shadow",
-      instructions: [{ verb: "DiscardRandomFromHand", remember: true }, { verb: "AssignDamage", amount: { stat: "cost", of: "picked", printed: true }, pick: { type: "character", control: "you" }, when: { kind: "matches", card: "picked", pick: { type: "card", control: "you", from: "discard" } } }],
+      instructions: [{ verb: "DiscardRandomFromHand", remember: true }, { verb: "AssignDamage", amount: { stat: "cost", of: "picked", printed: true }, pick: { type: "character", control: "you" }, when: DISCARDED_BY_ME }],
     },
 
     // 17025 Guardians of the Jungle (encounter side quest). A:1: each location gets +1 Threat. A:2: each time it becomes the current quest, the encounter deck and discard pile are searched for a Territorial Ape, put into play engaged with the first player.
