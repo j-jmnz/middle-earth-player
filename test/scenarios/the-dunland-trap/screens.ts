@@ -13,6 +13,6 @@ export const screens: ScreenMoment[] = [
   { name: "time-dial-3b-last", layout: { stage: "08013", timeCounters: 1, engaged: [TURCH] }, note: "Stage 3B with 1 counter left: the dial says the last one makes the checks and attacks, and the players win unless a hero is destroyed (08013:B:3)." },
   { name: "turch-engaged", layout: { stage: "08013", timeCounters: 5, engaged: [TURCH] }, note: "08014:A:1 to A:3: Chief Turch engaged with the first player; a tap opens his preview (cannot leave play or be destroyed, follows the first player, a counter for each engagement)." },
   { name: "hills-staging", layout: { stage: "08012", staging: ["08020"] }, note: "08020:A:1: Hills of Dunland in the staging area; its preview says the draw effect, once for all copies." },
-  { name: "ravine-dunland", layout: { stage: "08012", active: RAVINE, engaged: ["07046"] }, note: "08015:A:1: Munuv Dûv Ravine is the active location; the engaged Dunland enemy's preview names the +1 Attack and +1 Defense." },
-  { name: "old-south-road", layout: { stage: "08012", timeCounters: 3, active: "08016" }, note: "08016:A:1: Old South Road is the active location; its preview says the extra counter at the end of each refresh phase." },
+  { name: "ravine-dunland", layout: { stage: "08012", active: RAVINE, engaged: ["07046"] }, note: "08015:A:1: Munuv Dûv Ravine is the active location; the Ravine's preview and the engaged Dunland enemy's Effects rows name the +1 Attack and +1 Defense." },
+  { name: "old-south-road", layout: { stage: "08011", timeCounters: 2, active: "08016" }, note: "08016:A:1 on stage 1B: Old South Road is the active location with 2 counters left; the dial warns that the next refresh phase takes both, and the Road's preview says the extra counter." },
 ];

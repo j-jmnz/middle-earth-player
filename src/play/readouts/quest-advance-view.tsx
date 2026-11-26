@@ -59,7 +59,7 @@ export function QuestAdvanceView({
   const s = useUiScale();
   const progress = useSharedValue(scale === 0 ? 1 : 0);
   const wide = screen.width > screen.height;
-  // On a short wide screen (a phone on its side) the question's printed line goes below its rows inside the scroll, so every row and the answer show at once and the line is read by scrolling; it is never cut.
+  // On a short wide screen (a phone on its side) the question's sentence goes below its rows inside the scroll, with the read hint after it and the stage's detail line left to the stage sheet, so every row and the answer show at once and the sentence is read in full by scrolling; nothing lies over it.
   const short = wide && screen.height < SHORT * s;
   const roomW = screen.width - insets.left - insets.right;
   const roomH = screen.height - insets.top - insets.bottom;
@@ -76,6 +76,7 @@ export function QuestAdvanceView({
   const tiles = asks ? trayTiles(sheet) : [];
   const marks = new Set(choice.choice.ids);
   const note = choice.header.note;
+  const readHint = tiles.some((tile) => tile.readId);
   return (
     <View testID="quest-advance" accessibilityViewIsModal onAccessibilityEscape={asks ? undefined : onProgress} style={StyleSheet.absoluteFill}>
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: t.night }, scrimStyle]} />
@@ -98,7 +99,7 @@ export function QuestAdvanceView({
           <Text testID="quest-advance-title" accessibilityRole="header" className="mt-1 font-display text-title text-bone">
             {words.title}
           </Text>
-          {words.detail ? (
+          {words.detail && !(asks && short) ? (
             <Text testID="quest-advance-detail" className="mt-1 text-label text-muted">
               {words.detail}
             </Text>
@@ -133,8 +134,9 @@ export function QuestAdvanceView({
                   );
                 })}
                 {note && short ? <Text className="mt-1 text-label text-muted">{note}</Text> : null}
+                {readHint && short ? <Text className="mt-1 text-label text-muted">Hold a card to read it.</Text> : null}
               </ScrollView>
-              {tiles.some((tile) => tile.readId) ? <Text className="mt-1 text-label text-muted">Hold a card to read it.</Text> : null}
+              {readHint && !short ? <Text className="mt-1 text-label text-muted">Hold a card to read it.</Text> : null}
               <View className="mt-2">
                 <DockButtons key={choice.resetKey} dock={choice.dock} picked={choice.picked} onButton={choice.onButton} />
               </View>

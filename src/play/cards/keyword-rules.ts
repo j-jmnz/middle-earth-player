@@ -7,7 +7,7 @@
 import { ruleDoc } from "./ledger.ts";
 
 export type KeywordKey =
-  | "surge" | "peril" | "indestructible" | "permanent" | "sentinel" | "ranged" | "restricted" | "battle" | "siege" | "immune" | "sailing" | "uncharted"
+  | "surge" | "peril" | "indestructible" | "cannotLeave" | "permanent" | "sentinel" | "ranged" | "restricted" | "battle" | "siege" | "immune" | "sailing" | "uncharted"
   | "phantom" | "dire" | "spectral" | "pass" | "ambush" | "hide" | "doomed" | "regenerate" | "archery" | "toughness" | "secrecy" | "boarding" | "aflame" | "grapple" | "burn" | "pillage" | "massive" | "underworld" | "prowl" | "villagers";
 
 /** `word` is the keyword as printed, without its value; `rules` are the span ids that define it, most specific book first. `text`: a keyword no rules span defines (Burn X) says its definition itself, with the source it comes from. */
@@ -26,6 +26,8 @@ export const KEYWORD_RULES: Readonly<Record<KeywordKey, RuleWord>> = {
   archery: { word: "Archery", rules: ["mec109.archery", "mec112.archery", "mec113.archery", "dcce.archery", "hon.archery"] },
   toughness: { word: "Toughness", rules: ["mec109.toughness", "mec112.toughness"] },
   indestructible: { word: "Indestructible", rules: ["mec109.indestructible", "mec112.indestructible", "mec108.indestructible", "emce.indestructible", "dcce.indestructible"] },
+  // A card whose own text says it cannot leave play (Chief Turch, 08014:A:1): the engine holds it indestructible too, but the card prints no such keyword, so the chip says the printed words.
+  cannotLeave: { word: "Cannot leave play", rules: ["rr.cannot"] },
   immune: { word: "Immune to player card effects", rules: ["mec109.immune-to-player-card-effects", "mec112.immune-to-player-card-effects", "mec113.immune-to-player-card-effects", "mec108.immune", "emce.immune", "dcce.immune", "rr.immune"] },
   permanent: { word: "Permanent", rules: ["rr.permanent", "mec109.permanent", "mec112.permanent", "ltp.permanent"] },
   sentinel: { word: "Sentinel", rules: ["rr.sentinel"] },

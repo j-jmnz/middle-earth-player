@@ -4,8 +4,13 @@ import { describe, expect, it } from "vitest";
 
 import { addModifier } from "../../rules/core/modified-stat.ts";
 import { updateCard } from "../../rules/core/state.ts";
-import { idOf, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
+import { settle } from "../../rules/engine/machine.ts";
+import { pushCardEffects } from "../../rules/interpret/effect-frames.ts";
+import { idOf, legalIntents, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
 import { dungeonDetail } from "../cards/dungeon-preview.ts";
+import { cardKeywords } from "../cards/card-keywords.ts";
+import { sheetFor } from "../choice/sheets.ts";
+import type { PickSheet } from "../choice/sheet-types.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
 
 const ID = "the-dunland-trap";
@@ -78,5 +83,23 @@ describe("the preview lines", () => {
   it("08016:A:1 says Old South Road takes a second counter at the end of each refresh phase, with the stage's own only on a stage that prints Time", () => {
     expect(detail(built({ stage: "08011", active: "08016" }), "08016")).toBe("At the end of each refresh phase, 1 time counter comes off the current quest, besides the one the stage takes.");
     expect(detail(built({ stage: "08012", active: "08016" }), "08016")).toBe("At the end of each refresh phase, 1 time counter comes off the current quest. The current stage has none.");
+  });
+});
+
+describe("the choice sheets of the stage paragraphs", () => {
+  it("08011:A:1 says the search sentence alone, with no printed stage paragraph after it", () => {
+    const made = tableFromLayout(ID, { seats: 2, stage: "08011", side: "A", deck: ["08018", "08017", "f0"] });
+    const source = idOf(made.state, "08011");
+    const effects = made.ctx.effects.filter((effect) => effect.cardCode === "08011" && effect.timing === "setup");
+    const waiting = settle(pushCardEffects({ ...made.state, window: null }, "setup", source, 0, false, effects, made.ctx, []), made.ctx, []);
+    const sheet = sheetFor(waiting, made.ctx, legalIntents(waiting, made.ctx), { card: (id) => made.cards.get(waiting.cards[id]?.code ?? "")?.name ?? id, line: () => "Set Chief Turch and Munuv Dûv Ravine aside, out of play. Make Old South Road the active location." }) as PickSheet | null;
+    expect(sheet?.note).toBe("Player 1, The Road to Tharbad: each player searches. Search the encounter deck for a Boar Clan enemy. It enters play engaged with you.");
+  });
+});
+
+describe("the keyword chips of Chief Turch", () => {
+  it("08014:A:1 says Cannot leave play, the words he prints, and not an Indestructible he does not print", () => {
+    const made = built({ stage: "08013", engaged: ["08014"] });
+    expect(cardKeywords(made.state, made.ctx, idOf(made.state, "08014")).map((chip) => chip.word)).toEqual(["Cannot leave play"]);
   });
 });
