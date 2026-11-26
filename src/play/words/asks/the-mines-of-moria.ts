@@ -12,4 +12,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
 
   // 51223:A:1 (Denizen of the Deep): attached to the non-unique enemy with the highest Attack, which returns to the staging area.
   "51223:whenRevealed:1 @0 Pick": { note: "Denizen of the Deep: choose the non-unique enemy it attaches to, among those with the highest Attack. That enemy returns to the staging area and gets +1 Threat, +1 Attack and +1 Defense, and is immune to player card effects.", verb: "Attach" },
+
+  "51201:setup:1 @1 ChooseQuestStage": { note: "{card}: choose 1 of the stage 2 quest cards to play with. The others are set aside.", verb: "Choose" },
+  "51201:setup:1 @2 ChooseQuestStage": { note: "{card}: choose 1 of the stage 3 quest cards to play with. The others are set aside.", verb: "Choose" },
 };

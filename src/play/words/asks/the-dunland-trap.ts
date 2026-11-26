@@ -19,4 +19,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
 
   // 08024:A:2 (Forced after the attached location is explored): each player searches the encounter deck and discard pile for a Dunland enemy and puts it into play engaged with him.
   "08024:forced:1 @0.0 SearchMove": { owned: true, why: "the location is explored.", note: "Search the encounter deck and discard pile for a Dunland enemy. It enters play engaged with you.", verb: "Engage" },
+
+  // 08024:A:2 (When Revealed): Dunlending Ambush attaches to the active location; with two active locations the first player chooses (rr.first-player).
+  "08024:whenRevealed:1 @0 AttachToActiveLocation": { note: "Dunlending Ambush: choose the active location it attaches to. Its Forced effect searches for a Dunland enemy when that location is explored.", verb: "Attach" },
 };

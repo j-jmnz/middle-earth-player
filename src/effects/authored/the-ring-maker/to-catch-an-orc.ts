@@ -18,6 +18,8 @@ const STAGED_LOCATIONS: PickSpec = { type: "location", control: "any", stagingOn
 // "A hero with Mugash attached" and "Mugash in play" (staged, engaged or attached).
 const HERO_WITH_MUGASH: PickSpec = { type: "hero", control: "any", hasAttachment: { names: [MUGASH_NAME] } };
 const MUGASH_IN_PLAY: PickSpec = { type: "card", control: "any", names: [MUGASH_NAME], allInPlay: true };
+// Stage 2B's Response (07063:B:3) has an option only while progress reached the stage this phase or Mugash is in play.
+const RESPONSE_HAS_OPTION: Condition = { kind: "any", conditions: [{ kind: "questProgressNoted", is: true }, { kind: "canPick", pick: MUGASH_IN_PLAY }] };
 const MUGASH_ATTACHED: Condition = { kind: "canPick", pick: HERO_WITH_MUGASH };
 const EXHAUSTED_CHARACTER: PickSpec = { type: "character", control: "any", state: "exhausted" };
 const READY_CHARACTER: PickSpec = { type: "character", control: "you", state: "ready" };
@@ -183,6 +185,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "response",
     trigger: "questSucceeded",
     eventSeat: "you",
+    // Offered only when an option can change something: the quest card is no player card, so the engine does not read its idle options (`noChangeReason`).
+    condition: RESPONSE_HAS_OPTION,
     instructions: [
       {
         verb: "Choose",

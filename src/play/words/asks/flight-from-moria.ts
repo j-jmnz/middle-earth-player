@@ -44,4 +44,6 @@ export const ASKS: Readonly<Record<string, Ask>> = {
 
   // 901208:A:1 (When Revealed): the first player removes questing characters from the quest one at a time until the Willpower removed reaches The Nameless Fear's Threat. The pick spans seats, so each row names its owner.
   "901208:whenRevealed:1 @0.0 Pick": { bind: { threat: FEAR_THREAT }, note: "{card}: choose 1 questing character, any player's, to remove from the quest. Go on until the Willpower removed is {threat}, The Nameless Fear's Threat now, or no questing character is left.", verb: "Remove" },
+
+  "03074:whenRevealed:1 @1 ChooseStageToFlip": { note: "{card}: choose 1 of the top 2 quest cards to become the active quest, flipped to side 2B. The other goes to the bottom of the quest deck.", verb: "Choose" },
 };

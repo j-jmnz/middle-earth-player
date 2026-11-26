@@ -18,4 +18,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
 
   // 51347:A:1 (Vast and Intricate): attached to the non-unique location in the staging area with the highest Threat.
   "51347:whenRevealed:1 @0 Pick": { note: "Vast and Intricate: choose the non-unique location in the staging area it attaches to, among those with the highest Threat. That location gets +2 Threat and is immune to player card effects.", verb: "Attach" },
+
+  "51301:setup:1 @1 ChooseQuestStage": { note: "{card}: choose 1 of the stage 2 quest cards to play with. The others are set aside.", verb: "Choose" },
+  "51301:setup:1 @2 ChooseQuestStage": { note: "{card}: choose 1 of the stage 3 quest cards to play with. The others are set aside.", verb: "Choose" },
 };

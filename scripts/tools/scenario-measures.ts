@@ -87,6 +87,12 @@ export function parseMeasure(text: string): Measure {
 // The tasks every scenario runs: a total that leaves one of them out is not a total.
 const REQUIRED = ["Read", "Build", "Tests", "Words", "Games", "Fix"] as const satisfies readonly MeasureTask[];
 
+/** The tasks every scenario runs whose writing minutes a measure's text does not give in the parsed form ("Read: 0 wait minutes, 5 writing minutes", as `pnpm scenario time <id>` prints them); empty when each is there. */
+export function missingTaskTimes(text: string): string[] {
+  const { tasks } = parseMeasure(text);
+  return REQUIRED.filter((task) => tasks[task].writing === undefined);
+}
+
 /** The sum of the writing minutes, `?` when no task gives any, and `<sum>+?` when one of the required tasks has none. */
 export function totalWriting(measure: Measure): string {
   const sum = MEASURE_TASKS.reduce((all, task) => all + (measure.tasks[task].writing ?? 0), 0);

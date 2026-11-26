@@ -44,4 +44,6 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // Determination (10172:A:1) and Ruthless (10164:A:4), worded once for every scenario that can deal them.
   ...DETERMINATION_ASKS,
   ...POOL_BOON_ASKS,
+
+  "09049:whenRevealed:1 @0.current.0 ChooseCurrentQuest": { note: "{card}: choose the main quest card or a side quest in the staging area to be the current quest this phase.", verb: "Choose" },
 };
