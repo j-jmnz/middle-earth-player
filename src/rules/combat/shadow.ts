@@ -1,7 +1,7 @@
 // Rules: rr.step-6-2, rr.step-6-4-2, rr.step-6-4-3, rr.shadow-effects, rr.cancel, rr.attacks-outside-the-combat-phase,
 // faq.enemy-attacks-outside-combat, faq.additional-attacks, ltp.shadow-discard (data/rules/entries.json).
 import { undefendedToCity } from "../families/pelennor/combat.ts";
-import { verbsRunningInFrame, type Effect } from "../../catalog/boundary.ts";
+import { verbsRunningInFrame, type Effect, type Instruction } from "../../catalog/boundary.ts";
 
 import { pushEffectFrame } from "../interpret/effect-frames.ts";
 import { holdsNow } from "../interpret/verbs.ts";
@@ -26,7 +26,7 @@ import { attackCanceled, defendersDeclared, holdAttackEnd, specialStrike } from 
 import { attackSwitched } from "../families/pelargir/vale/switch.ts";
 import { holdAttack } from "../families/defense/listen.ts";
 import { startShadowAttack } from "../families/defense/shadow-attack.ts";
-import { startNalirAttacks } from "../families/ring-maker/nalir.ts";
+import { runAtEnd } from "./attack-end.ts";
 import { announceShadowRaise, noteShadowStart } from "../families/defense/shadow.ts";
 import { announceShadowResolved } from "../families/dungeon/shadow.ts";
 import { announceShadowsResolved } from "../families/angmar/reanimate/shadows.ts";
@@ -345,15 +345,12 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   const base = troll ? [...(attack.after ?? []), ...troll.instructions] : (attack.after ?? []);
   const after = pillage ? [...base, pillage] : base;
   const waiting = attack.shadowAttackers ?? [];
-  const nalir = attack.nalirAttackers ?? [];
-  // Enemies an effect made attack Nalir during this attack follow the shadow attackers (08067:B:2).
-  const next = (): ScenarioState => {
-    const shadow = waiting.length > 0 ? startShadowAttack(ended, attack.seat, waiting, ctx, steps, nalir) : null;
-    return shadow?.pendingAttack ? shadow : nalir.length > 0 ? startNalirAttacks(shadow ?? ended, ctx, steps, nalir) : (shadow ?? ended);
-  };
-  if (after.length === 0) return next();
+  // What an effect left to run once this attack has ended (attack-end.ts) follows the shadow attackers, in a frame of its own.
+  const shadowStart: readonly Instruction[] = waiting.length > 0 ? [{ verb: "StartShadowAttack", attackers: [...waiting] }] : [];
   // The attack's own state decides where it was made from: an enemy that attacked from the staging area without being flagged is `fromStaging`.
-  if (!attackHere(state, attack.enemyId)) return next();
+  const own = after.length > 0 && attackHere(state, attack.enemyId);
+  if (!own && (attack.onEnd ?? []).length > 0) return runAtEnd(ended, attack, steps, shadowStart);
+  if (!own) return waiting.length > 0 ? (startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended) : ended;
   // Only the effect that searches the deck for another copy of a destroyed ally (DiscardCopiesFromDeck of "other", 10137:A:2) reads the ally the attack destroyed.
   const destroyedAlly = after.some((one) => one.verb === "DiscardCopiesFromDeck" && one.of === "other") ? destroyedAllyOf(state, attack, ctx) : undefined;
   // Only an effect that reanimates the character the attack destroyed (Unholy Crypt, 101161:A:2), or one that acts for its controller (Assault on Osgiliath, 06100:A:2), reads it.
@@ -366,7 +363,9 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       actor: attack.seat,
       peril: false,
       effectId: `${attack.enemyId}:afterAttack`,
-      instructions: [...after, ...(waiting.length > 0 ? [{ verb: "StartShadowAttack" as const, attackers: [...waiting] }] : []), ...nalir.map((enemy) => ({ verb: "AttackNalir" as const, enemy }))],
+      instructions: [...after, ...shadowStart, ...(attack.onEnd ?? [])],
+      // What waited on the attack keeps the cause of the effect that queued it; the rest keeps the frame's cause (below).
+      ...(attack.onEndCause ? { causes: [...[...after, ...shadowStart].map(() => undefined), ...(attack.onEnd ?? []).map(() => attack.onEndCause)] } : {}),
       cancel: null,
       blockCancel: null,
       // An attack that sends its excess damage on (excessToShip) leaves that damage (0 when there was none) for the effect; X is the characters it destroyed.

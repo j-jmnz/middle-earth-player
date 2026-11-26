@@ -7,6 +7,7 @@ import type { EngineStep } from "../../../rules/core/intents.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { pushCardEffects } from "../../../rules/interpret/effect-frames.ts";
 import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { inCause } from "../../../rules/core/cause.ts";
 import { destroyCard } from "../../../rules/core/destroy.ts";
 import { moveCard } from "../../../rules/core/zones.ts";
 import { holds } from "../../../rules/interpret/conditions.ts";
@@ -56,6 +57,17 @@ describe("AttackNalir (08067:B:2, 08083:A:1)", () => {
     expect(begun.pendingAttack?.seat).toBe(0);
   });
 
+  // The enemies that attack, in order, as the attack in progress changes while the game is fought out.
+  const attackers = (made: ReturnType<typeof table>, from: ReturnType<typeof opened>, state: ScenarioState): string[] => {
+    const seen: string[] = [];
+    fight(made, { ...from, state }, (now) => {
+      const id = now.pendingAttack?.enemyId;
+      if (id && seen.at(-1) !== id) seen.push(id);
+      return seen.length >= 3;
+    });
+    return seen;
+  };
+
   it("08067:B:2 an attack in progress is not lost: Bellach waits for its end, then attacks Nalir (Spy From Mordor's Forced at 6.4.1, 08072:A:1)", () => {
     const t = table({ stage: STAGE_2, play: [NALIR], engaged: [SPY], staging: [BELLACH], phase: "Encounter" });
     const atDefense = drive(t, opened(t), (state) => state.window?.kind === "defense");
@@ -64,7 +76,7 @@ describe("AttackNalir (08067:B:2, 08083:A:1)", () => {
     const queued = run(t, atDefense.state, { verb: "AttackNalir", enemy: bellach });
     // No second attack begins in the middle of the first; it waits.
     expect(queued.pendingAttack?.enemyId).toBe(idOf(t.state, SPY));
-    expect(queued.pendingAttack?.nalirAttackers).toEqual([bellach]);
+    expect(queued.pendingAttack?.onEnd).toEqual([{ verb: "AttackNalir", enemy: bellach }]);
     let seen: ScenarioState["pendingAttack"] = null;
     fight(t, { ...atDefense, state: queued }, (state) => {
       if (state.pendingAttack?.enemyId === bellach) seen = state.pendingAttack;
@@ -73,6 +85,40 @@ describe("AttackNalir (08067:B:2, 08083:A:1)", () => {
     expect(seen).not.toBeNull();
     expect(seen!.seat).toBe(0);
     expect(seen!.onlyHeroes).toEqual([idOf(t.state, NALIR)]);
+  });
+
+  it("08067:B:2 after the attack's own after-effect: the waiting attack follows an AfterAttack instruction of the attack in progress", () => {
+    const t = table({ stage: STAGE_2, play: [NALIR], engaged: [SPY], staging: [BELLACH], phase: "Encounter" });
+    const atDefense = drive(t, opened(t), (state) => state.window?.kind === "defense");
+    const bellach = idOf(t.state, BELLACH);
+    // The after-effect is the Spy's own Forced (08072:A:1) as far as the cause check reads it.
+    const steps: EngineStep[] = [];
+    const raised = inCause(steps, { effect: "08072:forced:1", line: "08072:A:1" }, () => run(t, atDefense.state, { verb: "AfterAttack", instructions: [{ verb: "RaiseThreat", amount: 5, who: "actor" }] }, { steps }));
+    const queued = run(t, raised, { verb: "AttackNalir", enemy: bellach });
+    const threats: number[] = [];
+    let seen = false;
+    fight(t, { ...atDefense, state: queued }, (state) => {
+      if (state.pendingAttack?.enemyId === bellach) {
+        seen = true;
+        threats.push(state.seats[0]?.threat ?? 0);
+      }
+      return seen;
+    });
+    expect(seen).toBe(true);
+    // The after-effect ran first: the threat was up by 5 when Bellach's attack began.
+    expect(threats[0]).toBeGreaterThanOrEqual((atDefense.state.seats[0]?.threat ?? 0) + 5);
+  });
+
+  it("08067:B:2 an attack waiting for Nalir follows a shadow attacker: Spy, the shadow attacker, then Bellach", () => {
+    const t = table({ stage: STAGE_2, play: [NALIR], engaged: [SPY], staging: [BELLACH, SPY], phase: "Encounter" });
+    const atDefense = drive(t, opened(t), (state) => state.window?.kind === "defense");
+    const [first, second] = Object.values(t.state.cards).filter((card) => card.code === SPY).map((card) => card.id);
+    const attacking = atDefense.state.pendingAttack?.enemyId;
+    const waiting = attacking === first ? second : first;
+    const bellach = idOf(t.state, BELLACH);
+    const withShadow = { ...atDefense.state, pendingAttack: { ...atDefense.state.pendingAttack!, shadowAttackers: [waiting!] } };
+    const queued = run(t, withShadow, { verb: "AttackNalir", enemy: bellach });
+    expect(attackers(t, atDefense, queued)).toEqual([attacking, waiting, bellach]);
   });
 
   it("08067:B:2 with Nalir out of play no attack is made", () => {

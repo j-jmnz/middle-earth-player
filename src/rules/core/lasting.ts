@@ -30,6 +30,8 @@ export const ENGINE_MARKS: ReadonlySet<ModifierStat> = new Set<ModifierStat>([
   "firstEnemyNoted",
   // "Raise your threat by the destroyed character's Willpower" (10107:A:2): the Willpower of a character as it was in play, read after it was destroyed.
   "lastWillpower",
+  // A location in the staging area that cannot leave it and was explored (core/destroy.ts): a mark, so the sweep does not explore it again.
+  "exploredHeld",
   // Aflame: how many attackers have attacked an enemy this round (families/aflame/attack.ts); a count of the round, not an effect.
   "attackersThisRound",
   // Progress counted this round or phase (the south location cap, the sponge, Angmar `progressPlacedHere`, the quest totals): counts, not effects.
