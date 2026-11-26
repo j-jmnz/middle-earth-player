@@ -160,8 +160,8 @@ export function pooledAudio(host: AudioHost, spares: number = SPARES): { create(
 // The gestures that can give a user activation (the HTML standard's activation-triggering events).
 const GESTURES = ["pointerup", "touchend", "click", "keydown"] as const;
 
-/** The page as an AudioHost: one AudioContext, made with the first element, and the window's gestures in the capture phase. */
-export function browserHost(win: Window & typeof globalThis): AudioHost {
+/** The page as an AudioHost: one AudioContext, made when first asked for, and the window's gestures in the capture phase. `context` hands it to the sound effects (buffer-audio.ts). */
+export function browserHost(win: Window & typeof globalThis): AudioHost & { context(): AudioContext } {
   let context: AudioContext | null = null;
   const audio = (): AudioContext => {
     context ??= new win.AudioContext();
@@ -172,6 +172,7 @@ export function browserHost(win: Window & typeof globalThis): AudioHost {
     if (win.document.visibilityState === "visible" && context) void context.resume().catch(swallow);
   });
   return {
+    context: audio,
     newElement() {
       const element = new win.Audio();
       element.preload = "auto";
@@ -180,7 +181,8 @@ export function browserHost(win: Window & typeof globalThis): AudioHost {
       return { element, gain };
     },
     resume() {
-      if (context && context.state !== "running") void context.resume().catch(swallow);
+      // Made here if nothing has made it: a page whose first sound is an effect has no element yet, and the gesture must start the context.
+      if (audio().state !== "running") void audio().resume().catch(swallow);
     },
     onGesture(handler) {
       for (const gesture of GESTURES) win.addEventListener(gesture, handler, true);

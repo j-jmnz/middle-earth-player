@@ -5,7 +5,9 @@
 import { createAudioPlayer as createPlayer, setAudioModeAsync, type AudioPlayer } from "./audio-player.native";
 import { Asset } from "expo-asset";
 
+import { browserBuffers, bufferAudio } from "../web/buffer-audio.ts";
 import { browserHost, pooledAudio, type PooledPlayer } from "../web/pooled-audio.ts";
+import { bundledSounds } from "./bundled";
 import { browserPage, webAudio, type Media, type Player } from "../web/web-audio.ts";
 
 export { setAudioModeAsync, type AudioPlayer };
@@ -17,7 +19,11 @@ const wrap = webAudio(page, process.env.EXPO_PUBLIC_DESKTOP !== "1", (player) =>
 
 // The web app's build (EXPO_PUBLIC_WEBAPP=1) plays through elements it keeps and blesses in each gesture (src/ui/web/pooled-audio.ts), since Safari refuses
 // an element that has had none; the page's wrapper is the same.
-const pool = page && process.env.EXPO_PUBLIC_WEBAPP === "1" ? pooledAudio(browserHost(window)) : null;
+const host = page && process.env.EXPO_PUBLIC_WEBAPP === "1" ? browserHost(window) : null;
+const pool = host ? pooledAudio(host) : null;
+// A sound effect plays from a decoded buffer, not an element: an element's play holds an iPad's page at each tap (src/ui/web/buffer-audio.ts).
+const buffers = host ? bufferAudio(browserBuffers(host.context)) : null;
+const effects = new Set<unknown>(Object.values(bundledSounds));
 const wrapPooled = webAudio(page, true, (player) => (player as unknown as PooledPlayer).media);
 
 // A bundled file as the web gives it: its URL, an object that holds it, or an asset number.
@@ -28,6 +34,7 @@ function uriOf(source: unknown): string {
 }
 
 export function createAudioPlayer(source: number): AudioPlayer {
+  if (buffers && effects.has(source)) return wrapPooled(buffers.create(uriOf(source)) as unknown as Player) as unknown as AudioPlayer;
   if (pool) return wrapPooled(pool.create(uriOf(source)) as unknown as Player) as unknown as AudioPlayer;
   return wrap(createPlayer(source) as unknown as Player) as unknown as AudioPlayer;
 }
