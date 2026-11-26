@@ -76,6 +76,12 @@ export function destroyedByAttack(state: ScenarioState, attack: PendingAttack, c
   });
 }
 
+// Whether an effect's instructions read the effect's X: an amount of X, a count per X, an X condition, a pick on a cost of X, a reveal less X, or the progress left to place.
+const READS_X = /"x":true|"per":"x"|"kind":"x"|"costIsX"|"lessX"|"verb":"PlaceProgressInStaging"|"verb":"AddToX"/;
+export function readsX(instructions: readonly unknown[]): boolean {
+  return READS_X.test(JSON.stringify(instructions));
+}
+
 export function charactersDestroyed(state: ScenarioState, attack: PendingAttack, ctx: ReduceContext): number {
   return destroyedByAttack(state, attack, ctx).length;
 }

@@ -30,7 +30,7 @@ import { announceShadowRaise, noteShadowStart } from "../families/defense/shadow
 import { announceShadowResolved } from "../families/dungeon/shadow.ts";
 import { announceShadowsResolved } from "../families/angmar/reanimate/shadows.ts";
 import { announceShadowWizardry } from "../families/wizardry/shadow.ts";
-import { announceDestroyed, charactersDestroyed, destroyedByAttack } from "../families/burden/attack.ts";
+import { announceDestroyed, charactersDestroyed, destroyedByAttack, readsX } from "../families/burden/attack.ts";
 import { printedOf } from "../core/printed.ts";
 import { attackHere, attackKey, countsEachAttack, locationDamage } from "../families/south/watcher.ts";
 import { pillageAfter } from "../families/sea/pillage.ts";
@@ -321,7 +321,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   // The characters this attack destroyed are the X of the effect it leaves for its end ("If this attack destroys a character").
   // Cave-troll's excess damage (excessToDamage) is one more instruction for the attack's end.
   const troll = excessDamageAfter(state, attack, ctx);
-  const destroyed = (attack.after ?? []).length > 0 ? charactersDestroyed(state, attack, ctx) : 0;
+  const destroyed = readsX(attack.after ?? []) ? charactersDestroyed(state, attack, ctx) : 0;
   const sendsExcess = flagged(state, attack.enemyId, "excessToShip");
   const done = expireModifiers(state, ["endOfAttack"]);
   const resolvedAttacks =
