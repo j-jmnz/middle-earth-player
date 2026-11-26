@@ -3,8 +3,9 @@
 import { describe, expect, it } from "vitest";
 
 import { modifiedStat } from "../../core/keywords.ts";
+import { settle } from "../../engine/machine.ts";
 import { moveCard } from "../../core/zones.ts";
-import { holds } from "../../interpret/conditions.ts";
+import { syncConstants } from "../../interpret/constants.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { idOf, idsOf, resolveRecords, revealFromTop, finish, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
@@ -83,6 +84,13 @@ describe("08081:A:1 Conspicuous Lot: Nalir counts as an ally his controller cont
     const done = finish({ state: revealFromTop(made.state, made.ctx, "08081", steps).state, steps }, made.ctx, () => "");
     expect(done.state.seats[0]?.threat).toBe(31);
     expect(done.state.seats[1]?.threat).toBe(30);
-    expect(holds).toBeDefined();
+  });
+});
+
+describe("08068:A:1 Nalir: the first player gains control of him", () => {
+  it("control goes to the first player while Nalir is in play", () => {
+    const made = table({ stage: "08066", seats: 2, firstPlayer: 1, play: [{ code: "08068", seat: 0 }] });
+    const synced = settle(syncConstants(made.state, made.ctx), made.ctx, []);
+    expect(synced.cards[idOf(synced, "08068")]?.controller).toBe(1);
   });
 });
