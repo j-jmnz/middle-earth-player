@@ -22,7 +22,8 @@ import { readCheckpoint, readSaveChecked, writeActive, writeCheckpoint, writeRep
 import { replayForTable, type ReplayedGame } from "./open-game";
 import { flushRunsOnLeave } from "./flush-runs-on-leave";
 import { flushRuns, queueRun } from "../data/pending-runs";
-import { recordCampaignRun } from "../data/run-writers";
+import { openRunId, recordCampaignRun } from "../data/run-writers";
+import { deleteRun } from "../data/run-store";
 import type { PlayClock } from "./play-clock";
 import { fingerprintOf, sessionCacheOf } from "./cache";
 import { gameStore } from "./game-store";
@@ -119,9 +120,10 @@ export type SessionStore = { store: TableStore; save: () => Save; clock: PlayClo
  * The table store for an opened session (game-store.ts). Each intent the reducer accepts is appended to the save and written at once, and an
  * undo takes the last one off, so a kill and relaunch replays the same game. `save` is the save as last written.
  */
-export function sessionStore<TRun>(session: Opened, user: Db<TRun>): SessionStore {
+export function sessionStore<TRun>(session: Opened, user: Db<TRun>, landed?: boolean): SessionStore {
   const { store, saved, clock } = gameStore<Save, Opened>({
     session,
+    landed,
     initial: session.save,
     cache: sessionCacheOf<Opened>(user, "save"),
     // The open's stamp is written already: a session the cache hands out later carries none, so the Resolution's open never writes the save as it stood at the table's open.
@@ -129,6 +131,11 @@ export function sessionStore<TRun>(session: Opened, user: Db<TRun>): SessionStor
     writers: { active: (save) => writeActive(user, save), undone: (save) => writeUndone(user, save), checkpoint: (id, checkpoint) => writeCheckpoint(user, id, checkpoint) },
     // A lost game: write the run now, so closing the Resolution any way (or never) still leaves it.
     onLost: (save, game: ScenarioState) => recordCampaignRun(user, save, finish(save, session.world, game), session.world, game),
+    // Undo takes the lost move back: the run it wrote goes (a new run has the same id, and a second write would change nothing).
+    onLostUndone: (save, left) => {
+      const id = openRunId(save, left.scenarioId);
+      if (id != null) deleteRun(user, id);
+    },
   });
   return { store, save: saved, clock };
 }

@@ -16,6 +16,11 @@ import { standaloneGames } from "./user-schema";
 
 type UserDb<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
+/** The id of the run of a save's open scenario (`state.scenarioId` is its scenario), or null with none open: the one place it is built, so a write and a take-back name the same run. */
+export function openRunId(save: Pick<Save, "id" | "active">, scenarioId: string): string | null {
+  return save.active ? campaignRunId(save.id, scenarioId, save.active.seed, save.active.startedAt) : null;
+}
+
 /**
  * Writes the run of a campaign scenario that ended. `before` is the save as the scenario left it (its open scenario and its
  * loadout are what the run reads), `after` the save `finish` returned: a win's reward is what its log newly earned, and a scenario
@@ -23,10 +28,11 @@ type UserDb<TRun> = BaseSQLiteDatabase<"sync", TRun>;
  */
 export function recordCampaignRun<TRun>(user: UserDb<TRun>, before: Save, after: Save, world: World, state: ScenarioState, now: number = Date.now()): RunRecord | null {
   const { active, loadout } = before;
-  if (!active || !loadout) return null;
+  const id = openRunId(before, state.scenarioId);
+  if (!active || !loadout || id == null) return null;
   const fresh = !before.log.completed.includes(state.scenarioId) && after.log.completed.includes(state.scenarioId);
   const run = runOf({
-    id: campaignRunId(before.id, state.scenarioId, active.seed, active.startedAt),
+    id,
     kind: "campaign",
     refId: before.id,
     campaignId: before.campaignId,

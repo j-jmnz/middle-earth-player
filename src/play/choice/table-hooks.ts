@@ -236,7 +236,8 @@ export function useAutoAnswer({
   const answer = useEffectEvent(() => {
     if (opened || hold) return;
     // The moment Undo went back to asks, even where the table would answer it; the next choice the player sends lifts that.
-    const held = moment?.kind === "undone";
+    // A table that opened on an Undo from a result screen has no moment yet: it asks until the player's first send.
+    const held = moment?.kind === "undone" || (moment == null && store.getState().landed);
     if (held) running.current = false;
     const intent = tableAnswer(game, sheet, legal, ctx, settings, running.current, held, seen.current);
     if (intent) {

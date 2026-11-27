@@ -1,6 +1,6 @@
 // The table of a standalone game: opens the game and keeps each accepted intent in user.db. Back goes to the scenarios.
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { BodyText, NavBar, Screen } from "../../../kit/chrome";
 import { bookletOf, scenarioName } from "../../../data/campaign-data";
@@ -20,7 +20,7 @@ const MISSING = { ok: false, message: MISSING_GAME } as const;
 
 export default function StandaloneTableScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ gameId: string }>();
+  const params = useLocalSearchParams<{ gameId: string; landing?: string }>();
   const gameId = routeCode(params.gameId);
   const { catalog, user } = useDatabases();
   // Each choice of the stale sheet runs once after a paint and opens the game again; a refusal stays on the sheet with its sentence (use-stale-choice.ts).
@@ -28,7 +28,12 @@ export default function StandaloneTableScreen() {
   // Opened once per game, after the first paint (null until then): the store holds the game from here on, and each accepted intent is
   // written to user.db.
   const session = useStandaloneSessionAfterPaint(gameId, choice.attempt);
-  const table = useMemo(() => (session?.ok ? standaloneStore(session, user) : null), [session, user]);
+  // An Undo made on the outcome opens the table with `landing=undo`: read once into state, then cleared (see the campaign table route). Safe to run again.
+  const [landed] = useState(params.landing === "undo");
+  useEffect(() => {
+    if (params.landing != null) router.setParams({ landing: undefined });
+  }, [params.landing, router]);
+  const table = useMemo(() => (session?.ok ? standaloneStore({ ...session, landed }, user) : null), [session, user, landed]);
 
   if (gameId && (!session || choice.running)) {
     // The replay has not run yet (a miss in the session cache): the table's own frame, so the table replaces it without a jump.

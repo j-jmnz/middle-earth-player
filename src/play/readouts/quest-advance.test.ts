@@ -13,7 +13,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 import { cavesTable, loadCavesWorld, type CavesLayout, type CavesWorld } from "../../../test/scenarios/the-caves-of-nibin-dum/scene.ts";
 
 import { ledgerLine } from "../cards/ledger.ts";
-import { advancedTo, advanceWords, closeLatch, nextLatch, NO_ADVANCE, openAdvance, openingLatch, questView, stageAsks } from "./quest-advance.ts";
+import { advancedTo, advanceWords, closeLatch, landedLatch, nextLatch, NO_ADVANCE, openAdvance, openingLatch, questView, stageAsks } from "./quest-advance.ts";
 import type { TableMoment } from "../store/store.ts";
 
 let world: CavesWorld;
@@ -97,6 +97,16 @@ describe("the quest advance screen's latch", () => {
     expect(openAdvance(nextLatch(closed, { seq: 1, stageId }, questView(game)), game)).toEqual({ seq: 1, stageId });
     // A game that is over opens on the table.
     expect(openAdvance(openingLatch(questView({ ...game, lost: true })), game)).toBeNull();
+  });
+
+  it("opens with no quest screen when an Undo from a result screen brought the player here; any other open still shows the stage", () => {
+    const made = make({ seats: 1, stage: "41004", progress: 0, setAside: ["41027"], deck: ["41030", "41031"], discard: ["41031"] });
+    const game = made.state;
+    const stageId = game.questStage ?? "";
+    expect(openAdvance(landedLatch(questView(game), true), game)).toBeNull();
+    expect(openAdvance(landedLatch(questView(game), false), game)).toEqual({ seq: 0, stageId });
+    // A later advance opens it again.
+    expect(openAdvance(nextLatch(landedLatch(questView(game), true), { seq: 2, stageId }, questView(game)), game)).toEqual({ seq: 2, stageId });
   });
 
   it("goes back to the table by itself once the stage's question is answered (41005:A:1)", () => {

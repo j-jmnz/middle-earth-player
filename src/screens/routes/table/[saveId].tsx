@@ -1,6 +1,6 @@
 // The table for the open scenario of a campaign save: opens the session and keeps each accepted intent in user.db.
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { BodyText, NavBar, Screen } from "../../kit/chrome";
 import { bookletParams, scenarioName } from "../../data/campaign-data";
@@ -20,7 +20,7 @@ const MISSING = { ok: false, message: MISSING_GAME } as const;
 
 export default function TableScreen() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ saveId: string }>();
+  const params = useLocalSearchParams<{ saveId: string; landing?: string }>();
   const saveId = routeCode(params.saveId);
   const { catalog, user } = useDatabases();
   // Each choice of the stale sheet runs once after a paint and opens the save again; a refusal stays on the sheet with its sentence (use-stale-choice.ts).
@@ -28,7 +28,12 @@ export default function TableScreen() {
   // Opened once per save, after the first paint (null until then): the store holds the game from here on, and each accepted intent is
   // written to user.db.
   const session = useTableSessionAfterPaint(saveId, choice.attempt);
-  const table = useMemo(() => (session?.ok ? sessionStore(session, user) : null), [session, user]);
+  // An Undo made on the Resolution opens the table with `landing=undo`: read once into state (the store must not be built again when the param is cleared), then cleared, so a later show does not land again. The effect is safe to run again.
+  const [landed] = useState(params.landing === "undo");
+  useEffect(() => {
+    if (params.landing != null) router.setParams({ landing: undefined });
+  }, [params.landing, router]);
+  const table = useMemo(() => (session?.ok ? sessionStore(session, user, landed) : null), [session, user, landed]);
 
   if (saveId && (!session || choice.running)) {
     // The replay has not run yet (a miss in the session cache): the table's own frame, so the table replaces it without a jump.

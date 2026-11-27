@@ -36,7 +36,7 @@ function playGame(seed: number): Played[] {
 }
 
 describe("which intents can be taken back", () => {
-  it("not one that drew, revealed or turned a card, nor one that ended the game; a commit or a play can be", () => {
+  it("not one that drew, revealed or turned a card; a commit, a play or one that ended the game can be", () => {
     const clean = new Set<string>();
     let hidden = 0;
     for (const seed of STARTER_SEEDS.slice(0, 3)) {
@@ -47,12 +47,28 @@ describe("which intents can be taken back", () => {
         }
         if (shows) hidden += 1;
         else if (!isOver(after)) clean.add(intent.type);
-        expect(nextUndoable([], after, { before, roundSteps: [], intent, steps }).length).toBe(shows || isOver(after) ? 0 : 1);
+        expect(nextUndoable([], after, { before, roundSteps: [], intent, steps }).length).toBe(shows && !isOver(after) ? 0 : 1);
       }
     }
     expect(hidden).toBeGreaterThan(10);
     expect(clean.has("Commit")).toBe(true);
     expect(clean.has("PlayCard")).toBe(true);
+  });
+});
+
+describe("the move that ends the game", () => {
+  it("can be taken back even when it showed a hidden card; the moves before a reveal still cannot", () => {
+    const [{ before, intent, steps }] = playGame(1).slice(-1);
+    const entry = { before, roundSteps: [], intent, steps };
+    const earlier = { before, roundSteps: [], intent, steps };
+    const reveal = { ...before, seedCursor: before.seedCursor + 1 };
+    expect(showedHidden(before, reveal)).toBe(true);
+    // A reveal that loses the game (a shadow card turned up by a defender): that one move stays, and nothing before it.
+    expect(nextUndoable([earlier], { ...reveal, lost: true }, entry)).toEqual([entry]);
+    expect(nextUndoable([earlier], { ...reveal, stageCleared: true }, entry)).toEqual([entry]);
+    // A reveal that leaves the game on drops the list, as before; a move that shows nothing keeps what came before it.
+    expect(nextUndoable([earlier], reveal, entry)).toEqual([]);
+    expect(nextUndoable([earlier], { ...before, lost: true }, entry)).toEqual([earlier, entry]);
   });
 });
 
@@ -121,6 +137,14 @@ describe("Undo on the table", () => {
     expect(store.getState().game).toEqual(played[later]?.after);
     expect(store.getState().history).toHaveLength(0);
     expect(store.getState().undo()).toBe(false);
+  });
+});
+
+describe("a table that opens on an Undo a result screen made", () => {
+  it("is marked landed, and an ordinary table is not", () => {
+    const [{ before }] = playGame(1).slice(0, 1);
+    expect(createTableStore({ ctx, game: before, landed: true }).getState().landed).toBe(true);
+    expect(createTableStore({ ctx, game: before }).getState().landed).toBe(false);
   });
 });
 

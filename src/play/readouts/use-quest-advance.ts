@@ -1,13 +1,13 @@
 // When the quest advance screen is up (quest-advance.ts): from the intent that advanced the quest until the player taps Progress, or,
 // when the new stage asked a question as it was revealed, until that question is answered. Read during the render the moment arrives
 // in, so the table's own answers (use-table-choice.ts, useAutoAnswer) already hold on that render. A combat spotlight plays first.
-// The table opens on it too, at the stage in play (openingLatch).
+// The table opens on it too, at the stage in play (openingLatch), unless it opened on an Undo a result screen made (landedLatch).
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useStore } from "zustand";
 
 import { isOver } from "../../rules/engine/undo.ts";
 
-import { advancedTo, askingStage, callerLastStage, stagesKey, closeLatch, nextLatch, openAdvance, openingLatch, questStageOf, type QuestAdvance, type QuestView } from "./quest-advance.ts";
+import { advancedTo, askingStage, callerLastStage, stagesKey, closeLatch, landedLatch, nextLatch, openAdvance, questStageOf, type QuestAdvance, type QuestView } from "./quest-advance.ts";
 import type { TableStore } from "../store/store.ts";
 import { useSpotlightHold } from "../spotlight/use-spotlight.ts";
 import { playSound } from "../../ui/sound/sound.ts";
@@ -24,6 +24,7 @@ export type QuestAdvanceState = {
 
 export function useQuestAdvance(store: TableStore): QuestAdvanceState {
   const moment = useStore(store, (state) => state.moment);
+  const landed = useStore(store, (state) => state.landed);
   // What the screen reads of the game, one value at a time: a state that changes none of them does not render this hook's caller.
   const questStage = useStore(store, (state) => questStageOf(state.game));
   const asking = useStore(store, (state) => askingStage(state.game));
@@ -34,7 +35,8 @@ export function useQuestAdvance(store: TableStore): QuestAdvanceState {
   const callerStage = useStore(store, (state) => callerLastStage(state.game));
   const view = useMemo((): QuestView => ({ questStage, asking, over, seatStages, callerStage }), [questStage, asking, over, seatStages, callerStage]);
   const spotlit = useSpotlightHold(store);
-  const [latch, setLatch] = useState(() => openingLatch(view));
+  // The table that opens on an Undo a result screen made opens on the table, not on the quest screen (store.ts, `landed`).
+  const [latch, setLatch] = useState(() => landedLatch(view, landed));
   // Set during render (the derived-state pattern): React renders again before it commits, so no effect sees the old latch.
   const next = nextLatch(latch, advancedTo(moment, view), view);
   if (next !== latch) setLatch(next);

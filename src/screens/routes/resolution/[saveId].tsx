@@ -9,7 +9,7 @@ import { Pressable, View } from "react-native";
 import { useStore } from "zustand";
 
 import { gameReport } from "../../../campaign/report";
-import { consequenceSentence, replayedSentence, resolutionView, settledSentence, type ResolutionTile } from "../../../campaign/resolution-view";
+import { consequenceSentence, gameIsOn, replayedSentence, resolutionView, settledSentence, type ResolutionTile } from "../../../campaign/resolution-view";
 import { finish } from "../../../campaign/session";
 import { scoreParts, scoreTotal } from "../../../campaign/score";
 import { ActionBar, BodyText, Label, StatTile, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, TextButton, TwoPane } from "../../kit/chrome";
@@ -24,6 +24,9 @@ import { goBack } from "../../nav/go-back";
 import { CardThumb } from "../../images/picture";
 import { GameReportView } from "../../campaign/game-report";
 import { routeCode } from "../../nav/route-code";
+import { ResultUndo } from "../../table/result-undo";
+import { useBottomInset } from "../../nav/use-bottom-inset";
+import { usePalette } from "../../kit/palette-hook";
 import { sessionStore, useTableSession, type SessionStore, type TableSession } from "../../session/table-session";
 import { useUiScale } from "../../../ui/ui-scale";
 import { useSizeClass } from "../../../ui/use-size-class";
@@ -70,6 +73,9 @@ function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; sel
 function Resolution({ session, opened, saveId }: { session: Extract<TableSession, { ok: true }>; opened: SessionStore; saveId: string }) {
   const router = useRouter();
   const { size } = useSizeClass();
+  const palette = usePalette();
+  const bottom = useBottomInset();
+  const scale = useUiScale();
   const { user } = useDatabases();
   const game = useStore(opened.store, (state) => state.game);
   const refusal = useStore(opened.store, (state) => state.refusal);
@@ -90,6 +96,15 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   // resolution waits on the path (Resume).
   const back = <NavBar onBack={() => goBack(router, { pathname: "/path/[saveId]", params: { saveId } })} backTestID="resolution-path" backLabel="Path" />;
 
+  // Undo puts back an unconfirmed pick first, then takes back the move that ended the game, or a choice made since, and returns to the table once the game is on again, with the route param that tells it (`landing=undo`).
+  // A pick never carries over a store Undo: the decline's id is the same in every group.
+  const undone = () => {
+    setChosen(null);
+    const now = opened.store.getState();
+    if (!gameIsOn(now.game, session.world, opened.save().log.beldisUses, session.destroyedHeroes)) return;
+    router.replace({ pathname: "/table/[saveId]", params: { saveId, landing: "undo" } });
+  };
+  const undo = <ResultUndo store={opened.store} testID="resolution-undo" onUndone={undone} picking={chosen != null} onPutBack={() => setChosen(null)} />;
   // A loss writes nothing to the log: the open scenario is dropped and the scenario stays current.
   // The loss is a run all the same (History), written beside the log, not in it.
   const close = () => {
@@ -122,6 +137,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
         </ScreenScroll>
         <ActionBar>
           <PrimaryButton label="Back to path" testID="resolution-back" onPress={close} />
+          <View className="mt-1 items-center">{undo}</View>
         </ActionBar>
       </Screen>
     );
@@ -248,7 +264,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
             ) : null}
           </ScreenScroll>
         )}
-        <ActionBar>
+        <ActionBar safe={view.kind !== "choosing"}>
           {refusal ? (
             <BodyText tone="danger" className="mb-2">
               {refusal}
@@ -291,10 +307,17 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
                 testID="resolution-confirm"
                 onPress={() => close()}
               />
+              <View className="mt-1 items-center">{undo}</View>
             </>
           )}
         </ActionBar>
       </View>
+      {/* Choosing: Undo stands outside the radio group (a button is no radio), under the bar, which then leaves the inset to this row. */}
+      {view.kind === "choosing" ? (
+        <View className="items-center" style={{ backgroundColor: palette.night, paddingBottom: Math.max(bottom, 12 * scale) }}>
+          {undo}
+        </View>
+      ) : null}
     </Screen>
   );
 }

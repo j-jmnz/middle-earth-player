@@ -8,7 +8,8 @@ import { actionsSheet, commitSheet, playSheet, windowSheet } from "./bar-sheets.
 import type { BeatStore } from "../store/beat-store.ts";
 import { tickSent } from "../../ui/haptics.ts";
 import { refusedFeedback } from "../../ui/sound/feedback.ts";
-import { playSound, playUndo } from "../../ui/sound/sound.ts";
+import { playSound } from "../../ui/sound/sound.ts";
+import { undoWithFeedback } from "./undo-feedback.ts";
 import { pointTitle } from "../phases/rail.ts";
 import { questStatNow } from "../phases/quest-stat.ts";
 import { isFreeResponse, nextStopTitle, passableWindow } from "../phases/stops.ts";
@@ -232,11 +233,8 @@ export function useTableChoice({
       setHeld(null);
       return;
     }
-    // Undo goes back exactly when there is an intent to take back, so the tick can play before it does the work.
-    if (store.getState().history.length === 0) return;
-    tickSent();
-    playUndo();
-    store.getState().undo();
+    // Undo goes back exactly when there is an intent to take back, so the tick can play before it does the work (undo-feedback.ts).
+    if (!undoWithFeedback(store)) return;
     reset();
     resetReader("undo");
   }, [picking, store, reset, resetReader]);
