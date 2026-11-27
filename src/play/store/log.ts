@@ -13,6 +13,7 @@ import { reshuffleWords } from "./pile-ids.ts";
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
 import { captureAttachedLine, mumakLogPlace } from "../words/scenarios/haradrim/capture.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
+import { trackLogLine } from "../words/scenarios/haradrim/track.ts";
 import { discoverLogLine, setAsideLine } from "../words/scenarios/wilderland.ts";
 import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poison.ts";
 import type { Cause } from "../../rules/core/cause.ts";
@@ -171,6 +172,9 @@ function words(step: EngineStep, names: LogNames, questStat: string | null): str
       return `The encounter discard pile (${step.count}) is shuffled into the encounter deck`;
     case "reshuffleDeck":
       return reshuffleWords(step.deck, step.count);
+    case "track":
+    case "searchFlip":
+      return trackLogLine(step, names.card);
     case "discover":
       return discoverLogLine({ location: names.card(step.locationId), looked: step.looked.length, loot: step.loot ? names.card(step.loot) : null, hazard: step.hazard ? names.card(step.hazard) : null });
   }

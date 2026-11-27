@@ -9,6 +9,7 @@ export const FLAG_NOTES: Readonly<Record<string, string>> = {
   progressCapShared: " (all the locations holding it share one limit: no more than this much progress in all can be placed on them each round)",
   questProgressCap: " (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count)",
   noEffectProgress: " (card effects cannot place progress on this stage or on an active location; the progress a successful quest places is not an effect)",
+  noMainQuestProgress: " (no progress can be placed on the main quest card while it lasts; a side quest that is the current quest still takes progress)",
   noQuestProgress: " (no progress can be placed on the current quest while it lasts; the active location still takes its share first)",
   stageCapped: " (the stage takes no more progress than its quest points even while it cannot advance; the rest is not placed)",
   handLimit: " (no player holds more cards in hand than this; a hand over it discards down to it at the next settle, the player choosing which cards)",

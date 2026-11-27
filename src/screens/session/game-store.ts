@@ -20,7 +20,7 @@ export type GameStoreParts<H extends Held, O> = {
   initial: H;
   cache: SessionCache<O>;
   /** The session as the cache keeps it once the table's game has moved on to `saved`. */
-  reopened: (saved: H, now: Pick<ReplayedGame, "game" | "roundSteps" | "history">) => O;
+  reopened: (saved: H, now: Pick<ReplayedGame, "game" | "roundSteps" | "history" | "destroyedHeroes">) => O;
   /** One statement each: an accepted intent, an Undo (the checkpoint behind the game goes with it) and a checkpoint. */
   writers: { active: (saved: H) => void; undone: (saved: H) => void; checkpoint: (id: string, checkpoint: Checkpoint) => void };
   /** A lost game can no longer be undone and its run is fixed: the caller writes it now (a win waits for its Resolution choices). */
@@ -48,8 +48,8 @@ export function gameStore<H extends Held, O>({ session, initial, cache, reopened
   };
   // Asked for the game later (the Resolution, the outcome screen), the cache reads this table's game as it stands now; the row it must match is `saved`.
   const follow = () => {
-    const { game, roundSteps, history } = store.getState();
-    cache.follow(saved.id, () => ({ fingerprint: fingerprintOf(saved, CATALOG_VERSION), session: reopened(saved, { game, roundSteps, history }) }));
+    const { game, roundSteps, history, destroyedHeroes } = store.getState();
+    cache.follow(saved.id, () => ({ fingerprint: fingerprintOf(saved, CATALOG_VERSION), session: reopened(saved, { game, roundSteps, history, destroyedHeroes }) }));
   };
   const store = committingStore(
     session,

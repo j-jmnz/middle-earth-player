@@ -107,6 +107,7 @@ import * as eilph from "../scenarios/the-nin-in-eilph/game.ts";
 import * as secret from "../scenarios/celebrimbors-secret/game.ts";
 import * as crown from "../scenarios/the-antlered-crown/game.ts";
 import * as harad from "../scenarios/race-across-harad/game.ts";
+import * as sands from "../scenarios/beneath-the-sands/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -226,6 +227,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-long-arm-of-mordor", "The Long Arm of Mordor", mordor.MORDOR_GOLDENS, mordor.mordorWorld, mordor.playGolden),
   entry("the-mumakil", "The Mûmakil", mumakil.MUMAKIL_GOLDENS, mumakil.mumakilWorld, mumakil.playGolden),
   entry("race-across-harad", "Race Across Harad", harad.HARAD_GOLDENS, harad.haradWorld, harad.playGolden),
+  entry("beneath-the-sands", "Beneath the Sands", sands.SANDS_GOLDENS, sands.sandsWorld, sands.playGolden),
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
   entry("the-battle-of-lake-town", "The Battle of Lake-town", town.TOWN_GOLDENS, town.townWorld, town.playGolden),
   entry("the-stone-of-erech", "The Stone of Erech", erech.ERECH_GOLDENS, erech.erechWorld, erech.playGolden),

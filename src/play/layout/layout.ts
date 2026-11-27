@@ -328,9 +328,10 @@ export function tableLayout(
   const slots: CardSlot[] = [];
   const marks: CombatMark[] = [];
   const stageEntry = views.questStage.entries[0];
-  // The cards captured under the quest stage and under an active location are one counted peek where the table stacks what lies under a card (Escape from Mount Gram): the peek stays within the depth the left column reserves, short of the deck and discard piles.
+  // The cards attached to or captured under the quest stage are one counted peek whether or not the table stacks what lies under a card (Grabbed by Spiders on Beneath the Sands, a Condition on the main quest): the peek hangs below the stage within the room the sideways card leaves
+  // in its row, half of what the staging card is taller by, so it stays short of the active location's column. A tap on it opens the attachment.
   if (stageEntry) {
-    if (options.stacks) placeCounted(stageEntry, "questStage", questStage, slots, peek, true);
+    placeCounted(stageEntry, "questStage", questStage, slots, Math.min(peek, Math.max(0, (card.h - questH) / 2)), true);
     slots.push(slotOf(stageEntry.card, "questStage", "card", questStage, true));
   }
   for (const [id, rect] of [["activeLocation", activeLocation], ["secondActiveLocation", secondActiveLocation]] as const) {

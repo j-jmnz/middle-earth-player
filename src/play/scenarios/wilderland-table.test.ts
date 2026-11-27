@@ -19,7 +19,8 @@ import { beatIds, setBeat, createBeats } from "../store/beat-store.ts";
 import { isDiscardPile, opensList, PILE_WORDS, pileIds, pileSelector, secondPilesOf } from "../store/selectors.ts";
 import { wilderlandFixture, wilderlandViews } from "../store/wilderland-fixture.ts";
 import { seaFixture } from "../dream-chaser/sea-fixture.ts";
-import { discoverLines, discoverLogLine, discoverTitle, lookBeat, lookIdsOf, lookStripWords } from "../words/scenarios/wilderland.ts";
+import { discoverLines, discoverLogLine, discoverTitle } from "../words/scenarios/wilderland.ts";
+import { lookBeat, lookIdsOf, lookStripWords } from "../words/look-strip.ts";
 
 describe("the Wilderland piles in selectors", () => {
   it("has the Evil Creatures pair once the game has dealt that deck, and the Caves deck alone once it has dealt that", () => {

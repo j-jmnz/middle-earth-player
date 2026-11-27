@@ -350,13 +350,13 @@ export function standaloneGame<D extends string, P extends object>(spec: Standal
   }
 
   /** Plays until the scenario is lost, or won (a standalone win settles at once: there is no Resolution to answer), or `limit` intents. */
-  function play(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, options: { policy?: Partial<P>; limit?: number } = {}): PlayedGame {
+  function play(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, options: { policy?: Partial<P>; limit?: number; trail?: boolean } = {}): PlayedGame {
     const policy = { ...spec.policy, ...options.policy };
-    return playToEnd(start(seatCount, seed, difficulty), ctx, (state, memory) => spec.intent(state, ctx, memory, policy), options.limit ?? spec.limit);
+    return playToEnd(start(seatCount, seed, difficulty), ctx, (state, memory) => spec.intent(state, ctx, memory, policy), options.limit ?? spec.limit, { trail: options.trail });
   }
 
-  function playGolden(golden: StandaloneGoldenBase & { policy?: Partial<P> }, ctx: ReduceContext): PlayedGame {
-    return play(golden.seatCount, golden.seed, golden.difficulty, ctx, { policy: golden.policy });
+  function playGolden(golden: StandaloneGoldenBase & { policy?: Partial<P> }, ctx: ReduceContext, options: { trail?: boolean } = {}): PlayedGame {
+    return play(golden.seatCount, golden.seed, golden.difficulty, ctx, { policy: golden.policy, trail: options.trail });
   }
 
   return { world, plan, start, play, playGolden };

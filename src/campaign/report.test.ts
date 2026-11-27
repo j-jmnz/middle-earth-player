@@ -45,4 +45,17 @@ describe("the report of a finished scenario", () => {
     expect(sum).toBe(scoreOf(state, made.ctx.cards).score);
     expect(lines.find((line) => line.label === "3 completed rounds × 10")?.value).toBe("+30");
   });
+
+  it("a hero that left play with its eliminated player is defeated with the player, and only a hero a destroy step named is destroyed", () => {
+    const made = mirkwoodTable(world, { stage: "01120" });
+    const [first, second] = made.state.seats[0].heroes;
+    let state = moveCard(moveCard(made.state, first ?? "", { zone: "discard", seat: 0 }), second ?? "", { zone: "discard", seat: 0 });
+    state = { ...state, seats: [{ ...state.seats[0], eliminated: true }, state.seats[1]], lost: true, lossReason: "No seats remain" };
+    const words = (destroyed?: ReadonlySet<string>) => gameReport(state, made.ctx.cards, destroyed).seats[0]?.heroes.map((hero) => hero.words);
+    // With no destroy steps known the report says what it always said.
+    expect(words()).toEqual(["Destroyed", "Destroyed"]);
+    // The second hero was destroyed in play; the first left with the player.
+    expect(words(new Set([second ?? ""]))).toEqual(["Defeated with the player", "Destroyed"]);
+    expect(words(new Set([first ?? "", second ?? ""]))).toEqual(["Destroyed", "Destroyed"]);
+  });
 });

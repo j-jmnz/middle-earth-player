@@ -409,6 +409,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("exploredPending"), code: z.string().min(1), effect: z.string().min(1) }),
   // The pursuit value (mec112.pursuit, the pursuit tracker beside the quest deck) is at most `max` and at least `min`: "If the pursuit value is 25 or lower" (143071:B:1), "30 or greater" (143022:A:2). False while no tracker is set (ScenarioState.pursuit).
   z.strictObject({ kind: z.literal("pursuit"), max: z.number().int().min(0).optional(), min: z.number().int().min(0).optional() }),
+  // Every living player controls an ally in play: "each player discards an ally he controls. Then, discard ~" reads it before the discards (17074:A:2, rr.then). Read by the haradrim family.
+  z.strictObject({ kind: z.literal("everySeatHasAlly") }),
   // The temperature of the heat tracker is at most `max` and at least `min`: "If the temperature is 60 or higher" (16068:B:3), "40 or higher" (16025:A:1). False while no tracker is set. Read by the haradrim family.
   z.strictObject({ kind: z.literal("temperature"), max: z.number().int().min(0).optional(), min: z.number().int().min(0).optional() }),
   // The attacking enemy's current Threat is greater than the defending character's current Willpower ("+2 Attack instead if its Threat is greater than the defending character's Willpower", 16062:A:2; 16065:A:2). False for an attack with no defending character. Read by the haradrim family.
