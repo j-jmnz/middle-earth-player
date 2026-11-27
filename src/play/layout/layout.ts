@@ -46,6 +46,9 @@ export type CardSlot = Rect & {
   progress: number;
   // A slight turn for the hand fan, in radians.
   tilt: number;
+  // An attachment's tap band (`bandBounds`): the peek it was laid out with and the lowest y the band may reach, the top of the hand (hits.ts).
+  bandPeek?: number;
+  bandFloor?: number;
   // How many cards a pile holds; 0 for anything else.
   count: number;
   // Committed to the quest: drawn a step higher, with its willpower.
@@ -395,15 +398,17 @@ export function tableLayout(
     slots.push(slotOf(entry.card, "hand", "card", { x: xs[index] ?? hand.x, y, w: handCard.w, h: handCard.h }, false, raised ? 0 : offset * 0.03));
   });
 
+  const zones = { questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand };
   return {
     width,
     height,
     card,
-    zones: { questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand },
+    zones,
     piles: pileRects,
     folds,
     stagingFoot: stagingY + card.h + peek * (options.stacks ? Math.min(1, deepestUnder(views.staging.entries)) : deepestUnder(views.staging.entries)),
-    slots,
+    // An attachment's tap band stops at the hand's top (hits.ts, bandBounds): the strip under a front-row hero lies just above the hand, and the hand strip scrubs.
+    slots: slots.map((slot) => (slot.kind === "attachment" ? { ...slot, bandPeek: peek, bandFloor: hand.y } : slot)),
     marks,
     attacker: options.attacker ?? null,
     scale,

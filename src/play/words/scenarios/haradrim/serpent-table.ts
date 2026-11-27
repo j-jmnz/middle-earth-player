@@ -24,7 +24,7 @@ export const guardedSpeech = (guards: readonly string[]): string => `Guarded by 
 
 /** The preview line of a card that carries objectives: a hero holds them, an enemy or a location has them hanging on it. */
 export const carriesWords = (held: readonly string[], hung: readonly string[]): string =>
-  [held.length > 0 ? `Holds ${held.join(", ")}` : "", hung.length > 0 ? `${hung.join(", ")} hangs on it` : ""].filter((part) => part !== "").join(". ");
+  [held.length > 0 ? `Holds ${held.join(", ")}` : "", hung.length > 0 ? `${hung.join(" and ")} ${hung.length === 1 ? "hangs" : "hang"} on it` : ""].filter((part) => part !== "").join(". ");
 
 /** The preview line of a stage-number enemy's totals: "X is the stage number of the main quest: Threat 2, Attack 4, Defense 3 now." */
 export const totalsWords = (stats: readonly { name: string; value: number }[], staged: boolean): string => `X is the stage number of the main quest${staged ? "" : " (no stage in play)"}: ${stats.map((one) => `${one.name} ${one.value}`).join(", ")} now.`;

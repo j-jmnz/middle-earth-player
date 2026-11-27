@@ -8,8 +8,9 @@ import { consideredEngagedSeats } from "../../rules/core/engaged.ts";
 import { claimedBy, idOf, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
 import { effectById } from "../../rules/windows/listen.ts";
+import { carriedDetail } from "../cards/dungeon-preview.ts";
 import { guardWith } from "../../rules/families/objectives/guard.ts";
-import { addsNoThreatNotes, carriedDetail, consideredChip, emptyEngagedWord, guardedChip, serpentDetail } from "../readouts/haradrim/serpent.ts";
+import { addsNoThreatNotes, consideredChip, emptyEngagedWord, guardedChip, serpentDetail } from "../readouts/haradrim/serpent.ts";
 import { bandBounds, hitSlot } from "../layout/hits.ts";
 import { tableLayout, type LayoutViews, type PileViews } from "../layout/layout.ts";
 import { PILES, TABLE_ZONES, pileSelector, secondPilesOf, zoneSelector } from "../store/selectors.ts";
@@ -188,8 +189,18 @@ describe("What the table says of the considered-engaged Serpent, a guarded objec
     const hung = at({ stage: "17108", staging: [SERPENT], attached: [{ code: BANNER, to: SERPENT, encounter: true }] });
     expect(carriedDetail(hung.state, hung.ctx, idOf(hung.state, SERPENT), (id) => hung.state.cards[id]?.code ?? id)).toBe("17091 hangs on it.");
     expect(carriedDetail(held.state, held.ctx, idOf(held.state, "dh2"), name)).toBeNull();
+    const both = at({ stage: "17108", staging: [SERPENT], attached: [{ code: BANNER, to: SERPENT, encounter: true }, { code: GARB, to: SERPENT, encounter: true }] });
+    expect(carriedDetail(both.state, both.ctx, idOf(both.state, SERPENT), (id) => both.state.cards[id]?.code ?? id)).toBe("17091 and 17092 hang on it.");
   });
 });
+
+const laidHeld = (width: number, height: number) => {
+  const t = at({ claimed: [{ code: GARB, by: "dh1" }] });
+  const facts = zoneFactsOf(t.ctx.cards);
+  const views = Object.fromEntries(TABLE_ZONES.map((zone) => [zone, zoneSelector(zone, 0, facts)(t.state)])) as unknown as LayoutViews;
+  const piles = Object.fromEntries([...PILES, ...secondPilesOf(t.state)].map((pile) => [pile, pileSelector(pile, 0)(t.state)])) as unknown as PileViews;
+  return tableLayout(width, height, views, piles, { scale: 1 });
+};
 
 describe("The band of a held or hung objective", () => {
   const laid = (width: number, height: number, scale = 1) => {
@@ -216,6 +227,21 @@ describe("The band of a held or hung objective", () => {
       // On the host's own face the host wins.
       expect(layout.slots[hitSlot(layout.slots, host.x + host.w / 2, host.y + host.h / 2)]?.id).toBe(host.id);
       expect(hitSlot(layout.slots, middle, band.y + band.h + 40)).toBe(-1);
+    }
+  });
+});
+
+describe("The band of a hero's held objective", () => {
+  it("17108:A:1 stays out of the hand: a tap on the hand strip below it is not the objective", () => {
+    for (const [width, height] of [[667, 375], [844, 390], [1280, 800]] as const) {
+      const layout = laidHeld(width, height);
+      const band = layout.slots.find((slot) => slot.kind === "attachment" && slot.zone === "play");
+      expect(band, `${width}x${height}`).toBeDefined();
+      if (!band) continue;
+      const bounds = bandBounds(band);
+      expect(bounds.y + bounds.h, `${width}x${height}`).toBeLessThanOrEqual(layout.zones.hand.y);
+      expect(bounds.h).toBeGreaterThanOrEqual(44);
+      expect(layout.slots[hitSlot(layout.slots, bounds.x + bounds.w / 2, layout.zones.hand.y + 2)]?.id).not.toBe(band.id);
     }
   });
 });

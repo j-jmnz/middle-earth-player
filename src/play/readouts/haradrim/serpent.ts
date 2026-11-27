@@ -7,7 +7,7 @@ import { consideredEngagedSeats } from "../../../rules/core/engaged.ts";
 import { flagged, inPlay, livingSeats, type ScenarioState } from "../../../rules/core/state.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 
-import { addsNoThreatNote, carriesWords, consideredChipText, consideredEmptyWord, consideredPreview, consideredSpeech, GUARDED_CHIP, guardedSpeech, totalsWords } from "../../words/scenarios/haradrim/serpent-table.ts";
+import { addsNoThreatNote, consideredChipText, consideredEmptyWord, consideredPreview, consideredSpeech, GUARDED_CHIP, guardedSpeech, totalsWords } from "../../words/scenarios/haradrim/serpent-table.ts";
 
 /** The living seats a staging enemy is considered engaged with because they control an objective; none for any other card. */
 export function claimerSeats(game: ScenarioState, cardId: string): number[] {
@@ -59,20 +59,4 @@ export function serpentDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   const seats = claimerSeats(game, cardId);
   const engaged = seats.length > 0 ? consideredPreview(whoWords(game, seats), !flagged(game, cardId, "noThreatContribution")) : "";
   return engaged ? `${totals} ${engaged}` : totals;
-}
-
-/** The preview line of a card that carries objectives: the claimed ones a hero holds, the unclaimed ones hanging on an enemy or a location. Null for a card that carries none. */
-export function carriedDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name: (id: string) => string): string | null {
-  const card = game.cards[cardId];
-  if (!card || !inPlay(card.zone)) return null;
-  const objectives = card.attachments.filter((id) => game.cards[id]?.guard !== true && game.cards[id]?.zone === "attached" && printedOf(ctx.cards, game.cards[id]?.code ?? "").type === "objective");
-  const held = objectives.filter((id) => game.cards[id]?.claimed === true).map(name);
-  const hung = objectives.filter((id) => game.cards[id]?.claimed !== true).map(name);
-  return held.length + hung.length > 0 ? `${carriesWords(held, hung)}.` : null;
-}
-
-/** The preview line of The Black Serpent and of any card that carries objectives, in that order; null for a card with neither. */
-export function haradDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name: (id: string) => string): string | null {
-  const lines = [serpentDetail(game, ctx, cardId), carriedDetail(game, ctx, cardId, name)].filter((line) => line != null);
-  return lines.length > 0 ? lines.join(" ") : null;
 }

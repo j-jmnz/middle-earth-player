@@ -38,11 +38,16 @@ export function contains(rect: Rect, x: number, y: number): boolean {
   return x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h;
 }
 
-/** The rectangle a tap finds an attachment in: the band of it that shows under its host (the bottom PEEK of its card), grown to 44 pt tall about its middle. Only a point no card holds reaches it (`hitSlot`). */
+/**
+ * The rectangle a tap finds an attachment in: the band of it that shows under its host (the bottom peek of its card), grown to 44 pt tall about its middle, and moved up
+ * where it would reach the hand (`slot.bandFloor`, the hand zone's top). Only a point no card holds reaches it (`hitSlot`).
+ */
 export function bandBounds(slot: CardSlot): Rect {
   "worklet";
-  const middle = slot.y + slot.h - PEEK / 2;
-  return { x: slot.x, y: middle - MIN_TARGET / 2, w: slot.w, h: MIN_TARGET };
+  const peek = slot.bandPeek ?? PEEK;
+  const middle = slot.y + slot.h - peek / 2;
+  const top = middle - MIN_TARGET / 2;
+  return { x: slot.x, y: slot.bandFloor != null ? Math.min(top, slot.bandFloor - MIN_TARGET) : top, w: slot.w, h: MIN_TARGET };
 }
 
 // The attachment whose 44 pt band holds the point, topmost first, or -1: a held or hung objective is a strip 10 pt tall, too thin to hit on its own.

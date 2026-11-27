@@ -180,6 +180,8 @@ const SLOT_FIELDS = Object.keys({
   damage: true,
   progress: true,
   tilt: true,
+  bandPeek: true,
+  bandFloor: true,
   count: true,
   committed: true,
   held: true,
