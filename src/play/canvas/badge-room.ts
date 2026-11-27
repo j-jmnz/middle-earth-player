@@ -11,17 +11,31 @@ export const BADGE_TOP = 17;
 export const BADGE_TOP_SHORT = 3;
 
 /** What stands at the foot of a card, in the effect column's way: the held or counted pill (`under`: its rect's height, whether it counts something, whether the card wears a number at its foot), a lifted pill (the open pick's number), and the plain foot pills (an engagement cost, a progress or loss number). */
-export type FootMarks = { under: { height: number; counted: boolean; strip: boolean } | null; lifted: boolean; plain: boolean; committed?: boolean };
+export type FootMarks = { under: { height: number; counted: boolean; strip: boolean } | null; lifted: boolean; plain: boolean; committed: boolean; combat: boolean };
 
-/** A committed hero's Willpower pill (`Badges`): 15 pt tall, 3 pt above the card's foot. */
+/** A committed hero's Willpower pill (`Badges`) and a defender's or attacker's combat pill (`CombatPill`): 15 pt tall, 3 pt above the card's foot. */
 const WILL_TOP = 15 + 3;
 
-/** The effect column of an upright card in a stacked play area's covered band, or null on any other card: `left` is how far it stands right of the card's edge, clear of the resource token that stands at the band's foot. */
-export type CoveredBand = { left: number };
+/** The effect column of an upright card in a stacked play area's covered band, or null on any other card: `left` is how far it stands right of the card's edge, clear of the resource token that stands at the band's foot; `width` is the part of the card the next card in its row leaves visible. */
+export type CoveredBand = { left: number; width: number };
 
-/** The covered-band column for a card (`covered`: its slot has `coveredFrom`, `sideways`: it is exhausted, so its name runs along its turned side and its top edge holds tokens only), or null. */
-export function coveredBand(covered: boolean, sideways: boolean, resources: number, s: number): CoveredBand | null {
-  return covered && !sideways ? { left: resources > 0 ? (TOKEN + 1) * s : 0 } : null;
+/** The covered-band column for a card (`covered`: its slot has `coveredFrom`, `sideways`: it is exhausted, so its name runs along its turned side and its top edge holds tokens only; `visible`: the width the next card in the row leaves), or null. */
+export function coveredBand(covered: boolean, sideways: boolean, resources: number, s: number, visible: number): CoveredBand | null {
+  return covered && !sideways ? { left: resources > 0 ? (TOKEN + 1) * s : 0, width: visible } : null;
+}
+
+/**
+ * Where a pill `width` wide stands across a card `cardWidth` wide at its foot (the Willpower pill, the combat pill): centered, but right of the resource token (`resources`) when the card is too narrow to clear it, and no wider than the card's rest. Offsets from the card's left edge.
+ */
+export function footPillSpan(cardWidth: number, width: number, resources: number, s: number): { left: number; width: number } {
+  const centered = (cardWidth - width) / 2;
+  const left = resources > 0 ? Math.max(centered, (TOKEN + 1) * s) : centered;
+  return left === centered ? { left, width } : { left, width: Math.min(width, cardWidth - 1 * s - left) };
+}
+
+/** True when a pill `pillWidth` wide fits, with its 2 pt margins, in the `room` a covered card's row has right of its token (`CoveredBand`). */
+export function pillFits(pillWidth: number, s: number, room: number): boolean {
+  return 2 * s + pillWidth <= room - 2 * s;
 }
 
 /** How far below the card's top edge the highest pill at the foot stands (what the effect pills stop above), or null with none. `height` is the card's rect. */
@@ -30,7 +44,7 @@ export function footStop(height: number, s: number, marks: FootMarks): number | 
     marks.under ? underMarkTop(marks.under.height, s, marks.under.counted, marks.under.strip) : null,
     marks.lifted ? height - (2 * TOKEN + FOOT_ROW + 2) * s : null,
     marks.plain ? height - (TOKEN + FOOT_ROW) * s : null,
-    marks.committed ? height - WILL_TOP * s : null,
+    marks.committed || marks.combat ? height - WILL_TOP * s : null,
   ].filter((top): top is number => top != null);
   return tops.length === 0 ? null : Math.min(...tops);
 }

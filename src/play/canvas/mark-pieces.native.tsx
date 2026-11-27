@@ -16,7 +16,7 @@ import type { CombatMark, Rect } from "../layout/layout.ts";
 import { STAGE_APART_WORD, type StagePill } from "../words/scenarios/stormcaller.ts";
 import type { OptionMark } from "../choice/sheet-types.ts";
 import { currentMark } from "./current-mark.ts";
-import { BADGE_TOP, badgeRoom, type CoveredBand, hiddenBadges, lonePick, loneRow } from "./badge-room.ts";
+import { BADGE_TOP, badgeRoom, type CoveredBand, hiddenBadges, footPillSpan, lonePick, loneRow, pillFits } from "./badge-room.ts";
 import { TOKEN } from "./token-spots.ts";
 import { STRIP, underMarkBox } from "./under-mark.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
@@ -27,12 +27,13 @@ import { CanvasIcon, BADGE_H, type Fonts, type TokenImages } from "./pieces.nati
  * 2026-11-01): an enemy's attack on a threat-red pill, a character's defense on an accent pill, each with its icon. The value counts
  * every effect; the effect pills down the card's left edge still say what changed it.
  */
-export function CombatPill({ rect, combat, fonts, t, s }: { rect: Rect; combat: CombatNumber; fonts: Fonts; t: TableTokens; s: number }) {
-  const { x, y, w, h } = rect;
+export function CombatPill({ rect, combat, resources, visible, fonts, t, s }: { rect: Rect; combat: CombatNumber; resources: number; visible: number; fonts: Fonts; t: TableTokens; s: number }) {
+  const { x, y, h } = rect;
   const pill = BADGE_H * s;
   const text = String(combat.value);
-  const width = 18 * s + fonts.badge.getTextWidth(text) + 5 * s;
-  const left = x + (w - width) / 2;
+  const span = footPillSpan(visible, 18 * s + fonts.badge.getTextWidth(text) + 5 * s, resources, s);
+  const { width } = span;
+  const left = x + span.left;
   const top = y + h - pill - 3 * s;
   const attack = combat.stat === "attack";
   const ink = attack ? t.onThreatPill : t.onAccent;
@@ -42,6 +43,26 @@ export function CombatPill({ rect, combat, fonts, t, s }: { rect: Rect; combat: 
       <RoundedRect x={left} y={top} width={width} height={pill} r={pill / 2} color={attack ? t.danger : t.night} style="stroke" strokeWidth={1 * s} />
       <CanvasIcon name={combat.stat} x={left + 3 * s} y={top + 2 * s} size={11 * s} color={ink} />
       <Text x={left + 17 * s} y={top + 11.5 * s} text={text} font={fonts.badge} color={ink} />
+    </Group>
+  );
+}
+
+/**
+ * The count of effects a covered card has no room to list: its row gives way to the pill at its foot (a committed hero's Willpower pill, a defender's or attacker's combat pill; `footStop`), so the bare count stands over that pill's upper right corner and the player knows to tap.
+ * `end` is the pill's right end (x), `visible` the width the next card leaves.
+ */
+export function FootCount({ rect, count, end, visible, fonts, t, s }: { rect: Rect; count: number; end: number; visible: number; fonts: Fonts; t: TableTokens; s: number }) {
+  const { x, y, h } = rect;
+  const pill = BADGE_H * s;
+  const text = String(count);
+  const width = fonts.badge.getTextWidth(text) + 10 * s;
+  const left = Math.min(end - 4 * s, x + visible - width - 1 * s);
+  // Over the pill's upper right corner, so its number stays readable.
+  const top = y + h - pill - 3 * s - 9 * s;
+  return (
+    <Group>
+      <RoundedRect x={left} y={top} width={width} height={pill} r={pill / 2} color={t.night} />
+      <Text x={left + 5 * s} y={top + 11.5 * s} text={text} font={fonts.badge} color={t.bone} />
     </Group>
   );
 }
@@ -206,16 +227,23 @@ export function badgeReach(effects: CardEffects, fonts: Fonts, s: number, height
   ];
   // The pill for the effects left out ("2 more") is as wide as its words and 12 pt, and is drawn when any are left out: the count is the one `Badges` draws, which depends on the room the card's height leaves.
   const left = hiddenBadges(effects.stats.length + effects.flags.length, height, s, BADGE_H * s, stop, covered);
-  const more = left > 0 ? fonts.badge.getTextWidth(moreText(left)) + 12 * s : 0;
   const shift = covered?.left ?? 0;
+  // A covered card's row ends at the next card in its row (`CoveredBand.width`); words and pills wider than that room give way to the round count, as `Badges` draws.
+  const avail = covered ? covered.width - shift : width;
+  const count = (n: number) => fonts.badge.getTextWidth(String(n)) + 10 * s;
+  const room = badgeRoom(height, s, BADGE_H * s, stop, covered);
   // A card with no room for a row draws no pill at all (badgeLayout).
-  if (widths.length === 0 || badgeRoom(height, s, BADGE_H * s, stop, covered) < 1) return 0;
+  if (widths.length === 0 || room < 1) return 0;
+  const words = left > 0 ? fonts.badge.getTextWidth(moreText(left)) + 12 * s : 0;
+  const more = covered && left > 0 && !pillFits(words, s, avail) ? count(left) : words;
   // One row for several effects: the kept chip and "N more" stand side by side (Badges), so the pills reach as far as both; `loneRow` is the one answer for both.
-  if (badgeRoom(height, s, BADGE_H * s, stop, covered) === 1 && widths.length > 1) {
+  if (room === 1 && widths.length > 1) {
     const keptStat = effects.stats[lonePick(effects.stats)];
-    const lone = loneRow(keptStat ? widths[lonePick(effects.stats)] ?? 0 : 0, fonts.badge.getTextWidth(String(widths.length - 1)) + 10 * s, fonts.badge.getTextWidth(moreText(widths.length - 1)) + 12 * s, s, width - shift);
+    const lone = loneRow(keptStat ? widths[lonePick(effects.stats)] ?? 0 : 0, count(widths.length - 1), fonts.badge.getTextWidth(moreText(widths.length - 1)) + 12 * s, s, avail);
     if (lone.mode != null) return shift + 2 * s + Math.max(24 * s, lone.reach - 2 * s);
   }
+  // A lone pill that does not fit a covered card's visible width is the round count "1".
+  if (covered && room === 1 && widths.length === 1 && !pillFits(widths[0] ?? 0, s, avail)) return shift + 2 * s + Math.max(24 * s, count(1));
   return shift + 2 * s + Math.max(24 * s, more, ...widths);
 }
 

@@ -1,7 +1,7 @@
 // Rules: docs/design-system-table.md (Tokens and effects). The count of effect pills hidden behind the "N more" pill, which badgeReach keeps a word pill clear of.
 import { describe, expect, it } from "vitest";
 
-import { BADGE_TOP, BADGE_TOP_SHORT, badgeLayout, badgeRoom, badgeShown, coveredBand, footStop, hiddenBadges, loneRow, type FootMarks } from "./badge-room.ts";
+import { BADGE_TOP, BADGE_TOP_SHORT, badgeLayout, badgeRoom, badgeShown, coveredBand, footStop, hiddenBadges, footPillSpan, loneRow, pillFits, type FootMarks } from "./badge-room.ts";
 import { TOKEN } from "./token-spots.ts";
 import { underMarkBox } from "./under-mark.ts";
 
@@ -63,10 +63,10 @@ const overlap = (a: Box, b: Box) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < 
 const SCALES = [0.85, 1, 1.25, 1.5];
 const HEIGHTS = [34, 44, 53, 62, 70, 84, 101];
 const HELD: { name: string; marks: (h: number) => FootMarks; counted: boolean; strip: boolean; none?: true }[] = [
-  { name: "no held pill", marks: () => ({ under: null, lifted: false, plain: false }), counted: false, strip: false, none: true },
-  { name: "held pill", marks: (h) => ({ under: { height: h, counted: false, strip: false }, lifted: false, plain: false }), counted: false, strip: false },
-  { name: "held pill over a committed hero's number", marks: (h) => ({ under: { height: h, counted: false, strip: true }, lifted: false, plain: false }), counted: false, strip: true },
-  { name: "held pill with a count", marks: (h) => ({ under: { height: h, counted: true, strip: false }, lifted: false, plain: false }), counted: true, strip: false },
+  { name: "no held pill", marks: () => ({ under: null, lifted: false, plain: false, committed: false, combat: false }), counted: false, strip: false, none: true },
+  { name: "held pill", marks: (h) => ({ under: { height: h, counted: false, strip: false }, lifted: false, plain: false, committed: false, combat: false }), counted: false, strip: false },
+  { name: "held pill over a committed hero's number", marks: (h) => ({ under: { height: h, counted: false, strip: true }, lifted: false, plain: false, committed: false, combat: false }), counted: false, strip: true },
+  { name: "held pill with a count", marks: (h) => ({ under: { height: h, counted: true, strip: false }, lifted: false, plain: false, committed: false, combat: false }), counted: true, strip: false },
 ];
 
 // Every box a card's foot and edge draw: the effect rows (and the "more" pill), the resource token, the held pill and the Willpower pill.
@@ -129,11 +129,11 @@ describe("the effect rows, the resource token and the foot pills never overlap",
   });
 
   it("the foot stop is the highest pill at the foot, and null with none", () => {
-    expect(footStop(100, 1, { under: null, lifted: false, plain: false })).toBeNull();
-    expect(footStop(100, 1, { under: null, lifted: false, plain: true })).toBe(78);
-    expect(footStop(100, 1, { under: null, lifted: true, plain: true })).toBe(58);
-    expect(footStop(100, 1, { under: { height: 100, counted: false, strip: false }, lifted: false, plain: false })).toBe(78);
-    expect(footStop(100, 1, { under: { height: 60, counted: true, strip: false }, lifted: false, plain: false })).toBe(18);
+    expect(footStop(100, 1, { under: null, lifted: false, plain: false, committed: false, combat: false })).toBeNull();
+    expect(footStop(100, 1, { under: null, lifted: false, plain: true, committed: false, combat: false })).toBe(78);
+    expect(footStop(100, 1, { under: null, lifted: true, plain: true, committed: false, combat: false })).toBe(58);
+    expect(footStop(100, 1, { under: { height: 100, counted: false, strip: false }, lifted: false, plain: false, committed: false, combat: false })).toBe(78);
+    expect(footStop(100, 1, { under: { height: 60, counted: true, strip: false }, lifted: false, plain: false, committed: false, combat: false })).toBe(18);
   });
 });
 
@@ -141,33 +141,69 @@ describe("an upright card in a stacked area's covered band", () => {
   it("keeps the title band clear and puts its one pill row right of the resource token", () => {
     for (const s of SCALES) {
       const band = 44 * s;
-      const covered = coveredBand(true, false, 2, s);
-      expect(covered, `s ${s}`).toEqual({ left: (TOKEN + 1) * s });
+      const covered = coveredBand(true, false, 2, s, 46 * s);
+      expect(covered, `s ${s}`).toEqual({ left: (TOKEN + 1) * s, width: 46 * s });
       // Without the rule the column starts at the top edge and covers the name.
       expect(badgeLayout(band, s, PILL * s, null, null).top).toBe(BADGE_TOP_SHORT * s);
       expect(badgeLayout(band, s, PILL * s, null, covered)).toEqual({ top: BADGE_TOP * s, rows: 1 });
       // A hero with no token needs no shift.
-      expect(coveredBand(true, false, 0, s)).toEqual({ left: 0 });
+      expect(coveredBand(true, false, 0, s, 46 * s)).toEqual({ left: 0, width: 46 * s });
     }
   });
 
   it("the pill clears the token, and gives way to a committed hero's Willpower pill", () => {
-    const covered = coveredBand(true, false, 1, 1)!;
+    const covered = coveredBand(true, false, 1, 1, 46 * 1)!;
     const { top, rows } = badgeLayout(44, 1, PILL, null, covered);
     expect(overlap({ name: "row", x: 2 + covered.left, y: top, w: 32, h: PILL }, { name: "token", x: 0, y: 44 - (TOKEN + 1), w: TOKEN + 1, h: TOKEN + 1 })).toBe(false);
     expect(rows).toBe(1);
-    const committed = footStop(44, 1, { under: null, lifted: false, plain: false, committed: true });
+    const committed = footStop(44, 1, { under: null, lifted: false, plain: false, committed: true, combat: false });
     expect(committed).toBe(44 - 18);
     expect(badgeRoom(44, 1, PILL, committed, covered)).toBe(0);
   });
 
   it("changes no other card: an exhausted card, a card outside a covered band and the committed foot stop on a tall card", () => {
-    expect(coveredBand(false, false, 3, 1)).toBeNull();
-    expect(coveredBand(true, true, 3, 1)).toBeNull();
+    expect(coveredBand(false, false, 3, 1, 46 * 1)).toBeNull();
+    expect(coveredBand(true, true, 3, 1, 46 * 1)).toBeNull();
     for (const h of HEIGHTS) {
       const free = badgeRoom(h, 1, PILL, null);
-      expect(badgeRoom(h, 1, PILL, footStop(h, 1, { under: null, lifted: false, plain: false, committed: true }))).toBe(free);
+      expect(badgeRoom(h, 1, PILL, footStop(h, 1, { under: null, lifted: false, plain: false, committed: true, combat: false }))).toBe(free);
     }
+  });
+
+  it("gives way to a defender's or attacker's combat pill at the foot, as it does to the Willpower pill", () => {
+    const covered = coveredBand(true, false, 1, 1, 46)!;
+    const combat = footStop(44, 1, { under: null, lifted: false, plain: false, committed: false, combat: true });
+    expect(combat).toBe(44 - 18);
+    expect(badgeRoom(44, 1, PILL, combat, covered)).toBe(0);
+    // The row would stand 17..32 pt, over the combat pill at 26..41 pt.
+    const { top } = badgeLayout(44, 1, PILL, null, covered);
+    expect(overlap({ name: "row", x: 2 + covered.left, y: top, w: 32, h: PILL }, { name: "combat", x: 21, y: 44 - 18, w: 26, h: PILL })).toBe(true);
+  });
+
+  it("on a phone-width card with a token the visible room is too short for the words or a chip and its count: the row falls back to the round count", () => {
+    const covered = coveredBand(true, false, 1, 1, 46)!;
+    const room = covered.width - covered.left;
+    expect(room).toBe(27);
+    // A 40 pt Attack chip, a 12 pt count pill and the 52 pt "3 more" pill: the chip does not fit beside its count, so there is no lone row.
+    expect(loneRow(40, 12, 52, 1, room).mode).toBeNull();
+    expect(pillFits(52, 1, room)).toBe(false);
+    expect(pillFits(12, 1, room)).toBe(true);
+    // A short chip takes the round count over its end; the words never fit.
+    expect(loneRow(16, 12, 52, 1, room)).toEqual({ mode: "overlap", compact: true, reach: 16 - 4 + 12 });
+  });
+
+  it("measures the lone row at the visible width, narrower than the card when the next card covers its side", () => {
+    expect(loneRow(30, 12, 52, 1, 80).mode).toBe("beside");
+    const visible = coveredBand(true, false, 1, 1, 60)!;
+    expect(loneRow(30, 12, 52, 1, visible.width - visible.left).mode).toBe("overlap");
   });
 });
 
+describe("footPillSpan", () => {
+  it("centers a foot pill, and moves it right of the resource token on a card too narrow to clear it", () => {
+    expect(footPillSpan(80, 32, 2, 1)).toEqual({ left: 24, width: 32 });
+    expect(footPillSpan(46, 32, 0, 1)).toEqual({ left: 7, width: 32 });
+    // A 46 pt card with a token: the pill starts at the token's edge and keeps inside the card.
+    expect(footPillSpan(46, 32, 1, 1)).toEqual({ left: TOKEN + 1, width: 46 - 1 - (TOKEN + 1) });
+  });
+});
