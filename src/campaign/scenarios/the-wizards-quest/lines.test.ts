@@ -137,3 +137,15 @@ describe("additional shadow cards", () => {
     expect(shadowCards(enemy).every((id) => state.cards[id]?.face === "up")).toBe(true);
   });
 });
+
+describe("defending player", () => {
+  it("51015:A:2 a Sentinel ally of the other player defends and is destroyed: the player the enemy attacks discards, not the ally's controller (rr.defending-player)", () => {
+    const build = (layout: Layout) => tableFromLayout("the-wizards-quest", layout, { extra: ["10116"] });
+    const hand = ["c0", "c0", "c0", "c0", "c0"];
+    const fought = fightEnemy(build, "f0", "51015", { seats: 2, play: [{ code: "10116", seat: 1 }], hand, deck: ["f0", "f0", "f0", "f0", "f0", "f0"] }, { defender: (made) => idOf(made.state, "10116") });
+    const state = fought.run.state;
+    expect(state.cards[idOf(state, "10116")]?.zone).toBe("discard");
+    expect(state.seats[0]?.hand.length).toBeLessThan(fought.made.state.seats[0]?.hand.length ?? 0);
+    expect(state.seats[1]?.hand.length).toBe(fought.made.state.seats[1]?.hand.length);
+  });
+});
