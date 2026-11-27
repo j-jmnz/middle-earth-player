@@ -93,6 +93,8 @@ export type EffectData = {
   picked?: readonly string[];
   // An event played from the hand: when the effect is done the card goes to its owner's discard pile.
   finish?: "discardSource";
+  // An event played from a hand: once it is in the discard pile its card hears `eventResolved` ("After an event is played").
+  announceResolved?: true;
   // Set when the "when revealed" Responses (a cancel) have been offered for this frame.
   interrupted?: boolean;
   // The cards a Pick looked at in a deck: the ones still there are put back by ArrangeTop.

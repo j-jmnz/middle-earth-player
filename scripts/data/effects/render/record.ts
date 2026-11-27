@@ -125,6 +125,7 @@ function triggerWords(effect: Obj): string {
   const trigger = str(effect.trigger);
   const cardType = isObj(effect.subject) ? effect.subject.cardType : undefined;
   if (trigger === "played" && cardType === "event") return "when an event is played, before its effects resolve";
+  if (trigger === "eventResolved") return "after an event is played, once its effects have resolved and it lies in the discard pile";
   if (trigger === "played" && cardType === "ally") return "after an ally is played from hand (not one put into play by an effect)";
   return TRIGGER[trigger] ?? `on the event ${trigger}`;
 }

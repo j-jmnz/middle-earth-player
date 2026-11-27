@@ -350,7 +350,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "50921:forced:1", cardCode: "50921", lines: ["50921:A:1"], timing: "forced", trigger: "whenRevealedCanceled", condition: { kind: "sourceIn", zone: "staging" }, instructions: [{ verb: "RevealEncounter" }] },
   { id: "50922:constant:2", cardCode: "50922", lines: ["50922:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { facedown: true, times: 2 }, until: "whileSourceInPlay", target: "self" }] },
   gate("50922", "50922:A:2", "50905"),
-  { id: "50922:forced:1", cardCode: "50922", lines: ["50922:A:2"], timing: "forced", trigger: "played", subject: { type: "card", control: "any", cardType: "event" }, condition: { kind: "all", conditions: [{ kind: "phase", is: "Quest" }, { kind: "sourceIn", zone: "staging" }] }, instructions: [{ verb: "AttachFacedown" }] },
+  { id: "50922:forced:1", cardCode: "50922", lines: ["50922:A:2"], timing: "forced", trigger: "eventResolved", subject: { type: "card", control: "any", cardType: "event" }, condition: { kind: "all", conditions: [{ kind: "phase", is: "Quest" }, { kind: "sourceIn", zone: "staging" }] }, instructions: [{ verb: "AttachFacedown" }] },
   gate("50923", "50923:A:1", "50906"),
   { id: "50923:constant:2", cardCode: "50923", lines: ["50923:A:1"], timing: "constant", condition: { kind: "sourceIn", zone: "staging" }, instructions: [{ verb: "ModifyStat", stat: "healCap", amount: 1, until: "whileSourceInPlay", target: "table" }] },
 

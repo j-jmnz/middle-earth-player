@@ -225,7 +225,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "19105",
       lines: ["19105:A:2"],
       timing: "forced",
-      trigger: "played",
+      trigger: "eventResolved",
       subject: { type: "card", control: "any", cardType: "event" },
       condition: { kind: "sourceIn", zone: "staging" },
       instructions: [{ verb: "RaiseThreat", amount: 1, who: "eventSeat" }],

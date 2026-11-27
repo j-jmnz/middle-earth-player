@@ -116,7 +116,7 @@ function runningActions(state: ScenarioState, cardId: string, seat: number, ctx:
 function playEvent(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext, steps: EngineStep[], x?: number): ScenarioState {
   const running = runningActions(state, cardId, seat, ctx);
   const first = running[0];
-  if (!first) return moveCard(state, cardId, { zone: "discard", seat });
+  if (!first) return queueEvent(moveCard(state, cardId, { zone: "discard", seat }), { trigger: "eventResolved", seat, cardId });
   // Two Actions on different lines (an Action and a Valour Action): the player uses one (families/deck/play.ts).
   const choice = alternativeActions(running);
   const framed = pushEffectFrame(
@@ -132,6 +132,7 @@ function playEvent(state: ScenarioState, cardId: string, seat: number, ctx: Redu
       cancel: null,
       blockCancel: null,
       finish: "discardSource",
+      announceResolved: true,
       ...(x != null ? { x } : {}),
       ...(state.window ? { resume: { window: state.window, seat } } : {}),
     },

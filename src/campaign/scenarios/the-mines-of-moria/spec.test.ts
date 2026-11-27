@@ -85,7 +85,7 @@ const ROWS: readonly Row[] = [
   { line: "51220:A:2", name: "Shadow: the defending character cannot ready until the end of the round", layout: { engaged: ["f3"], deck: F0 }, act: [attack("f3", { shadow: "51220" }), defend("dh1")], expect: [flag("dh1", "cannotReady")] },
   { line: "51221:A:2", name: "Shadow: it is shuffled into the encounter deck", layout: { engaged: ["f3"], deck: F0 }, act: [attack("f3", { shadow: "51221" }), defend("dh1")], expect: [zone("51221", "encounterDeck")] },
   { line: "51222:A:1", name: "it gets +1 Threat for each resource on it", layout: { staging: [{ code: "51222", resources: 2 }] }, act: [], expect: [stat("51222", "threat", 4)] },
-  { line: "51222:A:2", name: "Forced: after an event is played 1 resource is placed on it", layout: { staging: ["51222"], hand: ["filler"] }, act: announce("played", "filler"), expect: [resourcesOn("51222", 1)] },
+  { line: "51222:A:2", name: "Forced: after an event is played 1 resource is placed on it", layout: { staging: ["51222"], hand: ["filler"] }, act: announce("eventResolved", "filler"), expect: [resourcesOn("51222", 1)] },
   { line: "51224:A:1", name: "it gets -10 engagement cost while there is an active location", layout: { staging: ["51224"], active: "51213" }, act: [], expect: [stat("51224", "engagementCost", 30)] },
   { line: "51225:A:1", name: "while in the staging area characters cannot be readied by player card effects", layout: { staging: ["51225"] }, act: [], expect: [flag("dh1", "cannotReadyByPlayerCard")] },
   { line: "51225:A:2", name: "Travel: each player exhausts a character", layout: { staging: ["51225"] }, act: resolve("51225", "travel"), expect: [exhausted("dh1")] },
