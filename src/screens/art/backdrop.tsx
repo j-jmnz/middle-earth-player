@@ -1,24 +1,26 @@
+import { useSyncExternalStore } from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 
 import { useTheme } from "../../ui/theme";
 import { useDriftRunning } from "./backdrop-drift";
 import { fogMatrix, gritTexture, maskStops, rgbOf, type FogLayer, type FogTexture } from "../../ui/fog/fog";
 import { scenesByTheme, type SceneLight, type SceneName, type Wash } from "./backdrop-scenes";
+import { browserBake, tileStore } from "./web/baked-tiles";
 
-// Web dev loop. Skia web needs CanvasKit, so the browser draws the same scene with CSS: each fog texture is an SVG feTurbulence tile
-// (stitched, so it repeats without a seam) drawn as a repeating background, faded out by a CSS mask; the morning light is gradients,
-// each beam a clipped gradient inside a blurred box. react-native-web forwards these CSS properties to the DOM. The drift is a CSS
+// The web and the desktop draw the scene with CSS, not Skia: each fog texture is an SVG feTurbulence tile (stitched, so it repeats without a
+// seam), baked once into a picture (web/baked-tiles.ts) and drawn as a repeating background, faded out by a CSS mask; the morning light is
+// gradients, each beam a clipped gradient inside a blurred box. react-native-web forwards these CSS properties to the DOM. The drift is a CSS
 // animation of a transform, one tile's width per loop, so it repeats without a jump: the tiles are on a layer one tile wider than the
 // box, which moves inside a box that holds the layer's mask, blend and opacity still. A transform runs on the compositor, so the drift
 // repaints nothing; animating the tiles' background-position instead repainted every masked, blended fog layer on the main thread in
 // every frame, under the table too.
 type WebStyle = Record<string, string | number>;
 
-const tiles = new Map<FogTexture, string>();
+const svgs = new Map<FogTexture, string>();
 
-/** A texture as a tileable SVG data URL, built once per texture. */
-function tileUrl(texture: FogTexture): string {
-  const cached = tiles.get(texture);
+/** A texture as a tileable SVG, built once per texture. */
+function tileSvg(texture: FogTexture): string {
+  const cached = svgs.get(texture);
   if (cached) return cached;
   const [w, h] = texture.tile;
   const svg =
@@ -27,9 +29,25 @@ function tileUrl(texture: FogTexture): string {
     `<feTurbulence type='fractalNoise' baseFrequency='${texture.freq[0]} ${texture.freq[1]}' numOctaves='${texture.octaves}' seed='${texture.seed}' stitchTiles='stitch'/>` +
     `<feColorMatrix type='matrix' values='${fogMatrix(texture).join(" ")}'/>` +
     `</filter><rect width='100%' height='100%' filter='url(#f)'/></svg>`;
-  const url = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
-  tiles.set(texture, url);
-  return url;
+  svgs.set(texture, svg);
+  return svg;
+}
+
+// The static render has no page, so it draws no tiles.
+const baked = typeof document === "undefined" ? null : tileStore(browserBake(document));
+const never = () => () => undefined;
+const none = () => null;
+
+// Pixels for each point of a tile: a fog texture's own (the haze is soft enough for half, as on the phone), and for the grit, which is
+// finer than a point, the screen's.
+function tileScale(texture: FogTexture): number {
+  if (texture !== gritTexture) return texture.bake ?? 1;
+  return Math.min(Math.max(1, Math.round(window.devicePixelRatio || 1)), 3);
+}
+
+/** A texture's tile as a CSS image, or null until its picture is made (a moment after the first screen that shows it). */
+function useTile(texture: FogTexture): string | null {
+  return useSyncExternalStore(baked?.subscribe ?? never, baked ? () => baked.read(tileSvg(texture), Math.round(texture.tile[0] * tileScale(texture)), Math.round(texture.tile[1] * tileScale(texture))) : none, none);
 }
 
 const pct = (value: number) => `${Math.round(value * 100)}%`;
@@ -67,7 +85,7 @@ function fogBoxStyle(layer: FogLayer): WebStyle {
  * than the box on the side it moves away from, so a loop never uncovers the box, and no wider: the layer is held as a texture while it moves. A
  * tile at the box's x shows texture point (x - offset - shift) whatever the layer's extra width, as the background-position drift did.
  */
-function fogTilesStyle(layer: FogLayer, rate: number, running: boolean): WebStyle {
+function fogTilesStyle(layer: FogLayer, rate: number, running: boolean, tile: string | null): WebStyle {
   const [tw, th] = layer.texture.tile;
   const [dx, dy] = layer.texture.offset ?? [0, 0];
   const drifting = layer.texture.drift !== 0 && rate > 0;
@@ -79,7 +97,7 @@ function fogTilesStyle(layer: FogLayer, rate: number, running: boolean): WebStyl
     bottom: 0,
     left: -before,
     right: -after,
-    backgroundImage: tileUrl(layer.texture),
+    ...(tile ? { backgroundImage: tile } : {}),
     backgroundSize: `${tw}px ${th}px`,
     backgroundRepeat: "repeat",
     // A layer that starts left of the box takes as much more position: the pattern sits where the box's own did.
@@ -98,9 +116,10 @@ function fogTilesStyle(layer: FogLayer, rate: number, running: boolean): WebStyl
 
 /** One fog layer: the still box and the tiles drifting inside it. */
 function Fog({ layer, rate, running }: { layer: FogLayer; rate: number; running: boolean }) {
+  const tile = useTile(layer.texture);
   return (
     <View style={[StyleSheet.absoluteFill, fogBoxStyle(layer) as object]}>
-      <View style={fogTilesStyle(layer, rate, running) as object} />
+      <View style={fogTilesStyle(layer, rate, running, tile) as object} />
     </View>
   );
 }
@@ -148,6 +167,7 @@ export function Backdrop({ scene }: { scene: SceneName }) {
   const s = scenesByTheme[useTheme()][scene];
   const { ground, vignette, grit } = s;
   const running = useDriftRunning();
+  const gritTile = useTile(gritTexture);
   const groundStyle: WebStyle =
     ground.kind === "solid"
       ? { backgroundColor: ground.color }
@@ -164,7 +184,7 @@ export function Backdrop({ scene }: { scene: SceneName }) {
       <View
         style={[
           StyleSheet.absoluteFill,
-          { backgroundImage: tileUrl(gritTexture), backgroundSize: `${gritTexture.tile[0]}px ${gritTexture.tile[1]}px`, opacity: grit.opacity, mixBlendMode: grit.blend } as object,
+          { ...(gritTile ? { backgroundImage: gritTile } : {}), backgroundSize: `${gritTexture.tile[0]}px ${gritTexture.tile[1]}px`, opacity: grit.opacity, mixBlendMode: grit.blend } as object,
         ]}
       />
     </View>

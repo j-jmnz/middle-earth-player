@@ -1,0 +1,28 @@
+# The web app's Worker and its static assets (docs/plans/pwa-iphone-ipad.md). Build first (pnpm webapp build), then deploy from this folder: npx wrangler deploy.
+name = "middle-earth-player"
+main = "worker.ts"
+compatibility_date = "2025-09-01"
+workers_dev = true
+# No preview URLs: each one is another origin with its own saves.
+preview_urls = false
+
+[assets]
+directory = "./build/web"
+binding = "ASSETS"
+html_handling = "auto-trailing-slash"
+not_found_handling = "none"
+
+[observability]
+enabled = true
+
+# The test site's store of meter logs (meter.ts). It has no id: wrangler makes the namespace at the first deploy and writes its id here. The permanent site
+# (env.production) has no such binding, so it keeps no log.
+[[kv_namespaces]]
+binding = "METER"
+
+# The permanent origin, which holds every player's saves and never changes (docs/plans/pwa-iphone-ipad.md, Decisions for the user): npx wrangler deploy --env production.
+# A deploy with no --env goes to the workers.dev name, for a test.
+[env.production]
+name = "ringsplayer"
+workers_dev = false
+routes = [{ pattern = "ringsplayer.app", custom_domain = true }]

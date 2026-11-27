@@ -87,6 +87,9 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     smoke: { steps: [{ script: "checks/desktop-smoke.ts" }], about: "launches the desktop app on a seeded export and checks it (--skip-build, --app <packed app>, --require-bundle, --expect-version)" },
     stage: { steps: [{ script: "desktop/stage.ts" }], about: "the release job's installers from desktop/out, with a .sha256 each and the 2 GiB check (--tag, --out, --suffix, --github-output)" },
   },
+  webapp: {
+    build: { steps: [{ script: "webapp/build.ts" }], about: "assets and the web export with Cloudflare's headers, page list and ignore file, in webapp/build/web (--skip-assets, --optional, --skip-export)" },
+  },
   browser: {
     shot: { steps: [catalog, canvaskit, { script: "browser/shot.ts" }], about: "opens routes of the web build in Chromium, writes PNGs to .agent/shots and prints each page's errors ([route...] --fixture <name> | --scene <id> '<layout>' | --moment <id>[/<name>] --tap <testID> --dark --landscape --ids --text --base <url>)" },
     run: { steps: [catalog, canvaskit, { script: "browser/run.ts" }], about: "runs a scratch Playwright script against the web build (<script.ts>, default export (app) => …; scripts/browser/app.ts)" },
