@@ -123,6 +123,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   stageProgress: (c) => ({ text: `the main quest stage (the main quest card, also while a side quest is the current quest) holds at least ${str(c.min)} progress${c.perStartedPlayer === true ? " for each player who started the game" : ""}`, read: ["min", "perStartedPlayer"] }),
   questLeads: () => ({ text: "the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area", read: [] }),
   soleAttacker: () => ({ text: "exactly one character was declared as an attacker in this attack", read: [] }),
+  engagedThisRound: (c) => ({ text: `${c.anySeat === true ? "a player" : "the acting player"} ${c.is === false ? "has not engaged" : "has engaged"} an enemy this round (at any moment of the round)`.replace("a player has not engaged", "no player has engaged"), read: ["is", "anySeat"] }),
   captives: (c) => ({ text: `the number of Captives in play${c.of === "actor" ? " that belong to the acting seat" : ""} is ${range(c.min, c.max)}`, read: ["min", "max", "of"] }),
   matches: (c, ctx) => {
     const subject = typeof c.card === "string" ? cardRefWords(c.card) : "the card";

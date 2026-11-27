@@ -83,6 +83,7 @@ describe("effects render read fields, conditions", () => {
     fortitudeFailed: [{ kind: "fortitudeFailed", scope: "round", who: "any" }],
     hostControlledByActor: [{ kind: "hostControlledByActor" }],
     captives: [{ kind: "captives", min: 1, max: 2, of: "actor" }],
+    engagedThisRound: [{ kind: "engagedThisRound", is: false }, { kind: "engagedThisRound", is: true, anySeat: true }],
     matches: [{ kind: "matches", card: "picked", pick: { type: "enemy", control: "any" }, inPlay: false, inStaging: true }, { kind: "matches", card: "self", inPlay: true }, { kind: "matches", card: "self", inStaging: false }],
     controls: [{ kind: "controls", code: "12345" }, { kind: "controls", code: "12345", who: "anyPlayer" }],
     freeOfEncounters: [{ kind: "freeOfEncounters" }],

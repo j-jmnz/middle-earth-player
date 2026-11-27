@@ -1,0 +1,310 @@
+Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; quest: 17132 Rescue the Prisoners; quest: 17133 Sneak Past the Guards; quest: 17134 Fight Your Way Out; staging: 17119 The Captives of Cirith Gurat; setAside: 17120 Abaan; setAside: 16061 Uruk Chieftain)
+
+## 17119 The Captives of Cirith Gurat
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+17119:A:1 (front): While a character is attached to an encounter card, it is considered to be a guarded objective with a blank text box.
+  17119:constant:1: Constant
+    - each card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
+
+17119:A:2 (front): Forced: When a character is attached to an encounter card, discard each token and attachment on that character.
+  17119:forced:1: Forced on the event attached (heard about card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the card the event is about loses its damage, resource and progress tokens, and each attachment on it is discarded
+
+17119:A:3 (front): Forced: When an objective is free of encounters, it is 'rescued' and that character's owner takes control of it, exhausted.
+  17119:forced:2: Forced after a card leaves play (heard about card (any player controls) or in the staging area or the active location, that is an enemy or a location, that holds a captive (a character or objective attached to it: it is guarding an objective))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - each captive the card the event is about held is rescued: a hero returns among its owner's heroes and an ally to its owner's play area, both exhausted and with no enters-play event, an objective with no owner (Abaan) to the staging area, and a captive whose owner left the game goes to that owner's discard pile; once for all of them the main quest stage hears that characters were rescued
+
+## 17120 Abaan
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+17120:A:1 (front): While Abaan is free of encounters, the first player gains control of Abaan.
+  17120:constant:1: Constant
+    - (constant, does nothing when run) while this objective is free of encounters the first player gains control of it: it stays in the staging area under its guard; once none is attached to it, it enters the first player's play area, controlled by them, and from then on it follows the first player token: it passes to the new first player each time the token moves, while it stays free of encounters
+
+17120:A:2 (front): Response: After Abaan exhausts, choose a Harad character to get +1 Willpower, +1 Attack, and +1 Defense until the end of the round.
+  17120:response:1: Response on the event exhausted (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose Harad character (any player controls)
+    - the picked card: stat willpower 1, until the end of the round
+    - the picked card: stat attack 1, until the end of the round
+    - the picked card: stat defense 1, until the end of the round
+
+17120:A:3 (front): If Abaan leaves play, the players lose the game.
+  17120:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players lose the game
+
+## 17121 Jailer of Cirith Gurat
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17121:A:1 (front): Forced: After Jailer of Cirith Gurat engages you, attach an ally you control to it.
+  17121:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ally (you control)
+    - the picked card is attached to this card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+
+17121:A:2 (shadow): Shadow: If attacking enemy's Threat is greater than defending ally's Willpower, attach defending ally to attacking enemy. Then, cancel this attack.
+  17121:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if all of: (the attacking enemy's current Threat is greater than the defending character's current Willpower (false when the attack has no defending character)) and (the defender is a ally (any player controls)): the defender is attached to the attacking enemy as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+    - then, if all of: (the attacking enemy's current Threat is greater than the defending character's current Willpower (false when the attack has no defending character)) and (the defender is a card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free)) (checked when this step runs, after the steps above; not tied to whether they did anything): the attack in progress is canceled: no shadow effect or damage resolves after this, and the enemy's attack is used up
+
+## 17122 Prison Guard
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17122:A:1 (front): While Prison Guard is guarding an objective, it gets +2 Defense.
+  17122:constant:1: Constant
+    only if this card is a card (any player controls) or in the staging area or the active location, that holds a captive (a character or objective attached to it: it is guarding an objective)
+    - this card: stat defense 2, while this card is in play
+
+17122:A:2 (front): While Prison Guard is not guarding an objective, it gains: "Forced: After Prison Guard attacks and damages an ally, attach that ally to Prison Guard."
+  17122:forced:1: Forced on the event attackDamagedCharacter (heard about this card)
+    only if all of: (this card is a enemy (any player controls) that holds no captive) and (the event's other card is a ally (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the event's other card is attached to this card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+
+## 17123 Dungeon Warg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17123:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+17123:A:2 (front): When Revealed: Dungeon Warg makes an immediate attack against the player who controls the most allies.
+  17123:whenRevealed:1: When revealed
+    - this enemy, in the staging area, makes an immediate attack against the player who controls the most ally (you control): a shadow card is dealt and it does not engage (the first player chooses among players that tie, all players at 0)
+
+17123:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack.
+  17123:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack 1, until the end of the attack
+
+## 17124 Gate of Iron
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17124:A:1 (front): While Gate of Iron is in the staging area, progress cannot be placed on locations in the staging area.
+  17124:constant:1: Constant
+    only if this card is in the staging area
+    - each location (any player controls) in the staging area only: stat noProgressPlaced 1, while this card is in play
+
+17124:A:2 (front): Travel: Discard the top card of the encounter deck. Then, the first player must discard a card from his hand with cost greater than the discarded card's Threat, or raise each player's threat by 3.
+  17124:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no option can be taken
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top card of the encounter deck goes to the encounter discard pile
+    - the first player chooses one of:
+      * option "discard" (only if there is a card (you control) in hand, with a printed cost greater than the printed Threat (0 with none) of the card last discarded from the encounter deck to choose):
+        - choose card (you control) in hand, with a printed cost greater than the printed Threat (0 with none) of the card last discarded from the encounter deck
+        - discard the picked card
+      * option "threat":
+        - raise threat by 3 (each player)
+
+## 17125 Dungeon Cell
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+17125:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+17125:A:2 (front): Dungeon Cell gets +X Threat where X is the printed Willpower of the attached objective.
+  17125:constant:1: Constant
+    - this card: stat threat the printed Willpower of the captive this card holds (0 when it holds none), while this card is in play
+
+17125:A:3 (front): While Dungeon Cell is in the staging area, it gains: "Forced: After an ally is destroyed, attach it to Dungeon Cell if there is no objective attached to Dungeon Cell."
+  17125:forced:1: Forced on the event characterDestroyed (heard about card (any player controls) or in the staging area or the active location, of card type ally)
+    only if all of: (this card is in the staging area) and (this card is a location (any player controls) that holds no captive)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the card the event is about is attached to this card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+
+## 17126 Uruk Guardroom
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17126:A:1 (front): While Uruk Guardroom is in the staging area, increase the cost to play each ally by 1.
+  17126:constant:1: Constant
+    only if this card is in the staging area
+    - while this card is in play, each card a player plays (from any zone) that is a card (any player controls) or in the staging area or the active location, of card type ally costs 1 more (every player's; several such cards stack)
+
+17126:A:2 (front): Travel: Shuffle the encounter discard pile into the encounter deck and discard cards until an Orc enemy is discarded. Add that enemy to the staging area.
+  17126:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - cards are discarded from the top of the encounter deck until an enemy with the trait Orc is discarded, or the deck is empty; that card becomes the picked card
+    - then, if the picked card is a Orc enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+
+## 17127 Mines of Cirith Gurat
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17127:A:1 (front): While Mines of Cirith Gurat is in the staging area, it gains: "Forced: When a player card would reduce a player's threat by any amount, reduce that amount to 1."
+  17127:constant:1: Constant
+    only if this card is in the staging area
+    - each player: stat threatReductionToOne 1, while this card is in play
+
+17127:A:2 (front): Travel: Each player discards the top 3 cards of his deck and raises his threat by 1 for each ally he discards this way.
+  17127:travel:1: Travel
+    - for each player, first player first:
+      - the top 3 card(s) of the acting player's deck go to their discard pile; X becomes how many of them are a ally (any player controls) among the cards this effect looked at or discarded
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by X (the acting player)
+
+## 17128 Torture Room
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17128:A:1 (front): When Revealed: The first player discards cards from the top of his deck until he discards an ally. Attach that ally to Torture Room and discard each other copy of that ally from play.
+  17128:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the rest of the effect is carried out by the first player
+    - the acting player discards cards from the top of their deck until an ally is discarded; it is the last picked card (nothing is picked when the deck holds none)
+    - the picked card is attached to this card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it; each other card in play with its title is discarded (nothing with no such card or no host)
+
+17128:A:2 (front): While Torture Room is guarding an objective, it gains: "Forced: At the end of the round, raise each player's threat by 1."
+  17128:forced:1: Forced at the end of the round
+    only if this card is a card (any player controls) or in the staging area or the active location, that holds a captive (a character or objective attached to it: it is guarding an objective)
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - raise threat by 1 (each player)
+
+## 17129 Taken Prisoner
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17129:A:1 (front): When Revealed: The first player attaches an ally he controls to an unattached enemy or location in the staging area. If he cannot, Taken Prisoner gains doomed 2.
+  17129:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the rest of the effect is carried out by the first player
+    - then, if any of: (the number of ally (you control) is less than 1) or (the number of card (any player controls) in the staging area only, that is an enemy or a location, with nothing attached to it, no attachment of any kind and no captive is less than 1) (checked when this step runs, after the steps above; not tied to whether they did anything): each player raises their threat by 2 from the doomed keyword this card gains (doomedRaised is announced for each)
+    - choose ally (you control)
+    - choose card (any player controls) in the staging area only, that is an enemy or a location, with nothing attached to it, no attachment of any kind and no captive
+    - the card picked before is attached to the picked card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+
+17129:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys an ally, reveal the top card of the encounter deck.
+  17129:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the event's other card is a card (any player controls) or in the staging area or the active location, of card type ally that is out of play now): the acting player reveals an encounter card
+
+## 17130 Tormented by Orcs
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17130:A:1 (front): When Revealed: Each player raises his threat by 1 for each guarded objective he owns. If any player does not own a guarded objective, Tormented by Orcs gains surge.
+  17130:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - raise threat by the number of card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free), that the acting player owns (the acting player)
+      - then, if the number of Captives in play that belong to the acting seat is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+17130:A:2 (shadow): Shadow: Until the end of the phase, attacking enemy gets +1 Defense (+2 Defense instead if it is guarding an objective).
+  17130:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attacking enemy is a card (any player controls) or in the staging area or the active location, that holds a captive (a character or objective attached to it: it is guarding an objective)): the attacking enemy: stat defense 1, until the end of the phase
+    - then, if the attacking enemy is a card (any player controls) or in the staging area or the active location, that holds a captive (a character or objective attached to it: it is guarding an objective) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat defense 2, until the end of the phase
+
+## 17131 Captured!
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17131:A:1 (front): When Revealed: Each player loses control of an ally he controls and attaches it to this stage. If no allies are attached to this stage, discard it and reveal an additional encounter card.
+  17131:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - choose ally (you control)
+      - the picked card is attached to this card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+    - then, if not (there is a card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free), that this card holds to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): discard this card
+    - then, if not (there is a card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free), that this card holds to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player reveals an encounter card
+
+17131:A:2 (front): Forced: When this stage is defeated, each player reduces his threat by X, where X is the cost of the ally he controls that was attached to this stage.
+  17131:forced:1: Forced after a side quest is defeated (its progress reached its quest points) (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - lower threat by the printed cost of the captive this card holds that the acting player owns (0 when it holds none) (the acting player)
+    - each captive this card holds is rescued: a hero returns among its owner's heroes and an ally to its owner's play area, both exhausted and with no enters-play event, an objective with no owner (Abaan) to the staging area, and a captive whose owner left the game goes to that owner's discard pile; once for all of them the main quest stage hears that characters were rescued
+
+## 17132 Rescue the Prisoners
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17132:A:1 (front): Setup: Set Uruk Chieftain aside, out of play. Add The Captives of Cirith Gurat and 1 copy of Dungeon Cell to the staging area. Attach Abaan to Dungeon Cell. Each player searches the encounter deck for a different Orc enemy and adds it to the staging area. Shuffle the encounter deck. Starting with the first player, each player discards cards from the top of his deck until an ally that is not in play is discarded and attaches that ally to an unattached enemy in the staging area.
+  17132:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls) in the staging area only, named "Dungeon Cell"
+    - the set-aside card with code 17120 is attached to the picked card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+    - for each player, first player first:
+      - the acting player finds one Orc enemy in the encounter deck and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - the acting player discards cards from the top of their deck until an ally that is not in play (an ally whose title a unique ally in play holds is skipped) is discarded; it is the last picked card (nothing is picked when the deck holds none)
+      - choose enemy (any player controls) in the staging area only, with nothing attached to it, no attachment of any kind and no captive
+      - the card picked before is attached to the picked card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+
+17132:B:1 (back): Each enemy and location in the staging area that is guarding an objective is immune to player card effects.
+  17132:constant:1: Constant
+    - each card (any player controls) in the staging area only, that holds a captive (a character or objective attached to it: it is guarding an objective): stat immuneToPlayerCards 1, while this card is in play
+
+17132:B:2 (back): Forced: After any number of characters are rescued, reveal an encounter card.
+  17132:forced:1: Forced after any number of captives are rescued (once for everything one effect rescued; heard by the main quest stage) (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the acting player reveals an encounter card
+
+17132:B:3 (back): This stage cannot be defeated while a guarded objective is in play.
+  17132:constant:2: Constant
+    only if there is a card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free) to choose
+    - the players cannot defeat this stage while this holds
+
+## 17133 Sneak Past the Guards
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17133:A:1 (front): When Revealed: Shuffle the encounter discard pile into the encounter deck. Each player discards cards from the encounter deck until an enemy is discarded and adds that enemy to the staging area.
+  17133:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - discard from the top of the encounter deck until 1 enemy for each player is discarded; add those enemies to the staging area
+
+17133:B:1 (back): Each enemy in the staging area cannot take damage and gets +X engagement cost, where X is the number of progress tokens here.
+  17133:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) in the staging area only: stat cannotTakeDamage 1, while this card is in play
+    - each enemy (any player controls) in the staging area only: stat engagementCost progress of this card, while this card is in play
+
+17133:B:2 (back): Forced: At the end of the round, reveal an encounter card. Then, place 1 resource here if no enemies were engaged this round.
+  17133:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player reveals an encounter card
+    - then, if no player has engaged an enemy this round (at any moment of the round) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on this card
+
+17133:B:3 (back): The players cannot defeat this stage unless there are at least 2 resources here.
+  17133:constant:2: Constant
+    only if resources of this card is less than 2
+    - the players cannot defeat this stage while this holds
+
+## 17134 Fight Your Way Out
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17134:A:1 (front): When Revealed: The first player adds Uruk Chieftain to the staging area. Each player chooses a hero he controls, discards all tokens and attachments from it, and attaches it to an unattached enemy in the staging area as a captive. Then, the players make a standard series of engagement checks against each enemy in the staging area. Reduce the engagement cost of each enemy not guarding an objective to 0 during these engagement checks.
+  17134:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one set-aside card with code 16061 joins the staging area (it is not revealed)
+    - for each player, first player first:
+      - choose hero (you control)
+      - choose enemy (any player controls) in the staging area only, with nothing attached to it, no attachment of any kind and no captive
+      - the card picked before is attached to the picked card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+    - the table: stat engagementCostZeroUnguarded (each enemy that holds no captive has engagement cost 0 until the end of the phase) 1, until the end of the phase
+    - the players make engagement checks against each enemy in the staging area, outside the encounter phase: in player order each engages the enemy of the highest engagement cost at or below their threat, pass after pass until a pass engages none
+
+17134:B:1 (back): Forced: At the beginning of the quest phase, discard cards from the encounter deck until an enemy is discarded and add that enemy to the staging area.
+  17134:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty (a deck that runs out has the encounter discard pile shuffled into it first, when it holds one); that card becomes the picked card
+    - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+
+17134:B:2 (back): The players cannot defeat this stage while a guarded objective is in play. If the players defeat this stage, they win the game.
+  17134:constant:1: Constant
+    only if there is a card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free) to choose
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
+    - the players cannot defeat this stage while this holds
+
+(rendered pieces: 217 by template, 0 as JSON)

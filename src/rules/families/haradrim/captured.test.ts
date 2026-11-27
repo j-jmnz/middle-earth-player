@@ -5,7 +5,6 @@ import { describe, expect, it } from "vitest";
 import type { EngineStep } from "../../core/intents.ts";
 import { destroyCard } from "../../core/destroy.ts";
 import { flagged } from "../../core/state.ts";
-import { moveCard } from "../../core/zones.ts";
 import { idOf, opened, resolveRecords, run as runInstruction, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { settle } from "../../engine/machine.ts";
 import { matchesPick, pickCandidates } from "../../interpret/pick.ts";
@@ -87,7 +86,7 @@ describe("17119:A:2 and 17119:A:3 the Captives: strip on attach, rescue when the
     expect(captivesOf(taken)).toEqual([]);
     const archer = idOf(made.state, ARCHER);
     const state = opened(made, { ...made.state, cards: { ...made.state.cards, [archer]: { ...made.state.cards[archer]!, zone: "captive", host: idOf(made.state, JAILER), captive: true, owner: 1, controller: null } } }).state;
-    const eliminated = { ...state, seats: state.seats.map((seat, index) => (index === 1 ? { ...seat, eliminated: true } : seat)) };
+    const eliminated = { ...state, seats: [state.seats[0]!, { ...state.seats[1]!, eliminated: true }] as typeof state.seats };
     const freed = settle(destroyCard(eliminated, idOf(eliminated, JAILER), made.ctx.cards, none), made.ctx, none);
     expect(freed.seats[1]?.discard).toContain(archer);
   });
