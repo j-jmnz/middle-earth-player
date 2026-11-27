@@ -135,7 +135,7 @@ export function ReaderTable({ store, width, height, bottomInset, nameOf, inactiv
   useReaderGateEnd(store);
   // A reading panel over the table is modal on iOS; Android hides the table from TalkBack while it is open (reader-panel.ts).
   const panelOpen = useReaderPanelOpen();
-  // The outcome banner lies over the table's top; while it is up the rows start under it, so a focused row is never covered (banner-height.ts).
+  // The outcome banner lies over the table's top, 4 pt under the top bar; while it is up the rows start under it, so a focused row is never covered (banner-height.ts).
   const banner = useBannerHeight();
   const seat = useStore(store, (state) => shownSeat(state.game, state.viewedSeat));
   const game = useStore(store, (state) => state.game);
@@ -154,7 +154,7 @@ export function ReaderTable({ store, width, height, bottomInset, nameOf, inactiv
   const rows = readerRows(game, seat, { facts, cards: readerSeed.cards, nameOf, playable: highlight.tappable, discover, lookWord, deckFaceUp });
   const deps: CardSpeechDeps = { nameOf, inactive, facts, info, highlight, cards: readerSeed.cards, sheet: readerSeed.sheet, peeking };
   return (
-    <ScrollView testID="reader-table" importantForAccessibility={tableVisibility(Platform.OS, panelOpen)} style={{ width, height }} contentContainerStyle={{ padding: 12 * s, paddingTop: 12 * s + banner, paddingBottom: 12 * s + bottomInset }}>
+    <ScrollView testID="reader-table" importantForAccessibility={tableVisibility(Platform.OS, panelOpen)} style={{ width, height }} contentContainerStyle={{ padding: 12 * s, paddingTop: 12 * s + (banner > 0 ? banner + 4 * s : 0), paddingBottom: 12 * s + bottomInset }}>
       {rows.map((section) => (
         <View key={section.key} className="mb-3 gap-1">
           {section.heading ? (

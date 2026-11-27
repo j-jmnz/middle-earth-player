@@ -440,14 +440,14 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
       {/* The combat spotlight: a full-screen canvas over the table, the bar and the dock, mounted only while it plays and deaf to touches
           (the table canvas and the scrim in TableLayers catch the skip). The banner, the preview and the menu stay above it. */}
       <PicturedSpotlight handoff={handoff} picture={pictureOf} nameOf={nameOf} sphereOf={sphereOf} />
-      {/* Over the top bar, the table and any open panel, centered on the screen at its top edge (user request, 2026-10-29), and
-          narrowed so it never covers the command column's tray (banner-span.ts). While the table peeks it hangs under the peek pill, so
+      {/* Over the table and any open panel, centered on the screen and hung 4 pt under the top bar, so the phase rail stays in view while it shows,
+          and narrowed so it never covers the command column's tray (banner-span.ts). While the table peeks it hangs under the peek pill, so
           Back to Player 1 stays in reach. */}
       {choice.banner ? (
         <MomentBanner
           key={choice.bannerKey}
           moment={choice.banner}
-          top={peek.words ? barTop + (TOP_BAR + PEEK_ROOM) * s : insets.top + 4 * s}
+          top={barTop + (peek.words ? TOP_BAR + PEEK_ROOM : TOP_BAR + 4) * s}
           leftClear={insets.left}
           rightClear={insets.right + commandWidth}
           onBeat={choice.onBeat}
