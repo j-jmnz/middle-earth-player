@@ -140,3 +140,16 @@ export function heldPrintedAmount(state: ScenarioState, found: { stat: "willpowe
 export function seatsWithoutCaptives(state: ScenarioState): number {
   return livingSeats(state).filter((seat) => !captivesOf(state).some((card) => card.owner === seat)).length;
 }
+
+// Abaan (17120:A:3, "If Abaan leaves play, the players lose the game"): the loss says the event and the cause as the Mûmak's does, "Abaan was destroyed. If Abaan leaves play, the players lose", or "left play" when he went any other way.
+const ABAAN = "17120";
+/** The loss reason of a game lost because Abaan left play, said in full; any other state as it was. */
+export function nameAbaanLoss(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+  if (!state.lost || state.lossReason == null) return state;
+  const abaan = Object.values(state.cards).find((card) => card.code === ABAAN);
+  if (!abaan) return state;
+  const name = printedOf(ctx.cards, ABAAN).name;
+  if (state.lossReason !== `${name} left play`) return state;
+  const destroyed = abaan.zone === "discard" || abaan.zone === "encounterDiscard";
+  return { ...state, lossReason: `${name} ${destroyed ? "was destroyed" : "left play"}. If ${name} leaves play, the players lose` };
+}

@@ -7,8 +7,11 @@ import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 import { reanimatedHeroes } from "../rules/families/angmar/reanimate/standing.ts";
 
-import { allHeroesDestroyed, lossWithCauses } from "../rules/core/elimination-words.ts";
+import { allHeroesDestroyed, lossText, lossWithCauses } from "../rules/core/elimination-words.ts";
 import { scoreParts, scoreTotal } from "./score.ts";
+
+// The screens say a loss reason through this (src/screens imports no rules module).
+export { lossText };
 
 export type ReportHero = { name: string; words: string; destroyed: boolean };
 export type ReportSeat = { label: string; threat: string; heroes: readonly ReportHero[] };

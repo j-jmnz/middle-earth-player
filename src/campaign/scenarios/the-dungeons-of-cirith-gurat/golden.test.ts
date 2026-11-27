@@ -52,7 +52,7 @@ describe("The Dungeons of Cirith Gurat golden", () => {
     },
     lost(state, golden) {
       const seats = state.seats.slice(0, golden.seatCount);
-      if (golden.lossReason === "Abaan left play") {
+      if (golden.lossReason?.startsWith("Abaan ")) {
         // Abaan left play: his player is still in the game, and the players lose at once.
         expect(cardsOf(state, ABAAN).every((card) => !["staging", "engaged", "play", "captive"].includes(card.zone)), golden.name).toBe(true);
         return;

@@ -22,7 +22,7 @@ import { revealRandomSetAside } from "./random-aside.ts";
 import { haradrimPickMatches } from "./pick.ts";
 import { allyBelowThreat, threatAboveWillpower, willpowerGap } from "./combat.ts";
 import { attackSeatWithMost, engageSeatWithMost } from "./engage.ts";
-import { attachCaptive, discardUntilAlly, heldPrintedAmount, rescueCaptured, seatsWithoutCaptives, stripCaptive } from "./captured.ts";
+import { attachCaptive, discardUntilAlly, heldPrintedAmount, nameAbaanLoss, rescueCaptured, seatsWithoutCaptives, stripCaptive } from "./captured.ts";
 import { announceOverLimit } from "./hand.ts";
 import { runHeat, temperatureAmount, temperatureCondition } from "./heat.ts";
 import { guardStagedHeroes, markStagedHeroes, moveHeroesToStaging, releaseStagedHero, takeObjectiveHero, undefendedStaged } from "./staged.ts";
@@ -120,7 +120,7 @@ export const manifest: RulesFamily = {
   },
   // The hook runs after the encounter deck is refilled: it notes the main quest card and announces a hand over the limit.
   settle: {
-    after: (state, ctx, steps) => announceOverLimit(noteStage(syncOrcsArea(state), gameReads(state, ctx, '"kind":"stageInPlayWholeRound"')), steps),
+    after: (state, ctx, steps) => nameAbaanLoss(announceOverLimit(noteStage(syncOrcsArea(state), gameReads(state, ctx, '"kind":"stageInPlayWholeRound"')), steps), ctx),
     sweep: (state, ctx) => markStagedHeroes(state, ctx),
   },
 };

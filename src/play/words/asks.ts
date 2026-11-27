@@ -23,6 +23,7 @@ import type { ChoiceNames, PickWords } from "./choice.ts";
 import { matchOf, repeatTimesOf, walk, type PathMatch } from "./record-path.ts";
 import { holdsProwl, prowlForced, prowlLeft } from "./group-steps.ts";
 import { askedSeat, seatSays } from "./seat.ts";
+import { discardValues, pickedValues } from "./asks-held.ts";
 
 /**
  * Words that change with the table: a template, or variants where the first whose `when` holds is said (one without `when` always holds, so it ends the list). A stage-two sentence says "in play" where stage one says
@@ -65,12 +66,14 @@ export type Ask = {
   xRows?: { label: Text; less?: { name: string; of: Amount; min: number; unit: string } };
   named?: Readonly<Record<string, { pick: PickSpec; otherwise: string }>>;
   caution?: { when: Condition; text: Text };
+  /** The stats each row of a Pick shows beside its name: an enemy's Threat and engagement cost, where the choice turns on them. */
+  rowStats?: readonly ("threat" | "engagementCost")[];
 };
 
 export type AsksTable = Readonly<Record<string, Ask>>;
 
 /** What a Pick's entry says: the words the chain returns, with the rows that are no card and the warning of each row an entry can add. */
-export type AskedWords = PickWords & { labels?: Readonly<Record<string, string>>; cautions?: Readonly<Record<string, string>>; bare?: true };
+export type AskedWords = PickWords & { labels?: Readonly<Record<string, string>>; cautions?: Readonly<Record<string, string>>; bare?: true; rowStats?: readonly ("threat" | "engagementCost")[] };
 
 /** Where the instruction stands: the record (its id), the path in it, and the table of the scenario that worded it. Worked out once for a sheet (askAt) and handed to every row's lookup. */
 export type AskAt = { id: string; path: string; table: AsksTable };
@@ -111,7 +114,7 @@ export function templatesOf(entry: Ask): string[] {
 
 /** The placeholders of an entry that no value answers: none of `card`, `owner`, `picked`, `host`, `subject`, `ringBearer`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` and `named` names. */
 export function unknownPlaceholders(entry: Ask, withN = true): string[] {
-  const known = new Set(["card", "owner", "x", "picked", "host", "subject", "ringBearer", "hero", "pair", "left", "ready", "forced", "dealt", "pursuitLimit", ...(entry.countdown != null ? ["countdown"] : []), ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...(entry.xRows?.less ? [entry.xRows.less.name] : []), ...Object.keys(entry.named ?? {}), ...Object.keys(entry.named ?? {}).map((name) => `${name}Cost`)]);
+  const known = new Set(["card", "owner", "x", "picked", "whose", "pickedCost", "discarded", "threat", "eliminated", "host", "subject", "ringBearer", "hero", "pair", "left", "ready", "forced", "dealt", "pursuitLimit", ...(entry.countdown != null ? ["countdown"] : []), ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...(entry.xRows?.less ? [entry.xRows.less.name] : []), ...Object.keys(entry.named ?? {}), ...Object.keys(entry.named ?? {}).map((name) => `${name}Cost`)]);
   return [...new Set(templatesOf(entry).flatMap(placeholdersOf))].filter((name) => !known.has(name));
 }
 
@@ -165,7 +168,7 @@ function askAtBy(a: AskFacts, table: AsksTable | undefined, find: (instructions:
 export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: ReturnType<typeof frameScope> } {
   const seat = askedSeat(a.game);
   const scope = frameScope(a.game, seat, a.source);
-  const values: Values = { card: a.source ? a.names.card(a.source) : "This card", owner: `Player ${seat + 1}`, picked: "The picked card", n: a.amountNow, pursuitLimit: a.game.widgets.pursuitTracker };
+  const values: Values = { card: a.source ? a.names.card(a.source) : "This card", owner: `Player ${seat + 1}`, picked: "The picked card", whose: "the player's", pickedCost: 0, n: a.amountNow, pursuitLimit: a.game.widgets.pursuitTracker };
   // The card the record's card lies on ("Exhaust Frodo Baggins, who carries A Heavy Burden") and the Ring-bearer, named only where an entry says them.
   const hostId = hostOf(a.game, a.source);
   // An AssignDamage not yet split into steps holds all of its amount.
@@ -204,7 +207,7 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
   values.host = hostId ? a.names.card(hostId) : "Its host";
   // The card an Each or an earlier Pick of the record chose, for the question it opens ("Fanuidhol: spend 1 resource from {picked}'s pool", 04016:A:1).
   const chosen = scope.picked?.findLast((id) => a.game.cards[id] != null);
-  if (chosen) values.picked = a.names.card(chosen);
+  if (chosen) Object.assign(values, { picked: a.names.card(chosen), ...pickedValues(a.game, a.ctx, chosen, seat) });
   // The card that triggered the record (Barren Moorland's ally), named only where an entry says it.
   if (templatesOf(entry).some((template) => placeholdersOf(template).includes("subject"))) values.subject = scope.subject ? a.names.card(scope.subject) : "that card";
   if (templatesOf(entry).some((template) => placeholdersOf(template).includes("ringBearer"))) {
@@ -219,6 +222,9 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
   // The Embassy's pair being decided ("Player 1's Gandalf with Hill-troll"), named only where an entry says it (146072:B:1).
   if (templatesOf(entry).some((template) => placeholdersOf(template).includes("pair"))) values.pair = embassyPairNow(a.game, (id) => a.names.card(id)) ?? "this pair";
   for (const [name, amount] of Object.entries(entry.bind ?? {})) values[name] = resolveAmount(a.game, amount, scope, a.ctx);
+  // The card just discarded and the players a raise would eliminate, named only where an entry says them (17124:A:2).
+  const wanted = (name: string) => templatesOf(entry).some((template) => placeholdersOf(template).includes(name));
+  Object.assign(values, discardValues(a.game, a.ctx, a.names, wanted, Number(values.raise ?? 0)));
   for (const [name, named] of Object.entries(entry.named ?? {})) {
     const only = pickCandidates(a.game, named.pick, scope.actor, [], scope.sourceId, a.ctx, undefined, undefined, true);
     values[name] = only.length === 1 && only[0] !== undefined ? a.names.card(only[0]) : named.otherwise;
@@ -243,7 +249,7 @@ const scopeOf = (a: AskFacts, hit: Hit, picked?: string) => ({ actor: hit.scope.
 function said(a: AskFacts, hit: Hit, text: Text, picked?: string, more?: Values): string | null {
   const scope = scopeOf(a, hit, picked);
   const chosen = typeof text === "string" ? text : text.find((variant) => variant.when === undefined || holds(a.game, variant.when, scope, a.ctx))?.text;
-  return chosen === undefined ? null : fill(chosen, { ...hit.values, ...(picked ? { picked: a.names.card(picked) } : {}), ...more });
+  return chosen === undefined ? null : fill(chosen, { ...hit.values, ...(picked ? { picked: a.names.card(picked), ...pickedValues(a.game, a.ctx, picked, hit.scope.actor) } : {}), ...more });
 }
 
 // The warning of one row: its text when the entry's condition holds with that row picked.
@@ -287,7 +293,7 @@ export function asksPick(a: AskFacts, table?: AsksTable): AskedWords | undefined
   }
   const owned = hit.entry.owned === true && a.game.seatCount > 1;
   const title = hit.entry.title == null ? null : said(a, hit, hit.entry.title);
-  return { verb: hit.entry.verb ?? "Choose", prompt, ...(title != null ? { title } : {}), ...(owned ? { owned: true as const } : {}), ...(hit.entry.bare === true ? { bare: true as const } : {}), ...(Object.keys(labels).length > 0 ? { labels } : {}), ...(Object.keys(cautions).length > 0 ? { cautions } : {}) };
+  return { verb: hit.entry.verb ?? "Choose", prompt, ...(title != null ? { title } : {}), ...(owned ? { owned: true as const } : {}), ...(hit.entry.bare === true ? { bare: true as const } : {}), ...(Object.keys(labels).length > 0 ? { labels } : {}), ...(Object.keys(cautions).length > 0 ? { cautions } : {}), ...(hit.entry.rowStats ? { rowStats: hit.entry.rowStats } : {}) };
 }
 
 /** The sentence over a Choose from its entry (the one keyed "Choose"), or undefined. `owned` says it leads with the player. */

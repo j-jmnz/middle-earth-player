@@ -301,6 +301,14 @@ describe("the captives and the cards that take them", () => {
     expect(steps).toContainEqual({ kind: "captive", event: "free", cardId: idOf(freed, "17120"), hostId: cell, seat: 0 });
   });
 
+  it("17120:A:3 the loss when Abaan is destroyed says the event and the cause", () => {
+    const made = table({ staging: [CAPTIVES, CELL], play: ["17120"] });
+    const abaan = idOf(made.state, "17120");
+    const lost = settle(destroyCard(opened(made).state, abaan, made.ctx.cards, none), made.ctx, none);
+    expect(lost.lost).toBe(true);
+    expect(lost.lossReason).toBe("Abaan was destroyed. If Abaan leaves play, the players lose");
+  });
+
   lineSpec("17123:A:2", "When Revealed: it makes an immediate attack against the player who controls the most allies", (effects) => {
     const made = table({ seats: 2, play: [{ code: ARCHER, seat: 1 }], staging: ["17123"] }, effects);
     const state = resolveRecords(opened(made).state, made.ctx, "17123", "whenRevealed", idOf(made.state, "17123"), pickFirst).state;

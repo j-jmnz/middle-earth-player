@@ -29,10 +29,10 @@
 "decks":"strong",
 "outcome":"lost",
 "policy":{"abaanDefends":true},
-"lossReason":"Abaan left play",
+"lossReason":"Abaan was destroyed. If Abaan leaves play, the players lose",
 "intents":[{"type":"Choose","optionId":"i6"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i46","i47"]},{"type":"Pass"},{"type":"Travel","locationId":"i82"},{"type":"Engage","enemyId":"i6"},{"type":"Undefended","heroId":"i46"},{"type":"DeclareAttackers","enemyId":"i6","attackerIds":["i48"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i46","i47","i49"]},{"type":"Pass"},{"type":"Travel","locationId":"i21"},{"type":"Engage","enemyId":"i5"},{"type":"Choose","optionId":"i49"},{"type":"DeclareDefender","defenderId":"i79"},{"type":"Pass"}],
 "checks":[1554020910,2364570633,2964350196,439284486,4011753171,4167158371,3623751123,3384026382,3337334435,1749936486,2314216189,99290882,1158044203,927452486,1405207178,2653420746,2976810222,3173532784,2423343198],
-"end":{"round":2,"lost":true,"cleared":false,"lossReason":"Abaan left play","hash":"12457a29624d9b0e4e8a0189"}
+"end":{"round":2,"lost":true,"cleared":false,"lossReason":"Abaan was destroyed. If Abaan leaves play, the players lose","hash":"47c23fecebf2753e99e0d53f"}
 },
 {
 "name":"true solo, lost, threat reaches 50 while the only hero left is held",

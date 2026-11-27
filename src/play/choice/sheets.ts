@@ -55,7 +55,7 @@ import { sailingSheet, shipRow } from "./sea-sheets.ts";
 import { asksCollection, collectionLabel, collectionOrder } from "./collection-sheets.ts";
 import { answeredCard, hideCommitNote, hideNumbers, lookNote, optionalEngageNote, responseNote } from "./sheet-notes.ts";
 import { orcsLabel } from "./orcs-label.ts";
-import { captiveLabel, cardLabel, copyLabel, has, option, seatedLabel, stagedAllyLabel, statOf, step, tiedLabel } from "./sheet-parts.ts";
+import { captiveLabel, cardLabel, copyLabel, has, option, rowStats, seatedLabel, stagedAllyLabel, statOf, step, tiedLabel } from "./sheet-parts.ts";
 import { sackStat } from "./sack-rows.ts";
 import { nightActionNote } from "../words/scenarios/night.ts";
 import { framsburgActionCaution, framsburgActionNote } from "../words/scenarios/framsburg.ts";
@@ -345,7 +345,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           // Gollum's pick of the card whose Sauron's Eye icons are not counted: each row shows the icons it adds.
           const eyes = data?.queue[0]?.instruction.verb === "IgnoreFortitudeEyes" ? [eyesStat(game, ctx, id)] : [];
           // A Sack card's tie: the number the characters tie on (131044:A:1 to 131050:A:1).
-          const tied = wait?.kind === "target" ? sackStat(wait.item.instruction, id, game, ctx) : [];
+          const tied = [...(wait?.kind === "target" ? sackStat(wait.item.instruction, id, game, ctx) : []), ...rowStats(game, ctx, id, asked.rowStats)];
           // An option of a sea verb that is no card: trade or keep the damage, the deck to discard from, the title named.
           const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? wilderlandOptionLabel(wait.item.instruction, id, words) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words, ctx.cards) ?? gundabadOptionLabel(wait.item.instruction, id, game, ctx, words) ?? (isBoonCode(wait.item.instruction, id) ? words.code(id) : null) ?? armiesOptionLabel(wait.item.instruction, id, game, ctx, words)) : null;
           // Copies of one card in different zones are told apart by where each one is.

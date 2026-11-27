@@ -1,7 +1,7 @@
 // The pieces the table's layout places cards with (layout.ts, play-area.ts): a card's slot, its footprint in a row, a row's left
 // edges, and the cards peeking out under a host. Pure.
 import { isReanimatedCode } from "../../rules/core/printed.ts";
-import { isExhausted, type CardInstance } from "../../rules/core/state.ts";
+import { heldStrip, isExhausted, type CardInstance } from "../../rules/core/state.ts";
 
 import type { CardSlot, Rect, SlotKind, SlotZone } from "./layout.ts";
 import type { ZoneEntry, ZoneId } from "../store/selectors.ts";
@@ -74,19 +74,30 @@ export function slotUnder(entry: ZoneEntry, card: CardInstance, zone: SlotZone, 
   return entry.stacked?.includes(card.id) ? { ...slot, code: "", opens: entry.card.id } : slot;
 }
 
-// Attachments and face-down shadow cards peek out from under the host, the most recent lowest.
+// How many peeks a card under its host shows: an attachment one, a held character (a hero, an ally or Abaan an encounter card holds) a taller strip that reads its name and owner.
+export const HELD_STRIP = 2.6;
+const peeksOf = (card: CardInstance): number => (heldStrip(card) ? HELD_STRIP : 1);
+
+// Attachments and face-down shadow cards peek out from under the host, the most recent lowest; each shows its own strip, so a held character's is taller.
 export function placeUnder(entry: ZoneEntry, zone: ZoneId, rect: Rect, out: CardSlot[], faceUpShadows: CardInstance[], peek: number): void {
   const under = entry.attached.filter((attached) => !(attached.zone === "shadow" && attached.face !== "down"));
   under.forEach((attached, at) => {
     const kind: SlotKind = attached.zone === "shadow" ? "shadow" : "attachment";
-    out.push(slotUnder(entry, attached, zone, kind, { x: rect.x, y: rect.y + (under.length - at) * peek, w: rect.w, h: rect.h }));
+    const depth = under.slice(at).reduce((sum, card) => sum + peeksOf(card), 0);
+    const slot = slotUnder(entry, attached, zone, kind, { x: rect.x, y: rect.y + depth * peek, w: rect.w, h: rect.h });
+    out.push(heldStrip(attached) ? { ...slot, strip: HELD_STRIP } : slot);
   });
   faceUpShadows.push(...entry.attached.filter((attached) => attached.zone === "shadow" && attached.face !== "down"));
 }
 
-// The most cards peeking out under one card of these entries: attachments and face-down shadow cards.
+// The deepest stack of peeks under one card of these entries, in peeks: attachments and face-down shadow cards one each, a held character 2.6.
 export function deepestUnder(entries: readonly ZoneEntry[]): number {
-  return Math.max(0, ...entries.map((entry) => entry.attached.filter((attached) => !(attached.zone === "shadow" && attached.face !== "down")).length));
+  return Math.max(0, ...entries.map((entry) => entry.attached.filter((attached) => !(attached.zone === "shadow" && attached.face !== "down")).reduce((sum, attached) => sum + peeksOf(attached), 0)));
+}
+
+// The deepest stack of these entries when a held character is among them, else 0: the staging row keeps this much room under it (layout.ts) only for such a row, so no other table moves.
+export function heldDepth(entries: readonly ZoneEntry[]): number {
+  return entries.some((entry) => entry.attached.some(heldStrip)) ? deepestUnder(entries) : 0;
 }
 
 // One peek under a card of the left column (the quest stage, an active location) that holds cards, with the count when there are several: the last put is the one that shows. `landscape` is a sideways card's (the quest stage).
@@ -94,8 +105,9 @@ export function placeCounted(entry: ZoneEntry, zone: ZoneId, rect: Rect, out: Ca
   const under = entry.attached.filter((card) => !(card.zone === "shadow" && card.face !== "down"));
   const last = under[under.length - 1];
   if (!last) return;
-  const slot = slotUnder(entry, last, zone, last.zone === "shadow" ? "shadow" : "attachment", { x: rect.x, y: rect.y + peek, w: rect.w, h: rect.h }, landscape);
-  out.push(under.length > 1 ? { ...slot, stack: under.length } : slot);
+  const slot = slotUnder(entry, last, zone, last.zone === "shadow" ? "shadow" : "attachment", { x: rect.x, y: rect.y + peeksOf(last) * peek, w: rect.w, h: rect.h }, landscape);
+  const shown = heldStrip(last) ? { ...slot, strip: HELD_STRIP } : slot;
+  out.push(under.length > 1 ? { ...shown, stack: under.length } : shown);
 }
 
 // One peek under a staging card that holds more than one card, with the count: a grappled arm, Black Key on the Raider Flagship (the last put is the one that shows).

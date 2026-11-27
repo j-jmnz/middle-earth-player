@@ -166,6 +166,11 @@ describe("the rail's words", () => {
     expect(railFor(await parked("Setup", "afterOpening", 0))).toMatchObject({ phase: "", round: 0, previousPhase: "", nextPhase: "Resource" });
     expect(phaseIndex(await parked("Setup", "afterOpening", 0))).toBe(-1);
   });
+
+  it("says \"Setup\" for the Setup's own choices in round 0, which the engine opens at its beginning-of-round step, and \"Beginning of round\" from round 1", async () => {
+    expect(railFor(await parked("Beginning of round", "beginRound", 0))).toMatchObject({ phase: "", current: "Setup", next: "Resources", round: 0 });
+    expect(railFor(await parked("Beginning of round", "beginRound", 1))).toMatchObject({ phase: "Beginning", current: "Beginning of round" });
+  });
 });
 
 describe("the carousel with an additional instance running", () => {

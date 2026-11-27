@@ -79,7 +79,7 @@ export type GuratGolden = { name: string; seatCount: 1 | 2; seed: number; diffic
 export const GURAT_GOLDENS: readonly GuratGolden[] = [
   { name: "true solo, won, Normal", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed, won, Normal", seatCount: 2, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "true solo, lost, Abaan leaves play", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "lost", policy: { abaanDefends: true }, lossReason: "Abaan left play" },
+  { name: "true solo, lost, Abaan leaves play", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "lost", policy: { abaanDefends: true }, lossReason: "Abaan was destroyed. If Abaan leaves play, the players lose" },
   { name: "true solo, lost, threat reaches 50 while the only hero left is held", seatCount: 1, seed: 14, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
   { name: "true solo, lost, every hero destroyed while an enemy holds the ally", seatCount: 1, seed: 21, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
 ];

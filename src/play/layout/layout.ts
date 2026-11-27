@@ -9,7 +9,7 @@ import type { CardInstance } from "../../rules/core/state.ts";
 
 import { pictureKey } from "../canvas/picture-key.ts";
 import type { BasePileId, FightKind, PileId, PileView, SecondPileId, VictoryPileId, ZoneId, ZoneView } from "../store/selectors.ts";
-import { ASPECT, deepestUnder, MIN_TARGET, placeCounted, placeUnder, rowXs, slotOf, type Metrics } from "./slots.ts";
+import { ASPECT, deepestUnder, heldDepth, MIN_TARGET, placeCounted, placeUnder, rowXs, slotOf, type Metrics } from "./slots.ts";
 import { placePlay, playPlan } from "./play-area.ts";
 import { placeEngaged, placeRow, type RowFolding } from "./row-place.ts";
 import type { RowReach } from "./row-reach.ts";
@@ -49,6 +49,8 @@ export type CardSlot = Rect & {
   // An attachment's tap band (`bandBounds`): the peek it was laid out with and the lowest y the band may reach, the top of the hand (hits.ts).
   bandPeek?: number;
   bandFloor?: number;
+  // A held character under its host (a hero, an ally or Abaan an encounter card holds, slots.ts HELD_STRIP): its strip is this many peeks tall, and reads its name at full size and its owner.
+  strip?: number;
   // How many cards a pile holds; 0 for anything else.
   count: number;
   // Committed to the quest: drawn a step higher, with its willpower.
@@ -273,7 +275,7 @@ export function tableLayout(
   const engagedH = card.h + peek * Math.max(1, deepestUnder(views.engaged.entries));
   const oneRow = card.h + 2 * peek;
   // The peek of a staging card with cards under it (a grappled enemy: one peek and its count) hangs below the card by a peek, deeper than the gap: the engagement row starts under it.
-  const stagingDrop = options.stacks ? Math.max(gap, peek * Math.min(1, deepestUnder(views.staging.entries))) : gap;
+  const stagingDrop = options.stacks ? Math.max(gap, peek * Math.min(1, deepestUnder(views.staging.entries))) : Math.max(gap, peek * heldDepth(views.staging.entries));
   const shown = Math.max(m.handMin, Math.round(card.h * HAND_SHOW));
   const restY = height - bottom - shown;
   // The room under the play area's one row, down to a gap above the hand: the play area's extra rows take it first, and the gaps
@@ -408,7 +410,7 @@ export function tableLayout(
     folds,
     stagingFoot: stagingY + card.h + peek * (options.stacks ? Math.min(1, deepestUnder(views.staging.entries)) : deepestUnder(views.staging.entries)),
     // An attachment's tap band stops at the hand's top (hits.ts, bandBounds): the strip under a front-row hero lies just above the hand, and the hand strip scrubs.
-    slots: slots.map((slot) => (slot.kind === "attachment" ? { ...slot, bandPeek: peek, bandFloor: hand.y } : slot)),
+    slots: slots.map((slot) => (slot.kind === "attachment" ? { ...slot, bandPeek: peek * (slot.strip ?? 1), bandFloor: hand.y } : slot)),
     marks,
     attacker: options.attacker ?? null,
     scale,

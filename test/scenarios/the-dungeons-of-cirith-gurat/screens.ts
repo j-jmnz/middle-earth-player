@@ -20,12 +20,12 @@ export const screens: ScreenMoment[] = [
   {
     name: "abaan-held",
     note: "17120:A:1, 17132:A:1: Abaan lies faceup under Dungeon Cell with no owner; his preview says who holds him, that the first player gains control of him when Dungeon Cell leaves play and that the players lose if he leaves play.",
-    layout: { ...BASE, staging: [CELL], play: [ABAAN], captive: [{ hero: ABAAN, under: CELL }] },
+    layout: { ...BASE, staging: [CELL, ABAAN], captive: [{ hero: ABAAN, under: CELL }] },
   },
   {
     name: "hero-captured",
     note: "17134:A:1: at stage 3A (Fight Your Way Out) each player's chosen hero lies faceup under an enemy in the staging area, the enemy wearing \"1 held\"; the hero's preview says who guards it and that it returns, exhausted, and its seat's dial says it is guarded by that enemy.",
-    layout: { ...BASE, stage: "17134", side: "A", staging: [JAILER, "16062"], staged: [{ hero: "dh1", under: JAILER }, { hero: "dh2" }] },
+    layout: { ...BASE, stage: "17134", side: "A", staging: [JAILER, "16062"], staged: [{ hero: "dh1", under: JAILER }, { hero: "dh2", under: "16062" }] },
   },
   {
     name: "captured-holds-allies",

@@ -116,8 +116,8 @@ export function ThreatRing({
   ticks?: readonly number[];
   // The seat that holds the Ring-bearer facedown: a small Ring mark beside its label, and these words in its accessibility label.
   ring?: string | null;
-  // The mark beside the label when `ring` is set: the One Ring (the Ring-bearer facedown), a hero (the prisoner).
-  ringMark?: "oneRing" | "hero";
+  // The mark beside the label when `ring` is set: the One Ring (the Ring-bearer facedown), a hero (the prisoner), an ally (an ally an enemy holds: its words, `ring`, are also drawn under the label).
+  ringMark?: "oneRing" | "hero" | "ally";
   // The number at which the players lose, when it is not the elimination level (the pursuit dial, 30): the meter fills toward it, the dial warms near it, and the reader hears it. Needs `elimination`.
   limit?: number;
   // The limit is the elimination level of a Dire quest (99, mec113.dire): the reader hears "near elimination", not "near the limit".
@@ -200,7 +200,7 @@ function ThreatDial({
   elimination: boolean;
   ticks: readonly number[];
   ring: string | null;
-  ringMark: "oneRing" | "hero";
+  ringMark: "oneRing" | "hero" | "ally";
   limit?: number;
   eliminates?: boolean;
   filled?: number;
@@ -352,6 +352,7 @@ function ThreatDial({
             </View>
           ) : null}
         </View>
+        {ring && ringMark === "ally" ? <Text numberOfLines={1} className="text-micro text-muted" style={{ maxWidth: 110 * s }}>{ring}</Text> : null}
       </View>
       )}
       {/* The caption: the name under the ring, over its foot, where the row has no room for it beside the ring. It hangs from the row's foot as the change badge does (inside the bar), takes no room in the row, never takes a tap, and gives way to the change badge, which stands in its place. A seat's caption is its letter ("P1") in the accent while the seat is the one asked. */}
