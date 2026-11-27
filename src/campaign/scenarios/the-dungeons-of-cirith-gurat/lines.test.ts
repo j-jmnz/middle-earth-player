@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import { destroyAndAnnounce, destroyCard } from "../../../rules/core/destroy.ts";
-import { eliminateEmpties } from "../../../rules/core/eliminate.ts";
+import { eliminateEmpties, eliminateSeat } from "../../../rules/core/eliminate.ts";
 import { ruleCause } from "../../../rules/core/cause.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import { printedOf, type PrintedCard } from "../../../rules/core/printed.ts";
@@ -304,9 +304,21 @@ describe("the captives and the cards that take them", () => {
   it("17120:A:3 the loss when Abaan is destroyed says the event and the cause", () => {
     const made = table({ staging: [CAPTIVES, CELL], play: ["17120"] });
     const abaan = idOf(made.state, "17120");
-    const lost = settle(destroyCard(opened(made).state, abaan, made.ctx.cards, none), made.ctx, none);
+    const steps: EngineStep[] = [];
+    const lost = settle(destroyCard(opened(made).state, abaan, made.ctx.cards, steps), made.ctx, steps);
     expect(lost.lost).toBe(true);
     expect(lost.lossReason).toBe("Abaan was destroyed. If Abaan leaves play, the players lose");
+  });
+
+  it("17120:A:3 the loss when Abaan leaves play with his controller's elimination says he left play, not that he was destroyed", () => {
+    const made = table({ seats: 2, staging: [CAPTIVES, CELL], play: [{ code: "17120", seat: 0 }] });
+    const abaan = idOf(made.state, "17120");
+    const taken = opened(made, updateCard(opened(made).state, abaan, { controller: 0 })).state;
+    const steps: EngineStep[] = [];
+    const lost = settle(eliminateSeat(taken, 0, steps), made.ctx, steps);
+    expect(steps.some((step) => step.kind === "destroy" && step.targetId === abaan)).toBe(false);
+    expect(lost.lost).toBe(true);
+    expect(lost.lossReason).toBe("Abaan left play. If Abaan leaves play, the players lose");
   });
 
   lineSpec("17123:A:2", "When Revealed: it makes an immediate attack against the player who controls the most allies", (effects) => {

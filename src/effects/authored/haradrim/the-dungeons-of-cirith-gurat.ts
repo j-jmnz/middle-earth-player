@@ -40,8 +40,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: `${CAPTIVES}:forced:1`, cardCode: CAPTIVES, lines: [`${CAPTIVES}:A:2`], timing: "forced", trigger: "attached", subject: CAPTIVE, instructions: [{ verb: "StripCaptive" }] },
   { id: `${CAPTIVES}:forced:2`, cardCode: CAPTIVES, lines: [`${CAPTIVES}:A:3`], timing: "forced", trigger: "leftPlay", subject: { ...GUARDING, enemyOrLocation: true }, instructions: [{ verb: "RescueCaptured" }] },
 
-  // 17120 Abaan (objective ally; A:3, the loss, is a template). While free of encounters the first player gains control of him; Response: after he exhausts, a Harad character gets +1 Willpower, Attack and Defense for the round.
+  // 17120 Abaan (objective ally; A:3, the loss, replaces the template's record so its reason says how he left play). While free of encounters the first player gains control of him; Response: after he exhausts, a Harad character gets +1 Willpower, Attack and Defense for the round.
   { id: `${ABAAN}:constant:1`, cardCode: ABAAN, lines: [`${ABAAN}:A:1`], timing: "constant", instructions: [{ verb: "GainControlWhenFree", who: "firstPlayer" }] },
+  { id: `${ABAAN}:triggered:1`, cardCode: ABAAN, lines: [`${ABAAN}:A:3`], timing: "triggered", trigger: "leftPlay", subject: "self", instructions: [{ verb: "LoseGame", saysHow: true }] },
   {
     id: `${ABAAN}:response:1`,
     cardCode: ABAAN,
@@ -286,4 +287,5 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: `${STAGE_3}:constant:1`, cardCode: STAGE_3, lines: [`${STAGE_3}:B:2`], timing: "constant", condition: { kind: "canPick", pick: CAPTIVE }, instructions: [{ verb: "Restrict", what: "advance" }] },
 ];
 
-export const AUTHORED_REPLACES: readonly string[] = [];
+// 17120:triggered:1 is the template's record with the loss saying how Abaan left play (`saysHow`).
+export const AUTHORED_REPLACES: readonly string[] = [`${ABAAN}:triggered:1`];

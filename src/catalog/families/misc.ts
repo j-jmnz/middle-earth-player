@@ -50,7 +50,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("AttachAsMount"), ...when }),
   // The players lose the game ("If Bilbo Baggins leaves play, the players lose the game"). `reason` is the loss as the log words it, where the card that left play is not the cause ("the Corsairs have
   // destroyed the Elven fleet", 11038:A:2).
-  z.strictObject({ verb: z.literal("LoseGame"), reason: z.string().min(1).optional(), ...when }),
+  // `saysHow`: the loss says how the card left play, "Abaan was destroyed. If Abaan leaves play, the players lose" when the intent's destroy steps name it and "Abaan left play. If ..." for any other exit (17120:A:3).
+  z.strictObject({ verb: z.literal("LoseGame"), reason: z.string().min(1).optional(), saysHow: z.literal(true).optional(), ...when }),
   // After CancelEffect on an encounter card just revealed: that card is discarded instead of being shuffled back into the
   // encounter deck ("cancel the effects of an encounter card just revealed ... and discard that card", 21009:A:1). The same player
   // then reveals another card.

@@ -223,7 +223,8 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
   if (templatesOf(entry).some((template) => placeholdersOf(template).includes("pair"))) values.pair = embassyPairNow(a.game, (id) => a.names.card(id)) ?? "this pair";
   for (const [name, amount] of Object.entries(entry.bind ?? {})) values[name] = resolveAmount(a.game, amount, scope, a.ctx);
   // The card just discarded and the players a raise would eliminate, named only where an entry says them (17124:A:2).
-  const wanted = (name: string) => templatesOf(entry).some((template) => placeholdersOf(template).includes(name));
+  // A name the entry binds always wins (Flight from Moria binds `threat` to The Nameless Fear's Threat).
+  const wanted = (name: string) => entry.bind?.[name] == null && templatesOf(entry).some((template) => placeholdersOf(template).includes(name));
   Object.assign(values, discardValues(a.game, a.ctx, a.names, wanted, Number(values.raise ?? 0)));
   for (const [name, named] of Object.entries(entry.named ?? {})) {
     const only = pickCandidates(a.game, named.pick, scope.actor, [], scope.sourceId, a.ctx, undefined, undefined, true);

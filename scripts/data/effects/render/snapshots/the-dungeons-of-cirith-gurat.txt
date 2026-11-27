@@ -37,7 +37,7 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
 17120:A:3 (front): If Abaan leaves play, the players lose the game.
   17120:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the players lose the game
+    - the players lose the game (the loss says whether the card was destroyed or left play another way)
 
 ## 17121 Jailer of Cirith Gurat
 (the scenario deals it into the encounter pile; the piles place it, no record does)
