@@ -170,6 +170,10 @@ export function runExtraVerb(
         const cost = id ? (printedOf(ctx.cards, discarded.cards[id]?.code ?? "").cost ?? 0) : 0;
         return noteEncounterThreat(raiseThreat(discarded, seat, cost, steps, currentCause(steps, UNATTRIBUTED)), seat, cost, focus.sourceId, ctx);
       }
+      if (instruction.announce) {
+        const id = joinedDiscard(state, discarded, seat);
+        if (id) steps.push({ kind: "discardedRandom", seat, cardId: id, cause: currentCause(steps, UNATTRIBUTED) });
+      }
       if (!instruction.remember) return discarded;
       // `remember`: the card discarded is the effect's picked card afterward ("the discarded card's printed cost", 143066:A:2). An empty hand discards nothing: the picked card is "" then (as a pick that found none), never an earlier player's card.
       return pushPicked(discarded, joinedDiscard(state, discarded, seat));

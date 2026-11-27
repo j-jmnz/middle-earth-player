@@ -13,16 +13,16 @@ import { PEEK, type CardSlot, type Rect } from "../layout/layout.ts";
 import { medallionAt } from "../layout/look-strip.ts";
 import { medallionCount } from "../words/scenarios/sea.ts";
 import { progressInStrip as progressInStripOf, stripCenterX, stripText } from "./table-canvas-views.ts";
-import { badgeLayout, badgeShown, type CoveredBand, footPillSpan, lonePick, loneRow, pillFits } from "./badge-room.ts";
+import { badgeLayout, badgeShown, type CoveredBand, footPillSpan, lonePick, loneRow, NAME_LINE, pillFits } from "./badge-room.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
+import { placeholderName } from "./placeholder-name.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
-import { fit, wrapName } from "./wrap.ts";
+import { fit } from "./wrap.ts";
 
 // Medium's sizes in points. Every piece draws them times `s`, the UI scale (ui-scale.ts, user request, 2026-10-28), which the canvas root
 // hands down as a prop beside the tokens `t`: a piece does not read the scale itself. A card's corner is the card screen's share of its
 // shorter side (`cardCorner`, user request, 2026-10-29); `RADIUS` is left for the shapes that are not cards (a drop zone's outline).
 export const RADIUS = 6;
-export const LINE = 14;
 export const BADGE_H = 15;
 // A card picture is drawn at sizes other than its copy's (a hand card at rest is smaller than the scrub's lifted copy; a card moving
 // grows and shrinks): linear filtering between mipmap levels, so it neither aliases when smaller nor blocks when larger.
@@ -150,6 +150,7 @@ export function CardBody({
   encounterBack,
   backs,
   nameLines,
+  nameFoot,
   t,
   s,
 }: {
@@ -162,12 +163,16 @@ export function CardBody({
   backs: BackImages;
   // How many lines the placeholder name may take (3 by default): one when effect pills stand down the left edge from 17 pt, so they never cover a second line of the name.
   nameLines?: number;
+  // A sideways card: where the highest pill at its foot stands, so the name stops above it (placeholder-name.ts).
+  nameFoot?: number | null;
   t: TableTokens;
   s: number;
 }) {
   const { x, y, w, h } = slot;
   const radius = cardCorner(w, h);
   const bare = slot.shown != null && slot.shown < w ? 0.7 : 1;
+  // The name's lines (placeholder-name.ts): shrunk to fit before they are cut, clear of the damage token, and above the foot pills of a card lying sideways.
+  const placed = image || slot.faceDown ? null : placeholderName({ name, w, s, shown: slot.shown ?? null, lines: nameLines, damage: slot.damage > 0, sideways: slot.exhausted, foot: nameFoot ?? null, measure: (text) => fonts.names.getTextWidth(text) });
   return (
     <Group>
       <RoundedRect x={x + 1 * s} y={y + 2 * s} width={w} height={h} r={radius} color={shadowOf(t)} />
@@ -182,9 +187,9 @@ export function CardBody({
           <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={t.raised} />
           <Group clip={{ x: x + 3 * s, y: y + 3 * s, width: bare === 1 ? w - 6 * s : (slot.shown ?? w) - 4 * s, height: h - 6 * s }}>
             {/* A card its guard lies over (`shown`) names itself smaller, in the part the guard leaves bare. */}
-            <Group transform={[{ translateX: x + 5 * s }, { translateY: y + 15 * s }, { scale: bare }]}>
-              {wrapName(name, bare === 1 ? w - 10 * s : ((slot.shown ?? w) - 8 * s) / bare, (text) => fonts.names.getTextWidth(text), nameLines).map((line, index) => (
-                <Text key={index} x={0} y={index * LINE * s} text={line} font={fonts.names} color={t.bone} />
+            <Group transform={[{ translateX: x + 5 * s }, { translateY: y + 15 * s }, { scale: placed?.scale ?? bare }]}>
+              {(placed?.lines ?? []).map((line, index) => (
+                <Text key={index} x={index === 0 ? (placed?.indent ?? 0) : 0} y={index * NAME_LINE * s} text={line} font={fonts.names} color={t.bone} />
               ))}
             </Group>
           </Group>
@@ -299,6 +304,7 @@ export function Badges({
   covered,
   owner,
   stageLoses,
+  titleRows = 1,
   fonts,
   images,
   t,
@@ -319,6 +325,8 @@ export function Badges({
   owner?: string | null;
   // Filling the stage loses the game (143075:B:3): the strip's numbers are threat red, with the word.
   stageLoses?: boolean;
+  // How many lines the card's placeholder name takes (2 pushes the effect column down by a line, badge-room.ts).
+  titleRows?: number;
   fonts: Fonts;
   images: TokenImages;
   t: TableTokens;
@@ -331,7 +339,7 @@ export function Badges({
   const strip = 15 * s;
   const label = questPoints != null ? (stripText(slot, questPoints, owner, stageLoses ?? false) ?? "") : "";
   // Rows that fit between the title band (or the top edge of a short card) and the resource token and the foot pills (badgeLayout).
-  const { top: first, rows: room } = badgeLayout(h, s, pill, stop, covered);
+  const { top: first, rows: room } = badgeLayout(h, s, pill, stop, covered, titleRows);
   // The part of the card the pills may use: right of the token and left of the next card in the row on a covered card, else the whole card.
   const shift = covered?.left ?? 0;
   const avail = covered ? covered.width - shift : w;

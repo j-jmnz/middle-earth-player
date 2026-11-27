@@ -209,7 +209,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 51222 Ancient Guardroom: +1 Threat for each resource on it; after an event is played a resource goes on it; Travel: assign X damage among characters in play, X its Threat.
   { id: "51222:constant:1", cardCode: "51222", lines: ["51222:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { stat: "resources", of: "self" }, until: "whileSourceInPlay", target: "self" }] },
-  { id: "51222:forced:1", cardCode: "51222", lines: ["51222:A:2"], timing: "forced", trigger: "played", subject: { type: "card", control: "any", cardType: "event" }, instructions: [{ verb: "PlaceResourceTokens", amount: 1, on: "self" }] },
+  { id: "51222:forced:1", cardCode: "51222", lines: ["51222:A:2"], timing: "forced", trigger: "eventResolved", subject: { type: "card", control: "any", cardType: "event" }, instructions: [{ verb: "PlaceResourceTokens", amount: 1, on: "self" }] },
   { id: "51222:travel:1", cardCode: "51222", lines: ["51222:A:3"], timing: "travel", instructions: [{ verb: "AssignDamage", amount: { stat: "threat", of: "self" }, pick: ANY_CHARACTER }] },
 
   // 51223 Denizen of the Deep: attached to the non-unique enemy with the highest Attack (then Threat), which returns to the staging area; surge with none (reading 15); the Condition gives the enemy +1 Threat, +1 Attack, +1 Defense and immunity to player card effects.

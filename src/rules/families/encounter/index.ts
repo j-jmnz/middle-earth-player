@@ -150,6 +150,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       const data = effectData(state);
       if (data?.finish !== "discardSource") return state;
       const { finish: _discard, ...kept } = data;
+      // The event stays in the hand; its After records hear it at the end of its frame (interpret/effect-frames.ts, finishEvent).
       return patchTop(state, { data: kept });
     }
     default:

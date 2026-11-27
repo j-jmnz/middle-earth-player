@@ -93,9 +93,9 @@ describe("Chaos in the Night's caution", () => {
     expect(caution(1, [30, 28])).toBeUndefined();
     expect(caution(1, [47, 28])).toContain("your threat");
     expect(caution(2, [30, 30])).toBeUndefined();
-    expect(caution(2, [30, 47])).toContain("Player 2's threat");
-    expect(caution(2, [47, 30])).toContain("Player 1's threat");
-    expect(caution(2, [48, 49])).toContain("Player 1's and Player 2's");
+    expect(caution(2, [30, 47])).toContain("Player 2 reaches 50");
+    expect(caution(2, [47, 30])).toContain("Player 1 reaches 50");
+    expect(caution(2, [48, 49])).toContain("Player 1 and Player 2 reach 50");
   });
 });
 

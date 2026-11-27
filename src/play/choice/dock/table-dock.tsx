@@ -8,7 +8,8 @@ import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 
 import { DockButtons, type DockExtra } from "./buttons.tsx";
 import { lineCount } from "./armed-room.ts";
-import { isDense, labelChars, PILL_PT, planWords, smallPictures, trayRoom, wordsWindow } from "./budget.ts";
+import { isDense, labelChars, PILL_PT, planWords, rowsRoom, smallPictures, trayRoom, wordsWindow } from "./budget.ts";
+import { RowsRoom } from "./rows-room.ts";
 import { dockLines } from "./lines.ts";
 import { useReaderMoment } from "./use-reader-moment.ts";
 import { momentHint } from "../reader-moment.ts";
@@ -93,8 +94,8 @@ export function TableDock({
 }: {
   // The step in words ("Combat", "Stops on, Combat"): not drawn, the rail names the phase; a screen reader hears it before the title.
   step: string;
-  // What leads the title: the seat that is asked in two-handed play ("Player 1 · ") and a Response's or an Action's timing
-  // ("Response · "), or "". The step overline is not drawn, so this is how the player knows a chance to respond from a plain question.
+  // What leads the title: the seat that is asked in two-handed play ("Player 1 · "), or "". A Response's or an Action's timing ends the
+  // title ("Pathless Country · Response"): the step overline is not drawn, so this is how the player knows a chance to respond from a plain question.
   lead?: string;
   title: string;
   // The title names the card the moment is about (a look's card, a Response's source): a tap on it opens that card in the preview, as Read does.
@@ -234,7 +235,7 @@ export function TableDock({
             ) : null}
           </View>
         </ScrollView>
-        {tray}
+        <RowsRoom value={dense && trayOpen && room.column > 0 ? rowsRoom({ column: room.column, block: room.block, titleLines: plan.titleLines, dense, text: fontScale }, s) : 0}>{tray}</RowsRoom>
         <View
           collapsable={false}
           onLayout={(event) => setRoom((now) => ({ ...now, block: Math.round(event.nativeEvent.layout.height) }))}

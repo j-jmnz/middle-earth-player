@@ -147,7 +147,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "18024",
     lines: ["18024:A:2"],
     timing: "forced",
-    trigger: "played",
+    trigger: "eventResolved",
     subject: { type: "card", control: "any", cardType: "event" },
     condition: { kind: "all", conditions: [{ kind: "phase", is: "Quest" }, { kind: "sourceIn", zone: "staging" }] },
     instructions: [{ verb: "AttachFacedown" }],

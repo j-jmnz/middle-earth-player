@@ -9,7 +9,12 @@ import { alliesWillpowerHolds } from "../../families/sea/skirmisher.ts";
 import { lastHideFailed } from "../../families/nightmare/guards.ts";
 import { livingSeats } from "../../core/state.ts";
 import { resolveAmount, type AmountScope } from "../amounts.ts";
-import type { ConditionHandlers } from "../condition-scope.ts";
+import type { ConditionHandlers, Scope } from "../condition-scope.ts";
+
+// The scope an amount in a condition is read in.
+function amountScope(scope: Scope): AmountScope {
+  return { actor: scope.actor, sourceId: scope.sourceId, ...(scope.picked ? { picked: scope.picked } : {}), ...(scope.subject ? { subject: scope.subject } : {}), ...(scope.other ? { other: scope.other } : {}), ...(scope.x != null ? { x: scope.x } : {}), ...(scope.participants ? { participants: scope.participants } : {}) };
+}
 
 export const playerHandlers = {
   hideFailed: (state, condition, scope) =>
@@ -24,12 +29,12 @@ export const playerHandlers = {
   handHasCard: (state, _condition, scope) => (state.seats[scope.actor]?.hand ?? []).some((id) => id !== scope.sourceId),
   firstPlayer: (state, _condition, scope) => scope.actor === firstPlayerFor(state, scope.actor),
   less: (state, condition, scope, ctx) => {
-    const read: AmountScope = { actor: scope.actor, sourceId: scope.sourceId, ...(scope.picked ? { picked: scope.picked } : {}), ...(scope.subject ? { subject: scope.subject } : {}), ...(scope.other ? { other: scope.other } : {}), ...(scope.x != null ? { x: scope.x } : {}), ...(scope.participants ? { participants: scope.participants } : {}) };
+    const read = amountScope(scope);
     return resolveAmount(state, condition.left, read, ctx) < resolveAmount(state, condition.right, read, ctx);
   },
   alliesWillpower: (state, condition, scope, ctx) => alliesWillpowerHolds(state, scope.actor, condition.min, scope.sourceId, ctx),
   survivorsThreat: (state, condition) => livingSeats(state).every((seat) => (state.seats[seat]?.threat ?? 0) <= condition.max),
-  seatThreat: (state, condition) => livingSeats(state).includes(condition.seat) && seatThreat(state, condition.seat) >= condition.min,
+  seatThreat: (state, condition, scope, ctx) => livingSeats(state).includes(condition.seat) && seatThreat(state, condition.seat) + (condition.plus ? resolveAmount(state, condition.plus, amountScope(scope), ctx) : 0) >= condition.min,
   raiseEliminates: (state, condition) => raiseEliminates(state, condition.seat, condition.raise),
   anyThreat: (state, condition) => livingSeats(state).some((seat) => seatThreat(state, seat) <= condition.max),
   heroExhausted: (state, _condition, scope) => (state.seats[scope.actor]?.heroes ?? []).some((id) => state.cards[id]?.exhausted === true),

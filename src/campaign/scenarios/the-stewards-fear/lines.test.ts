@@ -261,7 +261,7 @@ describe("06016:A:2 and 06017:A:2 the attack against the first player", () => {
     return done;
   };
   function fireEvent(t: LayoutTable, card: string): ScenarioState {
-    return { ...t.state, window: null, pendingEvents: [{ trigger: "played", seat: 0, cardId: card }] };
+    return { ...t.state, window: null, pendingEvents: [{ trigger: "eventResolved", seat: 0, cardId: card }] };
   }
 
   it("06017:A:2 after any player plays an event Bane attacks the first player, in the staging area or engaged with another player", () => {

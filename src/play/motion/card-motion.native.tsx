@@ -21,7 +21,7 @@ import { easingOf, useMotionScale } from "../../ui/motion-run.ts";
 import { ghostPoseAt, landAt, motionEnd, motionSpan, poseAt } from "./pose.ts";
 import { kindMoves, motionKind } from "./kind.ts";
 import { UpdateLog } from "./update-log.ts";
-import { motionsBetween, slotRotation, still, type Ghost, type Motion } from "./motion.ts";
+import { motionsBetween, slotRotation, still, turnedFrom, type Ghost, type Motion } from "./motion.ts";
 import type { TableStore } from "../store/store.ts";
 import { fxPlan, fxSpan, type Fx } from "./token-fx.ts";
 import { tokenDeltas } from "./token-deltas.ts";
@@ -64,7 +64,7 @@ function nextTrack(track: Track, layout: TableLayout, seat: number, acting: numb
   const from = kind === "ordinary" && track.seat !== seat ? track.actingLayout : track.layout;
   const sameSize = from.width === layout.width && from.height === layout.height;
   const animate = k > 0 && sameSize && kindMoves(kind);
-  const between = animate ? motionsBetween(from, layout, zoneNow, { zoneWas: (cardId) => prevGame.cards[cardId]?.zone ?? null, grappledFrom: (cardId) => (prevGame.cards[cardId]?.zone === "grappled" ? (prevGame.cards[cardId]?.host ?? null) : null) }) : motionsBetween(null, layout, zoneNow);
+  const between = animate ? motionsBetween(from, layout, zoneNow, { zoneWas: (cardId) => prevGame.cards[cardId]?.zone ?? null, grappledFrom: (cardId) => (prevGame.cards[cardId]?.zone === "grappled" ? (prevGame.cards[cardId]?.host ?? null) : null), turnedFrom: (cardId) => turnedFrom(prevGame, game, cardId) }) : motionsBetween(null, layout, zoneNow);
   // A token pops once its card has arrived; a card off the table shows none. The damage a spotlight's attacks placed pops in the
   // spotlight, at the end of its burst, so the state's own pop leaves out that much of the change (archery or an effect's damage on
   // the same card keeps its pop and its number).

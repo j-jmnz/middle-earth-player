@@ -98,7 +98,7 @@ describe("a line that works only where its card is", () => {
     for (const [zone, attached] of [["staging", true], ["engaged", false]] as const) {
       const made = table({ phase: "Quest", stage: "50902", ...(zone === "staging" ? { staging: ["50922"] } : { engaged: ["50922"] }) });
       const played = spawn(made.state, "event", { zone: "discard", seat: 0 });
-      const settled = settle(fireForced({ ...played.state, window: null }, { trigger: "played", seat: 0, cardId: played.id }, made.ctx, []), made.ctx, []);
+      const settled = settle(fireForced({ ...played.state, window: null }, { trigger: "eventResolved", seat: 0, cardId: played.id }, made.ctx, []), made.ctx, []);
       expect(settled.cards[played.id]?.zone === "under" || settled.cards[played.id]?.host != null, zone).toBe(attached);
     }
   });

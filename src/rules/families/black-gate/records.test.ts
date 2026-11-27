@@ -14,11 +14,13 @@ import { hero, recordsOf, send, table, treachery } from "../defense/table.ts";
 
 const records = [...AUTHORED_EFFECTS, ...CAMPAIGN_CARDS];
 const mouth = definePrinted({ code: "146031", name: "The Mouth of Sauron", type: "enemy", attack: 6, defense: 5, health: 11, threat: 4, engagementCost: 99, isUnique: true });
+// A plain enemy beside the Mouth keeps the optional engagement window open: the Mouth cannot leave the staging area, so it is never offered (rr.cannot).
+const foe = definePrinted({ code: "foe", name: "Foe", type: "enemy", attack: 1, defense: 1, health: 1, threat: 1, engagementCost: 50 });
 const rage = definePrinted({ code: "146039", name: "Rage Filled Him", type: "treachery" });
 
 describe("Rage Filled Him (146039:A:2)", () => {
   function reveal(health: number) {
-    const base = table({ cards: [hero("a", { health }), hero("b", { health }), mouth, rage, treachery("x")], effects: recordsOf(records, "146039", "146031"), heroes: [{ code: "a" }, { code: "b" }], staging: [{ code: "146031" }] });
+    const base = table({ cards: [hero("a", { health }), hero("b", { health }), mouth, foe, rage, treachery("x")], effects: recordsOf(records, "146039", "146031"), heroes: [{ code: "a" }, { code: "b" }], staging: [{ code: "146031" }, { code: "foe" }] });
     const placed = { ...base, state: { ...base.state, window: null } };
     const effect = recordsOf(records, "146039").find((record) => record.timing === "whenRevealed");
     const pushed = pushEffectFrame(placed.state, { frame: "whenRevealed", sourceId: null, actor: 0, peril: false, effectId: effect?.id ?? "", instructions: effect?.instructions ?? [], cancel: null, blockCancel: null }, []);

@@ -122,6 +122,9 @@ const TRIGGERS = [
   "resourcesMoved",
   // Heard on either event: resources were added to a hero's pool, or moved to it ("After attached hero gains any number of resources", Heir of Mardil, 08113:A:2).
   "resourcesGained",
+  // About an event card played from a hand: its effects are done and it lies in the discard pile ("After an event is played" resolves here;
+  // "When an event is played" is the `played` trigger, heard before the event's effects resolve).
+  "eventResolved",
 ] as const;
 
 // `heroType`: the holder loses the ally card type and gains the hero card type (Sword-thain): it is among its controller's

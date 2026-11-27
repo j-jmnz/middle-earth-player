@@ -332,7 +332,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
     - this card: stat threat resources of this card, while this card is in play
 
 51222:A:2 (front): Forced: After an event is played, place 1 resource here.
-  51222:forced:1: Forced when an event is played, before its effects resolve (heard about card (any player controls) or in the staging area or the active location, of card type event)
+  51222:forced:1: Forced after an event is played, once its effects have resolved and it lies in the discard pile (heard about card (any player controls) or in the staging area or the active location, of card type event)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 resource tokens on this card
 

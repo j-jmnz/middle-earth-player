@@ -4,6 +4,7 @@
 // above them; the count stays in the title's spoken label. The readout, the refusal and the buttons are the dock's, once, under the
 // rows. A row is picked like a card on the table (the same pick, table-choice.ts); a long press on a card's row shows it large. A tap
 // outside folds it (use-table-choice.ts).
+import { useContext, useRef, useState, type RefObject } from "react";
 import { useWindowDimensions, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
@@ -11,7 +12,8 @@ import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { CardImage } from "../../ui/card-image.tsx";
 import { cardCorner } from "../../ui/card-corner.ts";
 import { ringRoom, ringScroll } from "../../ui/focus-ring-style.ts";
-import { LIST_PICTURE, LIST_PICTURE_SMALL, smallPictures, trayRoom } from "./dock/budget.ts";
+import { detailLines, LIST_PICTURE, LIST_PICTURE_SMALL, moreBelow, smallPictures, trayRoom } from "./dock/budget.ts";
+import { RowsRoom } from "./dock/rows-room.ts";
 import { dropShadowOf } from "../../ui/surfaces.ts";
 import { IconValue } from "../../ui/game-icon.tsx";
 import { PlaceGlyph } from "../dream-chaser/island-glyph.tsx";
@@ -38,6 +40,13 @@ const cardBox = (small: boolean, s: number) => {
 };
 // The rows enter this far up (MOTION.trayEnter).
 const RISE = 16;
+
+// What the rows' scroll view last measured; `measure` folds one reading in and answers whether rows lie below.
+type Measured = { viewport: number; content: number; y: number };
+function measure(held: RefObject<Measured>, reading: Partial<Measured>): boolean {
+  held.current = { ...held.current, ...reading };
+  return moreBelow(held.current.viewport, held.current.content, held.current.y);
+}
 
 // The foreseen damage of a defender, as a pill; threat red when the card would be destroyed.
 // A row's leading mark: a travel row on the Island Map shows the glyph of its place (island-glyph.tsx) beside the card picture.
@@ -115,6 +124,13 @@ export function ChoiceTray({
   // A phone draws the small picture, and the rows keep one row of it (dock/budget.ts; the dock budgets its words against the same).
   const { height: screenHeight, fontScale } = useWindowDimensions();
   const small = smallPictures(screenHeight, s);
+  // On a dense dock a row's printed line keeps the lines the rows' room holds (dock/budget.ts, detailLines), so no row is cut mid-line at the foot.
+  const room = useContext(RowsRoom);
+  // The rows scroll when they outgrow the room: a fade at their foot says that more lie below (dock/budget.ts, moreBelow). Only that answer is state, so a scroll that does not change it renders nothing.
+  const measured = useRef<Measured>({ viewport: 0, content: 0, y: 0 });
+  const [more, setMore] = useState(false);
+  const t = useTableTokens();
+  const detailCap = room > 0 ? detailLines(room, fontScale) : undefined;
   const { progress, leaving } = useOpenMotion(open, MOTION.trayEnter, MOTION.trayLeave);
   const motion = useAnimatedStyle(() => ({ opacity: progress.get(), transform: [{ translateY: (1 - progress.get()) * RISE * s }] }));
   const shown = useHeld(open ? sheet : null) ?? sheet;
@@ -125,12 +141,13 @@ export function ChoiceTray({
   const refused = [...(shown.kind === "pick" ? (shown.unavailable ?? []) : []), ...(refusedRows ?? [])];
   if (!open && !leaving) return null;
   return (
-    <Animated.View testID="sheet" collapsable={false} pointerEvents={open ? "auto" : "none"} style={[{ flexShrink: 1, minHeight: 0 }, motion]}>
-      {/* The rows' focus ring has room inside the scroll (ringScroll); its margins take that room back, and trayRoom's row is counted from under it. */}
+    // Clipped at the title's foot: a row scrolled up never passes under the title. The clip stands a ring's room outside the rows (ringScroll's margins are on this view, its padding on the scroll content), so a focused row's ring is inside it.
+    <Animated.View testID="sheet" collapsable={false} pointerEvents={open ? "auto" : "none"} style={[{ flexShrink: 1, minHeight: 0, overflow: "hidden", ...ringScroll(s).style }, motion]}>
+      {/* The rows' focus ring has room inside the clip (ringScroll); the margins take that room back, and trayRoom's row is counted from under it. */}
       {/* The gesture handler's scroll view, not React Native's: on Android a touch on a row's transparent part otherwise passes through to
           the table canvas under the command column, whose drag (6 pt) starts before the list scrolls and cancels it. Its own handler
           makes the list the touch's target, so a swipe on the rows scrolls them and a tap still picks one. */}
-      <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: tiles.length > 0 ? trayRoom(small, fontScale) * s + ringRoom(s) : 0, ...ringScroll(s).style }} contentContainerStyle={ringScroll(s).content} showsVerticalScrollIndicator={false} nestedScrollEnabled>
+      <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: tiles.length > 0 ? trayRoom(small, fontScale) * s + ringRoom(s) : 0 }} contentContainerStyle={ringScroll(s).content} showsVerticalScrollIndicator={false} nestedScrollEnabled scrollEventThrottle={32} onLayout={(event) => setMore(measure(measured, { viewport: Math.round(event.nativeEvent.layout.height) }))} onContentSizeChange={(_width, height) => setMore(measure(measured, { content: Math.round(height) }))} onScroll={(event) => setMore(measure(measured, { y: Math.round(event.nativeEvent.contentOffset.y) }))}>
         {tiles.map((tile) => {
           const share = shareFor(shown, picked, tile.id);
           const readId = tile.readId;
@@ -144,6 +161,7 @@ export function ChoiceTray({
               dense={dense && tile.detail == null}
               label={shown.kind === "distribute" ? `${tile.label} · ${share}` : tile.label}
               detail={tile.detail}
+              detailLines={detailCap}
               stats={tile.stats}
               selected={selected}
               testID={shown.kind === "trigger" ? `sheet-trigger-${tile.id.split("|")[0] ?? tile.id}` : tile.look != null ? `sheet-look-${tile.id}` : `sheet-option-${tile.id}`}
@@ -163,6 +181,9 @@ export function ChoiceTray({
           <RefusedTile key={item.id} item={item} dense={dense} />
         ))}
       </ScrollView>
+      {more ? (
+        <View testID="sheet-more" pointerEvents="none" accessible={false} importantForAccessibility="no" style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 22 * s, backgroundImage: `linear-gradient(180deg, ${withAlphaHex(t.night, 0)} 0%, ${withAlphaHex(t.night, 0.92)} 100%)` }} />
+      ) : null}
     </Animated.View>
   );
 }

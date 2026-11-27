@@ -104,6 +104,30 @@ describe("17024:A:1 Biting Insects on the choice sheet", () => {
   });
 });
 
+describe("17024:A:1 the banner names the card Biting Insects discarded at random", () => {
+  it("tells the discard in the log and the banner, and only Biting Insects pushes the step", () => {
+    const made = at({ hand: [{ code: "c2", seat: 0 }], deck: ["f0"] });
+    const before = opened(made).state;
+    const steps: EngineStep[] = [];
+    const run = { state: revealFromTop(before, made.ctx, "17024", steps).state, steps };
+    expect(run.steps.filter((step) => step.kind === "discardedRandom")).toHaveLength(1);
+    const card = nameIn(made, run.state);
+    expect(logLines(run.steps, { card, code: (code: string) => code, effectCard: () => null, rule: () => null, line: () => null } as LogNames).map((line) => line.text)).toContain("Player 1 discards c2 at random");
+    // In a game of one player the banner leaves the seat out, as its other lines do.
+    const text = momentOf(before, run.state, run.steps, { card } as never)?.lines.map((line) => line.text) ?? [];
+    expect(text).toContain("Discards c2 at random");
+  });
+
+  it("names the player in the banner of a two-handed game", () => {
+    const made = at({ seats: 2, hand: [{ code: "c2", seat: 0 }], deck: ["f0"] });
+    const before = opened(made).state;
+    const steps: EngineStep[] = [];
+    const after = revealFromTop(before, made.ctx, "17024", steps).state;
+    const text = momentOf(before, after, steps, { card: nameIn(made, after) } as never)?.lines.map((line) => line.text) ?? [];
+    expect(text).toContain("Player 1 discards c2 at random");
+  });
+});
+
 describe("17015:A:3 the Wild Mûmak's end-of-round choice on the choice sheet", () => {
   it("words each row in a short line the row can show whole, and keeps the question in the sheet's note", () => {
     const made = at({ engaged: [{ code: MUMAK, seat: 0 }] });
