@@ -35,7 +35,7 @@ const EOWYN = "01007";
 const BERAVOR = "01012";
 const STEWARD = "01026";
 const SPYGLASS = "11180"; // an Item that prints no "Attach to" line
-const INTIMIDATION = "143015"; // a Permanent boon: "Setup: Attach to a Warrior hero."
+const INTIMIDATION = "143015"; // a Permanent boon
 const PAL = "pal";
 const ALLY = "ally";
 const CARD = "card";
@@ -266,16 +266,18 @@ describe("Helm of Secrecy moves another player's attachment (22090:A:2)", () => 
   });
 });
 
-describe("Helm of Secrecy moves a boon whose Setup named a host (22090:A:2)", () => {
-  // "moving all eligible attachments to the hero from your collection": the Warrior host in Intimidation's Setup line is checked as it enters play (rr.attachment-cards), not as a lasting limit, so the boon moves to the swapped-in hero, who is no Warrior.
-  it("22090:A:2 Intimidation (Setup: Attach to a Warrior hero) goes with the swap to a hero that is no Warrior", () => {
-    const tab = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }, { code: BERAVOR, seat: 0 }], attached: [{ code: INTIMIDATION, host: BERAVOR }], hand: [{ code: HELM, seat: 0 }] });
-    const [beravor, boon] = [idsOf(tab, BERAVOR), idsOf(tab, INTIMIDATION)];
+describe("Helm of Secrecy leaves a Permanent attachment behind (22090:A:2)", () => {
+  // mec109.permanent: a Permanent card stays with its hero for the campaign and is removed from the game when that hero leaves play, so the swap does not move it (Intimidation is Permanent), while a card that is not Permanent moves with it.
+  it("22090:A:2 Intimidation (Permanent) is removed from the game with the swapped-out hero; Steward of Gondor moves", () => {
+    const tab = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }, { code: BERAVOR, seat: 0 }], attached: [{ code: INTIMIDATION, host: BERAVOR }, { code: STEWARD, host: BERAVOR }], hand: [{ code: HELM, seat: 0 }] });
+    const [beravor, boon, steward] = [idsOf(tab, BERAVOR), idsOf(tab, INTIMIDATION), idsOf(tab, STEWARD)];
     let run = play(begin(tab.state), tab, idsOf(tab, HELM));
     run = sendUnledgered(run, { type: "Choose", optionId: beravor }, tab.ctx);
     const eowyn = choices(run.state, tab).find((id) => run.state.cards[id]?.code === EOWYN) ?? "";
     run = sendUnledgered(run, { type: "Choose", optionId: eowyn }, tab.ctx);
-    expect(run.state.cards[boon]).toMatchObject({ host: eowyn, zone: "play" });
+    expect(run.state.cards[boon]?.zone).toBe("removed");
+    expect(run.state.cards[eowyn]?.attachments).not.toContain(boon);
+    expect(run.state.cards[steward]).toMatchObject({ host: eowyn, zone: "play" });
   });
 });
 

@@ -99,6 +99,8 @@ function swap(state: ScenarioState, oldId: string, newId: string, seat: number, 
   for (const attachmentId of [...old.attachments]) {
     const attachment = next.cards[attachmentId];
     if (!attachment) continue;
+    // A Permanent attachment stays with its hero for the campaign: it is removed from the game when that hero leaves play, so it does not move (mec109.permanent).
+    if (printedOf(ctx.cards, attachment.code).keywords.permanent) continue;
     const owner = attachment.owner ?? attachment.controller ?? seat;
     if (!attachmentHostIds(next, owner, attachment.code, ctx, { byEffect: true, anySeat: true }).includes(newId)) continue;
     next = attachTo(updateCard(next, oldId, { attachments: (next.cards[oldId]?.attachments ?? []).filter((id) => id !== attachmentId) }), attachmentId, newId);
