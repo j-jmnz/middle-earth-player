@@ -178,7 +178,7 @@ function useMouse({ layout, canvas, k, live, onTap, onPreview }: Args, scrub: Sc
       if (steps !== 0 && next !== index.get()) lifting(next);
     };
     // A right click: the card the open hand has lifted when the pointer is on the risen hand, else what is under the pointer on the table (a face-up, held or dead
-    // card the hold would open; a pile opens its list). Not while a spotlight plays, whose skip is a left press. The page's own menu is off over the table.
+    // card the hold would open; a facedown card under a location opens the location; a pile opens its list). Not while a spotlight plays, whose skip is a left press. The page's own menu is off over the table.
     const context = (event: MouseEvent) => {
       const at = onTable(event, here);
       if (!at) return;
@@ -193,6 +193,7 @@ function useMouse({ layout, canvas, k, live, onTap, onPreview }: Args, scrub: Sc
       const slot = layout.slots[hitSlot(layout.slots, at.x, at.y)];
       if (!slot) return;
       if (slot.kind === "pile") onTap(slot.id);
+      else if (slot.faceDown && slot.opens !== undefined) onPreview(slot.opens);
       else if (!slot.faceDown || slot.held || slot.dead) onPreview(slot.id);
     };
     window.addEventListener("pointermove", move, true);
