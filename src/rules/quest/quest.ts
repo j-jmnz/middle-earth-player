@@ -19,6 +19,7 @@ import { checkEngages } from "./check.ts";
 import { askSplit } from "../families/smaug/split.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { moveCard } from "../core/zones.ts";
+import { cannotLeaveStaging } from "../core/staging-bar.ts";
 import { placeQuestingProgress, type QuestDamageCause } from "../families/defense/damage.ts";
 import { travelsOverActive } from "../families/grapple/travel.ts";
 import { exploreIfFull, freeSlot, makeActiveIn, placeOnActive } from "../families/south/locations.ts";
@@ -369,12 +370,12 @@ export function stagingLocations(state: ScenarioState, cards: Cards, seat?: numb
 }
 
 // The enemies in the staging area a player may optionally engage: not one that cannot be engaged at all (141048:A:1) or
-// cannot be optionally engaged (141051:A:1, 141052:A:1), and none at all while the table holds the flag ("Until the end of the round, enemies cannot be optionally engaged", 12164:A:1).
+// cannot be optionally engaged (141051:A:1, 141052:A:1), nor one that cannot leave the staging area while it holds the bar (it would not leave: rr.optional-engagement, rr.cannot; `losesCannotLeaveStaging` lifts it), and none at all while the table holds the flag ("Until the end of the round, enemies cannot be optionally engaged", 12164:A:1).
 // Once stages are separate a seat optionally engages only an enemy in its own staging area (mec109.multiple-staging-areas): the acting seat, or `seat`.
 export function optionalEnemies(state: ScenarioState, cards: Cards, seat?: number): string[] {
   const acting = seat ?? state.activeSeat;
   if (flagged(state, "table", "cannotBeOptionallyEngaged")) return [];
-  return stagingEnemies(state, cards, acting).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged") && !engagementBarred(state, id, acting, "engage") && !optionalThreatBarred(state, id, acting) && !familyOptionalEngageBarred(state, id, acting, cards));
+  return stagingEnemies(state, cards, acting).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged") && !cannotLeaveStaging(state, id) && !engagementBarred(state, id, acting, "engage") && !optionalThreatBarred(state, id, acting) && !familyOptionalEngageBarred(state, id, acting, cards));
 }
 
 // The enemies in the staging area; with `seat`, once stages are separate, in that seat's staging area (families/breaking/areas.ts).
