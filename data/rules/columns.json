@@ -63,5 +63,12 @@
   "rah": {"only": [1, 2], "default": [{"x": 55, "y": 50, "w": 250, "h": 690}, {"x": 308, "y": 50, "w": 250, "h": 690}]},
   "tbs": {"only": [1, 2], "default": [{"x": 55, "y": 50, "w": 250, "h": 690}, {"x": 308, "y": 50, "w": 250, "h": 690}]},
   "dcg": {"only": [1, 2], "default": [{"x": 55, "y": 50, "w": 250, "h": 690}, {"x": 308, "y": 50, "w": 250, "h": 690}]},
-  "cop": {"only": [1], "default": [{"x": 55, "y": 50, "w": 250, "h": 690}, {"x": 308, "y": 50, "w": 250, "h": 690}]}
+  "cop": {"only": [1], "default": [{"x": 55, "y": 50, "w": 250, "h": 690}, {"x": 308, "y": 50, "w": 250, "h": 690}]},
+  "asite": {"default": [], "handRead": "by eye from the rendered pages of MEC77 (A Shadow in the East rules insert): the PDF is a scan with a faulty text layer"},
+  "war": {"default": [], "handRead": "by eye from the rendered pages of MEC78: the PDF is a scan with a faulty text layer"},
+  "tcou": {"default": [], "handRead": "by eye from the rendered pages of MEC79: the PDF is a scan with a faulty text layer"},
+  "cotw": {"default": [], "handRead": "by eye from the rendered pages of MEC80: the PDF is a scan with a faulty text layer"},
+  "utam": {"default": [], "handRead": "by eye from the rendered pages of MEC81: the PDF is a scan with a faulty text layer"},
+  "tlos": {"default": [], "handRead": "by eye from the rendered pages of MEC82: the PDF is a scan with a faulty text layer"},
+  "tfon": {"default": [], "handRead": "by eye from the rendered pages of MEC83: the PDF is a scan with a faulty text layer"}
 }

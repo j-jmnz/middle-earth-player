@@ -161,6 +161,14 @@ export const PRODUCTS: readonly ProductDef[] = [
   { name: "The Black Serpent", packs: ["TBS"], home: "haradrim", load: "dragncards", easySheet: false, twinPack: null },
   { name: "The Dungeons of Cirith Gurat", packs: ["DoCG"], home: "haradrim", load: "dragncards", easySheet: false, twinPack: null },
   { name: "The Crossings of Poros", packs: ["CoP"], home: "haradrim", load: "dragncards", easySheet: false, twinPack: null },
+  // Vengeance of Mordor: A Shadow in the East deluxe expansion (three scenarios) and the six Adventure Packs, whose scenario and encounter cards are Hall of Beorn's like the earlier cycles'.
+  { name: "A Shadow in the East", packs: ["ASitE"], home: "vengeance-of-mordor", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Wrath and Ruin", packs: ["WaR"], home: "vengeance-of-mordor", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The City of Ulfast", packs: ["TCoU"], home: "vengeance-of-mordor", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Challenge of the Wainriders", packs: ["CotW"], home: "vengeance-of-mordor", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "Under the Ash Mountains", packs: ["UtAM"], home: "vengeance-of-mordor", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Land of Sorrow", packs: ["TLoS"], home: "vengeance-of-mordor", load: "dragncards", easySheet: false, twinPack: null },
+  { name: "The Fortress of Nurn", packs: ["TFoN"], home: "vengeance-of-mordor", load: "dragncards", easySheet: false, twinPack: null },
   // Standalone scenarios: each official scenario printed on its own, Hall of Beorn's cards of it alone. Hall of Beorn lists the event scenarios of 2011 to 2017 under the year (`scenarioProduct`).
   { name: "The Massing at Osgiliath", packs: ["TMaO"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2011" },
   { name: "The Battle of Lake-town", packs: ["TBoLT"], home: "standalone-scenarios", load: "dragncards", easySheet: false, twinPack: null, scenarioProduct: "2012" },

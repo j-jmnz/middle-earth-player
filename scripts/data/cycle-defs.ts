@@ -18,6 +18,7 @@ const DRAGON_TREASURE = ["132020", "132021", "132022", "132023", "132024"];
 const againstTheShadow = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("03", n, id, product, extra);
 const ringMaker = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("04", n, id, product, extra);
 const haradrim = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("07", n, id, product, extra);
+const vengeanceOfMordor = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("09", n, id, product, extra);
 const hobbit = (n: number, id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef => cycleScenario("0A", n, id, product, extra);
 
 export const CYCLE_DEFS: readonly CampaignDef[] = [
@@ -150,6 +151,28 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
     ],
     saga: false,
     ledger: "haradrim",
+  },
+  // No source names a cycle: Hall of Beorn lists the scenarios of A Shadow in the East and of its six Adventure Packs under each product, and RingsDB numbers the deluxe expansion and the six packs as cycles 25 and 26.
+  // DragnCards numbers the decks Q09.1 to Q09.9 (Q08 is Wilderland's). The cycle has no Campaign Mode, so the Scenarios tab lists it; released is the US release of its first product (hallofgondor.com/release-dates).
+  {
+    id: "vengeance-of-mordor",
+    name: "Vengeance of Mordor",
+    kind: "cycle",
+    released: "2019-08-02",
+    products: ["A Shadow in the East", "Wrath and Ruin", "The City of Ulfast", "Challenge of the Wainriders", "Under the Ash Mountains", "The Land of Sorrow", "The Fortress of Nurn"],
+    scenarios: [
+      vengeanceOfMordor(1, "the-river-running", "A Shadow in the East", { setupSpan: "vom.setup-the-river-running" }),
+      vengeanceOfMordor(2, "danger-in-dorwinion", "A Shadow in the East", { setupSpan: "vom.setup-danger-in-dorwinion" }),
+      vengeanceOfMordor(3, "the-temple-of-doom", "A Shadow in the East", { setupSpan: "vom.setup-the-temple-of-doom" }),
+      vengeanceOfMordor(4, "wrath-and-ruin", "Wrath and Ruin", { setupSpan: "vom.setup-wrath-and-ruin" }),
+      vengeanceOfMordor(5, "the-city-of-ulfast", "The City of Ulfast", { setupSpan: "vom.setup-the-city-of-ulfast" }),
+      vengeanceOfMordor(6, "challenge-of-the-wainriders", "Challenge of the Wainriders", { setupSpan: "vom.setup-challenge-of-the-wainriders" }),
+      vengeanceOfMordor(7, "under-the-ash-mountains", "Under the Ash Mountains", { setupSpan: "vom.setup-under-the-ash-mountains" }),
+      vengeanceOfMordor(8, "the-land-of-sorrow", "The Land of Sorrow", { setupSpan: "vom.setup-the-land-of-sorrow" }),
+      vengeanceOfMordor(9, "the-fortress-of-nurn", "The Fortress of Nurn", { setupSpan: "vom.setup-the-fortress-of-nurn" }),
+    ],
+    saga: false,
+    ledger: "vengeance-of-mordor",
   },
   {
     // The scenarios printed on their own (RingsDB's cycle 50 packs that are not A Long-extended Party's): one product line each as it is built. The index counts the built ones.
