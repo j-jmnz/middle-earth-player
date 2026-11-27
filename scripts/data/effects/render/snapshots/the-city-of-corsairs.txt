@@ -319,7 +319,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
   12157:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each Ship enemy (any player controls) or in the staging area:
-      - the picked card is dealt a shadow card [also {"inPlay":true}]
+      - the picked card is dealt a shadow card (an enemy in the staging area is in play too and is dealt one)
     - then, if the Heading card shows Cloud, Rain or Storm (off-course) (false while the game has no Heading card) (checked when this step runs, after the steps above; not tied to whether they did anything): for each Ship enemy (any player controls) or in the staging area:
       - the picked card: stat engagementCost -10, until the end of the round
 
@@ -433,4 +433,4 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
       - the acting player assigns the resource tokens on Raider enemy (any player controls) engaged with you damage among the character (you control), one at a time
     - then, if the number of Raider enemy (any player controls) is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
-(rendered pieces: 312 by template, 1 as JSON)
+(rendered pieces: 313 by template, 0 as JSON)

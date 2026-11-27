@@ -44,7 +44,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   {"id":"41028:constant:1","cardCode":"41028","lines":["41028:A:1"],"timing":"constant","condition":IN_STAGING,"instructions":[{"verb":"ModifyStat","stat":"attackableAsEngaged","amount":1,"until":"whileSourceInPlay","target":"self"},{"verb":"ModifyStat","stat":"defense","amount":{"stat":"threat","of":"self"},"until":"whileSourceInPlay","target":"self"}]},
   {"id":"41028:travel:1","cardCode":"41028","lines":["41028:A:2"],"timing":"travel","instructions":[{"verb":"Heal","amount":4,"target":"self"}]},
   // 41029 Cave Torch (the Setup attaches it): exhausting it places up to 3 progress on a Dark location (at least 1: placing none is no use; the exhaust is the first
-  // instruction, not a paid cost, so the Forced effect hears it: rules/player/usage.ts does not announce an exhausted cost); after it exhausts,
+  // instruction, so the Forced effect hears it); after it exhausts,
   // the top encounter card is discarded and an enemy goes to the staging area (as 41015:travel:1).
   {"id":"41029:action:1","cardCode":TORCH,"lines":["41029:A:2"],"timing":"action","condition":{"kind":"all","conditions":[{"kind":"exhausted","code":TORCH,"is":false},{"kind":"canPick","pick":DARK_LOCATION}]},"instructions":[{"verb":"Exhaust"},{"verb":"ChooseX","max":[3]},{"verb":"Pick","pick":DARK_LOCATION},{"verb":"PlaceProgressOn","amount":{"x":true},"target":"picked"}]},
   {"id":"41029:forced:1","cardCode":TORCH,"lines":["41029:A:3"],"timing":"forced","trigger":"exhausted","subject":"self","instructions":[{"verb":"MoveEncounterCard","card":"deckTop","to":"discard"},{"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"}}}]},

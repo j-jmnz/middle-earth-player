@@ -1,7 +1,6 @@
 // Rules: rr.action, rr.cost, rr.limits, rr.response, rr.in-play-and-out-of-play, rr.play-and-put-into-play, rr.ownership-and-control,
 // rr.then, rr.sentinel, rr.printed, rr.triggered-ability (data/rules/entries.json).
-// The Blood of Gondor heroes and allies, each printed line tested from the words on the card (data/cards/BoG.json: data/printed holds no
-// ledger for this pack, so the lines are the text of data/cards and every intent goes through sendUnledgered): Caldara 06107:A:1, Squire
+// The Blood of Gondor heroes and allies, each printed line tested from the words on the card (data/cards/BoG.json: the lines are the ledger lines in data/printed, read from the scans): Caldara 06107:A:1, Squire
 // of the Citadel 06108:A:1, Guthlaf 06110:A:1 and A:2, Emery 06112:A:1, Anborn 06114:A:1. The attachments are in
 // the-blood-of-gondor-attachments.test.ts, the events in the-blood-of-gondor-events.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -15,8 +14,8 @@ import { playCost } from "../../rules/player/attach.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { choices, discarded, fillers, play, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { type Table, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { choices, discarded, fillers, play, playerTableFor, triggers } from "../../../test/harness/player-table.ts";
 
 const CALDARA = "06107";
 const SQUIRE = "06108";
@@ -72,12 +71,12 @@ describe("Caldara (06107:A:1)", () => {
   lineSpec("06107:A:1", "Caldara: discard her to put a Spirit ally into play for each other Spirit hero", (effects) => {
     const { tab, ids: [took = "", guide = "", tracker = "", scout = ""] } = scene(effects, [{ code: EOWYN, seat: 0 }, { code: ELEANOR, seat: 0 }, { code: DENETHOR, seat: 0 }]);
     const caldara = idsOf(tab, CALDARA);
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: caldara, effectId: "06107:action:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: caldara, effectId: "06107:action:1" }, tab.ctx);
     expect(run.state.cards[caldara]?.zone).toBe("discard");
     expect(choices(run.state, tab).sort()).toEqual([took, guide, tracker].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: took }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: took }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([guide, tracker].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: tracker }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: tracker }, tab.ctx);
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[took]).toMatchObject({ zone: "play", controller: 0 });
     expect(run.state.cards[tracker]).toMatchObject({ zone: "play", controller: 0 });
@@ -88,8 +87,8 @@ describe("Caldara (06107:A:1)", () => {
   // "each other hero you control": the other player's Spirit hero is not counted, so one ally comes into play for Éowyn alone.
   it("06107:A:1 Caldara: another player's Spirit hero is not counted", () => {
     const { tab, ids: [took = "", guide = "", tracker = ""] } = scene(EFFECTS, [{ code: EOWYN, seat: 0 }, { code: DUNHERE, seat: 1 }], 2);
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, CALDARA), effectId: "06107:action:1" }, tab.ctx);
-    run = sendUnledgered(run, { type: "Choose", optionId: guide }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, CALDARA), effectId: "06107:action:1" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: guide }, tab.ctx);
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[guide]?.zone).toBe("play");
     expect([took, tracker].map((id) => run.state.cards[id]?.zone)).toEqual(["discard", "discard"]);
@@ -109,12 +108,12 @@ describe("Squire of the Citadel (06108:A:1)", () => {
   lineSpec("06108:A:1", "Squire of the Citadel: after it leaves play, 1 resource to a Gondor hero", (effects) => {
     const tab = table(effects, { seats: 2, heroes: [{ code: DENETHOR, seat: 0 }, { code: GIMLI, seat: 0 }, { code: ELEANOR, seat: 1 }], allies: [{ code: SQUIRE, seat: 0 }] });
     const [squire, eleanor] = [idsOf(tab, SQUIRE), idsOf(tab, ELEANOR)];
-    let run = sendUnledgered(begin(placeDamage(tab.state, squire, 1, tab.ctx.cards, [], "framework", ruleCause("rr.damage"))), { type: "Pass" }, tab.ctx);
+    let run = send(begin(placeDamage(tab.state, squire, 1, tab.ctx.cards, [], "framework", ruleCause("rr.damage"))), { type: "Pass" }, tab.ctx);
     expect(run.state.cards[squire]?.zone).toBe("discard");
     expect(triggers(run.state, tab)).toContain("06108:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: squire, effectId: "06108:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: squire, effectId: "06108:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, DENETHOR), eleanor].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: eleanor }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: eleanor }, tab.ctx);
     expect(run.state.cards[eleanor]?.resources).toBe(6 + 1);
     expect(run.state.cards[idsOf(tab, DENETHOR)]?.resources).toBe(6);
   });
@@ -123,7 +122,7 @@ describe("Squire of the Citadel (06108:A:1)", () => {
   it("06108:A:1 Squire of the Citadel: not offered with no Gondor hero", () => {
     const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], allies: [{ code: SQUIRE, seat: 0 }] });
     const squire = idsOf(tab, SQUIRE);
-    const run = sendUnledgered(begin(placeDamage(tab.state, squire, 1, tab.ctx.cards, [], "framework", ruleCause("rr.damage"))), { type: "Pass" }, tab.ctx);
+    const run = send(begin(placeDamage(tab.state, squire, 1, tab.ctx.cards, [], "framework", ruleCause("rr.damage"))), { type: "Pass" }, tab.ctx);
     expect(run.state.cards[squire]?.zone).toBe("discard");
     expect(triggers(run.state, tab)).not.toContain("06108:response:1");
   });
@@ -172,9 +171,9 @@ describe("Emery (06112:A:1)", () => {
     const tab = scene(effects, [SPIRIT_CARD, PLAIN, SPIRIT_CARD]);
     const emery = idsOf(tab, EMERY);
     const top = (tab.state.seats[0]?.deck ?? []).slice(0, 3);
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: emery, effectId: "06112:action:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: emery, effectId: "06112:action:1" }, tab.ctx);
     expect(choices(run.state, tab)).toEqual(["seat:0", "seat:1"]);
-    run = sendUnledgered(run, { type: "Choose", optionId: "seat:1" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "seat:1" }, tab.ctx);
     expect(top.map((id) => run.state.cards[id]?.zone)).toEqual(["discard", "discard", "discard"]);
     expect(run.state.seats[0]?.deck).toHaveLength(2);
     expect(run.state.cards[emery]).toMatchObject({ zone: "play", controller: 1 });
@@ -185,8 +184,8 @@ describe("Emery (06112:A:1)", () => {
   it("06112:A:1 Emery: discarded when a discarded card is Lore", () => {
     const tab = scene(EFFECTS, [SPIRIT_CARD, LORE_CARD, PLAIN]);
     const emery = idsOf(tab, EMERY);
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: emery, effectId: "06112:action:1" }, tab.ctx);
-    run = sendUnledgered(run, { type: "Choose", optionId: "seat:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: emery, effectId: "06112:action:1" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "seat:1" }, tab.ctx);
     expect(run.state.seats[0]?.deck).toHaveLength(2);
     expect(run.state.cards[emery]?.zone).toBe("discard");
   });
@@ -209,10 +208,10 @@ describe("Anborn (06114:A:1)", () => {
     const start = table(effects, { heroes: [{ code: DENETHOR, seat: 0 }], allies: [{ code: ANBORN, seat: 0 }] });
     const { tab, ids: [snare = "", stakes = "", plain = ""] } = discarded(start, [[SNARE, 0], [STAKES, 0], [PLAIN, 0]]);
     const anborn = idsOf(tab, ANBORN);
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: anborn, effectId: "06114:action:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: anborn, effectId: "06114:action:1" }, tab.ctx);
     expect(run.state.cards[anborn]?.exhausted).toBe(true);
     expect(choices(run.state, tab).sort()).toEqual([snare, stakes].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: snare }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: snare }, tab.ctx);
     expect(run.state.cards[snare]?.zone).toBe("hand");
     expect(run.state.cards[stakes]?.zone).toBe("discard");
     expect(run.state.cards[plain]?.zone).toBe("discard");

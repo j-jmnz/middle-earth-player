@@ -8,6 +8,7 @@ import { definePrinted } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { ally, enemy, hero, offered, recordsOf, send, table, treachery, until, type Table, type TableSpec } from "../defense/table.ts";
+import { canPayCancel } from "../../windows/cancel.ts";
 import { groupResources } from "../defense/conditions.ts";
 import { legalIntents as legalState } from "../../engine/reduce.ts";
 import { send as sendOn, idOf, legalIntents as legalOn, finish } from "../../../../test/harness/scene-kit.ts";
@@ -155,5 +156,12 @@ describe("Orc Vanguard's lock is read before the pick of a spend", () => {
     const built = table({ cards: [hero("a"), hero("b")], effects: [], heroes: [{ code: "a" }, { code: "b" }] });
     expect(groupResources(built.state, [0], "tactics", built.ctx)).toBe(6);
     expect(groupResources(locked(built.state, built.ids.a ?? ""), [0], "tactics", built.ctx)).toBe(3);
+  });
+
+  it("a cancel offer is not opened when only a locked hero can pay for it", () => {
+    const built = table({ cards: [hero("a", { sphere: "spirit" })], effects: [], heroes: [{ code: "a" }], resources: 2 });
+    const offer = { sphere: "spirit" as const, amount: 1, unless: null };
+    expect(canPayCancel(built.state, offer, built.ctx)).toBe(true);
+    expect(canPayCancel(locked(built.state, built.ids.a ?? ""), offer, built.ctx)).toBe(false);
   });
 });

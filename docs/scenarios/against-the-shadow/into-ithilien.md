@@ -97,7 +97,7 @@ The readings of Into Ithilien use the statuses defined in the Readings bullet of
 
 ### 05055 Southron Support
 
-- `05055:A:2` (span-settled). Each player in turn order, the first player first, searches the encounter deck and discard pile for a Harad enemy and adds it to the staging area, if able (not revealed); a player who finds none adds none; then the encounter deck is shuffled. Doomed 3 is the keyword. Basis: rr.search; rr.doomed-x; faq.cancel-encounter-effect; traits from `data/cards`.
+- `05055:A:2` (span-settled). Each player in turn order, the first player first, searches the encounter deck and discard pile for a Harad enemy and adds it to the staging area, if able (not revealed); a Haradrim Elite found this way attacks as it is added (05053:A:1, announced by the record); a player who finds none adds none; then the encounter deck is shuffled. Doomed 3 is the keyword. Basis: rr.search; rr.doomed-x; faq.cancel-encounter-effect; traits from `data/cards`.
 
 ### 05068 Ambush in Ithilien, 05069 Southron Counter-attack, 05070 The Hidden Way, 05071 Approaching Cair Andros
 

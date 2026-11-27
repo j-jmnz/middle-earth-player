@@ -8,6 +8,7 @@ import { chipText, moreText, MUST_COMMIT_WORD, type CardEffects, type CombatNumb
 import { DETERMINED_WORD } from "../words/scenarios/angmar/wastes-table.ts";
 import { BLANK_WORD } from "../words/card-bars.ts";
 import { CHAMPION_WORD } from "../words/scenarios/haradrim/umbar-table.ts";
+import { SHIELD_WORD } from "../words/scenarios/against-the-shadow/vale.ts";
 import { type IconName } from "../../ui/icon-map.ts";
 import { glyphCells, type PlaceMark } from "../store/island-place.ts";
 import { COLS, ROWS } from "../dream-chaser/island-table.ts";
@@ -146,8 +147,8 @@ export function CurrentQuestMark({ rect, clear, fonts, t, s }: { rect: Rect; cle
   return <WordPill rect={rect} text="Current" clear={clear} fonts={fonts} t={t} s={s} />;
 }
 
-// The round glyph a word falls back to where it does not fit: "Determined" is a "D", the Champion of Escape from Umbar a "C", Desert Crossing's "Blank" a "B"; "Determination" has none (the plain dot).
-const SHORT_GLYPHS: ReadonlyMap<string, string> = new Map([[DETERMINED_WORD, "D"], [CHAMPION_WORD, "C"], [BLANK_WORD, "B"]]);
+// The round glyph a word falls back to where it does not fit: "Determined" is a "D", the Champion of Escape from Umbar a "C", the Morgul Bodyguard that shields a Captain an "S", Desert Crossing's "Blank" a "B"; "Determination" has none (the plain dot).
+const SHORT_GLYPHS: ReadonlyMap<string, string> = new Map([[DETERMINED_WORD, "D"], [CHAMPION_WORD, "C"], [SHIELD_WORD, "S"], [BLANK_WORD, "B"]]);
 const shortGlyph = (word: string): string | undefined => SHORT_GLYPHS.get(word);
 
 /** A hero or ally the Campaign Log marks determined ("Determined"), or that carries a Determination ("Determination"): the same pill as the current quest's, a character wearing neither of the other marks (mec108.campaign-log, ledger line 10172:A:1). */
@@ -157,14 +158,14 @@ export function DeterminedMarkView({ rect, word, clear, fonts, t, s }: { rect: R
 }
 
 /**
- * A card whose text box is blank (Desert Crossing, Cold from Angmar, the heroes The Long Arm of Mordor holds): the accent "Blank" pill stands in the pill column at the card's foot, as the "1 held" pill does, never on the name at the top; where the word does not fit, a round "B".
+ * A card marked with a word that must not stand on its name at the top: the accent "Blank" pill of a card whose text box is blank (Desert Crossing, Cold from Angmar, the heroes The Long Arm of Mordor holds), the "Shield" of the Morgul Bodyguard that takes a Captain's damage and the "Champion" of Escape from Umbar. It stands in the pill column at the card's foot, as the "1 held" pill does; where the word does not fit, a round glyph ("B", "S", "C").
  * `lifted`: another mark holds the foot row (the engagement cost, a combat number, the progress strip, a held pill), so this one stands a row above it.
  */
-export function BlankMarkView({ rect, lifted, fonts, t, s }: { rect: Rect; lifted: boolean; fonts: Fonts; t: TableTokens; s: number }) {
-  const words = fonts.badge.getTextWidth(BLANK_WORD);
+export function BlankMarkView({ rect, word, lifted, fonts, t, s }: { rect: Rect; word: string; lifted: boolean; fonts: Fonts; t: TableTokens; s: number }) {
+  const words = fonts.badge.getTextWidth(word);
   const box = underMarkBox(rect, words, 0, s, false, false, lifted);
   const fits = words + 10 * s <= rect.w - 4 * s;
-  const text = fits ? BLANK_WORD : "B";
+  const text = fits ? word : (shortGlyph(word) ?? word.slice(0, 1));
   const width = fits ? box.width : box.height;
   const x = box.x + (box.width - width) / 2;
   const shown = fonts.badge.getTextWidth(text);

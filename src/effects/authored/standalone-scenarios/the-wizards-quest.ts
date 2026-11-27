@@ -184,7 +184,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "51014:shadow:1", cardCode: "51014", lines: ["51014:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", when: ATTACKER_UNIQUE_OR_NOT, instructions: [{ verb: "ImmediateAttack" }] }] },
 
   // 51015 Bane of Amon Lanc: after it destroys an ally the defending player discards 1 card for each excess point of damage.
-  { id: "51015:forced:1", cardCode: "51015", lines: ["51015:A:2"], timing: "forced", trigger: "characterDestroyedByAttack", subject: { type: "ally", control: "any" }, eventSeat: "you", condition: { kind: "matches", card: "other", pick: { type: "enemy", control: "any", isSource: true } }, instructions: [{ verb: "DiscardFromHand", amount: { excessOf: "subject" } }] },
+  // The defending player is the player the enemy attacks, whoever controls the ally that defended (rr.defending-player): the discard runs for the player it is engaged with.
+  { id: "51015:forced:1", cardCode: "51015", lines: ["51015:A:2"], timing: "forced", trigger: "characterDestroyedByAttack", subject: { type: "ally", control: "any" }, condition: { kind: "matches", card: "other", pick: { type: "enemy", control: "any", isSource: true } }, instructions: [{ verb: "ForEachPlayer", order: "firstFirst", seats: "engaged", instructions: [{ verb: "DiscardFromHand", amount: { excessOf: "subject" } }] }] },
 
   // 51016 Oak-wood Grove: no progress on the other locations of the staging area while it is there; Travel: each player exhausts a character.
   { id: "51016:constant:1", cardCode: "51016", lines: ["51016:A:1"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "ModifyStat", stat: "noProgressPlaced", amount: 1, until: "whileSourceInPlay", holders: { type: "location", control: "any", stagingOnly: true, other: true } }] },

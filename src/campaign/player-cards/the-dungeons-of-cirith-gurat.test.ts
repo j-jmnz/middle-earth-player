@@ -1,7 +1,6 @@
 // Rules: bts.valour, rr.action, rr.response, rr.cost, rr.limits, rr.ready, rr.modifiers, rr.attachment-cards, rr.restricted, rr.traits,
 // rr.triggered-ability, rr.threat-threat-dial, rr.initial-threat-level, rr.enters-play (data/rules/entries.json).
-// The Dungeons of Cirith Gurat hero, allies and attachments, written from their card text (data/cards/DoCG.json; data/printed holds no
-// ledger for this pack, so every intent goes through sendUnledgered): Folco Boffin 17109:A:1 and A:2, Knight of Dale 17110:A:1 and A:2,
+// The Dungeons of Cirith Gurat hero, allies and attachments, written from their card text (data/cards/DoCG.json; the ledger lines in data/printed are read from the scans): Folco Boffin 17109:A:1 and A:2, Knight of Dale 17110:A:1 and A:2,
 // Diligent Noble 17111:A:1, A:2 and A:3, Riddermark Knight 17112:A:1, Eregion Survivor 17114:A:1, Leaflock 17116:A:1, A:2 and A:3, Legacy
 // Blade 17117:A:1. The events are in the-dungeons-of-cirith-gurat-events.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -15,8 +14,8 @@ import { hasTrait } from "../../rules/interpret/conditions.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { attacking, fillers, hosts, passAll, play, playCode, playerTableFor, sendUnledgered, stat, threatened, triggers } from "../../../test/harness/player-table.ts";
+import { type Table, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { attacking, fillers, hosts, passAll, play, playCode, playerTableFor, stat, threatened, triggers } from "../../../test/harness/player-table.ts";
 
 const FOLCO = "17109";
 const DALE = "17110";
@@ -75,7 +74,7 @@ describe("Folco Boffin (17109:A:1, A:2)", () => {
     const tab = threatened(table(effects, { seats: 2, heroes: [{ code: FOLCO, seat: 0 }, { code: ARAGORN, seat: 0 }, { code: PAL, seat: 1 }] }), 30);
     const folco = idsOf(tab, FOLCO);
     expect(triggers(tab.state, tab)).toContain("17109:action:1");
-    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: folco, effectId: "17109:action:1" }, tab.ctx);
+    const run = send(begin(tab.state), { type: "Trigger", cardId: folco, effectId: "17109:action:1" }, tab.ctx);
     expect(run.state.cards[folco]?.zone).toBe("discard");
     expect(run.state.seats[0]?.threat).toBe(30 - 7);
     expect(run.state.seats[1]?.threat).toBe(6);
@@ -103,7 +102,7 @@ describe("Knight of Dale (17110:A:1, A:2)", () => {
     const [card, aragorn] = [idsOf(tab, DALE), idsOf(tab, ARAGORN)];
     expect(triggers(tab.state, tab)).toContain("17110:action:1");
     expect(refusal(tab.state, spend(tab, idsOf(tab, EOWYN)), tab.ctx)).not.toBeNull();
-    const run = sendUnledgered(begin(tab.state), spend(tab, aragorn), tab.ctx);
+    const run = send(begin(tab.state), spend(tab, aragorn), tab.ctx);
     expect(run.state.cards[card]?.exhausted).toBe(false);
     expect(run.state.cards[aragorn]?.resources).toBe(6 - 1);
     expect(triggers(updateCard(run.state, card, { exhausted: true }), tab)).not.toContain("17110:action:1");
@@ -115,7 +114,7 @@ describe("Knight of Dale (17110:A:1, A:2)", () => {
     const tab = knight(effects, 40);
     const card = idsOf(tab, DALE);
     expect(triggers(tab.state, tab)).toContain("17110:action:2");
-    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: card, effectId: "17110:action:2" }, tab.ctx);
+    const run = send(begin(tab.state), { type: "Trigger", cardId: card, effectId: "17110:action:2" }, tab.ctx);
     expect(run.state.cards[card]?.exhausted).toBe(false);
     expect(run.state.cards[idsOf(tab, ARAGORN)]?.resources).toBe(6);
     expect(triggers(updateCard(run.state, card, { exhausted: true }), tab)).not.toContain("17110:action:2");
@@ -159,7 +158,7 @@ describe("Diligent Noble (17111:A:1, A:2, A:3)", () => {
     const card = idsOf(tab, NOBLE);
     let run = play(begin(tab.state), tab, card, idsOf(tab, THALIN));
     expect(triggers(run.state, tab)).toContain("17111:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: card, effectId: "17111:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: card, effectId: "17111:response:1" }, tab.ctx);
     expect(run.state.seats[0]?.hand).toHaveLength(1);
     expect(run.state.seats[0]?.deck).toHaveLength(1);
   });
@@ -183,9 +182,9 @@ describe("Riddermark Knight (17112:A:1)", () => {
   lineSpec("17112:A:1", "Riddermark Knight: +2 Attack for the attack after it is declared as an attacker, then it is discarded", (effects) => {
     const tab = riders(effects);
     const [knight, weak] = [idsOf(tab, RIDDERMARK), idsOf(tab, WEAK)];
-    let run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: weak, attackerIds: [knight] }, tab.ctx);
+    let run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: weak, attackerIds: [knight] }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("17112:response:1");
-    run = passAll(sendUnledgered(run, { type: "Trigger", cardId: knight, effectId: "17112:response:1" }, tab.ctx), tab.ctx);
+    run = passAll(send(run, { type: "Trigger", cardId: knight, effectId: "17112:response:1" }, tab.ctx), tab.ctx);
     expect(run.steps.filter((step) => step.kind === "strike" && step.side === "player").map((step) => (step.kind === "strike" ? step.attack : 0))).toEqual([2 + 2]);
     expect(run.state.cards[weak]?.damage).toBe(4);
     expect(run.state.cards[knight]?.zone).toBe("discard");
@@ -195,7 +194,7 @@ describe("Riddermark Knight (17112:A:1)", () => {
   // "After Riddermark Knight is declared": the ally attacking alone does not offer it.
   it("17112:A:1 Riddermark Knight: not offered when another character attacks", () => {
     const tab = riders(EFFECTS);
-    const run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WEAK), attackerIds: [idsOf(tab, ALLY)] }, tab.ctx);
+    const run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WEAK), attackerIds: [idsOf(tab, ALLY)] }, tab.ctx);
     expect(triggers(run.state, tab)).not.toContain("17112:response:1");
   });
 });

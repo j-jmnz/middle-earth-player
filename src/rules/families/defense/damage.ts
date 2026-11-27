@@ -75,17 +75,23 @@ export function redirectDamage(state: ScenarioState, instruction: Extract<Instru
   return placeDamage(cancelDealt(state, from, amount, dealt, ctx), to, amount, ctx.cards, steps, "framework", currentCause(steps, UNATTRIBUTED));
 }
 
-// "Attached hero takes all damage assigned to the chosen hero": damage assigned to a card that holds damageToSourceHost goes to
-// the host of that modifier's source while the host is in play.
+// Where the damage assigned to `id` is placed: damage assigned to a card that holds damageToSourceHost goes to the host of that modifier's source while the host is in play (02099), then the Scroll and Bodyguard flags are read.
 export function damageGoesTo(state: ScenarioState, id: string, source?: DamageSource): string {
+  // Song of Mocking changes who the damage is assigned to; a card that says the damage is dealt to another card (Alcaron's Scroll) then acts on the card it was assigned to (agent recommendation, docs/brief.md, Player card readings).
+  const assigned = assignedTo(state, id);
+  // "Any damage dealt by this attack is dealt to the hero with Alcaron's Scroll attached, if able" (05020:A:2): the pelargir family names the hero, or none.
+  // "Any damage that would be dealt to a Captain enemy is dealt to 1 Morgul Bodyguard instead" (06148:A:1): the Captain holds the flag while a Bodyguard is in play.
+  return scrollDamageTarget(state, assigned, source) ?? bodyguardTarget(state, assigned) ?? assigned;
+}
+
+// "Attached hero takes all damage assigned to the chosen hero": the host of the source of the modifier, while it is in play.
+function assignedTo(state: ScenarioState, id: string): string {
   for (const modifier of state.modifiers) {
     if (modifier.stat !== "damageToSourceHost" || modifier.instanceId !== id || modifier.amount <= 0 || !modifierActive(state, modifier)) continue;
     const host = state.cards[modifier.sourceId]?.host;
     if (host && host !== id && inPlay(state.cards[host]?.zone ?? "removed")) return host;
   }
-  // "Any damage dealt by this attack is dealt to the hero with Alcaron's Scroll attached, if able" (05020:A:2): the pelargir family names the hero, or none.
-  // "Any damage that would be dealt to a Captain enemy is dealt to 1 Morgul Bodyguard instead" (06148:A:1): the Captain holds the flag while a Bodyguard is in play.
-  return scrollDamageTarget(state, id, source) ?? bodyguardTarget(state, id) ?? id;
+  return id;
 }
 
 // Damage a card does not take from this source: Bilbo Baggins in the riddle area takes it only from Gollum (families/riddles/gollum.ts).
@@ -167,7 +173,7 @@ export function noteAttackDamage(before: ScenarioState, damaged: ScenarioState, 
 }
 
 // The event of damage that destroyed its card goes ahead of that card's "destroyed" event: the damage is heard before the destruction.
-function queueBeforeDestruction(state: ScenarioState, event: GameEvent): ScenarioState {
+export function queueBeforeDestruction(state: ScenarioState, event: GameEvent): ScenarioState {
   const pending = state.pendingEvents ?? [];
   const at = pending.findIndex((one) => one.trigger === "characterDestroyed" && one.subject === event.subject);
   return at < 0 ? queueEvent(state, event) : { ...state, pendingEvents: [...pending.slice(0, at), event, ...pending.slice(at)] };

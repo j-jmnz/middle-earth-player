@@ -100,8 +100,8 @@ export const simpleVerbs = [
   z.strictObject({ verb: z.literal("SetThreat"), value: z.number().int().min(0), ...when }),
   // Puts the source ally under another player's control.
   z.strictObject({ verb: z.literal("GiveControl"), ...when }),
-  // Cancels what the Response it is played in answers: the "when revealed" effects about to resolve, or the shadow effect.
-  verb("CancelEffect"),
+  // Cancels what the Response it is played in answers: the "when revealed" effects about to resolve, or the shadow effect. `shadow`: an Action that cancels the shadow effect of the attack in progress before its card is turned over (12060:A:2).
+  z.strictObject({ verb: z.literal("CancelEffect"), shadow: z.literal(true).optional(), ...when }),
   // Shows the actor the top card of the encounter deck. The window closes with a pass.
   verb("LookAtEncounterTop"),
   // Shuffles the actor's deck.

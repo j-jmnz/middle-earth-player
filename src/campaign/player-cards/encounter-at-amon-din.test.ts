@@ -296,14 +296,18 @@ describe("Hobbit-sense (06065:A:1, A:2)", () => {
     expect(refusal(combat(mixed.state, mixed).state, { type: "PlayCard", cardId: idsOf(mixed, SENSE), payments: [{ heroId: idsOf(mixed, PIPPIN), amount: 2 }] }, mixed.ctx)).not.toBeNull();
   });
 
-  // "Combat Action: Enemies engaged with you do not attack this round. You cannot declare attacks this round.": played in the combat action
+  // "Combat Action: Enemies engaged with you do not attack this phase. You cannot declare attacks this phase.": played in the combat action
   // window, the Soft makes no attack (the game does not ask for a defender), and Pippin's attack on it is refused.
-  lineSpec("06065:A:2", "Hobbit-sense: enemies engaged with you do not attack this round and you cannot declare attacks", (effects) => {
+  lineSpec("06065:A:2", "Hobbit-sense: enemies engaged with you do not attack this phase and you cannot declare attacks", (effects) => {
     const tab = sense(effects, [PIPPIN, PAL]);
     const opened = combat(tab.state, tab);
     expect(opened.state.window?.kind).toBe("frameAction");
     const played = play(opened, tab, idsOf(tab, SENSE));
     expect(played.state.cards[idsOf(tab, SENSE)]?.zone).toBe("discard");
+    // Both effects last "this phase", not the round (the printed text).
+    const held = played.state.modifiers.filter((modifier) => modifier.stat === "cannotAttack");
+    expect(held.length).toBeGreaterThan(0);
+    expect(held.every((modifier) => modifier.until === "endOfPhase")).toBe(true);
     expect(refusal(attacking(played.state), { type: "DeclareAttackers", enemyId: idsOf(tab, SOFT), attackerIds: [idsOf(tab, PIPPIN)] }, tab.ctx)).not.toBeNull();
     // The game runs through the combat phase into the next round with no defense asked for and no enemy strike.
     const run = passAll(played, tab.ctx);

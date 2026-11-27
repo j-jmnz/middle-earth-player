@@ -33,7 +33,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
 
 17039:A:4 (front): Stage 4B cannot be defeated while River Harnen is in play.
   17039:constant:2: Constant
-    - the players cannot defeat the main quest stage while this holds
+    - the players cannot defeat the main quest stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 17040 Expanse of Harad
 (the scenario deals it into the encounter pile; the piles place it, no record does)

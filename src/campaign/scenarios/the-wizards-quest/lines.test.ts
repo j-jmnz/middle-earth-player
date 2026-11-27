@@ -5,7 +5,9 @@ import { describe, expect, it } from "vitest";
 import { legalIntents } from "../../../rules/engine/legal.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { attachBlocked, restricted } from "../../../rules/interpret/restrictions.ts";
-import { moveCard } from "../../../rules/core/zones.ts";
+import { moveCard, shadowCards } from "../../../rules/core/zones.ts";
+import { playedLayout } from "../../../../test/harness/card-spec-play.ts";
+import { attack } from "../../../../test/harness/card-spec.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { addModifier } from "../../../rules/core/keywords.ts";
 import { healDamage } from "../../../rules/families/dreamchaser/heal-cap.ts";
@@ -122,5 +124,28 @@ describe("Befouled Equipment", () => {
     const second = finish({ state: revealFromTop(first, made.ctx, "51036", []).state, steps: [] }, made.ctx).state;
     const copies = Object.values(second.cards).filter((card) => card.code === "51036");
     expect(copies.map((card) => card.host).sort()).toEqual([ally, idOf(second, "dh1")].sort());
+  });
+});
+
+describe("additional shadow cards", () => {
+  it("51049:A:2 the additional shadow card goes to the attacking enemy and is resolved with it, not held by the shadow card", () => {
+    const { run } = playedLayout("the-wizards-quest", { engaged: ["f3"], deck: ["f0", "f0", "f0", "f0", "f0", "f0"] }, attack("f3", { shadow: "51049", undefended: true }));
+    const state = run.state;
+    const enemy = state.cards[idOf(state, "f3")];
+    expect(shadowCards(enemy).map((id) => state.cards[id]?.code).sort()).toEqual(["51049", "f0"]);
+    expect(shadowCards(state.cards[idOf(state, "51049")])).toEqual([]);
+    expect(shadowCards(enemy).every((id) => state.cards[id]?.face === "up")).toBe(true);
+  });
+});
+
+describe("defending player", () => {
+  it("51015:A:2 a Sentinel ally of the other player defends and is destroyed: the player the enemy attacks discards, not the ally's controller (rr.defending-player)", () => {
+    const build = (layout: Layout) => tableFromLayout("the-wizards-quest", layout, { extra: ["10116"] });
+    const hand = ["c0", "c0", "c0", "c0", "c0"];
+    const fought = fightEnemy(build, "f0", "51015", { seats: 2, play: [{ code: "10116", seat: 1 }], hand, deck: ["f0", "f0", "f0", "f0", "f0", "f0"] }, { defender: (made) => idOf(made.state, "10116") });
+    const state = fought.run.state;
+    expect(state.cards[idOf(state, "10116")]?.zone).toBe("discard");
+    expect(state.seats[0]?.hand.length).toBeLessThan(fought.made.state.seats[0]?.hand.length ?? 0);
+    expect(state.seats[1]?.hand.length).toBe(fought.made.state.seats[1]?.hand.length);
   });
 });

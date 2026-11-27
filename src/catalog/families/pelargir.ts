@@ -206,6 +206,8 @@ const FLAGS = [
   // On a Captain enemy while its stage is current: it cannot leave play unless it is destroyed ("Murzag cannot leave play unless destroyed", 06144:B:1, 06145:B:1, 06146:B:2). A Pick that feeds a verb taking the card out of play any other way leaves it out, so no player is offered a target whose effect cannot happen (rr.cannot; src/rules/families/pelargir/vale/cannot-leave.ts);
   // a shuffle of the staging area leaves it where it is, and a settle sweep puts it back in the staging area when an effect with no pick moved it out of play anyway. Returning it to the staging area is not leaving play.
   "cannotLeavePlay",
+  // On the same Captain: no move takes it out of play but its destruction, so it keeps its damage, attachments and shadow cards (src/rules/core/zones.ts moveCard, src/rules/families/encounter/moves.ts moveEncounter). The Guardians' "cannot leave play except by a quest effect" (08037:B:1) hold only `cannotLeavePlay`.
+  "cannotLeaveUnlessDestroyed",
   // On each Captain enemy while a Morgul Bodyguard is in play: damage that would be dealt to it is dealt to one Bodyguard instead ("Any damage that would be dealt to a Captain enemy is dealt to 1 Morgul Bodyguard instead", 06148:A:1; src/rules/families/defense/damage.ts damageGoesTo asks families/pelargir/vale/bodyguard.ts).
   "shieldedByBodyguard",
   // On an enemy until the end of the attack: a shadow effect ended this attack ("Attacking enemy engages the next player and makes an immediate attack", 06148:A:2), so no damage is dealt and no shadow card that is left resolves (src/rules/combat/shadow.ts resolveAttack asks families/pelargir/vale/switch.ts).

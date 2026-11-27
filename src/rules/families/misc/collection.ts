@@ -13,7 +13,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { releaseAttachments } from "../../core/keywords.ts";
 import { printedOf, type PrintedCard } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
-import type { ScenarioState } from "../../core/state.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { updateCard, withSeat } from "../../core/state.ts";
 import { attachTo, moveCard, spawn } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
@@ -26,14 +26,43 @@ function plainHero(printed: PrintedCard): boolean {
   return printed.type === "hero" && printed.sphere != null && printed.sphere !== "fellowship" && printed.sphere !== "baggins";
 }
 
+const PLAIN_HEROES = new WeakMap<ReduceContext["cards"], readonly PrintedCard[]>();
+
+// The hero cards of the card table a card can name, in code order. The card table is never changed once the reducer is handed it, so the list is kept for it: the Pick filter reads it for each hero on every legality check.
+function plainHeroes(ctx: ReduceContext): readonly PrintedCard[] {
+  let heroes = PLAIN_HEROES.get(ctx.cards);
+  if (!heroes) {
+    heroes = [...ctx.cards.values()].filter(plainHero).sort((left, right) => (left.code < right.code ? -1 : left.code > right.code ? 1 : 0));
+    PLAIN_HEROES.set(ctx.cards, heroes);
+  }
+  return heroes;
+}
+
 // The hero card codes of the card table that fit, in code order.
 function collectionCodes(ctx: ReduceContext, fits: (printed: PrintedCard) => boolean): string[] {
-  return [...ctx.cards.values()].filter((printed) => plainHero(printed) && fits(printed)).map((printed) => printed.code).sort();
+  return plainHeroes(ctx).filter(fits).map((printed) => printed.code);
 }
 
 // The titles of the heroes and allies in play: a hero of one of them is not brought in again (rr.unique-cards).
 function titlesInPlay(state: ScenarioState, ctx: ReduceContext): Set<string> {
   return new Set(Object.values(state.cards).filter((card) => card.zone === "heroes" || card.zone === "play").map((card) => printedOf(ctx.cards, card.code).name));
+}
+
+// Whether the hero holds a token SwapHero discards.
+function hasTokens(hero: { damage: number; resources: number; progress: number }): boolean {
+  return hero.damage > 0 || hero.resources > 0 || hero.progress > 0;
+}
+
+// The test a collection hero must pass to replace `hero`: no more threat cost, and no title in play (rr.unique-cards). The titles are read once for the test.
+function swapFits(state: ScenarioState, hero: CardInstance, ctx: ReduceContext): (printed: PrintedCard) => boolean {
+  const threat = printedOf(ctx.cards, hero.code).threat ?? 0;
+  const inGame = titlesInPlay(state, ctx);
+  return (printed) => (printed.threat ?? 0) <= threat && !inGame.has(printed.name);
+}
+
+// The codes of the collection heroes that can replace the hero, in code order.
+function swapCodes(state: ScenarioState, hero: CardInstance, ctx: ReduceContext): string[] {
+  return collectionCodes(ctx, swapFits(state, hero, ctx));
 }
 
 // The cards made as candidates for `sourceId`'s choice, still set aside.
@@ -75,15 +104,27 @@ export function swapHero(state: ScenarioState, instruction: Verb<"SwapHero">, fo
   const old = hero ? state.cards[hero] : undefined;
   if (!hero || !old || old.zone !== "heroes" || old.controller == null) return state;
   const seat = old.controller;
-  const threat = printedOf(ctx.cards, old.code).threat ?? 0;
   // A title already in play (any player's hero or ally) cannot be brought in a second time (rr.unique-cards).
-  const inGame = titlesInPlay(state, ctx);
-  const codes = collectionCodes(ctx, (printed) => (printed.threat ?? 0) <= threat && !inGame.has(printed.name));
+  const codes = swapCodes(state, old, ctx);
   // The tokens are discarded first, as the card says, whether or not a hero can be swapped in.
-  const cleared = old.damage || old.resources || old.progress ? updateCard(state, hero, { damage: 0, resources: 0, progress: 0 }) : state;
+  const cleared = hasTokens(old) ? updateCard(state, hero, { damage: 0, resources: 0, progress: 0 }) : state;
   const picked = choose(cleared, codes, instruction, focus);
   if (picked.asked || !picked.chosen) return picked.state;
   return swap(picked.state, hero, picked.chosen, seat, ctx, steps);
+}
+
+// Whether the instruction is the SwapHero of the hero the Pick before it chose (Helm of Secrecy).
+export function swapsPicked(instruction: Instruction | undefined): boolean {
+  return instruction?.verb === "SwapHero";
+}
+
+// Whether SwapHero can change the game for the hero: it holds tokens to discard, or a hero of the collection fits its threat cost. A hero with neither is not offered as the target, as no player is offered a target whose effect cannot happen
+// (rr.the-word-choose, rr.triggered-ability: an ability can be initiated only when its effect has the potential to change the game state).
+export function swappable(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
+  const hero = state.cards[id];
+  if (!hero) return false;
+  if (hasTokens(hero)) return true;
+  return plainHeroes(ctx).some(swapFits(state, hero, ctx));
 }
 
 function swap(state: ScenarioState, oldId: string, newId: string, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -99,6 +140,8 @@ function swap(state: ScenarioState, oldId: string, newId: string, seat: number, 
   for (const attachmentId of [...old.attachments]) {
     const attachment = next.cards[attachmentId];
     if (!attachment) continue;
+    // A Permanent attachment stays with its hero for the campaign: it is removed from the game when that hero leaves play, so it does not move (mec109.permanent).
+    if (printedOf(ctx.cards, attachment.code).keywords.permanent) continue;
     const owner = attachment.owner ?? attachment.controller ?? seat;
     if (!attachmentHostIds(next, owner, attachment.code, ctx, { byEffect: true, anySeat: true }).includes(newId)) continue;
     next = attachTo(updateCard(next, oldId, { attachments: (next.cards[oldId]?.attachments ?? []).filter((id) => id !== attachmentId) }), attachmentId, newId);

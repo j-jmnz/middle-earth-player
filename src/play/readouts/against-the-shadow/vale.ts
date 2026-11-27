@@ -25,6 +25,9 @@ import {
   NAZGUL_REFUSAL,
   NAZGUL_SHEET,
   nazgulWords,
+  SHIELD_WORD,
+  shieldMarkWords,
+  shieldNowWords,
   shieldReadout,
   shieldWords,
   stageLines,
@@ -135,8 +138,12 @@ export function valeDetail(game: ScenarioState, ctx: ReduceContext, cardId: stri
     if (card.code === NAZGUL) parts.push(nazgulWords(guards));
     return parts.join(" ");
   }
-  if (card.code === BODYGUARD && inPlay(card.zone)) return bodyguardWords(guards, card.damage, printedOf(ctx.cards, card.code).health ?? 0);
-  if (card.code === TOWER && card.zone === "staging") return towerWords(card.progress);
+  if (card.code === BODYGUARD && inPlay(card.zone)) {
+    const words = bodyguardWords(guards, card.damage, printedOf(ctx.cards, card.code).health ?? 0);
+    return valeShieldMark(game, cardId) ? `${words} ${shieldNowWords}` : words;
+  }
+  // The dial opens this preview on a tap, so the warning the dial gives a screen reader is on it too, for a player who sees it.
+  if (card.code === TOWER && card.zone === "staging") return card.progress >= TOWER_NEAR ? `${towerWords(card.progress)} ${towerWarn(card.progress)}` : towerWords(card.progress);
   if (card.code === BRIDGE && inPlay(card.zone)) return bridgeWords(towerTokens(game), card.zone !== "staging");
   return null;
 }
@@ -146,6 +153,14 @@ const shielder = (game: ScenarioState, id: string): CardInstance | null => {
   const target = live(game) ? bodyguardTarget(game, id) : null;
   return target ? (game.cards[target] ?? null) : null;
 };
+
+/** The pill on the Morgul Bodyguard that takes the damage meant for a Captain in play (the engine's own pick, `shielder`), so the table shows which one it is. Null for any other card and in any other scenario. */
+export function valeShieldMark(game: ScenarioState, cardId: string): { word: string; speech: string } | null {
+  const card = game.cards[cardId];
+  if (!card || !live(game) || card.code !== BODYGUARD || !(card.zone === "staging" || card.zone === "engaged")) return null;
+  const shields = Object.values(game.cards).some((other) => CAPTAINS.has(other.code) && PLAY.includes(other.zone as (typeof PLAY)[number]) && shielder(game, other.id)?.id === cardId);
+  return shields ? { word: SHIELD_WORD, speech: shieldMarkWords } : null;
+}
 
 /** The player-attack sheet's line for an attack on a Captain: where his damage goes while a Bodyguard is in play, or the Nazgûl's cut. Empty for any other enemy. */
 export function valeAttackNote(game: ScenarioState, ctx: ReduceContext, enemyId: string): string {

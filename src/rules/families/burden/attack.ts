@@ -67,7 +67,8 @@ export function immediateAttackEach(state: ScenarioState, instruction: Each, foc
 // damage was redirected to) that are in the discard pile (an objective ally in the encounter discard pile) with as much damage as they have hit points ("If this attack destroys a
 // character", 141065:A:2, 141066:A:2; "After a character is destroyed by a Hill Troll", 01130:A:4).
 export function destroyedByAttack(state: ScenarioState, attack: PendingAttack, ctx: ReduceContext): string[] {
-  const hit = new Set([...declaredDefenders(attack), ...(attack.heroId ? [attack.heroId] : [])].flatMap((id) => [id, damageGoesTo(state, id, "combat")]));
+  // `defense.hit`: the cards the damage landed on, redirects included (a hero Song of Mocking sent the damage to, destroyed by it, is no longer the redirect's target here).
+  const hit = new Set([...declaredDefenders(attack), ...(attack.heroId ? [attack.heroId] : [])].flatMap((id) => [id, damageGoesTo(state, id, "combat")]).concat(attack.defense?.hit ?? []));
   return [...hit].filter((id) => {
     const card = state.cards[id];
     if (!card || (card.zone !== "discard" && card.zone !== "encounterDiscard")) return false;

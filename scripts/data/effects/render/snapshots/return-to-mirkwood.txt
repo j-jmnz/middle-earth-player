@@ -43,7 +43,7 @@ Scenario piles that place cards with no record (quest: 02126 Through the Forest;
 02129:B:2 (back): Players cannot defeat this stage if there are any enemies in play. If players defeat this stage, they have won the game.
   02129:constant:1: Constant
     only if there is enemy in play (in the staging area or engaged)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 02130 Gollum
 (the scenario deals it into the setAside pile; the piles place it, no record does)

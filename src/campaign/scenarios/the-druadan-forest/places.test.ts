@@ -3,9 +3,10 @@
 // Each test builds its moment with the scene kit; its title starts with the line id. The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; the stand-in ally costs 1.
 import { describe, expect, it } from "vitest";
 
-import type { ScenarioState } from "../../../rules/core/state.ts";
+import { modifiedStat } from "../../../rules/core/keywords.ts";
+import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { settle } from "../../../rules/engine/machine.ts";
-import { archeryRecipients, archeryTotal } from "../../../rules/combat/combat.ts";
+import { archeryRecipients, archeryTotal, assignArchery } from "../../../rules/combat/combat.ts";
 import { playCost } from "../../../rules/player/attach.ts";
 import { legalIntents, legalTargets, type PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { resolveAmount } from "../../../rules/interpret/amounts.ts";
@@ -144,6 +145,31 @@ describe("06043:B:1 An Untimely End", () => {
     expect(recipients.every((id) => allies.state.cards[id]?.code === "ally")).toBe(true);
     const other = table({ staging: [ELITE], play: ["ally"] });
     expect(archeryRecipients(other.state, other.ctx.cards).some((id) => other.state.cards[id]?.zone === "heroes")).toBe(true);
+  });
+});
+
+describe("06043:B:1 archery damage after an ally dies", () => {
+  // The points an ally's death leaves are the players' to assign again (docs/scenarios/against-the-shadow/the-druadan-forest.md, 06043:B:1).
+  it("06043:B:1 the points left after an ally is destroyed are assigned again, to the other ally, and to a hero when none is left", () => {
+    const made = table({ stage: STAGE_2, staging: [ELITE], play: ["ally", "ally"] });
+    const [first, second] = archeryRecipients(made.state, made.ctx.cards);
+    const health = modifiedStat(made.state, made.state.cards[first!]!, "hitPoints", made.ctx.cards);
+    const weak = updateCard(made.state, first!, { damage: health - 1 });
+    const open = { ...weak, window: { kind: "archery" as const, total: 4 } };
+    const dealt = assignArchery(open, [{ cardId: first!, amount: 3 }, { cardId: second!, amount: 1 }], made.ctx, []);
+    expect(dealt.cards[first!]?.zone).toBe("discard");
+    expect(dealt.cards[second!]?.damage).toBe(0);
+    expect(dealt.window).toEqual({ kind: "archery", total: 3 });
+    expect(archeryRecipients(dealt, made.ctx.cards)).toEqual([second]);
+    // The second ally has 2 hit points: it takes 2 of the 3, and the last point goes to a hero, the only characters left.
+    const killed = assignArchery(dealt, [{ cardId: second!, amount: 3 }], made.ctx, []);
+    expect(killed.cards[second!]?.zone).toBe("discard");
+    expect(killed.window).toEqual({ kind: "archery", total: 1 });
+    const hero = archeryRecipients(killed, made.ctx.cards)[0]!;
+    expect(killed.cards[hero]?.zone).toBe("heroes");
+    const done = assignArchery(killed, [{ cardId: hero, amount: 1 }], made.ctx, []);
+    expect(done.cards[hero]?.damage).toBe(1);
+    expect(done.window).toBeNull();
   });
 });
 

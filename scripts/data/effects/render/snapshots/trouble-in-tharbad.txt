@@ -149,7 +149,7 @@ Scenario piles that place cards with no record (quest: 08066 Double Dealings; qu
 08072:A:1 (front): Forced: When Spy From Mordor attacks, remove 1 time counter from the current quest.
   08072:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
     who acts: the acting player is the defending player (the player the attack is against)
-    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it is heard (a record that holds its events lets it resolve only after the whole effect has finished; a stage with none loses none)
 
 ## 08073 Bellach's Marauder
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -165,7 +165,7 @@ Scenario piles that place cards with no record (quest: 08066 Double Dealings; qu
 08073:A:2 (shadow): Shadow: Remove 1 time counter from the current quest.
   08073:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it is heard (a record that holds its events lets it resolve only after the whole effect has finished; a stage with none loses none)
 
 ## 08074 Streets of Tharbad
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -264,7 +264,7 @@ Scenario piles that place cards with no record (quest: 08066 Double Dealings; qu
     - return every enemy engaged with a player to the staging area
     - the first player chooses one of:
       * option "time" (only if all of: (0 is less than resources of the current quest stage) and (the table does not hold the flag timeBarred)):
-        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it is heard (a record that holds its events lets it resolve only after the whole effect has finished; a stage with none loses none)
       * option "threat":
         - every enemy and location in the staging area, now and arriving there later while the effect lasts (Spy only: an enemy or a location that holds the Trait): stat threat 2, until the end of the phase
 
@@ -293,7 +293,7 @@ Scenario piles that place cards with no record (quest: 08066 Double Dealings; qu
     who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "time" (only if all of: (0 is less than resources of the current quest stage) and (the table does not hold the flag timeBarred)):
-        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it is heard (a record that holds its events lets it resolve only after the whole effect has finished; a stage with none loses none)
       * option "enemies":
         - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat engagementCost -20, until the end of the round
         - every enemy in play, staged or engaged, now and entering later while the effect lasts: stat attack 1, until the end of the round

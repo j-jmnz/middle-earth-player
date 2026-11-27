@@ -23,6 +23,7 @@ import { heldInHand } from "../../rules/families/ring-maker/hand.ts";
 import { lootDeckWords, lootGuardWords } from "../words/loot.ts";
 import { lootUnder } from "../../rules/families/sidequests/loot.ts";
 import { alleywayMark, championMark, seizeMark } from "../readouts/haradrim/umbar.ts";
+import { valeShieldMark } from "../readouts/against-the-shadow/vale.ts";
 import { stagedSeatChip } from "../readouts/haradrim/staged.ts";
 import { consideredChip, guardedChip } from "../readouts/haradrim/serpent.ts";
 import { stackMark } from "../readouts/against-the-shadow/stewards-fear.ts";
@@ -365,7 +366,7 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     loss: card != null && inPlay(card.zone) ? (shipLoss(game, ctx, cardId) ?? seizeMark(game, ctx, cardId)) : null,
     place: card?.zone === "staging" ? stagingPlace(game, cardId) : null,
     side: sideQuestMark(game, ctx, cardId),
-    determined: determinedMark(game, ctx, cardId) ?? championMark(game, ctx, cardId) ?? blankMark(game, ctx, cardId),
+    determined: determinedMark(game, ctx, cardId) ?? championMark(game, ctx, cardId) ?? valeShieldMark(game, cardId) ?? blankMark(game, ctx, cardId),
     dead: deadSpeech(game, ctx.cards, cardId),
     combat: card != null ? combatNumber(game, ctx, card) : null,
     seat: stagedSeatChip(game, cardId) ?? consideredChip(game, cardId) ?? guardedChip(game, ctx, cardId, (id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name),

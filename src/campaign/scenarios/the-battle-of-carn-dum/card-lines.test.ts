@@ -7,7 +7,7 @@ import { describe, expect } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { reduce } from "../../../rules/engine/reduce.ts";
 import { attachBlocked } from "../../../rules/interpret/restrictions.ts";
-import { lineSpec } from "../../../../test/harness/line-spec.ts";
+import { lineDefault, lineSpec } from "../../../../test/harness/line-spec.ts";
 import { idOf, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "the-battle-of-carn-dum";
@@ -35,7 +35,7 @@ function playOnto(effects: readonly Effect[], host: (made: ReturnType<typeof tab
 }
 
 describe("Raiment of the Second Age (10191:A:1)", () => {
-  lineSpec("10191:A:1", "it may be played on another player's hero or ally", (effects) => {
+  lineDefault("10191:A:1", "it may be played on another player's hero or ally", (effects) => {
     for (const host of [(made: ReturnType<typeof tableFromLayout>) => made.seat1Hero ?? "", (made: ReturnType<typeof tableFromLayout>) => idOf(made.state, "ally")]) {
       const played = playOnto(effects, host);
       expect(played.ok).toBe(true);

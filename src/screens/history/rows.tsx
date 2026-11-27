@@ -4,7 +4,7 @@
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
-import { runEnded, type RunRecord } from "../../campaign/runs";
+import { causeWords, runEnded, type RunRecord } from "../../campaign/runs";
 import { longPressA11y } from "../../ui/long-press-action";
 import { rowSurface } from "../../ui/surfaces";
 import { withAlphaHex } from "../../ui/tokens";
@@ -146,7 +146,7 @@ function RunLine({ run, nameOf, faces }: { run: RunRecord; nameOf: (code: string
       </View>
       {run.lossCause ? (
         <Text className={ended ? "mt-0.5 text-label text-muted" : "mt-0.5 text-label text-danger"} testID={`run-${run.id}-cause`}>
-          {run.lossCause}
+          {causeWords(run.lossCause)}
         </Text>
       ) : null}
       {detail ? <Text className="mt-0.5 text-label text-muted">{detail}</Text> : null}

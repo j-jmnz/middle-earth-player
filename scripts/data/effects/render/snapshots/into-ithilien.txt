@@ -51,7 +51,7 @@ Scenario piles that place cards with no record (activeLocation: 05028 Ithilien R
 
 05027:A:1 (front): Southron Company gets +2 Threat and +2 Attack while the current quest card has the battle or siege keyword.
   05027:constant:1: Constant
-    only if any of: ([json condition {"kind":"questKeyword","keyword":"battle","is":true}]) or ([json condition {"kind":"questKeyword","keyword":"siege","is":true}])
+    only if any of: (the current quest card has the Battle keyword (printed or gained)) or (the current quest card has the Siege keyword (printed or gained))
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat threat 2, while this card is in play
     - this card: stat attack 2, while this card is in play
@@ -60,8 +60,8 @@ Scenario piles that place cards with no record (activeLocation: 05028 Ithilien R
   05027:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if all of: ([json condition {"kind":"questKeywords","is":false}]) and ([json condition {"kind":"questKeyword","keyword":"battle","is":false}]) and ([json condition {"kind":"questKeyword","keyword":"siege","is":false}]): the attacking enemy: stat attack 1, until the end of the attack
-    - then, if any of: ([json condition {"kind":"questKeywords","is":true}]) or ([json condition {"kind":"questKeyword","keyword":"battle","is":true}]) or ([json condition {"kind":"questKeyword","keyword":"siege","is":true}]) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+    - if all of: (the current quest card has no printed keyword) and (the current quest card lacks the Battle keyword (printed or gained)) and (the current quest card lacks the Siege keyword (printed or gained)): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if any of: (the current quest card has a printed keyword) or (the current quest card has the Battle keyword (printed or gained)) or (the current quest card has the Siege keyword (printed or gained)) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
 
 ## 05028 Ithilien Road
 (the scenario deals it into the activeLocation pile; the piles place it, no record does)
@@ -165,7 +165,7 @@ Scenario piles that place cards with no record (activeLocation: 05028 Ithilien R
   05051:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by the number of character (any player controls) committed to the quest (each player)
-    - then, if any of: ([json condition {"kind":"questKeyword","keyword":"battle","is":true}]) or ([json condition {"kind":"questKeyword","keyword":"siege","is":true}]) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if any of: (the current quest card has the Battle keyword (printed or gained)) or (the current quest card has the Siege keyword (printed or gained)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 05051:A:2 (shadow): Shadow: Each player raises his threat by the number of enemies engaged with him.
   05051:shadow:1: Shadow
@@ -225,7 +225,8 @@ Scenario piles that place cards with no record (activeLocation: 05028 Ithilien R
   05055:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one Harad enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+      - the acting player finds one Harad enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
+      - the picked card, if it lies in the staging area, is announced as added to the staging area, so its own Forced effect that hears it resolves (a search puts a card there without that announcement unless the record opts in with this instruction)
     - shuffle the encounter deck
 
 ## 05068 Ambush in Ithilien
@@ -295,4 +296,4 @@ Scenario piles that place cards with no record (activeLocation: 05028 Ithilien R
   05071:constant:2: Constant
     (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
 
-(rendered pieces: 144 by template, 10 as JSON)
+(rendered pieces: 155 by template, 0 as JSON)

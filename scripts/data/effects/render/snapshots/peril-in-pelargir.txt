@@ -63,7 +63,7 @@ Scenario piles that place cards with no record (quest: 05065 The Leaping Fish; q
 05023:A:1 (front): Forced: Each time a location is discarded from the top of the encounter deck, raise each player's threat by 1.
   05023:constant:1: Constant
     - the table: stat noteDeckDiscards (held by the table: a card that goes from the top of the encounter deck to its discard pile is announced, so a card that hears "discarded from the encounter deck" answers it) 1, while this card is in play
-  05023:forced:1: Forced on the event discardedFromEncounterDeck (heard about location (any player controls))
+  05023:forced:1: Forced on the event discardedFromEncounterDeck (heard about location in the encounter discard pile)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by 1 (each player)
 
@@ -71,7 +71,7 @@ Scenario piles that place cards with no record (quest: 05065 The Leaping Fish; q
   05023:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - repeat the number of Thug enemy (any player controls) or in the staging area times:
-      - the attacking enemy is dealt a shadow card [also {"inPlay":true}]
+      - the attacking enemy is dealt a shadow card (an enemy in the staging area is in play too and is dealt one)
 
 ## 05024 Collateral Damage
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -80,7 +80,7 @@ Scenario piles that place cards with no record (quest: 05065 The Leaping Fish; q
   05024:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard 2 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)
-    - discard the number of treachery (any player controls) encounterDiscard, named "Collateral Damage" x 2 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on); they join the cards this effect discarded before, so a later amount "discarded by this effect" counts them all
+    - discard the number of treachery in the encounter discard pile, named "Collateral Damage" x 2 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on); they join the cards this effect discarded before, so a later amount "discarded by this effect" counts them all
     - raise each player's threat by 2 for each location card this effect discarded from the top of the encounter deck, in any of its discard steps, even one a reset of the deck put back in it
 
 05024:A:2 (shadow): Shadow: Any damage dealt by this attack is dealt to the hero with Alcaron's Scroll attached, if able.
@@ -262,7 +262,7 @@ Scenario piles that place cards with no record (quest: 05065 The Leaping Fish; q
 05066:B:2 (back): The players cannot advance to the next stage unless Alcaron's Scroll is attached to a hero.
   05066:constant:2: Constant
     only if the card with code 05019 is not attached to a hero (it is in the staging area, on an enemy or out of play)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 05066:B:3 (back): When Revealed: Attach Alcaron's Scroll to the highest engagement cost enemy in play, if able. Otherwise, add Alcaron's Scroll to the staging area.
   05066:whenRevealed:1: When revealed
@@ -293,6 +293,6 @@ Scenario piles that place cards with no record (quest: 05065 The Leaping Fish; q
 05067:B:3 (back): The players cannot defeat this stage unless Alcaron's Scroll is attached to a hero. If the players defeat this stage, they have won the game.
   05067:constant:2: Constant
     only if the card with code 05019 is not attached to a hero (it is in the staging area, on an enemy or out of play)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
-(rendered pieces: 165 by template, 1 as JSON)
+(rendered pieces: 166 by template, 0 as JSON)

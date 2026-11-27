@@ -59,6 +59,14 @@ describe("Calphon (11028:A:1 to A:3, 110013:A:1 to A:3)", () => {
     expect(handCodes(kept.state)).toEqual(["c5"]);
   });
 
+  it("offers his Action to the player who controls him only (rr.action, rr.objective-cards)", () => {
+    const made = make({ seats: 2, calphon: "original", deckOf: ["c1", "c2", "c3"], hand: ["c5"] });
+    const calphon = made.calphon ?? "";
+    const offered = (seat: number) => legalIntents({ ...made.state, activeSeat: seat }, made.ctx).some((item) => item.type === "Trigger" && item.cardId === calphon);
+    expect(offered(0)).toBe(true);
+    expect(offered(1)).toBe(false);
+  });
+
   it("shows the look window the bottom card only, to the actor (A:2)", () => {
     const made = make({ calphon: "original", deckOf: ["c1", "c2", "c3"], hand: ["c5"] });
     const intent = legalIntents(made.state, made.ctx).find((item) => item.type === "Trigger") as Extract<PlayerIntent, { type: "Trigger" }>;

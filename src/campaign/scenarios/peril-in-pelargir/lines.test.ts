@@ -9,6 +9,7 @@ import type { EngineStep } from "../../../rules/core/intents.ts";
 import { UNATTRIBUTED } from "../../../rules/core/cause.ts";
 import { destroyCard, placeDamage } from "../../../rules/core/keywords.ts";
 import { flagged, updateCard, type GameEvent, type ScenarioState } from "../../../rules/core/state.ts";
+import { attachTo, spawn } from "../../../rules/core/zones.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { legalIntents, legalTargets, reduce, startScenario, type PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
@@ -155,6 +156,27 @@ describe("05020 Harbor Thug and 05024 Collateral Damage as a shadow card", () =>
     const hit = placeDamage(shadowed, table.hero, 1, table.ctx.cards, [], "framework", UNATTRIBUTED);
     expect(hit.cards[table.hero]?.damage).toBe(1);
     expect(hit.cards[table.hero2]?.damage).toBe(0);
+  });
+  // Reading (docs/brief.md, Player card readings): Song of Mocking changes who the damage is assigned to, then the Scroll sends the damage dealt to its hero.
+  it("05020:A:2 damage that Song of Mocking sends to its host is still dealt to the Scroll hero", () => {
+    const table = scrollTable({ engaged: [THUG], deck: ["05024", "f0"], heroes: [{ code: "dh3" }] }, "dh2");
+    const thug = idOf(table.state, THUG);
+    const song = spawn(table.state, "attachment", { zone: "attached" }, "up");
+    const host = idOf(table.state, "dh3");
+    const sung = updateCard(attachTo(song.state, song.id, host), song.id, { face: "up" });
+    const state = {
+      ...sung,
+      pendingAttack: { enemyId: thug, seat: 0, undefended: true, heroId: idOf(sung, "dh1") },
+      modifiers: [
+        ...sung.modifiers,
+        { instanceId: thug, sourceId: thug, stat: "damageToScroll" as const, amount: 1, until: "endOfAttack" as const },
+        { instanceId: idOf(sung, "dh1"), sourceId: song.id, stat: "damageToSourceHost" as const, amount: 1, until: "endOfPhase" as const },
+      ],
+    };
+    const hit = placeDamage(state, idOf(state, "dh1"), 1, table.ctx.cards, [], "combat", UNATTRIBUTED);
+    expect(hit.cards[idOf(state, "dh1")]?.damage).toBe(0);
+    expect(hit.cards[host]?.damage).toBe(0);
+    expect(hit.cards[table.hero2]?.damage).toBe(1);
   });
   it("05020:A:2 with the Scroll on no hero the damage stays with the defender", () => {
     const result = fightEnemy((made: Layout) => tableFromLayout(SCENARIO, made), THUG, THUG, {});

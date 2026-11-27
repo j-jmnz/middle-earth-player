@@ -15,7 +15,8 @@ import { discardResolved, turnHiddenCard, turnHiddenCards } from "./hidden-turn.
 import { inOwnSurgeChain } from "./surge-chain.ts";
 import { undefendedAnnounced } from "./undefended.ts";
 import { archeryOfAmount } from "./archery-of.ts";
-import { discardEncounterTopMore, raiseThreatPerDiscarded } from "./discard.ts";
+import { raiseThreatPerDiscarded } from "./discard.ts";
+import { discardEncounterTop } from "../uncharted/cards.ts";
 import { pelargirCondition } from "./conditions.ts";
 import { noteFirstEnemy } from "./first-enemy.ts";
 import { damageCardThenSetX } from "./damage-noted.ts";
@@ -49,7 +50,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "AttackScrollHolder":
       return attackScrollHolder(state, instruction, focus, ctx, steps);
     case "DiscardEncounterTopMore":
-      return discardEncounterTopMore(state, instruction, focus, ctx, steps);
+      return discardEncounterTop(state, instruction, focus, ctx, steps);
     case "RaiseThreatPerDiscarded":
       return raiseThreatPerDiscarded(state, instruction, focus, ctx, steps);
     case "TakeControlOfStagedObjectives":

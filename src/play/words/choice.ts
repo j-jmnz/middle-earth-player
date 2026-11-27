@@ -230,13 +230,15 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
   }
 }
 
-/** Where an out-of-play card is, for an option that names one copy among several: "Ringwraith set aside". */
+/** Where an out-of-play card is, for an option that names one copy among several: "Ringwraith set aside", "Old Bridge from the encounter deck". */
 export function outOfPlayLabel(game: ScenarioState, cardId: string, names: ChoiceNames): string {
   const card = game.cards[cardId];
   const name = card ? names.code(card.code) : cardId;
   switch (card?.zone) {
     case "setAside":
       return `${name} set aside`;
+    case "encounterDeck":
+      return `${name} from the encounter deck`;
     case "encounterDiscard":
       return `${name} from the encounter discard pile`;
     case "victory":

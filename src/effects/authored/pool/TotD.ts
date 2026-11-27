@@ -9,8 +9,8 @@ export const RECORDS: readonly Effect[] = [
   {"id":"12057:constant:3","cardCode":"12057","lines":["12057:A:3"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay","holders":{"type":"hero","control":"any","spheres":["leadership"],"hasAttachment":{"trait":"Mount"}}}]},
   // 12059 Armored Destrier (line 2 open: "after attached hero defends" has no trigger about the defender)
   {"id":"12059:constant:1","cardCode":"12059","lines":["12059:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any","spheres":["leadership"]},{"type":"hero","control":"any","keyword":"sentinel"}]}]},
-  // 12060 Déorwine (line 1 is the Sentinel keyword). The Response he gains is his while he is the declared defender.
-  {"id":"12060:response:1","cardCode":"12060","lines":["12060:A:2"],"timing":"response","trigger":"shadowPending","anyPlayer":true,"condition":{"kind":"matches","card":"self","pick":{"type":"character","control":"any","defending":true}},"cost":{"kind":"resources","amount":1,"sphere":"leadership"},"instructions":[{"verb":"CancelEffect"}]},
+  // 12060 Déorwine (line 1 is the Sentinel keyword). The Action is his while he is the declared defender and the shadow card is not turned over yet.
+  {"id":"12060:action:1","cardCode":"12060","lines":["12060:A:2"],"timing":"action","anyPlayer":true,"condition":{"kind":"all","conditions":[{"kind":"matches","card":"self","pick":{"type":"character","control":"any","defending":true}},{"kind":"shadowPending"}]},"cost":{"kind":"resources","amount":1,"sphere":"leadership"},"instructions":[{"verb":"CancelEffect","shadow":true}]},
   // 12061 Revealed in Wrath
   {"id":"12061:constant:1","cardCode":"12061","lines":["12061:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":{"kind":"count","pick":{"type":"hero","control":"you","trait":"Noldor"},"min":1}}]},
   // 12062 Rhovanion Outrider: a location explored by the progress has left play.

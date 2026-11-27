@@ -14,7 +14,8 @@ import { moveCard } from "../../core/zones.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { shuffleEncounterDeck } from "../../interpret/verbs.ts";
 import { startReveal } from "../../windows/frames.ts";
-import { pushFrame } from "../../windows/windows.ts";
+import { patchTop, pushFrame, topFrame } from "../../windows/windows.ts";
+import { ruleCause } from "../../core/cause.ts";
 import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -109,7 +110,10 @@ export function releaseUnderworldStacks(state: ScenarioState, ctx: ReduceContext
   const { window } = state;
   // An open action window waits under the reveal and comes back when it is over, as it does under a delayed effect (attack/flow.ts).
   const held = window ? pushFrame({ ...state, window: null }, { frame: "event", cardId: null, seat: state.activeSeat, peril: false, data: { kind: "resume", window, seat: state.activeSeat, passed: state.passed } }, steps) : state;
-  return startReveal(updateCard(held, orphan, { host: null }), seat, ctx, steps, orphan);
+  // The reveal is the keyword's (ats.underworld), not the staging step's: its step names that rule as the cause.
+  const revealed = startReveal(updateCard(held, orphan, { host: null }), seat, ctx, steps, orphan);
+  const top = topFrame(revealed);
+  return top?.data.kind === "reveal" && top.cardId === orphan ? patchTop(revealed, { data: { ...top.data, cause: ruleCause("ats.underworld") } }) : revealed;
 }
 
 // The windows a player acts in: a stack released while one is open does not wait for the players to pass.

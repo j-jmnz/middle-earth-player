@@ -2,7 +2,7 @@
 // rr.step-3-3, rr.step-5-3, rr.step-6-4-1 (data/rules/entries.json).
 // The Heirs of Númenor attachments, each printed line tested from the words on the card (lineSpec, test/harness/line-spec.ts): Spear of the
 // Citadel 05009:A:2 and A:3, Blood of Númenor 05013:A:1 and A:2, Ranger Spikes 05017:A:1 to A:3. The lines are the text of
-// data/cards/HoN.json (data/printed holds no ledger for this pack), so every intent goes through sendUnledgered.
+// data/cards/HoN.json (the ledger lines in data/printed are read from the scans).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
@@ -12,8 +12,8 @@ import { updateCard } from "../../rules/core/state.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { atDefense, attach, enter, hosts, passAll, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { type Run, type Scene, type Table, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { atDefense, attach, enter, hosts, passAll, play, playerTableFor, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const SPEAR = "05009";
 const BLOOD = "05013";
@@ -61,7 +61,7 @@ describe("Spear of the Citadel (05009:A:2, A:3)", () => {
   function defends(effects: readonly Effect[], defender: string): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: [{ code: LEGOLAS, seat: 0 }, { code: DENETHOR, seat: 0 }], attached: [{ code: SPEAR, host: LEGOLAS }], engaged: [{ code: WEAK, seat: 0 }] });
     let run = atDefense(tab);
-    run = sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx);
+    run = send(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx);
     return { tab, run };
   }
 
@@ -70,7 +70,7 @@ describe("Spear of the Citadel (05009:A:2, A:3)", () => {
   lineSpec("05009:A:3", "after the attached character is declared as a defender, 1 damage to the attacking enemy", (effects) => {
     const { tab, run: declared } = defends(effects, LEGOLAS);
     expect(triggers(declared.state, tab)).toContain("05009:response:1");
-    const run = sendUnledgered(declared, { type: "Trigger", cardId: idsOf(tab, SPEAR), effectId: "05009:response:1" }, tab.ctx);
+    const run = send(declared, { type: "Trigger", cardId: idsOf(tab, SPEAR), effectId: "05009:response:1" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, WEAK)]?.damage).toBe(1);
   });
 
@@ -103,7 +103,7 @@ describe("Blood of Númenor (05013:A:1, A:2)", () => {
   lineSpec("05013:A:2", "spends 1 resource for +1 Defense per resource left, once per phase, until the end of the phase", (effects) => {
     const tab = scene(effects, 4);
     const denethor = idsOf(tab, DENETHOR);
-    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, BLOOD), effectId: "05013:action:1", payments: [{ heroId: denethor, amount: 1 }] }, tab.ctx);
+    const run = send(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, BLOOD), effectId: "05013:action:1", payments: [{ heroId: denethor, amount: 1 }] }, tab.ctx);
     expect(run.state.cards[denethor]?.resources).toBe(4 - 1);
     expect(stat(run.state, tab, denethor, "defense")).toBe(3 + 3);
     expect(triggers(run.state, tab)).not.toContain("05013:action:1");
@@ -140,9 +140,9 @@ describe("Ranger Spikes (05017:A:1 to A:3)", () => {
     const spikes = idsOf(tab, SPIKES);
     const played = play(begin(tab.state), tab, spikes, "staging");
     let run = enter(played.state, tab, "questCommit");
-    run = sendUnledgered(run, { type: "Commit", cardIds: [idsOf(tab, DENETHOR)] }, tab.ctx);
+    run = send(run, { type: "Commit", cardIds: [idsOf(tab, DENETHOR)] }, tab.ctx);
     // The commit is done; the staging step reveals the top Lurker.
-    run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = send(run, { type: "Pass" }, tab.ctx);
     const revealed = (tab.ids[LURKER] ?? []).filter((id) => run.state.cards[id]?.zone === "staging");
     expect(revealed).toHaveLength(1);
     expect(run.state.cards[spikes]?.host).toBe(revealed[0]);
@@ -161,7 +161,7 @@ describe("Ranger Spikes (05017:A:1 to A:3)", () => {
     const tab = spiked(effects, "encounter");
     const lurker = idsOf(tab, LURKER);
     expect(stat(tab.state, tab, lurker, "threat")).toBe(3 - 2);
-    const run = passAll(sendUnledgered(begin(tab.state), { type: "DeclineEngage" }, tab.ctx), tab.ctx);
+    const run = passAll(send(begin(tab.state), { type: "DeclineEngage" }, tab.ctx), tab.ctx);
     expect(run.state.cards[lurker]?.zone).toBe("staging");
   });
 
@@ -169,7 +169,7 @@ describe("Ranger Spikes (05017:A:1 to A:3)", () => {
   it("05017:A:3 the attached enemy may still be engaged by choice", () => {
     const tab = spiked(EFFECTS, "encounter");
     const lurker = idsOf(tab, LURKER);
-    const run = sendUnledgered(begin(tab.state), { type: "Engage", enemyId: lurker }, tab.ctx);
+    const run = send(begin(tab.state), { type: "Engage", enemyId: lurker }, tab.ctx);
     expect(run.state.cards[lurker]?.zone).toBe("engaged");
   });
 });

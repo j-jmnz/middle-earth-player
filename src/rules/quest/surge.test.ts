@@ -91,6 +91,26 @@ describe("surge", () => {
     expect(revealed.state.encounterDeck).toEqual([second.id]);
   });
 
+  it("reveals the surge of a card that eliminated the seat revealing it, for the first seat still in the game (rr.player-elimination, rr.surge)", () => {
+    const doomed = definePrinted({ code: "doom", name: "Doom", type: "treachery", threat: 0, keywords: { doomed: 1, surge: true } });
+    const later = definePrinted({ code: "later", name: "Later", type: "enemy", threat: 0, engagementCost: 50 });
+    const cards = cardMap([doomed, later, hero("aragorn", "leadership"), hero("gimli", "tactics")]);
+    let state = blankScenario({ seatCount: 2, seed: 4, definition: fixtureDefinition(["stage"]) });
+    state = spawn(state, "aragorn", { zone: "heroes", seat: 0 }).state;
+    state = spawn(state, "gimli", { zone: "heroes", seat: 1 }).state;
+    state = { ...state, seats: [{ ...state.seats[0], threat: 49 }, { ...state.seats[1], threat: 10 }] };
+    const doom = spawn(state, "doom", { zone: "encounterDeck" });
+    const second = spawn(doom.state, "later", { zone: "encounterDeck" });
+    state = { ...second.state, phase: "Quest", mode: "questCommit", window: { kind: "pass" }, activeSeat: 0, firstPlayer: 0 };
+    const ctx = { effects: [], cards };
+    const first = expectOk(reduce(state, { type: "Pass" }, ctx));
+    const revealed = expectOk(reduce(first.state, { type: "Pass" }, ctx));
+    expect(revealed.state.cards[second.id]?.controller).toBe(1);
+    expect(revealed.state.seats[0]?.eliminated).toBe(true);
+    expect(revealed.state.encounterDeck).toEqual([]);
+    expect(revealed.state.staging).toContain(second.id);
+  });
+
   it("shuffles the encounter discard pile back in when the deck is out of cards in the quest phase (rr.running-out-of-cards)", () => {
     const later = definePrinted({ code: "later", name: "Later", type: "enemy", threat: 0, engagementCost: 50 });
     const cards = cardMap([later, hero("aragorn", "leadership")]);

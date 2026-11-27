@@ -1,7 +1,6 @@
 // Rules: rr.attachment-cards, rr.modifiers, rr.printed, rr.response, rr.action, rr.triggered-ability, rr.then, rr.cost, rr.lasting-effects,
 // rr.enters-play, rr.staging-area, rr.combat-phase, rr.quest-phase, rr.ready, rr.move (data/rules/entries.json).
-// The Morgul Vale player cards, written from their card text (data/cards/TMV.json; data/printed holds no ledger for this pack, so every
-// intent goes through sendUnledgered): Théoden 06134:A:2, Pelargir Ship Captain 06135:A:1, Visionary Leadership 06136:A:1 and A:2,
+// The Morgul Vale player cards, written from their card text (data/cards/TMV.json; the ledger lines in data/printed are read from the scans): Théoden 06134:A:2, Pelargir Ship Captain 06135:A:1, Visionary Leadership 06136:A:1 and A:2,
 // Spear of the Mark 06137:A:1 and A:2, Forth Eorlingas! 06138:A:1, Steed of the Mark 06139:A:1 and A:2, Lay of Nimrodel 06140:A:1, Ered
 // Nimrais Prospector 06141:A:1, Scroll of Isildur 06142:A:1 to A:3.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -15,8 +14,8 @@ import { playCost } from "../../rules/player/attach.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { attach, attacking, choices, combat, discarded, fillers, hosts, passAll, play, playerTableFor, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { type Table, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { attach, attacking, choices, combat, discarded, fillers, hosts, passAll, play, playerTableFor, printed, questing, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const THEODEN = "06134";
 const CAPTAIN = "06135";
@@ -85,13 +84,13 @@ describe("Pelargir Ship Captain (06135:A:1)", () => {
   lineSpec("06135:A:1", "Pelargir Ship Captain: moves 1 resource from a hero you control to another hero", (effects) => {
     const tab = table(effects, { seats: 2, heroes: [{ code: THEODRED, seat: 0 }, { code: DENETHOR, seat: 0 }, { code: GIMLI, seat: 1 }], hand: [{ code: CAPTAIN, seat: 0 }] }, 3);
     const [theodred, denethor, gimli, captain] = [idsOf(tab, THEODRED), idsOf(tab, DENETHOR), idsOf(tab, GIMLI), idsOf(tab, CAPTAIN)];
-    let run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: captain, payments: [{ heroId: theodred, amount: 2 }] }, tab.ctx);
+    let run = send(begin(tab.state), { type: "PlayCard", cardId: captain, payments: [{ heroId: theodred, amount: 2 }] }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("06135:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: captain, effectId: "06135:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: captain, effectId: "06135:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([theodred, denethor].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: denethor }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: denethor }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([theodred, gimli].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: gimli }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: gimli }, tab.ctx);
     expect(run.state.cards[denethor]?.resources).toBe(2);
     expect(run.state.cards[gimli]?.resources).toBe(4);
     expect(run.state.cards[theodred]?.resources).toBe(1);
@@ -101,7 +100,7 @@ describe("Pelargir Ship Captain (06135:A:1)", () => {
   it("06135:A:1 Pelargir Ship Captain: no Response when no hero you control has a resource", () => {
     const scene = table(EFFECTS, { seats: 2, heroes: [{ code: THEODRED, seat: 0 }, { code: GIMLI, seat: 1 }], hand: [{ code: CAPTAIN, seat: 0 }] }, 2);
     const tab = { ...scene, state: updateCard(scene.state, idsOf(scene, GIMLI), { resources: 3 }) };
-    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, CAPTAIN), payments: [{ heroId: idsOf(tab, THEODRED), amount: 2 }] }, tab.ctx);
+    const run = send(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, CAPTAIN), payments: [{ heroId: idsOf(tab, THEODRED), amount: 2 }] }, tab.ctx);
     expect(run.state.cards[idsOf(tab, THEODRED)]?.resources).toBe(0);
     expect(triggers(run.state, tab)).not.toContain("06135:response:1");
   });
@@ -110,7 +109,7 @@ describe("Pelargir Ship Captain (06135:A:1)", () => {
 // "to another hero's resource pool": with a single hero in play there is no other hero to move it to (rr.move), so no Response.
 it("06135:A:1 Pelargir Ship Captain: no Response with no other hero", () => {
   const tab = table(EFFECTS, { heroes: [{ code: THEODRED, seat: 0 }], hand: [{ code: CAPTAIN, seat: 0 }] }, 3);
-  const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, CAPTAIN), payments: [{ heroId: idsOf(tab, THEODRED), amount: 2 }] }, tab.ctx);
+  const run = send(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, CAPTAIN), payments: [{ heroId: idsOf(tab, THEODRED), amount: 2 }] }, tab.ctx);
   expect(run.state.cards[idsOf(tab, THEODRED)]?.resources).toBe(1);
   expect(triggers(run.state, tab)).not.toContain("06135:response:1");
 });
@@ -130,7 +129,7 @@ describe("Visionary Leadership (06136:A:1, A:2)", () => {
   lineSpec("06136:A:2", "Visionary Leadership: Gondor characters get +1 Willpower while the hero has a resource", (effects) => {
     const tab = table(effects, { seats: 2, heroes: [{ code: DENETHOR, seat: 0 }, { code: ELEANOR, seat: 0 }, { code: THEODRED, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: GUARD, seat: 0 }, { code: SPEARMAN, seat: 1 }], hand: [{ code: VISIONARY, seat: 0 }] }, 2);
     const card = idsOf(tab, VISIONARY);
-    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: card, hostId: idsOf(tab, DENETHOR), payments: [{ heroId: idsOf(tab, THEODRED), amount: 2 }] }, tab.ctx);
+    const run = send(begin(tab.state), { type: "PlayCard", cardId: card, hostId: idsOf(tab, DENETHOR), payments: [{ heroId: idsOf(tab, THEODRED), amount: 2 }] }, tab.ctx);
     for (const code of [DENETHOR, ELEANOR, GUARD, SPEARMAN]) expect(stat(run.state, tab, idsOf(tab, code), "willpower")).toBe(printed(tab, code, "willpower") + 1);
     expect(stat(run.state, tab, idsOf(tab, THEODRED), "willpower")).toBe(printed(tab, THEODRED, "willpower"));
   });
@@ -166,7 +165,7 @@ describe("Spear of the Mark and Forth Eorlingas! (06137:A:1, A:2, 06138:A:1)", (
   lineSpec("06137:A:2", "Spear of the Mark: +1 Attack against an engaged enemy", (effects) => {
     const { tab, engaged } = scene(effects);
     expect(stat(tab.state, tab, idsOf(tab, THEODRED), "attack")).toBe(printed(tab, THEODRED, "attack") + 1);
-    const run = passAll(sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: engaged, attackerIds: [idsOf(tab, THEODRED)] }, tab.ctx), tab.ctx);
+    const run = passAll(send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: engaged, attackerIds: [idsOf(tab, THEODRED)] }, tab.ctx), tab.ctx);
     expect(strikeOf(run.steps)).toEqual([printed(tab, THEODRED, "attack") + 1]);
   });
 
@@ -176,12 +175,12 @@ describe("Spear of the Mark and Forth Eorlingas! (06137:A:1, A:2, 06138:A:1)", (
   lineSpec("06138:A:1", "Forth Eorlingas!: each Rohan hero may attack the staging area this phase", (effects) => {
     const { tab, staged: enemyId } = scene(effects);
     expect(refusal(attacking(tab.state), { type: "DeclareAttackers", enemyId, attackerIds: [idsOf(tab, EOWYN)] }, tab.ctx)).not.toBeNull();
-    const run = sendUnledgered(combat(tab.state, tab), { type: "PlayCard", cardId: idsOf(tab, EORLINGAS), payments: [{ heroId: idsOf(tab, LEGOLAS), amount: 2 }] }, tab.ctx);
+    const run = send(combat(tab.state, tab), { type: "PlayCard", cardId: idsOf(tab, EORLINGAS), payments: [{ heroId: idsOf(tab, LEGOLAS), amount: 2 }] }, tab.ctx);
     const open = attacking(run.state);
     expect(refusal(open, { type: "DeclareAttackers", enemyId, attackerIds: [idsOf(tab, LEGOLAS)] }, tab.ctx)).not.toBeNull();
     expect(refusal(open, { type: "DeclareAttackers", enemyId, attackerIds: [idsOf(tab, SNOWBOURN)] }, tab.ctx)).not.toBeNull();
     expect(refusal(open, { type: "DeclareAttackers", enemyId, attackerIds: [idsOf(tab, EOWYN)] }, tab.ctx)).toBeNull();
-    const attacked = passAll(sendUnledgered(begin(open), { type: "DeclareAttackers", enemyId, attackerIds: [idsOf(tab, THEODRED)] }, tab.ctx), tab.ctx);
+    const attacked = passAll(send(begin(open), { type: "DeclareAttackers", enemyId, attackerIds: [idsOf(tab, THEODRED)] }, tab.ctx), tab.ctx);
     expect(strikeOf(attacked.steps)).toEqual([printed(tab, THEODRED, "attack") + 2]);
     expect(refusal(attacking(withMode(run.state, "refresh")), { type: "DeclareAttackers", enemyId, attackerIds: [idsOf(tab, EOWYN)] }, tab.ctx)).not.toBeNull();
   });
@@ -207,19 +206,19 @@ describe("Steed of the Mark (06139:A:1, A:2)", () => {
   lineSpec("06139:A:2", "Steed of the Mark: after the hero commits, 1 of its resources readies it", (effects) => {
     const tab = table(effects, { start: "quest", heroes: [{ code: THEODRED, seat: 0 }, { code: EOWYN, seat: 0 }], attached: [{ code: STEED, host: THEODRED }], deck: ["f0", "f0"] }, 2);
     const theodred = idsOf(tab, THEODRED);
-    let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [theodred] }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Commit", cardIds: [theodred] }, tab.ctx);
     expect(run.state.cards[theodred]?.exhausted).toBe(true);
     expect(triggers(run.state, tab)).toContain("06139:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, STEED), effectId: "06139:response:1", payments: [{ heroId: theodred, amount: 1 }] }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, STEED), effectId: "06139:response:1", payments: [{ heroId: theodred, amount: 1 }] }, tab.ctx);
     expect(run.state.cards[theodred]).toMatchObject({ exhausted: false, committed: true, resources: 1 });
   });
 
   // With no resource on the attached hero, the cost cannot be paid: no Response. Éowyn, who does not ride the Steed, is offered none.
   it("06139:A:2 Steed of the Mark: no Response with an empty pool, nor for another hero", () => {
     const empty = table(EFFECTS, { start: "quest", heroes: [{ code: THEODRED, seat: 0 }], attached: [{ code: STEED, host: THEODRED }], deck: ["f0", "f0"] }, 0);
-    expect(triggers(sendUnledgered(begin(empty.state), { type: "Commit", cardIds: [idsOf(empty, THEODRED)] }, empty.ctx).state, empty)).not.toContain("06139:response:1");
+    expect(triggers(send(begin(empty.state), { type: "Commit", cardIds: [idsOf(empty, THEODRED)] }, empty.ctx).state, empty)).not.toContain("06139:response:1");
     const other = table(EFFECTS, { start: "quest", heroes: [{ code: THEODRED, seat: 0 }, { code: EOWYN, seat: 0 }], attached: [{ code: STEED, host: THEODRED }], deck: ["f0", "f0"] }, 2);
-    expect(triggers(sendUnledgered(begin(other.state), { type: "Commit", cardIds: [idsOf(other, EOWYN)] }, other.ctx).state, other)).not.toContain("06139:response:1");
+    expect(triggers(send(begin(other.state), { type: "Commit", cardIds: [idsOf(other, EOWYN)] }, other.ctx).state, other)).not.toContain("06139:response:1");
   });
 });
 
@@ -229,9 +228,9 @@ describe("Lay of Nimrodel (06140:A:1)", () => {
   lineSpec("06140:A:1", "Lay of Nimrodel: a Spirit hero gets +1 Willpower per resource until the end of the phase", (effects) => {
     const tab = table(effects, { heroes: [{ code: EOWYN, seat: 0 }, { code: ELEANOR, seat: 0 }, { code: DENETHOR, seat: 0 }], hand: [{ code: LAY, seat: 0 }] }, 3);
     const [eowyn, eleanor] = [idsOf(tab, EOWYN), idsOf(tab, ELEANOR)];
-    let run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, LAY), payments: [{ heroId: eleanor, amount: 1 }] }, tab.ctx);
+    let run = send(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, LAY), payments: [{ heroId: eleanor, amount: 1 }] }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([eowyn, eleanor].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: eowyn }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: eowyn }, tab.ctx);
     expect(stat(run.state, tab, eowyn, "willpower")).toBe(printed(tab, EOWYN, "willpower") + 3);
     expect(stat(run.state, tab, eleanor, "willpower")).toBe(printed(tab, ELEANOR, "willpower"));
     expect(stat(questing(withMode(run.state, "questCommit")), tab, eowyn, "willpower")).toBe(printed(tab, EOWYN, "willpower"));
@@ -255,10 +254,10 @@ describe("Ered Nimrais Prospector (06141:A:1)", () => {
     const top = tab.state.seats[0]?.deck.slice(0, 3) ?? [];
     let run = play(begin(tab.state), tab, idsOf(tab, PROSPECTOR));
     expect(triggers(run.state, tab)).toContain("06141:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, PROSPECTOR), effectId: "06141:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, PROSPECTOR), effectId: "06141:response:1" }, tab.ctx);
     for (const id of top) expect(run.state.cards[id]?.zone).toBe("discard");
     expect(choices(run.state, tab).sort()).toEqual([vigilant, ...top].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: vigilant }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: vigilant }, tab.ctx);
     expect(run.state.cards[vigilant]?.zone).toBe("deck");
     expect(run.state.seats[0]?.deck).toHaveLength(3);
     expect(run.state.seats[0]?.discard).toHaveLength(3);
@@ -268,7 +267,7 @@ describe("Ered Nimrais Prospector (06141:A:1)", () => {
   lineSpec("06141:A:1", "Ered Nimrais Prospector: with fewer than 3 cards in the deck, nothing is shuffled back", (effects) => {
     const { tab, vigilant } = scene(effects, 2);
     let run = play(begin(tab.state), tab, idsOf(tab, PROSPECTOR));
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, PROSPECTOR), effectId: "06141:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, PROSPECTOR), effectId: "06141:response:1" }, tab.ctx);
     expect(run.state.seats[0]?.deck).toHaveLength(0);
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[vigilant]?.zone).toBe("discard");
@@ -300,14 +299,14 @@ describe("Scroll of Isildur (06142:A:1 to A:3)", () => {
     const { tab: listed, ids: [imladris = "", will = "", wealth = ""] } = discarded(scene, [[IMLADRIS, 0], [WILL, 0], [WEALTH, 0]]);
     const denethor = idsOf(listed, DENETHOR);
     const tab = { ...listed, state: updateCard(listed.state, denethor, { damage: 2 }) };
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, SCROLL), effectId: "06142:action:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, SCROLL), effectId: "06142:action:1" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, SCROLL)]?.zone).toBe("discard");
     expect(choices(run.state, tab).sort()).toEqual([imladris, wealth].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: imladris }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: imladris }, tab.ctx);
     // Its cost is paid one resource at a time, by a Lore hero (Eleanor is no choice).
     const beravor = idsOf(tab, BERAVOR);
     expect(choices(run.state, tab).sort()).toEqual([denethor, beravor].sort());
-    run = sendUnledgered(sendUnledgered(run, { type: "Choose", optionId: beravor }, tab.ctx), { type: "Choose", optionId: beravor }, tab.ctx);
+    run = send(send(run, { type: "Choose", optionId: beravor }, tab.ctx), { type: "Choose", optionId: beravor }, tab.ctx);
     expect(run.state.cards[beravor]?.resources).toBe(6 - 2);
     // Denethor is the only damaged character, so Lore of Imladris heals him without a question.
     expect(run.state.window?.kind).not.toBe("choose");

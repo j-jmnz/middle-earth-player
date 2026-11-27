@@ -10,7 +10,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
-import { cannotLeaveStaging } from "../../core/zones.ts";
+import { cannotLeaveStaging } from "../../core/staging-bar.ts";
 import type { Focus } from "../index.ts";
 import { addWithHostToVictory, attachRandomSetAside } from "./capture.ts";
 import { exploredCondition } from "./explored.ts";

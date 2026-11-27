@@ -6,7 +6,7 @@ import { done, isObj, joinAnd, jsonOf, quoted, str, type Ctx, type Obj } from ".
 export type PickRenderer = (pick: unknown, ctx: Ctx) => string;
 
 const CONTROL: Readonly<Record<string, string>> = { you: "you control", any: "any player controls", other: "another player controls" };
-const FROM: Readonly<Record<string, string>> = { play: "in play", hand: "in hand", discard: "in the discard pile", deck: "in the deck", victory: "in the victory display", loot: "in the loot pile", encounterDeck: "in the encounter deck", ravenDeck: "in the Raven deck" };
+const FROM: Readonly<Record<string, string>> = { play: "in play", hand: "in hand", discard: "in the discard pile", deck: "in the deck", victory: "in the victory display", loot: "in the loot pile", encounterDeck: "in the encounter deck", encounterDiscard: "in the encounter discard pile", ravenDeck: "in the Raven deck" };
 const ENGAGED: Readonly<Record<string, string>> = { you: "engaged with you", other: "engaged with another player" };
 
 // Each entry reads some keys and says one qualifier; the order is the order the phrase reads in. A key whose value says nothing (`committed: false` before it had words) is not claimed, so it prints after the text as `[also {...}]`.
@@ -139,10 +139,12 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["guardsObjectiveLocation"], pick.guardsObjectiveLocation === true ? "attached to an objective-location as its guard" : null);
   note(["copyInDiscard"], pick.copyInDiscard === true ? "with a copy of it (the same title) in its controller's discard pile" : pick.copyInDiscard === "owner" ? "with a card of its title in its owner's discard pile" : null);
   // A Captive is in play but no player controls it (families/captives owns "Captives are in play but are not under any player's control", 143022:A:1).
-  const control = pick.captive === "only" || pick.captive === "free" ? "in play, controlled by no player" : typeof pick.control === "string" ? (CONTROL[pick.control] ?? pick.control) : "";
+  // A card in an encounter pile is under no player's control: "(any player controls)" would say something the filter does not.
+  const noOwner = pick.from === "encounterDiscard" || pick.from === "encounterDeck";
+  const control = noOwner ? "" : pick.captive === "only" || pick.captive === "free" ? "in play, controlled by no player" : typeof pick.control === "string" ? (CONTROL[pick.control] ?? pick.control) : "";
   // A card of any player's reaches past the table: the staging area's cards and the active location answer it too (interpret/pick.ts).
   if (pick.type === "card" && pick.control === "any" && pick.stagingOnly !== true && (pick.from === undefined || pick.from === "play")) after.unshift("or in the staging area or the active location");
   const noun = [...front, str(pick.type)].join(" ");
-  const text = `${noun} (${control})${after.length > 0 ? ` ${after.join(", ")}` : ""}`;
+  const text = `${noun}${control === "" ? "" : ` (${control})`}${after.length > 0 ? ` ${after.join(", ")}` : ""}`;
   return done(ctx, text, pick, read);
 };

@@ -149,6 +149,8 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
     }
     case "DealShadow":
       if (!focus.sourceId) return state;
+      // A shadow effect that says "deal the attacking enemy an additional shadow card" (51345:A:2, 08022:A:2) runs from the shadow card itself: the card goes to the enemy that attacks, not to the shadow card.
+      if (instruction.additional && state.cards[focus.sourceId]?.zone === "shadow" && state.pendingAttack) return dealAdditionalShadow(state, state.pendingAttack.enemyId, steps, ctx);
       return instruction.additional ? dealAdditionalShadow(state, focus.sourceId, steps, ctx) : dealOneShadow(state, focus.sourceId, steps, ctx);
     case "ResolveEffect":
       return withFrame(state, "ResolveEffect", focus.sourceId, false, (framed) => framed, steps);

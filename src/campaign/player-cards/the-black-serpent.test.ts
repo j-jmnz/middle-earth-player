@@ -1,7 +1,6 @@
 // Rules: rr.attachment-cards, rr.limits, rr.lasting-effects, rr.modifiers, rr.action, rr.response, rr.triggered-ability, rr.ready,
 // rr.drawing-cards, rr.play-restrictions-and-permissions, rr.unique-cards, rr.traits, rr.cost (data/rules/entries.json).
-// The Black Serpent player cards, written from their card text (data/cards/TBS.json; data/printed holds no ledger for this pack, so the
-// lines are the text of data/cards and every intent goes through sendUnledgered): Song of Hope 17082:A:1 and A:2, Burst into Song
+// The Black Serpent player cards, written from their card text (data/cards/TBS.json; the lines are the ledger lines in data/printed, read from the scans): Song of Hope 17082:A:1 and A:2, Burst into Song
 // 17083:A:1, Defender of Cair Andros 17084:A:1 and A:2, Oath of Eorl 17085:A:1, Fearless Scout 17086:A:1 and A:2, Dúnedain Pipe 17088:A:1
 // and A:2, Old Toby 17089:A:1, Southron Refugee 17090:A:1.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -17,8 +16,8 @@ import { playCost } from "../../rules/player/attach.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { atDefense, attach, choices, enter, fillers, hosts, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { type Table, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { atDefense, attach, choices, enter, fillers, hosts, play, playerTableFor, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const SONG_OF_HOPE = "17082";
 const BURST = "17083";
@@ -87,7 +86,7 @@ describe("Song of Hope (17082:A:1, A:2)", () => {
     let run = begin(tab.state);
     for (let use = 0; use < 3; use += 1) {
       expect(triggers(run.state, tab)).toContain("17082:action:1");
-      run = sendUnledgered(run, { type: "Trigger", cardId: song, effectId: "17082:action:1", payments: [{ heroId: lead, amount: 1 }] }, tab.ctx);
+      run = send(run, { type: "Trigger", cardId: song, effectId: "17082:action:1", payments: [{ heroId: lead, amount: 1 }] }, tab.ctx);
     }
     expect(stat(run.state, tab, lead, "willpower")).toBe(1 + 3);
     expect(run.state.cards[lead]?.resources).toBe(6 - 3);
@@ -148,7 +147,7 @@ describe("Defender of Cair Andros (17084:A:1, A:2)", () => {
   function declared(effects: readonly Effect[], threat: number) {
     const tab = atThreat(table(effects, { heroes: [{ code: TAC, seat: 0 }], allies: [{ code: DEFENDER, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }] }), threat);
     let run = atDefense(tab);
-    run = sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, DEFENDER) }, tab.ctx);
+    run = send(run, { type: "DeclareDefender", defenderId: idsOf(tab, DEFENDER) }, tab.ctx);
     return { tab, run };
   }
 
@@ -157,7 +156,7 @@ describe("Defender of Cair Andros (17084:A:1, A:2)", () => {
   lineSpec("17084:A:2", "Defender of Cair Andros: at threat 40, after he is declared as a defender, 1 damage to the attacker", (effects) => {
     const { tab, run } = declared(effects, 40);
     expect(triggers(run.state, tab)).toContain("17084:response:1");
-    const next = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, DEFENDER), effectId: "17084:response:1" }, tab.ctx);
+    const next = send(run, { type: "Trigger", cardId: idsOf(tab, DEFENDER), effectId: "17084:response:1" }, tab.ctx);
     expect(next.state.cards[idsOf(tab, WEAK)]?.damage).toBe(1);
   });
 
@@ -215,7 +214,7 @@ describe("Fearless Scout (17086:A:1, A:2)", () => {
     let run = play(begin(tab.state), tab, idsOf(tab, SCOUT), idsOf(tab, TAC));
     const hand = run.state.seats[0]?.hand.length ?? 0;
     expect(triggers(run.state, tab)).toContain("17086:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, SCOUT), effectId: "17086:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, SCOUT), effectId: "17086:response:1" }, tab.ctx);
     expect(run.state.seats[0]?.hand).toHaveLength(hand + 1);
     expect(run.state.seats[0]?.deck).toHaveLength(2);
   });
@@ -247,9 +246,9 @@ describe("Dúnedain Pipe (17088:A:1, A:2)", () => {
     const [pipe, event] = [idsOf(tab, PIPE), idsOf(tab, HARAD_EVENT)];
     const top = tab.state.seats[0]?.deck[0] ?? "";
     expect(triggers(tab.state, tab)).toContain("17088:action:1");
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: pipe, effectId: "17088:action:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: pipe, effectId: "17088:action:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([event, idsOf(tab, ALLY)].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: event }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: event }, tab.ctx);
     expect(run.state.seats[0]?.deck.at(-1)).toBe(event);
     expect(run.state.cards[top]?.zone).toBe("hand");
     expect([...(run.state.seats[0]?.hand ?? [])].sort()).toEqual([idsOf(tab, ALLY), top].sort());
@@ -305,7 +304,7 @@ describe("Southron Refugee (17090:A:1)", () => {
     const tab = refugee(effects);
     const [inPlay = "", inHand = "", third = ""] = tab.ids[REFUGEE] ?? [];
     expect(playCost(tab.state, inHand, 0, tab.ctx)).toBe(2);
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: inPlay, effectId: "17090:action:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: inPlay, effectId: "17090:action:1" }, tab.ctx);
     expect(run.state.cards[inPlay]?.exhausted).toBe(true);
     expect(playCost(run.state, inHand, 0, tab.ctx)).toBe(1);
     expect(playCost(run.state, idsOf(tab, HARAD_EVENT), 0, tab.ctx)).toBe(1);
@@ -320,7 +319,7 @@ describe("Southron Refugee (17090:A:1)", () => {
   it("17090:A:1 Southron Refugee: the reduction ends with the phase", () => {
     const tab = refugee(EFFECTS);
     const [inPlay = "", inHand = ""] = tab.ids[REFUGEE] ?? [];
-    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: inPlay, effectId: "17090:action:1" }, tab.ctx);
+    const run = send(begin(tab.state), { type: "Trigger", cardId: inPlay, effectId: "17090:action:1" }, tab.ctx);
     expect(playCost(enter(run.state, tab, "questCommit").state, inHand, 0, tab.ctx)).toBe(2);
   });
 });

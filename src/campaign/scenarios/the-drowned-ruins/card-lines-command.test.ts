@@ -269,11 +269,11 @@ describe("Brand's Response hears an attachment played from the hand (18001:A:2)"
 });
 
 describe("Spyglass played from the hand (11203:A:5)", () => {
-  // A hand play is the player's own: Spyglass, which prints no "Attach to" line, goes on a character of the playing seat with two seats, before and after the host of an effect's attachment was opened to every seat.
-  it("11203:A:5 with two seats Spyglass played from the hand is offered the playing seat's characters only", () => {
+  // "A player has the option to play attachments by attaching them to another player's character" (rr.attachment-cards): Spyglass, which prints no "Attach to" line, is offered every character of both seats from the hand too.
+  it("11203:A:5 with two seats Spyglass played from the hand is offered the characters of both seats", () => {
     const made = withState(commandTable("11203", EFFECTS, 1, { seats: 2, phase: "Planning", play: ["ally"] }), (state) => spawn(state, SPYGLASS, { zone: "hand", seat: 0 }).state);
     const hosts = [...legalTargets(made.state, { type: "PlayCard", cardId: idOf(made.state, SPYGLASS) }, made.ctx)].sort();
-    expect(hosts).toEqual([made.hero, made.hero2, idOf(made.state, "ally")].sort());
+    expect(hosts).toEqual([made.hero, made.hero2, made.seat1Hero ?? "", idOf(made.state, "ally")].sort());
   });
 });
 

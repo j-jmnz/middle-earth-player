@@ -249,7 +249,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
 145069:B:2 (back): The players cannot defeat this stage while Great Corsair Ship is in play. When this stage is defeated, the players win the game.
   145069:constant:2: Constant
     only if the card with code 145030 is in play
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 145071 The Corsair Fleet
 (the scenario deals it into the staging pile; the piles place it, no record does)

@@ -8,6 +8,8 @@ import { Moving } from "../motion/card-motion.native.tsx";
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
 import { Badges, BandName, CardBody, HeldMark, NotAppliedMark, StackMark, SuccessMedallion, Tokens } from "./pieces.native.tsx";
 import { BLANK_WORD } from "../words/card-bars.ts";
+import { CHAMPION_WORD } from "../words/scenarios/haradrim/umbar-table.ts";
+import { SHIELD_WORD } from "../words/scenarios/against-the-shadow/vale.ts";
 import { badgeReach, BlankMarkView, CombatPill, CurrentQuestMark, DelayedMark, DeterminedMarkView, EngagementMark, FireMarkView, OptionMarkView, PlaceMarkView, SeatChipView, ShipLossView, StageMarks, UnderMarkView } from "./mark-pieces.native.tsx";
 import { footStop } from "./badge-room.ts";
 import { underRect } from "./under-mark.ts";
@@ -60,6 +62,9 @@ function drawFrame(p: PieceProps) {
 }
 
 // The card wears something at its foot (a stage's or active location's progress, a committed character's Willpower, a defender's or attacker's combat number, or a resource token): a pill with no count stands one row up, clear of it.
+// The words a card wears in the foot pill column, not on its name at the top: Blank, Shield (the Morgul Bodyguard) and Champion (Escape from Umbar).
+const FOOT_WORDS: ReadonlySet<string> = new Set([BLANK_WORD, SHIELD_WORD, CHAMPION_WORD]);
+
 const wearsFootNumber = (info: { questPoints: number | null; willpower: number | null; combat?: unknown }, resources: number) => info.questPoints != null || info.willpower != null || info.combat != null || resources > 0;
 
 // Where the highest pill at the card's foot stands, which the effect pills stop above (footStop in badge-room.ts).
@@ -90,8 +95,8 @@ function drawOverlay(p: PieceProps) {
         {info?.fire ? <FireMarkView rect={rect} mark={info.fire} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.side?.loses ? <FireMarkView rect={rect} mark={info.side.loses} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.side?.current ? <CurrentQuestMark rect={rect} clear={badgeReach(info.effects, fonts, s, rect.h, stop, rect.w)} fonts={fonts} t={t} s={s} /> : null}
-        {info?.determined?.word === BLANK_WORD ? <BlankMarkView rect={rect} lifted={info.under != null || info.seat != null || info.engagement != null || info.combat != null || info.fire != null || info.loss != null || info.questPoints != null} fonts={fonts} t={t} s={s} /> : null}
-        {info?.determined && info.determined.word !== BLANK_WORD ? <DeterminedMarkView rect={rect} word={info.determined.word} clear={badgeReach(info.effects, fonts, s, rect.h, stop, rect.w)} fonts={fonts} t={t} s={s} /> : null}
+        {info?.determined && FOOT_WORDS.has(info.determined.word) ? <BlankMarkView rect={rect} word={info.determined.word} lifted={info.under != null || info.seat != null || info.engagement != null || info.combat != null || info.fire != null || info.loss != null || info.questPoints != null} fonts={fonts} t={t} s={s} /> : null}
+        {info?.determined && !FOOT_WORDS.has(info.determined.word) ? <DeterminedMarkView rect={rect} word={info.determined.word} clear={badgeReach(info.effects, fonts, s, rect.h, stop, rect.w)} fonts={fonts} t={t} s={s} /> : null}
         {info?.seat ? <SeatChipView rect={rect} text={info.seat.chip} fonts={fonts} t={t} s={s} /> : null}
         {info?.loss ? <ShipLossView rect={rect} mark={info.loss} fonts={fonts} t={t} s={s} /> : null}
         {info?.place ? <PlaceMarkView rect={rect} mark={info.place} t={t} s={s} /> : null}

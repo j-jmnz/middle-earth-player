@@ -201,7 +201,15 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "05055",
       lines: ["05055:A:2"],
       timing: "whenRevealed",
-      instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "SearchMove", type: "enemy", trait: "Harad", to: "staging" }] }, { verb: "ShuffleEncounterDeck" }],
+      instructions: [
+        {
+          verb: "ForEachPlayer",
+          order: "firstFirst",
+          // A Haradrim Elite found here attacks as it is added to the staging area (05053:A:1): the search announces only an ambush enemy, so the record announces the card (as 06091:A:1 does).
+          instructions: [{ verb: "SearchMove", type: "enemy", trait: "Harad", to: "staging", remember: true }, { verb: "AnnounceAddedToStaging" }],
+        },
+        { verb: "ShuffleEncounterDeck" },
+      ],
     },
 
     // 05068 Ambush in Ithilien (stage 1). A:1: the piles place Celador, Ithilien Road as the active location and one Southron Company for each player. B:1: Battle (the keyword is the card's own, the reminder text carries no rule). B:2: completed with Celador in the staging area

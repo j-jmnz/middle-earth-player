@@ -129,7 +129,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40004:B:3 (back): The players can only advance at the end of the quest phase.
   40004:constant:3: Constant
     only if not (the Quest phase has just ended)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 40005 Destroy the Dreadnaught
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -257,7 +257,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (any player controls)
     - heal 2 damage from the picked card
-    - for each card (any player controls) encounterDiscard (up to 2 chosen):
+    - for each card in the encounter discard pile (up to 2 chosen):
       - the picked card is added to the victory display
 
 ## 40009 Silent Mist

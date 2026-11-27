@@ -10,8 +10,8 @@ import type { ReduceContext } from "../interpret/interpret.ts";
 import { applyResponse, responseIntents, responseReason } from "../windows/responses.ts";
 import { applyMulliganTrigger, mulliganTriggerReason } from "../families/deck/play.ts";
 import { textBlank } from "../families/attachments/hold.ts";
-import { printedOf } from "../core/printed.ts";
-import { flagged, inPlay, type ScenarioState } from "../core/state.ts";
+import { isAllyLike, printedOf } from "../core/printed.ts";
+import { flagged, inPlay, inPlayerArea, type ScenarioState } from "../core/state.ts";
 import { hostLostToCost, payUsage, usable, usageReason } from "./usage.ts";
 import { announcePlayerAbility } from "../families/deck/pressure.ts";
 import { areaHeadOf, headOf, isolatedAreas, stageSeat } from "../families/breaking/areas.ts";
@@ -38,7 +38,11 @@ function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, 
   const effect = effectsOfCard(state, ctx, instance).find((entry) => entry.id === effectId && entry.timing === "action");
   // An objective, quest or location in play belongs to no player: any player may initiate its Action (rr.action).
   // The campaign card next to the quest deck belongs to no player either, and its Action is any player's (11197:A:3, "Travel Action"); so is the Quest Action of a mode card (40002:B:1).
-  const shared = inPlay(instance.zone) && (SHARED_TYPES.has(printedOf(ctx.cards, instance.code).type) || instance.zone === "campaign" || instance.zone === "modeCard");
+  // An objective ally a player controls is an ally under that player's control: only the controller uses its Action (rr.action, rr.objective-cards: "If a player claims an objective, then that player gains control of that objective").
+  const printed = printedOf(ctx.cards, instance.code);
+  // A revealed card carries its revealing seat as controller, so "controlled" means in a player's play area, not a set controller.
+  const controlledAlly = isAllyLike(printed) && inPlayerArea(instance);
+  const shared = inPlay(instance.zone) && !controlledAlly && (SHARED_TYPES.has(printed.type) || instance.zone === "campaign" || instance.zone === "modeCard");
   // An Action used from the hand ("put ~ into play from your hand", effect.fromHand) is used there; any other in play.
   if (effect?.fromHand ? instance.zone !== "hand" : instance.zone !== "heroes" && instance.zone !== "play" && instance.zone !== "attached" && !shared) return undefined;
   // Only the card's controller uses its Action, unless any player may (Éowyn's once a round each, "Any player may trigger").

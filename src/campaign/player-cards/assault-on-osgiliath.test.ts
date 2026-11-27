@@ -2,8 +2,7 @@
 // rr.response, rr.enters-play, rr.printed, rr.engaged, rr.cost, rr.action, rr.limits, rr.lasting-effects, rr.resources,
 // rr.play-restrictions-and-permissions, rr.then, rr.player-deck, rr.restricted, rr.exhausted, rr.damage, rr.triggered-ability
 // (data/rules/entries.json).
-// The Assault on Osgiliath player cards, written from their card text (data/cards/AoO.json; data/printed holds no ledger for this pack, so
-// every intent goes through sendUnledgered): Faramir 06081:A:2, Sword of Morthond 06082:A:1 and A:2, Men of the West 06083:A:1, Knight of
+// The Assault on Osgiliath player cards, written from their card text (data/cards/AoO.json; the ledger lines in data/printed are read from the scans): Faramir 06081:A:2, Sword of Morthond 06082:A:1 and A:2, Men of the West 06083:A:1, Knight of
 // Minas Tirith 06084:A:1, Gondorian Fire 06085:A:1 and A:2, Pelargir Shipwright 06086:A:1, Map of Earnil 06087:A:1 to A:3, Ranger Bow
 // 06088:A:1 and A:2, Forest Patrol 06089:A:1 and A:2, Palantir 06090:A:1.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -17,8 +16,8 @@ import { playCost } from "../../rules/player/attach.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf } from "../../../test/harness/scene.ts";
-import { attach, canPlay, choices, discarded, hosts, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { attach, canPlay, choices, discarded, hosts, play, playerTableFor, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const FARAMIR = "06081";
 const SWORD = "06082";
@@ -81,7 +80,7 @@ describe("Faramir (06081:A:2)", () => {
     const faramir = idsOf(tab, FARAMIR);
     const attack = tab.ctx.cards.get(FARAMIR)?.attack ?? 0;
     expect(stat(tab.state, tab, faramir, "attack")).toBe(attack + 2);
-    const run = sendUnledgered(begin(tab.state), { type: "Engage", enemyId: idsOf(tab, WALL) }, tab.ctx);
+    const run = send(begin(tab.state), { type: "Engage", enemyId: idsOf(tab, WALL) }, tab.ctx);
     expect(run.state.cards[idsOf(tab, WALL)]?.zone).toBe("engaged");
     expect(stat(run.state, tab, faramir, "attack")).toBe(attack + 1);
   });
@@ -122,12 +121,12 @@ describe("Men of the West (06083:A:1)", () => {
     const scene = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }], hand: [{ code: MEN, seat: 0 }] });
     const { tab, ids: [lossarnach = "", swan = "", ethir = "", spearman = ""] } = discarded(scene, [[LOSSARNACH, 0], [SWAN, 0], [ETHIR, 0], [SPEARMAN, 0]]);
     const aragorn = idsOf(tab, ARAGORN);
-    let run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, MEN), payments: [{ heroId: aragorn, amount: 2 }] }, tab.ctx);
+    let run = send(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, MEN), payments: [{ heroId: aragorn, amount: 2 }] }, tab.ctx);
     expect(run.state.cards[aragorn]?.resources).toBe(6 - 2);
     expect(choices(run.state, tab).sort()).toEqual([lossarnach, swan, ethir].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: swan }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: swan }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([lossarnach, ethir].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: ethir }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: ethir }, tab.ctx);
     expect(run.state.window?.kind).not.toBe("choose");
     expect([swan, ethir, lossarnach, spearman].map((id) => run.state.cards[id]?.zone)).toEqual(["hand", "hand", "discard", "discard"]);
   });
@@ -150,10 +149,10 @@ describe("Knight of Minas Tirith (06084:A:1)", () => {
     const { tab, card, run: played } = knight(effects, [GIMLI, LEGOLAS], 2);
     const target = idsOf(tab, TARGET);
     expect(triggers(played.state, tab)).toContain("06084:response:1");
-    let run = sendUnledgered(played, { type: "Trigger", cardId: card, effectId: "06084:response:1" }, tab.ctx);
+    let run = send(played, { type: "Trigger", cardId: card, effectId: "06084:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, WALL), target].sort());
     const before = run.steps.length;
-    run = sendUnledgered(run, { type: "Choose", optionId: target }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: target }, tab.ctx);
     expect(run.state.cards[target]).toMatchObject({ zone: "engaged", controller: 0, damage: 2 });
     expect(run.state.cards[card]?.exhausted).toBe(true);
     expect(run.steps.slice(before).some((step) => step.kind === "strike" && step.side === "player" && step.enemyId === target)).toBe(true);
@@ -193,7 +192,7 @@ describe("Gondorian Fire (06085:A:1, A:2)", () => {
     // The resource comes from the attached hero's pool: Legolas cannot pay it.
     const byLegolas = { type: "Trigger", cardId: card, effectId: "06085:action:1", payments: [{ heroId: idsOf(tab, LEGOLAS), amount: 1 }] } as const;
     expect(refusal(tab.state, byLegolas, tab.ctx)).not.toBeNull();
-    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: card, effectId: "06085:action:1", payments: [{ heroId: aragorn, amount: 1 }] }, tab.ctx);
+    const run = send(begin(tab.state), { type: "Trigger", cardId: card, effectId: "06085:action:1", payments: [{ heroId: aragorn, amount: 1 }] }, tab.ctx);
     expect(run.state.cards[aragorn]?.resources).toBe(5);
     expect(run.state.cards[idsOf(tab, LEGOLAS)]?.resources).toBe(6);
     expect(stat(run.state, tab, aragorn, "attack")).toBe(attack + 5);
@@ -206,7 +205,7 @@ describe("Gondorian Fire (06085:A:1, A:2)", () => {
   lineSpec("06085:A:2", "Gondorian Fire: the bonus is counted once, and does not change when the hero spends a resource afterwards", (effects) => {
     const { tab, aragorn, card } = fire(effects, 6);
     const attack = tab.ctx.cards.get(ARAGORN)?.attack ?? 0;
-    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: card, effectId: "06085:action:1", payments: [{ heroId: aragorn, amount: 1 }] }, tab.ctx);
+    const run = send(begin(tab.state), { type: "Trigger", cardId: card, effectId: "06085:action:1", payments: [{ heroId: aragorn, amount: 1 }] }, tab.ctx);
     expect(stat(run.state, tab, aragorn, "attack")).toBe(attack + 5);
     const spent = updateCard(run.state, aragorn, { resources: 1 });
     expect(stat(spent, tab, aragorn, "attack")).toBe(attack + 5);
@@ -247,7 +246,7 @@ describe("Map of Earnil (06087:A:1, A:2, A:3)", () => {
     expect(playCost(two.state, idsOf(two, MAP), 0, two.ctx)).toBe(2);
     const one = table(effects, { heroes: [{ code: EOWYN, seat: 0 }, { code: ARAGORN, seat: 0 }], hand: [{ code: MAP, seat: 0 }] });
     expect(playCost(one.state, idsOf(one, MAP), 0, one.ctx)).toBe(3);
-    const run = sendUnledgered(begin(two.state), { type: "PlayCard", cardId: idsOf(two, MAP), hostId: idsOf(two, EOWYN), payments: [{ heroId: idsOf(two, EOWYN), amount: 2 }] }, two.ctx);
+    const run = send(begin(two.state), { type: "PlayCard", cardId: idsOf(two, MAP), hostId: idsOf(two, EOWYN), payments: [{ heroId: idsOf(two, EOWYN), amount: 2 }] }, two.ctx);
     expect(run.state.cards[idsOf(two, MAP)]?.host).toBe(idsOf(two, EOWYN));
   });
 
@@ -264,11 +263,11 @@ describe("Map of Earnil (06087:A:1, A:2, A:3)", () => {
   it("06087:A:3 Map of Earnil: discard it to play a Spirit event from the discard pile, then put the event at the bottom of the deck", () => {
     const { tab, ids: [greeting = ""], card } = map(EFFECTS, [GREETING]);
     expect(triggers(tab.state, tab)).toContain("06087:action:1");
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: card, effectId: "06087:action:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: card, effectId: "06087:action:1" }, tab.ctx);
     expect(run.state.cards[card]?.zone).toBe("discard");
     // The Greeting's own choice: reduce one player's threat by 6 (the only player, so the engine takes him).
     expect(choices(run.state, tab).sort()).toEqual(["each", "one"]);
-    run = sendUnledgered(run, { type: "Choose", optionId: "one" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "one" }, tab.ctx);
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.seats[0]?.threat).toBe(30 - 6);
     expect(run.state.cards[idsOf(tab, EOWYN)]?.resources).toBe(6 - 3);
@@ -301,9 +300,9 @@ describe("Ranger Bow (06088:A:1, A:2)", () => {
   lineSpec("06088:A:2", "Ranger Bow: exhaust it and the character to deal 1 damage to an enemy in the staging area", (effects) => {
     const tab = bow(effects, [WALL, WALL]);
     const [first = "", second = ""] = tab.ids[WALL] ?? [];
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, BOW), effectId: "06088:action:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, BOW), effectId: "06088:action:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([first, second].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: second }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: second }, tab.ctx);
     expect([second, first, idsOf(tab, TARGET)].map((id) => run.state.cards[id]?.damage)).toEqual([1, 0, 0]);
     expect(run.state.cards[idsOf(tab, BOW)]?.exhausted).toBe(true);
     expect(run.state.cards[idsOf(tab, BERAVOR)]?.exhausted).toBe(true);
@@ -345,7 +344,7 @@ describe("Forest Patrol (06089:A:1, A:2)", () => {
     const { tab, staged, engaged, card } = patrol(EFFECTS, 0);
     let run = play(begin(tab.state), tab, card);
     expect(choices(run.state, tab).sort()).toEqual([engaged, staged].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: engaged }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: engaged }, tab.ctx);
     expect(run.state.cards[engaged]?.damage).toBe(3);
     expect(run.state.cards[staged]?.damage).toBe(0);
   });

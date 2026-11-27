@@ -412,7 +412,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18076:B:3 (back): This stage cannot be defeated while the nemesis is in play. The nemesis cannot take damage unless there is at least 8 progress on this stage. If the players defeat the nemesis, they win the game.
   18076:constant:2: Constant
     only if there is a enemy (any player controls) or in the staging area, that is the nemesis (the enemy the stage named, until it leaves play) to choose
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
   18076:constant:3: Constant
     only if progress of this card is less than 8
     - each enemy (any player controls) or in the staging area, that is the nemesis (the enemy the stage named, until it leaves play): stat cannotTakeDamage 1, while this card is in play
@@ -440,6 +440,6 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18077:B:2 (back): This stage cannot be defeated while a player is engaged with an enemy. When this stage is defeated, the players win the game.
   18077:constant:1: Constant
     only if any of: (there is a enemy (any player controls) engaged with you to choose) or (there is a enemy (any player controls) engaged with another player to choose)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 (rendered pieces: 297 by template, 0 as JSON)

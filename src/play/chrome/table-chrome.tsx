@@ -9,6 +9,7 @@ import Animated, { FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withSequen
 // Split by platform (Skia on a phone, CSS on the web), so imported without its extension.
 import { ArcRing } from "../../ui/arc-ring";
 import { useFocusRing } from "../../ui/focus-ring.ts";
+import { DialIcon } from "./dial-icon.tsx";
 import { GameIcon } from "../../ui/game-icon.tsx";
 import type { IconName } from "../../ui/icon-map.ts";
 import type { LogMark } from "../store/log.ts";
@@ -19,7 +20,7 @@ import { dialSpeech, type DialRole } from "../store/peek.ts";
 import type { SeatThreat } from "../store/selectors.ts";
 import { threatDelta, threatDeltaWords, threatLevel, threatMeter, threatSound, type ThreatLevel } from "../readouts/threat-level.ts";
 import { playSound } from "../../ui/sound/sound.ts";
-import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
+import { withAlphaHex, type TableToken, type TableTokens } from "../../ui/tokens.ts";
 import { badgeFoot, CAPTION_LINE, CAPTION_OVER, CAPTION_PAD, captionOf, DIAL_PAD, DIAL_SIZE, HEADING_BADGE_OVER, HEADING_LABEL_W } from "./top-bar-layout.ts";
 import { touch, useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
@@ -51,7 +52,9 @@ function dialLook(t: TableTokens, dial: { threat: number; eliminated: boolean; e
       : dial.warn || dial.elimination
         ? dialOf(t)[level]
         : { edge: t.accent, fill: t.night, meter: t.accent };
-  return { own, level, look };
+  // The icon beside the number wears the ring's own meaning: a goal or a plain count in the accent (a vector icon; a raster token takes no tint), a seat that is out muted, the danger tint where the dial counts toward a loss, on the solid threat red once critical.
+  const tint: TableToken = dial.eliminated ? "muted" : dial.goal || !(dial.warn || dial.elimination) ? "accent" : level === "critical" ? "onThreat" : "danger";
+  return { own, level, look, tint };
 }
 
 /**
@@ -222,7 +225,7 @@ function ThreatDial({
   const s = useUiScale();
   const focus = useFocusRing();
   const badge = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.threatBadgeIn, speed), out: layoutAnim(FadeOut, MOTION.threatBadgeOut, speed) }), [speed]);
-  const { own, level, look } = dialLook(t, { threat: threat.threat, eliminated: threat.eliminated, elimination, goal: goal === true, limit, warn });
+  const { own, level, look, tint } = dialLook(t, { threat: threat.threat, eliminated: threat.eliminated, elimination, goal: goal === true, limit, warn });
   // The change since the number last moved, shown beside the dial for DELTA_MS. A new change replaces it.
   const seen = useRef(threat.threat);
   const [change, setChange] = useState<{ before: number; after: number; at: number } | null>(null);
@@ -304,7 +307,7 @@ function ThreatDial({
               <Text testID={`${id}-value`} className="font-display" numberOfLines={shown == null ? undefined : 1} adjustsFontSizeToFit={shown != null} minimumFontScale={0.6} style={{ fontSize: (shown == null ? 20 : 12) * s, lineHeight: (shown == null ? 24 : 16) * s, color: critical ? t.onThreat : t.depth === "light" ? t.bone : t.onThreat }}>
                 {shown ?? String(threat.threat)}
               </Text>
-              {icon && icon !== "threat" ? <GameIcon name={icon} size={9 * s} tint="danger" /> : null}
+              {icon && icon !== "threat" ? <DialIcon name={icon} size={9 * s} tint={tint} critical={critical} t={t} s={s} /> : null}
             </View>
           </ArcRing>
           {/* A tick on the ring at each staging enemy's engagement cost: bone where the threat has reached it, faint where not yet. */}

@@ -151,10 +151,10 @@ function putOn(state: ScenarioState, id: string, hostId: string, seat: number, c
 }
 
 // The hosts an attachment put into play may go on: where its PlayInto rule puts it, else the cards it may be attached to for the
-// seat, that match the instruction's `host` filter (its `control` read from the actor's side; a filter that names no seat (`any`, `other`) lets a card with no "Attach to" record go on a character of any seat).
+// seat, that match the instruction's `host` filter (its `control` read from the actor's side; a filter that names no seat (`any`, `other`), or no filter, lets a card with no "Attach to" record go on a character of any seat).
 function hostsFor(state: ScenarioState, instruction: PutIntoPlay, card: CardInstance, seat: number, focus: Focus, ctx: ReduceContext): string[] {
   const filter = instruction.host;
-  const base = (playIntoRule(ctx, card.code) ? playTargets(state, seat, card.code, ctx) : null) ?? attachmentHostIds(state, seat, card.code, ctx, { anySeat: filter != null && filter.control !== "you" });
+  const base = (playIntoRule(ctx, card.code) ? playTargets(state, seat, card.code, ctx) : null) ?? attachmentHostIds(state, seat, card.code, ctx, { anySeat: filter?.control !== "you" });
   return base.filter((hostId) => {
     if (hostId === card.id) return false;
     if (!filter) return true;

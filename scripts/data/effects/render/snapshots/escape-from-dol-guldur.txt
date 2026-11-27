@@ -177,7 +177,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01123:B:3 (back): Players cannot advance to the next stage of this quest unless they have at least 1 objective card.
   01123:constant:2: Constant
     only if the number of objective (any player controls) that is attached to another card is at most 0
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 01124 Through the Caverns
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -194,7 +194,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01124:B:3 (back): Players cannot advance to the next stage of this quest unless they have rescued the prisoner and have all 3 "Escape from Dol Guldur" objective cards.
   01124:constant:2: Constant
     only if any of: (a hero is the "prisoner" now, facedown, until it is rescued) or (the number of objective (any player controls) that is attached to another card is at most 2)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 01125 Out of the Dungeons
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -209,7 +209,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 01125:B:2 (back): Players cannot defeat this stage while Nazgûl of Dol Guldur is in play. If this stage is defeated and Nazgûl of Dol Guldur is not in play, the players have won the game.
   01125:constant:1: Constant
     only if the card with code 01102 is in play
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 01131 Escape from Dol Guldur
 

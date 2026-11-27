@@ -84,7 +84,7 @@ function attackersSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNam
     key: `attackers:${enemyId}`,
     step: "Combat",
     title: `Attack ${names.card(enemyId)}`,
-    note: fateTargetNote(game, ctx, enemyId, defense, names.card(enemyId)) ?? (willpowerAttack(game) ? `${willpowerAttackWords(defense)} Choose the characters that attack it.` : `Defense ${defense}.${valeAttackNote(game, ctx, enemyId)} Choose the characters that attack it.`),
+    note: fateTargetNote(game, ctx, enemyId, defense, names.card(enemyId)) ?? (willpowerAttack(game) ? `${willpowerAttackWords(defense)} Choose the characters that attack it.` : `${valeAttackNote(game, ctx, enemyId).trim()} Defense ${defense}. Choose the characters that attack it.`.trim()),
     verb: "Attack",
     stats: statOf(game, ctx, enemyId, "defense"),
     options: characters.map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, read) })),

@@ -112,7 +112,8 @@ export const STAT_TEMPLATES: Readonly<Record<string, Template>> = {
   Restrict: (i, ctx) => {
     // The restriction binds the main quest stage: "this stage" only on a quest card, the stage itself; an encounter side quest is a stage that is defeated too, and the bar holds the main quest stage as well.
     const barred = ctx.cardType === "quest" ? "this stage" : ctx.cardType === "encounter-side-quest" ? "this stage and the main quest stage" : "the main quest stage";
-    if (i.what === "advance") return { text: `the players cannot defeat ${barred} while this holds`, read: ["what"] };
+    // faq.progress-without-advancing says the progress stays on the stage; that it is defeated at once when the bar ends is the quest-advancement rule (rr.quest-advancement).
+    if (i.what === "advance") return { text: `the players cannot defeat ${barred} while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)`, read: ["what"] };
     if (i.what === "defend") {
       if (i.anyDefender === true) return { text: "no character can be declared as a defender against this card's attacks (only this card's, not another enemy's)", read: ["what", "anyDefender"] };
       const who = i.allies === true ? "allies" : i.belowSourceHitPoints === true ? "allies with fewer printed hit points than this card" : typeof i.maxWillpower === "number" ? `characters with Willpower ${i.maxWillpower} or less` : "characters";

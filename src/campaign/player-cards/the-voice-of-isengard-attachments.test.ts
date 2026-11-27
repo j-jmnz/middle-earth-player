@@ -1,7 +1,6 @@
 // Rules: rr.attachment-cards, rr.restricted, rr.response, rr.cost, rr.shadow-effects, rr.step-6-1, rr.doomed-x, rr.destroy,
 // rr.triggered-ability (data/rules/entries.json).
-// The Voice of Isengard attachments, each printed line tested from the words on the card (data/cards/VoI.json: data/printed holds no
-// ledger for this pack, so the lines are the text of data/cards and every intent goes through sendUnledgered): Rohan Warhorse 07008:A:1
+// The Voice of Isengard attachments, each printed line tested from the words on the card (data/cards/VoI.json: the lines are the ledger lines in data/printed, read from the scans): Rohan Warhorse 07008:A:1
 // and A:2, Silver Lamp 07009:A:1 and A:2, Keys of Orthanc 07010:A:1 and A:2.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -12,8 +11,8 @@ import { updateCard } from "../../rules/core/state.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf } from "../../../test/harness/scene.ts";
-import { attach, attacking, combat, fillers, hosts, play, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { attach, attacking, combat, fillers, hosts, play, playerTableFor, triggers } from "../../../test/harness/player-table.ts";
 
 const WARHORSE = "07008";
 const LAMP = "07009";
@@ -73,7 +72,7 @@ describe("Rohan Warhorse (07008:A:1, A:2)", () => {
     let run = play(play(begin(start.state), start, first, gimli), start, second, gimli);
     expect(run.state.cards[gimli]?.attachments).toHaveLength(2);
     run = play(run, start, third, gimli);
-    for (let guard = 0; guard < 3 && run.state.window?.kind === "choose"; guard += 1) run = sendUnledgered(run, { type: "Choose", optionId: first }, start.ctx);
+    for (let guard = 0; guard < 3 && run.state.window?.kind === "choose"; guard += 1) run = send(run, { type: "Choose", optionId: first }, start.ctx);
     expect([first, second, third].filter((id) => run.state.cards[id]?.host === gimli)).toHaveLength(2);
   });
 
@@ -83,14 +82,14 @@ describe("Rohan Warhorse (07008:A:1, A:2)", () => {
     const start = table(effects, { heroes: [{ code: GIMLI, seat: 0 }, { code: LEGOLAS, seat: 0 }], attached: [{ code: WARHORSE, host: GIMLI }], engaged: [{ code: FRAIL, seat: 0 }] });
     const tab = attach(start, []);
     const [gimli, legolas, warhorse, frail] = [idsOf(tab, GIMLI), idsOf(tab, LEGOLAS), idsOf(tab, WARHORSE), idsOf(tab, FRAIL)];
-    let run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: frail, attackerIds: [gimli, legolas] }, tab.ctx);
+    let run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: frail, attackerIds: [gimli, legolas] }, tab.ctx);
     expect(run.state.cards[frail]?.zone).not.toBe("engaged");
     expect(run.state.cards[gimli]?.exhausted).toBe(true);
     // Legolas's own Response to the same attack is offered first; it is passed.
     expect(triggers(run.state, tab)).toEqual(["01005:response:1"]);
-    run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = send(run, { type: "Pass" }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("07008:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: warhorse, effectId: "07008:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: warhorse, effectId: "07008:response:1" }, tab.ctx);
     expect(run.state.cards[warhorse]?.exhausted).toBe(true);
     expect(run.state.cards[gimli]?.exhausted).toBe(false);
     expect(run.state.cards[legolas]?.exhausted).toBe(true);
@@ -99,7 +98,7 @@ describe("Rohan Warhorse (07008:A:1, A:2)", () => {
   // An attack the attached hero is not in: no Response.
   it("07008:A:2 Rohan Warhorse: not offered when the attached hero did not attack", () => {
     const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }, { code: LEGOLAS, seat: 0 }], attached: [{ code: WARHORSE, host: GIMLI }], engaged: [{ code: FRAIL, seat: 0 }] });
-    const run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, FRAIL), attackerIds: [idsOf(tab, LEGOLAS)] }, tab.ctx);
+    const run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, FRAIL), attackerIds: [idsOf(tab, LEGOLAS)] }, tab.ctx);
     expect(run.state.cards[idsOf(tab, FRAIL)]?.zone).not.toBe("engaged");
     expect(triggers(run.state, tab)).not.toContain("07008:response:1");
   });
@@ -107,7 +106,7 @@ describe("Rohan Warhorse (07008:A:1, A:2)", () => {
   // An attack that does not destroy the enemy: no Response.
   it("07008:A:2 Rohan Warhorse: not offered when the attack does not destroy the enemy", () => {
     const tab = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }], attached: [{ code: WARHORSE, host: GIMLI }], engaged: [{ code: WALL, seat: 0 }] });
-    const run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WALL), attackerIds: [idsOf(tab, GIMLI)] }, tab.ctx);
+    const run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WALL), attackerIds: [idsOf(tab, GIMLI)] }, tab.ctx);
     expect(run.state.cards[idsOf(tab, WALL)]?.zone).toBe("engaged");
     expect(triggers(run.state, tab)).not.toContain("07008:response:1");
   });
@@ -167,7 +166,7 @@ describe("Keys of Orthanc (07010:A:1, A:2)", () => {
     let run = play(begin(tab.state), tab, idsOf(tab, DEEP));
     expect(run.state.seats[0]?.threat).toBe(8 + 2);
     expect(triggers(run.state, tab)).toContain("07010:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: keys, effectId: "07010:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: keys, effectId: "07010:response:1" }, tab.ctx);
     expect(run.state.cards[keys]?.exhausted).toBe(true);
     expect(run.state.cards[gimli]?.resources).toBe(6 + 1);
   });
@@ -176,11 +175,11 @@ describe("Keys of Orthanc (07010:A:1, A:2)", () => {
   lineSpec("07010:A:2", "Keys of Orthanc: after a doomed encounter card is revealed, 1 resource to the attached hero", (effects) => {
     const tab = table(effects, { start: "quest", heroes: [{ code: DENETHOR, seat: 0 }, { code: GIMLI, seat: 0 }], allies: [{ code: SNOWBOURN, seat: 0 }], attached: [{ code: KEYS, host: GIMLI }], deck: [DOOM, GLADE] });
     const [gimli, keys] = [idsOf(tab, GIMLI), idsOf(tab, KEYS)];
-    let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, SNOWBOURN)] }, tab.ctx);
-    run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, SNOWBOURN)] }, tab.ctx);
+    run = send(run, { type: "Pass" }, tab.ctx);
     expect(run.state.seats[0]?.threat).toBe(8 + 1);
     expect(triggers(run.state, tab)).toContain("07010:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: keys, effectId: "07010:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: keys, effectId: "07010:response:1" }, tab.ctx);
     expect(run.state.cards[gimli]?.resources).toBe(6 + 1);
   });
 

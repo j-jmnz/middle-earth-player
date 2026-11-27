@@ -2,6 +2,7 @@
 // record History lists. Every number in it comes from the engine's final state (the score from scoreOf, the loss cause from
 // the state's lossReason, each seat's threat from the seat); nothing is typed. It sits beside the campaign log, not in it: the
 // log's rule that a loss writes nothing stays, and a loss writes a run. A run is written once and never rewritten. Pure.
+import { lossReasonWords } from "../rules/core/elimination-words.ts";
 import { ENDED_BY_DEFEAT, endedInDefeat } from "../rules/core/eliminate.ts";
 import { resolutionResult } from "../rules/setup/resolution.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
@@ -119,6 +120,11 @@ export function runOf(input: RunInput): RunRecord | null {
 }
 
 /** A won run that carries a cause ended on its last player's elimination and went on to its Resolution (`ENDED_BY_DEFEAT`): the run list words it as an end, not a win. */
+/** What a stored loss cause says to a player: the engine's reason "No seats remain" is said as "Every player is eliminated" (rules/core/elimination-words.ts). Read time only: the saved text stays as the engine gave it. */
+export function causeWords(cause: string | null): string | null {
+  return lossReasonWords(cause);
+}
+
 export function runEnded(run: Pick<RunRecord, "result" | "lossCause">): boolean {
   return run.result === "won" && run.lossCause != null;
 }

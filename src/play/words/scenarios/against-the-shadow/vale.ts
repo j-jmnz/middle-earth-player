@@ -71,6 +71,13 @@ export const nazgulWords = (bodyguards: number): string =>
 export const bodyguardWords = (bodyguards: number, damage: number, hits: number): string =>
   `While it is in play, damage meant for a Captain goes whole to the Morgul Bodyguard with the most damage. The Bodyguard's own Defense does not reduce it. ${plural(bodyguards, "Morgul Bodyguard")} in play. This one has ${damage} of ${hits} damage.`;
 
+/** The pill on the Morgul Bodyguard that takes the damage meant for a Captain, and what a screen reader hears of it. */
+export const SHIELD_WORD = "Shield";
+export const shieldMarkWords = "It takes the damage meant for a Captain: it holds the most damage of the Morgul Bodyguards in play.";
+
+/** The line a shielding Bodyguard's preview adds: it is the one that takes a Captain's damage now. */
+export const shieldNowWords = "This one takes the damage meant for a Captain now.";
+
 /** To the Tower's preview line. */
 export const towerWords = (count: number): string =>
   `Objective. It stays in the staging area all game: no card or effect can shuffle, discard or take it, and it is never engaged. The Power of Mordor counts it. It holds ${count} of the ${TOWER_LIMIT} progress tokens that lose the game. Card effects place progress tokens on it; questing never does.`;

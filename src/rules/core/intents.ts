@@ -17,6 +17,8 @@ export type EngineStep =
   | { kind: "reveal"; seat: number; cardId: string; cause: Cause }
   // `boarding`: the ship-enemy whose Boarding keyword revealed this enemy from the Corsair deck (dcce.boarding); absent on every other engagement.
   | { kind: "engage"; seat: number; enemyId: string; boarding?: string }
+  // An engaged enemy went back to the staging area by an effect (a shadow card, a location, an ability): `cause` is the effect that returned it.
+  | { kind: "returnToStaging"; enemyId: string; cause: Cause }
   | { kind: "commit"; cardId: string }
   | { kind: "hideCommit"; cardId: string }
   | { kind: "fortitudeCommit"; cardId: string }

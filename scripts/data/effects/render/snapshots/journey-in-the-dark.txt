@@ -32,7 +32,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142041:B:2 (back): The players cannot advance unless there are X resource tokens on this stage. X is the number of players times 3.
   142041:constant:1: Constant
     only if not (the card with code 142041 in play holds at least 3 resource token(s) for each player)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 142041:B:3 (back): Forced: After an enemy is defeated, place 1 resource token on this stage.
   142041:forced:2: Forced after an enemy is destroyed
@@ -57,7 +57,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142042:B:2 (back): The players cannot defeat this stage while The Great Bridge is in play.
   142042:constant:2: Constant
     only if the card with code 142050 is in play
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 142042:B:3 (back): If the players defeat this stage, they win the game.
   142042:constant:3: Constant
@@ -195,7 +195,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142051:A:2 (front): The players cannot advance to the next stage.
   142051:constant:1: Constant
-    - the players cannot defeat the main quest stage while this holds
+    - the players cannot defeat the main quest stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 142051:A:3 (front): Travel: Each player searches the encounter deck and discard pile for a different enemy and adds it to the staging area to travel here. One of those enemies must be Orc-chieftain, if able.
   142051:travel:1: Travel

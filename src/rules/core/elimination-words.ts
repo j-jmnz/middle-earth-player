@@ -31,11 +31,18 @@ export function eliminationWords(state: ScenarioState, seat: number, heroes?: He
   return heroes?.(seat) ? `Player ${seat + 1}'s last hero was destroyed.` : null;
 }
 
-/** The reason a lost game gives: the engine's reason, and for "No seats remain" the cause of each elimination after it ("No seats remain. Player 1's threat reached 50."). */
+/** What the engine's reason says to a player: the reason, with "No seats remain" said as "Every player is eliminated". */
+export const EVERY_PLAYER_ELIMINATED = "Every player is eliminated";
+
+export function lossReasonWords(reason: string | null): string | null {
+  return reason === NO_SEATS_REMAIN ? EVERY_PLAYER_ELIMINATED : reason;
+}
+
+/** The reason a lost game gives: the engine's reason, and for "No seats remain" the words "Every player is eliminated" and the cause of each elimination after them ("Every player is eliminated. Player 1's threat reached 50."). */
 export function lossWithCauses(state: ScenarioState, heroes?: HeroCause): string | null {
   if (state.lossReason !== NO_SEATS_REMAIN) return state.lossReason ?? null;
   const causes = Array.from({ length: state.seatCount }, (_, seat) => eliminationWords(state, seat, heroes)).filter((words): words is string => words != null);
-  return causes.length === 0 ? NO_SEATS_REMAIN : `${NO_SEATS_REMAIN}. ${causes.join(" ")}`;
+  return causes.length === 0 ? EVERY_PLAYER_ELIMINATED : `${EVERY_PLAYER_ELIMINATED}. ${causes.join(" ")}`;
 }
 
 /** The reason as a sentence for the Defeat note: it ends with a period, and "The scenario is lost." stands for a game with no reason. */

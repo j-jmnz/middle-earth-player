@@ -54,6 +54,6 @@
 "lossReason":"No seats remain",
 "intents":[{"type":"Keep"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i39","i40","i41"]},{"type":"Pass"},{"type":"Commit","cardIds":["i72","i73","i74"]},{"type":"Pass"},{"type":"DeclineTravel"},{"type":"Choose","optionId":"seat:0"},{"type":"DeclineEngage"},{"type":"DeclineEngage"},{"type":"ChooseEnemy","enemyId":"i106"},{"type":"Undefended","heroId":"i39"},{"type":"Undefended","heroId":"i40"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i72","i73","i74"]},{"type":"Commit","cardIds":["i41","i31"]}],
 "checks":[2376367212,2376367212,1316938803,1316938803,1316938803,1316938803,1247421558,1095198249,1095198249,3487770586,2401226346,496957187,3585108776,3585108776,773948025,3194233402,2630441436,64150157,64150157,3869468122,3869468122,3869468122,3869468122,1438365575,3545117509,1804618355],
-"end":{"round":2,"lost":true,"cleared":false,"lossReason":"No seats remain","hash":"4aedbacbca2fc031f6a938ff"}
+"end":{"round":2,"lost":true,"cleared":false,"lossReason":"No seats remain","hash":"1dae9e941aa17b287ce23ce7"}
 }
 ]

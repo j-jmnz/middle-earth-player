@@ -11,6 +11,7 @@ import { hasTrait } from "./conditions.ts";
 import { greatestChallenge, outOfPlayChoices, searchable } from "./search.ts";
 import { applyTargetVerb, targetCandidates } from "./effect-verbs.ts";
 import { startReveal } from "../windows/frames.ts";
+import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 import type { EngineStep } from "../core/intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { moveEncounter } from "../families/encounter/moves.ts";
@@ -185,6 +186,7 @@ function applyTargeted(
         if (!next.cards[id]) continue;
         const engaged = next.cards[id]?.zone === "engaged";
         next = updateCard(moveCard(next, id, { zone: "staging" }), id, { controller: null });
+        if (engaged) steps.push({ kind: "returnToStaging", enemyId: id, cause: currentCause(steps, UNATTRIBUTED) });
         // "After an enemy enters the staging area" hears an engaged enemy that comes back (146017:A:1); only a game with such a record queues it.
         if (engaged && gameReads(next, ctx, '"trigger":"returnedToStaging"')) next = queueEvent(next, { trigger: "returnedToStaging", seat: item.seat, cardId: id });
         count += 1;

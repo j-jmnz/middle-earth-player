@@ -28,6 +28,7 @@ import type { Focus } from "../index.ts";
 import { addedToStaging, announceEntered } from "./reveal.ts";
 import { timeOnReveal } from "../angmar/time.ts";
 import { stagingDest } from "../breaking/areas.ts";
+import { keptInPlay } from "../pelargir/vale/cannot-leave.ts";
 import { freeSlot, makeActiveIn } from "../south/locations.ts";
 
 type MoveInstruction = Extract<Instruction, { verb: "MoveEncounterCard" }>;
@@ -111,6 +112,8 @@ export function moveEncounter(
   const card = state.cards[id];
   if (!card) return state;
   const wasInPlay = inPlay(card.zone);
+  // A card that cannot leave play unless destroyed (Murzag, 06144:B:1) stays as it is, with its damage, attachments and shadow cards: nothing here takes it out of play.
+  if (wasInPlay && keptInPlay(state, id) && (to === "deckTop" || to === "deckBottom" || to === "shuffle" || to === "discard" || to === "victory" || to === "removed")) return state;
   const next = forgetLooked(state, id);
   switch (to) {
     case "deckTop":

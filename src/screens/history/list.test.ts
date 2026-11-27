@@ -125,6 +125,8 @@ describe("history words", () => {
     expect(resultWords(run("x"))).toBe("Won");
     expect(resultWords(run("x", { result: "lost", lossCause: "All heroes died" }))).toBe("Lost · All heroes died");
     expect(resultWords(run("x", { result: "lost", lossCause: null }))).toBe("Lost");
+    // A run saved with the engine's reason says it in words at read time.
+    expect(resultWords(run("x", { result: "lost", lossCause: "No seats remain" }))).toBe("Lost · Every player is eliminated");
     expect(runDate(run("x", { endedAt: null }))).toBeNull();
     expect(courseWords(run("x", { threats: null, rounds: 3 }))).toBe("3 rounds");
     expect(courseWords(run("x", { threats: null, rounds: null }))).toBeNull();

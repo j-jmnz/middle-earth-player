@@ -9,13 +9,11 @@ import type { EngineStep } from "../../core/intents.ts";
 import { constantVerbCodes } from "../../interpret/constant-records.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
-import { restricted } from "../../interpret/restrictions.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { hostOf, inPlay, updateCard } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
-import { advanceStage } from "../../quest/quest.ts";
-import { afterProgress } from "../../quest/stage-reveal.ts";
+import { advanceAndReveal } from "../../quest/stage-reveal.ts";
 import { effectById } from "../../windows/listen.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { guardWith } from "../objectives/guard.ts";
@@ -32,9 +30,8 @@ type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name 
  */
 export function advanceToRandomStage(state: ScenarioState, instruction: Verb<"AdvanceToRandomStage">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (!focus.sourceId || state.questStage !== focus.sourceId) return state;
-  const before = steps.length;
   const own = instruction.stageSet === true ? undefined : randomNextOf(instruction);
-  return afterProgress(advanceStage(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length, own), before, ctx, steps);
+  return advanceAndReveal(state, ctx, steps, { randomSet: own });
 }
 
 function inPlayWithCode(state: ScenarioState, code: string): string | undefined {

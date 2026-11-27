@@ -22,6 +22,7 @@ import { lowerThreatByEffect, playerSource } from "../families/quest/threat.ts";
 import { destroyCard, placeDamage } from "../core/keywords.ts";
 import type { CardInstance, ScenarioState } from "../core/state.ts";
 import { flagged, inPlay, livingSeats, updateCard, withSeat, withThreat } from "../core/state.ts";
+import { facedownShadow } from "../families/defense/shadow.ts";
 import { printedOf, scenarioOwned, type PrintedCard } from "../core/printed.ts";
 import { readyBarred, readyPatch } from "../core/holder-classes.ts";
 import { titleBarred } from "../families/nightmare/guards.ts";
@@ -242,7 +243,7 @@ export function runPlayerVerb(
     }
     case "CancelEffect":
       // Fire-filled Trench cancels a player event's cancel of a revealed treachery (families/pelennor/combat.ts).
-      return counterCancel(state, ctx) ?? bonesCancel(state, ctx, steps) ?? announceCanceled(cancelAnswered(state), state, ctx, focus.seat);
+      return counterCancel(state, ctx) ?? bonesCancel(state, ctx, steps) ?? announceCanceled(cancelAnswered(state, instruction.shadow === true), state, ctx, focus.seat);
     case "LookAtEncounterTop": {
       const top = state.encounterDeck[0];
       return top ? { ...state, window: { kind: "look", seat: focus.seat, cardIds: [top] }, activeSeat: focus.seat, passed: [] } : state;
@@ -309,7 +310,7 @@ export function runPlayerVerb(
 
 // A Response to "the when revealed effects are about to resolve" or "the shadow effect has just triggered" cancels it. The
 // frame under the response frame is the effect; the shadow effect is the pending attack's.
-function cancelAnswered(state: ScenarioState): ScenarioState {
+function cancelAnswered(state: ScenarioState, shadowAction: boolean): ScenarioState {
   for (let index = state.stack.length - 1; index >= 0; index -= 1) {
     const frame = state.stack[index];
     if (frame?.data.kind !== "responses") continue;
@@ -331,6 +332,13 @@ function cancelAnswered(state: ScenarioState): ScenarioState {
   }
   // No Response is open: a When Revealed effect that cancels itself ("spend 1 Fellowship resource and exhaust The One Ring to cancel this effect", 144055:A:2) is the one running on top (rr.cancel).
   const running = state.stack.at(-1);
+  // An Action taken before the shadow card is turned over (`shadow`) cancels the shadow effect dealt to the attacking enemy (12060:A:2).
+  const attack = state.pendingAttack;
+  if (shadowAction && attack && !attack.shadowResolved && !attack.shadowCanceled) {
+    const canceled: ScenarioState = { ...state, pendingAttack: { ...attack, shadowCanceled: true } };
+    const shadowId = facedownShadow(state, attack.enemyId);
+    return shadowId ? updateCard(canceled, shadowId, { face: "up" }) : canceled;
+  }
   // A Shadow effect that any player may cancel by discarding a hero (50209:A:2, 50210:A:2) is the one running on top too.
   if ((running?.frame === "whenRevealed" || running?.frame === "shadow") && running.data.kind === "effect") return patchTop(state, { data: { ...running.data, canceled: true } });
   return state;

@@ -13,7 +13,7 @@ import { updateCard } from "../../rules/core/state.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
-import { lineSpec } from "../../../test/harness/line-spec.ts";
+import { lineDefault, lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
 import { atDefense, combat, discarded, hosts, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
@@ -136,7 +136,7 @@ describe("Éomund and Nor am I a Stranger (02030:A:1, 02031:A:1, A:2)", () => {
   });
 
   // "Attach to a character.": the heroes and the allies of both players are offered; the enemy is not. Éowyn (Spirit) pays.
-  lineSpec("02031:A:1", "Nor am I a Stranger: attach to a character", (effects) => {
+  lineDefault("02031:A:1", "Nor am I a Stranger: attach to a character", (effects) => {
     const tab = scene(effects);
     const stranger = idsOf(tab, STRANGER);
     const characters = [THEODRED, ARAGORN, EOWYN, PAL, EOMUND, SNOWBOURN].map((code) => idsOf(tab, code));

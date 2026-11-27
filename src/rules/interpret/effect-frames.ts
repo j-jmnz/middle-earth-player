@@ -19,6 +19,7 @@ import { lookedDeckSeat } from "../families/deck/rules.ts";
 import { feedsDiscard, pickCandidates } from "./pick.ts";
 import { placesPicked } from "../families/pelargir/progress-bar.ts";
 import { leavesPlayPicked, leavesPlayPickedInEach } from "../families/pelargir/vale/cannot-leave.ts";
+import { swapsPicked } from "../families/misc/collection.ts";
 import { spendsPicked } from "../families/pelargir/spending.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "../core/state.ts";
@@ -386,7 +387,7 @@ function pick(state: ScenarioState, item: QueueItem, frame: Frame, ctx: ReduceCo
   if (instruction.verb !== "Pick" || data?.kind !== "effect") return state;
   // The actor chooses, unless the card says the first player does.
   const chooser = instruction.pick.who === "firstPlayer" ? firstPlayerFor(state, item.seat) : item.seat;
-  const found = pickCandidates(state, instruction.pick, chooser, data.picked ?? [], frame.cardId, ctx, data.x, data.participants, false, { discards: data.queue[0]?.instruction.verb === "DiscardPicked", spends: spendsPicked(data.queue[0]?.instruction), places: placesPicked(data.queue[0]?.instruction), leaves: leavesPlayPicked(data.queue.map((entry) => entry.instruction)) });
+  const found = pickCandidates(state, instruction.pick, chooser, data.picked ?? [], frame.cardId, ctx, data.x, data.participants, false, { discards: data.queue[0]?.instruction.verb === "DiscardPicked", spends: spendsPicked(data.queue[0]?.instruction), places: placesPicked(data.queue[0]?.instruction), leaves: leavesPlayPicked(data.queue.map((entry) => entry.instruction)), swaps: swapsPicked(data.queue[0]?.instruction) });
   const options = (instruction.pick.from ?? "play") === "play" ? found : distinctChoices(state, found);
   // The further defenders of Stand Together (families/defense/defenders.ts): the pick may be stopped, and then no more are declared.
   const stoppable = data.effectId === DEFENDERS_FRAME;

@@ -315,7 +315,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 146066:B:3 (back): This stage cannot be defeated while The Two Watchers is in play.
   146066:constant:3: Constant
     only if any of: (the card with code 146070 is in play) or (the card with code 146071 is in play)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
   146066:constant:4: Constant
     - this card: stat advancesWhenFreed (a stage with no progress and no quest points advances at once when nothing holds it back, with no progress needed) 1, while this card is in play
 
@@ -341,7 +341,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 146067:B:2 (back): This stage cannot be defeated unless Topmost Chamber is in the victory display. When the Ring-bearer is free of encounters, the first player gains control of it.
   146067:constant:1: Constant
     only if the card with code 146015 is not in the victory display
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
   146067:constant:2: Constant
     - (rule marker) the first player gains control of the Ring-bearer a card guards as soon as that card is out of play: it returns among their heroes where it was, as it was held
 
@@ -378,7 +378,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 146068:B:3 (back): This stage cannot be defeated while The Two Watchers is in play. If this stage is defeated, the players win the game.
   146068:constant:3: Constant
     only if any of: (the card with code 146070 is in play) or (the card with code 146071 is in play)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
   146068:questResolution:1: Quest resolution
     - the players win the game
 
