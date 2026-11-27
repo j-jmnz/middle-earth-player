@@ -156,6 +156,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("survivorsThreat"), max: z.number().int().min(0) }),
   // Some living player's threat is at most `max` ("if any player's threat is 20 or less", 08081:A:1): read in the effect that runs, whichever player it acts for.
   z.strictObject({ kind: z.literal("anyThreat"), max: z.number().int().min(0) }),
+  // The living player in seat `seat` (0 for Player 1) has a threat of at least `min`: a warning that names the player a raise would eliminate (Chaos in the Night, 17103:A:1). False for a seat that is not in the game or is eliminated.
+  z.strictObject({ kind: z.literal("seatThreat"), seat: z.number().int().min(0), min: z.number().int().min(0) }),
   // The attack that left this effect for its end (AfterAttack), or the damage the answered event placed, dealt at least `min` damage (1 by default):
   // "If this attack deals damage to a Ship objective" (11051:A:2; read with a `matches` condition on the defender).
   // The attack that left this effect for its end sent at least `min` damage on past its defender (excessToShip; 11055:A:2).

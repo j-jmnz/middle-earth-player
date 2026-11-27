@@ -6,7 +6,7 @@ import { memo } from "react";
 
 import { Moving } from "../motion/card-motion.native.tsx";
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
-import { Badges, CardBody, HeldMark, NotAppliedMark, StackMark, SuccessMedallion, Tokens } from "./pieces.native.tsx";
+import { Badges, BandName, CardBody, HeldMark, NotAppliedMark, StackMark, SuccessMedallion, Tokens } from "./pieces.native.tsx";
 import { BLANK_WORD } from "../words/card-bars.ts";
 import { badgeReach, BlankMarkView, CombatPill, CurrentQuestMark, DelayedMark, DeterminedMarkView, EngagementMark, FireMarkView, OptionMarkView, PlaceMarkView, SeatChipView, ShipLossView, StageMarks, UnderMarkView } from "./mark-pieces.native.tsx";
 import { footStop } from "./badge-room.ts";
@@ -103,6 +103,7 @@ function drawOverlay(p: PieceProps) {
         {slot.kind === "card" && slot.faceDown && slot.held ? <HeldMark rect={rect} icon="hero" t={t} s={s} /> : null}
         {slot.kind === "card" && slot.faceDown && slot.dead ? <HeldMark rect={rect} icon="threat" t={t} s={s} /> : null}
         {slot.stack != null ? <StackMark slot={slot} fonts={fonts} t={t} s={s} /> : null}
+        {slot.kind === "attachment" && !slot.faceDown ? <BandName slot={slot} name={p.name} fonts={fonts} t={t} s={s} /> : null}
       </Group>
       {slot.success != null && slot.success > 0 ? <SuccessMedallion slot={slot} fonts={fonts} t={t} s={s} /> : null}
       {slot.kind === "card" ? <PickRing rect={rect} picked={p.picked} share={p.share} dimmed={veiled} fonts={fonts} t={t} s={s} /> : null}

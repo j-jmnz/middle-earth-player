@@ -17,6 +17,7 @@ import { beatIds } from "../store/beat-store.ts";
 import { cardCorner } from "../../ui/card-corner.ts";
 import { Leaving, useCardMotion } from "../motion/card-motion.native.tsx";
 import { seatTag, stagingWord } from "../words/scenarios/area.ts";
+import { emptyEngagedWord } from "../readouts/haradrim/serpent.ts";
 import { lookIdsOf } from "../words/scenarios/wilderland.ts";
 import { CardBody, RADIUS } from "./pieces.native.tsx";
 import { AttackerMark, CombatMarkView, StagingTag } from "./mark-pieces.native.tsx";
@@ -168,7 +169,7 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
   const attackerSlot = layout.attacker ? (layout.slots.find((slot) => slot.id === layout.attacker && slot.kind === "card") ?? null) : null;
   const emptyWords: [Rect, string, number?][] = [
     ...(views.staging.entries.length === 0 ? [[layout.zones.staging, stagingWord(game, seat)] as [Rect, string]] : []),
-    ...(views.engaged.entries.length === 0 ? [[layout.zones.engaged, "No enemy engaged", layout.stagingFoot] as [Rect, string, number?]] : []),
+    ...(views.engaged.entries.length === 0 ? [[layout.zones.engaged, emptyEngagedWord(game, seat, (id) => nameOf(game.cards[id]?.code ?? "")), layout.stagingFoot] as [Rect, string, number?]] : []),
     ...(views.activeLocation.entries.length === 0 ? [[layout.zones.activeLocation, "No location"] as [Rect, string]] : []),
   ];
 

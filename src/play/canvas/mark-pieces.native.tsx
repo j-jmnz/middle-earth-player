@@ -15,7 +15,7 @@ import type { CombatMark, Rect } from "../layout/layout.ts";
 import { STAGE_APART_WORD, type StagePill } from "../words/scenarios/stormcaller.ts";
 import type { OptionMark } from "../choice/sheet-types.ts";
 import { currentMark } from "./current-mark.ts";
-import { BADGE_TOP, badgeRoom, hiddenBadges } from "./badge-room.ts";
+import { BADGE_TOP, badgeRoom, hiddenBadges, lonePick } from "./badge-room.ts";
 import { TOKEN } from "./token-spots.ts";
 import { STRIP, underMarkBox } from "./under-mark.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
@@ -203,7 +203,10 @@ export function badgeReach(effects: CardEffects, fonts: Fonts, s: number, height
   const left = hiddenBadges(effects.stats.length + effects.flags.length, height, s, BADGE_H * s, stop);
   const more = left > 0 ? fonts.badge.getTextWidth(moreText(left)) + 12 * s : 0;
   // A card with no room for a row draws no pill at all (badgeLayout).
-  return widths.length === 0 || badgeRoom(height, s, BADGE_H * s, stop) < 1 ? 0 : 2 * s + Math.max(24 * s, more, ...widths);
+  if (widths.length === 0 || badgeRoom(height, s, BADGE_H * s, stop) < 1) return 0;
+  // One row for several effects: the kept chip and "N more" stand side by side (Badges), so the pills reach as far as both.
+  const lone = badgeRoom(height, s, BADGE_H * s, stop) === 1 && widths.length > 1;
+  return lone ? 2 * s + Math.max(24 * s, (widths[lonePick(effects.stats)] ?? 0) + 2 * s + 12 * s + fonts.badge.getTextWidth(moreText(widths.length - 1))) : 2 * s + Math.max(24 * s, more, ...widths);
 }
 
 // An accent pill with a word inside the card's top edge, upright, clear of the effect badges' column; where the word does not fit, a short accent dot in its place (a round pill with `short` in it when the word has one).

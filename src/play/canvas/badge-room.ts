@@ -49,3 +49,11 @@ export function badgeShown(total: number, rows: number): { shown: number; hidden
 export function hiddenBadges(total: number, height: number, s: number, pill: number, stop: number | null = null): number {
   return badgeShown(total, badgeRoom(height, s, pill, stop)).hidden;
 }
+
+/**
+ * The one effect pill a card keeps when its edge has room for a single row and more than one effect is on it: the Attack chip when it has one (an enemy's Attack is what the player faces), else the first. It stands with the "N more" pill beside it
+ * on the same row when the card is wide enough (`Badges`); `stats` are the stat chips in order, the flags follow them.
+ */
+export function lonePick(stats: readonly { stat: string }[]): number {
+  return Math.max(0, stats.findIndex((badge) => badge.stat === "attack"));
+}

@@ -8,6 +8,7 @@ import { attachTo, moveCard, spawn, type Destination } from "../../src/rules/cor
 import type { ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";
 import { attachmentTargets } from "../../src/rules/player/planning.ts";
 import { holdCaptive } from "../../src/rules/families/captives/index.ts";
+import { guardWith } from "../../src/rules/families/objectives/guard.ts";
 import { syncConstants } from "../../src/rules/interpret/constants.ts";
 import { markSideQuests } from "../../src/rules/families/wilderland/night-quest.ts";
 import { markProgressNoted } from "../../src/rules/families/angmar/progress.ts";
@@ -84,7 +85,7 @@ export type Layout = {
   modeCard?: true | "easy";
   // Cards attached to the first card of `to`, wherever it lies (an attachment is spawned in play and attached).
   // `encounter`: an encounter card attached the way its own effect attaches it (zone attached, controlled by no one, not claimed): the Sack cards, the Troll Key and the Troll Purse; an enemy lies as an attachment (Mugash, 07024:A:2).
-  attached?: readonly { code: string; to: string; encounter?: true }[];
+  attached?: readonly { code: string; to: string; encounter?: true; guard?: true }[];
   // Objectives a hero holds, as ClaimObjective leaves them: `code` lies attached to the first card of `by` (zone attached, faceup, claimed, controlled by that hero's player).
   claimed?: readonly { code: string; by: string }[];
   // The codes of the cards committed to the quest (a hero stand-in, an ally of `play`).
@@ -245,6 +246,12 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   for (const [zone, items] of Object.entries(layout.piles ?? {}) as [PileZone, readonly Entry[]][]) for (const item of items) put(entry(item).code, { zone }, item, zone === "outOfPlay0" || zone === "outOfPlay1" ? "down" : undefined);
   for (const attachment of layout.attached ?? []) {
     const host = idOf(state, attachment.to);
+    // `guard`: the card guards the objective `to` as Guarded leaves it: it stays in the staging area, attached to the objective, with the guard mark.
+    if (attachment.guard) {
+      const spawned = spawn(state, attachment.code, { zone: "staging" });
+      state = guardWith(spawned.state, spawned.id, host);
+      continue;
+    }
     if (attachment.encounter) {
       const spawned = spawn(state, attachment.code, { zone: "play", seat: 0 });
       state = attachTo(moveCard(spawned.state, spawned.id, { zone: "attached" }), spawned.id, host);

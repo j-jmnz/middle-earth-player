@@ -215,6 +215,8 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return instruction.all ? "cancel that damage" : `cancel ${amountWords(instruction.amount)} of that damage`;
     case "CancelEffect":
       return "cancel those effects";
+    case "CancelEventEffects":
+      return "cancel the effects of the event that was played";
     case "Engage":
       return instruction.target === "self" && sourceId ? `engage ${names.card(sourceId)}` : "engage that enemy";
     case "Discard":

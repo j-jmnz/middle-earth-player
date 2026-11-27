@@ -1,12 +1,22 @@
 import type { Ask } from "../asks.ts";
-import { ELIMINATED } from "../asks-conditions.ts";
+import type { Condition } from "../../../catalog/boundary.ts";
 import { ELIMINATION_LEVEL } from "../../../rules/core/eliminate.ts";
 
 // The choice words of The Black Serpent (haradrim part 7), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario the-black-serpent --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=the-black-serpent` prints each sentence.
 // A choice of the defending player or of the player who plays the card (the Redoubt, the Tower, the Serpent Guard's shadow, Bold and Grim, No Quarter's shadow) is owned. The first player answers for the group at No Quarter's reveal, Chaos in the Night's
 // threat or progress choice and the Redoubt's travel, so those sentences are not owned. Removing progress is a cost with no loss, so it has no caution; a threat raise that reaches the elimination level warns.
-const ELIMINATED_BY_THREAT = { when: ELIMINATED(3, ELIMINATION_LEVEL), text: "Tap again: this takes your threat to 50 and eliminates you. If you are the last player, the game is lost" };
+// Chaos in the Night raises every player's threat, so the warning reads each seat's threat (the condition seatThreat) and names the players it eliminates; a solo game says "your".
+const REACHES = (seat: number): Condition => ({ kind: "seatThreat", seat, min: ELIMINATION_LEVEL - 3 });
+const ELIMINATED_BY_THREAT = {
+  when: { kind: "any", conditions: [REACHES(0), REACHES(1)] } as Condition,
+  text: [
+    { when: { kind: "all", conditions: [{ kind: "not", condition: { kind: "otherPlayer" } }, REACHES(0)] } as Condition, text: "Tap again: this takes your threat to 50 and eliminates you. If you are the last player, the game is lost" },
+    { when: { kind: "all", conditions: [REACHES(0), REACHES(1)] } as Condition, text: "Tap again: this takes Player 1's and Player 2's threat to 50 and eliminates both. The game is lost" },
+    { when: REACHES(0), text: "Tap again: this takes Player 1's threat to 50 and eliminates Player 1. If Player 2 is eliminated too, the game is lost" },
+    { text: "Tap again: this takes Player 2's threat to 50 and eliminates Player 2. If Player 1 is eliminated too, the game is lost" },
+  ],
+} as const;
 
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 16042:A:2 (Southron Soldier, shadow): engage a non-unique enemy in the staging area and deal it a shadow card.
@@ -18,7 +28,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 17094:A:3 (The Black Serpent, forced): the first player chooses between X progress off the main quest and the Serpent's attack.
   "17094:forced:1 @0 Choose": { note: "The Black Serpent: remove progress equal to the stage number of the main quest, or it attacks you." },
   "17094:forced:1 @0 progress": { label: "Remove {x} progress from the main quest", bind: { x: { stage: true } } },
-  "17094:forced:1 @0 attack": { label: "The Black Serpent attacks you" },
+  "17094:forced:1 @0 attack": { label: "The Black Serpent attacks you (Attack {x})", bind: { x: { stat: "attack", of: "self" } } },
 
   // 17095:A:1 (Serpent Guard, forced) and A:2 (shadow): 2 progress off the main quest, or no damage to enemies.
   "17095:forced:1 @0 Choose": { owned: true, note: "Serpent Guard engaged you: remove 2 progress from the main quest, or enemies engaged with you cannot take damage this round." },

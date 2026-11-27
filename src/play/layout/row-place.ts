@@ -62,7 +62,9 @@ export function placeRow(placed: readonly ZoneEntry[], zone: ZoneId, area: Rect,
       else placeUnder(entry, zone, rect, out, [], m.peek);
       // A committed character stands a step higher, sent toward the quest.
       const lift = entry.card.committed ? -m.peek / 2 : 0;
-      out.push(slotOf(entry.card, zone, "card", { ...rect, y: rect.y + lift }));
+      // An objective its guard lies over shows its name, pills and tokens in the part the guard leaves uncovered (`shown`, shownBounds).
+      const covered = zone === "staging" && at < group.length - 1;
+      out.push({ ...slotOf(entry.card, zone, "card", { ...rect, y: rect.y + lift }), ...(covered ? { shown: size.w * PAIR_STEP } : {}) });
     });
   });
   // Whether the row took the room past its own span (row-reach.ts).

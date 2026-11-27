@@ -2,6 +2,7 @@
 // heroes, cards in play, engaged enemies and hand, the stack of open frames and the legal intents. A card's stats are the ones the engine reads now
 // (`modifiedStat`), with the printed number beside one a modifier moved. Hidden cards are named: this is for debugging the engine, not for the player.
 import { modifiedStat } from "../../src/rules/core/keywords.ts";
+import { stagingThreat } from "../../src/rules/quest/quest.ts";
 import type { CardInstance } from "../../src/rules/core/state-types.ts";
 import type { ModifierStat } from "../../src/catalog/effect-schema.ts";
 import type { LegalIntent } from "../../src/rules/core/intents.ts";
@@ -90,7 +91,8 @@ export function stateText(state: ScenarioState, ctx: ReduceContext, options: Sta
   if (state.failure) lines.push(`failure: ${state.failure}`);
   lines.push(`quest: ${state.questStage ? cardLine(state, ctx, state.questStage) : "none"}; ${stagesLeft(state, ctx)} stages left`);
   for (const id of [state.activeLocation, state.secondActiveLocation]) if (id) lines.push(`active location: ${cardLine(state, ctx, id)}`);
-  const threat = state.staging.reduce((total, id) => total + (state.cards[id] ? modifiedStat(state, state.cards[id], "threat", ctx.cards) : 0), 0);
+  // The total the quest resolves against: a card that adds no Threat (an enemy considered engaged) is left out, as the engine sums it.
+  const threat = stagingThreat(state, ctx.cards);
   lines.push(`staging (${threat} threat):`, ...state.staging.map((id) => `  ${cardLine(state, ctx, id)}`));
   lines.push(
     [pile("encounter deck", state.encounterDeck, state, ctx, options.full ? 3 : 0, true), pile("encounter discard", state.encounterDiscard, state, ctx, 3), pile("victory", state.victory, state, ctx, 5)]

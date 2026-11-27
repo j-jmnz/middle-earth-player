@@ -9,11 +9,11 @@ import { cardCorner } from "../../ui/card-corner.ts";
 import { chipText, moreText, MUST_COMMIT_WORD, type CardEffects } from "../cards/card-effects.ts";
 import { SPHERE_TINT, type IconName } from "../../ui/icon-map.ts";
 import { ICONS } from "../../ui/icons/generated.ts";
-import type { CardSlot, Rect } from "../layout/layout.ts";
+import { PEEK, type CardSlot, type Rect } from "../layout/layout.ts";
 import { medallionAt } from "../layout/look-strip.ts";
 import { medallionCount } from "../words/scenarios/sea.ts";
 import { progressInStrip as progressInStripOf, stripCenterX, stripText } from "./table-canvas-views.ts";
-import { badgeLayout, badgeShown } from "./badge-room.ts";
+import { badgeLayout, badgeShown, lonePick } from "./badge-room.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 import { wrapName } from "./wrap.ts";
@@ -180,7 +180,7 @@ export function CardBody({
         <Group>
           <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={t.raised} />
           <Group clip={{ x: x + 3 * s, y: y + 3 * s, width: w - 6 * s, height: h - 6 * s }}>
-            {wrapName(name, w - 10 * s, (text) => fonts.names.getTextWidth(text), nameLines).map((line, index) => (
+            {wrapName(name, Math.min(w, slot.shown ?? w) - 10 * s, (text) => fonts.names.getTextWidth(text), nameLines).map((line, index) => (
               <Text key={index} x={x + 5 * s} y={y + (15 + index * LINE) * s} text={line} font={fonts.names} color={t.bone} />
             ))}
           </Group>
@@ -222,6 +222,33 @@ function CountPill({ slot, text, fonts, t, s }: { slot: CardSlot; text: string; 
 /** The count on a staging card's one peek when more than one card is under it ("×2"): a small night pill at the right end of the visible strip. */
 export function StackMark({ slot, fonts, t, s }: { slot: CardSlot; fonts: Fonts; t: TableTokens; s: number }) {
   return <CountPill slot={slot} text={`×${slot.stack ?? 0}`} fonts={fonts} t={t} s={s} />;
+}
+
+// The name on an attachment's visible band is the names face at this share of its size, so it fits the band's 10 pt.
+const BAND_NAME = 0.68;
+
+/** The short name of an attachment on the band that shows below its host (an objective a hero holds, one that hangs on an enemy): night under bone text at the left, clipped before the count pill at the right end. */
+export function BandName({ slot, name, fonts, t, s }: { slot: CardSlot; name: string; fonts: Fonts; t: TableTokens; s: number }) {
+  const band = PEEK * s;
+  const x = slot.x;
+  const y = slot.y + slot.h - band;
+  const width = slot.w - (slot.stack != null ? 22 * s : 0);
+  const text = fitName(name, (width - 6 * s) / BAND_NAME, (line) => fonts.names.getTextWidth(line));
+  return (
+    <Group clip={{ x, y, width, height: band }}>
+      <Group transform={[{ translateX: x + 3 * s }, { translateY: y + band - 2 * s }, { scale: BAND_NAME }]}>
+        <Text x={0} y={0} text={text} font={fonts.names} color={t.bone} />
+      </Group>
+    </Group>
+  );
+}
+
+// The name cut to the width with an ellipsis (the whole name when it fits).
+function fitName(name: string, width: number, measure: (text: string) => number): string {
+  if (measure(name) <= width) return name;
+  let cut = name;
+  while (cut.length > 1 && measure(`${cut}…`) > width) cut = cut.slice(0, -1);
+  return `${cut.trimEnd()}…`;
 }
 
 /**
@@ -300,8 +327,18 @@ export function Badges({
   // Rows that fit between the title band (or the top edge of a short card) and the resource token and the foot pills (badgeLayout).
   const { top: first, rows: room } = badgeLayout(h, s, pill, stop);
   const items = [...effects.stats.map((badge) => ({ kind: "stat" as const, badge })), ...effects.flags.map((flag) => ({ kind: "flag" as const, flag }))];
-  const { shown: count, hidden } = badgeShown(items.length, room);
-  const shown = items.slice(0, count);
+  const split = badgeShown(items.length, room);
+  // A single row with more than one effect on the card: keep the Attack chip (or the first) with "N more" beside it when the card is wide enough, never "N more" alone.
+  const keep = room === 1 && items.length > 1 ? lonePick(effects.stats) : -1;
+  const keptItem = keep >= 0 ? items[keep] : undefined;
+  const keptWidth = keptItem?.kind === "stat" ? 15 * s + fonts.badge.getTextWidth(chipText(keptItem.badge)) + 5 * s : 0;
+  const fullMore = fonts.badge.getTextWidth(moreText(items.length - 1)) + 12 * s;
+  // The words "N more" when they fit beside the chip; on a narrower card the bare count in a round pill ("3": a count with no sign, never read as a change).
+  const countOnly = fonts.badge.getTextWidth(String(items.length - 1)) + 10 * s;
+  const lone = keptItem != null && keptWidth > 0 && 2 * s + keptWidth + 2 * s + Math.min(fullMore, countOnly) <= w - 2 * s;
+  const compact = lone && 2 * s + keptWidth + 2 * s + fullMore > w - 2 * s;
+  const hidden = lone ? items.length - 1 : split.hidden;
+  const shown = lone && keptItem ? [keptItem] : items.slice(0, split.shown);
   const rows: ReactElement[] = shown.map((item, index) => {
     const top = y + first + index * (pill + 2 * s);
     if (item.kind === "flag" && item.flag.flag === "mustCommit") {
@@ -345,13 +382,15 @@ export function Badges({
     );
   });
   if (hidden > 0) {
-    const top = y + first + shown.length * (pill + 2 * s);
-    const more = moreText(hidden);
-    const width = fonts.badge.getTextWidth(more) + 12 * s;
+    // Beside the kept chip on its row, else on the next row down.
+    const top = lone ? y + first : y + first + shown.length * (pill + 2 * s);
+    const left = lone ? x + 4 * s + keptWidth : x + 2 * s;
+    const more = compact ? String(hidden) : moreText(hidden);
+    const width = fonts.badge.getTextWidth(more) + (compact ? 10 * s : 12 * s);
     rows.push(
       <Group key="more">
-        <RoundedRect x={x + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={t.night} />
-        <Text x={x + 8 * s} y={top + 11.5 * s} text={more} font={fonts.badge} color={t.bone} />
+        <RoundedRect x={left} y={top} width={width} height={pill} r={pill / 2} color={t.night} />
+        <Text x={left + (compact ? 5 : 6) * s} y={top + 11.5 * s} text={more} font={fonts.badge} color={t.bone} />
       </Group>,
     );
   }
