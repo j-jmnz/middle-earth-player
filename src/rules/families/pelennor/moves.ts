@@ -9,7 +9,7 @@ import { inPlay, updateCard } from "../../core/state.ts";
 import { attachTo, moveCard, shadowCards } from "../../core/zones.ts";
 import { hasTrait } from "../../interpret/conditions.ts";
 import { dealOneShadow, type ReduceContext } from "../../interpret/interpret.ts";
-import { effectData, moveEncounter, noAttackThisPhase } from "../encounter/moves.ts";
+import { effectData, moveEncounter } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -29,7 +29,7 @@ export function engageShadowCard(state: ScenarioState, focus: Focus, ctx: Reduce
   const attack = state.pendingAttack;
   if (!id || !card || card.zone !== "shadow" || !attack || printedOf(ctx.cards, card.code).type !== "enemy") return state;
   const free = updateCard(moveCard(state, id, { zone: "staging" }), id, { host: null, face: "up", controller: null });
-  return noAttackThisPhase(moveEncounter(free, id, "engaged", attack.seat, ctx, steps), id, attack.seat);
+  return moveEncounter(free, id, "engaged", attack.seat, ctx, steps);
 }
 
 /** AttachShadowToHero: at the end of an attack that damaged its defending hero (or the hero an undefended attack landed on), the attacker's shadow card with the code attaches to that hero faceup, unless the hero carries a copy. */

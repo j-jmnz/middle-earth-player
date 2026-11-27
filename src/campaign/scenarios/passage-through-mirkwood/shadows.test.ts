@@ -83,9 +83,9 @@ describe("Shadow effects", () => {
     expect(run.state.encounterDiscard.map((id) => run.state.cards[id]?.code)).not.toContain("01136");
   });
 
-  it("Ungoliant's Swarm put into play engaged by its shadow makes no attack in that combat phase (01136:A:2)", () => {
+  it("Ungoliant's Swarm put into play engaged by its shadow is eligible to attack in that combat phase (01136:A:2, rr.step-6-4a)", () => {
     const { run } = fight(world, "01136", "grunt");
-    expect(run.state.resolvedAttacks).toContain(first(run.state, "01136"));
+    expect(run.state.resolvedAttacks).not.toContain(first(run.state, "01136"));
   });
 
   it("Lingering Venom exhausts each damaged character the defending player controls (01137:A:3)", () => {

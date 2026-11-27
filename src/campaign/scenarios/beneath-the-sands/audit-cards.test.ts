@@ -109,10 +109,11 @@ describe("17067 Spider Broodling", () => {
       expect(inDeck(off.run.state).length).toBe(3);
     }
   });
-  it("17067:A:2 a Broodling put into play by its Shadow effect does not attack in that combat phase", () => {
+  // rr.step-6-4a: an enemy engaged during the combat phase that has not yet attacked this round is eligible to attack.
+  it("17067:A:2 a Broodling put into play engaged by its Shadow effect is eligible to attack in that combat phase (rr.step-6-4a)", () => {
     const on = fought(EFFECTS, BROODLING, "f0", { seats: 1, staging: [ON] }, undefendedOn(0));
     expect(engagedCodes(on.run.state)).toContain(BROODLING);
-    expect(damageOf(on.run.state, "dh1")).toBe(1);
+    expect(damageOf(on.run.state, "dh1")).toBe(3);
   });
 });
 
