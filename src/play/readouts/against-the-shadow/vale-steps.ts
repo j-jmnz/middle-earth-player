@@ -11,22 +11,14 @@ const TOWER = "06147";
 const BODYGUARD = "06148";
 const NAZGUL = "06153";
 const MURZAG = "06151";
-const VALE = "06155";
 const CAPTAINS: ReadonlySet<string> = new Set([MURZAG, "06152", NAZGUL]);
-// The shadow cards whose record returns the attacker after the attack (06154:A:2 Morgul Road, 06158:A:3 Sleepless Malice), and Morgul Vale's Forced return at the end of the round (06155:A:1): the record and the printed line each step names as its cause.
-const RETURNING: Readonly<Record<string, { effect: string; line: string }>> = {
-  "06154": { effect: "06154:shadow:1", line: "06154:A:2" },
-  "06158": { effect: "06158:shadow:1", line: "06158:A:3" },
-};
-const VALE_RETURN = { effect: "06155:forced:1", line: "06155:A:1" };
-
 /** What a step carries: the tokens on To the Tower after it, the Captain a Bodyguard took damage for, or that the Nazgûl's cut reduced the damage. */
-// `by`: Murzag, whose Forced effect revealed the card or engaged the enemy; `who`: the player whose choice placed the tokens (two players only); `returns`: an enemy went back to the staging area with no step of the engine, by the shadow card `via` or by the Forced effect of the card `via`; `quiet`: a damage step of 0 the Nazgûl's cut left, which the strike's "No damage" already says.
+// `by`: Murzag, whose Forced effect revealed the card or engaged the enemy; `who`: the player whose choice placed the tokens (two players only); `returns`: the engine's step of an enemy that went back to the staging area, by the shadow card `via` or by the Forced effect of the card `via`; `quiet`: a damage step of 0 the Nazgûl's cut left, which the strike's "No damage" already says.
 export type ValeNote = { who?: number; returns?: { via: string; shadow: boolean }; tower?: number; for?: string; cut?: true; by?: string; quiet?: true; switched?: true };
 export type ValeStep = EngineStep & { vale?: ValeNote };
 
 /** The steps with each progress step on To the Tower stamped with the count it leaves, and each damage step a Bodyguard or the Nazgûl took after a player's strike stamped with why. The same steps in another scenario. */
-export function stampVale(steps: readonly EngineStep[], before: ScenarioState, after?: ScenarioState): readonly EngineStep[] {
+export function stampVale(steps: readonly EngineStep[], before: ScenarioState): readonly EngineStep[] {
   if (before.scenarioId !== SCENARIO || steps.length === 0) return steps;
   const tower = Object.values(before.cards).find((card) => card.code === TOWER && card.zone === "staging");
   let now = tower?.progress ?? 0;
@@ -60,6 +52,17 @@ export function stampVale(steps: readonly EngineStep[], before: ScenarioState, a
       const engaged = steps.some((later) => later.kind === "engage" && later.enemyId === step.cardId);
       return { ...step, vale: { by: murzag, ...(engaged ? { quiet: true as const } : {}) } } as ValeStep;
     }
+    // An enemy the engine returned to the staging area: the card whose printed line did it is told, a shadow card of the enemy's own or Morgul Vale at the end of the round.
+    if (step.kind === "returnToStaging" && "line" in step.cause) {
+      const code = step.cause.line.split(":")[0];
+      const enemy = before.cards[step.enemyId];
+      const own = [enemy?.shadowId, ...(enemy?.extraShadowIds ?? [])].find((id) => id != null && before.cards[id]?.code === code);
+      const via = own ?? Object.values(before.cards).find((card) => card.code === code && card.zone !== "deck" && card.zone !== "removed")?.id;
+      if (via) {
+        changed = true;
+        return { ...step, vale: { returns: { via, shadow: own != null } } } as ValeStep;
+      }
+    }
     if (step.kind === "progress" && tower && step.targetId === tower.id) {
       now = Math.max(0, now + step.amount);
       changed = true;
@@ -86,29 +89,7 @@ export function stampVale(steps: readonly EngineStep[], before: ScenarioState, a
     }
     return step;
   });
-  const back = after ? returnedSteps(steps, before, after) : [];
-  return changed || back.length > 0 ? [...stamped, ...back] : steps;
-}
-
-// An enemy engaged before the intent and in the staging area after it, with no player eliminated: a shadow card that returns its attacker (Morgul Road, Sleepless Malice) or Morgul Vale's return at the end of the round. The engine returns it with no step, so the table adds one
-// (a damage of 0 on the enemy, which carries the words) to its own copy of the steps.
-function returnedSteps(steps: readonly EngineStep[], before: ScenarioState, after: ScenarioState): EngineStep[] {
-  if (steps.some((step) => step.kind === "eliminate")) return [];
-  const out: EngineStep[] = [];
-  for (const [id, card] of Object.entries(before.cards)) {
-    if (card.zone !== "engaged" || after.cards[id]?.zone !== "staging") continue;
-    const attacked = before.pendingAttack?.enemyId === id || steps.some((step) => step.kind === "attack" && step.side === "enemy" && step.enemyId === id);
-    const roundEnd = before.phase === "End of round" || before.phase === "Beginning of round";
-    // The card that returned it: the shadow card among its own whose record returns the attacker, or Morgul Vale at the end of the round.
-    const shadow = attacked ? [card.shadowId, ...(card.extraShadowIds ?? [])].find((shadowId) => shadowId != null && RETURNING[before.cards[shadowId]?.code ?? ""] != null) : undefined;
-    const vale = attacked || !roundEnd ? undefined : Object.values(after.cards).find((other) => other.code === VALE && (other.zone === "staging" || other.zone === "engaged"))?.id;
-    const via = shadow ?? vale;
-    if (!via) continue;
-    const record = shadow != null ? RETURNING[before.cards[shadow]?.code ?? ""] : VALE_RETURN;
-    if (!record) continue;
-    out.push({ kind: "damage", targetId: id, amount: 0, cause: { effect: record.effect, line: record.line }, vale: { returns: { via, shadow: shadow != null } } } as ValeStep);
-  }
-  return out;
+  return changed ? stamped : steps;
 }
 
 /** The note a kept step carries, or null. */
@@ -126,7 +107,7 @@ export function valeStepWords(step: EngineStep, card: (id: string) => string, fr
   if (step.kind === "engage" && note.by != null) return murzagEngagesWords(card(note.by), card(step.enemyId), seats && seats.count > 1 ? `Player ${step.seat + 1}` : "you");
   if (step.kind === "progress" && note.tower != null) return `${towerStepWords(step.amount, card(step.targetId), note.tower, note.who != null ? `Player ${note.who + 1}` : undefined)}${from ? ` (${from})` : ""}`;
   if (step.kind === "damage" && note.for != null) return bodyguardTookWords(step.amount, card(step.targetId), card(note.for));
-  if (step.kind === "damage" && note.returns != null) return returnsWords(card(step.targetId), card(note.returns.via), note.returns.shadow);
+  if (step.kind === "returnToStaging" && note.returns != null) return returnsWords(card(step.enemyId), card(note.returns.via), note.returns.shadow);
   if (step.kind === "damage" && note.cut === true) return cutWords(card(step.targetId));
   return null;
 }

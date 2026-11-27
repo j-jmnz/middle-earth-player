@@ -194,9 +194,14 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 52, scenarios: ["the-morgul-vale"], note: "A Captain that cannot leave play unless destroyed stays where it is, with its damage, attachments and shadow cards, when an effect tries to move it out of play." },
   { version: 52, scenarios: ["the-fate-of-numenor", "temple-of-the-deceived", "the-drowned-ruins"], note: "Only the player who controls an objective ally, like Calphon, can use its Action." },
   { version: 52, scenarios: "all", note: "Hobbit-sense lasts this phase, as printed. Helm of Secrecy leaves a Permanent attachment behind. An attachment with no printed host can be played on another player's character. A card that returns to a hand or a deck is no longer exhausted and holds no tokens." },
+  { version: 53, scenarios: "all", note: "A hero destroyed by damage that Song of Mocking sent to it counts as destroyed by the attack, and when Alcaron's Scroll also redirects the damage, the Song moves it first and the Scroll then sends it to its hero. A character that damage destroys outside an attack is heard as having taken that damage." },
+  { version: 53, scenarios: "all", note: "Archery damage that an ally's death leaves undealt (The Drúadan Forest, An Untimely End) is assigned again by the players, and an enemy a Shadow or location effect returns to the staging area has a step in the log." },
+  { version: 53, scenarios: "all", note: "The surge of a card that eliminated the player revealing it is revealed for the first player still in the game, and a cancel is not offered when only a hero that Orc Vanguard locks could pay for it." },
+  { version: 53, scenarios: ["the-battle-of-lake-town"], note: "A location the Fisherman's Dock split explores is heard by the cards that answer an explored location." },
+  { version: 53, scenarios: "all", note: "The effects at the end of the round resolve while the table shows the End of round phase, not Beginning of round." },
 ];
 
-export const ENGINE_VERSION = 52;
+export const ENGINE_VERSION = 53;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

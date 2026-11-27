@@ -284,6 +284,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         if (count) line(boardingWords({ ship: names.card(step.enemyId), count, seat: step.seat, seats: after.seatCount }), null, [step.enemyId]);
         return;
       }
+      case "returnToStaging": return void line(valeStepWords(step, names.card) ?? `${names.card(step.enemyId)} returns to the staging area`, null, [step.enemyId]);
       case "fortitudeTest":
         open(1, step.success ? "Fortitude test passed" : "Fortitude test failed", step.success ? "good" : "bad");
         line(`Willpower ${step.willpower} against ${plural(step.eyes, "Sauron's Eye icon")}`, "willpower");
@@ -332,12 +333,8 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         line(POOL_COPY);
         return;
       // Poison and unconscious (hob.venom-poison, hob.unconscious-characters): the character's table pill and its turn follow each line.
-      case "poison":
-        line(poisonLine(names.card(step.targetId), step.count, step.of), null, [step.targetId]);
-        return;
-      case "unconscious":
-        line(unconsciousLine(names.card(step.targetId), step.ready === true), null, [step.targetId]);
-        return;
+      case "poison": return void line(poisonLine(names.card(step.targetId), step.count, step.of), null, [step.targetId]);
+      case "unconscious": return void line(unconsciousLine(names.card(step.targetId), step.ready === true), null, [step.targetId]);
       case "resetEncounterDeck":
         line("The encounter discard pile is shuffled into the encounter deck");
         return;

@@ -115,7 +115,7 @@ export function keepIntent(kept: Kept, before: ScenarioState, after: ScenarioSta
   const steps = carryHidden(given, before, after);
   return {
     roundSteps: nextRoundSteps(kept.roundSteps, before, after, steps, ctx),
-    history: nextUndoable(kept.history, after, { before, roundSteps: kept.roundSteps, intent, steps: stampVale(steps, before, after) }),
+    history: nextUndoable(kept.history, after, { before, roundSteps: kept.roundSteps, intent, steps: stampVale(steps, before) }),
     destroyedHeroes: withDestroyed(kept.destroyedHeroes, heroesDestroyed(before, steps)),
   };
 }
@@ -126,7 +126,7 @@ export function keepIntent(kept: Kept, before: ScenarioState, after: ScenarioSta
  */
 export function nextRoundSteps(previous: readonly EngineStep[], before: ScenarioState, after: ScenarioState, steps: readonly EngineStep[], ctx?: ReduceContext): readonly EngineStep[] {
   if (steps.length === 0) return previous;
-  const kept = stampVale(stampHidden(stampControl(stampVillagers(stampCounted(steps, before, ctx), before, after), before, after), before, after, ctx ? typeIn(after, ctx.cards) : undefined), before, after);
+  const kept = stampVale(stampHidden(stampControl(stampVillagers(stampCounted(steps, before, ctx), before, after), before, after), before, after, ctx ? typeIn(after, ctx.cards) : undefined), before);
   return after.round !== before.round ? [...kept] : [...previous, ...kept];
 }
 
@@ -184,7 +184,7 @@ export function createTableStore(input: TableInput): TableStore {
       // A choice of The Blood of Gondor that moved a hidden card and returned no step still shows (blood-steps.ts).
       const steps = carryHidden(result.steps, before, result.state);
       // The banner words the steps as the log does: The Morgul Vale's notes on them (vale-steps.ts) are applied first, and any other game's steps stay as they are.
-      const told = stampVale(steps, before, result.state);
+      const told = stampVale(steps, before);
       // A round ends with its refresh: setup (round 0) ends with no summary.
       const crossed = result.state.round !== before.round && before.round > 0;
       const ended = crossed ? { ended: { round: before.round, steps: finishedRoundSteps([...get().roundSteps, ...told]) } } : {};

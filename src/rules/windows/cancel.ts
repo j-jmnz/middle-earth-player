@@ -4,6 +4,7 @@ import type { EngineStep, LegalIntent, PlayerIntent } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { noteSpent } from "../families/costs/pay.ts";
 import { encounterUncancelable } from "../families/encounter/cancel.ts";
+import { resourcesLocked } from "../families/pelargir/spending.ts";
 import { heroPays, validatePayments } from "../player/payments.ts";
 import type { CancelOffer, EffectData, Frame, ScenarioState } from "../core/state.ts";
 import { updateCard } from "../core/state.ts";
@@ -11,11 +12,11 @@ import { patchTop, topFrame } from "./windows.ts";
 
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
 
-// The first player pays. A hero can pay when its pool is the cost's sphere (or the cost is neutral).
+// The first player pays. A hero can pay when its pool is the cost's sphere (or the cost is neutral) and no card locks its pool (Orc Vanguard, 05058:A:1: resourcesLocked).
 function payers(state: ScenarioState, offer: CancelOffer, ctx: ReduceContext): string[] {
   return (state.seats[state.firstPlayer]?.heroes ?? []).filter((id) => {
     const hero = state.cards[id];
-    return hero != null && hero.resources > 0 && heroPays(state, id, offer.sphere, ctx);
+    return hero != null && hero.resources > 0 && heroPays(state, id, offer.sphere, ctx) && !resourcesLocked(state, id);
   });
 }
 

@@ -119,6 +119,8 @@ function words(step: EngineStep, names: LogNames, questStat: string | null): str
       return valeQuiet(step) ? null : valeStepWords(step, names.card) ?? `${player(step.seat)} reveals ${names.card(step.cardId)}`;
     case "engage":
       return valeStepWords(step, names.card, null, { count: 2 }) ?? `${names.card(step.enemyId)} engages ${player(step.seat)}`;
+    case "returnToStaging":
+      return valeStepWords(step, names.card) ?? `${names.card(step.enemyId)} returns to the staging area`;
     case "commit":
       return `${names.card(step.cardId)} commits to the quest`;
     case "hideCommit":

@@ -20,8 +20,6 @@ import { DOCK } from "./travel.ts";
 const SPLITTERS: readonly string[] = [DOCK, TOWER];
 const splits = (state: ScenarioState, id: string | null): boolean => id != null && SPLITTERS.includes(state.cards[id]?.code ?? "");
 
-const involvesTower = (state: ScenarioState): boolean => [state.activeLocation, state.secondActiveLocation].some((id) => id != null && state.cards[id]?.code === TOWER);
-
 type Cards = ReadonlyMap<string, PrintedCard>;
 
 type Split = Extract<Instruction, { verb: "SplitProgress" }>;
@@ -48,8 +46,8 @@ export function splitProgress(state: ScenarioState, instruction: Split, focus: F
   let next = state;
   if (one != null) next = placeOn(next, one, instruction.onFirst, ctx.cards, steps);
   if (two != null) next = placeOn(next, two, amount - instruction.onFirst, ctx.cards, steps);
-  // A location the share explored has left play: the cards that answer it hear it (rr.explored; Ruined Tower's explore is taken by 06091:B:2). Only a split with Ruined Tower announces it: The Battle of Lake-town's Dock split plays as it always did.
-  return involvesTower(state) ? afterProgress(next, before, ctx, steps) : next;
+  // A location the share explored has left play: the cards that answer it hear it, as a location explored by quest progress is heard in any other split (rr.explored; Ruined Tower's explore is taken by 06091:B:2).
+  return afterProgress(next, before, ctx, steps);
 }
 
 /** The room each active location has for progress now, when the players divide it between two (Fisherman's Dock is one of them): [first, second], or null when there is no choice (no Dock, a location without quest points or room, or the progress fills both). */

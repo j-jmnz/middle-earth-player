@@ -220,11 +220,11 @@ describe("the Bodyguard, the Nazgûl and the attack sheets (06148:A:1, 06153:A:2
     expect(answered.state.cards[id]?.zone).toBe("staging");
     expect(banner).toContain("Murzag returns to the staging area (Morgul Road's shadow effect)");
     expect(log).toContain("Murzag returns to the staging area (Morgul Road's shadow effect)");
-    // The end of the round: the stamp reads the move of an engaged enemy to the staging area when Morgul Vale is in play.
+    // The end of the round: the engine's step of the return, with Morgul Vale's Forced effect as its cause, is worded with the card that did it.
     const round = table({ phase: "Refresh", staging: [tower, vale], engaged: [murzag] });
-    const before = { ...opened(round).state, phase: "Beginning of round" as const };
+    const before = { ...opened(round).state, phase: "End of round" as const };
     const gone = { ...before, cards: { ...before.cards, [idOf(before, murzag)]: { ...before.cards[idOf(before, murzag)], zone: "staging" as const } } } as ScenarioState;
-    expect(told(round, before, gone, [{ kind: "draw", seat: 0, cardId: "x", cause: { rule: "rr.step-1-3" } }] as never[]).log).toContain("Murzag returns to the staging area (Morgul Vale's effect at the end of the round)");
+    expect(told(round, before, gone, [{ kind: "returnToStaging", enemyId: idOf(before, murzag), cause: { effect: "06155:forced:1", line: "06155:A:1" } }] as never[]).log).toContain("Murzag returns to the staging area (Morgul Vale's effect at the end of the round)");
   });
 
   it("the return names the shadow card whose record returns the attacker, also when it is not the first one, and cites that record's line", () => {
