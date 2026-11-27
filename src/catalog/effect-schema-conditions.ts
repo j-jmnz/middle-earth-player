@@ -155,7 +155,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("survivorsThreat"), max: z.number().int().min(0) }),
   // Some living player's threat is at most `max` ("if any player's threat is 20 or less", 08081:A:1): read in the effect that runs, whichever player it acts for.
   z.strictObject({ kind: z.literal("anyThreat"), max: z.number().int().min(0) }),
-  // The living player in seat `seat` (0 for Player 1) has a threat of at least `min`: a warning that names the player a raise would eliminate (Chaos in the Night, 17103:A:1). With `plus`, the seat\'s threat and that amount, a raise read now (the resources on Off Track, 17079:A:1), are at least `min`. False for a seat that is not in the game or is eliminated.
+  // The living player in seat `seat` (0 for Player 1) has a threat of at least `min`: a warning that names the player a raise would eliminate (Chaos in the Night, 17103:A:1). With `plus`, the seat's threat and that amount, a raise read now (the resources on Off Track, 17079:A:1), are at least `min`. False for a seat that is not in the game or is eliminated.
   z.strictObject({ kind: z.literal("seatThreat"), seat: z.number().int().min(0), min: z.number().int().min(0), plus: amountSchema.optional() }),
   // The attack that left this effect for its end (AfterAttack), or the damage the answered event placed, dealt at least `min` damage (1 by default):
   // "If this attack deals damage to a Ship objective" (11051:A:2; read with a `matches` condition on the defender).
@@ -474,7 +474,5 @@ export type Condition = z.infer<typeof conditionSchema>;
 export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" | "versusDefender" | "versusVictoryTrait" | "inArea" | "defendingAgainst" | "holderExhausted" }> {
   return condition?.kind === "versusHighEngagement" || condition?.kind === "defendingAgainst" || condition?.kind === "attacking" || condition?.kind === "versusDefender" || condition?.kind === "versusVictoryTrait" || condition?.kind === "inArea" || condition?.kind === "holderExhausted";
 }
-
-export { targetSchema } from "./effect-schema-targets.ts";
 
 export const when = { when: conditionSchema.optional() };

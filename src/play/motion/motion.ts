@@ -135,8 +135,8 @@ export function motionsBetween(
       const played = was.zone === "hand" && slot.zone !== "hand";
       // The one enemy of a grappled stack that showed under its location turns over as it is detached.
       const turned = was.kind === "attachment" && was.faceDown && !slot.faceDown && slot.kind === "card";
-      // The card shows the other face of its double-sided card: it turns over where it lies, from the face it showed (never a facedown card turning up, which is a reveal, nor another card in the slot).
-      const overturned = slot.kind === "card" && was.kind === "card" && !was.faceDown && !slot.faceDown && was.code !== slot.code && options.turnedFrom?.(slot.id) === was.code;
+      // The card shows the other face of its double-sided card: it turns over where it lies, from the face it showed (never a facedown card turning up, which is a reveal, nor another card in the slot). A card that also changes zone (Gollum, who turns into Sméagol as he is engaged) glides to it showing its new face, with no turn.
+      const overturned = slot.kind === "card" && was.kind === "card" && !was.faceDown && !slot.faceDown && was.code !== slot.code && was.zone === slot.zone && options.turnedFrom?.(slot.id) === was.code;
       motions.set(slot.id, { ...from(slot, was, slotRotation(was), 1), flip: turned || overturned, land: played ? "squash" : turned ? "pop" : null, ...(overturned ? { fromPicture: was.picture ?? was.code } : {}) });
       continue;
     }

@@ -16,7 +16,8 @@ import type { CombatMark, Rect } from "../layout/layout.ts";
 import { STAGE_APART_WORD, type StagePill } from "../words/scenarios/stormcaller.ts";
 import type { OptionMark } from "../choice/sheet-types.ts";
 import { currentMark } from "./current-mark.ts";
-import { BADGE_TOP, badgeRoom, type CoveredBand, hiddenBadges, footPillSpan, lonePick, loneRow, pillFits } from "./badge-room.ts";
+import { apartPlateY, STAGE_MARK_H } from "./stage-marks.ts";
+import { badgeRoom, type CoveredBand, hiddenBadges, footPillSpan, lonePick, loneRow, pillFits } from "./badge-room.ts";
 import { TOKEN } from "./token-spots.ts";
 import { STRIP, underMarkBox } from "./under-mark.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
@@ -220,18 +221,18 @@ export function SeatChipView({ rect, text, fonts, t, s }: { rect: Rect; text: st
 }
 
 /** How far the widest effect badge reaches from the card's left edge, so a word pill keeps clear of the badge column (the rows are drawn by `Badges`: a stat is the icon, the number and 5 pt, a flag the pill and 4 pt (the must-commit pill is a stat's width), the "more" pill its words and 12 pt, at least 24 pt). */
-export function badgeReach(effects: CardEffects, fonts: Fonts, s: number, height: number, stop: number | null, width: number, covered: CoveredBand | null = null): number {
+export function badgeReach(effects: CardEffects, fonts: Fonts, s: number, height: number, stop: number | null, width: number, covered: CoveredBand | null = null, titleRows = 1): number {
   const widths = [
     ...effects.stats.map((badge) => 15 * s + fonts.badge.getTextWidth(chipText(badge)) + 5 * s),
     ...effects.flags.map((flag) => (flag.flag === "mustCommit" ? 15 * s + fonts.badge.getTextWidth(MUST_COMMIT_WORD) + 5 * s : BADGE_H * s + 4 * s)),
   ];
   // The pill for the effects left out ("2 more") is as wide as its words and 12 pt, and is drawn when any are left out: the count is the one `Badges` draws, which depends on the room the card's height leaves.
-  const left = hiddenBadges(effects.stats.length + effects.flags.length, height, s, BADGE_H * s, stop, covered);
+  const left = hiddenBadges(effects.stats.length + effects.flags.length, height, s, BADGE_H * s, stop, covered, titleRows);
   const shift = covered?.left ?? 0;
   // A covered card's row ends at the next card in its row (`CoveredBand.width`); words and pills wider than that room give way to the round count, as `Badges` draws.
   const avail = covered ? covered.width - shift : width;
   const count = (n: number) => fonts.badge.getTextWidth(String(n)) + 10 * s;
-  const room = badgeRoom(height, s, BADGE_H * s, stop, covered);
+  const room = badgeRoom(height, s, BADGE_H * s, stop, covered, titleRows);
   // A card with no room for a row draws no pill at all (badgeLayout).
   if (widths.length === 0 || room < 1) return 0;
   const words = left > 0 ? fonts.badge.getTextWidth(moreText(left)) + 12 * s : 0;
@@ -337,21 +338,19 @@ export function StagingTag({ rect, text, font, t, s }: { rect: Rect; text: strin
  * (docs/design-system-table.md, The Stormcaller's area).
  */
 export function StageMarks({ rect, pill, apart, fonts, t, s }: { rect: Rect; pill: StagePill; apart: boolean; fonts: Fonts; t: TableTokens; s: number }) {
-  const height = 11 * s;
+  const height = STAGE_MARK_H * s;
   const room = rect.w - 6 * s;
   const plate = fonts.small.getTextWidth(STAGE_APART_WORD);
   const plateW = Math.min(room, plate + 8 * s);
   const pillX = rect.x + 3 * s;
   const pillY = rect.y + rect.h - STRIP * s - height - 2 * s;
-  // The plate stands under the picture's title band, clear of the pill, when the card is tall enough for both; when it is not it hangs above the card's top edge, so the pill keeps its whole words ("Orcs 1") and the plate reads in full.
-  const below = rect.y + BADGE_TOP * s + 1 * s;
-  const roomBelow = below + height + 1 * s <= pillY;
+  // The plate stands under the picture's title band, clear of the pill, when the card is tall enough for both; when it is not it stands just above the pill, inside the card (stage-marks.ts).
   // The pill says whose stage it is when it fits the uncovered width, and only its number when it does not.
   const text = fonts.small.getTextWidth(pill.text) + 8 * s <= room ? pill.text : pill.short;
   const words = fonts.small.getTextWidth(text);
   const pillW = Math.min(room, words + 8 * s);
   const plateX = rect.x + (rect.w - plateW) / 2;
-  const plateY = roomBelow ? below : rect.y - height - 1 * s;
+  const plateY = apartPlateY(rect, pillY, s);
   return (
     <Group>
       <RoundedRect x={pillX} y={pillY} width={pillW} height={height} r={height / 2} color={pill.danger ? t.threat : withAlphaHex(t.night, 0.9)} />

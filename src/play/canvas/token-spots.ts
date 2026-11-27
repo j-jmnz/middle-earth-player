@@ -14,3 +14,14 @@ export function tokenSpot(rect: Rect, token: TokenKind, s = 1): { cx: number; cy
   if (token === "damage") return { cx: x + w - half, cy: y + half };
   return { cx: x + w - half, cy: y + h - half };
 }
+
+/** How far the damage token reaches in from a card's top-right corner (its left edge, from the right edge), so a line of the name keeps clear of it. */
+export function damageReach(s = 1): number {
+  const spot = tokenSpot({ x: 0, y: 0, w: 0, h: 0 }, "damage", s);
+  return -spot.cx + (TOKEN / 2) * s;
+}
+
+/** How far the damage token reaches down from a card's top edge. */
+export function damageDrop(s = 1): number {
+  return tokenSpot({ x: 0, y: 0, w: 0, h: 0 }, "damage", s).cy + (TOKEN / 2) * s;
+}

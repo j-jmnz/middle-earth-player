@@ -380,6 +380,15 @@ describe("motionsBetween: a card turned over in place to the other face of its d
     expect(poseAt(motion!, 0, 1).back).toBe(true);
   });
 
+  it("does not turn a card that changes zone as it shows the other face: it glides to it (Gollum into Sméagol)", () => {
+    const before = layout([slot("obj", "staging", rect, { code: "17079", picture: "17079.B" })]);
+    const moved = layout([slot("obj", "engaged", at(300, 120), { code: "17080" })]);
+    const motion = motionsBetween(before, moved, nowhere, { turnedFrom: turned("obj") }).motions.get("obj");
+    expect(motion?.flip).toBe(false);
+    expect(motion?.fromPicture).toBeUndefined();
+    expect(motion?.dx).not.toBe(0);
+  });
+
   it("does not turn a card that only changed code, one that lay facedown, or one the state does not say turned", () => {
     const code = (id: string) => (id === "obj" ? "17079" : null);
     const before = layout([slot("obj", "staging", rect, { code: "17079" })]);

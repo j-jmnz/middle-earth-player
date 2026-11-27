@@ -2,7 +2,8 @@
 import { z } from "zod";
 
 import { cardRefSchema, positiveAmountSchema } from "./effect-schema-amount.ts";
-import { conditionSchema, targetSchema, when } from "./effect-schema-conditions.ts";
+import { conditionSchema, when } from "./effect-schema-conditions.ts";
+import { targetSchema } from "./effect-schema-targets.ts";
 import { pickSchema, whoSchema } from "./effect-schema-pick.ts";
 import { modifyStatSchema } from "./effect-schema-stats.ts";
 import { FAMILY_VERBS } from "./families/index.ts";
