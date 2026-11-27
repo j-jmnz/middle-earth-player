@@ -3,6 +3,8 @@ import type { Effect } from "../../../catalog/boundary.ts";
 import { type ScenarioState } from "../../../rules/core/state.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { PASSING, codesIn, fightEnemy, finish, idOf, idsOf, legalIntents, legalTargets, opened, revealFromTop, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
+import { pick } from "../../../../test/harness/pick.ts";
+export { pick };
 
 export const SID = "beneath-the-sands";
 export const BROOD = "17065";
@@ -39,15 +41,6 @@ export const inDeck = (state: ScenarioState): string[] => state.encounterDeck.ma
 export const has = (state: ScenarioState, zone: string, code: string): boolean => codesIn(state, zone).includes(code);
 export const resourcesOf = (state: ScenarioState, code: string): number => state.cards[idOf(state, code)]?.resources ?? -1;
 export const damageOf = (state: ScenarioState, code: string): number => state.cards[idOf(state, code)]?.damage ?? -1;
-/** The option of an open choice that the keys name (an option id or the code of the card it offers), the first option when none matches. */
-export const pick = (...keys: string[]) => (state: ScenarioState): string => {
-  const options = state.window?.kind === "choose" ? state.window.options : [];
-  for (const key of keys) {
-    const hit = options.find((option) => option === key || state.cards[option]?.code === key);
-    if (hit !== undefined) return hit;
-  }
-  return options[0] ?? "";
-};
 
 /** The id of the card of a code that lies in the zone. */
 export const inZone = (state: ScenarioState, zone: string, code: string): string => idsOf(state, code).find((id) => state.cards[id]?.zone === zone) ?? "";

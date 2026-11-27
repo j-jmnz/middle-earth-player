@@ -12,6 +12,7 @@ import { playedLayout } from "../../../../test/harness/card-spec-play.ts";
 import { attack, count, deckCount, endRound, reveal, rowProblems, travel, type Row } from "../../../../test/harness/card-spec.ts";
 import { codesIn, drive, engagedCodes, fightEnemy, finish, idOf, idsOf, legalIntents, opened, send, statOf, tableFromLayout, zoneOf, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { IntentRefused } from "../../../../test/harness/scene.ts";
+import { pick } from "../../../../test/harness/pick.ts";
 
 const SID = "desert-crossing";
 const BURNT = "16025";
@@ -22,15 +23,6 @@ const make = (effects: readonly Effect[], layout: Layout, extra: readonly string
 const played = (effects: readonly Effect[], layout: Layout, act: Parameters<typeof playedLayout>[2]): ScenarioState => playedLayout(SID, layout, act, effects).run.state;
 const damageIn = (state: ScenarioState): number => Object.values(state.cards).reduce((sum, card) => sum + (card.zone === "heroes" || card.zone === "play" ? card.damage : 0), 0);
 const damageOf = (state: ScenarioState, code: string): number => idsOf(state, code).reduce((sum, id) => sum + (state.cards[id]?.damage ?? 0), 0);
-/** The option of the open choice that names the card with the code (or the option itself); the first option when none does. */
-const pick = (...keys: string[]) => (state: ScenarioState): string => {
-  const options = state.window?.kind === "choose" ? state.window.options : [];
-  for (const key of keys) {
-    const hit = options.find((option) => option === key || state.cards[option]?.code === key);
-    if (hit !== undefined) return hit;
-  }
-  return options[0] ?? "";
-};
 const threatOf = (made: Made): number => stagingThreatOf(made.state, made.cards);
 
 describe("16024 Carrion Bird", () => {

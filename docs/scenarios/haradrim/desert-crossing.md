@@ -29,6 +29,8 @@ The statuses are those of the Readings bullet of `docs/scenarios/haradrim.md`. E
 
 ### Temperature and stages
 
+Sources read for the temperature and stages readings: https://visionofthepalantir.com/2019/08/17/desert-crossing/, https://visionofthepalantir.com/2025/07/27/qotw-desert-crossing/, https://ffg-forum-archive.entropicdreams.com/topic/224887-the-sands-of-harad/page/10 and the Hall of Beorn card pages named in the Readings note above; none rules on the readings below.
+
 - Setup (`16068:A:1`) (span-settled; `hrd.heat-tracker`, `hrd.setup-desert-crossing`). Each player adds one Burnt Sands from the encounter deck to the staging area, the deck is shuffled, the tracker is set to 10.
 - Ally enters play (`16068:B:1`) (recommended). The ally's controller chooses: exhaust it, or deal 1 damage to it; it fires for each ally of any player that enters play while stage 1B is current. Not taken: the first player chooses. Why recommended: the card has no "you" and `rr.forced` only orders abilities; no source names the chooser; the controller bears the cost.
 - End of round (`16068:B:2`, `16069:B:1`, `16070:B:2`) (span-settled; `faq.triggering-forced-effects`). The temperature rises by 4; a stage reached in the same end of round does not fire its Forced that round.
@@ -43,9 +45,13 @@ The statuses are those of the Readings bullet of `docs/scenarios/haradrim.md`. E
 
 ### Temperature at 0
 
+Sources read for the temperature at 0 readings: https://visionofthepalantir.com/2019/08/17/desert-crossing/, https://visionofthepalantir.com/2025/07/27/qotw-desert-crossing/, https://ffg-forum-archive.entropicdreams.com/topic/224887-the-sands-of-harad/page/10 and the Hall of Beorn card pages named in the Readings note above; none rules on the readings below.
+
 - Seek Shade (`16023:A:3`) (recommended). The temperature falls by 10 with a floor of 0; at 0 to 9 it becomes 0, never negative; X is then 0. Not taken: a negative temperature. Basis: `rr.modifiers` ("if a value is below 0, it is treated as 0"), `rr.threat-threat-dial`, `hrd.heat-tracker` (a threat tracker). Why recommended: no source rules on the heat tracker at 0; the spans cover a card value and a threat dial, not this tracker.
 
 ### Encounter cards
+
+Sources read for the encounter cards readings: https://visionofthepalantir.com/2019/08/17/desert-crossing/, https://visionofthepalantir.com/2025/07/27/qotw-desert-crossing/, https://ffg-forum-archive.entropicdreams.com/topic/224887-the-sands-of-harad/page/10 and the Hall of Beorn card pages named in the Readings note above; none rules on the readings below.
 
 - Mirage (`16022:A:1`) (recommended). The active location is discarded (a discard, not an explore); the whole discard pile (that location included) is shuffled into the deck; cards are discarded from the top until a location is; that location becomes the active location, so its "after it becomes the active location" Forced fires (a copy of the same location too); no Travel effect resolves; with no active location the first step does nothing; with no location in the deck the whole deck is discarded and nothing becomes active, and in the quest phase the empty deck then gets the discard pile back, shuffled (`rr.running-out-of-cards`; in another phase it stays empty). Not taken: the new location's Forced does not fire. Why recommended: https://visionofthepalantir.com/2019/08/17/desert-crossing/ says the Forced fires again and that it triggers no "explored" effect, but it is one fan blog and the spans name no non-travel activation; the "no location found" case has no source.
 - Seek Shade (`16023:A:2`) (span-settled; `hrd.side-quests`, `faq.side-quest-current-quest-text`). Forced in the staging area: at the end of the round X progress is removed from the main quest (the quest deck's top card, never the active location or a side quest); X = 0 below 10.

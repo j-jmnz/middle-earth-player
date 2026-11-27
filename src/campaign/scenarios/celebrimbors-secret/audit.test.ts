@@ -10,6 +10,7 @@ import { settle } from "../../../rules/engine/machine.ts";
 import { stagingThreat } from "../../../rules/quest/quest.ts";
 import { codesIn, drive, engagedCodes, fight, fightEnemy, finish, idOf, legalIntents, opened, resolveRecords, revealFromTop, send, tableFromLayout, zoneOf, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
+import { pick } from "../../../../test/harness/pick.ts";
 
 const SID = "celebrimbors-secret";
 const BELLACH = "08124";
@@ -33,15 +34,6 @@ const tableOf = (effects: readonly Effect[]) => (layout: Layout): Made => tableF
 const UNDER_TWO: Layout["under"] = [{ code: TOWER, to: SEARCH }, { code: PLAZA, to: SEARCH }];
 const HOST_MOULD = (to: string) => ({ code: MOULD, to, encounter: true as const });
 
-/** The window's option that the first code names (a card of that code, or the option id itself); the first option when none matches. */
-const pick = (...keys: string[]) => (state: ScenarioState): string => {
-  const options = state.window?.kind === "choose" ? state.window.options : [];
-  for (const key of keys) {
-    const hit = options.find((option) => option === key || state.cards[option]?.code === key);
-    if (hit !== undefined) return hit;
-  }
-  return options[0] ?? "";
-};
 
 /** The options that the keys name, one key for each choice the effects open in turn (the last key again when the choices outnumber them). */
 const inOrder = (...keys: string[]) => {

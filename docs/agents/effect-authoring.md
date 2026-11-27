@@ -308,7 +308,12 @@ Read each new record against these before the review. Each one is a card bug a r
 - **A limit on the card.** "Limit 1 per hero", "limit once per phase" and "until the end of the phase" each get a test that tries the second copy, the second use, and the next phase.
 - **A general change.** A fix in a reader that many records share changes other cards: list them by code and read each printed line before the fix lands (`docs/agents/card-audit.md`, Fix and review).
 - **New core state.** Test it at its boundaries, not only on the normal path: a phase's end, an Undo, a save and load.
+- **A render sentence shared with other cards.** A sentence added to the render for one scenario's card (`scripts/data/effects/render`) is printed for every record that uses the same verb, flag or condition, and a timing or a condition it names can be false for them: run `pnpm effects render --checks` on the other cards that use it (`pnpm effects reach origin/main`) and read each against its printed line.
 - **The options of a choice.** Every new `Choose` or `Pick` gets words in `src/play/words` that name the number, the side and whose deck (`docs/design-system-table.md`, Choice tray).
+- **Copied code.** A helper written again in a second family, a test file or a test helper: search for it first (`pnpm doc find`, grep the families and `test/harness`), and import it. `scripts/checks/copied-code.test.ts` fails on a function body of eight lines or more that two files share.
+- **A caution or a choice that reads one seat.** A pick that spans seats, a threat or hit-point caution and an elimination each read every seat: test with the second player choosing and with a player out.
+- **A test that proves less than its title.** Write the title from the assertion; a test of a limit, a second use or a phase's end tries that case.
+- **A step the last-move line or the log does not tell.** A new engine step (a capture, a claim, a track, a flip, a loss cause) gets its log line in the same change, and a line in the last move unless the table shows the fact once the intent is resolved (`docs/design-system-table.md`, Last move, Left to the table); the loss and the end screen name the cause.
 
 ## Not expressible yet: leave open, report
 
