@@ -1,7 +1,7 @@
 // Undo on a result screen (the Resolution, a standalone game's outcome). The move that ended the game can be taken back like
 // any other (docs/architecture.md, State): the button goes back one move through the same store the table uses, with the table's
 // tick and sound (undoWithFeedback), and `onUndone` runs once it has. Shown only while there is a move to take back, or an
-// unconfirmed pick to put back first (docs/brief.md, Rules engine: "While a pick is being made, Undo puts back the pick first").
+// unconfirmed pick to put back first (docs/brief.md, The engine plays the game: "While a pick is being made, Undo puts back the pick first").
 import { useStore } from "zustand";
 
 import { undoWithFeedback } from "../../play/choice/undo-feedback";

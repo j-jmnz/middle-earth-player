@@ -346,7 +346,7 @@ Expo Router. The app opens on the campaign list. Its dock (`(tabs)`) is Campaign
 | History | `runs`, `saves` and `standalone_games` (open and archived), the campaign files, `cards` (through `deckFaces`: names and faces) | `saves.archivedAt` and `standalone_games.archivedAt` on Archive and Restore; a deleted save's or game's row (a deleted playthrough's open scenario is recorded as a run first, `recordUnclosedRun`) |
 | Standalone briefing | decks, catalog, scenario definition; a finished game's loadout for Play again | a new `standalone_games` row with its loadout and open game |
 | Standalone table | the same table view (`src/screens/table/view.tsx`) over a game replayed by `src/screens/session/standalone-session.ts` (the replay and the committing store are shared with the campaign table in `src/screens/session/open-game.ts`) | each accepted intent, appended to `standalone_games.activeScenario` |
-| Standalone outcome | the replayed game, or the stored result of a game already finished | the result (score or loss reason) as the screen opens; the open game is cleared |
+| Standalone outcome | the replayed game, or the stored result of a game already finished | the result (score or loss reason) when the screen is left (Done, Play again, Back, a back gesture), with the game's run dated to the move that ended it; before that the game stays open and over, and Undo takes the move back |
 | Campaign path | save, pool | nothing until a scenario ends |
 | Log | save | notes |
 | Briefing | save, deck, catalog, scenario definition | the loadout, then the opening `ScenarioState` from the reducer |

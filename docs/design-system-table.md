@@ -559,7 +559,7 @@ When an intent the player sent advances the quest, and when the table opens on a
 
 ## Undo
 
-Undo is the first of the dock's quiet pills. It takes back the last choice while it showed nothing hidden (`docs/brief.md`, The engine plays the game); each tap goes back one more, and it leaves the dock once a card has been revealed since. While a pick is being made, its first tap puts back the pick only (its hint says "Puts back this pick"; otherwise "Takes back your last choice"); while a sheet opened from the table is up, Cancel is there instead. The cards move back the way they came. The banner says "Taken back", the choice in words ("Frodo Baggins committed to the quest") and what it had done.
+Undo is the first of the dock's quiet pills. It takes back the last choice while it showed nothing hidden (`docs/brief.md`, The engine plays the game); each tap goes back one more, and it leaves the dock once a card has been revealed since. While a pick is being made, its first tap puts back the pick only (its hint says "Puts back this pick"; otherwise "Takes back your last choice"); while a sheet opened from the table is up, Cancel is there instead. The cards move back the way they came. The banner says "Taken back", the choice in words ("Frodo Baggins committed to the quest") and what it had done. A move that ended the game can be taken back from the Resolution or the standalone outcome (`docs/design-system.md`, Resolution and standalone outcome); the table then opens on the moment taken back with this banner, and with no quest screen over it.
 
 ## Haptics
 
