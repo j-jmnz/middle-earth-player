@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 import { TextButton } from "../../ui/buttons.tsx";
 import { Segmented } from "../../ui/segmented.tsx";
 import { SettingSwitch } from "../../ui/setting-switch.tsx";
-import { ALWAYS_EMPTY_LINE, BANNER_CLOSES_LINE, BANNER_CLOSES_WORDS, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, DEBUG_LINE, EFFECTS_VOLUME_LINE, fogLine, GUIDE_LINE, HAPTICS_LINE, MUSIC_LINE, MUSIC_VOLUME_LINE, STOP_OTHER_AUDIO_LINE, SOUNDS_LINE, NONE_YET, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TITLE_FACE_LINE, TITLE_FACE_WORDS, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, type AlwaysRow } from "./settings-words.ts";
+import { ALWAYS_EMPTY_LINE, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, DEBUG_LINE, EFFECTS_VOLUME_LINE, fogLine, GUIDE_LINE, HAPTICS_LINE, MUSIC_LINE, MUSIC_VOLUME_LINE, STOP_OTHER_AUDIO_LINE, SOUNDS_LINE, NONE_YET, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TITLE_FACE_LINE, TITLE_FACE_WORDS, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, type AlwaysRow } from "./settings-words.ts";
 import { SETTING_TITLES, type SettingId } from "./settings-catalog.ts";
 import { platformLine, TABLE_LIST_DETAIL } from "./settings-platform.ts";
 import { CHECK_LINE } from "../../ui/update/offer.ts";
@@ -16,7 +16,7 @@ import { playSound } from "../../ui/sound/sound.ts";
 import { VolumeSlider } from "../../ui/sound/volume-slider.tsx";
 import { SPEEDS } from "../../ui/motion-tokens.ts";
 import { useReduceMotion } from "../../ui/motion-run.ts";
-import { BANNER_CLOSES_OPTIONS, CARD_QUALITY_OPTIONS, CONFIRM_TIME_OPTIONS, REDUCE_MOTION_OPTIONS, STRONG_OUTLINES_OPTIONS, TABLE_LIST_OPTIONS, THEME_OPTIONS, TITLE_FACE_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "../../ui/table-settings.ts";
+import { CARD_QUALITY_OPTIONS, CONFIRM_TIME_OPTIONS, REDUCE_MOTION_OPTIONS, STRONG_OUTLINES_OPTIONS, TABLE_LIST_OPTIONS, THEME_OPTIONS, TITLE_FACE_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "../../ui/table-settings.ts";
 import { useTheme } from "../../ui/theme.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { Text } from "../../ui/text.tsx";
@@ -96,8 +96,6 @@ export function SettingRow({ id, settings, onChange, always, testPrefix }: RowPr
       return <ChoiceRow title={title} detail={SPEED_LINE} id={tid("speed")} options={SPEEDS} words={SPEED_WORDS} value={settings.animationSpeed} onChange={(animationSpeed) => onChange({ animationSpeed })} />;
     case "reduceMotion":
       return <ChoiceRow title={title} detail={REDUCE_MOTION_LINE} id={tid("reduce-motion")} options={REDUCE_MOTION_OPTIONS} words={REDUCE_MOTION_WORDS} value={settings.reduceMotion} onChange={(reduceMotion) => onChange({ reduceMotion })} />;
-    case "bannerCloses":
-      return <ChoiceRow title={title} detail={BANNER_CLOSES_LINE} id={tid("banner-closes")} options={BANNER_CLOSES_OPTIONS} words={BANNER_CLOSES_WORDS} value={settings.bannerCloses} onChange={(bannerCloses) => onChange({ bannerCloses })} />;
     case "spotlight":
       return <SettingSwitch roomy label={title} detail={SPOTLIGHT_LINE} value={settings.spotlight} onChange={(spotlight) => onChange({ spotlight })} testID={tid("spotlight")} />;
     case "haptics":

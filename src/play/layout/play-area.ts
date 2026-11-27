@@ -114,15 +114,18 @@ export function placePlay(plan: PlayPlan, area: Rect, out: CardSlot[], m: Metric
   let y = area.y;
   plan.rows.forEach((row, index) => {
     const next = y + (plan.pitch ?? rowDepth(row, plan.size, m) + m.gap);
-    const covered = plan.pitch != null && index < plan.rows.length - 1 ? { coveredFrom: next } : {};
+    const covers = plan.pitch != null && index < plan.rows.length - 1;
     const xs = rowXs(playWidths(row, plan.size, m), area.x, area.w, m.gap);
     row.forEach((entry, at) => {
       const rect = cardRect(entry.card, xs[at] ?? area.x, y, plan.size);
+      // The part of a back-row card the next card in its row leaves visible, for its effect pills.
+      const nextX = xs[at + 1];
+      const covered = covers ? { coveredFrom: next, coveredStep: nextX == null ? rect.w : Math.min(rect.w, nextX - rect.x) } : {};
       placeUnder(entry, "play", rect, out, [], m.peek);
       // A committed character stands a step higher, sent toward the quest.
       const lift = entry.card.committed ? -m.peek / 2 : 0;
       // An exhausted card is turned about its center, which leaves its top lower than its row's: in a back row it rises by the difference, so the band that shows above the front row is the 44 pt the row keeps, with room for its tokens.
-      const turned = covered.coveredFrom != null && isExhausted(entry.card) ? -(plan.size.h - plan.size.w) / 2 : 0;
+      const turned = covers && isExhausted(entry.card) ? -(plan.size.h - plan.size.w) / 2 : 0;
       out.push({ ...slotOf(entry.card, "play", "card", { ...rect, y: rect.y + lift + turned }), ...covered });
     });
     y = next;

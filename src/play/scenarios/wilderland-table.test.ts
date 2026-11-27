@@ -273,13 +273,13 @@ describe("the banner of a Travel to a Discover location", () => {
     expect(texts.some((text) => text.startsWith("And "))).toBe(false);
   });
 
-  it("shows the strip under reduced motion, which rings only the last line's cards, and holds it on the last beat", () => {
+  it("lays the strip from the last line's cards alone", () => {
     const { before, after, steps } = travelled(["mist", "loot1", "stalker", "orc"]);
     const moment = momentOf(before, after, steps, names(after));
-    // Reduced motion shows every line at once and rings the last one's cards (readouts/moment-banner.tsx).
+    // The last move's line rings every kept line's cards at once (table-hooks.ts); the strip's ids are on the last line.
     const rung = moment?.lines[(moment?.lines.length ?? 1) - 1]?.cards ?? [];
     expect(lookIdsOf(new Set(rung))).toEqual(after.encounterDiscard);
-    // Every earlier line leaves the strip out, so it shows on the last beat alone.
+    // Every earlier line leaves the strip out.
     expect(moment?.lines.slice(0, -1).every((line) => lookIdsOf(new Set(line.cards)).length === 0)).toBe(true);
   });
 

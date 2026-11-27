@@ -7,7 +7,8 @@ import { legalIntents, reduce, type PlayerIntent, type ScenarioState } from "../
 import { enemy, hero, seaTable, shipEnemy } from "../../../rules/families/sea/table.ts";
 import { spawn } from "../../../rules/core/zones.ts";
 
-import { intentWords, momentOf } from "../../store/outcome.ts";
+import { intentWords } from "../../store/intent-words.ts";
+import { momentOf } from "../../store/outcome.ts";
 import { sailingTable } from "../../dream-chaser/sea-fixture.ts";
 import { pileSpeech } from "../../canvas/pile-speech.ts";
 import {

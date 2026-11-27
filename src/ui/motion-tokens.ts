@@ -6,7 +6,7 @@
 // everything snaps). Each token is at most 500 ms; the sweep, the spotlight's hold and its whole run (phase 24), and the lives
 // of its ash are the exceptions.
 // What is not motion stays out of the scale: a gate or a timer (the top bar's 400 ms measure fallback, the dock's second-tap
-// window, the banner's beats, the 350 ms settle after a new moment) is not a token.
+// window, the look strip's hold, the 350 ms settle after a new moment) is not a token.
 
 /** The Animation speed setting (table-settings.ts). */
 export type Speed = "normal" | "quick" | "slow";
@@ -21,7 +21,7 @@ export function motionScale(speed: Speed, reduced: boolean): number {
   return speed === "quick" ? 0.6 : 1;
 }
 
-/** How much longer the banner's beats and hold last: 1.5 for Slow, 1 otherwise (they are timers, not tokens, so Quick leaves them and reduced motion does not snap the hold). */
+/** How much longer the look strip's hold lasts (readouts/last-move-time.ts): 1.5 for Slow, 1 otherwise (it is a timer, not a token, so Quick leaves it and reduced motion does not snap it). */
 export function paceScale(speed: Speed): number {
   return speed === "slow" ? 1.5 : 1;
 }
