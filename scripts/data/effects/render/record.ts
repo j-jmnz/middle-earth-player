@@ -149,11 +149,14 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   if (effect.byEncounterDeck === true) notes.push("only when the encounter deck revealed it");
   if (effect.notFromDiscard === true) notes.push("not for a card found in the encounter discard pile");
   if (effect.byPlay === true) notes.push("only when a player played the attachment");
-  if (effect.early === true) notes.push("resolves before the other Forced effects of the moment");
+  if (effect.afterForcedOn !== undefined) {
+    const named = [effect.afterForcedOn].flat().map((code) => (typeof code === "string" ? (ctx.nameOf?.(code) ?? code) : str(code)));
+    notes.push(`resolves after the Forced effects on each of ${named.join(", ")} in play`);
+  }
   if (effect.holdsEvents === true) notes.push("the Forced effects that hear what it does (a draw, the last time counter taken off the stage) resolve after the whole effect has finished, not between its steps or between two players' turns in it");
   if (isObj(effect.cancel)) notes.push(`may be canceled by paying ${str(effect.cancel.cost)}`);
   if (isObj(effect.uncancelable)) notes.push(`cannot be canceled while ${renderCondition(effect.uncancelable, ctx)}`);
-  const head = done(ctx, `${timing}${trigger}${notes.length > 0 ? ` (${notes.join("; ")})` : ""}`, effect, ["id", "cardCode", "lines", "timing", "trigger", "subject", "eventSeat", "limit", "cost", "anyPlayer", "answeredBy", "whenFirst", "holdsEvents", "fromHand", "fromVictory", "byEncounterDeck", "notFromDiscard", "byPlay", "early", "cancel", "uncancelable", "condition", "instructions"]);
+  const head = done(ctx, `${timing}${trigger}${notes.length > 0 ? ` (${notes.join("; ")})` : ""}`, effect, ["id", "cardCode", "lines", "timing", "trigger", "subject", "eventSeat", "limit", "cost", "anyPlayer", "answeredBy", "whenFirst", "holdsEvents", "fromHand", "fromVictory", "byEncounterDeck", "notFromDiscard", "byPlay", "afterForcedOn", "cancel", "uncancelable", "condition", "instructions"]);
   const lines = [`${str(effect.id)}: ${head}`];
   if (effect.condition !== undefined) lines.push(`  only if ${renderCondition(effect.condition, ctx)}`);
   const instructions = Array.isArray(effect.instructions) ? effect.instructions : [];

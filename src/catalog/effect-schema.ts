@@ -339,8 +339,8 @@ export const effectSchema = z.strictObject({
   notFromDiscard: z.literal(true).optional(),
   // An "attached" event is heard only when a player played the attachment onto its host, from a hand or from another zone by an effect that says play (rr.play-and-put-into-play), not when an effect moved it, put it into play or a Setup attached it ("After you play an attachment on a Dale character", 18001:A:2).
   byPlay: z.literal(true).optional(),
-  // This Forced effect resolves before the other Forced effects of the same moment, whatever the age of their cards (the engine resolves the oldest card's first): "after resolving the Forced effect on each stage 3 in play" (50907:A:1; docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 5).
-  early: z.literal(true).optional(),
+  // This Forced effect initiates only after the Forced effects on the card with this code (or on a card with any of these codes), in the same moment, have resolved: "After resolving the Forced effect on Dol Guldur" (50907:A:1 after each stage 3, 50931:B:2, docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 5). The first player's choice of order (OrderForced, families/encounter/forced-order.ts) does not offer it before them.
+  afterForcedOn: z.union([z.string(), z.array(z.string())]).optional(),
   // The Forced effects that hear what this effect does (a draw, the last time counter taken off the stage) resolve after the whole effect, not between its steps (families/ring-maker/events.ts, The Fords of Isen).
   holdsEvents: z.literal(true).optional(),
   cancel: cancelSchema.optional(),

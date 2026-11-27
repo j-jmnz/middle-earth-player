@@ -359,6 +359,8 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return "attack the defending player once this attack has ended";
     case "StartShadowAttack":
       return "attack the defending player";
+    case "OrderForced":
+      return "choose which Forced effect resolves first";
     // The campaign family's verbs (src/catalog/families/campaign.ts) that a Journey Along the Anduin record holds.
     case "SetAsideEachPlayer":
       return `set aside a copy of ${names.code(instruction.code)} for each player`;

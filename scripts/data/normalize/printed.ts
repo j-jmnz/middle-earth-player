@@ -36,17 +36,27 @@ export const LEDGER_KEYWORD_PACKS: ReadonlySet<string> = new Set(PRODUCTS.filter
 
 const KEEPS_RINGSDB: ReadonlySet<string> = new Set(REPRINTS.filter((reprint) => reprint.keepsRingsDb).map((reprint) => reprint.pack));
 
-function ledgerKeywords(entry: LedgerEntry): PrintedKeywords {
+// The keywords the sentences that open each line of a card's text name ("Immune to player card effects. Cannot be optionally engaged." opens with one); a line stops at its first sentence that is not a keyword.
+function openingKeywords(lines: readonly string[]): PrintedKeywords {
   const sentences: string[] = [];
-  for (const line of entry.lines) {
+  for (const line of lines) {
     for (const sentence of line.split(/(?<=\.)\s+/)) {
       const parsed = parseKeywordTokens([sentence]);
       if (parsed.unknown.length > 0 || Object.keys(parsed.keywords).length === 0) break;
       sentences.push(sentence);
     }
   }
-  const keywords = parseKeywordTokens(sentences).keywords;
+  return parseKeywordTokens(sentences).keywords;
+}
+
+function ledgerKeywords(entry: LedgerEntry): PrintedKeywords {
+  const keywords = openingKeywords(entry.lines);
   return entry.sailingSuccess ? { ...keywords, sailingSuccess: entry.sailingSuccess } : keywords;
+}
+
+// Hall of Beorn and DragnCards list "Immune to player card effects" as text only on many cards (Spider Burrow, Poros Garrison, Priest of Sauron): a card whose text opens a line with it has the keyword, in any pack.
+export function immuneFromText(cards: readonly Card[]): Card[] {
+  return cards.map((card) => (card.keywords?.immune || !openingKeywords((card.text ?? "").split("\n")).immune ? card : { ...card, keywords: { ...card.keywords, immune: true } }));
 }
 
 // A double-sided location whose side B opens with the Uncharted keyword (dcce.uncharted): the card has it, and the engine reads it only while the card lies on that side.

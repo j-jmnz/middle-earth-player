@@ -172,9 +172,9 @@ export function printedIn(scenarioId: string, code: string): PrintedCard | undef
 /**
  * A table built from a layout, with no scene file: the scenario's codes are read from data/scenarios/<scenarioId>.json and data/cards.
  * `effects` are the records the table runs (the authored ones by default); the do-nothing Action for the filler event is added to them. `extra` names
- * other cards of data/cards the layout places (a player card in the hand, `pnpm game scene`), added to this table's cards only.
+ * other cards of data/cards the layout places (a player card in the hand, `pnpm game scene`), added to this table's cards only. `round` is the round the table stands in (0, which the phase rail reads as the Setup, when absent).
  */
-export function tableFromLayout(scenarioId: string, layout: Layout = {}, options: { effects?: readonly Effect[]; extra?: readonly string[] } = {}): LayoutTable {
+export function tableFromLayout(scenarioId: string, layout: Layout = {}, options: { effects?: readonly Effect[]; extra?: readonly string[]; round?: number } = {}): LayoutTable {
   const world = loadedWorld(scenarioId);
   const effects = options.effects ?? EFFECTS;
   // A layout that names a Nightmare quest card as its stage (Grimbeorn's Folly) has it after the printed stages, as the Nightmare deal does (src/campaign/start.ts).
@@ -315,6 +315,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     const spawned = spawn(state, code, { zone: "staging" });
     state = takeControlOfLocation(spawned.state, { verb: "TakeControlOfLocation", card: "self" }, { seat: spawned.state.firstPlayer, sourceId: spawned.id }, ctx);
   }
+  if (options.round != null) state = { ...state, round: options.round };
   return { state: syncConstants(state, ctx), ctx, hero: first.id, hero2: secondHero.id, seat1Hero, definition, cards };
 }
 

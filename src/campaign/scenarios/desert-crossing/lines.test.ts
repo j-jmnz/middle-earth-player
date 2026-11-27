@@ -34,6 +34,30 @@ describe("the Setup of the deal", () => {
   });
 });
 
+describe("the order of the Forced effects at the end of the round (rr.forced)", () => {
+  // The stage raises the temperature by 4 and Seek Shade removes X progress, X the tens digit of the temperature, both at the end of the round: the first player chooses which initiates first, and the order changes X.
+  const layout: Layout = { stage: MAIN, progress: 6, temperature: 36, staging: ["16023"] };
+  const order = (first: "stage" | "shade"): ScenarioState => {
+    const made = table(layout);
+    const stage = made.state.questStage ?? "";
+    return played(layout, endRound, answer(first === "stage" ? stage : idOf(made.state, "16023")));
+  };
+  it("16068:B:2 and 16023:A:2 the stage first raises the temperature to 40, so Seek Shade removes 4 progress", () => {
+    const state = order("stage");
+    expect(temperatureOf(state)).toBe(40);
+    expect(state.cards[state.questStage ?? ""]?.progress).toBe(2);
+  });
+  it("16068:B:2 and 16023:A:2 Seek Shade first removes 3 progress at 36, then the stage raises the temperature to 40", () => {
+    const state = order("shade");
+    expect(temperatureOf(state)).toBe(40);
+    expect(state.cards[state.questStage ?? ""]?.progress).toBe(3);
+  });
+  it("16068:B:2 and 16023:A:2 the first player is asked once: the last Forced effect resolves on its own", () => {
+    const state = order("shade");
+    expect(state.window?.kind).not.toBe("choose");
+  });
+});
+
 describe("the temperature is read live", () => {
   it("16028:A:1 the Were-worm's X follows the temperature: a rise from 30 to 40 makes its Threat 4", () => {
     const made = table({ staging: ["16028"], temperature: 30 });

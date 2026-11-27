@@ -12,7 +12,7 @@ import { loadRaw } from "./normalize/load-raw.ts";
 import { asksFileNames, checkAsksNames, renderAsksBarrel } from "./effects/asks-barrel.ts";
 import { authoredFileNames, authoredOrder, renderAuthoredBarrel } from "./effects/barrel.ts";
 import { boxCodes, boxOwners, generateEffects, renderGenerated } from "./effects/generate.ts";
-import { applyPrinted } from "./normalize/printed.ts";
+import { applyPrinted, immuneFromText } from "./normalize/printed.ts";
 import { buildCampaignIndex } from "./normalize/campaigns.ts";
 import { buildScenarios } from "./normalize/scenarios.ts";
 import { loadPrebuiltDecks } from "./prebuilt-decks.ts";
@@ -54,7 +54,7 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR, log: Log = buil
   const scanProblems = verifyScans(ledger);
   if (scanProblems.length > 0) throw new Error(`printed-text ledger: ${scanProblems.join("; ")}`);
   const printed = applyPrinted(sourceCards.cards, ledger);
-  const cards = printed.cards;
+  const cards = immuneFromText(printed.cards);
   log.info(`printed: ${ledger.entries.length} ledger entries; ${printed.differences.length} differ from the source text${printed.differences.length > 0 && !verbose() ? " (--verbose lists them)" : ""}`);
   for (const difference of printed.differences) log.debug(`  ${difference.key}: ledger ${JSON.stringify(difference.ledger)} | source ${JSON.stringify(difference.source)}`);
   const byPack = new Map<string, Card[]>();

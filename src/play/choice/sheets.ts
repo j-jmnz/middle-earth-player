@@ -41,6 +41,7 @@ import { cancelRequest, triggerRequest } from "./pay.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
 import { STEP_WORDS } from "../phases/rail.ts";
 import { travelRefusals } from "./travel-refusals.ts";
+import { immuneRefusals } from "./immune-refusals.ts";
 import { armiesOptionLabel } from "../words/scenarios/the-hobbit/armies.ts";
 import { ARMIES_STAGE_FRAME } from "../../rules/families/armies/stages.ts";
 import { DEFENDERS_FRAME } from "../../rules/families/defense/defenders.ts";
@@ -257,7 +258,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const data = frame?.data.kind === "effect" ? frame.data : null;
       const effect = data ? effectById(ctx, data.effectId) : undefined;
       const source = frame?.cardId ?? null;
-      const words: ChoiceNames = { card: names.card, code: (code) => ctx.cards.get(code)?.name ?? code, traits: (code) => ctx.cards.get(code)?.traits ?? [] };
+      const words: ChoiceNames = { card: names.card, code: (code) => ctx.cards.get(code)?.name ?? code, traits: (code) => ctx.cards.get(code)?.traits ?? [], line: names.line };
       const line = lineOf(effect, names);
       // Two-handed, the sheet says whose decision it is: the first player's for "the first player must either" (rr.first-player).
       const who = game.seatCount > 1 ? ` Player ${window.seat + 1} chooses.` : "";
@@ -330,6 +331,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       return {
         ...base,
         ...(asked.title ? { title: asked.title } : {}),
+        ...immuneRefusals(game, ctx, names, wait?.kind === "target" ? wait.item.instruction : null, window.options, source, window.seat),
         ...(stopsDefenders ? { alternative: { label: "No more defenders", intent: { type: "Choose" as const, optionId: DONE } } } : {}),
         note: [`${asked.prompt}${asked.owned ? "" : who}`, committedNote(game, ctx, effect, window.seat), asked.bare ? null : line].filter((part) => part != null).join(" "),
         printed: asked.bare ? null : line,
@@ -358,10 +360,10 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const rowCaution = asked.cautions?.[id] ?? fire?.caution ?? ship?.caution ?? crown?.caution ?? kingsCaution;
           // A plain card row that shares its name with another row says what tells the copies apart (Mr. Underhill's two Black Riders).
           const plainLabel = card.label === names.card(id) ? (copyLabel(game, names, id, window.options) ?? card.label) : card.label;
-          const label = (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? crown?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? stagedAllyLabel(game, ctx, names, id, window.options) ?? seatedLabel(game, ctx, names, id, window.options) ?? orcsLabel(game, names, id, window.options) ?? tiedLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay || zoned ? outOfPlayLabel(game, id, words) : plainLabel);
+          const label = asked.rows?.[id]?.label ?? (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? crown?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? stagedAllyLabel(game, ctx, names, id, window.options) ?? seatedLabel(game, ctx, names, id, window.options) ?? orcsLabel(game, names, id, window.options) ?? tiedLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay || zoned ? outOfPlayLabel(game, id, words) : plainLabel);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
-          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction) || isBoonCode(wait.item.instruction, id)) ? { code: id } : {}), ...statsOf(game, ctx, id, asked.rowStats, willpower, eyes, tied), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };
+          return { ...card, label, ...(asked.rows?.[id]?.detail ? { detail: asked.rows[id].detail } : {}), ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction) || isBoonCode(wait.item.instruction, id)) ? { code: id } : {}), ...statsOf(game, ctx, id, asked.rowStats, willpower, eyes, tied), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };
         }),
       };
     }

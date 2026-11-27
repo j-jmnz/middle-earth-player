@@ -192,7 +192,9 @@ function enterMode(state: ScenarioState, mode: ModeName, crossed: boolean): Scen
   if (expiring.length === 0) return changed;
   const discounts = (changed.discounts ?? []).filter((discount) => discount.until === "used" || !expiring.includes(discount.until));
   const kept = discounts.length === (changed.discounts ?? []).length ? changed : { ...changed, discounts };
-  return expireModifiers(kept, expiring);
+  const lapsed = kept.modifiers.filter((modifier) => expiring.includes(modifier.until));
+  const expired = expireModifiers(kept, expiring);
+  return lapsed.length === 0 ? expired : { ...expired, lapsedModifiers: [...(expired.lapsedModifiers ?? []), ...lapsed] };
 }
 
 // The seat a Peril card's staging is locked to, or null. An enemy attack that card starts is open to every player

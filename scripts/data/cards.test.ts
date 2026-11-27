@@ -253,6 +253,15 @@ describe("Mirkwood Paths cards", () => {
     expect(cards.get("18020")?.keywords).not.toMatchObject({ immune: true });
   });
 
+  it("reads \"Immune to player card effects\" that opens a line of a card's text as the keyword in every pack (Hall of Beorn lists it as text only), and only then", () => {
+    // A location of an adventure pack with a ledger, an enemy and a location of a box with no ledger entry, an objective ally and an enemy of the saga and standalone boxes.
+    for (const code of ["17068", "21030", "21047", "17145", "50204", "145068", "17015"]) expect(cards.get(code)?.keywords, code).toMatchObject({ immune: true });
+    expect(cards.get("17015")?.keywords).toMatchObject({ indestructible: true, immune: true });
+    // A card whose text names the keyword without opening a line with it does not have it (the Immune of "Immune to non-Fellowship player card effects" is its own thing).
+    expect(cards.get("17069")?.keywords).not.toMatchObject({ immune: true });
+    expect(cards.get("144075")?.keywords).not.toMatchObject({ immune: true });
+  });
+
   it("types an objective-location, names the Expansion's encounter sets without the Campaign suffix, and gives the side quests Fire in the Night's set", () => {
     expect(cards.get("18029")).toMatchObject({ name: "Overgrown Path", type: "objective", typeName: "Objective Location" });
     expect(cards.get("18016")).toMatchObject({ name: "The Old Ford", type: "location" });

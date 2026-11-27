@@ -351,7 +351,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "16055",
       lines: ["16055:A:2"],
       timing: "shadow",
-      instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ModifyStat", stat: "cannotReady", amount: 1, until: "endOfRound", target: "other", when: { kind: "dealt" } }] }],
+      // An undefended attack has no defending character (docs/scenarios/haradrim/desert-crossing.md, Encounter cards): the hero it damages is not "the defending character".
+      instructions: [{ verb: "AfterAttack", when: { kind: "not", condition: { kind: "undefended" } }, instructions: [{ verb: "ModifyStat", stat: "cannotReady", amount: 1, until: "endOfRound", target: "other", when: { kind: "dealt" } }] }],
     },
   ],
   { pool: [...ATTACK_ON_DOL_GULDUR, ...ESCAPE_FROM_KHAZAD_DUM] },

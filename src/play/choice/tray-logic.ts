@@ -46,7 +46,7 @@ export function trayTiles(sheet: Sheet): TrayTile[] {
         label: item.label,
         code: item.code,
         readId: item.code ? item.id : null,
-        detail: null,
+        detail: item.detail ?? null,
         stats: item.stats ?? [],
         mark: item.mark ?? null,
         ...(item.place ? { place: item.place } : {}),

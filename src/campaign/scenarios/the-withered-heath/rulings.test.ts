@@ -5,6 +5,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { settle } from "../../../rules/engine/machine.ts";
 import type { ScenarioState } from "../../../rules/engine/reduce.ts";
 import { CODES, codesIn, finish, heathTable, idOf, legalIntents, loadHeathWorld, resolveRecords, send, start, type HeathWorld, type PlayerIntent, type Run } from "../../../../test/scenarios/the-withered-heath/scene.ts";
+import { asksForcedOrder } from "../../../rules/families/encounter/forced-order.ts";
 
 let world: HeathWorld;
 beforeAll(async () => {
@@ -74,7 +75,9 @@ describe("user ruling 2026-11-05: 12175:B:5 Dragon-slayer", () => {
     const t = heathTable(world, { seats, campaign: true, stage: "19025", phase: "PlayerAttacks", setAside: all, victory: SIGNS(4), engaged: [{ code: CODES.coldDrake, seat: 0, damage: 17 }] });
     const drake = idOf(t.state, CODES.coldDrake);
     const strong: ScenarioState = { ...t.state, modifiers: [...t.state.modifiers, { instanceId: t.hero, sourceId: t.hero, stat: "attack", amount: 9, until: "endOfPhase" }] };
-    return { t, run: send(start(strong), { type: "DeclareAttackers", enemyId: drake, attackerIds: [t.hero] }, t.ctx) };
+    const attacked = send(start(strong), { type: "DeclareAttackers", enemyId: drake, attackerIds: [t.hero] }, t.ctx);
+    // The Forced effects of Cold-Drake's defeat differ: the first player is asked their order (rr.forced) and takes the first.
+    return { t, run: asksForcedOrder(attacked.state) ? send(attacked, { type: "Choose", optionId: attacked.state.window?.kind === "choose" ? (attacked.state.window.options[0] ?? "") : "" }, t.ctx) : attacked };
   };
   const boonsOn = (run: Run, id: string): string[] => Object.values(run.state.cards).filter((card) => card.host === id).map((card) => card.code);
 

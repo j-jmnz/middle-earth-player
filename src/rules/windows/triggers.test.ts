@@ -13,6 +13,7 @@ import { updateCard } from "../core/state.ts";
 import { fireForced, crossBoundary } from "./triggers.ts";
 import { pushDue } from "./delayed.ts";
 import { topFrame } from "./windows.ts";
+import { applyChoice } from "./choices.ts";
 import { spawn } from "../core/zones.ts";
 
 function place(code: string) {
@@ -47,19 +48,22 @@ describe("forced effects", () => {
     state = spawn(state, "a", { zone: "staging" }).state;
     state = spawn(state, "q", { zone: "staging" }).state;
     const steps: EngineStep[] = [];
-    const settled = settle(fireForced(state, { trigger: "hideFailed", seat: 0 }, ctx, steps), ctx, steps);
+    const asked = settle(fireForced(state, { trigger: "hideFailed", seat: 0 }, ctx, steps), ctx, steps);
+    // The triggered effect has resolved; the two Forced effects differ, so the first player is asked which initiates first (rr.forced), the oldest card first in the list.
+    expect(threats(steps)).toEqual([3]);
+    expect(asked.window).toMatchObject({ kind: "choose", seat: 0 });
+    const options = asked.window?.kind === "choose" ? asked.window.options : [];
+    expect(options.map((id) => asked.cards[id]?.code)).toEqual(["b", "a"]);
+    // The first player takes the oldest first: the rest are asked no more, the last one resolves on its own.
+    const settled = settle(applyChoice(asked, options[0] ?? ""), ctx, steps);
     expect(threats(steps)).toEqual([3, 2, 1]);
-    expect(frames(steps)).toEqual([
-      "push:event",
-      "push:forced",
-      "pop:forced",
-      "push:forced",
-      "push:forced",
-      "pop:forced",
-      "pop:forced",
-      "pop:event",
-    ]);
+    expect(frames(steps)).toEqual(["push:event", "push:forced", "pop:forced", "push:ResolveEffect", "push:forced", "pop:forced", "push:forced", "pop:forced", "pop:ResolveEffect", "pop:event"]);
     expect(settled.stack).toEqual([]);
+    // The other order is the first player's to choose too.
+    const otherSteps: EngineStep[] = [];
+    const other = settle(applyChoice(settle(fireForced(state, { trigger: "hideFailed", seat: 0 }, ctx, otherSteps), ctx, otherSteps), options[1] ?? ""), ctx, otherSteps);
+    expect(threats(otherSteps)).toEqual([3, 1, 2]);
+    expect(other.stack).toEqual([]);
   });
 
   it("ignore a card that is not in play and a different event", () => {

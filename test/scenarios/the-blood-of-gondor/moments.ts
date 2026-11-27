@@ -36,6 +36,8 @@ export function momentsOf(played: PlayedGame, ctx: ReduceContext): Moment[] {
   const trail = played.trail ?? [];
   const steps = stepsByIntent(played, ctx);
   const found: Moment[] = [];
+  // The first player token passed and the control of Faramir and Lord Alcaron is still to follow: the Forced effects of the pass differ, so the new first player is asked their order (rr.forced) before the control moves.
+  let owed = false;
   trail.forEach((after, at) => {
     const before = beforeOf(played, at);
     const intent = played.intents[at];
@@ -72,7 +74,11 @@ export function momentsOf(played: PlayedGame, ctx: ReduceContext): Moment[] {
     if (intent?.type === "Trigger" && intent.effectId === `${FARAMIR}:action:1`) found.push({ kind: "faramir", at, seat: after.activeSeat, codes: [] });
     if (intent?.type === "Trigger" && intent.effectId === `${ALCARON}:action:1`) found.push({ kind: "alcaron", at, seat: after.activeSeat, codes: [] });
     const control = (state: ScenarioState) => Object.values(state.cards).filter((card) => card.code === FARAMIR || card.code === ALCARON).map((card) => `${card.code}:${card.controller ?? "-"}:${card.zone}`).join(",");
-    if (before.firstPlayer !== after.firstPlayer) found.push({ kind: "control", at, seat: after.firstPlayer, codes: [control(after)] });
+    if (before.firstPlayer !== after.firstPlayer) owed = true;
+    if (owed && after.window?.kind !== "choose") {
+      owed = false;
+      found.push({ kind: "control", at, seat: after.firstPlayer, codes: [control(after)] });
+    }
     const inPlay = (state: ScenarioState) => Object.values(state.cards).some((card) => card.code === "06123" && (card.zone === "staging" || state.activeLocation === card.id));
     if (stage === CAPTURED && inPlay(after) && !(codeOf(before, before.questStage) === CAPTURED && inPlay(before))) found.push({ kind: "crossroads", at, seat: -1, codes: [] });
     if (pushedIn(list, after, "whenRevealed").includes("06131") || pushedIn(list, after, "reveal").includes("06131")) found.push({ kind: "conflict", at, seat: -1, codes: [] });

@@ -86,7 +86,8 @@ function checkChoose(state: ScenarioState, sheet: PickSheet, seen: Seen): void {
     expect(sheet.note ?? "").toMatch(/^(Choose |[^:]+: )/);
     for (const option of sheet.options) expect(option.label).not.toBe(option.id);
   }
-  if (state.seatCount > 1) expect(sheet.note ?? "").toContain(`Player ${window.seat + 1} chooses.`);
+  // The first player's order of simultaneous Forced effects is named by the sheet's title ("Player 1 · Order the Forced effects"), not by its note.
+  if (state.seatCount > 1 && !(data?.wait?.kind === "target" && data.wait.item.instruction.verb === "OrderForced")) expect(sheet.note ?? "").toContain(`Player ${window.seat + 1} chooses.`);
 }
 
 describe("The Ring Goes South on the table", () => {

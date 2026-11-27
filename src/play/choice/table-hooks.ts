@@ -21,6 +21,8 @@ import { stageName } from "../../rules/families/wilderland/gundabad.ts";
 import { fateNames } from "../words/scenarios/fate-beats.ts";
 import { flipsAtStaging, mustBypassLead } from "../words/scenarios/gundabad-beats.ts";
 import { forestAdvanceWords } from "../readouts/standalone-scenarios/old-forest-words.ts";
+import { immuneProgressWords } from "../store/immune-note.ts";
+import type { EngineStep } from "../../rules/core/intents.ts";
 import type { LegalIntent, ReduceContext, ScenarioState, TableMoment, TableStore } from "../store/store.ts";
 import { tableSettings, type TableSettings } from "../../ui/table-settings.ts";
 import { bannerLabel, bannerSpeech } from "../readouts/banner-speech.ts";
@@ -78,6 +80,8 @@ export function useLastMove(store: TableStore, ctx: ReduceContext, names: SheetN
   const fate = useMemo(() => fateNames(ctx, names.card), [ctx, names]);
   // Which side of The Old Forest's stage 2 test the advance fell on (words/scenarios/old-forest.ts).
   const forestAdvance = useCallback((before: ScenarioState, after: ScenarioState, stageId: string) => forestAdvanceWords(ctx, before, after, stageId), [ctx]);
+  // The progress an immune active location did not take (immune-note.ts).
+  const immuneProgress = useCallback((before: ScenarioState, step: Extract<EngineStep, { kind: "progress" }>) => immuneProgressWords(ctx, before, step, names.card), [ctx, names]);
   // Where a card with a PlayInto record goes, for what a reader hears after Undo (host-words.ts).
   const playInto = useCallback((cardId: string) => playIntoRule(ctx, store.getState().game.cards[cardId]?.code ?? "")?.into, [store, ctx]);
   // One moment told both ways, and the round's summary when it ended one (outcome.ts). Called as each moment is told, never in a render.
@@ -94,14 +98,14 @@ export function useLastMove(store: TableStore, ctx: ReduceContext, names: SheetN
       const spotlit = (targetId: string) => played.some((clash) => clash.target === targetId);
       // The seat the table draws when no peek is up: a fact about the other seat's area is not on screen.
       const seat = actingSeat(store.getState().game);
-      const set = { card: names.card, typeOf: (cardId: string) => printedOf(ctx.cards, codeOf(cardId)).type, questStat: (state: ScenarioState) => questStatNow(state, ctx), passes, shadow, stage, revealed, stageName: stageNamed, mustBypass, atStaging, fate, forestAdvance, spotlit, seat };
+      const set = { card: names.card, typeOf: (cardId: string) => printedOf(ctx.cards, codeOf(cardId)).type, questStat: (state: ScenarioState) => questStatNow(state, ctx), passes, shadow, stage, revealed, stageName: stageNamed, mustBypass, atStaging, fate, forestAdvance, immuneProgress, spotlit, seat };
       // After an undo the game is the state before the intent taken back, and `left` the state it had made: the table shows all of it, so only a reader is told.
       if (moment.kind === "undone") return { full: takenBack(intentWords(moment.intent, names.card, moment.after, playInto), momentOf(moment.after, moment.left, moment.steps, set)), lean: null, summary: null };
       const after = moment.after;
       const summary = moment.ended ? roundSummary(moment.ended.round, moment.ended.steps, after, (cardId) => ctx.cards.get(after.cards[cardId]?.code ?? "")?.backType === "player") : null;
       return { ...momentsOf(moment.before, after, moment.steps, set), summary };
     },
-    [store, ctx, names, shadow, stage, revealed, stageNamed, mustBypass, fate, forestAdvance, playInto, spotlights, reader],
+    [store, ctx, names, shadow, stage, revealed, stageNamed, mustBypass, fate, forestAdvance, immuneProgress, playInto, spotlights, reader],
   );
   // Every moment worth telling since the last one told, oldest first: the table answers the windows after a send in the same tap (stops.ts,
   // followAnswers), so more than one can arrive before the next render, and each has its say.

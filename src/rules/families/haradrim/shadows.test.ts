@@ -44,6 +44,14 @@ describe("17043:A:2 Uruk Pursuer's shadow comes into play engaged with the defen
     expect(state.cards[idOf(state, URUK)]?.zone).toBe("engaged");
   });
 
+  it("the Pursuer put into play engaged by its shadow is eligible to attack in that combat phase (rr.step-6-4a)", () => {
+    // The attacker's attack and the Pursuer's own attack are both made; at the same stage the Pursuer stays a discarded shadow card and only the attacker attacks.
+    const another = fightEnemy(table, "17043", URUK, { stage: "17048" }, options()).run.state;
+    const same = fightEnemy(table, "17043", URUK, { stage: "17047" }, options()).run.state;
+    expect(same.resolvedAttacks.length).toBe(1);
+    expect(another.resolvedAttacks.length).toBe(2);
+  });
+
   it("at the same stage the shadow card does nothing and is discarded", () => {
     const fought = fightEnemy(table, "17043", URUK, { stage: "17047" }, options());
     expect(fought.run.state.cards[idOf(fought.run.state, "17043")]?.zone).not.toBe("engaged");

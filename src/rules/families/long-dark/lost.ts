@@ -14,6 +14,7 @@ import { askTarget } from "../../windows/choices.ts";
 import { textBlank } from "../attachments/hold.ts";
 import { effectsOfCard } from "../misc/text.ts";
 import { effectData } from "../encounter/moves.ts";
+import { nextInOrder } from "../../windows/in-order.ts";
 import { fireForced } from "../../windows/triggers.ts";
 import { patchTop } from "../../windows/windows.ts";
 import type { Focus } from "../index.ts";
@@ -35,20 +36,21 @@ function raise(state: ScenarioState, id: string, ctx: ReduceContext, steps: Engi
 
 // "Trigger all Lost: effects in play": the set was fixed when the verb first ran (`rest` holds what is left of it). The first player picks the effect that resolves next; it resolves in full and the verb comes back for the rest.
 function lostInOrder(state: ScenarioState, instruction: Verb, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const data = effectData(state);
   const left = instruction.rest ?? lostCards(state, ctx);
-  if (!data || left.length === 0) return state;
+  if (!effectData(state) || left.length === 0) return state;
   // The order matters only between different cards: one effect, or copies of one card, resolve oldest first.
   const alike = left.every((id) => state.cards[id]?.code === state.cards[left[0] ?? ""]?.code);
-  const chosen = focus.chosen != null && left.includes(focus.chosen) ? focus.chosen : alike ? left[0] : undefined;
-  if (chosen == null) return askTarget(state, { instruction: { ...instruction, rest: left }, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, left);
-  const rest = left.filter((id) => id !== chosen);
-  let next = state;
-  if (rest.length > 0) {
-    const again: QueueItem = { instruction: { ...instruction, rest }, seat: focus.seat, chosen: null, cause: currentCause(steps, UNATTRIBUTED) };
-    next = patchTop(next, { data: { ...data, queue: [again, ...data.queue] } });
-  }
-  return raise(next, chosen, ctx, steps);
+  const cause = currentCause(steps, UNATTRIBUTED);
+  const next = nextInOrder(state, {
+    options: alike ? left.slice(0, 1) : left,
+    picked: focus.chosen,
+    ask: { instruction: { ...instruction, rest: left }, seat: state.firstPlayer, chosen: null, cause },
+    rest: (chosen) => {
+      const rest = left.filter((id) => id !== chosen);
+      return rest.length > 0 ? { instruction: { ...instruction, rest }, seat: focus.seat, chosen: null, cause } : null;
+    },
+  });
+  return next.chosen == null ? next.state : raise(next.state, next.chosen, ctx, steps);
 }
 
 /** TriggerLost: see src/catalog/families/long-dark.ts. */

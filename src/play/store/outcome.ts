@@ -50,7 +50,7 @@ export const MOST = 5;
 // `revealed` gives the printed When Revealed lines of a card (the Stormcaller's stage the C side of which was just revealed), or null.
 const SIDE_QUEST_TITLE = "End of the planning phase";
 
-type Names = { spotlit?: (targetId: string) => boolean; seat?: number; card: (cardId: string) => string; typeOf?: (cardId: string) => string | null; questStat?: (before: ScenarioState) => "willpower" | "attack" | "defense"; passes?: (cardId: string) => boolean; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null; stageName?: (cardId: string) => string | null; mustBypass?: (cardId: string) => string | null; atStaging?: (cardId: string) => boolean; fate?: FateNames; forestAdvance?: (before: ScenarioState, after: ScenarioState, stageId: string) => string | null };
+type Names = { spotlit?: (targetId: string) => boolean; seat?: number; card: (cardId: string) => string; typeOf?: (cardId: string) => string | null; questStat?: (before: ScenarioState) => "willpower" | "attack" | "defense"; passes?: (cardId: string) => boolean; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null; stageName?: (cardId: string) => string | null; mustBypass?: (cardId: string) => string | null; atStaging?: (cardId: string) => boolean; fate?: FateNames; forestAdvance?: (before: ScenarioState, after: ScenarioState, stageId: string) => string | null; immuneProgress?: (before: ScenarioState, step: Extract<EngineStep, { kind: "progress" }>) => string | null };
 
 // "stage 3 of 4" for the Stormcaller's stage `cardId` (the area's current stage once it has advanced), or "its next stage" for a state that moved on.
 function stormcallerStageWords(state: ScenarioState, cardId: string): string {
@@ -160,7 +160,7 @@ export function momentsOf(before: ScenarioState, after: ScenarioState, steps: re
       }
       case "progress": {
         // The tokens are on the card; The Morgul Vale's own words say more than the tokens do.
-        const vale = valeStepWords(step, names.card, valeFrom(after, step.cause, names.card));
+        const vale = valeStepWords(step, names.card, valeFrom(after, step.cause, names.card)) ?? names.immuneProgress?.(before, step) ?? null;
         line(vale ?? (step.amount < 0 ? `${-step.amount} progress removed from ${stageNamed(step.targetId)}` : `${step.amount} progress on ${stageNamed(step.targetId)}`), "progress", [], vale == null);
         return;
       }

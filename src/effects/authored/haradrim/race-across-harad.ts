@@ -83,7 +83,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "17042:whenRevealed:1", cardCode: "17042", lines: ["17042:A:1"], timing: "whenRevealed", instructions: [{ verb: "MoveToOrcsArea", target: "self" }] },
     { id: "17042:shadow:1", cardCode: "17042", lines: ["17042:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", when: DIFFERENT, instructions: [{ verb: "MoveToOrcsArea", target: "self" }] }] },
 
-    // 17043 Uruk Pursuer. When Revealed it goes into the Orcs' area and gains surge while the players are at another stage; Shadow: at another stage it comes into play engaged with the defending player (it makes no attack this round).
+    // 17043 Uruk Pursuer. When Revealed it goes into the Orcs' area and gains surge while the players are at another stage; Shadow: at another stage it comes into play engaged with the defending player (it has not attacked this round, so it attacks in this combat phase).
     { id: "17043:whenRevealed:1", cardCode: "17043", lines: ["17043:A:1"], timing: "whenRevealed", instructions: [{ verb: "MoveToOrcsArea", target: "self" }, { verb: "GainSurge", when: DIFFERENT }] },
     { id: "17043:shadow:1", cardCode: "17043", lines: ["17043:A:2"], timing: "shadow", instructions: [{ verb: "EngageShadowCard", when: DIFFERENT }] },
 

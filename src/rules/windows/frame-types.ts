@@ -136,6 +136,8 @@ export type EffectData = {
   hold?: string;
   // The events the effect queues wait until it has resolved completely (Effect.holdsEvents).
   holdsEvents?: true;
+  // The event whose Forced effects OrderForced is putting in the first player's order (rr.forced).
+  orderEvent?: GameEvent;
   // The card DiscardBottom discarded from the bottom of a deck in this effect (the `discardedCost` condition, families/uncharted/cards.ts).
   discarded?: string;
   // Every card the running effect discarded from the top of a deck, over all the players it acted for, oldest first (the amount `discarded`, families/deck/discarded.ts).
