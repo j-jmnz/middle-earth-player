@@ -92,12 +92,22 @@ export default function StandaloneOutcome() {
       </View>
     );
 
+  const actions = (
+    <>
+      <PrimaryButton label="Done" testID="outcome-done" onPress={done} />
+      <View className="mt-1 items-center">
+        <TextButton label="Play again" testID="outcome-again" tone="accent" onPress={again} />
+      </View>
+    </>
+  );
+  const twoPane = size === "expanded" && report != null;
+
   return (
     <Screen testID="standalone-outcome" scene={won ? "victory" : "ember"}>
       {back}
       {/* Expanded, with the game's details at hand: the title and the numbers at the left, the report in a pane at the right.
           Otherwise (a reopened game keeps only its result; or a phone, or a medium window) one readable column. */}
-      {size === "expanded" && report ? (
+      {twoPane ? (
         <TwoPane
           kind="supporting"
           side="end"
@@ -107,10 +117,14 @@ export default function StandaloneOutcome() {
               {linesBlock}
             </ScreenScroll>
           }
+          // The bar stands in the report's pane, so the title and the lines at the left keep the whole height: under a full-width bar a phone on its side cut them off.
           end={
-            <ScreenScroll top={16} bottom={24}>
-              <GameReportView report={report} tiles={won} />
-            </ScreenScroll>
+            <>
+              <ScreenScroll top={16} bottom={24}>
+                <GameReportView report={report} tiles={won} />
+              </ScreenScroll>
+              <ActionBar align="fill">{actions}</ActionBar>
+            </>
           }
         />
       ) : (
@@ -124,12 +138,7 @@ export default function StandaloneOutcome() {
           ) : null}
         </ScreenScroll>
       )}
-      <ActionBar>
-        <PrimaryButton label="Done" testID="outcome-done" onPress={done} />
-        <View className="mt-1 items-center">
-          <TextButton label="Play again" testID="outcome-again" tone="accent" onPress={again} />
-        </View>
-      </ActionBar>
+      {twoPane ? null : <ActionBar>{actions}</ActionBar>}
     </Screen>
   );
 }

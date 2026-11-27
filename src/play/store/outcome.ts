@@ -33,6 +33,7 @@ import { deadVillagers, heldBeat, onVillagers, villagerLines } from "../readouts
 import { underHost } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { hiddenChanges, hiddenLines } from "../readouts/against-the-shadow/blood-steps.ts";
 import { valeFrom, valeOf, valeQuiet, valeStepWords } from "../readouts/against-the-shadow/vale-steps.ts";
+import { tellEngage } from "../words/engage-line.ts";
 import { HIDDEN_TITLE } from "../words/scenarios/against-the-shadow/blood.ts";
 import { NO_HERO_DAMAGE, VILLAGERS_TITLE } from "../words/scenarios/against-the-shadow/amon-din.ts";
 import { releasedWords, UNDERWORLD_TITLE } from "../words/scenarios/against-the-shadow/stewards-fear.ts";
@@ -111,6 +112,8 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   // The cards of The Blood of Gondor turned faceup in this intent: an enemy among them engages under its turn line (hiddenLines), not in a beat of its own.
   const hidden = hiddenChanges(before, after, steps, after.questStage != null && after.cards[after.questStage]?.code === "06118", names.typeOf);
   const turnedEngaged = new Set(hidden?.seats.flatMap((entry) => entry.turned.filter((turned) => turned.fate.kind === "engaged").map((turned) => turned.id)) ?? []);
+  // Two or more engagements in one intent are one beat with a line each (words/engage-line.ts).
+  const manyEngaged = steps.filter((step, index) => step.kind === "engage" && !joined.has(index) && !turnedEngaged.has(step.enemyId) && valeOf(step)?.by == null).length > 1;
 
   steps.forEach((step, index) => {
     switch (step.kind) {
@@ -277,8 +280,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         return;
       case "engage": {
         if (joined.has(index) || turnedEngaged.has(step.enemyId)) return;
-        open(4, valeOf(step)?.by != null ? "" : `${names.card(step.enemyId)} engages`, "bad");
-        line(valeStepWords(step, names.card, null, { count: after.seatCount }) ?? (after.seatCount > 1 ? `Engaged with Player ${step.seat + 1}` : "Engaged with you"));
+        tellEngage({ id: step.enemyId, name: names.card(step.enemyId), seat: step.seat }, after.seatCount, manyEngaged, valeStepWords(step, names.card, null, { count: after.seatCount }), valeOf(step)?.by != null, { open, line, title: () => current?.title });
         const count = boarded.get(index);
         // The ship's ring follows this beat.
         if (count) line(boardingWords({ ship: names.card(step.enemyId), count, seat: step.seat, seats: after.seatCount }), null, [step.enemyId]);

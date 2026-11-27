@@ -158,14 +158,14 @@ export function DeterminedMarkView({ rect, word, clear, fonts, t, s }: { rect: R
 }
 
 /**
- * A card whose text box is blank (Desert Crossing, Cold from Angmar, the heroes The Long Arm of Mordor holds): the accent "Blank" pill stands in the pill column at the card's foot, as the "1 held" pill does, never on the name at the top; where the word does not fit, a round "B".
+ * A card marked with a word that must not stand on its name at the top: the accent "Blank" pill of a card whose text box is blank (Desert Crossing, Cold from Angmar, the heroes The Long Arm of Mordor holds), the "Shield" of the Morgul Bodyguard that takes a Captain's damage and the "Champion" of Escape from Umbar. It stands in the pill column at the card's foot, as the "1 held" pill does; where the word does not fit, a round glyph ("B", "S", "C").
  * `lifted`: another mark holds the foot row (the engagement cost, a combat number, the progress strip, a held pill), so this one stands a row above it.
  */
-export function BlankMarkView({ rect, lifted, fonts, t, s }: { rect: Rect; lifted: boolean; fonts: Fonts; t: TableTokens; s: number }) {
-  const words = fonts.badge.getTextWidth(BLANK_WORD);
+export function BlankMarkView({ rect, word, lifted, fonts, t, s }: { rect: Rect; word: string; lifted: boolean; fonts: Fonts; t: TableTokens; s: number }) {
+  const words = fonts.badge.getTextWidth(word);
   const box = underMarkBox(rect, words, 0, s, false, false, lifted);
   const fits = words + 10 * s <= rect.w - 4 * s;
-  const text = fits ? BLANK_WORD : "B";
+  const text = fits ? word : (shortGlyph(word) ?? word.slice(0, 1));
   const width = fits ? box.width : box.height;
   const x = box.x + (box.width - width) / 2;
   const shown = fonts.badge.getTextWidth(text);

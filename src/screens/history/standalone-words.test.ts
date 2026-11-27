@@ -27,5 +27,6 @@ describe("standalone list words", () => {
     expect(outcomeLines({ outcome: "lost", reason: "The One Ring left play", rounds: 3 })).toEqual(["The One Ring left play.", "3 rounds completed."]);
     // The final game, when at hand, says why each seat went out after the engine's reason.
     expect(outcomeLines({ outcome: "lost", reason: "No seats remain", rounds: 4 }, "Every player is eliminated. Player 1's threat reached 50.")).toEqual(["Every player is eliminated. Player 1's threat reached 50.", "4 rounds completed."]);
+    expect(outcomeLines({ outcome: "lost", reason: "No seats remain", rounds: 4 })).toEqual(["Every player is eliminated.", "4 rounds completed."]);
   });
 });

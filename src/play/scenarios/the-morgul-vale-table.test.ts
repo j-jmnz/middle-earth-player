@@ -72,6 +72,12 @@ describe("the To the Tower dial (06147:A:3)", () => {
     expect(nine?.word).toBe("9/10");
   });
 
+  it("the tap on the dial shows the card, and its preview says the dial's warning from 7 tokens", () => {
+    expect(detail(made, withTokens(made, 6), tower)).not.toContain("more progress token");
+    expect(detail(made, withTokens(made, 7), tower)).toContain("3 more progress tokens on To the Tower lose the game.");
+    expect(detail(made, withTokens(made, 9), tower)).toContain("One more progress token on To the Tower loses the game.");
+  });
+
   it("says what places and removes tokens, for both seats, and The White Bridge's X", () => {
     const two = table({ seats: 2, staging: [tower, bridge] });
     expect(dials(two, withTokens(two, 4))[0]?.note).toBe(
@@ -224,6 +230,17 @@ describe("the Bodyguard, the Nazgûl and the attack sheets (06148:A:1, 06153:A:2
   it("the Bodyguard's own preview says whose damage it takes and how much it holds", () => {
     const made = table({ staging: [tower, { code: bodyguard, damage: 2 }, { code: bodyguard }] });
     expect(detail(made, opened(made).state, bodyguard)).toBe("While it is in play, damage meant for a Captain goes whole to the Morgul Bodyguard with the most damage. The Bodyguard's own Defense does not reduce it. 2 Morgul Bodyguards in play. This one has 2 of 6 damage.");
+  });
+
+  it("the Bodyguard that shields a Captain says so in its preview", () => {
+    const made = table({ engaged: [murzag], staging: [tower, { code: bodyguard, damage: 2 }, { code: bodyguard }] });
+    const guards = Object.values(made.state.cards).filter((card) => card.code === bodyguard);
+    const shielding = guards.find((card) => card.damage === 2)?.id ?? "";
+    const other = guards.find((card) => card.damage === 0)?.id ?? "";
+    const state = opened(made).state;
+    const text = (id: string) => previewCards(state, made.ctx, id, describe_(made), idName(made, state), [], ledgerLine).cards.find((card) => card.code === bodyguard)?.detail ?? "";
+    expect(text(shielding)).toContain("This one takes the damage meant for a Captain now.");
+    expect(text(other)).not.toContain("takes the damage meant for a Captain now");
   });
 
   it("an enemy that goes back to the staging area by a shadow card, or by Morgul Vale at the end of the round, says so in the banner and the log", () => {

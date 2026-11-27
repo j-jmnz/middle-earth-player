@@ -9,6 +9,7 @@ import Animated, { FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withSequen
 // Split by platform (Skia on a phone, CSS on the web), so imported without its extension.
 import { ArcRing } from "../../ui/arc-ring";
 import { useFocusRing } from "../../ui/focus-ring.ts";
+import { DialIcon } from "./dial-icon.tsx";
 import { GameIcon } from "../../ui/game-icon.tsx";
 import type { IconName } from "../../ui/icon-map.ts";
 import type { LogMark } from "../store/log.ts";
@@ -51,7 +52,7 @@ function dialLook(t: TableTokens, dial: { threat: number; eliminated: boolean; e
       : dial.warn || dial.elimination
         ? dialOf(t)[level]
         : { edge: t.accent, fill: t.night, meter: t.accent };
-  // The icon beside the number wears the ring's own meaning: a goal or a plain count in the accent (Rescued Villagers), a seat that is out muted, the danger tint where the dial counts toward a loss, on the solid threat red once critical.
+  // The icon beside the number wears the ring's own meaning: a goal or a plain count in the accent (a vector icon; a raster token takes no tint), a seat that is out muted, the danger tint where the dial counts toward a loss, on the solid threat red once critical.
   const tint: TableToken = dial.eliminated ? "muted" : dial.goal || !(dial.warn || dial.elimination) ? "accent" : level === "critical" ? "onThreat" : "danger";
   return { own, level, look, tint };
 }
@@ -306,7 +307,7 @@ function ThreatDial({
               <Text testID={`${id}-value`} className="font-display" numberOfLines={shown == null ? undefined : 1} adjustsFontSizeToFit={shown != null} minimumFontScale={0.6} style={{ fontSize: (shown == null ? 20 : 12) * s, lineHeight: (shown == null ? 24 : 16) * s, color: critical ? t.onThreat : t.depth === "light" ? t.bone : t.onThreat }}>
                 {shown ?? String(threat.threat)}
               </Text>
-              {icon && icon !== "threat" ? <GameIcon name={icon} size={9 * s} tint={tint} /> : null}
+              {icon && icon !== "threat" ? <DialIcon name={icon} size={9 * s} tint={tint} critical={critical} t={t} s={s} /> : null}
             </View>
           </ArcRing>
           {/* A tick on the ring at each staging enemy's engagement cost: bone where the threat has reached it, faint where not yet. */}

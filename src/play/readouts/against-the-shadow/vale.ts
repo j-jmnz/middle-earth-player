@@ -27,6 +27,7 @@ import {
   nazgulWords,
   SHIELD_WORD,
   shieldMarkWords,
+  shieldNowWords,
   shieldReadout,
   shieldWords,
   stageLines,
@@ -137,8 +138,12 @@ export function valeDetail(game: ScenarioState, ctx: ReduceContext, cardId: stri
     if (card.code === NAZGUL) parts.push(nazgulWords(guards));
     return parts.join(" ");
   }
-  if (card.code === BODYGUARD && inPlay(card.zone)) return bodyguardWords(guards, card.damage, printedOf(ctx.cards, card.code).health ?? 0);
-  if (card.code === TOWER && card.zone === "staging") return towerWords(card.progress);
+  if (card.code === BODYGUARD && inPlay(card.zone)) {
+    const words = bodyguardWords(guards, card.damage, printedOf(ctx.cards, card.code).health ?? 0);
+    return valeShieldMark(game, cardId) ? `${words} ${shieldNowWords}` : words;
+  }
+  // The dial opens this preview on a tap, so the warning the dial gives a screen reader is on it too, for a player who sees it.
+  if (card.code === TOWER && card.zone === "staging") return card.progress >= TOWER_NEAR ? `${towerWords(card.progress)} ${towerWarn(card.progress)}` : towerWords(card.progress);
   if (card.code === BRIDGE && inPlay(card.zone)) return bridgeWords(towerTokens(game), card.zone !== "staging");
   return null;
 }
