@@ -3,6 +3,7 @@ import { DIRE_VALOUR_SHIFT } from "../../families/black-gate/dire.ts";
 import { firstPlayerFor } from "../../families/breaking/areas.ts";
 import { spendablePools } from "../../families/costs/verbs.ts";
 import { distinctTraitCount } from "../../families/misc/traits.ts";
+import { raiseEliminates } from "../../core/eliminate.ts";
 import { seatThreat } from "../../families/play/hooks.ts";
 import { alliesWillpowerHolds } from "../../families/sea/skirmisher.ts";
 import { lastHideFailed } from "../../families/nightmare/guards.ts";
@@ -29,6 +30,7 @@ export const playerHandlers = {
   alliesWillpower: (state, condition, scope, ctx) => alliesWillpowerHolds(state, scope.actor, condition.min, scope.sourceId, ctx),
   survivorsThreat: (state, condition) => livingSeats(state).every((seat) => (state.seats[seat]?.threat ?? 0) <= condition.max),
   seatThreat: (state, condition) => livingSeats(state).includes(condition.seat) && seatThreat(state, condition.seat) >= condition.min,
+  raiseEliminates: (state, condition) => raiseEliminates(state, condition.seat, condition.raise),
   anyThreat: (state, condition) => livingSeats(state).some((seat) => seatThreat(state, seat) <= condition.max),
   heroExhausted: (state, _condition, scope) => (state.seats[scope.actor]?.heroes ?? []).some((id) => state.cards[id]?.exhausted === true),
   otherPlayer: (state, _condition, scope) => livingSeats(state).some((seat) => seat !== scope.actor),

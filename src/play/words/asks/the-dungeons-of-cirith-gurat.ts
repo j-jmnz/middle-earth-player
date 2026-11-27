@@ -3,15 +3,14 @@ import type { Ask } from "../asks.ts";
 // The choice words of The Dungeons of Cirith Gurat (haradrim part 8), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario the-dungeons-of-cirith-gurat --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=the-dungeons-of-cirith-gurat` prints each sentence.
 import type { Condition } from "../../../catalog/boundary.ts";
-import { ELIMINATION_LEVEL } from "../../../rules/core/eliminate.ts";
 
 const ALLY: Condition = { kind: "matches", card: "picked", pick: { type: "ally", control: "any" } };
 const HERO: Condition = { kind: "matches", card: "picked", pick: { type: "hero", control: "any" } };
 
-// The Gate of Iron's Travel raises every player's threat by 3: the warning holds when any living player (seatThreat reads only a living one) would reach the level, and names each such player.
+// The Gate of Iron's Travel raises every player's threat by 3: the warning holds when the raise takes any living player to its own elimination level, and names each such player (`raiseEliminates`, one read for the condition and for `{eliminated}`, words/asks-held.ts).
 const RAISE = 3;
-const ANY_ELIMINATED: Condition = { kind: "any", conditions: [0, 1, 2, 3].map((seat) => ({ kind: "seatThreat" as const, seat, min: ELIMINATION_LEVEL - RAISE })) };
-const ELIMINATED_BY_THREAT = { when: ANY_ELIMINATED, text: "Tap again: this takes the threat of {eliminated} to 50 or more and eliminates them. If no player is left, the game is lost" };
+const ANY_ELIMINATED: Condition = { kind: "any", conditions: [0, 1, 2, 3].map((seat) => ({ kind: "raiseEliminates" as const, seat, raise: RAISE })) };
+const ELIMINATED_BY_THREAT = { when: ANY_ELIMINATED, text: "Tap again: this takes the threat of {eliminated} to the elimination level and eliminates them. If no player is left, the game is lost" };
 // A character a pick captures loses its tokens and attachments (17119:A:2).
 const LOSES = "loses its tokens and attachments";
 

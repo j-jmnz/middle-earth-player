@@ -3,6 +3,7 @@
 // The engine decided each fact; nothing here changes one. No control types damage, resources, threat, progress or life.
 import { describe, expect, it } from "vitest";
 
+import type { Instruction } from "../../catalog/boundary.ts";
 import { updateCard } from "../../rules/core/state.ts";
 import { idOf, legalIntents, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
 import { expectOk } from "../../rules/core/test-fixture.ts";
@@ -19,6 +20,10 @@ import { deepestUnder, HELD_STRIP, placeUnder } from "../layout/slots.ts";
 import type { CardSlot } from "../layout/layout.ts";
 import { zoneSelector } from "../store/selectors.ts";
 import { discardValues, pickedValues, whoseWords } from "../words/asks-held.ts";
+import { asksOption } from "../words/asks.ts";
+import { ASKS } from "../words/asks/the-dungeons-of-cirith-gurat.ts";
+import { effectById } from "../../rules/windows/listen.ts";
+import { walk } from "../../../test/harness/record-walk.ts";
 import { attachedWords } from "../words/scenarios/haradrim/capture.ts";
 
 const ABAAN = "17120";
@@ -115,6 +120,10 @@ describe("the characters an encounter card holds", () => {
     expect(words).toContain("Gandalf is captured by Captured!");
     expect(words).toContain("dh1 is guarded by Jailer of Cirith Gurat");
     expect(words).not.toContain("Captive");
+    // A seat that holds an ally and a hero wears the mark of the one whose words come last, not of the first it found.
+    const mark = dials.find((dial) => dial.seat === 0)?.mark;
+    expect(mark).toBe(words.endsWith("Gandalf is captured by Captured!") ? "ally" : "hero");
+    expect(words.indexOf("Gandalf")).not.toBe(words.indexOf("dh1"));
   });
 
   it("17121:A:1 gives the dial of a seat that lost only an ally the ally mark, with the words it says, and a held hero the hero mark", () => {
@@ -126,9 +135,10 @@ describe("the characters an encounter card holds", () => {
   });
 
   it("17120:A:3 marks the dial of the seat that controls a freed Abaan, as Derufin's is, two-handed and alone", () => {
-    const two = at({ stage: "17133", play: [ABAAN] });
+    const two = at({ stage: "17133", staging: ["17119"], play: [ABAAN] });
+    expect(capturedHands(at({ stage: "17133", play: [ABAAN] }).state), "without The Captives of Cirith Gurat in play").toEqual([]);
     expect(capturedHands(two.state)).toEqual([{ seat: 0, label: "P1 · Abaan", note: "Abaan: if he leaves play the players lose the game." }]);
-    expect(capturedHands(at({ seats: 1, stage: "17133", play: [ABAAN] }).state).map((mark) => mark.label)).toEqual(["Abaan"]);
+    expect(capturedHands(at({ seats: 1, stage: "17133", staging: ["17119"], play: [ABAAN] }).state).map((mark) => mark.label)).toEqual(["Abaan"]);
     expect(capturedHands(held().state)).toEqual([]);
   });
 
@@ -168,6 +178,25 @@ describe("the words of the choices that capture and discard", () => {
     const solo = at({ seats: 1, threat: [48, 0] });
     expect(discardValues(solo.state, solo.ctx, names(solo), wanted, 3).eliminated).toBe("you");
     expect(discardValues(t.state, t.ctx, names(t), wanted, 0).eliminated).toBe("nobody");
+  });
+
+  it("17124:A:2 warns of the elimination only for a seat the raise of 3 takes to its own level, with the names the same reader gives", () => {
+    const gate = (layout: Layout) => {
+      const t = at(layout);
+      let choose: Instruction | undefined;
+      walk(effectById(t.ctx, "17124:travel:1")!.instructions, (instruction, _next, _after, path) => {
+        if (path === "2" && instruction.verb === "Choose") choose = instruction;
+      });
+      return asksOption({ game: t.state, ctx: t.ctx, names: names(t), instruction: choose!, source: idOf(t.state, "17124"), effectId: "17124:travel:1", options: [] }, "threat", ASKS)?.caution;
+    };
+    expect(gate({ staging: ["17124"], threat: [30, 28] })).toBeUndefined();
+    expect(gate({ staging: ["17124"], threat: [46, 28] })).toBeUndefined();
+    expect(gate({ staging: ["17124"], threat: [47, 28] })).toBe("Tap again: this takes the threat of Player 1 to the elimination level and eliminates them. If no player is left, the game is lost");
+    expect(gate({ staging: ["17124"], threat: [47, 47] })).toContain("of Player 1 and Player 2 to");
+    expect(gate({ staging: ["17124"], seats: 1, threat: [47, 0] })).toContain("of you to");
+    // A level lowered by 5 (45): 43 plus 3 eliminates there, and 41 plus 3 does not.
+    expect(gate({ staging: ["17124"], threat: [43, 28], eliminationReduction: 5 })).toContain("of Player 1 to");
+    expect(gate({ staging: ["17124"], threat: [41, 28], eliminationReduction: 5 })).toBeUndefined();
   });
 
   it("17131:A:1 says whose a picked ally is and what it costs, two-handed and alone", () => {

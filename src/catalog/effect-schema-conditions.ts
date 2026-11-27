@@ -150,15 +150,15 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("damageHere"), max: z.number().int().min(0) }),
   // The amount `left` is less than the amount `right`: "If that character's printed Willpower is less than the discarded card's Threat" (142058:A:2).
   z.strictObject({ kind: z.literal("less"), left: amountSchema, right: amountSchema }),
-  // Each surviving player's threat is at most `max` ("1 XP if each surviving player's threat is 40 or less", dcce.gaining-xp): read at a campaign
-  // card's Resolution, true with no surviving player.
+  // Each surviving player's threat is at most `max` ("1 XP if each surviving player's threat is 40 or less", dcce.gaining-xp): read at a campaign card's Resolution, true with no surviving player.
   z.strictObject({ kind: z.literal("survivorsThreat"), max: z.number().int().min(0) }),
   // Some living player's threat is at most `max` ("if any player's threat is 20 or less", 08081:A:1): read in the effect that runs, whichever player it acts for.
   z.strictObject({ kind: z.literal("anyThreat"), max: z.number().int().min(0) }),
   // The living player in seat `seat` (0 for Player 1) has a threat of at least `min`: a warning that names the player a raise would eliminate (Chaos in the Night, 17103:A:1). False for a seat that is not in the game or is eliminated.
   z.strictObject({ kind: z.literal("seatThreat"), seat: z.number().int().min(0), min: z.number().int().min(0) }),
-  // The attack that left this effect for its end (AfterAttack), or the damage the answered event placed, dealt at least `min` damage (1 by default):
-  // "If this attack deals damage to a Ship objective" (11051:A:2; read with a `matches` condition on the defender).
+  // The living player in seat `seat` would reach its threat elimination level (50, or the level the game now holds) if its threat rose by `raise`: the same read as the names of the players such a raise eliminates (The Gate of Iron, 17124:A:2). False for a seat that is not in the game or is eliminated.
+  z.strictObject({ kind: z.literal("raiseEliminates"), seat: z.number().int().min(0), raise: z.number().int().min(1) }),
+  // The attack that left this effect for its end (AfterAttack), or the damage the answered event placed, dealt at least `min` damage (1 by default): "If this attack deals damage to a Ship objective" (11051:A:2; read with a `matches` condition on the defender).
   // The attack that left this effect for its end sent at least `min` damage on past its defender (excessToShip; 11055:A:2).
   // The heal or ready the effect answers was made by a player card's effect (11217:B:3), not by a rule, the refresh phase or an encounter card.
   z.strictObject({ kind: z.literal("byPlayerCard") }),

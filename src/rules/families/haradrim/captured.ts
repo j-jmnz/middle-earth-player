@@ -8,7 +8,7 @@ import type { Instruction, PickSpec } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { destroyCard, releaseAttachments } from "../../core/destroy.ts";
 import { uniqueBlocked } from "../../core/keywords.ts";
-import { printedOf } from "../../core/printed.ts";
+import { isSideQuestType, printedOf } from "../../core/printed.ts";
 import { flagged, inPlay, livingSeats, updateCard, type CardInstance, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { frameScope, refCard, type AmountScope } from "../../interpret/amounts.ts";
@@ -88,7 +88,9 @@ function release(state: ScenarioState, card: CardInstance, ctx: ReduceContext, s
 export function rescueCaptured(state: ScenarioState, instruction: Verb<"RescueCaptured">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const hostId = instruction.host === "self" ? focus.sourceId : refCard(state, "subject", frameScope(state, focus.seat, focus.sourceId));
   const held = hostId ? captivesHeldBy(state, hostId) : [];
-  if (held.length === 0) return state;
+  // A side quest that goes to the victory display frees its captives in its own defeat, after its reward (Captured!, 17131:A:2): the Captives' Forced on its leaving play leaves them (an enemy in the victory display is freed here).
+  const quest = hostId != null && instruction.host !== "self" && state.cards[hostId]?.zone === "victory" && isSideQuestType(printedOf(ctx.cards, state.cards[hostId]?.code ?? "").type);
+  if (held.length === 0 || quest) return state;
   const next = held.reduce((current, card) => release(current, card, ctx, steps), state);
   return next.questStage ? queueEvent(next, { trigger: "charactersRescued", seat: null, subject: next.questStage }) : next;
 }

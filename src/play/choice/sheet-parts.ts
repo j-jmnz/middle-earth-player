@@ -33,6 +33,12 @@ export function rowStats(game: ScenarioState, ctx: ReduceContext, id: string, ki
   return kinds.flatMap((kind): SheetStat[] => (kind === "threat" ? statOf(game, ctx, id, "threat") : cost == null ? [] : [{ icon: "engagementCost", value: cost, word: "Engagement cost" }]));
 }
 
+/** The stats a row of a pick shows, as a sheet option takes them (`{ stats }`, none for none): the lists the row already has (a Willpower, the Eye icons, a Sack tie) and then the enemy stats its entry's `rowStats` names. */
+export function statsOf(game: ScenarioState, ctx: ReduceContext, id: string, kinds: readonly ("threat" | "engagementCost")[] | undefined, ...lists: readonly (readonly SheetStat[])[]): { stats?: SheetStat[] } {
+  const stats = [...lists.flat(), ...rowStats(game, ctx, id, kinds)];
+  return stats.length > 0 ? { stats } : {};
+}
+
 /** A card's name as a tile or row reads it; a Lost Island's is followed by what tells it from the others (progress, place in staging). */
 export function cardLabel(game: ScenarioState, names: SheetNames, id: string): string {
   const card = game.cards[id];

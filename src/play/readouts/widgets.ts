@@ -91,8 +91,8 @@ export function heldDials(game: ScenarioState, nameOf: (code: string) => string,
     const host = card.host ? game.cards[card.host] : undefined;
     const words = stagedDial(game, card, nameOf) ?? `${nameOf(card.code)} is a Captive${host ? ` ${isEnemy(host.code) ? "held by" : "under"} ${nameOf(host.code)}` : ""}`;
     const before = dials.get(card.owner);
-    // An ally an enemy holds wears the ally mark and says its words on the dial; a hero wears the hero mark.
-    dials.set(card.owner, { seat: card.owner, words: before ? `${before.words}. ${words}` : words, mark: before?.mark ?? (isHeldCharacter(card) ? "ally" : "hero") });
+    // An ally an enemy holds wears the ally mark and says its words on the dial; a hero wears the hero mark. A seat that holds several wears the mark of the one held last, whose words come last.
+    dials.set(card.owner, { seat: card.owner, words: before ? `${before.words}. ${words}` : words, mark: isHeldCharacter(card) ? "ally" : "hero" });
   }
   for (const gollum of [...gollumHeld(game), ...guardianHeld(game)]) {
     const before = dials.get(gollum.seat);

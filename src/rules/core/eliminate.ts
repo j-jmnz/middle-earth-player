@@ -4,6 +4,7 @@ import { threatSaved } from "../families/quest/threat.ts";
 import { GOLLUM, SMEAGOL, isGollum } from "../families/gollum/index.ts";
 import { DIRE_ELIMINATION_LEVEL } from "../families/black-gate/dire.ts";
 import { heroWaiting } from "../families/deck/hero.ts";
+import { seatThreat } from "../families/play/hooks.ts";
 import { discardArea } from "../families/breaking/areas.ts";
 import { discardIsolated } from "../families/breaking/barrow.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
@@ -142,6 +143,11 @@ export function eliminateSeat(state: ScenarioState, index: number, steps: Engine
 /** The threat at which a seat is eliminated: 99 while the main quest is Dire (mec113.dire), lowered by a card the seat holds (The One Ring, families/misc.ts). */
 export function eliminationLevel(state: ScenarioState, seat: number): number {
   return (state.dire ? DIRE_ELIMINATION_LEVEL : ELIMINATION_LEVEL) - Math.max(0, heldAmount(state, `seat:${seat}`, "eliminationReduction"));
+}
+
+/** Whether a living seat would reach its elimination level if its threat rose by `raise`: the one read the words of a raise and the condition `raiseEliminates` share. */
+export function raiseEliminates(state: ScenarioState, seat: number, raise: number): boolean {
+  return livingSeats(state).includes(seat) && seatThreat(state, seat) + raise >= eliminationLevel(state, seat);
 }
 
 // `final`: the play sweep has already let an ally gain the hero card type, so a seat in heroSavers with no heroes is eliminated now.

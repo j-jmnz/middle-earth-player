@@ -364,7 +364,7 @@ describe("the captives and the cards that take them", () => {
     expect(defeated.cards[idOf(defeated, ARCHER)]).toMatchObject({ zone: "play", controller: 0, exhausted: true });
   });
 
-  it("17131:A:2 Captured! that leaves play in any other way frees its allies too, with no reward, and none is left in the captive zone", () => {
+  it("17119:A:3 Captured! that leaves play in any other way frees its allies too, by the Captives' Forced, with no reward, and none is left in the captive zone", () => {
     const made = table({ seats: 2, play: [ARCHER, { code: AXEHAND, seat: 1 }], staging: [CAPTIVES], threat: [35, 30], deck: ["f3", "f3"] });
     const revealed = settle(resolveRecords(opened(made).state, made.ctx, "17131", "whenRevealed").state, made.ctx, none);
     const quest = idOf(revealed, "17131");
