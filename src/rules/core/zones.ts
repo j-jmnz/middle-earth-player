@@ -411,8 +411,8 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   if ((current.zone === "play" || current.zone === "heroes" || current.zone === "attached" || (current.zone === "staging" && state.modifiers.length > 0 && flagged(state, id, "guardedAlly"))) && !inPlay(dest.zone)) moved = queueEvent(moved, { trigger: "leftPlay", seat: current.controller, cardId: id });
   // A card that holds the sponge (Forbidden Descent, 10101:A:2) leaves play from the staging area: announced to its own Forced effect, whether it was explored there by progress or discarded.
   if (current.zone === "staging" && !inPlay(dest.zone) && flagged(state, id, "progressSponge")) moved = queueEvent(moved, { trigger: "leftStagingArea", seat: null, cardId: id });
-  // An enemy that guards a hero (Carried Away, 18074:B:2) is announced when it leaves play in any way; only a game that holds such a hero asks.
-  if ((current.zone === "engaged" || current.zone === "staging") && !inPlay(dest.zone) && Object.values(moved.cards).some((card) => heldHero(card) && card.host === id)) moved = queueEvent(moved, { trigger: "leftPlay", seat: null, cardId: id });
+  // An enemy or location that holds a hero or ally (Carried Away, 18074:B:2; the captives of Cirith Gurat) is announced when it leaves play in any way; only a game that holds such a captive asks.
+  if ((current.zone === "engaged" || current.zone === "staging" || current.zone === "activeLocation") && !inPlay(dest.zone) && Object.values(moved.cards).some((card) => heldHero(card) && card.host === id)) moved = queueEvent(moved, { trigger: "leftPlay", seat: null, cardId: id });
   // A card a player card put out of play under itself "while ~ is in play" comes back to the staging area when it leaves (07003:A:3).
   if ((current.zone === "play" || current.zone === "heroes") && !inPlay(dest.zone)) for (const under of cardsUnder(moved, id)) moved = updateCard(moveCard(moved, under, { zone: "staging" }), under, { face: "up" });
   // An enemy that leaves play takes its dealt shadow cards to the encounter discard (Learn to Play p16).

@@ -327,8 +327,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The characters the actor controls have at least `min` different Traits between them ("a total of at least 9 different Traits
   // between them", 17064:A:1).
   z.strictObject({ kind: z.literal("distinctTraits"), min: z.number().int().positive() }),
-  // The actor engaged an enemy this round (`is`), or did not ("If you have not engaged an enemy this round", 08056:A:2).
-  z.strictObject({ kind: z.literal("engagedThisRound"), is: z.boolean() }),
+  // The actor engaged an enemy this round (`is`), or did not ("If you have not engaged an enemy this round", 08056:A:2); `anySeat`: any player did ("if no enemies were engaged this round", 17133:B:2).
+  z.strictObject({ kind: z.literal("engagedThisRound"), is: z.boolean(), anySeat: z.literal(true).optional() }),
   // The burden deck holds at least `min` cards (1 by default): "shuffle the top card of the burden deck into the encounter deck".
   z.strictObject({ kind: z.literal("burdenDeck"), min: z.number().int().positive().optional() }),
   // The scenario is played in Campaign Mode, which is when its campaign card is in the game (rr.campaign-cards): "Use this

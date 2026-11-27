@@ -8,6 +8,7 @@ import { engagedThisPhase } from "../../families/quest/conditions.ts";
 import { seatThreat } from "../../families/play/hooks.ts";
 import { modifiedStat, versusDefender, versusHighEngagement } from "../../core/modified-stat.ts";
 import { printedOf } from "../../core/printed.ts";
+import { livingSeats } from "../../core/state.ts";
 import { hostOf } from "../amounts.ts";
 import type { ConditionHandlers } from "../condition-scope.ts";
 
@@ -39,7 +40,7 @@ export const combatHandlers = {
     const id = scope.holderId ?? (condition.card === "host" ? hostOf(state, scope.sourceId) : condition.card === "subject" ? scope.subject : scope.sourceId);
     return attackingHolds(state, condition, id ? state.cards[id] : undefined, ctx, scope.against);
   },
-  engagedThisRound: (state, condition, scope) => engagedThisRound(state, scope.actor) === condition.is,
+  engagedThisRound: (state, condition, scope) => (condition.anySeat === true ? livingSeats(state).some((seat) => engagedThisRound(state, seat)) : engagedThisRound(state, scope.actor)) === condition.is,
   engagedThisPhase: (state, condition) => engagedThisPhase(state) === condition.is,
   // The combat step a card may be played in (09008, 02118, 143012).
   combatStep: (state, condition) => combatStepIs(state, condition.is),

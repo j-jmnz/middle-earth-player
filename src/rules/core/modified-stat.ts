@@ -34,6 +34,8 @@ export function modifiedStat(
   if (stat === "defense" && defenseFromWillpower(state, instance, cards)) return modifiedStat(state, instance, "willpower", cards, against);
   // "During the encounter phase, treat each enemy's engagement cost as if it were 0" (41005:B:1).
   if (stat === "engagementCost" && state.phase === "Encounter" && flagged(state, "table", "engagementCostZero")) return 0;
+  // "Reduce the engagement cost of each enemy not guarding an objective to 0 during these engagement checks" (17134:A:1): an enemy that holds no captive.
+  if (stat === "engagementCost" && state.modifiers.length > 0 && flagged(state, "table", "engagementCostZeroUnguarded") && !Object.values(state.cards).some((other) => other.captive === true && other.host === instance.id)) return 0;
   const printed = printedOf(cards, instance.code);
   // The Threat of the enemies grappled with a location is added to it (dcce.grapple).
   let total = printedStat(printed, stat, instance.face) + (stat === "threat" ? grappleThreat(state, instance.id) : 0);
