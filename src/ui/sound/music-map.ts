@@ -167,6 +167,7 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "the-antlered-crown": { calm: "rohan", combat: "isengard" },
   "the-mumakil": { calm: "fangorn", combat: "pelennor" },
   "race-across-harad": { calm: "rohan", combat: "uruk" },
+  "beneath-the-sands": UNDERGROUND,
 };
 
 /** The loop a table plays: its scenario's combat loop during the Combat phase, its calm loop otherwise, and the menu's for a scenario with no pair. */

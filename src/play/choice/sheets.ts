@@ -5,6 +5,7 @@
 // legalTargets list, or a number the engine computed (the Hide numbers, an attack and a defense). Nothing here writes a
 // number: a sheet names who does something, the reducer decides what happens.
 import type { Effect } from "../../catalog/boundary.ts";
+import { defeatSentence } from "../../rules/core/elimination-words.ts";
 import { comparisonLossNote } from "../readouts/against-the-shadow/amon-din.ts";
 import { effectById, effectsOf } from "../../rules/windows/listen.ts";
 import { endedInDefeat } from "../../rules/core/eliminate.ts";
@@ -144,7 +145,7 @@ export function wonSheet(game: ScenarioState): Sheet {
 
 export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonly LegalIntent[], names: SheetNames): Sheet | null {
   if (game.lost) {
-    return { kind: "outcome", key: "lost", result: "lost", step: "Scenario", title: "Defeat", note: comparisonLossNote(game) ?? (game.lossReason ? `${game.lossReason}.` : "The scenario is lost."), action: "Continue" };
+    return { kind: "outcome", key: "lost", result: "lost", step: "Scenario", title: "Defeat", note: comparisonLossNote(game) ?? defeatSentence(game), action: "Continue" };
   }
   if (game.stageCleared) return wonSheet(game);
   // A Sailing test being asked: the first player's commit, then one shift-or-keep for each success symbol (sea-sheets.ts).

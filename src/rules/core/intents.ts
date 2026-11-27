@@ -58,6 +58,10 @@ export type EngineStep =
   | { kind: "reshuffleDeck"; deck: string; count: number; cause: Cause }
   // Discover X resolved for the active location: the cards looked at (top of the encounter deck first), the Loot objective attached to it as a guarded objective and the Hazard card revealed, if any (emce.discover). The rest went to the encounter discard pile.
   | { kind: "discover"; locationId: string; looked: readonly string[]; loot?: string; hazard?: string; cause: Cause }
+  // Beneath the Sands' Track keyword resolved (hrd.track): the location (`locationId`, null when no card ran it), the Track value, the encounter cards discarded (top first), those of them that print On Track, and whether the Search objective flipped to On Track.
+  | { kind: "track"; locationId: string | null; amount: number; discarded: readonly string[]; marked: readonly string[]; flipped: boolean; cause: Cause }
+  // The Search objective flipped to `to` (hrd.search-objective): the objective card, which keeps its place and shows its other side.
+  | { kind: "searchFlip"; cardId: string; to: "onTrack" | "offTrack"; cause: Cause }
   // A card from the encounter discard pile was set aside for the Resolution to add a copy of to the campaign pool (A Growing Threat, 12167:A:2; emce.campaign-pool-encounter): the card that did it and the card set aside.
   | { kind: "setAsideForPool"; sourceId: string; cardId: string; cause: Cause }
   // A card of a player's hand was put facedown underneath a card in play (Discovered!, 08134:A:2): hidden, so the line never names it.

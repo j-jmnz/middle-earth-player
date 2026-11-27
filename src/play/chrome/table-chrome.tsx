@@ -256,8 +256,12 @@ function ThreatDial({
     return () => clearTimeout(timer);
   }, [change]);
   const pop = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));
-  const delta = change && word == null ? threatDelta(change.before, change.after) : null;
-  const deltaWords = change && word == null ? threatDeltaWords(name, change.before, change.after) : null;
+  // A seat that left the game wears the word "Out" on its dimmed dial, where a sighted player reads its number (the spoken label says "eliminated").
+  const shown = word ?? (threat.eliminated ? "Out" : undefined);
+  // A seat that is out wears "Out" and no change: its threat no longer counts.
+  const moved = change != null && word == null && !threat.eliminated;
+  const delta = moved ? threatDelta(change.before, change.after) : null;
+  const deltaWords = moved ? threatDeltaWords(name, change.before, change.after) : null;
   const critical = level === "critical" && !threat.eliminated;
   // The words for a dial near its limit: its own warning first, then what the number alone says.
   const losesAtLimit = limit != null && eliminates !== true;
@@ -297,8 +301,8 @@ function ThreatDial({
               }}
             >
               {/* The disc is 38·s wide and counts on the word fitting (Day, Night): one line, shrunk to the disc at the phone's larger text sizes (docs/design-system.md, Type). */}
-              <Text testID={`${id}-value`} className="font-display" numberOfLines={word == null ? undefined : 1} adjustsFontSizeToFit={word != null} minimumFontScale={0.6} style={{ fontSize: (word == null ? 20 : 12) * s, lineHeight: (word == null ? 24 : 16) * s, color: critical ? t.onThreat : t.depth === "light" ? t.bone : t.onThreat }}>
-                {word ?? String(threat.threat)}
+              <Text testID={`${id}-value`} className="font-display" numberOfLines={shown == null ? undefined : 1} adjustsFontSizeToFit={shown != null} minimumFontScale={0.6} style={{ fontSize: (shown == null ? 20 : 12) * s, lineHeight: (shown == null ? 24 : 16) * s, color: critical ? t.onThreat : t.depth === "light" ? t.bone : t.onThreat }}>
+                {shown ?? String(threat.threat)}
               </Text>
               {icon && icon !== "threat" ? <GameIcon name={icon} size={9 * s} tint="danger" /> : null}
             </View>

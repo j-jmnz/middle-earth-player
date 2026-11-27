@@ -23,6 +23,7 @@ import { placeQuestingProgress, type QuestDamageCause } from "../families/defens
 import { travelsOverActive } from "../families/grapple/travel.ts";
 import { exploreIfFull, freeSlot, makeActiveIn, placeOnActive } from "../families/south/locations.ts";
 import { noteQuestPlaced, questRoom } from "../families/caves/progress.ts";
+import { mainQuestBlocked } from "../families/haradrim/track.ts";
 import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts";
 import { attachedStageFrom, branchFrom, holdStage, reached as reachedStage } from "../families/quest/branch.ts";
 import { leaveStage, nextInOrder, randomStageFrom } from "../families/wilderland/random-stage.ts";
@@ -251,6 +252,8 @@ export function putOnStage(from: ScenarioState, stageId: string, wanted: number,
   const { counted, reduced = true } = options;
   // "Progress cannot be placed here" (148003:B:1, while a Great Barrow is in play): the stage takes none, whatever places it.
   if (flagged(from, stageId, "noProgressPlaced")) return from;
+  // "Progress cannot be placed on the main quest." (17079:A:2): no main quest card takes any, whatever places it; a side quest that is the current quest still does.
+  if (mainQuestBlocked(from)) return from;
   // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1).
   const { state, remaining: absorbed } = absorbFirst(from, stageId, wanted, cards, steps);
   // Each Orc Grunts in play reduces the progress placed on the current quest by 1 (10130:A:2).

@@ -39,6 +39,7 @@ const TRIGGER: Readonly<Record<string, string>> = {
   lastTimeCounterRemoved: "after the last time counter is removed from a card, at the end of the refresh phase or by a card effect",
   timeCounterRemoved: "after a time counter is removed from the current quest, at the end of the refresh phase or by a card effect",
   afterStageRevealed: "after a quest stage is revealed and its When Revealed effects have resolved, a parallel stage that replaces the stage before fires it too; the flip of the opening stage in the Setup does not",
+  searchFlippedOff: "after the Search objective is flipped to Off Track (a flip to On Track does not fire it)",
   flipped: "after a card is flipped over (the FlipCard verb)",
   questSucceeded: "after the players quest successfully",
   enemyDestroyed: "after an enemy is destroyed",

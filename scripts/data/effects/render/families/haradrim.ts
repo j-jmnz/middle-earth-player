@@ -31,6 +31,20 @@ export const HARADRIM_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => M
   AddOrcsProgress: (i, ctx) => ({ text: `${amt(i.amount, ctx)} progress goes on the Orcs' current stage, no more than it needs; a full stage is defeated as OrcsProgress says`, read: ["amount"] }),
   TakeObjectiveAlly: (i) => ({ text: `the acting player takes control of one of the set-aside objective allies (${(Array.isArray(i.codes) ? i.codes : []).map(str).join(", ")}) into their play area, ready (asked only when different cards are left, copies of one card are one choice); it is an ally in play`, read: ["codes"] }),
   EliminateAfterAttack: () => ({ text: "the acting player is eliminated from the game by a card effect; while an enemy attack on that player is in progress the elimination waits until that attack has resolved (its end-of-attack effects and the Forced effects it announces resolve first)", read: [] }),
+  FlipSearchObjective: (i) => ({
+    text: `the Search objective in play flips to ${i.to === "onTrack" ? "On Track (each resource on it is discarded)" : i.to === "offTrack" ? "Off Track" : "no side"}${i.despiteBlock === true ? ", even while Lost Underground stops flips (this card's own flip)" : " (nothing while Lost Underground is in play; its constant also stops Track from resolving)"}; nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not`,
+    read: ["to", "despiteBlock"],
+  }),
+  ResolveTrack: (i) => ({
+    text: `Track ${str(i.amount)}: discard ${str(i.amount)} cards from the top of the encounter deck, shuffling the encounter discard pile into the deck each time the deck runs out and going on; if any discarded card is one that prints On Track in the lower right corner (codes ${(Array.isArray(i.marked) ? i.marked : []).map(str).join(", ")}), flip the Search objective to On Track; Track does not resolve at all while Lost Underground is in play (no card is discarded)`,
+    read: ["amount", "marked"],
+  }),
+  StageMarkedFromTop: (i) => ({
+    text: `look at the top ${str(i.count)} cards of the encounter deck (all of it with fewer): the first one that prints On Track in the lower right corner (codes ${(Array.isArray(i.marked) ? i.marked : []).map(str).join(", ")}) is added to the staging area, not revealed, and the others are discarded; with none found the Search objective flips to Off Track`,
+    read: ["count", "marked"],
+  }),
+  AddTopmostFromDiscard: (i) => ({ text: `the ${str(i.cardType)} put on the encounter discard pile last is added to the staging area (nothing with none there)`, read: ["cardType"] }),
+  SetAsideCode: (i) => ({ text: `the card with code ${str(i.code)} in play, wherever it lies, is set aside, out of play, with no damage (nothing when none is in play)`, read: ["code"] }),
   EngageSeatWithMost: (i, ctx) => ({ text: `this enemy engages the player engaged with the most ${pck(i.pick, ctx)} (the first player chooses among players that tie, all players at 0; nothing changes when it is already engaged with that player, else it moves to that player)`, read: ["pick"] }),
 };
 
@@ -53,6 +67,11 @@ export const HARADRIM_SAMPLES: Samples = {
   AddOrcsProgress: [{ verb: "AddOrcsProgress", amount: 2 }],
   TakeObjectiveAlly: [{ verb: "TakeObjectiveAlly", codes: ["17038"] }],
   EliminateAfterAttack: [{ verb: "EliminateAfterAttack" }],
+  FlipSearchObjective: [{ verb: "FlipSearchObjective", to: "onTrack" }, { verb: "FlipSearchObjective", to: "offTrack", despiteBlock: true }],
+  ResolveTrack: [{ verb: "ResolveTrack", amount: 3, marked: ["17066", "17067"] }],
+  StageMarkedFromTop: [{ verb: "StageMarkedFromTop", count: 3, marked: ["17066", "17067"] }],
+  AddTopmostFromDiscard: [{ verb: "AddTopmostFromDiscard", cardType: "location" }],
+  SetAsideCode: [{ verb: "SetAsideCode", code: "17065" }],
   EngageSeatWithMost: [{ verb: "EngageSeatWithMost", pick: { type: "enemy", control: "any", trait: "Orc", nonUnique: true } }],
 };
 
@@ -64,6 +83,7 @@ export const HARADRIM_CONDITIONS: ConditionTemplates = {
     text: `${c.is === "sameStage" ? "the players' main quest stage has the same number as the Orcs' stage" : c.is === "differentStage" ? "the players' main quest stage has another number than the Orcs' stage" : "the Orcs' stage"}${typeof c.at === "number" ? ` (and the Orcs' stage is stage ${c.at})` : ""} (a side quest as the current quest changes nothing; false in a game with no Orcs' area)`,
     read: ["is", "at"],
   }),
+  everySeatHasAlly: () => ({ text: "each living player controls an ally in play (read when the instruction starts, so before any discard that follows it)", read: [] }),
   threatAboveWillpower: () => ({ text: "the attacking enemy's current Threat is greater than the defending character's current Willpower (false when the attack has no defending character)", read: [] }),
 };
 
@@ -72,5 +92,6 @@ export const HARADRIM_CONDITION_SAMPLES: Samples = {
   temperature: [{ kind: "temperature", min: 40 }, { kind: "temperature", max: 39 }],
   locationExploredThisRound: [{ kind: "locationExploredThisRound" }],
   threatAboveWillpower: [{ kind: "threatAboveWillpower" }],
+  everySeatHasAlly: [{ kind: "everySeatHasAlly" }],
   orcsStage: [{ kind: "orcsStage", is: "sameStage" }, { kind: "orcsStage", is: "differentStage" }, { kind: "orcsStage", at: 2 }],
 };

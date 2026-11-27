@@ -49,6 +49,8 @@ export function lineTimings(line: string): Set<string> {
   if (/^Forced:\s+While\b/i.test(line.trim())) allowed.add("constant");
   // "Forced: When faced with the option to travel, if The Great Goblin is in the victory display the players must travel to Great Cavern Room if able." (131067:A:2) binds the travel step while the card is in the staging area: a constant Restrict, which has no event to answer.
   if (/^Forced:\s+When faced with the option to travel\b/i.test(line.trim())) allowed.add("constant");
+  // "When Revealed: Flip the Search objective to Off Track. While Lost Underground is in play, the Search objective cannot flip." (17075:A:1): the While sentence holds for as long as the card is in play, however its When Revealed went, so it is a constant of its own beside the When Revealed record.
+  if (label === "whenRevealed" && /\.\s+While [^,.]+ is in play, /.test(line)) allowed.add("constant");
   // A "(Counts as a ... attachment with the text: ...)" line also grants the attachment's own constant text, and so does an enemy that attaches itself "as a Tentacle attachment with the text: ..." (04073:A:1).
   if (/\bas an? (?:\w+ )?attachment/i.test(line)) allowed.add("constant");
   // A claimed objective's "(If detached, return Book of Mazarbul to the staging area.)" (03024:A:2) is a constant rule of its own beside the Action that claims it: the flag `returnsToStagingArea` (families/objectives/claimed.ts).

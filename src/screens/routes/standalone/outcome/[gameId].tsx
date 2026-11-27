@@ -31,7 +31,7 @@ export default function StandaloneOutcome() {
   const finished = useMemo(() => (session?.ok ? finishStandalone(session.stored, session.world, session.game) : (session?.stored ?? null)), [session]);
   const ended = session?.ok === true && finished?.result != null;
   // The details of the game, while its final state is at hand (a game reopened from the list keeps only its result).
-  const report = useMemo(() => (session?.ok && finished?.result ? gameReport(session.game, session.world.cards) : null), [session, finished]);
+  const report = useMemo(() => (session?.ok && finished?.result ? gameReport(session.game, session.world.cards, session.destroyedHeroes) : null), [session, finished]);
   useEffect(() => {
     if (!ended || !finished) return;
     writeStandalone(user, finished);
@@ -81,7 +81,7 @@ export default function StandaloneOutcome() {
       </View>
     ) : (
       <View className="mt-6 gap-1" testID="outcome-lines">
-        {outcomeLines(result).map((line) => (
+        {outcomeLines(result, report?.lossReason).map((line) => (
           <BodyText key={line} tone="muted" className="text-center">
             {line}
           </BodyText>

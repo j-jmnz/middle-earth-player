@@ -98,7 +98,7 @@ export const pickSchema = z.strictObject({
   intoPlay: z.boolean().optional(),
   // The printed cost must be the X the event was played for (Stand and Fight).
   costIsX: z.boolean().optional(),
-  // Only the topmost card of each discard pile that matches (Erebor Hammersmith).
+  // Only the topmost card of each discard pile that matches (Erebor Hammersmith); of the encounter discard pile, the topmost card of the pick's type (the words of 17079:A:1).
   topmost: z.boolean().optional(),
   // Who chooses. The actor, unless the card says the first player does.
   who: z.enum(["actor", "firstPlayer"]).optional(),

@@ -3,7 +3,7 @@
 // resource on the campaign card, and the bottom of a deck (looked at, discarded).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { resetEncounterDeck } from "../../interpret/verbs.ts";
+import { reshuffleDiscard, resetEncounterDeck } from "../../interpret/verbs.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import { characters } from "../../combat/combat.ts";
 import { askTarget } from "../../windows/choices.ts";
@@ -139,19 +139,30 @@ export function discardCostlier(state: ScenarioState, instruction: Verb<"Discard
   return next;
 }
 
-/** DiscardEncounterTop: the top cards of the encounter deck go to its discard pile, face up; they are the cards the effect looked at. */
-export function discardEncounterTop(state: ScenarioState, instruction: Verb<"DiscardEncounterTop">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const count = resolveAmount(state, instruction.count, frameScope(state, focus.seat, focus.sourceId), ctx);
+/** How a discard from the top of the encounter deck meets an empty deck: `none` stops, `reset` refills it with the Nightmare reset (10097:A:1), `shuffle` shuffles the discard pile in at once in any phase (rr.running-out-of-cards). */
+export type TopRefill = "none" | "reset" | "shuffle";
+
+/** Discards up to `count` cards from the top of the encounter deck, face up, refilling an empty deck as `refill` says; returns the new state and the ids discarded, in order. */
+export function discardTopCards(state: ScenarioState, count: number, refill: TopRefill, steps: EngineStep[], ctx: ReduceContext, rule = "rr.running-out-of-cards"): { state: ScenarioState; ids: string[] } {
   let next = state;
   const ids: string[] = [];
   for (let taken = 0; taken < count; taken += 1) {
-    // A deck that ran out during the effect is reset before the next card is discarded (10097:A:1).
-    if (instruction.reset && next.encounterDeck.length === 0) next = resetEncounterDeck(next, steps, ctx);
+    if (next.encounterDeck.length === 0) {
+      if (refill === "reset") next = resetEncounterDeck(next, steps, ctx);
+      else if (refill === "shuffle") next = reshuffleDiscard(next, steps, rule);
+    }
     const id = next.encounterDeck[0];
     if (id === undefined) break;
     ids.push(id);
     next = updateCard(moveCard(next, id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });
   }
+  return { state: next, ids };
+}
+
+/** DiscardEncounterTop: the top cards of the encounter deck go to its discard pile, face up; they are the cards the effect looked at. A deck that ran out during the effect is reset before the next card is discarded (10097:A:1). */
+export function discardEncounterTop(state: ScenarioState, instruction: Verb<"DiscardEncounterTop">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const count = resolveAmount(state, instruction.count, frameScope(state, focus.seat, focus.sourceId), ctx);
+  const { state: next, ids } = discardTopCards(state, count, instruction.reset ? "reset" : "none", steps, ctx);
   const data = effectData(next);
   return data ? patchTop(next, { data: { ...data, looked: ids } }) : next;
 }

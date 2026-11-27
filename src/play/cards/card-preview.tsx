@@ -340,7 +340,7 @@ export function CardPreview({
       >
         {frame}
         {wide ? (
-          <Animated.View style={[{ flex: 1, maxWidth: 360 * s, marginLeft: 20 * s, maxHeight: size.height }, buttonsStyle]}>
+          <Animated.View style={[{ flex: 1, maxWidth: 360 * s, marginLeft: 20 * s, maxHeight: size.height, backgroundColor: t.night }, buttonsStyle]}>
             {/* Not a control of its own: a tap here reaches the scrim and closes the preview too; only Details and the rows of what is
                 with the card do something else (user request, 2026-10-29). */}
             <View style={{ flexShrink: 1 }}>
@@ -349,12 +349,12 @@ export function CardPreview({
               {scrolls ? (
                 <ScrollView style={{ flexShrink: 1 }}>
                   {heading}
-                  <View className="mt-2">{body}</View>
+                  <View className="mt-3">{body}</View>
                 </ScrollView>
               ) : (
                 <>
                   {heading}
-                  <ScrollView style={{ flexShrink: 1 }} className="mt-2">
+                  <ScrollView style={{ flexShrink: 1 }} className="mt-3">
                     {body}
                   </ScrollView>
                 </>

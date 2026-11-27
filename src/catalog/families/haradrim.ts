@@ -1,5 +1,5 @@
 // The haradrim family (The Sands of Harad cycle, Escape from Umbar and Desert Crossing): the heat tracker (the temperature), a stage that holds no more progress than its quest points while it cannot advance, a quest card noted for the round it came into play, a hand limit
-// on the table, a card placed faceup under a location, The Long Arm of Mordor's heroes in the staging area (staged and guarded heroes: Captives held by no card or by an Orc, objective-heroes taken by the players) and Race Across Harad's Orcs' area (a second quest deck, its cards in the area zone or the staging area, the Orcs' stage and its progress) with the Tamed Mûmak objective ally. The conditions `stageInPlayWholeRound` and `temperature` and the amount `temperature` are in effect-schema-conditions.ts and effect-schema-amount.ts. src/rules/families/haradrim/ runs and reads them.
+// on the table, a card placed faceup under a location, The Long Arm of Mordor's heroes in the staging area (staged and guarded heroes: Captives held by no card or by an Orc, objective-heroes taken by the players) and Race Across Harad's Orcs' area (a second quest deck, its cards in the area zone or the staging area, the Orcs' stage and its progress) with the Tamed Mûmak objective ally, and Beneath the Sands' Search objective (track.ts: its flips, Track X and the cards that search for On Track). The conditions `stageInPlayWholeRound` and `temperature` and the amount `temperature` are in effect-schema-conditions.ts and effect-schema-amount.ts. src/rules/families/haradrim/ runs and reads them.
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
@@ -52,6 +52,19 @@ const VERBS = [
   z.strictObject({ verb: z.literal("EliminateAfterAttack"), ...when }),
   // "Each player takes control of a Tamed Mûmak" (17047:A:1): the actor takes one of the set-aside objective allies with these codes into their play area, faceup, ready; with several different cards left the actor is asked (copies of one card are one choice).
   verbFlags(z.strictObject({ verb: z.literal("TakeObjectiveAlly"), codes: z.array(z.string().min(1)).min(1), ...when }), { setupRuns: "inForEachPlayer" }),
+  // "Flip the Search objective to On Track / Off Track" (17068:A:2, 17073:A:1, 17075:A:1, 17075:A:2, 17077:A:1, 17078:A:1; hrd.search-objective): the objective card in play shows its other side, keeping its place, and discards each resource when it flips to On Track. Nothing changes
+  // when it already shows that side, or while the table holds `cannotFlipSearch` (Lost Underground), unless `despiteBlock` (the side quest's own flips). A flip to Off Track queues `searchFlippedOff` about the objective.
+  z.strictObject({ verb: z.literal("FlipSearchObjective"), to: z.enum(["onTrack", "offTrack"]), despiteBlock: z.literal(true).optional(), ...when }),
+  // "Track X" (17069:A:1 to 17072:A:1; hrd.track): discards `amount` cards from the top of the encounter deck, the discard pile shuffled back into an empty deck at once (any phase); when one of them has a code in `marked` (the cards that print "On Track" in the lower right
+  // corner, read from the scans), it flips the objective to On Track. While the table holds `cannotFlipSearch` Track does not resolve at all: no card is discarded (17075:A:1, "Do not resolve the Track keyword").
+  z.strictObject({ verb: z.literal("ResolveTrack"), amount: z.number().int().positive(), marked: z.array(z.string().min(1)).min(1), ...when }),
+  // "Search the top 3 cards of the encounter deck for a card with 'On Track' in the lower right corner, add it to the staging area and discard the rest. If no card enters play from this effect, flip this objective" (17080:A:1): the first card of the top `count` with a code in
+  // `marked` is added to the staging area, not revealed, the others are discarded, and with none found the objective flips to Off Track. A deck with fewer cards is looked at in full.
+  z.strictObject({ verb: z.literal("StageMarkedFromTop"), count: z.number().int().positive(), marked: z.array(z.string().min(1)).min(1), ...when }),
+  // "Return the topmost location in the encounter discard pile to the staging area" (17079:A:1): the card of this type put on the discard pile last is added to the staging area. Nothing happens with none.
+  z.strictObject({ verb: z.literal("AddTopmostFromDiscard"), cardType: z.literal("location"), ...when }),
+  // "Set Brood Mother aside, out of play" (17068:A:3): the card in play with this code, from play, wherever it lies, goes to the set-aside pile with no damage and no controller. Nothing happens with none in play.
+  z.strictObject({ verb: z.literal("SetAsideCode"), code: z.string().min(1), ...when }),
 ] as const;
 
 const TRIGGERS = [
@@ -61,6 +74,8 @@ const TRIGGERS = [
   "temperatureChanged",
   // About an Orcs' stage that is full (17052:B:3, 17053:B:3, 17054:B:3): the record that heard it resolves when the Orcs defeat the stage, before they advance. The engine pushes it itself (families/haradrim/orcs-stage.ts); no event is queued.
   "orcsStageDefeated",
+  // About the Search objective after it is flipped to Off Track (17074:A:2, 17078:B:2): FlipSearchObjective queues it; a flip to On Track queues none (families/haradrim/track.ts).
+  "searchFlippedOff",
 ] as const;
 
 const FLAGS = [
@@ -86,6 +101,10 @@ const FLAGS = [
   "undefendedToMumak",
   // On the table, until the end of the phase: the total Threat in the Orcs' area is added to the total Threat in the staging area, read live (17046:A:1; families/haradrim/orcs-values.ts orcsStagingRaise).
   "orcsInStagingThreat",
+  // On the table, while Lost Underground is in play (17075:A:1, a constant): the Search objective does not flip, except by the side quest's own two flips (`despiteBlock`), and Track does not resolve at all. The flag means both (families/haradrim/track.ts).
+  "cannotFlipSearch",
+  // On the table, while Off Track is in play: "Progress cannot be placed on the main quest." (17079:A:2): no progress is placed on the main quest card, though a side quest that is the current quest takes it (17079:A:2; mainQuestBlocked in families/haradrim/track.ts, read by quest.ts).
+  "noMainQuestProgress",
 ] as const;
 
 export const manifest = { name: "haradrim", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

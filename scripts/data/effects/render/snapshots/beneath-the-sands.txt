@@ -1,0 +1,290 @@
+Scenario piles that place cards with no record (quest: 17076 Searching the Caves; quest: 17077 Getting Closer; quest: 17078 The Spiders' Hive; staging: 17079 Off Track; setAside: 17065 Brood Mother)
+
+## 17065 Brood Mother
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+17065:A:1 (front): Cannot have attachments. Cannot take damage.
+  17065:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+    - this card: stat cannotTakeDamage 1, while this card is in play
+
+17065:A:2 (front): Brood Mother engages the first player.
+  17065:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this enemy, in the staging area, engages the first player
+
+17065:A:3 (front): Forced: At the end of the round, search the encounter deck and discard pile for a Spider Broodling and add it to the staging area, if able. Shuffle the encounter deck.
+  17065:forced:2: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one card with code 17067 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+## 17066 Hive Guardian
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17066:A:1 (front): While On Track is in play, Hive Guardian gets +2 Attack and -5 engagement cost.
+  17066:constant:1: Constant
+    only if the card with code 17080 is in play
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack 2, while this card is in play
+    - this card: stat engagementCost -5, while this card is in play
+
+17066:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if On Track is in play).
+  17066:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the card with code 17080 is in play): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the card with code 17080 is in play (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 17067 Spider Broodling
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17067:A:1 (front): While On Track is in play, Spider Broodling gains surge.
+  17067:constant:1: Constant
+    only if the card with code 17080 is in play
+    - this card: stat gainsSurge (it has the Surge keyword as it is revealed) 1, while this card is in play
+
+17067:A:2 (shadow): Shadow: If On Track is in play, put Spider Broodling into play engaged with you and deal it a shadow card.
+  17067:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the card with code 17080 is in play: the shadow card this is, an enemy, leaves its attacker and engages the player the attack is against; it enters play there
+    - then, if this card is engaged with a player (that player is who "you" means in this record) (checked when this step runs, after the steps above; not tied to whether they did anything): this card is dealt a shadow card
+
+## 17068 Spider Burrow
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17068:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+17068:A:2 (front): Forced: After Spider Burrow becomes the active location, flip the Search objective to On Track and add Brood Mother to the staging area.
+  17068:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the Search objective in play flips to On Track (each resource on it is discarded) (nothing while Lost Underground is in play; its constant also stops Track from resolving); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
+    - one set-aside card with code 17065 joins the staging area (it is not revealed)
+
+17068:A:3 (front): Forced: When Spider Burrow leaves play as an explored location, set Brood Mother aside, out of play (unless the players are at stage 3B).
+  17068:forced:2: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - if not (the players are on stage 3): the card with code 17065 in play, wherever it lies, is set aside, out of play, with no damage (nothing when none is in play)
+
+## 17069 Pitch Black Tunnel
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17069:A:1 (front): Track 4.
+  17069:forced:1: Forced after the players travel (heard about this card)
+    only if the card with code 17079 is in play
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - Track 4: discard 4 cards from the top of the encounter deck, shuffling the encounter discard pile into the deck each time the deck runs out and going on; if any discarded card is one that prints On Track in the lower right corner (codes 17066, 17067, 17069, 17070, 17072), flip the Search objective to On Track; Track does not resolve at all while Lost Underground is in play (no card is discarded)
+
+17069:A:2 (front): X is the number of characters controlled by the first player.
+  17069:constant:1: Constant
+    - this card: stat threat the number of character (any player controls) controlled by the first player, while this card is in play
+
+17069:A:3 (front): Travel: Reveal the top card of the encounter deck to travel here.
+  17069:travel:1: Travel
+    - the acting player reveals an encounter card
+
+## 17070 Nest of Vermin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17070:A:1 (front): Track 3.
+  17070:forced:1: Forced after the players travel (heard about this card)
+    only if the card with code 17079 is in play
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - Track 3: discard 3 cards from the top of the encounter deck, shuffling the encounter discard pile into the deck each time the deck runs out and going on; if any discarded card is one that prints On Track in the lower right corner (codes 17066, 17067, 17069, 17070, 17072), flip the Search objective to On Track; Track does not resolve at all while Lost Underground is in play (no card is discarded)
+
+17070:A:2 (front): Travel: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until a Creature enemy is discarded. Add the discarded enemy to the staging area.
+  17070:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - cards are discarded from the top of the encounter deck until an enemy with the trait Creature is discarded, or the deck is empty; that card becomes the picked card
+    - then, if the picked card is a Creature enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+
+## 17071 Cobwebbed Cavern
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17071:A:1 (front): Track 2.
+  17071:forced:1: Forced after the players travel (heard about this card)
+    only if the card with code 17079 is in play
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - Track 2: discard 2 cards from the top of the encounter deck, shuffling the encounter discard pile into the deck each time the deck runs out and going on; if any discarded card is one that prints On Track in the lower right corner (codes 17066, 17067, 17069, 17070, 17072), flip the Search objective to On Track; Track does not resolve at all while Lost Underground is in play (no card is discarded)
+
+17071:A:2 (front): While On Track is in play, Cobwebbed Cavern gets +2 Threat.
+  17071:constant:1: Constant
+    only if the card with code 17080 is in play
+    - this card: stat threat 2, while this card is in play
+
+17071:A:3 (shadow): Shadow: Exhaust a character you control.
+  17071:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 17072 Blocked Passage
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17072:A:1 (front): Track 2.
+  17072:forced:1: Forced after the players travel (heard about this card)
+    only if the card with code 17079 is in play
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - Track 2: discard 2 cards from the top of the encounter deck, shuffling the encounter discard pile into the deck each time the deck runs out and going on; if any discarded card is one that prints On Track in the lower right corner (codes 17066, 17067, 17069, 17070, 17072), flip the Search objective to On Track; Track does not resolve at all while Lost Underground is in play (no card is discarded)
+
+17072:A:2 (front): While On Track is in play, progress cannot be placed on locations in the staging area.
+  17072:constant:1: Constant
+    only if the card with code 17080 is in play
+    - each location (any player controls) in the staging area only: stat noProgressPlaced 1, while this card is in play
+
+17072:A:3 (shadow): Shadow: Discard an attachment you control.
+  17072:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control)
+    - discard the picked card
+
+## 17073 Forced Off Track
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17073:A:1 (front): When Revealed: Either flip the Search objective to Off Track, or deal 1 damage to each questing character.
+  17073:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    - the first player chooses one of:
+      * option "flip":
+        - the Search objective in play flips to Off Track (nothing while Lost Underground is in play; its constant also stops Track from resolving); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
+      * option "damage":
+        - deal 1 damage to each character (any player controls) committed to the quest
+
+17073:A:2 (shadow): Shadow: If On Track is in play, attacking enemy makes an additional attack against you after this one.
+  17073:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - if the card with code 17080 is in play: when the attack in progress ends:
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
+
+## 17074 Grabbed by Spiders
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17074:A:1: Surge. Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+17074:A:2 (front): When Revealed: Attach to the main quest. Limit 1 per quest. (Counts as a Condition attachment with the text: "Forced: After the Search objective is flipped to Off Track, each player discards an ally he controls. Then, discard Grabbed by Spiders.")
+  17074:whenRevealed:1: When revealed
+    - if the number of attachment (any player controls) named "Grabbed by Spiders" is at most 0: this card is attached to the main quest card (never a side quest) and leaves with it
+  17074:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  17074:forced:1: Forced after the Search objective is flipped to Off Track (a flip to On Track does not fire it) (heard about objective (any player controls))
+    only if this card is attached to a card
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if each living player controls an ally in play (read when the instruction starts, so before any discard that follows it): discard this card
+    - for each player, first player first:
+      - if there is a ally (you control) to choose: choose ally (you control)
+      - then, if there is a ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+## 17075 Lost Underground
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17075:A:1 (front): When Revealed: Flip the Search objective to Off Track. While Lost Underground is in play, the Search objective cannot flip. (Do not resolve the Track keyword.)
+  17075:whenRevealed:1: When revealed
+    - the Search objective in play flips to Off Track, even while Lost Underground stops flips (this card's own flip); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
+  17075:constant:1: Constant
+    - the table: stat cannotFlipSearch 1, while this card is in play
+
+17075:A:2 (front): Response: When this stage is defeated, flip the Search objective to On Track and ignore its Forced effects until the end of the phase.
+  17075:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the Search objective in play flips to On Track (each resource on it is discarded), even while Lost Underground stops flips (this card's own flip); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
+    - each objective (any player controls) named "On Track" (only the cards that match now: one that arrives later does not get it): stat cannotTriggerForced (the card's Forced effects do not trigger; cannotTriggerEffects bars its Actions and Responses) 1, until the end of the phase
+
+## 17076 Searching the Caves
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17076:A:1 (front): Setup: Set Brood Mother aside, out of play. Add the Search objective to the staging area (Off Track face up).
+  17076:setup:1: Setup
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
+
+17076:B:1 (back): When Revealed: Discard cards from the encounter deck until X locations are discarded, where X is the number of players. Add each location discarded by this effect to the staging area.
+  17076:whenRevealed:1: When revealed
+    - discard cards from the top of the encounter deck until 1 location(s) for each player in the game are discarded, or the deck is empty, and add each location discarded to the staging area
+
+## 17077 Getting Closer
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17077:A:1 (front): When Revealed: Flip the Search objective to Off Track. Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X enemies are discarded, where X is the number of players. Add each enemy discarded by this effect to the staging area.
+  17077:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the Search objective in play flips to Off Track (nothing while Lost Underground is in play; its constant also stops Track from resolving); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
+    - shuffle the encounter discard pile into the encounter deck
+    - discard from the top of the encounter deck until 1 enemy for each player is discarded; add those enemies to the staging area
+
+17077:B:1 (back): While On Track is in play, encounter card effects cannot be canceled.
+  17077:constant:1: Constant
+    only if the card with code 17080 is in play
+    - the table: stat encounterUncancelable (no Response cancels an encounter card's When Revealed or Shadow effect, and no paid cancel is offered against one) 1, while this card is in play
+
+## 17078 The Spiders' Hive
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17078:A:1 (front): When Revealed: The first player adds Brood Mother to the staging area. Each other player reveals an encounter card. Flip the Search objective to Off Track.
+  17078:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one set-aside card with code 17065 joins the staging area (it is not revealed)
+    - for each player, first player first:
+      - if not (the actor holds the first player token): the acting player reveals an encounter card
+    - the Search objective in play flips to Off Track (nothing while Lost Underground is in play; its constant also stops Track from resolving); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
+
+17078:B:1 (back): While there are at least 5 progress tokens on this stage, Brood Mother loses the text: 'Cannot take damage.'
+  17078:constant:1: Constant
+    only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 5 progress
+    - each enemy (any player controls) or in the staging area, named "Brood Mother": stat losesNoDamage 1, while this card is in play
+
+17078:B:2 (back): Forced: After the Search objective is flipped to Off Track, remove all progress tokens from this stage.
+  17078:forced:1: Forced after the Search objective is flipped to Off Track (a flip to On Track does not fire it) (heard about objective (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - remove progress of this card progress from this card
+
+17078:B:3 (back): This stage cannot be defeated while Brood Mother is in play. If the players defeat this stage, they win the game.
+  17078:constant:2: Constant
+    only if there is a enemy (any player controls) or in the staging area, named "Brood Mother" to choose
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
+    - the players cannot defeat this stage while this holds
+  17078:questResolution:1: Quest resolution
+    - the players win the game
+
+## 17079 Off Track
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+17079:A:1 (front): Forced: At the end of the quest phase, place 1 resource here. Then, either return the topmost location in the encounter discard pile to the staging area, or raise each player's threat by 1 for each resource here.
+  17079:forced:1: Forced at the end of the phase
+    only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - place 1 resource tokens on this card
+    - the first player chooses one of:
+      * option "location" (only if there is a location (any player controls) encounterDiscard to choose):
+        - the location put on the encounter discard pile last is added to the staging area (nothing with none there)
+      * option "threat":
+        - raise threat by resources of this card (each player)
+
+17079:A:2 (front): Progress cannot be placed on the main quest.
+  17079:constant:1: Constant
+    - the table: stat noMainQuestProgress (no progress can be placed on the main quest card while it lasts; a side quest that is the current quest still takes progress) 1, while this card is in play
+
+## 17080 On Track
+
+17080:A:1 (front): Forced: At the end of the quest phase, search the top 3 cards of the encounter deck for a card with 'On Track' in the lower right corner, add it to the staging area and discard the rest. If no card enters play from this effect, flip this objective.
+  17080:forced:1: Forced at the end of the phase
+    only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - look at the top 3 cards of the encounter deck (all of it with fewer): the first one that prints On Track in the lower right corner (codes 17066, 17067, 17069, 17070, 17072) is added to the staging area, not revealed, and the others are discarded; with none found the Search objective flips to Off Track
+
+17080:A:2 (front): Forced: After the players quest unsuccessfully, flip this objective.
+  17080:forced:2: Forced after the players quest unsuccessfully
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the Search objective in play flips to Off Track (nothing while Lost Underground is in play; its constant also stops Track from resolving); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
+
+(rendered pieces: 160 by template, 0 as JSON)
