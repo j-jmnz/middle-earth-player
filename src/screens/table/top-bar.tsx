@@ -23,7 +23,7 @@ import { dialProps, type TableDial } from "../../play/readouts/dials";
 import { defenseLimitWords } from "../../play/words/scenarios/fortress";
 import { useTableTokens } from "../../ui/use-table-tokens";
 import { withAlphaHex } from "../../ui/tokens";
-import { BAR_PAD, chipCompact, dialZones, DIAL_GAP, keepWidest, dialScale, EDGE_FADE, HEADING_BADGE_OVER, headingCompact, headingOffset, railWide, scrollCue, TOP_BAR, warnedDialId } from "../../play/chrome/top-bar-layout";
+import { BAR_PAD, chipCompact, dialZones, DIAL_GAP, keepWidest, dialBoxOf, dialScale, EDGE_FADE, HEADING_BADGE_OVER, headingCompact, headingOffset, railWide, scrollCue, TOP_BAR, warnedDialId } from "../../play/chrome/top-bar-layout";
 import { UiScaleContext, useUiScale } from "../../ui/ui-scale";
 
 export { TOP_BAR };
@@ -109,10 +109,10 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
   const [chipW, setChipW] = useState(0);
   const onChip = (event: LayoutChangeEvent) => setChipW(Math.round(event.nativeEvent.layout.width));
   const scroller = useRef<ComponentRef<typeof ScrollView>>(null);
-  // The dials row is scrolled past its start: a fade at the left edge says a dial is out of view there, as the right edge's does.
-  const [past, setPast] = useState(false);
-  // The row has been scrolled to its end: the cue ("›") that says more lies ahead shows until then.
-  const [reachedEnd, setReachedEnd] = useState(false);
+  // The row's scroll offset and its content's width (with the end room), both measured: the fade at the left edge shows once the row is scrolled past its start, and the cue ("›") at the right shows while the row has more ahead. The cue is worked out in the render from these and the zone's width, so a row that grows or shrinks without a scroll keeps it true.
+  const [offsetX, setOffsetX] = useState(0);
+  const [content, setContent] = useState(0);
+  const past = offsetX > 2 * s;
   const onBar = (event: LayoutChangeEvent) => setBar({ width: Math.round(event.nativeEvent.layout.width), x: Math.round(event.nativeEvent.layout.x) });
   // The zones need the bar and the dials measured. Until both are, the rail is held invisible rather than drawn at a guess, so it
   // never jumps when the table opens.
@@ -175,10 +175,9 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
           scrollEnabled={zones?.scroll ?? false}
           scrollEventThrottle={32}
           onScroll={(event) => {
-            const { contentOffset, layoutMeasurement, contentSize } = event.nativeEvent;
-            setPast(contentOffset.x > 2 * s);
-            setReachedEnd(!scrollCue({ scroll: true }, contentOffset.x, layoutMeasurement.width, contentSize.width, s));
+            setOffsetX(event.nativeEvent.contentOffset.x);
           }}
+          onContentSizeChange={(width) => setContent(width)}
           showsHorizontalScrollIndicator={false}
           style={{ height: (TOP_BAR + 20) * s, marginVertical: -10 * s }}
           contentContainerStyle={{ alignItems: "center", paddingVertical: 10 * s, paddingRight: zones?.scroll ? EDGE_FADE * s : 0 }}
@@ -233,8 +232,10 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
             {defense != null ? <ThreatRing threat={{ seat: 0, threat: defense.value, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${defense.name}`} testID="defense-tokens" icon={null} limit={defense.limit} limitWords={defenseLimitWords(defense.value, defense.limit, defense.stage)} goal compact /> : null}
             {scenario.map((dial) => {
               const press = dial.cardId && onDial ? () => onDial(dial.cardId ?? "", dial.extra) : dial.pile && onDialPile ? () => onDialPile(dial.pile ?? "") : dial.lists && onDialReading ? () => onDialReading(dial.id) : undefined;
-              const ring = <ThreatRing key={dial.id} {...dialProps(dial)} captioned={captioned} onPress={press} compact />;
-              return dial.current || dial.warn ? <View key={dial.id} onLayout={(event) => onBox(dial.id, event)}>{ring}</View> : ring;
+              const ring = <ThreatRing {...dialProps(dial)} captioned={captioned} onPress={press} compact />;
+              // Every scenario dial stands in the same measuring View, so a dial that starts or stops to warn keeps its instance (its pop, its "+1" and its sound).
+              const box = dialBoxOf(dial);
+              return <View key={box.key} onLayout={box.measured ? (event) => onBox(dial.id, event) : undefined}>{ring}</View>;
             })}
             {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} hint="Shows the card the tokens are on" onPress={onDial ? () => onDial(tokens.cardId) : undefined} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}
@@ -264,7 +265,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
           </View>
         ) : null}
         {/* The cue in the room the row keeps clear at its end: a dial lies past the fade. */}
-        {zones?.scroll && !reachedEnd ? (
+        {zones && scrollCue(zones, offsetX, zones.left, content, s) ? (
           <View testID="top-bar-more" pointerEvents="none" style={{ position: "absolute", top: 0, bottom: 0, right: 2 * s, justifyContent: "center" }}>
             <Text className="text-body text-bone">{"\u203A"}</Text>
           </View>

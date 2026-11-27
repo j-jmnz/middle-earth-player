@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { MIN_NAME_SCALE, nameScale, wrapName } from "./wrap.ts";
+import { MIN_NAME_SCALE, nameDrop, nameScale, wrapName } from "./wrap.ts";
 
 // One unit per character: a line of width 10 holds ten characters.
 const measure = (text: string) => text.length;
@@ -34,9 +34,27 @@ describe("a name that does not fit shrinks before it is cut", () => {
     expect(nameScale("Poros Garrison", 12, measure, 1)).toBeCloseTo(12 / 14);
   });
 
+  it("sizes a two-line name by the widest line of its best split, so every word shows", () => {
+    expect(nameScale("The Black Serpent", 9, measure, 2)).toBe(1);
+    expect(nameScale("The Black Serpent", 6, measure, 2)).toBe(MIN_NAME_SCALE);
+    expect(wrapName("The Black Serpent", 9, measure, 2)).toEqual(["The Black", "Serpent"]);
+  });
+
   it("never goes under the minimum, so the rest is cut with an ellipsis at the widened width", () => {
     const scale = nameScale("Mablung-and-Damrod", 8, measure);
     expect(scale).toBe(MIN_NAME_SCALE);
     expect(wrapName("Mablung-and-Damrod", 8 / scale, measure)[0]?.endsWith("…")).toBe(true);
+  });
+});
+
+describe("a name on a card with effect pills", () => {
+  it("stays on one line while it fits at the smallest type, or when it is one word", () => {
+    expect(nameDrop("Poros Garrison", 11, measure, 14)).toEqual({ lines: 1, drop: 0 });
+    expect(nameDrop("Mablung-and-Damrod", 8, measure, 14)).toEqual({ lines: 1, drop: 0 });
+  });
+
+  it("takes two lines when one cut it, and tells how far the pills move down", () => {
+    expect(nameDrop("The Black Serpent", 9, measure, 14)).toEqual({ lines: 2, drop: 16 });
+    expect(nameDrop("The Black Serpent", 5, measure, 14).drop).toBeCloseTo(14 * MIN_NAME_SCALE + 2);
   });
 });

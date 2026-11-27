@@ -220,18 +220,18 @@ export function SeatChipView({ rect, text, fonts, t, s }: { rect: Rect; text: st
 }
 
 /** How far the widest effect badge reaches from the card's left edge, so a word pill keeps clear of the badge column (the rows are drawn by `Badges`: a stat is the icon, the number and 5 pt, a flag the pill and 4 pt (the must-commit pill is a stat's width), the "more" pill its words and 12 pt, at least 24 pt). */
-export function badgeReach(effects: CardEffects, fonts: Fonts, s: number, height: number, stop: number | null, width: number, covered: CoveredBand | null = null): number {
+export function badgeReach(effects: CardEffects, fonts: Fonts, s: number, height: number, stop: number | null, width: number, covered: CoveredBand | null = null, lower = 0): number {
   const widths = [
     ...effects.stats.map((badge) => 15 * s + fonts.badge.getTextWidth(chipText(badge)) + 5 * s),
     ...effects.flags.map((flag) => (flag.flag === "mustCommit" ? 15 * s + fonts.badge.getTextWidth(MUST_COMMIT_WORD) + 5 * s : BADGE_H * s + 4 * s)),
   ];
   // The pill for the effects left out ("2 more") is as wide as its words and 12 pt, and is drawn when any are left out: the count is the one `Badges` draws, which depends on the room the card's height leaves.
-  const left = hiddenBadges(effects.stats.length + effects.flags.length, height, s, BADGE_H * s, stop, covered);
+  const left = hiddenBadges(effects.stats.length + effects.flags.length, height, s, BADGE_H * s, stop, covered, lower);
   const shift = covered?.left ?? 0;
   // A covered card's row ends at the next card in its row (`CoveredBand.width`); words and pills wider than that room give way to the round count, as `Badges` draws.
   const avail = covered ? covered.width - shift : width;
   const count = (n: number) => fonts.badge.getTextWidth(String(n)) + 10 * s;
-  const room = badgeRoom(height, s, BADGE_H * s, stop, covered);
+  const room = badgeRoom(height, s, BADGE_H * s, stop, covered, lower);
   // A card with no room for a row draws no pill at all (badgeLayout).
   if (widths.length === 0 || room < 1) return 0;
   const words = left > 0 ? fonts.badge.getTextWidth(moreText(left)) + 12 * s : 0;

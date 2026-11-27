@@ -303,6 +303,7 @@ export function Badges({
   t,
   s,
   contrast = false,
+  lower = 0,
 }: {
   slot: CardSlot;
   rect: Rect;
@@ -324,13 +325,15 @@ export function Badges({
   s: number;
   // Strong outlines (table-settings.ts): each pill gets a bone edge, so it reads on any picture.
   contrast?: boolean;
+  // The room the card's name takes below the title band on two lines (nameDrop): the pills start under it.
+  lower?: number;
 }) {
   const { x, y, w, h } = rect;
   const pill = BADGE_H * s;
   const strip = 15 * s;
   const label = questPoints != null ? (stripText(slot, questPoints, owner, stageLoses ?? false) ?? "") : "";
   // Rows that fit between the title band (or the top edge of a short card) and the resource token and the foot pills (badgeLayout).
-  const { top: first, rows: room } = badgeLayout(h, s, pill, stop, covered);
+  const { top: first, rows: room } = badgeLayout(h, s, pill, stop, covered, lower);
   // The part of the card the pills may use: right of the token and left of the next card in the row on a covered card, else the whole card.
   const shift = covered?.left ?? 0;
   const avail = covered ? covered.width - shift : w;
