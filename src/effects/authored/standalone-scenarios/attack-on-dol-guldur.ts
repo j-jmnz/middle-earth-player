@@ -463,6 +463,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["50931:B:3"],
     timing: "forced",
     trigger: "endOfRound",
+    afterForcedOn: DOL_GULDUR,
     instructions: [{ verb: "WinGame", when: { kind: "all", conditions: [CITY_AT_0, { kind: "count", pick: { type: "enemy", control: "any", staging: true, trait: "Lieutenant" }, max: 0 }] } }],
   },
   {
@@ -471,6 +472,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["50931:B:2"],
     timing: "forced",
     trigger: "endOfRound",
+    afterForcedOn: DOL_GULDUR,
     condition: AT_STAGE_3,
     instructions: [
       { verb: "SelectRandomStage", codes: [...STAGES_3] },

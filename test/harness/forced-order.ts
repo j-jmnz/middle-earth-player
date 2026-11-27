@@ -16,6 +16,10 @@ export function asksForcedOrder(state: ScenarioState): boolean {
 /** The order questions of a settled state answered with their first option (the order the engine took before the first player chose), while one is open. */
 export function inForcedOrder(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
-  for (let guard = 0; guard < 8 && next.window?.kind === "choose" && asksForcedOrder(next); guard += 1) next = settle(applyChoice(next, next.window.options[0] ?? ""), ctx, steps);
+  for (let asked = 0; next.window?.kind === "choose" && asksForcedOrder(next); asked += 1) {
+    // A moment never orders more cards than this: a longer run is a loop, not an answer.
+    if (asked >= 8) throw new Error("inForcedOrder: more than 8 order questions in a row");
+    next = settle(applyChoice(next, next.window.options[0] ?? ""), ctx, steps);
+  }
   return next;
 }

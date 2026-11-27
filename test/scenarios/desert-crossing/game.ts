@@ -62,7 +62,7 @@ export type CrossingGolden = { name: string; seatCount: 1 | 2; seed: number; dif
 export const CROSSING_GOLDENS: readonly CrossingGolden[] = [
   { name: "true solo, won, Normal", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed, won, Normal", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "true solo, lost, temperature reaches 60", seatCount: 1, seed: 9, difficulty: "Normal", decks: "strong", outcome: "lost", policy: { choose: "last" }, lossReason: "The temperature reached 60" },
+  { name: "true solo, lost, temperature reaches 60, the last option of every Choose window", seatCount: 1, seed: 9, difficulty: "Normal", decks: "strong", outcome: "lost", policy: { choose: "last" }, lossReason: "The temperature reached 60" },
   { name: "two-handed, lost, temperature reaches 60", seatCount: 2, seed: 4, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "The temperature reached 60" },
   { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "tense", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed, lost, threat reaches 50", seatCount: 2, seed: 1, difficulty: "Normal", decks: "tense", outcome: "lost", lossReason: "No seats remain" },

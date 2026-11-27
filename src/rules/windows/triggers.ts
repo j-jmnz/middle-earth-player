@@ -103,6 +103,26 @@ function signature(one: Found, _at: number, found: readonly Found[]): string {
   return found.filter((other) => other.instance.id === one.instance.id).map((other) => other.effect.id).join(",");
 }
 
+/**
+ * The cards whose effects may initiate next, one card for each set of effects, in the default order. What the cards print holds back some: an `early` effect initiates before the rest, and an effect printed "After resolving the Forced
+ * effect on X" (`afterForcedOn`) waits while a card with that code still has effects to initiate (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 5).
+ */
+export function orderOptions(found: readonly Found[]): string[] {
+  const waiting = (one: Found): boolean => one.effect.afterForcedOn != null && found.some((other) => other.instance.id !== one.instance.id && other.instance.code === one.effect.afterForcedOn);
+  const free = found.filter((one) => !waiting(one));
+  const ready = free.length > 0 ? free : found;
+  const early = ready.filter((one) => one.effect.early === true);
+  const seen = new Set<string>();
+  const options: string[] = [];
+  for (const one of early.length > 0 ? early : ready) {
+    const sign = signature(one, 0, found);
+    if (seen.has(sign) || options.includes(one.instance.id)) continue;
+    seen.add(sign);
+    options.push(one.instance.id);
+  }
+  return options;
+}
+
 /** The effects OrderForced still has to initiate, as the effects and the cards that bear them (an entry whose card or effect is gone is left out). */
 export function foundOf(state: ScenarioState, ctx: ReduceContext, entries: readonly { effectId: string; sourceId: string }[]): Found[] {
   return entries.flatMap((entry) => {
@@ -112,13 +132,21 @@ export function foundOf(state: ScenarioState, ctx: ReduceContext, entries: reado
   });
 }
 
-// Each matching effect gets its own forced frame. The oldest resolves first, so it is pushed last.
-// `counted`: the uses of the effects with a limit were already spent when they triggered (pushForced), so none is spent again.
-export function pushFound(state: ScenarioState, found: readonly Found[], event: GameEvent, ctx: ReduceContext, steps: EngineStep[], counted = false): ScenarioState {
+// Each matching effect gets its own forced frame. The oldest resolves first, so it is pushed last. The uses of the effects with a limit are spent as they trigger.
+export function pushFound(state: ScenarioState, found: readonly Found[], event: GameEvent, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  return pushFrames(state, found, event, ctx, steps, true);
+}
+
+/** pushFound for effects whose limit use was already spent when they triggered (pushForced), so none is spent again. */
+export function pushCounted(state: ScenarioState, found: readonly Found[], event: GameEvent, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  return pushFrames(state, found, event, ctx, steps, false);
+}
+
+function pushFrames(state: ScenarioState, found: readonly Found[], event: GameEvent, ctx: ReduceContext, steps: EngineStep[], spend: boolean): ScenarioState {
   let next = state;
   for (const { effect, instance } of [...found].reverse()) {
     const actor = forcedActor(state, instance, event, ctx);
-    next = announceAbility(counted ? next : noteForcedUse(next, effect, instance.id, actor), instance.id, actor, ctx);
+    next = announceAbility(spend ? noteForcedUse(next, effect, instance.id, actor) : next, instance.id, actor, ctx);
     next = pushEffectFrame(
       next,
       {
@@ -189,11 +217,13 @@ export function crossBoundary(state: ScenarioState, ctx: ReduceContext, steps: E
   if (ctx.effects.length === 0 && next.delayed.length === 0) return next;
   // The Forced effects of the end of a phase or round are collected while the lasting effects that ended with it still hold ("until the end of the phase" includes that phase's own end).
   const lapsed = lapsedModifiers ?? [];
-  const forcedAtEnd = (current: ScenarioState, event: GameEvent): ScenarioState => {
-    if (lapsed.length === 0) return fireForced(current, event, ctx, steps);
-    const fired = fireForced({ ...current, modifiers: [...current.modifiers, ...lapsed] }, event, ctx, steps);
-    return { ...fired, modifiers: fired.modifiers.filter((modifier) => !lapsed.includes(modifier)) };
+  // The Responses offered at the same end hear them too ("Response: At the end of each round", 41050:A:3).
+  const holdingLapsed = (current: ScenarioState, run: (held: ScenarioState) => ScenarioState): ScenarioState => {
+    if (lapsed.length === 0) return run(current);
+    const done = run({ ...current, modifiers: [...current.modifiers, ...lapsed] });
+    return { ...done, modifiers: done.modifiers.filter((modifier) => !lapsed.includes(modifier)) };
   };
+  const forcedAtEnd = (current: ScenarioState, event: GameEvent): ScenarioState => holdingLapsed(current, (held) => fireForced(held, event, ctx, steps));
   next = pushDue(next, ended, "endOfRound", steps);
   next = pushDue(next, ended, "endOfPhase", steps);
   // The effects delayed to the beginning of the travel phase (148004:B:2) come due as it begins.
@@ -208,7 +238,7 @@ export function crossBoundary(state: ScenarioState, ctx: ReduceContext, steps: E
     // The Responses to the end of the round are offered once its Forced effects have resolved ("Response: At the end of each round, place 1
     // resource token here", 41050:A:3): their frame goes under the Forced ones.
     const event = { trigger: "endOfRound", seat: null, phase: ended } as const;
-    next = forcedAtEnd(offerResponses(next, event, ctx, steps), event);
+    next = forcedAtEnd(holdingLapsed(next, (held) => offerResponses(held, event, ctx, steps)), event);
   }
   const fired = forcedAtEnd(next, { trigger: "endOfPhase", seat: null, phase: ended });
   // The effects of the end of the round resolve while the table is still in the End of round phase; the beginning of the round shows again once they are done (machine.ts, beginRound).

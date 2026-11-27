@@ -11,6 +11,8 @@ import { fireForced } from "../../../rules/windows/triggers.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { first, opening, revealFromTop, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
+import { applyChoice } from "../../../rules/windows/choices.ts";
+import { asksForcedOrder } from "../../../../test/harness/forced-order.ts";
 import { guldurStart, guldurWorld } from "../../../../test/scenarios/attack-on-dol-guldur/game.ts";
 
 const table = (layout: Layout) => tableFromLayout("attack-on-dol-guldur", layout);
@@ -133,5 +135,21 @@ describe("the bars of the locations reach that location only", () => {
   it("50923:A:1 caps the damage healed from each character at 1 each round while Dungeon Door is in the staging area", () => {
     expect(heldAmount(table({ stage: "50902", staging: ["50923"] }).state, "table", "healCap")).toBe(1);
     expect(heldAmount(table({ stage: "50902", engaged: ["50923"] }).state, "table", "healCap")).toBe(0);
+  });
+});
+
+describe("the Forced effects at the end of the round at stage 3 keep the order their cards print (rr.forced, reading 5)", () => {
+  // 50907:A:1 "after resolving the Forced effect on each stage 3" (the stage's `early` effect first) and 50931:B:2 "After resolving the Forced effect on Dol Guldur": the first player is offered no order that breaks either.
+  it("the stage's Forced effect, Dol Guldur's reduction, the win check and the random stage resolve in that order, and the first player is never asked for an order", () => {
+    const made = table({ threat: [0, 0], modeCard: true, stage: "50903", progress: 3, staging: [DG(10)], deck: PLACES });
+    const steps: Parameters<typeof settle>[2] = [];
+    let state = settle(fireForced({ ...made.state, window: null }, { trigger: "endOfRound", seat: null, phase: "End of round" }, made.ctx, steps), made.ctx, steps);
+    for (let guard = 0; guard < 12 && state.window?.kind === "choose"; guard += 1) {
+      expect(asksForcedOrder(state)).toBe(false);
+      state = settle(applyChoice(state, state.window.options[0] ?? ""), made.ctx, steps);
+    }
+    expect(state.window?.kind).not.toBe("choose");
+    const order = steps.flatMap((step) => (step.kind === "push" && step.frame === "forced" && step.cardId ? [state.cards[step.cardId]?.code] : []));
+    expect(order).toEqual(["50903", "50907", "50931", "50931"]);
   });
 });
