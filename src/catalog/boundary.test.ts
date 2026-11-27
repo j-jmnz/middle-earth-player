@@ -81,6 +81,13 @@ describe("catalog boundary", () => {
     expect(instructionSchema.safeParse({ verb: "ModifyStat", stat: "willpower", amount: 2 }).success).toBe(false);
   });
 
+  it("rejects an AdvanceToRandomStage that announces a draw but names no stage set, since it would tell nothing", () => {
+    const advance = { verb: "AdvanceToRandomStage", codes: ["17160", "17161"] };
+    expect(instructionSchema.safeParse({ ...advance, announce: true }).success).toBe(false);
+    expect(instructionSchema.safeParse({ ...advance, stageSet: true, announce: true }).success).toBe(true);
+    expect(instructionSchema.safeParse({ ...advance, stageSet: true }).success).toBe(true);
+  });
+
   it("rejects an amount on an instruction", () => {
     expect(instructionSchema.safeParse({ verb: "PayCost", amount: 1 }).success).toBe(false);
   });

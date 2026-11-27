@@ -172,11 +172,14 @@ describe("the placeholder name of a card with effect pills", () => {
     expect(pieceProps(staged, withPills(1)).titleRows).toBe(1);
   });
 
-  it("gives a name that fits no line, even shrunk, a second line, and the pills start under it (Uruk Chieftain)", () => {
+  it("gives a name that fits no line, even shrunk, the lines it needs (two on a short card, up to three on a tall one), and the pills start under them (Uruk Chieftain)", () => {
     const long = `Uruk Chieftain ${"of the Black Land ".repeat(12)}`;
     const props = pieceProps(staged, withPills(2, long));
-    expect(props.nameLines).toBe(2);
-    expect(props.titleRows).toBe(2);
+    expect(props.nameLines).toBe(staged.h >= 80 * 1 ? 3 : 2);
+    expect(props.titleRows).toBe(props.nameLines);
+    const short = pieceProps({ ...staged, h: 60 * 1 }, withPills(2, long));
+    expect(short.nameLines).toBe(2);
+    expect(short.titleRows).toBe(2);
     // A card with no pills keeps its default lines, and one with a picture draws no placeholder name.
     expect(pieceProps(staged, withPills(0, long)).titleRows).toBe(1);
     const pictured = { ...withPills(2, long), images: new Map([[staged.picture ?? staged.code, {} as SkImage]]) } as PieceContext;

@@ -2,7 +2,7 @@
 // The words of The Blood of Gondor's table pieces. A hidden card lies facedown in a player's play area: the table says how many each player holds and never what a card is, nor its type, until it is turned faceup. Pure.
 import type { Instruction } from "../../../../catalog/boundary.ts";
 
-import { capital, plural } from "../../list.ts";
+import { capital, listAnd, plural } from "../../list.ts";
 import { ownerWords } from "../../owner.ts";
 
 const HIDDEN = "hidden card";
@@ -135,19 +135,18 @@ export function hiddenWords(instruction: Instruction): string | null {
 const verb = (who: string, base: string): string => (who === "You" ? base : `${base}s`);
 export const takenWords = (who: string, amount: number, now: number, why: string | null): string => `${who} ${verb(who, "take")} ${hiddenCards(amount)}${why ? ` (${why})` : ""}, ${verb(who, "hold")} ${now} now`;
 export const turnedWords = (who: string, count: number, why: string | null): string => `${who} ${verb(who, "turn")} ${hiddenCards(count)} faceup${why ? ` (${why})` : ""}`;
-const joined = (names: readonly string[]): string => (names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}` : (names[0] ?? ""));
 const few = (count: number, one: string, many: string): string => (count === 1 ? one : many);
 /** What became of the cards one turn turned faceup, in one clause for the banner (the log tells each card): the enemies that engage by name, with the attack they make this phase, then the cards that never engage, those added to staging, and a count of the others. `engaged` is by seat word ("you", "Player 2"). */
 export const turnFateWords = (fates: { engaged: readonly { target: string; names: readonly string[] }[]; destroyed: readonly string[]; staging: readonly string[]; discarded: readonly string[]; deck: number; elsewhere: number; combat: boolean; named: boolean }): string => {
   const parts: string[] = [];
   for (const group of fates.engaged) {
     const many = group.names.length > 1;
-    parts.push(`${joined(group.names)} ${many ? "engage" : "engages"} ${group.target}${fates.combat ? ` and ${many ? "attack" : "attacks"} this phase` : ""}`);
+    parts.push(`${listAnd(group.names)} ${many ? "engage" : "engages"} ${group.target}${fates.combat ? ` and ${many ? "attack" : "attacks"} this phase` : ""}`);
   }
-  if (fates.destroyed.length > 0) parts.push(`${joined(fates.destroyed)} never ${fates.destroyed.length > 1 ? "engage" : "engages"}`);
-  if (fates.staging.length > 0) parts.push(`${joined(fates.staging)} ${fates.staging.length > 1 ? "are" : "is"} added to the staging area`);
+  if (fates.destroyed.length > 0) parts.push(`${listAnd(fates.destroyed)} never ${fates.destroyed.length > 1 ? "engage" : "engages"}`);
+  if (fates.staging.length > 0) parts.push(`${listAnd(fates.staging)} ${fates.staging.length > 1 ? "are" : "is"} added to the staging area`);
   const other = fates.named ? "other " : "";
-  if (fates.discarded.length > 0) parts.push(fates.named ? `${fates.discarded.length} other ${few(fates.discarded.length, "card is", "cards are")} discarded` : `${joined(fates.discarded)} ${few(fates.discarded.length, "is", "are")} discarded`);
+  if (fates.discarded.length > 0) parts.push(fates.named ? `${fates.discarded.length} other ${few(fates.discarded.length, "card is", "cards are")} discarded` : `${listAnd(fates.discarded)} ${few(fates.discarded.length, "is", "are")} discarded`);
   if (fates.deck > 0) parts.push(`${fates.deck} ${other}${few(fates.deck, "card is", "cards are")} shuffled back into the encounter deck`);
   if (fates.elsewhere > 0) parts.push(`${fates.elsewhere} ${other}${few(fates.elsewhere, "card has", "cards have")} left the hidden cards`);
   return parts.join("; ");

@@ -235,6 +235,24 @@ export function headingOffset(zones: Pick<BarZones, "left" | "scroll">, dial: { 
   return Math.max(0, Math.min(wanted, end));
 }
 
+/**
+ * The scenario dial the scrolling row keeps whole in the zone before any other: the one that says the game is nearly lost, a critical warning first and then a near one. Null when no dial warns (the bar then keeps the Heading dial, else the current stage of several).
+ */
+export function warnedDialId(dials: readonly { id: string; warn?: { level: "near" | "critical" } }[]): string | null {
+  return (dials.find((dial) => dial.warn?.level === "critical") ?? dials.find((dial) => dial.warn?.level === "near"))?.id ?? null;
+}
+
+/** How the dials row holds a scenario dial: every dial stands in one measuring box under its own key, `measured` for the ones the row may keep whole (the current stage of several, a dial that warns). A dial never moves in or out of a box, so a change of its warning keeps its instance. */
+export function dialBoxOf(dial: { id: string; current?: boolean; warn?: object }): { key: string; measured: boolean } {
+  const warned = dial.warn != null;
+  return { key: dial.id, measured: dial.current === true || warned };
+}
+
+/** Whether a scroll cue shows in the room kept at the row's end: the zone scrolls and its view has not reached the end of the row. `x` is the row's offset, `view` the zone's width and `content` the row's width with its end room, in screen points. */
+export function scrollCue(zones: Pick<BarZones, "scroll">, x: number, view: number, content: number, scale = 1): boolean {
+  return zones.scroll && x + view < content - 2 * scale;
+}
+
 /** The pill shows the neighbor phases only when it has room, and the phone is 760 pt or wider inside the insets. */
 export function railWide(rail: number, narrowScreen: boolean, scale = 1): boolean {
   return !narrowScreen && rail / scale >= RAIL_WIDE;

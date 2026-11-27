@@ -412,7 +412,8 @@ export function stageOf(code: string, effects: readonly Effect[]): { code: strin
   const look = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "LookAtStages");
   const catchUp = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "CatchUpWins");
   const random = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "AdvanceToRandomStage" && instruction.stageSet === true);
-  const randomNext = random?.verb === "AdvanceToRandomStage" ? randomNextOf(random) : undefined;
+  const owner = random?.verb === "AdvanceToRandomStage" && random.announce === true ? effects.find((effect) => effect.cardCode === code && effect.instructions.includes(random)) : undefined;
+  const randomNext = random?.verb === "AdvanceToRandomStage" ? { ...randomNextOf(random), ...(owner ? { announce: { effect: owner.id, line: owner.lines[0] ?? "" } } : {}) } : undefined;
   const attached = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "AdvanceIfAttached");
   const attachedNext = attached?.verb === "AdvanceIfAttached" ? { code: attached.code, then: attached.then, otherwise: attached.otherwise } : undefined;
   const deck = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).some((instruction) => instruction.verb === "FlipAtQuestPhase" || (instruction.verb === "FlipCurrentQuest" && instruction.resolve === true));

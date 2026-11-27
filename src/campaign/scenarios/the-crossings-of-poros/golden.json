@@ -1,0 +1,71 @@
+[
+{
+"name":"true solo, won, Normal, Desert Path then Orc Patrols",
+"seatCount":1,
+"seed":3,
+"difficulty":"Normal",
+"decks":"strong",
+"outcome":"won",
+"intents":[{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i23","i24"]},{"type":"Pass"},{"type":"Choose","optionId":"place"},{"type":"Travel","locationId":"i67"},{"type":"Engage","enemyId":"i12"},{"type":"Undefended","heroId":"i23"},{"type":"Undefended","heroId":"i24"},{"type":"DeclareAttackers","enemyId":"i12","attackerIds":["i25"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i23","i24"]},{"type":"Pass"},{"type":"Travel","locationId":"i20"},{"type":"Engage","enemyId":"i79"},{"type":"Undefended","heroId":"i25"},{"type":"Undefended","heroId":"i24"},{"type":"Choose","optionId":"i25"},{"type":"DeclareAttackers","enemyId":"i79","attackerIds":["i56"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i23","i24","i56"]},{"type":"Pass"},{"type":"Travel","locationId":"i18"},{"type":"Choose","optionId":"progress"},{"type":"Undefended","heroId":"i23"},{"type":"Undefended","heroId":"i24"}],
+"checks":[3745909121,4144087844,3550325054,2508410614,1092272762,422742581,4248500066,929251682,1010627392,382216269,4222959786,233441029,1468912296,4194088374,1711689544,1821873091,4044027624,1918274723,3783040531,1014662894,24946613,3441755703,1621526260,2279467007,1565142486,3449078593,84635962,678167035,783836792,467049711],
+"end":{"round":3,"lost":false,"cleared":true,"hash":"83ed38f027fa5f81e3a78090"}
+},
+{
+"name":"true solo, won, Normal, Ephel Duath then Deadly Creatures",
+"seatCount":1,
+"seed":1,
+"difficulty":"Normal",
+"decks":"strong",
+"outcome":"won",
+"intents":[{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i23","i24"]},{"type":"Pass"},{"type":"Travel","locationId":"i19"},{"type":"Undefended","heroId":"i23"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i24"]},{"type":"Pass"},{"type":"Choose","optionId":"i81"},{"type":"Choose","optionId":"i23"},{"type":"Travel","locationId":"i15"},{"type":"Engage","enemyId":"i97"},{"type":"Choose","optionId":"i23"},{"type":"Choose","optionId":"progress"},{"type":"ChooseEnemy","enemyId":"i76"},{"type":"Undefended","heroId":"i24"},{"type":"Undefended","heroId":"i25"},{"type":"DeclareAttackers","enemyId":"i76","attackerIds":["i25"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i23","i24"]},{"type":"Pass"},{"type":"Choose","optionId":"i23"},{"type":"DeclineTravel"},{"type":"Engage","enemyId":"i12"},{"type":"Undefended","heroId":"i24"},{"type":"ChooseEnemy","enemyId":"i97"},{"type":"Undefended","heroId":"i25"},{"type":"ChooseEnemy","enemyId":"i13"},{"type":"Undefended","heroId":"i25"},{"type":"Undefended","heroId":"i23"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i23","i24","i56"]},{"type":"Pass"},{"type":"Choose","optionId":"place"},{"type":"DeclineTravel"},{"type":"Engage","enemyId":"i97"},{"type":"DeclineEngage"},{"type":"Choose","optionId":"progress"},{"type":"ChooseEnemy","enemyId":"i13"},{"type":"Undefended","heroId":"i24"},{"type":"ChooseEnemy","enemyId":"i12"},{"type":"Undefended","heroId":"i23"},{"type":"Undefended","heroId":"i25"},{"type":"DeclareAttackers","enemyId":"i12","attackerIds":["i25"]},{"type":"DeclineAttack"}],
+"checks":[542629305,3720776289,2951964059,2297269758,2085390812,3648351842,3551649085,2674317584,3744709907,1706943235,1615072311,3388650359,3129656039,2228780508,293506012,3208592439,2767165472,2758285216,3115673637,1202663517,3484965466,3837952537,3980982478,1435539644,1834974408,375348808,3238209802,3674625754,2896876711,2303132208,1923278213,1055023982,800254509,771088227,1607338236,3357657001,2886241986,3364188719,930382646,3089701922,2444894763,4012523769,1180381970,1237407253,3241356691,2477449460,3919893532,2395415805,2820824336,3233184136],
+"end":{"round":4,"lost":false,"cleared":true,"hash":"3af4e9f581646714ec9c7fc0"}
+},
+{
+"name":"two-handed, won, Normal, Ephel Duath then Southron Pursuit",
+"seatCount":2,
+"seed":8,
+"difficulty":"Normal",
+"decks":"strong",
+"outcome":"won",
+"intents":[{"type":"Keep"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i23","i24"]},{"type":"Pass"},{"type":"Commit","cardIds":["i56","i57"]},{"type":"Pass"},{"type":"Choose","optionId":"place"},{"type":"Choose","optionId":"place"},{"type":"Travel","locationId":"i18"},{"type":"Engage","enemyId":"i8"},{"type":"Engage","enemyId":"i13"},{"type":"Undefended","heroId":"i23"},{"type":"Undefended","heroId":"i24"},{"type":"Undefended","heroId":"i25"},{"type":"Undefended","heroId":"i56"},{"type":"Undefended","heroId":"i57"},{"type":"DeclareAttackers","enemyId":"i8","attackerIds":["i25"]},{"type":"DeclineAttack"},{"type":"DeclareAttackers","enemyId":"i13","attackerIds":["i58"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i56","i57"]},{"type":"Pass"},{"type":"Commit","cardIds":["i23","i24"]},{"type":"Pass"},{"type":"Travel","locationId":"i91"},{"type":"Engage","enemyId":"i129"},{"type":"DeclineEngage"},{"type":"Undefended","heroId":"i58"},{"type":"ChooseEnemy","enemyId":"i11"},{"type":"Undefended","heroId":"i57"},{"type":"ChooseEnemy","enemyId":"i110"},{"type":"Undefended","heroId":"i56"},{"type":"Undefended","heroId":"i56"},{"type":"DeclareAttackers","enemyId":"i11","attackerIds":["i58","i89"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i23","i24","i89"]},{"type":"Pass"},{"type":"Commit","cardIds":["i56","i57"]},{"type":"Pass"},{"type":"Choose","optionId":"place"},{"type":"Travel","locationId":"i15"},{"type":"Engage","enemyId":"i118"},{"type":"Choose","optionId":"progress"},{"type":"Engage","enemyId":"i10"},{"type":"DeclineEngage"},{"type":"Choose","optionId":"progress"},{"type":"Choose","optionId":"seat:0"},{"type":"ChooseEnemy","enemyId":"i110"},{"type":"Undefended","heroId":"i24"},{"type":"ChooseEnemy","enemyId":"i118"},{"type":"Undefended","heroId":"i25"},{"type":"ChooseEnemy","enemyId":"i10"},{"type":"Undefended","heroId":"i23"},{"type":"Undefended","heroId":"i24"},{"type":"Undefended","heroId":"i57"},{"type":"DeclareAttackers","enemyId":"i118","attackerIds":["i25"]},{"type":"DeclineAttack"},{"type":"DeclareAttackers","enemyId":"i129","attackerIds":["i58"]},{"type":"DeclineAttack"}],
+"checks":[2656960451,2656960451,397965656,397965656,397965656,397965656,3406568672,1071399342,1071399342,1067667804,2728238573,1303232088,3767333450,3940100030,3238504471,1672038076,3550637747,2224151169,2136003883,730263846,412332325,1184446122,1184446122,1254560117,3750216239,3750216239,3793344568,3793344568,3793344568,3793344568,2714374213,2768644395,2768644395,392629269,321578416,1105317964,3933779406,173235280,197217707,2905443272,2934282994,358067201,2130707663,2172371155,602315047,2038873934,2038873934,1240611553,1240611553,1240611553,1240611553,2482681340,1320018965,1320018965,3682100183,1488941618,710551540,2612720346,1302428229,203217024,4293473997,2602949529,3575567768,3591791799,1399666848,3317889442,1953669,948339732,2869207087,1437048402,2298821451,1085812996,2108423060,2108423060,2251592651,3308595106],
+"end":{"round":3,"lost":false,"cleared":true,"hash":"8addd9c6c92a6f6781625db9"}
+},
+{
+"name":"true solo, lost, threat reaches 50",
+"seatCount":1,
+"seed":1,
+"difficulty":"Normal",
+"decks":"weak",
+"outcome":"lost",
+"lossReason":"No seats remain",
+"intents":[{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i23","i24"]},{"type":"Pass"},{"type":"Travel","locationId":"i19"},{"type":"Undefended","heroId":"i23"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i23","i24"]},{"type":"Pass"},{"type":"DeclineTravel"},{"type":"Undefended","heroId":"i24"},{"type":"Undefended","heroId":"i25"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i23","i24"]},{"type":"Pass"},{"type":"DeclineTravel"},{"type":"Undefended","heroId":"i23"}],
+"checks":[1537691446,818812444,2039489310,1565861485,3620448030,837460400,3958519211,1400185324,2597067234,3468436025,378123459,737479405,4156471405,1749171894,4063012729,4278767395,186331178,384217814,1272513263],
+"end":{"round":3,"lost":true,"cleared":false,"lossReason":"No seats remain","hash":"0f614add02c25c6e69a6c7bf"}
+},
+{
+"name":"true solo, lost, every hero destroyed",
+"seatCount":1,
+"seed":1,
+"difficulty":"Normal",
+"decks":"brittle",
+"outcome":"lost",
+"lossReason":"No seats remain",
+"intents":[{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i23","i24"]},{"type":"Pass"},{"type":"Travel","locationId":"i19"},{"type":"Undefended","heroId":"i23"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i24"]},{"type":"Pass"},{"type":"Choose","optionId":"i81"},{"type":"Choose","optionId":"i23"},{"type":"Travel","locationId":"i15"},{"type":"Engage","enemyId":"i97"},{"type":"Choose","optionId":"i24"},{"type":"Choose","optionId":"progress"},{"type":"ChooseEnemy","enemyId":"i76"},{"type":"Undefended","heroId":"i25"},{"type":"Undefended","heroId":"i24"},{"type":"DeclareAttackers","enemyId":"i76","attackerIds":["i25"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i25"]},{"type":"Pass"},{"type":"Choose","optionId":"i24"},{"type":"DeclineTravel"},{"type":"DeclineEngage"},{"type":"Undefended","heroId":"i25"},{"type":"ChooseEnemy","enemyId":"i97"},{"type":"Undefended","heroId":"i24"}],
+"checks":[542629305,3720776289,2951964059,2297269758,2085390812,3648351842,3551649085,2674317584,3744709907,1706943235,1615072311,57697780,4036263530,2528002149,2909648887,2775050702,187651289,2050304623,2627097592,539477072,2456959001,3292580662,3801369283,3234673502,2175541266,2452372041,2604872893,1733227399,3000840683,1346098684,2136186260],
+"end":{"round":3,"lost":true,"cleared":false,"lossReason":"No seats remain","hash":"0392b8f0333c51d62fad7d87"}
+},
+{
+"name":"true solo, lost, Poros Garrison leaves play",
+"seatCount":1,
+"seed":2,
+"difficulty":"Normal",
+"decks":"strong",
+"outcome":"lost",
+"lossReason":"Poros Garrison left play",
+"intents":[{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i23","i24"]},{"type":"Pass"},{"type":"Choose","optionId":"place"},{"type":"Travel","locationId":"i19"},{"type":"Engage","enemyId":"i11"},{"type":"Undefended","heroId":"i23"},{"type":"Undefended","heroId":"i24"},{"type":"DeclareAttackers","enemyId":"i11","attackerIds":["i25"]},{"type":"DeclineAttack"},{"type":"Pass"},{"type":"Pass"},{"type":"Commit","cardIds":["i23","i24"]},{"type":"Pass"},{"type":"DeclineTravel"},{"type":"Engage","enemyId":"i87"}],
+"checks":[3207761089,1803739181,2124419743,3385759042,2196720436,2438001217,1602955432,4263554745,408150706,3929914204,4043559747,1620369140,543754009,3476106119,1065745285,2454123995,2750675498],
+"end":{"round":2,"lost":true,"cleared":false,"lossReason":"Poros Garrison left play","hash":"bd112a23d836d1eeafb52b7f"}
+}
+]

@@ -14,6 +14,8 @@ const RULES = path.resolve(import.meta.dirname, "..", "..", "src", "rules");
 // A destination in the set-aside zone written on one line (`{ zone: "setAside" }`, a ternary that ends there, `leaves: "setAside"`); and a draw with the game's seed in a file that reads the set-aside cards.
 const WRITES = /zone:[^,}\n]*"setAside"|leaves\??:\s*"setAside"/;
 const DRAWS = /\b(shuffleIds|nextUint)\(/;
+// A call of the one seeded draw of a set-aside card (core/set-aside-draw.ts): its caller holds a site even when its file never spells the zone.
+const SEEDED_PICK = /\bdrawRandomSetAside\(/;
 // The zone's own definition and its bookkeeping: no verb.
 const ENGINE = new Set(["core/zones.ts", "core/state-types.ts", "core/state.ts", "engine/state-version.ts"]);
 
@@ -34,7 +36,7 @@ function functionsWithSite(text: string): string[] {
   let current = "(module)";
   for (const line of text.split("\n")) {
     current = FUNCTION.exec(line)?.[1] ?? current;
-    if (WRITES.test(line) || (reads && DRAWS.test(line))) found.add(current);
+    if (WRITES.test(line) || SEEDED_PICK.test(line) || (reads && DRAWS.test(line))) found.add(current);
   }
   return [...found].sort();
 }

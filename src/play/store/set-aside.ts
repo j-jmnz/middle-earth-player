@@ -24,13 +24,13 @@ import { underworldCount } from "../readouts/against-the-shadow/stewards-fear.ts
 
 /**
  * A row of the list: the copies of one printed card that say the same, as one row. `id` is the first copy (the one a tap shows), `picture` the picture key of the side it lies on,
- * `kept` the damage it keeps while set aside (SetAsideInPlay `keepDamage`, 19024:A:1; 0 for none: a copy with its own damage has its own row), `count` the copies.
+ * `kept` the damage it keeps while set aside (SetAsideInPlay `keepDamage`, 19024:A:1; 0 for none: a copy with its own damage has its own row), `count` the copies, `set` its encounter set ("" for a card of none).
  */
-export type SetAsideRow = { readonly id: string; readonly code: string; readonly picture: string; readonly kept: number; readonly count: number };
+export type SetAsideRow = { readonly id: string; readonly code: string; readonly picture: string; readonly kept: number; readonly count: number; readonly set: string };
 
 /** The public set-aside cards by id, in a stable order that says nothing of when each was set aside (by name, then id); the same cards as rows; and the number of facedown ones. */
-/** `deck`: how many of the facedown cards lie in The Steward's Fear's underworld deck (absent in any other game); the rest are the cards the Setup hides. */
-export type SetAsideList = { readonly cards: readonly string[]; readonly rows: readonly SetAsideRow[]; readonly facedown: number; readonly deck?: number };
+/** `deck`: how many of the facedown cards lie in The Steward's Fear's underworld deck (absent in any other game); the rest are the cards the Setup hides. `grouped` (absent when not): the open cards come from more than one encounter set, so the rows are ordered by set and the panel lists each set under its name (decided here, once). */
+export type SetAsideList = { readonly cards: readonly string[]; readonly rows: readonly SetAsideRow[]; readonly facedown: number; readonly deck?: number; readonly grouped?: true };
 
 const EMPTY: SetAsideList = { cards: [], rows: [], facedown: 0 };
 
@@ -136,7 +136,7 @@ export function setAsideList(game: ScenarioState, ctx: ReduceContext): SetAsideL
   return memoOf(LISTS, game, ctx, () => {
     const sort = asideSorter(game, ctx);
     const loot = new Set((game.lootDecks ?? []).flat());
-    const open: { id: string; name: string; code: string; picture: string; kept: number }[] = [];
+    const open: { id: string; name: string; code: string; picture: string; kept: number; set: string }[] = [];
     let facedown = 0;
     for (const id of game.setAside) {
       const card = game.cards[id];
@@ -145,20 +145,21 @@ export function setAsideList(game: ScenarioState, ctx: ReduceContext): SetAsideL
       if (printed?.type === "quest") continue;
       const sorted = sort(printed, card.code);
       if (sorted === "facedown") facedown += 1;
-      else if (sorted === "open") open.push({ id, name: printed?.name ?? "", code: card.code, picture: pictureKey(card), kept: card.keepsDamage === true ? card.damage : 0 });
+      else if (sorted === "open") open.push({ id, name: printed?.name ?? "", code: card.code, picture: pictureKey(card), kept: card.keepsDamage === true ? card.damage : 0, set: printed?.encounterSet ?? "" });
     }
     if (open.length === 0 && facedown === 0) return EMPTY;
-    // By name, then by id as a number: the order of `setAside` would say when each card was set aside.
-    open.sort((left, right) => left.name.localeCompare(right.name) || left.id.localeCompare(right.id, undefined, { numeric: true }));
+    // By encounter set when the cards come from more than one (the panel groups them under the set's name), then by name, then by id as a number: the order of `setAside` would say when each card was set aside.
+    const grouped = new Set(open.map((entry) => entry.set)).size > 1;
+    open.sort((left, right) => (grouped ? left.set.localeCompare(right.set) : 0) || left.name.localeCompare(right.name) || left.id.localeCompare(right.id, undefined, { numeric: true }));
     // The copies of one printed card that say the same are one row, at the place of the first.
     const rows = new Map<string, SetAsideRow>();
     for (const entry of open) {
       const key = `${entry.picture}\t${entry.kept}`;
       const row = rows.get(key);
-      rows.set(key, row ? { ...row, count: row.count + 1 } : { id: entry.id, code: entry.code, picture: entry.picture, kept: entry.kept, count: 1 });
+      rows.set(key, row ? { ...row, count: row.count + 1 } : { id: entry.id, code: entry.code, picture: entry.picture, kept: entry.kept, count: 1, set: entry.set });
     }
     const deck = Math.min(facedown, underworldCount(game));
-    return { cards: open.map((entry) => entry.id), rows: [...rows.values()], facedown, ...(deck > 0 ? { deck } : {}) };
+    return { cards: open.map((entry) => entry.id), rows: [...rows.values()], facedown, ...(grouped ? { grouped: true as const } : {}), ...(deck > 0 ? { deck } : {}) };
   });
 }
 
@@ -170,21 +171,21 @@ export function setAsideCount(game: ScenarioState, ctx: ReduceContext): number {
 
 /**
  * The list as one string, for a subscription: a state that changes nothing the panel draws gives an equal string, so the panel does not render (.claude/rules/code-standards.md,
- * Rendering the table and screens). The first line is the facedown count, then a line for each row. `setAsideFromKey` reads it back.
+ * Rendering the table and screens). The first line is the facedown count, the cards of the underworld deck among them (when there are any) and whether the rows are grouped by set, then a line for each row. `setAsideFromKey` reads it back.
  */
 export function setAsideKey(game: ScenarioState, ctx: ReduceContext): string {
   const list = setAsideList(game, ctx);
-  return [list.deck ? `${list.facedown}\t${list.deck}` : String(list.facedown), ...list.rows.map((row) => [row.id, row.code, row.picture, row.kept, row.count].join("\t"))].join("\n");
+  return [[list.facedown, ...(list.deck || list.grouped ? [list.deck ?? 0] : []), ...(list.grouped ? [1] : [])].join("\t"), ...list.rows.map((row) => [row.id, row.code, row.picture, row.kept, row.count, row.set].join("\t"))].join("\n");
 }
 
-export function setAsideFromKey(key: string): { rows: readonly SetAsideRow[]; facedown: number; deck?: number; total: number } {
+export function setAsideFromKey(key: string): { rows: readonly SetAsideRow[]; facedown: number; deck?: number; grouped?: true; total: number } {
   const [first = "0", ...lines] = key.split("\n");
   const rows = lines.map((line): SetAsideRow => {
-    const [id = "", code = "", picture = "", kept = "0", count = "1"] = line.split("\t");
-    return { id, code, picture, kept: Number(kept), count: Number(count) };
+    const [id = "", code = "", picture = "", kept = "0", count = "1", set = ""] = line.split("\t");
+    return { id, code, picture, kept: Number(kept), count: Number(count), set };
   });
-  const [count = "0", inDeck = "0"] = first.split("\t");
+  const [count = "0", inDeck = "0", groupedFlag = "0"] = first.split("\t");
   const facedown = Number(count);
   const deck = Number(inDeck);
-  return { rows, facedown, ...(deck > 0 ? { deck } : {}), total: facedown + rows.reduce((sum, row) => sum + row.count, 0) };
+  return { rows, facedown, ...(groupedFlag === "1" ? { grouped: true as const } : {}), ...(deck > 0 ? { deck } : {}), total: facedown + rows.reduce((sum, row) => sum + row.count, 0) };
 }

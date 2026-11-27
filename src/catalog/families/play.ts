@@ -74,7 +74,8 @@ const VERBS = [
   // player gains control of attached ally"; `lastPlayer`: "The last player gains control of Na'asiyah", 11079:A:1, dcce.last-player). The engine moves it whenever the first player changes.
   // `intoPlay` (with `card: self`): an objective ally in the staging area joins that player's play area, faceup and ready, once, and stays with him when the first player token moves ("he joins the first player as an ally", 02037:A:2); without it a card in the staging area is left where it is.
   // `follows` (with `intoPlay`): after it has joined, the card passes to each new first player as the token moves ("The first player gains control of Wilyador, as an ally", 02064:A:1; sotm.ally-objective-wilyador).
-  z.strictObject({ verb: z.literal("ControlledBy"), who: z.enum(["firstPlayer", "lastPlayer"]), card: z.enum(["self", "host"]), intoPlay: z.literal(true).optional(), follows: z.literal(true).optional(), ...when }),
+  // `announce`: the log tells each pass of control that follows the first player token ("Poros Garrison passes to Player 2 with the first player token"); a record without it passes silently.
+  z.strictObject({ verb: z.literal("ControlledBy"), who: z.enum(["firstPlayer", "lastPlayer"]), card: z.enum(["self", "host"]), intoPlay: z.literal(true).optional(), follows: z.literal(true).optional(), announce: z.literal(true).optional(), ...when }),
   // The actor takes the first player token: they are the first player from now on (rr.first-player).
   z.strictObject({ verb: z.literal("TakeFirstPlayer"), ...when }),
   // Each player raises their threat by `amount` from the doomed keyword the source gains (rr.doomed-x): "You may give ~

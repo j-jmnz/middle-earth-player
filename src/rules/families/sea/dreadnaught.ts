@@ -9,7 +9,7 @@ import { eliminateSeat } from "../../core/eliminate.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat } from "../../core/keywords.ts";
-import { nextUint } from "../../core/seed.ts";
+import { drawRandomSetAside } from "../../core/set-aside-draw.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import { lastPicked, pickedList } from "../../interpret/player-verbs.ts";
 import { printedOf, type PrintedCard } from "../../core/printed.ts";
@@ -66,13 +66,10 @@ export function pickFewestHitPoints(state: ScenarioState, focus: Focus, ctx: Red
 /** EngageRandomSetAside: of the unique enemies with the Trait that are set aside, one chosen with the game's seed (in id order, so a seed always picks the same) is put into play engaged with the actor: not revealed (no When Revealed, no Boarding), dealt no shadow card, but an engagement for the Forced effects that hear it (reading 19). */
 export function engageRandomSetAside(state: ScenarioState, instruction: Extract<Instruction, { verb: "EngageRandomSetAside" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.seats[focus.seat]?.eliminated) return state;
-  const set = state.setAside
-    .filter((id) => {
-      const printed = printedOf(ctx.cards, state.cards[id]?.code ?? "");
-      return printed.type === "enemy" && printed.isUnique && printed.traits.includes(instruction.trait);
-    })
-    .sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
-  const id = set[nextUint(state.seed, state.seedCursor) % Math.max(set.length, 1)];
+  const id = drawRandomSetAside(state, (candidate) => {
+    const printed = printedOf(ctx.cards, state.cards[candidate]?.code ?? "");
+    return printed.type === "enemy" && printed.isUnique && printed.traits.includes(instruction.trait);
+  });
   if (!id) return state;
   return moveEncounter(updateCard({ ...state, seedCursor: state.seedCursor + 1 }, id, { face: "up" }), id, "engaged", focus.seat, ctx, steps);
 }

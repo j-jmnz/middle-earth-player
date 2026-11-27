@@ -1,9 +1,8 @@
 import type { ScenarioState } from "../../../src/rules/core/state.ts";
-import { expectOk } from "../../../src/rules/core/test-fixture.ts";
 import type { EngineStep } from "../../../src/rules/core/intents.ts";
-import { reduce, type ReduceContext } from "../../../src/rules/engine/reduce.ts";
+import type { ReduceContext } from "../../../src/rules/engine/reduce.ts";
 import { hiddenIds } from "../../../src/rules/families/pelargir/hidden.ts";
-import type { PlayedGame } from "../../harness/game-kit.ts";
+import { stepsByIntent, type PlayedGame } from "../../harness/game-kit.ts";
 import { ALCARON, CAPTURED, FARAMIR } from "./game.ts";
 
 // Test helper. The moments of a played Blood of Gondor game that its goldens and its seed finder name, read from the states between the intents (`trail`): each is the index of the intent that made it, so a check asserts the
@@ -24,20 +23,8 @@ export const shadowsIn = (steps: readonly EngineStep[], state: ScenarioState): s
 /** The codes of the cards pushed as a frame (a reveal, a When Revealed) in the steps. */
 export const pushedIn = (steps: readonly EngineStep[], state: ScenarioState, frame: string): string[] => steps.filter((step) => step.kind === "push" && step.frame === frame).map((step) => codeOf(state, (step as { cardId: string | null }).cardId));
 
-/** The engine steps of each intent of the game (the game replayed: a played game keeps its steps in one list). */
-const STEPS = new WeakMap<PlayedGame, (readonly EngineStep[])[]>();
-export function stepsByIntent(played: PlayedGame, ctx: ReduceContext): (readonly EngineStep[])[] {
-  const known = STEPS.get(played);
-  if (known) return known;
-  let state = played.kept;
-  const steps = played.intents.map((intent) => {
-    const result = expectOk(reduce(state, intent, ctx));
-    state = result.state;
-    return result.steps;
-  });
-  STEPS.set(played, steps);
-  return steps;
-}
+// The engine steps of each intent come from the play itself (game-kit.ts, `stepsByIntent`), never from a second replay.
+export { stepsByIntent };
 
 const TAKING_SHADOWS: readonly string[] = ["06122", "06131"];
 const TURNING_SHADOWS: readonly string[] = ["06121", "06130"];

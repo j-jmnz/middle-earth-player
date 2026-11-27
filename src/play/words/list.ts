@@ -89,3 +89,6 @@ export function keptWords(damage: number): string | null {
 export function setAsideWords(kind: string | null, kept: string | null): string | null {
   return [kind, kept].filter(Boolean).join(" · ") || null;
 }
+
+/** "A", "A and B", "A, B and C": the one way the table's words join a list of names. */
+export const listAnd = (parts: readonly string[]): string => (parts.length <= 1 ? (parts[0] ?? "") : `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`);

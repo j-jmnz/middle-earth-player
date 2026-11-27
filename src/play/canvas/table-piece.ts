@@ -14,7 +14,7 @@ import type { BackImages, Fonts, TokenImages } from "./pieces.native.tsx";
 import type { CardSlot } from "../layout/layout.ts";
 import { shownBounds } from "../layout/hits.ts";
 import { footStop } from "./badge-room.ts";
-import { nameFitsOne } from "./placeholder-name.ts";
+import { nameRows } from "./placeholder-name.ts";
 import { underRect } from "./under-mark.ts";
 import { AT_REST, still, type Motion } from "../motion/motion.ts";
 import type { OptionMark } from "../choice/sheet-types.ts";
@@ -176,14 +176,15 @@ export function pieceProps(slot: CardSlot, ctx: PieceContext): PieceProps {
   const nameFoot = slot.exhausted && body.image == null ? footStopOf(slot, info, ctx.highlight.marks.get(slot.id), ctx.s) : null;
   // A card with effect pills names itself on one line, since the pills stand down its left edge; a name that does not fit one line, even shrunk to the floor, takes a second and the pills start under it (the rest wait behind "N more").
   const box = { name: body.name, w: slot.w, s: ctx.s, shown: slot.shown ?? null, lines: 1, damage: slot.damage > 0, sideways: slot.exhausted, foot: nameFoot, measure: (text: string) => ctx.fonts.names.getTextWidth(text) };
-  const twoLines = pills > 0 && body.image == null && !slot.faceDown && !nameFitsOne(box);
+  // A name that does not fit one line takes the lines it needs, at most three where the card is tall enough to hold them over its pills (two on a short card).
+  const rows = pills > 0 && body.image == null && !slot.faceDown ? nameRows(box, slot.h >= 80 * ctx.s ? 3 : 2) : 1;
   // A quest area's stage wears its number pill above its progress strip: its title keeps one line (shrunk, then cut) so the pill never covers a second.
-  const nameLines = twoLines ? 2 : pills > 0 || slot.stormcaller === "stage" ? 1 : slot.zone === "questStage" || slot.zone === "activeLocation" ? 2 : undefined;
+  const nameLines = rows > 1 ? rows : pills > 0 || slot.stormcaller === "stage" ? 1 : slot.zone === "questStage" || slot.zone === "activeLocation" ? 2 : undefined;
   return {
     ...body,
     ...(nameLines != null ? { nameLines } : {}),
     nameFoot,
-    titleRows: twoLines && !slot.exhausted ? 2 : 1,
+    titleRows: slot.exhausted ? 1 : rows,
     motion: ctx.motions.get(slot.id) ?? AT_REST,
     clock: ctx.clock,
     turnedFrom: turnedFace(ctx.motions.get(slot.id), ctx),

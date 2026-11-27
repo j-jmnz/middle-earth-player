@@ -39,6 +39,8 @@ export type NameLayout = {
   indent: number;
   /** True when the name fits one line at the floor, with nothing cut. */
   fitsOne: boolean;
+  /** True when a word or a line was cut with an ellipsis. */
+  cut: boolean;
 };
 
 // The narrowest the lines may be, in points: a foot pill that leaves less than this does not take the name's room away.
@@ -66,9 +68,29 @@ export function placeholderName(a: NameBox): NameLayout {
   // One line: the whole name against the first line. Several: the widest word against a line (a word is never split, so it is cut where it does not fit); a line wider than the first one takes it on the next.
   const needed = a.lines === 1 ? full : widest;
   const room = a.lines === 1 ? first : across;
-  const squeeze = needed > room && room / needed >= NAME_FLOOR ? room / needed : 1;
-  const lines = wrapName(a.name, across / squeeze, a.measure, a.lines, first / squeeze);
-  return { lines, scale: bare * squeeze, indent: indent / (bare * squeeze), fitsOne: full <= first || first / full >= NAME_FLOOR };
+  const squeeze0 = needed > room && room / needed >= NAME_FLOOR ? room / needed : 1;
+  const fitsOne = full <= first || first / full >= NAME_FLOOR;
+  const lay = (squeeze: number): NameLayout => {
+    const lines = wrapName(a.name, across / squeeze, a.measure, a.lines, first / squeeze);
+    const cut = lines.join(" ").split(/\s+/).filter((word) => word.length > 0).join(" ") !== words.join(" ");
+    return { lines, scale: bare * squeeze, indent: indent / (bare * squeeze), fitsOne, cut };
+  };
+  const first0 = lay(squeeze0);
+  if (a.lines === 1 || !first0.cut) return first0;
+  // Several lines and some text cut: shrink, step by step down to the floor, until the whole name fits the lines it may take.
+  for (let squeeze = squeeze0 - 0.05; squeeze >= NAME_FLOOR - 1e-9; squeeze -= 0.05) {
+    const tried = lay(squeeze);
+    if (!tried.cut) return tried;
+  }
+  return first0;
+}
+
+/** The fewest lines (up to `most`) that show the name whole at the floor size, or `most` when even those cut it. A card with effect pills asks it to make the pill column start under the name. */
+export function nameRows(a: NameBox, most: number): number {
+  for (let rows = 1; rows < most; rows += 1) {
+    if (!placeholderName({ ...a, lines: rows }).cut) return rows;
+  }
+  return most;
 }
 
 /** Whether a name fits one line, at the floor at most: when it does not, a card with effect pills gives the name a second line and the pills start under it. */

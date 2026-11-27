@@ -60,8 +60,8 @@ export function badgeLayout(height: number, s: number, pill: number, stop: numbe
   const tokenFloor = covered ? height - 1 * s : height - (TOKEN + 2) * s;
   const floor = stop == null ? tokenFloor : Math.min(tokenFloor, stop - 1 * s);
   const rowsFrom = (limit: number, top: number) => Math.max(0, Math.floor((limit - top + 2 * s) / (pill + 2 * s)));
-  // A name of two lines (a placeholder that does not fit one) pushes the column down by the second line, so no pill covers it.
-  const titleTop = (BADGE_TOP + (titleRows > 1 ? NAME_LINE : 0)) * s;
+  // A name of several lines (a placeholder that does not fit one) pushes the column down by each line after the first, so no pill covers it.
+  const titleTop = (BADGE_TOP + (titleRows - 1) * NAME_LINE) * s;
   if (covered) return { top: BADGE_TOP * s, rows: rowsFrom(floor, BADGE_TOP * s) };
   const top = rowsFrom(tokenFloor, titleTop) >= 2 || titleRows > 1 ? titleTop : BADGE_TOP_SHORT * s;
   return { top, rows: rowsFrom(floor, top) };

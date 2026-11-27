@@ -127,7 +127,7 @@ function SetAsideReading({ store, ctx, names, picture, onRead, onClose }: { stor
   const list = setAsideFromKey(key);
   const cards = list.rows.map((row) => {
     const made = listCard(row.id, row.code, row.picture, names, picture, ctx.cards, setAsideWords(kindWords(ctx.cards.get(row.code)), keptWords(row.kept)));
-    return { ...made, label: copiesLabel(made.label, row.count), spoken: copiesSaid(made.label, row.count) };
+    return { ...made, label: copiesLabel(made.label, row.count), spoken: copiesSaid(made.label, row.count), ...(list.grouped === true ? { group: row.set === "" ? "Other cards" : row.set } : {}) };
   });
   return <SetAsideList title={SET_ASIDE_TITLE} head={setAsideHead(list.total)} cards={cards} facedown={list.facedown === 0 ? null : list.deck ? facedownSplitWords(list.facedown, list.deck) : facedownWords(list.facedown)} onRead={onRead} onClose={onClose} />;
 }

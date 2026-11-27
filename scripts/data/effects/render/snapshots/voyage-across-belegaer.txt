@@ -53,7 +53,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110137:A:4 (front): Draw 1 additional card during the resource phase.
   110137:constant:2: Constant
-    - actorSeat: stat extraDraw 1, while this card is in play
+    - the player who controls this card (the first player when none does): stat extraDraw 1, while this card is in play
 
 110137:A:5 (front): If the Dawn Star is destroyed, its controller is eliminated from the game.
   110137:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
@@ -71,7 +71,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 110137:B:4 (back): Draw 1 additional card during the resource phase.
   110137:constant:3: Constant
-    - actorSeat: stat extraDraw 1, while this card is in play
+    - the player who controls this card (the first player when none does): stat extraDraw 1, while this card is in play
 
 110137:B:5 (back): If the Dawn Star is destroyed, its controller is eliminated from the game.
   110137:triggered:4: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
@@ -663,7 +663,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11081:A:4 (front): Draw 1 additional card during the resource phase.
   11081:constant:2: Constant
-    - actorSeat: stat extraDraw 1, while this card is in play
+    - the player who controls this card (the first player when none does): stat extraDraw 1, while this card is in play
 
 11081:A:5 (front): If the Dawn Star is destroyed, its controller is eliminated from the game.
   11081:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)

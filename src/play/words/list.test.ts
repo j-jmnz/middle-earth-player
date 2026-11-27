@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { copiesLabel, copiesSaid, facedownWords, keptWords, kindWords, SET_ASIDE_TITLE, setAsideHead, setAsideLabel, setAsideSaid, setAsideWords, victorySaid, victoryWords } from "./list.ts";
+import { copiesLabel, listAnd, copiesSaid, facedownWords, keptWords, kindWords, SET_ASIDE_TITLE, setAsideHead, setAsideLabel, setAsideSaid, setAsideWords, victorySaid, victoryWords } from "./list.ts";
 
 describe("kindWords", () => {
   it("names the type and the sphere", () => {
@@ -34,5 +34,14 @@ describe("kindWords", () => {
     expect(setAsideWords("Enemy", keptWords(15))).toBe("Enemy · Keeps 15 damage");
     expect(setAsideWords("Enemy", null)).toBe("Enemy");
     expect(setAsideWords(null, null)).toBeNull();
+  });
+});
+
+describe("listAnd", () => {
+  it("joins one, two and three names as the table's words do", () => {
+    expect(listAnd([])).toBe("");
+    expect(listAnd(["Garrison"])).toBe("Garrison");
+    expect(listAnd(["Desert Sands", "The Desert Path"])).toBe("Desert Sands and The Desert Path");
+    expect(listAnd(["A", "B", "C"])).toBe("A, B and C");
   });
 });

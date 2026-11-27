@@ -39,7 +39,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("TakeControlOfStagedObjectives"), trait: z.string().min(1), ...when }),
   // "Remove stage 4 from the quest deck, if able" (05033:A:2, 05034:A:2, 05035:A:2): the stage with this code is set aside and is no longer part of the quest; the stage that is defeated before it goes to the next stage still in the quest deck. When it is the current stage the
   // quest advances at once to the next stage still in the quest deck, and that stage is revealed. A stage already gone: nothing happens.
-  z.strictObject({ verb: z.literal("RemoveStage"), code: z.string().min(1), ...when }),
+  // `announce`: the log tells a stage that is removed from the quest deck while the quest is at another stage ("The Desert Path leaves the game").
+  z.strictObject({ verb: z.literal("RemoveStage"), code: z.string().min(1), announce: z.literal(true).optional(), ...when }),
   // "Resolve the 'when revealed' effect on the topmost treachery card in the encounter discard pile, if able" (05056:A:2): the When Revealed effects (not Doomed, not Surge) of the last treachery placed in the encounter discard pile resolve for the actor; the card stays in the discard pile.
   // With no treachery there nothing happens. Its effects cannot be canceled when `uncancelable` is set.
   z.strictObject({ verb: z.literal("ResolveTopmostTreachery"), uncancelable: z.literal(true).optional(), ...when }),

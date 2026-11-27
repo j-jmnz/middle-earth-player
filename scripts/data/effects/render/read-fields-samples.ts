@@ -225,7 +225,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
     { verb: "AttachSelf", to: { kind: "enemy", trait: "Balrog" } },
   ],
   MakeActive: [{ verb: "MakeActive" }, { verb: "MakeActive", target: "self" }, { verb: "MakeActive", random: true }],
-  ControlledBy: [{ verb: "ControlledBy", who: "firstPlayer", card: "host" }, { verb: "ControlledBy", who: "lastPlayer", card: "self", intoPlay: true, follows: true }],
+  ControlledBy: [{ verb: "ControlledBy", who: "firstPlayer", card: "host" }, { verb: "ControlledBy", who: "lastPlayer", card: "self", intoPlay: true, follows: true, announce: true }],
   ShuffleIntoDeck: [{ verb: "ShuffleIntoDeck", code: "02048", trait: "Troll", type: "enemy", each: true }, { verb: "ShuffleIntoDeck", trait: "Tentacle", type: "enemy", who: "firstPlayer" }],
   CancelEffect: [{ verb: "CancelEffect" }],
   SetAsideFromDeck: [{ verb: "SetAsideFromDeck", code: "900503" }],

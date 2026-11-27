@@ -47,7 +47,8 @@ function PanelClose({ testID, onPress, paper = true }: { testID: string; onPress
  * A card in a list: its name (`spoken` is what a screen reader hears of the name when it differs: "Deep Deep Dark, 4 copies" for "Deep Deep Dark ×4"), the line under it (its type and sphere), what a screen reader hears of that line when it differs ("4 victory
  * points" for "4 VP"), and its picture (null for a facedown card or while none is known).
  */
-export type ListCard = { id: string; label: string; spoken?: string; detail?: string | null; said?: string; picture: PictureSource | null; pictureKey: string };
+// `group`: the encounter set a set-aside row is listed under (SetAsideList); the cards come in the order of their groups.
+export type ListCard = { id: string; label: string; spoken?: string; detail?: string | null; said?: string; picture: PictureSource | null; pictureKey: string; group?: string };
 
 /**
  * One card of a list, on the night panel (docs/design-system-table.md, Reading panels): its picture as the table draws it, its name in
@@ -184,7 +185,7 @@ export function RowList({ title, cards, onRead, onClose }: { title: string; card
 /**
  * The set-aside cards, from the menu's row (store/set-aside.ts), on the frame of a discard pile's list. The head counts every card and says where they are ("21 cards · out of play").
  * The cards the scenario hides come first, as one line that is no button, "2 cards are facedown": no name, picture or type. Then each printed card the players may read, by name,
- * its copies on one row ("Deep Deep Dark ×4"); a row shows the card large and sends nothing.
+ * its copies on one row ("Deep Deep Dark ×4"); a row shows the card large and sends nothing. Cards of more than one encounter set are grouped under the set's name, as the Aside dial's panel lists them (Reading panels).
  */
 export function SetAsideList({ title, head, cards, facedown, onRead, onClose }: { title: string; head: string; cards: readonly ListCard[]; facedown: string | null; onRead: (cardId: string) => void; onClose: () => void }) {
   return (
@@ -194,8 +195,15 @@ export function SetAsideList({ title, head, cards, facedown, onRead, onClose }: 
       <ScrollView className="mt-3" style={{ flexShrink: 1 }}>
         {cards.length === 0 && !facedown ? <Text className="text-center text-body text-muted">No card is set aside.</Text> : null}
         {facedown ? <FacedownRow words={facedown} /> : null}
-        {cards.map((card) => (
-          <CardRow key={card.id} card={card} playable={false} testID={`set-aside-card-${card.id}`} onPress={() => onRead(card.id)} />
+        {cards.map((card, at) => (
+          <View key={card.id}>
+            {card.group != null && card.group !== cards[at - 1]?.group ? (
+              <Text testID={`set-aside-group-${card.group}`} accessibilityRole="header" className="mb-1 mt-2 px-1.5 font-display text-eyebrow uppercase text-faint">
+                {card.group}
+              </Text>
+            ) : null}
+            <CardRow card={card} playable={false} testID={`set-aside-card-${card.id}`} onPress={() => onRead(card.id)} />
+          </View>
         ))}
       </ScrollView>
     </View>

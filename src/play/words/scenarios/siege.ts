@@ -2,6 +2,8 @@
 // The words of The Siege of Gondor's table pieces: The Corsair Fleet's resources, the Ship locations toward Great Corsair Ship's travel, Pelargir Quays' damage tokens, the Port's heal cap, the progress Great Corsair Ship holds on stage 1B and the
 // seat that controls the Army of the Dead. Pure.
 
+import { listAnd } from "../list.ts";
+
 /** What the Fleet's dial says: its resources are X, and the Fleet gains one at the beginning of each staging step (145071:A:1). */
 export const fleetWords = (resources: number): string => `X is ${resources}: the resources on The Corsair Fleet. It gains 1 at the beginning of each staging step. Great Corsair Ship's Threat, the Fleet's damage and Driven to the Brink's damage are X. If you win, this number is written in the campaign log.`;
 
@@ -19,7 +21,7 @@ export const portWords = (cap: number): string => `While Port of Pelargir is in 
 
 /** The warning once a character has used its allowance: the characters at the cap, named. */
 export const portReachedWords = (cap: number, names: readonly string[]): string => {
-  const who = names.length <= 1 ? (names[0] ?? "A character") : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+  const who = names.length === 0 ? "A character" : listAnd(names);
   return names.length > 1
     ? `${who} have each had ${cap} damage healed this round: no more can be healed from them until the round ends`
     : `${who} has had ${cap} damage healed this round: no more can be healed from it until the round ends`;

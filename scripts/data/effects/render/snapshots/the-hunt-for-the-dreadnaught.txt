@@ -268,7 +268,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 
 40009:A:2 (front): Your starting hand size is 8 cards.
   40009:constant:1: Constant
-    - actorSeat: stat startingHand (the cards the player draws once the fleet is taken, beyond the 6 of the opening hand) 2, while this card is in play
+    - the player who controls this card (the first player when none does): stat startingHand (the cards the player draws once the fleet is taken, beyond the 6 of the opening hand) 2, while this card is in play
 
 40009:A:3 (front): Action: Play an event from your hand with a cost of 3 or more, reducing its cost by 1.
   40009:action:1: Action
