@@ -67,6 +67,8 @@ const objectiveAction = (code: string, line: string, instructions: Instruction[]
   cardCode: code,
   lines: [line],
   timing: "action",
+  // Only the player who controls the objective may use it: a hero holds it, not the staging area or an encounter card (rr.guarded, rr.objective-cards).
+  condition: { kind: "attachedToHero", code, is: true },
   cost: [{ kind: "exhaustSelf" }, { kind: "raiseThreat", amount: 1 }],
   instructions,
 });
