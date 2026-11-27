@@ -52,7 +52,7 @@ import { useTableTokens } from "../../ui/use-table-tokens.ts";
 
 const NO_CARDS: readonly CardInstance[] = [];
 
-// No card is ringed by the last move's line while the table peeks.
+// No card is ringed by a banner beat while the table peeks.
 const NO_BEAT: ReadonlySet<string> = new Set();
 
 // A faint word in an empty zone, so the player knows what the space is for. `foot`: the y a card above the zone reaches into it (the staging row's peeks over an empty engagement row); the word stands under it.
@@ -72,14 +72,14 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
   const acting = useStore(store, (state) => actingSeat(state.game));
   const peeking = useStore(store, (state) => state.viewedSeat != null);
   const highlight = peeking ? NO_HIGHLIGHT : marked;
-  // The cards the last move's line names are ringed; this canvas alone reads them, so a beat draws it and not the screen (beat-store.ts).
+  // The cards the banner's line names are ringed; this canvas alone reads them, so a beat draws it and not the screen (beat-store.ts).
   const beatKey = useStore(beats, (state) => state.key);
   const beat = useMemo(() => beatIds(beatKey), [beatKey]);
   const beating = peeking ? NO_BEAT : beat;
   const { views, piles } = useViews(store, seat, facts);
   // The cards a Sailing test looked at stand in a strip over the table (look-strip.ts); the rest of the table carries the night veil meanwhile.
   const lookedCards = useStore(store, (state) => lookedOf(state.game));
-  // Discover X's cards that went to the encounter discard pile lie in the same strip while the last move's line rings them (emce.discover), in the engagement and play bands only: the table carries the veil, and the Loot
+  // Discover X's cards that went to the encounter discard pile lie in the same strip while the banner is on the beat that names them (emce.discover), in the engagement and play bands only: the table carries the veil, and the Loot
   // objective and the Hazard the beat rings stand above it in staging. A card that has since left the discard pile (reshuffled, or drawn into staging) is not shown.
   const game = useStore(store, (state) => state.game);
   const discoverKey = useMemo(() => lookIdsOf(beating).join(","), [beating]);
@@ -102,7 +102,7 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
   const deckTop = deckTopId && draggable.includes(deckTopId) ? deckTopCard : null;
   const deckShown = deckFaceUp && !deckTop ? deckTopCard : null;
   const targetIds = useMemo(() => new Set(targets.flatMap((target) => (target.kind === "card" ? [target.cardId] : []))), [targets]);
-  // What a row's fold must keep on the table: the cards the open moment asks about, the picked ones, a card being dragged and the cards the last move's line rings (row-fold.ts).
+  // What a row's fold must keep on the table: the cards the open moment asks about, the picked ones, a card being dragged and the banner's beat (row-fold.ts).
   // The moment's own cards (`marked.keep`) count while the tray is open or the table peeks, when nothing glows.
   const keep = useMemo(() => new Set([...marked.keep, ...targetIds, ...beating, ...(selected ? [selected] : [])]), [marked, targetIds, beating, selected]);
   const layout = useMemo(
