@@ -108,6 +108,7 @@ import * as secret from "../scenarios/celebrimbors-secret/game.ts";
 import * as crown from "../scenarios/the-antlered-crown/game.ts";
 import * as harad from "../scenarios/race-across-harad/game.ts";
 import * as sands from "../scenarios/beneath-the-sands/game.ts";
+// import * as serpent from "../scenarios/the-black-serpent/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -242,4 +243,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-mines-of-moria", "The Mines of Moria", mines.MINES_GOLDENS, mines.minesWorld, mines.playGolden),
   entry("escape-from-khazad-dum", "Escape from Khazad-dûm", khazad.KHAZAD_GOLDENS, khazad.khazadWorld, khazad.playGolden),
   entry("the-hunt-for-the-dreadnaught", "The Hunt for the Dreadnaught", dreadnaught.DREADNAUGHT_GOLDENS, dreadnaught.dreadnaughtWorld, dreadnaught.playGolden),
+  // entry("the-black-serpent", "The Black Serpent", serpent.SERPENT_GOLDENS, serpent.serpentWorld, serpent.playGolden),
 ];

@@ -112,6 +112,7 @@ import secretFixtures from "./fixtures/celebrimbors-secret.json";
 import crownFixtures from "./fixtures/the-antlered-crown.json";
 import haradFixtures from "./fixtures/race-across-harad.json";
 import sandsFixtures from "./fixtures/beneath-the-sands.json";
+import serpentFixtures from "./fixtures/the-black-serpent.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -242,6 +243,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-mumakil": mumakilFixtures,
   "race-across-harad": haradFixtures,
   "beneath-the-sands": sandsFixtures,
+  "the-black-serpent": serpentFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
