@@ -13,6 +13,8 @@ export type TableDial = {
   // The dial's test id when it is not `isengard-<id>` (The Passage of the Marshes' dials).
   testID?: string;
   label: string;
+  // The name the dial's caption shows when the label is too long for it (`captionOf`, play/chrome/top-bar-layout.ts): a few letters, the same word the label says.
+  short?: string;
   name: string;
   value: number;
   limit?: number;
@@ -49,6 +51,7 @@ export function dialProps(dial: TableDial) {
   return {
     threat: { seat: 0, threat: dial.value, eliminated: false },
     label: dial.label,
+    short: dial.short,
     accessibilityName: dial.name,
     testID: dial.testID ?? `isengard-${dial.id}`,
     icon: dial.icon ?? null,

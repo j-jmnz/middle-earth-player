@@ -30,6 +30,7 @@ export function ettenmoorsDials(game: ScenarioState, nameOf: (code: string) => s
     id: "losing",
     testID: "angmar-losing",
     label: "Losing Time",
+    short: "Losing",
     name: live ? `Resources on ${nameOf(card.code)}, a Losing Time is revealed at ${LOSING_TIME_AT}:` : `Resources on ${nameOf(card.code)}, no Losing Time is set aside:`,
     value: card.resources,
     ...(live ? { limit: LOSING_TIME_AT, warms: true as const } : {}),
