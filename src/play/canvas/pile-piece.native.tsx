@@ -18,6 +18,17 @@ const PILE_WORD: Readonly<Record<string, string>> = { deck: "Deck", discard: "Di
 // The turn of each card fanned behind the victory pile's top, the nearest first (radians, about the pile's foot; layout.ts keeps VICTORY_FAN of room for it).
 const FAN_TURNS = [-0.12, -0.24];
 
+/** The word of an empty pile, centered in the pile's width and shrunk to fit it with 2 pt on each side, so two piles side by side ("Encounter", "Discard") never run their words together. */
+function PileWord({ word, x, y, w, fonts, t, s }: { word: string; x: number; y: number; w: number; fonts: Fonts; t: TableTokens; s: number }) {
+  const width = fonts.small.getTextWidth(word);
+  const k = Math.min(1, (w - 4 * s) / Math.max(width, 1));
+  return (
+    <Group transform={[{ translateX: x + (w - width * k) / 2 }, { translateY: y }, { scale: k }]}>
+      <Text x={0} y={0} text={word} font={fonts.small} color={t.faint} />
+    </Group>
+  );
+}
+
 /** The victory pile's fan: the cards before its top, turned about the pile's foot, the oldest farthest out (docs/design-system-table.md, Piles). */
 function VictoryFan({ slot, fan, t, s }: { slot: CardSlot; fan: readonly (SkImage | null)[]; t: TableTokens; s: number }) {
   const { x, y, w, h } = slot;
@@ -124,7 +135,7 @@ export function Pile({
         <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={t.hairline} style="stroke" strokeWidth={1 * s}>
           <DashPathEffect intervals={[4 * s, 4 * s]} />
         </RoundedRect>
-        {label ? <Text x={x + (w - fonts.small.getTextWidth(word)) / 2} y={y + h / 2 + 4 * s} text={word} font={fonts.small} color={t.faint} /> : null}
+        {label ? <PileWord word={word} x={x} y={y + h / 2 + 4 * s} w={w} fonts={fonts} t={t} s={s} /> : null}
       </Group>
     );
   }

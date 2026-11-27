@@ -221,7 +221,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - add the Siege value printed on the card the event is about (a destroyed enemy, an explored location; 0 when it prints none) to this round's Siege tally
   50907:forced:3: Forced at the end of the round
-    only if 2 is less than the stage number of the quest
+    only if 2 is less than the stage number of the main quest (also while a side quest is the current quest)
     who acts: the acting player is the first player (a phase has no player of its own)
     - up to the Siege values added up this round: each enemy destroyed and each location explored adds its printed Siege value resource token(s) come off the card with code 50907 in play
 
@@ -467,7 +467,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the players cannot travel to this location while this holds
     - this card: stat noProgressPlaced 1, while this card is in play
-  50922:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
+  50922:forced:1: Forced when an event is played, before its effects resolve (heard about card (any player controls) or in the staging area or the active location, of card type event)
     only if all of: (it is the Quest phase) and (this card is in the staging area)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card the event is about, now in a discard pile, is attached facedown to this card: out of play under it, with no text, and discarded to its owner's discard pile when this card leaves play
@@ -619,7 +619,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
 
 50931:B:2 (back): While the players are at stage 3, this card gains: 'Forced: After resolving the Forced effect on Dol Guldur, randomly select a stage 3 that was not in play this round and resolve its Forced effect. Then, discard all progress from the current stage 3 and advance to a new stage 3 of your choice.'
   50931:forced:2: Forced at the end of the round
-    only if 2 is less than the stage number of the quest
+    only if 2 is less than the stage number of the main quest (also while a side quest is the current quest)
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose at random, with the game's seed, one of the stages 50903, 50904, 50905, 50906 but the current one, and note it as the option taken

@@ -143,7 +143,8 @@ export function pieceProps(slot: CardSlot, ctx: PieceContext): PieceProps {
   const pills = info ? info.effects.stats.length + info.effects.flags.length : 0;
   return {
     ...bodyProps(slot, ctx),
-    ...(pills > 0 ? { nameLines: 1 } : {}),
+    // A quest stage or an active location wears its progress strip at the foot: its name takes two lines at most, so the strip never covers a third.
+    ...(pills > 0 ? { nameLines: 1 } : slot.zone === "questStage" || slot.zone === "activeLocation" ? { nameLines: 2 } : {}),
     motion: ctx.motions.get(slot.id) ?? AT_REST,
     clock: ctx.clock,
     dimmed: card && isDimmed(slot, ctx),
@@ -179,6 +180,8 @@ const SLOT_FIELDS = Object.keys({
   damage: true,
   progress: true,
   tilt: true,
+  bandPeek: true,
+  bandFloor: true,
   count: true,
   committed: true,
   held: true,

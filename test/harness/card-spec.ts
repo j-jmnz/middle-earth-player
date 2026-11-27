@@ -74,6 +74,8 @@ export const refused = (code: string, value = true): Expect => ({ expect: "refus
 export const counter = (name: CounterName, value: number): Expect => ({ expect: "counter", name, value });
 /** The card lies in the captive zone, held by the host card. */
 export const heldBy = (code: string, host: string): Expect => ({ expect: "heldBy", code, host });
+/** The card is attached to (hosted by) the first card with the code `host`: a guard on its objective, an objective on its enemy or hero. */
+export const attachedTo = (code: string, host: string): Expect => ({ expect: "attachedTo", code, host });
 /** The encounter deck holds this many cards: one is gone for each shadow card or reveal drawn from it (an additional attack is dealt a new shadow card, faq.additional-attacks). */
 export const deckCount = (value: number): Expect => ({ expect: "deckCount", value });
 /** The card is (or is not) exhausted. */

@@ -8,7 +8,7 @@ import { BLACK_GATE } from "../../rules/families/harad/under.ts";
 import { live as stewardsFear, stackUnder } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { isReanimatedCode } from "../../rules/core/printed.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
-import { flagged, type CardInstance, type ScenarioState } from "../../rules/core/state.ts";
+import { flagged, inPlay, type CardInstance, type ScenarioState } from "../../rules/core/state.ts";
 import { cardsUnder, shadowCards } from "../../rules/core/zones.ts";
 import { lookedIds } from "../../rules/families/sea/sailing.ts";
 import { captivesOf, captivesUnder } from "../../rules/families/captives/values.ts";
@@ -69,7 +69,7 @@ const EMPTY: readonly CardInstance[] = [];
 
 /**
  * The characters in the attack in progress, by the enemy they fight: the declared defender, or the hero an undefended attack
- * hits once named; the attackers of a player attack. Only enemies engaged with `seat`.
+ * hits once named; the attackers of a player attack. Only enemies engaged with `seat`, and only characters still in play: a hero the attack destroyed is in the discard pile and is not drawn beside its attacker.
  */
 export function combatPairs(game: ScenarioState, seat: number): ReadonlyMap<string, { ids: readonly string[]; kind: FightKind }> {
   const pairs = new Map<string, { ids: readonly string[]; kind: FightKind }>();
@@ -78,12 +78,12 @@ export function combatPairs(game: ScenarioState, seat: number): ReadonlyMap<stri
   if (attack && engaged.includes(attack.enemyId)) {
     const defended = attack.defenderId != null && !attack.undefended;
     // Every defender declared (Stand Together, rr.multiple-defenders), or the hero an undefended attack hits.
-    const fighters = (defended ? declaredDefenders(attack) : [attack.heroId]).filter((id): id is string => id != null && game.cards[id] != null);
+    const fighters = (defended ? declaredDefenders(attack) : [attack.heroId]).filter((id): id is string => id != null && game.cards[id] != null && inPlay(game.cards[id].zone));
     if (fighters.length > 0) pairs.set(attack.enemyId, { ids: fighters, kind: defended ? "defense" : "undefended" });
   }
   const strike = game.pendingStrike;
   if (strike && engaged.includes(strike.enemyId)) {
-    const attackers = strike.attackerIds.filter((id) => game.cards[id] != null);
+    const attackers = strike.attackerIds.filter((id) => game.cards[id] != null && inPlay(game.cards[id].zone));
     if (attackers.length > 0) pairs.set(strike.enemyId, { ids: attackers, kind: "attack" });
   }
   return pairs;

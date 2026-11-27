@@ -390,7 +390,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146070:A:2 (front): X is twice the stage number of the main quest.
   146070:constant:1: Constant
-    - this card: stat threat the stage number of the quest x 2, while this card is in play
+    - this card: stat threat the stage number of the main quest (also while a side quest is the current quest) x 2, while this card is in play
 
 146070:A:3 (front): Forced: After the players travel here, flip The Two Watchers to its enemy side and move it to the staging area.
   146070:forced:1: Forced after the players travel (heard about this card)

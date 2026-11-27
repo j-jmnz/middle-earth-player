@@ -206,12 +206,12 @@ Scenario piles that place cards with no record (quest: 19168 Urdug's Assault; qu
   19165:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose objective (any player controls) or in the staging area, named "The Goblins' Assault"
-    - place the stage number of the quest progress on the picked card
+    - place the stage number of the main quest (also while a side quest is the current quest) progress on the picked card
 
 19165:A:3 (shadow): Shadow: Attacking enemy gets +X Attack, where X is the stage number of the main quest.
   19165:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - the attacking enemy: stat attack the stage number of the quest, until the end of the attack
+    - the attacking enemy: stat attack the stage number of the main quest (also while a side quest is the current quest), until the end of the attack
 
 ## 19166 Urdug's Command
 (the scenario deals it into the encounter pile; the piles place it, no record does)

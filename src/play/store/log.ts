@@ -11,7 +11,7 @@ import { changedWords } from "../words/scenarios/against-the-shadow/amon-din.ts"
 import { barredWords } from "../words/scenarios/against-the-shadow/osgiliath.ts";
 import { reshuffleWords } from "./pile-ids.ts";
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
-import { captureAttachedLine, mumakLogPlace } from "../words/scenarios/haradrim/capture.ts";
+import { attachedWords } from "../words/scenarios/haradrim/capture.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
 import { trackLogLine } from "../words/scenarios/haradrim/track.ts";
 import { discoverLogLine, setAsideLine } from "../words/scenarios/wilderland.ts";
@@ -156,7 +156,8 @@ function words(step: EngineStep, names: LogNames, questStat: string | null): str
     case "grapple":
       return grappleLine(names.card(step.enemyId), names.card(step.locationId));
     case "attachDrawn":
-      return captureAttachedLine(names.card(step.cardId), names.card(step.hostId), mumakLogPlace(step.seat));
+    case "claim":
+      return attachedWords(step, names.card, 2);
     case "detach":
       return detachLine(names.card(step.enemyId), names.card(step.locationId));
     case "flip":

@@ -6,7 +6,7 @@ import { memo } from "react";
 
 import { Moving } from "../motion/card-motion.native.tsx";
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
-import { Badges, CardBody, HeldMark, NotAppliedMark, StackMark, SuccessMedallion, Tokens } from "./pieces.native.tsx";
+import { Badges, BandName, CardBody, HeldMark, NotAppliedMark, StackMark, SuccessMedallion, Tokens } from "./pieces.native.tsx";
 import { BLANK_WORD } from "../words/card-bars.ts";
 import { CHAMPION_WORD } from "../words/scenarios/haradrim/umbar-table.ts";
 import { SHIELD_WORD } from "../words/scenarios/against-the-shadow/vale.ts";
@@ -94,9 +94,9 @@ function drawOverlay(p: PieceProps) {
         {info?.engagement ? <EngagementMark rect={rect} cost={info.engagement.cost} engages={info.engagement.engages} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.fire ? <FireMarkView rect={rect} mark={info.fire} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.side?.loses ? <FireMarkView rect={rect} mark={info.side.loses} fonts={fonts} images={tokens} t={t} s={s} /> : null}
-        {info?.side?.current ? <CurrentQuestMark rect={rect} clear={badgeReach(info.effects, fonts, s, rect.h, stop)} fonts={fonts} t={t} s={s} /> : null}
+        {info?.side?.current ? <CurrentQuestMark rect={rect} clear={badgeReach(info.effects, fonts, s, rect.h, stop, rect.w)} fonts={fonts} t={t} s={s} /> : null}
         {info?.determined && FOOT_WORDS.has(info.determined.word) ? <BlankMarkView rect={rect} word={info.determined.word} lifted={info.under != null || info.seat != null || info.engagement != null || info.combat != null || info.fire != null || info.loss != null || info.questPoints != null} fonts={fonts} t={t} s={s} /> : null}
-        {info?.determined && !FOOT_WORDS.has(info.determined.word) ? <DeterminedMarkView rect={rect} word={info.determined.word} clear={badgeReach(info.effects, fonts, s, rect.h, stop)} fonts={fonts} t={t} s={s} /> : null}
+        {info?.determined && !FOOT_WORDS.has(info.determined.word) ? <DeterminedMarkView rect={rect} word={info.determined.word} clear={badgeReach(info.effects, fonts, s, rect.h, stop, rect.w)} fonts={fonts} t={t} s={s} /> : null}
         {info?.seat ? <SeatChipView rect={rect} text={info.seat.chip} fonts={fonts} t={t} s={s} /> : null}
         {info?.loss ? <ShipLossView rect={rect} mark={info.loss} fonts={fonts} t={t} s={s} /> : null}
         {info?.place ? <PlaceMarkView rect={rect} mark={info.place} t={t} s={s} /> : null}
@@ -108,6 +108,7 @@ function drawOverlay(p: PieceProps) {
         {slot.kind === "card" && slot.faceDown && slot.held ? <HeldMark rect={rect} icon="hero" t={t} s={s} /> : null}
         {slot.kind === "card" && slot.faceDown && slot.dead ? <HeldMark rect={rect} icon="threat" t={t} s={s} /> : null}
         {slot.stack != null ? <StackMark slot={slot} fonts={fonts} t={t} s={s} /> : null}
+        {slot.kind === "attachment" && !slot.faceDown ? <BandName slot={slot} name={p.name} fonts={fonts} t={t} s={s} /> : null}
       </Group>
       {slot.success != null && slot.success > 0 ? <SuccessMedallion slot={slot} fonts={fonts} t={t} s={s} /> : null}
       {slot.kind === "card" ? <PickRing rect={rect} picked={p.picked} share={p.share} dimmed={veiled} fonts={fonts} t={t} s={s} /> : null}

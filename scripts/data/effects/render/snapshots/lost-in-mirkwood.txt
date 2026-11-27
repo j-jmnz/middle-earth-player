@@ -33,7 +33,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     - each card (any player controls) or in the staging area or the active location, attached to an objective-location as its guard: stat immuneToPlayerCards 1, while this card is in play
   18028:constant:2: Constant
     only if not (there is a card (any player controls) or in the staging area or the active location, that is an Objective-Location (its printed type line says so), in the staging area or the active location to choose)
-    - currentQuest: stat progressDiscards 1, while this card is in play
+    - the main quest card (also while a side quest is the current quest): stat progressDiscards 1, while this card is in play
 
 18028:A:2 (front): Forced: When progress would be placed on the main quest, if there are no objective-locations in play, discard an equal number of cards from the top of the encounter deck instead. Then, put the topmost objective-location in the encounter discard pile into play.
   18028:forced:1: Forced after progress that would be placed on the current quest is replaced by the stage's flag (X is that progress: the amount that would have gone on the quest)

@@ -167,7 +167,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
 
 51211:A:1 (front): X is 1 more than the stage number of the main quest.
   51211:constant:1: Constant
-    - this card: stat threat the stage number of the quest + 1, while this card is in play
+    - this card: stat threat the stage number of the main quest (also while a side quest is the current quest) + 1, while this card is in play
 
 51211:A:2: Immune to player card effects.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
@@ -332,7 +332,7 @@ Scenario piles that place cards with no record (quest: 51201 To the West-door; q
     - this card: stat threat resources of this card, while this card is in play
 
 51222:A:2 (front): Forced: After an event is played, place 1 resource here.
-  51222:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
+  51222:forced:1: Forced when an event is played, before its effects resolve (heard about card (any player controls) or in the staging area or the active location, of card type event)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 resource tokens on this card
 

@@ -1,5 +1,4 @@
 // Rules: rr.in-play-and-out-of-play, rr.discard-pile-and-victory-display (data/rules/entries.json).
-import type { CardFace, CardInstance, ScenarioState, ZoneName } from "./state.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { leaveWith } from "../families/play/zones.ts";
 import { keptInPlay } from "../families/pelargir/vale/cannot-leave.ts";
@@ -18,7 +17,8 @@ import { joinOrcsArea } from "../families/haradrim/orcs-zone.ts";
 import { joinUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "../families/uncharted/zone.ts";
 import { deckRoute, isDeckZone, joinPile, leavePile, shufflePile, type PileZone } from "./piles.ts";
 import { isReanimatedCode, ORC_GUARD_CODE, reanimatedBase } from "./printed.ts";
-import { flagged, heldHero, inPlay, updateCard, updateCards, withSeat } from "./state.ts";
+import { flagged, heldHero, inPlay, updateCard, updateCards, withSeat, type CardFace, type CardInstance, type ScenarioState, type ZoneName } from "./state.ts";
+import { cannotLeaveStaging } from "./staging-bar.ts";
 
 export type Destination =
   | { zone: "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "seatStaging"; seat: number }
@@ -368,7 +368,7 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   // A card that cannot enter the staging area stays where it is ("Shrine to Morgoth ... cannot enter the staging area", 12094:A:1).
   if (dest.zone === "staging" && flagged(state, id, "cannotEnterStaging")) return state;
   // A card that cannot leave the staging area stays in it, whatever moves it (Uglúk, 143069:B:2).
-  if (current.zone === "staging" && dest.zone !== "staging" && flagged(state, id, "cannotLeaveStaging") && !supersedes && !(defeated && flagged(state, id, "leavesStagingWhenDefeated"))) return state;
+  if (current.zone === "staging" && dest.zone !== "staging" && cannotLeaveStaging(state, id) && !supersedes && !(defeated && flagged(state, id, "leavesStagingWhenDefeated"))) return state;
   // A card that cannot leave play unless destroyed stays where it is, with its damage, tokens, attachments and shadow cards, whatever else moves it out of play (families/pelargir/vale/cannot-leave.ts).
   if (!destroyed && !defeated && inPlay(current.zone) && !inPlay(dest.zone) && keptInPlay(state, id)) return state;
   if (current.zone === "hand" && heldInHand(state, id)) return state; // a card that cannot leave the hand stays in it, whatever moves it (Ill Tidings, 07023:A:1)

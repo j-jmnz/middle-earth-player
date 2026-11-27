@@ -18,12 +18,17 @@ import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
+/** The id of one set-aside card with the trait, drawn by the game seed (the ids in order, one step of the seed), or undefined when none is set aside. The caller advances `seedCursor` when it uses the card. */
+export function drawRandomSetAside(state: ScenarioState, trait: string, ctx: ReduceContext): string | undefined {
+  const ids = state.setAside.filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").traits.includes(trait)).sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
+  return ids[nextUint(state.seed, state.seedCursor) % Math.max(ids.length, 1)];
+}
+
 /** AttachRandomSetAside: one set-aside card with the trait, drawn by the game seed (the ids in order, one step of the seed), is attached faceup to the last picked card in play and controlled by nobody. */
 export function attachRandomSetAside(state: ScenarioState, instruction: Verb<"AttachRandomSetAside">, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const host = state.cards[lastPicked(state)];
   if (!host || !inPlay(host.zone)) return state;
-  const ids = state.setAside.filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").traits.includes(instruction.trait)).sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
-  const drawn = ids[nextUint(state.seed, state.seedCursor) % Math.max(ids.length, 1)];
+  const drawn = drawRandomSetAside(state, instruction.trait, ctx);
   if (!drawn) return state;
   const lying = updateCard(attachTo(moveCard({ ...state, seedCursor: state.seedCursor + 1 }, drawn, { zone: "attached" }), drawn, host.id), drawn, { face: "up", exhausted: false });
   steps.push({ kind: "attachDrawn", cardId: drawn, hostId: host.id, seat: engagedSeat(state, host.id) });

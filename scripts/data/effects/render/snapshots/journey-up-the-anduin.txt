@@ -176,7 +176,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     - this card: stat threat the number of cards attached facedown to this card x 2, while this card is in play
 
 18024:A:2 (front): While Lonely Lands is in the staging area, it gains: "Forced: After an event is played during the quest phase, place it facedown under Lonely Lands."
-  18024:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
+  18024:forced:1: Forced when an event is played, before its effects resolve (heard about card (any player controls) or in the staging area or the active location, of card type event)
     only if all of: (it is the Quest phase) and (this card is in the staging area)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card the event is about, now in a discard pile, is attached facedown to this card: out of play under it, with no text, and discarded to its owner's discard pile when this card leaves play

@@ -122,6 +122,8 @@ export function useTableChoice({
   const legal = useStore(store, (state) => state.legal);
   const moment = useStore(store, (state) => state.moment);
   const canUndo = useStore(store, (state) => state.history.length > 0);
+  // The heroes the table saw destroyed: the Defeat note tells a seat's last hero was destroyed from them.
+  const destroyed = useStore(store, (state) => state.destroyedHeroes);
   // The phone's screen reader (not the web list): it hears a sheet's readerNote and gets the words of each card (reader-table.tsx).
   const readerMode = useReaderMode();
   // The tray lists the choices for any reader, and a development build that forces the reader table (screen-reader.ts) lists them too.
@@ -143,7 +145,7 @@ export function useTableChoice({
   // The outcome banner of the last moment worth showing, and the round's summary after it (table-hooks.ts).
   const { banner, bannerKey, onBeat, dismiss: dismissBanner } = useBanner(store, ctx, names, beats);
 
-  const base = useMemo(() => sheetFor(game, ctx, legal, names) ?? windowSheet(game, ctx, legal, names), [game, ctx, legal, names]);
+  const base = useMemo(() => sheetFor(game, ctx, legal, names, destroyed) ?? windowSheet(game, ctx, legal, names), [game, ctx, legal, names, destroyed]);
   const live = overlay && overlay.game === game ? overlay : null;
   const sheet = live?.sheet ?? base;
   const table: TapContext = useMemo(() => ({ game, ctx, legal, names }), [game, ctx, legal, names]);
@@ -205,7 +207,7 @@ export function useTableChoice({
   // When the moment on the dock last changed, or its spotlight ended: a send just after it is the tail of a double tap (table-hooks.ts).
   const settled = useSettle(store, `${sheet.key}:${moment?.seq ?? 0}`);
   // The table answers for the player where the player's settings say so (stops.ts); Pass to stop starts a run.
-  const sheetOf = useCallback((at: ScenarioState, offered: readonly LegalIntent[]) => sheetFor(at, ctx, offered, names) ?? windowSheet(at, ctx, offered, names), [ctx, names]);
+  const sheetOf = useCallback((at: ScenarioState, offered: readonly LegalIntent[]) => sheetFor(at, ctx, offered, names, destroyed) ?? windowSheet(at, ctx, offered, names), [ctx, names, destroyed]);
   const { startRun, follow } = useAutoAnswer({ store, ctx, game, sheet, legal, settings, moment, opened: live != null, sheetOf, hold });
   // `confirm`: a dock button or a card's tap sent it, so its acceptance plays the confirm click (docs/design-system-table.md, Sound).
   const dispatch = useCallback(

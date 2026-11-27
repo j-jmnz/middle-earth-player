@@ -8,6 +8,7 @@ import { attachTo, moveCard, spawn, type Destination } from "../../src/rules/cor
 import type { ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";
 import { attachmentTargets } from "../../src/rules/player/planning.ts";
 import { holdCaptive } from "../../src/rules/families/captives/index.ts";
+import { guardWith } from "../../src/rules/families/objectives/guard.ts";
 import { syncConstants } from "../../src/rules/interpret/constants.ts";
 import { markSideQuests } from "../../src/rules/families/wilderland/night-quest.ts";
 import { markProgressNoted } from "../../src/rules/families/angmar/progress.ts";
@@ -82,9 +83,11 @@ export type Layout = {
   // The scenario's mode card lies beside the quest deck on its back, as a finished Setup leaves it (The Siege of Annúminas' Standard Game Mode, 50801:B:1).
   // `"easy"`: the scenario's Easy Mode card instead (The Hunt for the Dreadnaught, 40001:B:1).
   modeCard?: true | "easy";
-  // Cards attached to the first card of `to`, wherever it lies (an attachment is spawned in play and attached).
+  // Cards attached to the first card of `to`, wherever it lies (an attachment is spawned in play and attached). An objective on a character is a plain attachment in play here, controlled and marked claimed; `claimed` builds the one ClaimObjective leaves (zone attached, `claimedBy`).
   // `encounter`: an encounter card attached the way its own effect attaches it (zone attached, controlled by no one, not claimed): the Sack cards, the Troll Key and the Troll Purse; an enemy lies as an attachment (Mugash, 07024:A:2).
-  attached?: readonly { code: string; to: string; encounter?: true }[];
+  attached?: readonly { code: string; to: string; encounter?: true; guard?: true }[];
+  // Objectives a hero holds, as ClaimObjective leaves them: `code` lies attached to the first card of `by` (zone attached, faceup, claimed, controlled by that hero's player).
+  claimed?: readonly { code: string; by: string }[];
   // The codes of the cards committed to the quest (a hero stand-in, an ally of `play`).
   committed?: readonly string[];
   // The codes of the cards that lie exhausted (every card of the code: a hero stand-in, an ally of `play`).
@@ -243,6 +246,12 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   for (const [zone, items] of Object.entries(layout.piles ?? {}) as [PileZone, readonly Entry[]][]) for (const item of items) put(entry(item).code, { zone }, item, zone === "outOfPlay0" || zone === "outOfPlay1" ? "down" : undefined);
   for (const attachment of layout.attached ?? []) {
     const host = idOf(state, attachment.to);
+    // `guard`: the card guards the objective `to` as Guarded leaves it: it stays in the staging area, attached to the objective, with the guard mark.
+    if (attachment.guard) {
+      const spawned = spawn(state, attachment.code, { zone: "staging" });
+      state = guardWith(spawned.state, spawned.id, host);
+      continue;
+    }
     if (attachment.encounter) {
       const spawned = spawn(state, attachment.code, { zone: "play", seat: 0 });
       state = attachTo(moveCard(spawned.state, spawned.id, { zone: "attached" }), spawned.id, host);
@@ -255,6 +264,10 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     const hostCard = state.cards[host];
     const hostPrinted = hostCard ? cards.get(hostCard.code) : undefined;
     if (cards.get(attachment.code)?.type === "objective" && hostCard?.controller != null && hostPrinted != null && isCharacterType(hostPrinted)) state = updateCard(state, spawned.id, { claimed: true, controller: hostCard.controller, face: "up" });
+  }
+  for (const claim of layout.claimed ?? []) {
+    const spawned = spawn(state, claim.code, { zone: "staging" });
+    state = claimedBy(spawned.state, spawned.id, idOf(spawned.state, claim.by));
   }
   for (const hidden of layout.under ?? []) {
     const spawned = spawn(state, hidden.code, { zone: "under", locationId: idOf(state, hidden.to) }, "down");
@@ -321,4 +334,9 @@ export function engagedHandTable(scenarioId: string, hand: string, enemy: string
 /** A scenario's `make`: `tableFromLayout` for `scenarioId` on the records it is given (all records by default). Write `const make = layoutTableFor(ID);`. */
 export function layoutTableFor(scenarioId: string): (layout: Layout, effects?: readonly Effect[]) => LayoutTable {
   return (layout, effects = EFFECTS) => tableFromLayout(scenarioId, layout, { effects });
+}
+
+/** The objective `objectiveId` lies attached to the hero `heroId`, faceup, claimed and controlled by the hero's player, as ClaimObjective leaves it (families/objectives/index.ts). */
+export function claimedBy(state: ScenarioState, objectiveId: string, heroId: string): ScenarioState {
+  return updateCard(attachTo(moveCard(state, objectiveId, { zone: "attached" }), objectiveId, heroId), objectiveId, { face: "up", controller: state.cards[heroId]?.controller ?? 0, claimed: true });
 }

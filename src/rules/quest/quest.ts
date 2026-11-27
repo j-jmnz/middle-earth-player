@@ -262,7 +262,10 @@ export function putOnStage(from: ScenarioState, stageId: string, wanted: number,
   if (!stage) return state;
   const advancing = points != null && canAdvance(state);
   // A stage that cannot hold more than its quest points even while it cannot advance (16066:B:1, 16067:B:1).
-  const placed = advancing || (points != null && flagged(state, stageId, "stageCapped")) ? Math.min(amount, Math.max(0, points - stage.progress)) : amount;
+  // `stageCappedPrinted` (17100:A:2): the cap is the quest points printed on the stage, not a value an effect changed.
+  const printedCap = flagged(state, stageId, "stageCappedPrinted") ? (printedOf(cards, stage.code).questPoints ?? null) : null;
+  const capped = printedCap ?? (points != null && flagged(state, stageId, "stageCapped") ? points : null);
+  const placed = advancing || capped != null ? Math.min(amount, Math.max(0, (capped ?? points ?? 0) - stage.progress)) : amount;
   let next = state;
   if (placed > 0) {
     next = updateCard(next, stageId, { progress: stage.progress + placed });

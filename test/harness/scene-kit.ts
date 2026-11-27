@@ -339,5 +339,5 @@ export function fightEnemy<T extends FightTable, L>(table: (layout: L) => T, sha
 }
 
 // The table built from a layout is test/harness/layout.ts; it lives there so this file keeps to the scene's helpers.
-export { attachTargetCodes, engagedHandTable, layoutTableFor, printedIn, tableFromLayout } from "./layout.ts";
+export { attachTargetCodes, claimedBy, engagedHandTable, layoutTableFor, printedIn, tableFromLayout } from "./layout.ts";
 export type { Layout, LayoutTable, Placed, PileZone } from "./layout.ts";

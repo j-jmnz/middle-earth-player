@@ -54,12 +54,12 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
 17041:A:1 (front): X is the stage number of the main quest.
   17041:forced:1: Forced after this location becomes the active location (heard about this card) (record also names 17041:A:2)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - each player assigns the stage number of the quest damage among the character (you control), one at a time
+    - each player assigns the stage number of the main quest (also while a side quest is the current quest) damage among the character (you control), one at a time
 
 17041:A:2 (front): Forced: After Blistering Erg becomes the active location, each player assigns X damage among characters he controls.
   17041:forced:1: Forced after this location becomes the active location (heard about this card) (record also names 17041:A:1)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - each player assigns the stage number of the quest damage among the character (you control), one at a time
+    - each player assigns the stage number of the main quest (also while a side quest is the current quest) damage among the character (you control), one at a time
 
 ## 17042 Harad Road
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -261,7 +261,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
 
 17052:A:1 (front): When Revealed: If the players have already defeated stage 2B, discard cards from the top of the encounter deck until an Orc enemy is discarded. Add that enemy to the Orcs' area.
   17052:whenRevealed:1: When revealed
-    only if 2 is less than the stage number of the quest
+    only if 2 is less than the stage number of the main quest (also while a side quest is the current quest)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until an enemy with the trait Orc is discarded, or the deck is empty (a deck that runs out has the encounter discard pile shuffled into it first, when it holds one); that card becomes the picked card
     - then, if the picked card is a Orc enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked card goes into the Orcs' area from wherever it is (an engaged enemy loses its engagement; nothing for a card that is not in play when this card is the source, or with no Orcs' area)
@@ -291,7 +291,7 @@ Scenario piles that place cards with no record (setAside: 16063 Uruk Warg-rider;
 
 17053:A:1 (front): When Revealed: If the players have already defeated stage 3B, discard cards from the top of the encounter deck until an Orc enemy is discarded. Add that enemy to the Orcs' area.
   17053:whenRevealed:1: When revealed
-    only if 3 is less than the stage number of the quest
+    only if 3 is less than the stage number of the main quest (also while a side quest is the current quest)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until an enemy with the trait Orc is discarded, or the deck is empty (a deck that runs out has the encounter discard pile shuffled into it first, when it holds one); that card becomes the picked card
     - then, if the picked card is a Orc enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked card goes into the Orcs' area from wherever it is (an engaged enemy loses its engagement; nothing for a card that is not in play when this card is the source, or with no Orcs' area)

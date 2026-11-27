@@ -276,12 +276,12 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 
 51316:A:1 (front): X is 1 more than the stage number of the main quest.
   51316:constant:1: Constant
-    - this card: stat threat the stage number of the quest + 1, while this card is in play
+    - this card: stat threat the stage number of the main quest (also while a side quest is the current quest) + 1, while this card is in play
 
 51316:A:2 (front): Travel: Each player discards the top X cards of his deck.
   51316:travel:1: Travel
     - for each player, first player first:
-      - the top the stage number of the quest + 1 card(s) of the acting player's deck go to their discard pile
+      - the top the stage number of the main quest (also while a side quest is the current quest) + 1 card(s) of the acting player's deck go to their discard pile
 
 ## 51317 Watchful Eyes
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -590,7 +590,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51338:A:2 (shadow): Shadow: Attacking enemy gets +X Attack, where X is the stage number of the main quest.
   51338:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - the attacking enemy: stat attack the stage number of the quest, until the end of the attack
+    - the attacking enemy: stat attack the stage number of the main quest (also while a side quest is the current quest), until the end of the attack
 
 ## 51339 Orc Horn Blower
 (the scenario deals it into the encounter pile; the piles place it, no record does)

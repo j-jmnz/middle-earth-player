@@ -179,7 +179,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 
 51011:A:2 (front): X is 1 more than the stage number of the main quest.
   51011:constant:1: Constant
-    - this card: stat threat the stage number of the quest + 1, while this card is in play
+    - this card: stat threat the stage number of the main quest (also while a side quest is the current quest) + 1, while this card is in play
 
 51011:A:3 (front): Cannot leave the staging area unless the players are at stage 3B.
   51011:constant:2: Constant
@@ -315,7 +315,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
   51020:whenRevealed:1: When revealed
     - for each player, first player first:
       - choose character (you control)
-      - deal the stage number of the quest + 1 damage to the picked card
+      - deal the stage number of the main quest (also while a side quest is the current quest) + 1 damage to the picked card
 
 51020:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character has an attachment).
   51020:shadow:1: Shadow
