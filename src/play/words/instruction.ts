@@ -96,6 +96,11 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return `shuffle an out-of-play ${names.code(instruction.code)} into the encounter deck`;
     case "GainSurge":
       return "reveal an additional encounter card";
+    // Beneath the Sands' Search objective (the asks file words the choice again for the sheet).
+    case "FlipSearchObjective":
+      return `flip the Search objective to ${instruction.to === "onTrack" ? "On Track" : "Off Track"}`;
+    case "AddTopmostFromDiscard":
+      return `return the topmost ${instruction.cardType} in the encounter discard pile to the staging area`;
     // The Antlered Crown (the asks file words the choice again for the sheet): Raven Skirmisher's counter off the active location.
     case "RemoveTimeCounters": {
       const amount = amountWords(instruction.amount);
