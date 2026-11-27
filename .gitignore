@@ -56,6 +56,9 @@ modules/*/android/.cxx/
 # the desktop shell's bundle, its web exports and the installers (pnpm desktop)
 desktop/build/
 desktop/out/
+# the web app's export for Cloudflare (pnpm webapp build) and wrangler's local state
+webapp/build/
+webapp/.wrangler/
 
 # CanvasKit's wasm, copied by pnpm assets canvaskit
 public/canvaskit.wasm

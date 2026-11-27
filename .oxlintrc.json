@@ -39,7 +39,9 @@
     ".claude/**",
     "assets/booklets/**",
     "desktop/build/**",
-    "desktop/out/**"
+    "desktop/out/**",
+    "webapp/build/**",
+    "webapp/.wrangler/**"
   ],
   "rules": {
     "import/namespace": "error",
@@ -249,6 +251,11 @@
             "target": "./discord",
             "from": "./src",
             "message": "discord/ (the Discord issue bot) imports nothing from src/: it runs as a Cloudflare Worker."
+          },
+          {
+            "target": "./webapp",
+            "from": "./src",
+            "message": "webapp/ (the web app's Cloudflare Worker) imports nothing from src/: it runs outside the app's bundle."
           }
         ]
       }

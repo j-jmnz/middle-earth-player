@@ -7,14 +7,16 @@ import { SettingChoice } from "../../../play/chrome/setting-row";
 import { AskInPlace } from "../../kit/ask-in-place";
 import { Label, TextButton } from "../../kit/chrome";
 import { useDatabases } from "../../data/databases";
+import { savedToStorage } from "../../data/web/saved";
 import { clearRestored, peekRestored, restoredLine } from "./backup-note";
 import { backUp, pickBackup, restore, type Picked, type Say } from "./backup-run";
 
 const BACKUP_LINE = "Saves every campaign, game, deck and run on this computer to a file. It is made only when you ask, and it stays where you save it.";
 const RESTORE_LINE = "Replaces the campaigns, games, decks, runs and settings on this computer with the ones in a backup file. A file this version of the app cannot read is refused.";
 
+// The web app keeps its saves in memory and copies them to storage (src/screens/data/web/memory-databases.ts), so the restored rows are in storage before the page goes.
 function reloadPage(): void {
-  window.location.reload();
+  void savedToStorage().then(() => window.location.reload());
 }
 
 export function BackupGroup() {
