@@ -23,7 +23,7 @@ import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { sheetFor } from "./sheets.ts";
 import { createTableStore } from "../store/store.ts";
 import { tapAction, tileAction, trayTiles } from "./tray-logic.ts";
-import { choiceFor, dockFor, onlyAnswer, onTheTable, primaryReady, tap, tappable, type Choice, type Dock, type TapContext } from "./table-choice.ts";
+import { choiceFor, dockFor, dockNote, onlyAnswer, onTheTable, primaryReady, tap, tappable, type Choice, type Dock, type TapContext } from "./table-choice.ts";
 
 // Rules: rr.action-windows, rr.step-3-4, rr.step-6-4-3 (data/rules/entries.json). The table answers every moment of whole
 // starter games: a tap on a card only picks it (or opens the question it leads to), the dock's buttons send intents the
@@ -499,5 +499,15 @@ describe("no quest drag during the Sailing commit (dcce.sailing-tests)", () => {
     const next = legalIntents(after, f.ctx);
     expect(draggableIds(after, f.ctx, next)).toContain(f.ids.aragorn);
     expect(dropTargets(after, f.ctx, next, f.ids.aragorn!)).toEqual([{ kind: "zone", zone: "questStage" }]);
+  });
+});
+
+describe("the dock's note", () => {
+  it("leaves out the card's name when the title already says it, and keeps any other note", () => {
+    expect(dockNote("Street Fighting", "Street Fighting: choose a hero you control to exhaust.")).toBe("Choose a hero you control to exhaust.");
+    expect(dockNote("Counter-attack", "Player 2: Counter-attack: return your highest-Threat location.")).toBe("Player 2: Return your highest-Threat location.");
+    expect(dockNote("Street Fighting", "Uruk Soldier destroyed a character: choose a location.")).toBe("Uruk Soldier destroyed a character: choose a location.");
+    expect(dockNote("Street Fighting", "Street Fighting: ")).toBe("Street Fighting: ");
+    expect(dockNote("Street Fighting", null)).toBeNull();
   });
 });

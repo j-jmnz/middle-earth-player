@@ -176,7 +176,7 @@ describe("the Bodyguard, the Nazgûl and the attack sheets (06148:A:1, 06153:A:2
 
   it("an attack on a shielded Captain says the damage goes to the Bodyguard and what it holds, in the sheet, the readout and the banner", () => {
     const { made, at, next, ids } = attackOn(murzag, [bodyguard]);
-    expect(next?.note).toBe("Defense 2. Damage to Murzag goes to Morgul Bodyguard, which holds 0 of 6 damage. Choose the characters that attack it.");
+    expect(next?.note).toBe("Damage to Murzag goes to Morgul Bodyguard, which holds 0 of 6 damage. Defense 2. Choose the characters that attack it.");
     expect(readoutFor(at.state, made.ctx, next ?? null, { key: next?.key ?? "", ids, shares: [] }, idName(made, at.state))?.result).toBe("1 damage on Morgul Bodyguard, not Murzag; 5 more destroys it");
     const attacked = send(at, { type: "DeclareAttackers", enemyId: idOf(at.state, murzag), attackerIds: ids }, made.ctx);
     const done = fight(made, attacked, (state) => state.mode !== "playerAttacks");
@@ -189,7 +189,7 @@ describe("the Bodyguard, the Nazgûl and the attack sheets (06148:A:1, 06153:A:2
     const plain = attackOn(murzag, []);
     expect(plain.next?.note).toBe("Defense 2. Choose the characters that attack it.");
     const { made, at, next, ids } = attackOn(nazgul, [], [BOROMIR, ARAGORN]);
-    expect(next?.note).toBe("Defense 4. He takes 1 damage at most from each attack. Choose the characters that attack it.");
+    expect(next?.note).toBe("He takes 1 damage at most from each attack. Defense 4. Choose the characters that attack it.");
     const attacked = send(at, { type: "DeclareAttackers", enemyId: idOf(at.state, nazgul), attackerIds: ids }, made.ctx);
     const done = fight(made, attacked, (state) => state.mode !== "playerAttacks");
     const { banner, log } = told(made, at.state, done.state, done.steps as never[]);

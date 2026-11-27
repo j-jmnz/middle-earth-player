@@ -55,11 +55,13 @@ export function optionalEngageNote(game: ScenarioState, ctx: ReduceContext, name
   const threat = game.seats[seat]?.threat ?? 0;
   const anyway = rows.filter((row) => row.engagesSeat === seat).map((row) => `${names.card(row.id)} (${row.cost})`);
   const stays = rows.filter((row) => row.engagesSeat == null).map((row) => `${names.card(row.id)} (${row.cost})`);
-  const parts = [`You may engage one enemy in staging. Your threat is ${threat}.`];
-  if (anyway.length > 0) parts.push(`The checks engage ${anyway.join(", ")} anyway.`);
-  if (stays.length > 0) parts.push(`${stays.join(", ")} ${stays.length === 1 ? "stays" : "stay"} in staging.`);
+  // The one-line dock cuts a long note at its end: what is particular to the table (an enemy the checks engage, one that stays, one that cannot be engaged) comes first, the general sentence last.
+  const parts: string[] = [];
   const barred = framsburgEngageNote(game, ctx, names, seat) ?? fateEngageNote(game, ctx, names);
   if (barred) parts.push(barred);
+  if (anyway.length > 0) parts.push(`The checks engage ${anyway.join(", ")} anyway.`);
+  if (stays.length > 0) parts.push(`${stays.join(", ")} ${stays.length === 1 ? "stays" : "stay"} in staging.`);
+  parts.push(`You may engage one enemy in staging. Your threat is ${threat}.`);
   return parts.join(" ");
 }
 
