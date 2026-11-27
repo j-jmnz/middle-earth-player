@@ -1,4 +1,4 @@
-// Rules: hrd.heat-tracker, hrd.guarded-x, rr.forced, rr.response, rr.cannot, rr.modifiers, rr.exhausted, faq.side-quest-current-quest-text (data/rules/entries.json).
+// Rules: hrd.heat-tracker, hrd.guarded-x, rr.forced, rr.running-out-of-cards, rr.response, rr.cannot, rr.modifiers, rr.exhausted, faq.side-quest-current-quest-text (data/rules/entries.json).
 // An audit of Desert Crossing, second half (card-audit; the first half is audit.test.ts, split for the file size limit of .claude/rules/code-standards.md): the locations, the enemies and the shadows, each built from the printed words, the rule spans and the readings of docs/scenarios/haradrim/desert-crossing.md, and run again without its line's records, where it must fail.
 import { describe, expect, it } from "vitest";
 
@@ -270,8 +270,7 @@ describe("16055 Giant Scorpion", () => {
     const none = played(effects, { deck: ["f0", "f0", "f0", "f0"] }, [attack("f3", { shadow: SCORPION }), endRound]);
     expect(none.cards[idOf(none, "dh1")]?.exhausted).toBe(false);
   });
-  // FAULT: the shadow reads "the defending character", and an undefended attack has none (docs/scenarios/haradrim/desert-crossing.md, Giant Scorpion shadow), but the engine marks the hero the undefended damage lands on as unable to ready.
-  it.fails("16055:A:2 shadow: an undefended attack has no defending character, so no character is kept from readying", () => {
+  it("16055:A:2 shadow: an undefended attack has no defending character, so no character is kept from readying", () => {
     const undefended = played(EFFECTS, { temperature: 30, deck: ["f0", "f0", "f0", "f0"] }, attack(WORM, { shadow: SCORPION, undefended: true }));
     expect(damageOf(undefended, "dh1")).toBe(3);
     expect(undefended.modifiers.some((modifier) => modifier.stat === "cannotReady")).toBe(false);
@@ -334,10 +333,16 @@ describe("16050 Desert Oasis", () => {
   });
 });
 
-// FAULT: Mirage prints "discard cards from the top until a location is discarded", so with no location in the deck or the discard pile the whole deck is discarded (as for Parched Wadi), but the engine discards nothing and the deck stays whole.
-it.fails("16022:A:1 with no location anywhere, cards are discarded from the top until the deck is empty", () => {
-  const row: Row = { line: "16022:A:1", layout: { deck: ["f0"], discard: ["f3"] }, act: reveal("16022"), expect: [deckCount(0), count("f0", "encounterDiscard", 1), count("f3", "encounterDiscard", 1)] };
-  expect(rowProblems(SID, row, EFFECTS)).toEqual([]);
+describe("16022:A:1 Mirage with no location anywhere", () => {
+  // The whole deck is discarded (as for Parched Wadi). In the quest phase the empty deck then gets the discard pile back (rr.running-out-of-cards); in any other phase it stays empty.
+  it("16022:A:1 in the quest phase the deck is discarded, then runs out and the discard pile is reset into it", () => {
+    const row: Row = { line: "16022:A:1", layout: { phase: "Quest", deck: ["f0"], discard: ["f3"] }, act: reveal("16022"), expect: [deckCount(3), count("f0", "encounterDeck", 1), count("f3", "encounterDeck", 1), count("16022", "encounterDeck", 1)] };
+    expect(rowProblems(SID, row, EFFECTS)).toEqual([]);
+  });
+  it("16022:A:1 outside the quest phase the whole deck is discarded and stays empty", () => {
+    const row: Row = { line: "16022:A:1", layout: { phase: "Travel", deck: ["f0"], discard: ["f3"] }, act: reveal("16022"), expect: [deckCount(0), count("f0", "encounterDiscard", 1), count("f3", "encounterDiscard", 1), count("16022", "encounterDiscard", 1)] };
+    expect(rowProblems(SID, row, EFFECTS)).toEqual([]);
+  });
 });
 
 // The Surge lines are keywords the engine reads from the card, so no record names them and there is nothing to take away: the plain play shows the next card is revealed.

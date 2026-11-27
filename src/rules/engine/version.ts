@@ -202,9 +202,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 54, scenarios: ["the-siege-of-cair-andros"], note: "A quest stage that a Response removed from the quest deck is marked as removed, and the stage list names it so." },
   { version: 55, scenarios: "all", note: "Déorwine's printed Action cancels a shadow effect dealt to the attacking enemy in the action window after the defender is declared, before the shadow card is turned over; it is no longer a Response to the shadow effect." },
   { version: 56, scenarios: "all", note: "Helm of Secrecy offers only a hero it can change: one with tokens to discard or a hero of the collection to swap in. Déorwine's Action is offered for a shadow card dealt face up too. An attachment an effect puts into play with no host filter and no Attach to line can go on a character of any player." },
+  { version: 57, scenarios: ["desert-crossing", "beneath-the-sands", "the-crossings-of-poros"], note: "The Giant Scorpion's Shadow effect keeps a character from readying only when a defending character takes damage: an undefended attack has no defending character, so the hero it hits can ready." },
 ];
 
-export const ENGINE_VERSION = 56;
+export const ENGINE_VERSION = 57;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

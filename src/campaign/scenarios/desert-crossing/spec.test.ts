@@ -118,7 +118,7 @@ const ROWS: readonly Row[] = [
   // 16055:A:1 "Forced: After Giant Scorpion damages a character, that character cannot ready until the end of the round." The Scorpion (Attack 3) beats the defending hero (Defense 2).
   { line: "16055:A:1", name: "Forced: the character the Scorpion damages cannot ready until the end of the round", layout: { engaged: ["16055"] }, act: attack("16055"), expect: [flag("dh1", "cannotReady"), exhausted("dh1")] },
   // 16055:A:2 "Shadow: If this attack deals damage, the defending character cannot ready until the end of the round."
-  { line: "16055:A:2", name: "Shadow: if the attack deals damage the defending character cannot ready until the end of the round", layout: {}, act: attack("f0", { shadow: "16055", undefended: true }), expect: flag("dh1", "cannotReady") },
+  { line: "16055:A:2", name: "Shadow: if the attack deals damage the defending character cannot ready until the end of the round", layout: { temperature: 30 }, act: attack("16028", { shadow: "16055" }), expect: flag("dh1", "cannotReady") },
 
   // 16068:B:1 "Forced: After an ally enters play, either exhaust it, or deal 1 damage to it."
   { line: "16068:B:1", name: "Forced: after an ally enters play the option exhaust exhausts it", layout: { stage: MAIN, play: ["ally"] }, act: [announce("enteredPlay", "ally"), answer("exhaust")], expect: [exhausted("ally"), damageOn("ally", 0)] },
