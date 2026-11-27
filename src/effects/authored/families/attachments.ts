@@ -211,7 +211,7 @@ export const RECORDS: readonly Effect[] = [
   {
     id: "21008:response:1",
     cardCode: "21008",
-    lines: ["21008:A:2"],
+    lines: ["21008:A:3"],
     timing: "response",
     trigger: "hostLeftPlay",
     condition: { kind: "subjectExplored" },

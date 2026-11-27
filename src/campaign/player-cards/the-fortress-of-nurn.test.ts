@@ -3,7 +3,7 @@
 // The Fortress of Nurn player cards, written from their card text (data/cards/TFoN.json; data/printed holds no ledger for this pack, so
 // the lines are the text of data/cards and every intent goes through sendUnledgered): Shining Shield 22138:A:1 and A:3, Knowledge of the
 // Enemy 22139:A:1, Haleth 22140:A:1 (its failed quest; the rest is in the-fate-of-numenor.test.ts), Woodman Lore 22141:A:1, Westfold
-// Lancer 22142:A:1, Tireless Thoroughbred 22143:A:2, Misty Mountain Journeyman 22144:A:1, Thorongil 22146:A:1, Bond of Friendship
+// Lancer 22142:A:1, Tireless Thoroughbred 22143:A:1 and A:3, Misty Mountain Journeyman 22144:A:1, Thorongil 22146:A:1, Bond of Friendship
 // 22147:A:1 and A:2.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -224,10 +224,10 @@ describe("Westfold Lancer (22142:A:1)", () => {
   });
 });
 
-describe("Tireless Thoroughbred (22143:A:2)", () => {
+describe("Tireless Thoroughbred (22143:A:1, A:3)", () => {
   // "Attach to a Warrior character. Restricted. Attached character gains ranged and sentinel.": the Warrior hero and the Warrior ally are
   // offered, the Tactics hero is not; the Warrior hero it is played on has ranged and sentinel in the state that play returns.
-  lineSpec("22143:A:2", "Tireless Thoroughbred: Attach to a Warrior character, who gains ranged and sentinel", (effects) => {
+  lineSpec("22143:A:3", "Tireless Thoroughbred: Attach to a Warrior character, who gains ranged and sentinel", (effects) => {
     const tab = table(effects, { heroes: [{ code: WARRIOR_HERO, seat: 0 }, { code: TAC, seat: 0 }], allies: [{ code: WARRIOR_ALLY, seat: 0 }], hand: [{ code: THOROUGHBRED, seat: 0 }] });
     const [horse, warrior] = [idsOf(tab, THOROUGHBRED), idsOf(tab, WARRIOR_HERO)];
     expect(hosts(tab, horse)).toEqual([warrior, idsOf(tab, WARRIOR_ALLY)].sort());

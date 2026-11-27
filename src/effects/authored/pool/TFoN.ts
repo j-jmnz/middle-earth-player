@@ -10,7 +10,7 @@ export const RECORDS: readonly Effect[] = [
   // 22141 Woodman Lore: up to X, so each ready is a choice.
   {"id":"22141:action:1","cardCode":"22141","lines":["22141:A:1"],"timing":"action","instructions":[{"verb":"Repeat","times":{"count":{"type":"location","control":"any","hasAttachment":{"playerCard":true}}},"instructions":[{"verb":"Choose","who":"actor","options":[{"id":"ready","requires":{"kind":"canPick","pick":{"type":"character","control":"you","trait":"Woodman","state":"exhausted"}},"instructions":[{"verb":"Pick","pick":{"type":"character","control":"you","trait":"Woodman","state":"exhausted"}},{"verb":"Ready","target":"picked"}]},{"id":"stop","instructions":[]}]}]}]},
   // 22143 Tireless Thoroughbred: Restricted is a keyword the engine reads.
-  {"id":"22143:constant:1","cardCode":"22143","lines":["22143:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"character","control":"any","trait":"Warrior"}]},{"verb":"ModifyStat","stat":"ranged","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"sentinel","amount":1,"until":"whileSourceInPlay","target":"host"}]},
+  {"id":"22143:constant:2","cardCode":"22143","lines":["22143:A:3"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"ranged","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"sentinel","amount":1,"until":"whileSourceInPlay","target":"host"}]},
   // 22144 Misty Mountain Journeyman
   {"id":"22144:constant:1","cardCode":"22144","lines":["22144:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":{"kind":"hasEngaged"}}]},
   // 22146 Thorongil: a hero that is neither Fellowship nor Baggins (printed or with a gained icon).

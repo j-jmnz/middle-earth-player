@@ -1,0 +1,342 @@
+{
+  "Title": "The Fortress of Nurn",
+  "Slug": "The-Fortress-of-Nurn",
+  "Product": "The Fortress of Nurn",
+  "Number": 6,
+  "QuestCards": [
+    {
+      "Title": "Assault on Dol Rhugar",
+      "Slug": "Assault-on-Dol-Rhugar-TFoN",
+      "IsUnique": false,
+      "CardType": "Quest",
+      "CardSubType": "None",
+      "Sphere": null,
+      "Front": {
+        "Subtitle": null,
+        "ImagePath": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Assault-on-Dol-Rhugar-1A.jpg",
+        "Stats": {
+          "StageNumber": "1A"
+        },
+        "Traits": [],
+        "Keywords": [],
+        "Text": [
+          "Setup: Player decks cannot exceed 50 cards. Create the Power of Mordor deck (see insert) and set it next to the quest deck. Each player puts 1 copy of Ulchor\u0060s Guard into play engaged with him. Add Thane Ulchor and all 4 copies of the Storm the Castle side quest to the staging area. Place the top card of the Power of Mordor deck faceup under each side quest in play. Each player places 8 cards from top of his deck under the quest deck and each side quest in play.\n"
+        ],
+        "Shadow": null,
+        "FlavorText": "Your quest to defeat Thane Ulchor has brought you to his stronghold in Mordor."
+      },
+      "Back": {
+        "Subtitle": null,
+        "ImagePath": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Assault-on-Dol-Rhugar-1B.jpg",
+        "Stats": {
+          "StageNumber": "1B",
+          "QuestPoints": "3"
+        },
+        "Traits": [],
+        "Keywords": [],
+        "Text": [
+          "Thane Ulchor cannot leave the staging area.\nWhile there are at least 3 progress tokens on this stage, it cannot be chosen as the current quest stage during the quest phase.\nThis stage cannot be defeated unless it is the end of the round and there are 3 Castle side quests in the victory display.\n"
+        ],
+        "Shadow": null,
+        "FlavorText": "You lead an army of rescued slaves in a surprise attack on Ulchor\u0060s fortress."
+      },
+      "CardSet": "The Fortress of Nurn",
+      "EncounterInfo": {
+        "EncounterSet": "The Fortress of Nurn",
+        "EasyModeQuantity": 0,
+        "IncludedEncounterSets": [
+          "Ulchor\u0027s Guard",
+          "Under Guard",
+          "The Power of Mordor"
+        ],
+        "StageNumber": 1,
+        "StageLetter": "A"
+      },
+      "Number": 159,
+      "Quantity": 1,
+      "Artist": "Piotr Arendzikowski",
+      "HasErrata": false,
+      "OctgnGuid": null,
+      "RingsDbCardId": null,
+      "RingsDbPopularity": 0,
+      "RingsDbVotes": 0,
+      "Categories": null
+    },
+    {
+      "Title": "The Final Confrontation",
+      "Slug": "The-Final-Confrontation-TFoN",
+      "IsUnique": false,
+      "CardType": "Quest",
+      "CardSubType": "None",
+      "Sphere": null,
+      "Front": {
+        "Subtitle": null,
+        "ImagePath": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/The-Final-Confrontation-2A.jpg",
+        "Stats": {
+          "StageNumber": "2A"
+        },
+        "Traits": [],
+        "Keywords": [],
+        "Text": [
+          "When Revealed: Reveal the top card of The Power of Mordor deck. Shuffle the encounter discard pile into the encounter deck. Thane Ulchor makes an immediate attack against each player in turn order.\n"
+        ],
+        "Shadow": null,
+        "FlavorText": "You have reached the great hall inside Dol Rhugar. There you find Ulchor, Thane of Nurn, waiting for you. \u0060You arrogant fools!\u0060 he says, rising to his full height. \u0060You have pursued me all this way only to die here where my power is at its strongest!\u0060"
+      },
+      "Back": {
+        "Subtitle": null,
+        "ImagePath": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/The-Final-Confrontation-2B.jpg",
+        "Stats": {
+          "StageNumber": "2B",
+          "QuestPoints": "12"
+        },
+        "Traits": [],
+        "Keywords": [],
+        "Text": [
+          "Encounter card effects cannot be canceled.\nThe number of damage tokens on Than Ulchor cannot exceed the number of progress tokens here.\nWhen Thane Ulchor is defeated, the players win the game.\n"
+        ],
+        "Shadow": null,
+        "FlavorText": "Ulchor strikes at you with undeniable power, but you hold your ground. You will either see him finally brought low, or die valiantly in the attempt."
+      },
+      "CardSet": "The Fortress of Nurn",
+      "EncounterInfo": {
+        "EncounterSet": "The Fortress of Nurn",
+        "EasyModeQuantity": 0,
+        "IncludedEncounterSets": [
+          "Ulchor\u0027s Guard",
+          "Under Guard",
+          "The Power of Mordor"
+        ],
+        "StageNumber": 2,
+        "StageLetter": "A"
+      },
+      "Number": 160,
+      "Quantity": 1,
+      "Artist": "Michele Frigo",
+      "HasErrata": false,
+      "OctgnGuid": null,
+      "RingsDbCardId": null,
+      "RingsDbPopularity": 0,
+      "RingsDbVotes": 0,
+      "Categories": null
+    }
+  ],
+  "ScenarioCards": [
+    {
+      "EncounterSet": "The Fortress of Nurn",
+      "Title": "Determined Defense",
+      "Slug": "Determined-Defense-TFoN",
+      "NormalQuantity": 3,
+      "EasyQuantity": 3,
+      "NightmareQuantity": 3
+    },
+    {
+      "EncounterSet": "The Fortress of Nurn",
+      "Title": "Easterling Mercenary",
+      "Slug": "Easterling-Mercenary-TFoN",
+      "NormalQuantity": 2,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 2
+    },
+    {
+      "EncounterSet": "The Fortress of Nurn",
+      "Title": "Fortress Walls",
+      "Slug": "Fortress-Walls-TFoN",
+      "NormalQuantity": 2,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 2
+    },
+    {
+      "EncounterSet": "The Fortress of Nurn",
+      "Title": "Guard Dogs",
+      "Slug": "Guard-Dogs-TFoN",
+      "NormalQuantity": 3,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 3
+    },
+    {
+      "EncounterSet": "The Fortress of Nurn",
+      "Title": "Guard Tower",
+      "Slug": "Guard-Tower-TFoN",
+      "NormalQuantity": 3,
+      "EasyQuantity": 3,
+      "NightmareQuantity": 3
+    },
+    {
+      "EncounterSet": "The Fortress of Nurn",
+      "Title": "Mordor Olog-hai",
+      "Slug": "Mordor-Olog-hai-TFoN",
+      "NormalQuantity": 2,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 2
+    },
+    {
+      "EncounterSet": "The Fortress of Nurn",
+      "Title": "Plaza of Nurn",
+      "Slug": "Plaza-of-Nurn-TFoN",
+      "NormalQuantity": 3,
+      "EasyQuantity": 2,
+      "NightmareQuantity": 3
+    },
+    {
+      "EncounterSet": "The Fortress of Nurn",
+      "Title": "Soldier of Nurn",
+      "Slug": "Soldier-of-Nurn-TFoN",
+      "NormalQuantity": 3,
+      "EasyQuantity": 3,
+      "NightmareQuantity": 3
+    },
+    {
+      "EncounterSet": "The Fortress of Nurn",
+      "Title": "Storm the Castle (Castle Garrison)",
+      "Slug": "Storm-the-Castle-Castle-Garrison-TFoN",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "The Fortress of Nurn",
+      "Title": "Storm the Castle (Lethal Counterattack)",
+      "Slug": "Storm-the-Castle-Lethal-Counterattack-TFoN",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "The Fortress of Nurn",
+      "Title": "Storm the Castle (No Quarter)",
+      "Slug": "Storm-the-Castle-No-Quarter-TFoN",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "The Fortress of Nurn",
+      "Title": "Storm the Castle (Stronghold of Mordor)",
+      "Slug": "Storm-the-Castle-Stronghold-of-Mordor-TFoN",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "The Fortress of Nurn",
+      "Title": "Thane Ulchor",
+      "Slug": "Thane-Ulchor-TFoN",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "The Fortress of Nurn",
+      "Title": "The Dark Lord\u0027s Reach",
+      "Slug": "The-Dark-Lord\u0027s-Reach-TFoN",
+      "NormalQuantity": 2,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 2
+    },
+    {
+      "EncounterSet": "The Fortress of Nurn",
+      "Title": "The Dungeons of Dol Rhugar",
+      "Slug": "The-Dungeons-of-Dol-Rhugar-TFoN",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "The Power of Mordor",
+      "Title": "Covered in Darkness",
+      "Slug": "Covered-in-Darkness-ASitE",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "The Power of Mordor",
+      "Title": "Kham\u00FBl the Easterling",
+      "Slug": "Khamul-the-Easterling-ASitE",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "The Power of Mordor",
+      "Title": "The Armies of Mordor",
+      "Slug": "The-Armies-of-Mordor-ASitE",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "The Power of Mordor",
+      "Title": "The Tower of Barad-d\u00FBr",
+      "Slug": "The-Tower-of-Barad-dur-ASitE",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "The Power of Mordor",
+      "Title": "Under the Watchful Eye",
+      "Slug": "Under-the-Watchful-Eye-ASitE",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "Ulchor\u0027s Guard",
+      "Title": "Fanaticism",
+      "Slug": "Fanaticism-ASitE",
+      "NormalQuantity": 2,
+      "EasyQuantity": 2,
+      "NightmareQuantity": 2
+    },
+    {
+      "EncounterSet": "Ulchor\u0027s Guard",
+      "Title": "Ulchor\u0027s Guard",
+      "Slug": "Ulchor\u0027s-Guard-ASitE",
+      "NormalQuantity": 4,
+      "EasyQuantity": 3,
+      "NightmareQuantity": 4
+    },
+    {
+      "EncounterSet": "Ulchor\u0027s Guard",
+      "Title": "Ulchor\u0027s Rage",
+      "Slug": "Ulchor\u0027s-Rage-ASitE",
+      "NormalQuantity": 3,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 3
+    },
+    {
+      "EncounterSet": "Under Guard",
+      "Title": "Catacombs",
+      "Slug": "Catacombs-ASitE",
+      "NormalQuantity": 2,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 2
+    },
+    {
+      "EncounterSet": "Under Guard",
+      "Title": "Side Street",
+      "Slug": "Side-Street-ASitE",
+      "NormalQuantity": 2,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 2
+    },
+    {
+      "EncounterSet": "Under Guard",
+      "Title": "Under Guard",
+      "Slug": "Under-Guard-ASitE",
+      "NormalQuantity": 3,
+      "EasyQuantity": 2,
+      "NightmareQuantity": 3
+    },
+    {
+      "EncounterSet": "Under Guard",
+      "Title": "Unwelcome Travelers",
+      "Slug": "Unwelcome-Travelers-ASitE",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    }
+  ]
+}

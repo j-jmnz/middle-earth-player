@@ -68,6 +68,14 @@ const SCAN_URL_FIXES: Readonly<Record<string, readonly string[]>> = {
   // Hall of Beorn's image paths of The Spider's Hive (Beneath the Sands) drop the apostrophe of the title, which 403s.
   "17078": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/The-Spider's-Hive-3A.jpg"],
   "17078.B": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Beneath-the-Sands/The-Spider's-Hive-3B.jpg"],
+  // Hall of Beorn's picture of The Dungeons of Dol Rhugar (The Fortress of Nurn) is 290 px wide; DragnCards' picture is the same card at full size.
+  "22158": ["https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/254444df-3e65-4531-b6db-2fdacd0788b4.jpg"],
+  // Hall of Beorn files each Storm the Castle (The Fortress of Nurn) as one picture of the front. The other face (Castle Garrison, Lethal Counterattack, No Quarter, Stronghold of Mordor) is
+  // DragnCards' "<id>.B.jpg" picture, which its numbering by pack (1 for every copy) cannot find by number.
+  "22161.B": ["https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/dc074506-e478-4b63-88e4-9d6e4f8eb6d4.B.jpg"],
+  "22162.B": ["https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/6860f9ad-0f09-450a-adf9-6ebe9b872a49.B.jpg"],
+  "22163.B": ["https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/107805c4-6abf-4eb1-87fd-0ad7ffcfbf42.B.jpg"],
+  "22164.B": ["https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/63f46289-b5ef-44d1-b6cb-ce382031a768.B.jpg"],
   "142075": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Argonath.jpg"],
   "141064": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Stricken-Dumb.jpg"],
   // Hall of Beorn's SetupB image of The Siege of Gondor's campaign card is a blank parchment, and The Battle of the Pelennor Fields' shows only the flavor quotation; DragnCards' pictures of the
@@ -92,10 +100,13 @@ export const PLAYER_REQUESTS = [
   "01017",
   "01030",
 ];
+// A Shadow in the East's Stinker and Gollum: the encounter cards the hero Sméagol (21072) shuffles in and flips to (vom.smeagol-gollum). No scenario lists them, so the ledger holds their text and no
+// effect record is demanded until the Sméagol cards are built.
+export const UNDEALT_CODES: readonly string[] = ["21071", "21073"];
 
 // The packs whose deck-legal player cards the ledger holds (the pilot of reading every player card from its scan). A pack is added here when
 // `pnpm data sync scans --pack <id>` and `pnpm data ledger-seed --pack <id>` have run for it; the ledger file is data/printed/player-cards.json.
-export const PLAYER_PACKS: readonly string[] = ["OHaUH", "HoN", "TSF", "TDF", "EaAD", "AoO", "BoG", "TMV", "VoI", "TDT", "TTT", "TiT", "NiE", "CS", "TAC", "TSoH", "M", "RAH", "BtS", "TBS", "DoCG", "CoP"];
+export const PLAYER_PACKS: readonly string[] = ["OHaUH", "HoN", "TSF", "TDF", "EaAD", "AoO", "BoG", "TMV", "VoI", "TDT", "TTT", "TiT", "NiE", "CS", "TAC", "TSoH", "M", "RAH", "BtS", "TBS", "DoCG", "CoP", "ASitE", "WaR", "TCoU", "CotW", "UtAM", "TLoS", "TFoN"];
 // Single deck-legal player cards the ledger holds beside the packs (`--codes <code,...>` on the same two commands): the cards with errata, where the source text and
 // the printed card most often differ. A code is added here when `pnpm data sync scans --codes` and `pnpm data ledger-seed --codes` have run for it.
 export const PLAYER_CODES: readonly string[] = [
@@ -182,7 +193,7 @@ function nightmareDeckCodes(): string[] {
 }
 
 export function scopeCodes(): string[] {
-  return [...new Set<string>([...campaignCards(), ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaigns(), loadScenarios()), ...nightmareDeckCodes(), ...boxCodes(), ...hobbitCodes(), ...starterCodes(), ...PLAYER_REQUESTS, ...playerPackCodes(PLAYER_PACKS), ...PLAYER_CODES])].sort();
+  return [...new Set<string>([...campaignCards(), ...MEC109_CHANGED, ...KNOWN_ERRORS, ...dealtCodes(loadCampaigns(), loadScenarios()), ...nightmareDeckCodes(), ...boxCodes(), ...hobbitCodes(), ...starterCodes(), ...PLAYER_REQUESTS, ...UNDEALT_CODES, ...playerPackCodes(PLAYER_PACKS), ...PLAYER_CODES])].sort();
 }
 
 type HobImages = { CardSet: string; Slug: string; RingsDbCardId: string | null; Front: { ImagePath: string | null }; Back: { ImagePath: string | null } | null };
@@ -326,7 +337,7 @@ export function scanTargets(codes: readonly string[] = scopeCodes()): ScanTarget
     const own = first.urls.filter((url) => !url.includes("dragncards"));
     const sideA = own.length > 0 ? own : first.urls;
     const front = sideA[0];
-    const back = isCampaign && front ? front.replace("SetupA", "SetupB") : (sideA[1] ?? (card.back ? dragnOtherSide(card) : null) ?? undefined);
+    const back = isCampaign && front ? front.replace("SetupA", "SetupB") : (sideA[1] ?? (card.back ? (dragnOtherSide(card) ?? SCAN_URL_FIXES[`${code}.B`]?.[0] ?? null) : null) ?? undefined);
     if (!front) throw new Error(`No scan for ${code}`);
     const guid = card.printings.map((printing) => printing.octgnGuid).find((value) => value !== undefined);
     const fromDragn = guid ? dragn.get(guid) : undefined;

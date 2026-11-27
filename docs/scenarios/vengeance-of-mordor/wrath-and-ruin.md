@@ -1,0 +1,23 @@
+# Wrath and Ruin
+
+Vengeance of Mordor part 4 (Wrath and Ruin, `WaR`), standalone only, on Easy and Normal (Q09.4, E09.4). Encounter sets Wrath and Ruin, Easterling Raiders and City of Rhûn (`vom.setup-wrath-and-ruin`; Easterling Raiders and City of Rhûn are in A Shadow in the East). The set and the scenario share a title, so the booklet reader keeps "Wrath and Ruin" whole (`setsOf`).
+
+- **Setup.** Stage 1A prints "Setup: Add Thane Ulchor and Gate of Dorwinion to the staging area. Each player adds a different location to the staging area. Make a copy of Makeshift Fortification the active location. Shuffle the encounter deck." (`22025:A:1`). The reader gives a staging clause, `eachPlayerAddsLocation` and an active clause. The ledger holds the printed "encounter" in "Shuffle the encounter deck" (the card prints "enocounter").
+- **Piles.** DragnCards stages six locations; one Makeshift Fortification is the active location (an override moves it from the staging pile; ALeP 3.363 says it comes from the encounter deck), the rest are the locations the players add. DragnCards has no line for Warriors of the East (21024), a card of Easterling Raiders; an override adds one copy at both difficulties, which equals Hall of Beorn's count.
+- **Taking control.** Stages 1B and 2B print "Forced: When a location is explored, the first player takes control of it." (`vom.controlling-locations`, `vom.losing-control-of-a-location`).
+
+## Data
+
+- Gate of Dorwinion is Victory 5, immune to player card effects, with X Threat the controlled locations plus 1; stage 2B wins the game when the players control it at the end of the round.
+
+## Readings
+
+The statuses are those of the Readings bullet of `docs/scenarios/vengeance-of-mordor.md`. Each key is the scan-read ledger line (`data/printed/vengeance-of-mordor.json`), `<code>:<side>:<n>`. Sources read: the Wrath and Ruin rulesheet (`vom.controlling-locations`, `vom.losing-control-of-a-location`), ALeP = https://alongextendedparty.com/semi-official-errata-faq-1-10/ (items 3.343 and 3.363), https://visionofthepalantir.com/2021/04/17/wrath-and-ruin/ (a play article; one comment, unanswered). A line not listed here is span-settled.
+
+- Control instead of the victory display (`22025:B:2`, `22026:B:3`) (researched). A location that is explored takes the first player's control instead of going to the victory display, even a location with a Victory number (Seedy Tavern): ALeP 3.343 (20 February 2020, Caleb Grace): https://alongextendedparty.com/semi-official-errata-faq-1-10/.
+- Makeshift Fortification (`22025:A:1`) (researched). The copy made active comes from the encounter deck, not from the locations the players add; a 4-player game has 4 non-unique locations in the staging area after Setup: ALeP 3.363 (10 December 2020, Caleb Grace): https://alongextendedparty.com/semi-official-errata-faq-1-10/.
+- Locations the players add (`22025:A:1`) (span-settled for "title", recommended for the pick). Each player in player order picks one non-unique location from the encounter deck, different in title, without revealing it, and the deck is shuffled after (user ruling 7). Not taken: a random location. Why recommended: ALeP 3.363 gives only the count; no official source says who picks.
+- Ransacked House (`22016:A:1`) (recommended). Any player may use the Encounter Action, the topmost discard enemy engages that player, and the player takes control of the House; taking control this way is not an explored location, so Thane Ulchor's Forced is not triggered. Not taken: only the first player. Why recommended: the post above reads it so; no official source settles it.
+- Contested Square (`22015:A:2`, `22015:A:3`) (recommended). Its progress is placed only while it is in the staging area; while controlled it returns to the staging area after a character its controller controls is destroyed. Not taken: progress while controlled. Why recommended: the post above reads it so; no official ruling settles it.
+- Gate of Dorwinion travel (`22014:A:3`) (recommended). "Stage 2B has at least 12 progress on it" is true only at stage 2; at stage 1 the players cannot travel to it. Not taken: progress on stage 1B counts. Why recommended: the card names stage 2B; no source settles another reading.
+- Stage 1B and 2B end of the round (`22025:B:3`) (recommended). "More locations under the players' control than in the staging area" counts the locations in the staging area at that moment, the active location excluded (it is not in the staging area). Not taken: the active location counts. Why recommended: no source settles the active location; the staging area does not hold it.

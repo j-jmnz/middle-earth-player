@@ -103,8 +103,10 @@ describe("pictures", () => {
     // none of a campaign expansion's cards): the pack bundles their scan, Hall of Beorn's digital render (about 1020 × 1451), so each must have one.
     // The Campaign Expansion's 40 cards, by code (120165 is the Journey Up the Anduin campaign card; the rest are 12166 to 12204).
     // Rider of Mirkwood (51011) is the back of The Wizard's Quest's Rhosgobel on cardgame.tools, whose row names Rhosgobel only: the card keeps its scan (Hall of Beorn's, 1390 × 2083). Mendor (51111) is the back of The Woodland Realm's Spider Den the same way (scan 1464 × 2094). Chamber of Mazarbul (51211) is the back of The Mines of Moria's The Watcher the same way, and Durin's Bane (51311) the back of Escape from Khazad-dûm's Dark Pit.
+    // The Crossroads Fort (17106, The Black Serpent's stage 1) and Gollum (21073, the enemy side of Sméagol / Gollum) are in the scan scope, which no picture source carries (JvZijp's Drive, FFG's PDFs and cardgame.tools hold neither): each keeps its scan,
+    // Hall of Beorn's full-size card (2092 and 1472 px wide).
     const emce = ["120165", ...Array.from({ length: 39 }, (_, at) => String(12166 + at))];
-    const unpictured = new Set([...MEC108_CHANGED, ...MEC109_CHANGED, ...MEC112_CHANGED, ...MEC113_CHANGED, "11084", "51011", "51111", "51211", "51311", ...emce]);
+    const unpictured = new Set([...MEC108_CHANGED, ...MEC109_CHANGED, ...MEC112_CHANGED, ...MEC113_CHANGED, "11084", "51011", "51111", "51211", "51311", "17106", "21073", ...emce]);
     const missing: string[] = [];
     for (const file of readdirSync(path.join(DATA_DIR, "cards")).filter((name) => name.endsWith(".json"))) {
       for (const card of JSON.parse(readFileSync(path.join(DATA_DIR, "cards", file), "utf8")) as { code: string }[]) {

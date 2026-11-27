@@ -19,8 +19,8 @@ import { play, put, run, seat, send, triggers } from "../play/fixture.ts";
 import { enemy, hero, offered, send as sendIntent, table as defenseTable, until } from "../defense/table.ts";
 import { definePrinted } from "../../core/printed.ts";
 
-// "If Bilbo / Aragorn leaves play, the players lose the game" (131001:A:3, 146002:A:3) is a generated record.
-const RECORDS = [...AUTHORED, ...[...POOL_GENERATED_EFFECTS, ...HOBBIT_GENERATED].filter((record) => record.lines.some((line) => line === "131001:A:3" || line === "146002:A:3"))];
+// "If The One Ring / Bilbo / Aragorn leaves play, the players lose the game" (21001:A:4, 131001:A:3, 146002:A:3) is a generated record.
+const RECORDS = [...AUTHORED, ...[...POOL_GENERATED_EFFECTS, ...HOBBIT_GENERATED].filter((record) => record.lines.some((line) => line === "21001:A:4" || line === "131001:A:3" || line === "146002:A:3"))];
 const ctx = miscCtx(RECORDS);
 const filler = codes("f", 8);
 
@@ -43,7 +43,7 @@ function started(deck: readonly string[], heroes: readonly string[] = ["dwarf", 
 }
 
 describe("The One Ring (21001)", () => {
-  it("is attached to a hero the player chooses after the opening hand, with a Master card fetched into the hand (21001:A:3)", () => {
+  it("is attached to a hero the player chooses after the opening hand, with a Master card fetched into the hand (21001:A:2)", () => {
     const { state, world } = started(["21001", "master", ...filler]);
     // The Ring left the deck for its Setup, which waits for the opening hand and the mulligan.
     expect(Object.values(state.cards).find((card) => card.code === "21001")?.zone).toBe("setAside");
@@ -74,7 +74,7 @@ describe("The One Ring (21001)", () => {
     expect(eliminateEmpties(withThreat(syncConstants(run(table.state, ctx), ctx), 0, 45), []).seats[0]?.eliminated).toBeFalsy();
   });
 
-  it("loses the game for the players when it leaves play (21001:A:3)", () => {
+  it("loses the game for the players when it leaves play (21001:A:4)", () => {
     const table = seat(1, ["dwarf", "rohan"]);
     const ring = put(table.state, "21001", "play");
     let state = attachTo(ring.state, ring.id, table.heroes[0] ?? "");

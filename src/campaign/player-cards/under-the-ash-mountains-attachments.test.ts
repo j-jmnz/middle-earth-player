@@ -1,7 +1,7 @@
 // Rules: rr.attachment-cards, rr.modifiers, bts.valour, wor.guarded-x, rr.guarded, rr.staging-area, rr.step-1-3, rr.hit-points,
 // mec109.the-one-ring, rr.explored (data/rules/entries.json).
 // The Under the Ash Mountains attachments, written from their card text (data/cards/UtAM.json; data/printed holds no ledger for this pack,
-// so the lines are the text of data/cards and every intent goes through sendUnledgered): Valiant Sword 22083:A:2, Stone of Elostirion
+// so the lines are the text of data/cards and every intent goes through sendUnledgered): Valiant Sword 22083:A:1 and A:3, Stone of Elostirion
 // 22084:A:1 and A:2, Well Preserved 22085:A:1 and A:2. The heroes, allies, events and contract are in under-the-ash-mountains.test.ts.
 import { beforeAll, describe, expect } from "vitest";
 
@@ -44,7 +44,7 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-describe("Valiant Sword (22083:A:2)", () => {
+describe("Valiant Sword (22083:A:1, A:3)", () => {
   // Aragorn and Théodred (Noble heroes), Beravor and the Noble ally; two Swords in hand; the threat at `threat`.
   const swords = (effects: readonly Effect[], threat: number): Table => {
     const tab = table(effects, { heroes: [{ code: ARAGORN, seat: 0 }, { code: THEODRED, seat: 0 }, { code: BERAVOR, seat: 0 }], allies: [{ code: NOBLE_ALLY, seat: 0 }], hand: [{ code: SWORD, seat: 0 }, { code: SWORD, seat: 0 }] });
@@ -54,7 +54,7 @@ describe("Valiant Sword (22083:A:2)", () => {
   // "Attach to a Noble hero. Limit 1 per hero. ... Attached hero gets +1 Attack (+2 Attack if your threat is 40 or higher).": Aragorn and
   // Théodred are offered, Beravor and the Noble ally are not; at threat 39 Aragorn has his Attack + 1, and the second Sword is offered only
   // Théodred. At threat 40 the Sword gives +2.
-  lineSpec("22083:A:2", "Valiant Sword: on a Noble hero, limit 1 per hero, +1 Attack, +2 at threat 40", (effects) => {
+  lineSpec("22083:A:3", "Valiant Sword: on a Noble hero, limit 1 per hero, +1 Attack, +2 at threat 40", (effects) => {
     const tab = swords(effects, 39);
     const [first = "", second = ""] = tab.ids[SWORD] ?? [];
     const [aragorn, theodred] = [idsOf(tab, ARAGORN), idsOf(tab, THEODRED)];

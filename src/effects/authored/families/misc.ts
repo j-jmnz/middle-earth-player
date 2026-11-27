@@ -73,7 +73,7 @@ export const RECORDS: readonly Effect[] = [
   {"id":"142014:constant:1","cardCode":"142014","lines":["142014:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any","trait":"Noble"},{"type":"character","control":"any","names":["Aragorn"]}]}]},
   {"id":"142014:constant:2","cardCode":"142014","lines":["142014:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay","target":"host"}]},
   // 22009 Inner Strength, 22033 Strength and Courage, 22085 Well Preserved: they go on the hero with The One Ring (an attachment named The One Ring: another Ring attachment, like Ring of Barahir, does not count).
-  {"id":"22009:constant:1","cardCode":"22009","lines":["22009:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any","hasAttachment":{"names":["The One Ring"]}}],"limitPerHost":true},{"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay","target":"host"}]},
+  {"id":"22009:constant:1","cardCode":"22009","lines":["22009:A:1","22009:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any","hasAttachment":{"names":["The One Ring"]}}],"limitPerHost":true},{"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay","target":"host"}]},
   {"id":"22033:constant:1","cardCode":"22033","lines":["22033:A:1","22033:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any","hasAttachment":{"names":["The One Ring"]}}],"limitPerHost":true},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","target":"host"}]},
   {"id":"22033:response:1","cardCode":"22033","lines":["22033:A:3"],"timing":"response","trigger":"declaredAttacker","subject":"host","cost":[{"kind":"exhaustCode","code":"21001"},{"kind":"raiseThreat","amount":1}],"instructions":[{"verb":"ModifyStat","stat":"attack","amount":{"stat":"attack","of":"host","printed":true},"until":"endOfAttack","target":"host"}]},
   {"id":"22085:constant:1","cardCode":"22085","lines":["22085:A:1","22085:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"any","hasAttachment":{"names":["The One Ring"]}}],"limitPerHost":true},{"verb":"ModifyStat","stat":"hitPoints","amount":1,"until":"whileSourceInPlay","target":"host"}]},
@@ -134,16 +134,14 @@ export const RECORDS: readonly Effect[] = [
     {"verb":"Pick","pick":{"type":"enemy","control":"any","staging":true,"nonUnique":true,"maxDefense":0}},{"verb":"Discard","target":{"kind":"picked"}}]},
 
   // The One Ring and the Master cards (player deck).
-  // 21001 The One Ring: immune to non-Master card effects; its Setup waits for the opening hands (Delay `startOfGame`), attaches it
-  // to a hero its player chooses and searches the deck for a Master card; it lowers the threat elimination level by 5; the
-  // players lose if it leaves play. The last two sentences of the Setup line are constant and triggered, which a line that opens
-  // with "Setup:" cannot name; the unlabelled line 2 stands for them (the coverage check allows any timing there).
-  {"id":"21001:constant:1","cardCode":"21001","lines":["21001:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"immuneToNonMaster","amount":1,"until":"whileSourceInPlay"}]},
-  {"id":"21001:setup:1","cardCode":"21001","lines":["21001:A:3"],"timing":"setup","instructions":[{"verb":"Delay","until":"startOfGame","instructions":[
+  // 21001 The One Ring: immune to non-Master card effects (line 1); its Setup (line 2) waits for the opening hands (Delay `startOfGame`), attaches it
+  // to a hero its player chooses and searches the deck for a Master card; the sentence after it lowers the threat elimination level by 5 (line 3, which
+  // also names the attachment: a Setup line cannot name a constant record); the players lose if it leaves play (line 4, the generated record).
+  {"id":"21001:constant:1","cardCode":"21001","lines":["21001:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"immuneToNonMaster","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"21001:setup:1","cardCode":"21001","lines":["21001:A:2"],"timing":"setup","instructions":[{"verb":"Delay","until":"startOfGame","instructions":[
     {"verb":"PutIntoPlay","card":"self"},
     {"verb":"Pick","pick":{"type":"card","control":"you","from":"deck","trait":"Master"}},{"verb":"MovePicked","to":"hand"},{"verb":"ShuffleDeck"}]}]},
-  {"id":"21001:constant:2","cardCode":"21001","lines":["21001:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"you"}]},{"verb":"ModifyStat","stat":"eliminationReduction","amount":5,"until":"whileSourceInPlay","target":"actorSeat"}]},
-  {"id":"21001:triggered:1","cardCode":"21001","lines":["21001:A:2"],"timing":"triggered","trigger":"leftPlay","subject":"self","instructions":[{"verb":"LoseGame"}]},
+  {"id":"21001:constant:2","cardCode":"21001","lines":["21001:A:3"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"you"}]},{"verb":"ModifyStat","stat":"eliminationReduction","amount":5,"until":"whileSourceInPlay","target":"actorSeat"}]},
   // 21009 The Master Ring: cancel the effects of the card just revealed, discard it, reveal another.
   {"id":"21009:response:1","cardCode":"21009","lines":["21009:A:1"],"timing":"response","trigger":"encounterRevealed","cost":[{"kind":"playEvent"},{"kind":"exhaustCode","code":"21001"},{"kind":"raiseThreat","amount":1}],"instructions":[{"verb":"CancelEffect"},{"verb":"DiscardCanceled"}]},
   // 21010 The Ruling Ring (the costs are the first instructions: an event's Action does not pay its record's costs).

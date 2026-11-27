@@ -1,0 +1,23 @@
+# The River Running
+
+Vengeance of Mordor part 1 (A Shadow in the East, `ASitE`), standalone only, on Easy and Normal (Q09.1, E09.1). Encounter sets The River Running, Riders of Rhûn, Easterling Raiders and Rolling Plains (`vom.setup-the-river-running`; the insert of the box prints the set list). The quest is two stages, and the scenario adds the encounter side quests Warriors of the East (21024) and An Arduous Journey (21029).
+
+- **Setup.** Stage 1A prints "Setup: Set Warriors of the East aside, out of play. Add Easterling Pursuit and 1 copy of River Running to the staging area. Each player adds 1 different Easterling enemy to the staging area. Shuffle the encounter deck." (`21075:A:1`). The reader gives an aside clause, a staging clause and the step `eachPlayerAddsTraitEnemy` (trait Easterling).
+- **Piles.** Easterling Pursuit and one River Running are staged; Warriors of the East is set aside. DragnCards stages one Easterling Outrider, Easterling Raider, Rider of Rhûn and Easterling Captain; four overrides leave them in the encounter deck, where the Setup finds them (the counts then equal Hall of Beorn's).
+- **Stage 2A.** Warriors of the East is added to the staging area, then X enemies (X the players) are discarded from the shuffled deck and added (`21076:A:1`).
+- **Win.** Stage 2B: "When this stage is defeated, the players win the game." (`21076:B:3`).
+
+## Data
+
+- Stage 1B gets +5 quest points per player and adds +1 Threat to the staging area for each resource on Easterling Pursuit.
+- Stage 2B takes -10 engagement cost from each enemy in the staging area, and no more than 5 progress a round while a player is engaged with an enemy.
+
+## Readings
+
+The statuses are those of the Readings bullet of `docs/scenarios/vengeance-of-mordor.md`. Each key is the scan-read ledger line (`data/printed/vengeance-of-mordor.json`), `<code>:<side>:<n>`. Sources read: the insert of A Shadow in the East (no rule of its own for the scenario beyond the Setup), the Vision of the Palantir page https://visionofthepalantir.com/2020/08/22/the-river-running/ (a play article with no designer answer in its comments), ALeP = https://alongextendedparty.com/semi-official-errata-faq-1-10/ (no entry for the scenario). A line not listed here is span-settled (its basis is the printed line and the rule span it names).
+
+- Different Easterling enemy (`21075:A:1`) (span-settled for "title", recommended for the pick). "1 different" is a title, not a card (user ruling 7, `docs/scenarios/ered-mithrin/roam-across-rhovanion.md`); each player in player order picks one non-engaged Easterling enemy from the encounter deck without revealing it, and the deck is shuffled after. Not taken: a random enemy. Why recommended: the page above advises the choice by player count and states no rule; no official answer or agreed thread settles who picks.
+- Easterling Pursuit (`21012:A:1`) (recommended). The resource is placed at the end of each round; with 3 or more the objective removes 3, and a count above 3 keeps the rest. The enemies are the discarded enemies of a deck shuffled with the discard pile, and with no enemy in the deck or discard pile nothing is added. Not taken: all resources removed. Why recommended: the page above gives "the objective can receive more than 3 resources, in which case 3 are still removed" and no official source says it; no ruling settles it.
+- Warriors of the East (`21024:A:2`, `21076:A:1`) (recommended). The side quest is added to the staging area by stage 2A, not revealed, so its Surge does not trigger; its Forced effect attaches the top Easterling treachery in the discard pile to each Easterling enemy that enters play after it. Not taken: a Surge when added. Why recommended: the page above says "added instead of revealed, so the Surge won't go off"; no official answer settles it.
+- Easterling Captain (`21017:A:2`) (recommended). The players choose which Easterling attachment to discard when it would take damage, the damage is cancelled, and a Captain with none takes the damage. The treachery attached when it enters play is attached without resolving its When Revealed text. Not taken: the first attachment is discarded. Why recommended: the page above advises discarding the Horse first, which means the players choose; no official source settles it.
+- Exposed Riverbank (`21015:A:1`) (recommended). While in the staging area it places a resource on Easterling Pursuit after a "when revealed" effect is canceled; it does not replace the canceled effect. Not taken: the canceled treachery still places its own resource. Why recommended: the page above says the Riverbank places one "instead of the treachery"; no official answer settles it.

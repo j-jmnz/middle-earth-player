@@ -1,7 +1,7 @@
 // Rules: rr.attachment-cards, rr.restricted, rr.modifiers, rr.response, rr.cancel, rr.cost, rr.shadow-effects, rr.guarded, wor.guarded-x,
 // rr.triggered-ability (data/rules/entries.json).
-// The Wrath and Ruin attachments, each line tested from the words on the card: Durin's Axe 22006:A:1, A:2 and A:3, Silver Circlet 22008:A:2,
-// Inner Strength 22009:A:1 and A:2. The lines are the text of data/cards/WaR.json (data/printed holds no entry for this pack), so every
+// The Wrath and Ruin attachments, each line tested from the words on the card: Durin's Axe 22006:A:1, A:2 and A:3, Silver Circlet 22008:A:1 and A:3,
+// Inner Strength 22009:A:1, A:2 and A:3. The lines are the text of data/cards/WaR.json (data/printed holds no entry for this pack), so every
 // intent goes through sendUnledgered. The shadow effect Inner Strength cancels is a fixture record (line fixture:A:1).
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -133,14 +133,14 @@ describe("Durin's Axe (22006:A:1, A:2, A:3)", () => {
   });
 });
 
-describe("Silver Circlet (22008:A:2)", () => {
+describe("Silver Circlet (22008:A:1, A:3)", () => {
   // Éowyn (who pays) and the Bearer (Spirit heroes), Legolas (Tactics) and a Spirit ally; two Circlets in hand.
   const circlets = (effects: readonly Effect[]) =>
     table(effects, { heroes: [{ code: EOWYN, seat: 0 }, { code: BEARER, seat: 0 }, { code: LEGOLAS, seat: 0 }], allies: [{ code: SPIRIT_ALLY, seat: 0 }], hand: [{ code: CIRCLET, seat: 0 }, { code: CIRCLET, seat: 0 }] });
 
   // "Attach to a Spirit hero. Limit 1 per hero.": Éowyn and the Bearer are offered, Legolas and the Spirit ally are not; with a Circlet on
   // Éowyn the second is offered only for the Bearer.
-  lineSpec("22008:A:2", "Silver Circlet: Attach to a Spirit hero, limit 1 per hero", (effects) => {
+  lineSpec("22008:A:1", "Silver Circlet: Attach to a Spirit hero, limit 1 per hero", (effects) => {
     const tab = circlets(effects);
     const [first = "", second = ""] = tab.ids[CIRCLET] ?? [];
     expect(hosts(tab, first)).toEqual([idsOf(tab, EOWYN), idsOf(tab, BEARER)].sort());
@@ -149,7 +149,7 @@ describe("Silver Circlet (22008:A:2)", () => {
   });
 
   // "Attached hero gets +2 Willpower.": on Éowyn, +2; the Bearer's stays.
-  lineSpec("22008:A:2", "Silver Circlet: the attached hero gets +2 Willpower", (effects) => {
+  lineSpec("22008:A:3", "Silver Circlet: the attached hero gets +2 Willpower", (effects) => {
     const tab = circlets(effects);
     const run = play(begin(tab.state), tab, tab.ids[CIRCLET]?.[0] ?? "", idsOf(tab, EOWYN));
     expect(stat(run.state, tab, idsOf(tab, EOWYN), "willpower")).toBe(printed(tab, EOWYN, "willpower") + 2);
@@ -157,7 +157,7 @@ describe("Silver Circlet (22008:A:2)", () => {
   });
 });
 
-describe("Inner Strength (22009:A:1, A:2)", () => {
+describe("Inner Strength (22009:A:1 to A:3)", () => {
   // The Bearer holds The One Ring; Éowyn pays (Spirit); two Inner Strength in hand.
   const ringed = (effects: readonly Effect[], extra: Scene["attached"] = []) =>
     table(effects, { heroes: [{ code: BEARER, seat: 0 }, { code: EOWYN, seat: 0 }], attached: [{ code: ONE_RING, host: BEARER }, ...extra], hand: [{ code: INNER, seat: 0 }, { code: INNER, seat: 0 }] });
@@ -173,7 +173,7 @@ describe("Inner Strength (22009:A:1, A:2)", () => {
   });
 
   // "Attached hero gets +1 Defense.": the Bearer's Defense is 2 + 1.
-  lineSpec("22009:A:1", "Inner Strength: the attached hero gets +1 Defense", (effects) => {
+  lineSpec("22009:A:2", "Inner Strength: the attached hero gets +1 Defense", (effects) => {
     const tab = ringed(effects);
     const run = play(begin(tab.state), tab, tab.ids[INNER]?.[0] ?? "", idsOf(tab, BEARER));
     expect(stat(run.state, tab, idsOf(tab, BEARER), "defense")).toBe(printed(tab, BEARER, "defense") + 1);
@@ -197,7 +197,7 @@ describe("Inner Strength (22009:A:1, A:2)", () => {
 
   // "Response: Exhaust The One Ring and raise your threat by 1 to cancel a shadow effect just triggered during an attack that attached hero
   // is defending.": The One Ring is exhausted, the threat goes from 8 to 9, and the attack (2) does no damage against Defense 3.
-  lineSpec("22009:A:2", "Inner Strength: exhaust The One Ring and raise the threat by 1 to cancel a shadow effect", (effects) => {
+  lineSpec("22009:A:3", "Inner Strength: exhaust The One Ring and raise the threat by 1 to cancel a shadow effect", (effects) => {
     const { tab, run: asked } = defended(effects, BEARER);
     const bearer = idsOf(tab, BEARER);
     expect(triggers(asked.state, tab)).toContain("22009:response:1");
@@ -208,14 +208,14 @@ describe("Inner Strength (22009:A:1, A:2)", () => {
   });
 
   // The shadow effect not canceled: the attack is 2 + 3 against Defense 3, and the Bearer takes 2.
-  it("22009:A:2 Inner Strength: the shadow effect resolves when it is not used", () => {
+  it("22009:A:3 Inner Strength: the shadow effect resolves when it is not used", () => {
     const { tab, run: asked } = defended(EFFECTS, BEARER);
     const run = passAll(sendUnledgered(asked, { type: "Pass" }, tab.ctx), tab.ctx, { responses: true });
     expect(run.state.cards[idsOf(tab, BEARER)]?.damage).toBe(2);
   });
 
   // "Exhaust The One Ring": with The One Ring already exhausted the cost cannot be paid, so no Response.
-  it("22009:A:2 Inner Strength: not offered when The One Ring is exhausted", () => {
+  it("22009:A:3 Inner Strength: not offered when The One Ring is exhausted", () => {
     const tab = table(EFFECTS, { heroes: [{ code: BEARER, seat: 0 }, { code: EOWYN, seat: 0 }], attached: [{ code: ONE_RING, host: BEARER }, { code: INNER, host: BEARER }], engaged: [{ code: BRUTE, seat: 0 }], deck: [BOOST] });
     const ring = idsOf(tab, ONE_RING);
     let run = passAll(combat(updateCard(tab.state, ring, { exhausted: true }), tab), tab.ctx);
@@ -226,7 +226,7 @@ describe("Inner Strength (22009:A:1, A:2)", () => {
   });
 
   // "an attack that attached hero is defending": Éowyn defends, so no Response.
-  it("22009:A:2 Inner Strength: not offered when another character defends", () => {
+  it("22009:A:3 Inner Strength: not offered when another character defends", () => {
     const { tab, run } = defended(EFFECTS, EOWYN);
     expect(triggers(run.state, tab)).not.toContain("22009:response:1");
   });

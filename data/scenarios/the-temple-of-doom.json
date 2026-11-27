@@ -1,0 +1,215 @@
+{
+  "id": "the-temple-of-doom",
+  "name": "The Temple of Doom",
+  "number": 3,
+  "stages": [
+    "21080",
+    "21081",
+    "21083",
+    "21084",
+    "21085"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Temple of Doom",
+      "count": 8
+    },
+    {
+      "name": "Ulchor's Guard",
+      "count": 9
+    },
+    {
+      "name": "Twisted Tunnels",
+      "count": 9
+    },
+    {
+      "name": "Easterling Raiders",
+      "count": 11
+    },
+    {
+      "name": "The Power of Mordor",
+      "count": 5
+    }
+  ],
+  "cards": [
+    {
+      "code": "21055",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "21056",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "21057",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "21058",
+      "normal": 4,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "21059",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "21060",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "21061",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "21062",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "21063",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "21064",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "21065",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "21020",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "21021",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "21022",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "21023",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "21024",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "21080",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "21081",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "21083",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "21084",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "21085",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "21053",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "21054",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "21066",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "21067",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "21068",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "21069",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "21070",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q09.3",
+    "dragnEasy": "E09.3",
+    "hobSlug": "The-Temple-of-Doom"
+  }
+}

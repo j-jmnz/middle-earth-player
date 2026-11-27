@@ -49,6 +49,8 @@ const overridesSchema = z.object({
         pile: z.enum(PILES).optional(),
         normal: z.number().int().nonnegative().optional(),
         easy: z.number().int().nonnegative().optional(),
+        // The load list has no line for the card, though the printed encounter set holds it (Wrath and Ruin's Warriors of the East): the rule adds the placement.
+        add: z.boolean().optional(),
         reason: z.string().min(1),
         source: z.string().min(1),
       }),

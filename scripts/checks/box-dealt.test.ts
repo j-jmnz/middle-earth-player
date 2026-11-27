@@ -26,6 +26,8 @@ const EXCEPTIONS: Readonly<Record<string, string>> = {
   "50810": "Man the Walls (stage 2E/2F), a quest card of The Siege of Annúminas' epic multiplayer mode only; epic multiplayer mode is not built.",
   "50811": "Stop the Attack (stage 3E/3F), a quest card of The Siege of Annúminas' epic multiplayer mode only; epic multiplayer mode is not built.",
   "50932": "Epic Multiplayer Mode, the mode card of Attack on Dol Guldur's 3-team mode; epic multiplayer mode is not built (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur).",
+  "21071": "Stinker, the treachery the hero Sméagol (21072) shuffles into the encounter deck at Setup (vom.smeagol-gollum): no scenario lists it; the player card of Sméagol deals it.",
+  "21073": "Gollum, the enemy side of the Sméagol / Gollum card (21072; vom.smeagol-gollum): no scenario lists it; Stinker flips Sméagol to it.",
   "142091": "The One Ring as printed in The Road Darkens (TRD 91): the app deals 141085 (TBR 85, TFotR 166), the same card, attached through the campaign card's setup.",
 };
 
