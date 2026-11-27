@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { armedLines, armedRoom, armedWords } from "./armed-room.ts";
-import { DOCK_PAD_DENSE_PX, DOCK_PAD_PX, LABEL_PX, labelChars, linesPlace, LIST_PICTURE, LIST_PICTURE_SMALL, PILL_PT, planWords, smallPictures, titleLinesOf, TITLE_PX, trayRoom, wordsWindow } from "./budget.ts";
+import { detailLines, DOCK_PAD_DENSE_PX, DOCK_PAD_PX, LABEL_PX, labelChars, linesPlace, LIST_PICTURE, LIST_PICTURE_SMALL, PILL_PT, planWords, rowsRoom, smallPictures, titleLinesOf, TITLE_PX, TRAY_LABEL_LINE_PX, TRAY_ROW_FRAME_PX, trayRoom, wordsWindow } from "./budget.ts";
 import { dockColumn } from "./fit.ts";
 import { dockLines } from "./lines.ts";
 
@@ -189,5 +189,38 @@ describe("the words window at the phone's text size 2", () => {
     const a = planWords({ ...plan, textWidth: 198, space: 80 });
     const b = planWords({ ...plan, space: 80 * X }, X);
     expect(b).toEqual(a);
+  });
+});
+
+describe("the lines a choice row's printed line may take", () => {
+  it("is what the rows' room holds after the row's name (two lines) and padding, never fewer than one", () => {
+    const room = 140;
+    expect(detailLines(room)).toBe(Math.floor((room - TRAY_ROW_FRAME_PX - 2 * TRAY_LABEL_LINE_PX) / LABEL_PX));
+    expect(detailLines(0)).toBe(1);
+  });
+
+  it("falls as the phone's text size grows, so a row never outgrows the rows' room (no mid-line cut)", () => {
+    const room = 150;
+    expect(detailLines(room, 1.5)).toBeLessThan(detailLines(room, 1));
+    for (const text of [1, 1.3, 1.5, 2]) {
+      const lines = detailLines(room, text);
+      // The row's height at its cap: it fits the room unless even one line does not.
+      const height = TRAY_ROW_FRAME_PX + 2 * TRAY_LABEL_LINE_PX * text + lines * LABEL_PX * text;
+      expect(lines === 1 || height <= room, `text ${text}`).toBe(true);
+    }
+  });
+
+  it("is told by the dock's room: the column less its padding, the pinned block and the words above the rows", () => {
+    const base = { column: 300, block: 120, titleLines: 1, dense: true };
+    expect(rowsRoom(base)).toBe(300 - 120 - DOCK_PAD_DENSE_PX - TITLE_PX - 2);
+    expect(rowsRoom({ ...base, titleLines: 2 })).toBe(rowsRoom(base) - TITLE_PX);
+    expect(rowsRoom({ ...base, text: 1.5 })).toBeLessThan(rowsRoom(base));
+    expect(rowsRoom({ ...base, column: 100 })).toBe(0);
+  });
+
+  it("holds more than one line at 667x375 for the Mûmak Trail Response (a short title, a pinned block of the worst dock)", () => {
+    const column375 = dockColumn(375, 1, { top: 0, bottom: 0 });
+    const room = rowsRoom({ column: column375, block: 124, titleLines: 1, dense: true });
+    expect(detailLines(room)).toBeGreaterThanOrEqual(1);
   });
 });

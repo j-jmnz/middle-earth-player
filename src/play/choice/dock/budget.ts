@@ -57,6 +57,31 @@ export function trayRoom(small: boolean, text = 1): number {
   return Math.max(small ? TRAY_ROW_SMALL_PX : TRAY_ROW_PX, TRAY_LABEL_LINE_PX * text + TRAY_ROW_PAD_PX);
 }
 
+// A choice row's own padding (py-1 above and below, mb-1.5 under, choice/sheet-paper.tsx Tile) and the dock's gap under the words (dense or not).
+export const TRAY_ROW_FRAME_PX = 14;
+const WORDS_FOOT_PX = 2;
+const WORDS_FOOT_TALL_PX = 8;
+
+/**
+ * The room the choice's rows have in the dock, in logical points: the column less its padding, the pinned block and the words above
+ * (the title's lines at the phone's text size and the gap under them). The rows scroll in it, so a row taller than it is cut at the foot.
+ */
+export function rowsRoom(a: { column: number; block: number; titleLines: number; dense: boolean; text?: number }, scale = 1): number {
+  const text = a.text ?? 1;
+  const words = Math.max(1, a.titleLines) * TITLE_PX * text + (a.dense ? WORDS_FOOT_PX : WORDS_FOOT_TALL_PX);
+  return Math.max(0, (a.column - a.block) / scale - (a.dense ? DOCK_PAD_DENSE_PX : DOCK_PAD_PX) - words);
+}
+
+/**
+ * The lines a row's printed line may take where the rows have `room` points: the row's name keeps its two lines and its padding, and the
+ * rest is label lines (at the phone's text size), never fewer than one. A longer line ends in an ellipsis on a whole line, never cut mid-line
+ * at the rows' foot (the dock's Read opens the whole card).
+ */
+export function detailLines(room: number, text = 1): number {
+  const left = room - TRAY_ROW_FRAME_PX - 2 * TRAY_LABEL_LINE_PX * text;
+  return Math.max(1, Math.floor(left / (LABEL_PX * text)));
+}
+
 /** The height of the words' window: the dock's room (the column less its padding) less its measured pinned block. */
 export function wordsWindow(a: { room: number; block: number; dense?: boolean }, scale = 1): number {
   return Math.max(0, (a.room - a.block) / scale - (a.dense ? DOCK_PAD_DENSE_PX : DOCK_PAD_PX)) * scale;

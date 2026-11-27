@@ -14,7 +14,6 @@ import { CONTROL_RADIUS, SHEET_RADIUS } from "../../ui/radius.ts";
 import { chipOnSurface, parchmentSurface } from "../../ui/surfaces.ts";
 import { layoutAnim, useMotionScale } from "../../ui/motion-run.ts";
 import { MOTION } from "../../ui/motion-tokens.ts";
-import { DENSE_BELOW } from "./dock/budget.ts";
 import type { SheetStat } from "./sheet-types.ts";
 import { withAlphaHex } from "../../ui/tokens.ts";
 import { capLines, touch, useUiScale } from "../../ui/ui-scale.ts";
@@ -115,6 +114,7 @@ export function Tile({
   said = "",
   hint,
   detailSpoken = true,
+  detailLines,
   reader,
 }: {
   label: string;
@@ -134,6 +134,8 @@ export function Tile({
   hint?: string;
   // The detail is drawn but not said again: its words are already in the stats ("Success" beside the success icon).
   detailSpoken?: boolean;
+  // The lines the row's printed line may take (dock/budget.ts, detailLines): the dock's rows on a short phone give it, so a longer line ends in an ellipsis on a whole line.
+  detailLines?: number;
   // How a screen reader meets the row (accessibility props only; a touch acts as it always did): its role, whether its state is "checked"
   // (a radio, a checkbox) or "selected", the name it speaks when that is not the drawn label, and for an "adjustable" row its value and the
   // increment and decrement actions that add or take away one share (tray-logic.ts, stepShares). Given only under useReaderMode.
@@ -146,8 +148,6 @@ export function Tile({
   // A row's name keeps two lines at the phone's default text size and grows with larger text (capLines, ui/ui-scale.ts).
   const screen = useWindowDimensions();
   const labelCap = capLines(2, screen.fontScale);
-  // On a short phone the dock's rows have room for about six lines of a row's printed line: a longer one ends in an ellipsis on a whole line, never cut mid-line at the foot of the rows (the dock's Read opens the whole card).
-  const detailCap = night && screen.height / s < DENSE_BELOW ? capLines(6, screen.fontScale) : undefined;
   // A screen reader's actions on the row: a share row's increment and decrement, and the long press's "Show card" (docs/design-system.md, Screen reader).
   const onStep = reader?.onStep;
   const actions = mergeA11yActions(
@@ -193,7 +193,7 @@ export function Tile({
               {night || dense ? null : numbers}
             </View>
             {detail ? (
-              <Text numberOfLines={detailCap} className={`mt-0.5 text-label ${night ? "text-muted" : "text-inkMuted"}`}>
+              <Text numberOfLines={detailLines} className={`mt-0.5 text-label ${night ? "text-muted" : "text-inkMuted"}`}>
                 {detail}
               </Text>
             ) : null}

@@ -4,6 +4,7 @@
 // above them; the count stays in the title's spoken label. The readout, the refusal and the buttons are the dock's, once, under the
 // rows. A row is picked like a card on the table (the same pick, table-choice.ts); a long press on a card's row shows it large. A tap
 // outside folds it (use-table-choice.ts).
+import { useContext } from "react";
 import { useWindowDimensions, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
@@ -11,7 +12,8 @@ import Animated, { useAnimatedStyle } from "react-native-reanimated";
 import { CardImage } from "../../ui/card-image.tsx";
 import { cardCorner } from "../../ui/card-corner.ts";
 import { ringRoom, ringScroll } from "../../ui/focus-ring-style.ts";
-import { LIST_PICTURE, LIST_PICTURE_SMALL, smallPictures, trayRoom } from "./dock/budget.ts";
+import { detailLines, LIST_PICTURE, LIST_PICTURE_SMALL, smallPictures, trayRoom } from "./dock/budget.ts";
+import { RowsRoom } from "./dock/rows-room.ts";
 import { dropShadowOf } from "../../ui/surfaces.ts";
 import { IconValue } from "../../ui/game-icon.tsx";
 import { PlaceGlyph } from "../dream-chaser/island-glyph.tsx";
@@ -115,6 +117,9 @@ export function ChoiceTray({
   // A phone draws the small picture, and the rows keep one row of it (dock/budget.ts; the dock budgets its words against the same).
   const { height: screenHeight, fontScale } = useWindowDimensions();
   const small = smallPictures(screenHeight, s);
+  // On a dense dock a row's printed line keeps the lines the rows' room holds (dock/budget.ts, detailLines), so no row is cut mid-line at the foot.
+  const room = useContext(RowsRoom);
+  const detailCap = room > 0 ? detailLines(room, fontScale) : undefined;
   const { progress, leaving } = useOpenMotion(open, MOTION.trayEnter, MOTION.trayLeave);
   const motion = useAnimatedStyle(() => ({ opacity: progress.get(), transform: [{ translateY: (1 - progress.get()) * RISE * s }] }));
   const shown = useHeld(open ? sheet : null) ?? sheet;
@@ -144,6 +149,7 @@ export function ChoiceTray({
               dense={dense && tile.detail == null}
               label={shown.kind === "distribute" ? `${tile.label} · ${share}` : tile.label}
               detail={tile.detail}
+              detailLines={detailCap}
               stats={tile.stats}
               selected={selected}
               testID={shown.kind === "trigger" ? `sheet-trigger-${tile.id.split("|")[0] ?? tile.id}` : tile.look != null ? `sheet-look-${tile.id}` : `sheet-option-${tile.id}`}
