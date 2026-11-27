@@ -226,7 +226,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "whenRevealed",
       instructions: [
         EACH_PLAYER([
-          { verb: "DiscardRandomFromHand", remember: true },
+          { verb: "DiscardRandomFromHand", remember: true, announce: true },
           { verb: "AssignDamage", amount: { stat: "cost", of: "picked", printed: true }, pick: { type: "character", control: "you" } },
         ]),
       ],
@@ -236,7 +236,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "17024",
       lines: ["17024:A:2"],
       timing: "shadow",
-      instructions: [{ verb: "DiscardRandomFromHand", remember: true }, { verb: "AssignDamage", amount: { stat: "cost", of: "picked", printed: true }, pick: { type: "character", control: "you" } }],
+      instructions: [{ verb: "DiscardRandomFromHand", remember: true, announce: true }, { verb: "AssignDamage", amount: { stat: "cost", of: "picked", printed: true }, pick: { type: "character", control: "you" } }],
     },
 
     // 17025 Guardians of the Jungle (encounter side quest). A:1: each location gets +1 Threat. A:2: each time it becomes the current quest, the encounter deck and discard pile are searched for a Territorial Ape, put into play engaged with the first player.

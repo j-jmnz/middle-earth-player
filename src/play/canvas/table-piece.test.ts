@@ -1,6 +1,7 @@
 // Which cards of a crowded table draw again (docs/architecture.md, Performance): a card whose props are equal is skipped by TablePiece, so the
 // comparison must say "different" for exactly the cards a change touched, and "same" for the rest, though layout and `slotNumbers` make
 // new objects for every card on every state.
+import type { SkImage } from "@shopify/react-native-skia";
 import { describe, expect, it } from "vitest";
 
 import type { ScenarioState } from "../../rules/core/state.ts";
@@ -155,8 +156,12 @@ describe("the placeholder name of a card with effect pills", () => {
   const { views, piles } = crowdedTable();
   const slots = laidOut(views, piles).slots;
   const staged = slots.find((slot) => slot.kind === "card" && !slot.faceDown && slot.zone === "staging") as CardSlot;
-  const withPills = (stats: number): PieceContext => ({
+  // A font that measures 6 pt a letter, so a name's width is known.
+  const measured = { ...fonts, names: { getTextWidth: (text: string) => text.length * 6 } } as unknown as Fonts;
+  const withPills = (stats: number, name = "Orc"): PieceContext => ({
     ...contextOf(),
+    fonts: measured,
+    nameOf: () => name,
     info: () => ({ ...numbersOf(null), effects: { stats: Array.from({ length: stats }, () => ({})), flags: [] } as unknown as SlotNumbers["effects"] }),
   });
 
@@ -164,5 +169,24 @@ describe("the placeholder name of a card with effect pills", () => {
     expect(staged).toBeDefined();
     expect(pieceProps(staged, withPills(1)).nameLines).toBe(1);
     expect(pieceProps(staged, withPills(0)).nameLines).toBeUndefined();
+    expect(pieceProps(staged, withPills(1)).titleRows).toBe(1);
+  });
+
+  it("gives a name that fits no line, even shrunk, a second line, and the pills start under it (Uruk Chieftain)", () => {
+    const long = `Uruk Chieftain ${"of the Black Land ".repeat(12)}`;
+    const props = pieceProps(staged, withPills(2, long));
+    expect(props.nameLines).toBe(2);
+    expect(props.titleRows).toBe(2);
+    // A card with no pills keeps its default lines, and one with a picture draws no placeholder name.
+    expect(pieceProps(staged, withPills(0, long)).titleRows).toBe(1);
+    const pictured = { ...withPills(2, long), images: new Map([[staged.picture ?? staged.code, {} as SkImage]]) } as PieceContext;
+    expect(pieceProps(staged, pictured).titleRows).toBe(1);
+    // A card lying sideways stands its pills upright over the turned name: a second name line moves none of them.
+    expect(pieceProps({ ...staged, exhausted: true }, withPills(2, long)).titleRows).toBe(1);
+  });
+
+  it("keeps the Stormcaller stage's title to one line, so its pill never covers a second", () => {
+    const stage = { ...staged, stormcaller: "stage" as const };
+    expect(pieceProps(stage, withPills(0)).nameLines).toBe(1);
   });
 });

@@ -210,6 +210,7 @@ function playRevealedFree(state: ScenarioState, item: QueueItem, ctx: ReduceCont
       cancel: null,
       blockCancel: null,
       finish: "discardSource",
+      announceResolved: true,
     },
     steps,
   );

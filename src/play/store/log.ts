@@ -12,6 +12,7 @@ import { barredWords } from "../words/scenarios/against-the-shadow/osgiliath.ts"
 import { reshuffleWords } from "./pile-ids.ts";
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
 import { attachedWords } from "../words/scenarios/haradrim/capture.ts";
+import { discardedRandomWords } from "../words/scenarios/haradrim/random-discard.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
 import { trackLogLine } from "../words/scenarios/haradrim/track.ts";
 import { stageStepLine } from "../words/stage-steps.ts";
@@ -161,6 +162,7 @@ function words(step: EngineStep, names: LogNames, questStat: string | null): str
       return grappleLine(names.card(step.enemyId), names.card(step.locationId));
     case "attachDrawn":
     case "claim":
+    case "captive":
       return attachedWords(step, names.card, 2);
     case "detach":
       return detachLine(names.card(step.enemyId), names.card(step.locationId));
@@ -178,6 +180,8 @@ function words(step: EngineStep, names: LogNames, questStat: string | null): str
       return poisonLine(names.card(step.targetId), step.count, step.of);
     case "unconscious":
       return unconsciousLine(names.card(step.targetId), step.ready === true);
+    case "discardedRandom":
+      return discardedRandomWords(names.card(step.cardId), player(step.seat));
     case "resetEncounterDeck":
       return `The encounter discard pile (${step.count}) is shuffled into the encounter deck`;
     case "reshuffleDeck":

@@ -12,6 +12,7 @@ import { reshuffleWords } from "./pile-ids.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
 import { attachedWords } from "../words/scenarios/haradrim/capture.ts";
 import { randomStageDetail } from "../words/scenarios/haradrim/poros-table.ts";
+import { discardedRandomWords } from "../words/scenarios/haradrim/random-discard.ts";
 import { boardingWords } from "../words/scenarios/sea.ts";
 import type { FateNames } from "../words/scenarios/fate-beats.ts";
 import { ignoredRevealNote } from "../readouts/ettenmoors.ts";
@@ -302,6 +303,7 @@ export function momentsOf(before: ScenarioState, after: ScenarioState, steps: re
         return;
       case "attachDrawn":
       case "claim":
+      case "captive":
         staging(attachedWords(step, names.card, after.seatCount), [step.cardId, step.kind === "claim" ? step.heroId : step.hostId]);
         return;
       // The enemies grappled with a location that became the active location or was explored come out from under it, faceup, into the staging area (dcce.grapple).
@@ -368,6 +370,7 @@ export function momentsOf(before: ScenarioState, after: ScenarioState, steps: re
         return;
       // Poison and unconscious (hob.venom-poison, hob.unconscious-characters): the character's table pill and its turn follow each line.
       case "poison": return void line(poisonLine(names.card(step.targetId), step.count, step.of), null, [step.targetId]);
+      case "discardedRandom": return void line(discardedRandomWords(names.card(step.cardId), after.seatCount > 1 ? `Player ${step.seat + 1}` : null), null, [step.cardId]);
       case "unconscious": return void line(unconsciousLine(names.card(step.targetId), step.ready === true), null, [step.targetId]);
       case "resetEncounterDeck":
         line("The encounter discard pile is shuffled into the encounter deck", null, [], true);

@@ -56,7 +56,8 @@ function cli(...args: string[]): { status: number | null; output: string } {
   return { status: run.status, output: `${run.stdout}${run.stderr}` };
 }
 
-describe("pnpm scenario new", () => {
+// Each `cli` call starts node and loads the planner (about 2 s alone, more on a loaded machine) and each skeleton check starts tsrs, so the file runs about 35 s and is a slow file (vitest.config.mts, slowFiles): its tests get a minute, not the default 5 s.
+describe("pnpm scenario new", { timeout: 60_000 }, () => {
   it("refuses an id that is not in data/scenarios", () => {
     const { plan, problems } = planScenario("the-lost-road", {}, repo, exists);
     expect(plan).toBeNull();
@@ -275,7 +276,7 @@ function typeErrorsOf(text: string): string[] {
 }
 
 // The game.ts skeleton of a campaign scenario and of a cycle scenario starts from the play policy kit (test/harness/policy-kit.ts), with a comment that lists the kit's rules.
-describe("the game.ts skeleton", () => {
+describe("the game.ts skeleton", { timeout: 60_000 }, () => {
   const kit = readFileSync(path.join(ROOT, "test/harness/policy-kit.ts"), "utf8");
   const exported = [...kit.matchAll(/^export (?:function|const) (\w+)/gm)].map((found) => found[1] as string).filter((name) => name !== "policyIntent" && name !== "POLICY_KIT_RULES");
 

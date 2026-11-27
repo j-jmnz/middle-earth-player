@@ -126,6 +126,11 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["isSource"], pick.isSource === true ? "that is this card itself" : null);
   note(["reanimated"], pick.reanimated === true ? "that is a Reanimated Dead" : null);
   note(["allInPlay"], pick.allInPlay === true ? "in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not" + (pick.type === "enemy" && pick.trait === "Orc" ? "; an Orc enemy in the Orcs' area counts, at the same stage and at another" : "") : null);
+  note(["guardsCaptive"], pick.guardsCaptive === true ? "that holds a captive (a character or objective attached to it: it is guarding an objective)" : pick.guardsCaptive === false ? "that holds no captive" : null);
+  note(["heldBySource"], pick.heldBySource === true ? "that this card holds" : null);
+  note(["ownedByActor"], pick.ownedByActor === true ? "that the acting player owns" : null);
+  note(["unattached"], pick.unattached === true ? "with nothing attached to it, no attachment of any kind and no captive" : null);
+  note(["costAboveDiscardedThreat"], pick.costAboveDiscardedThreat === true ? "with a printed cost greater than the printed Threat (0 with none) of the card last discarded from the encounter deck" : null);
   note(["sameTitleAsDiscarded"], pick.sameTitleAsDiscarded === true ? "that shares its printed title with a card the effect discarded from the chooser's own deck" : null);
   note(["inOrcsArea"], pick.inOrcsArea === true ? "in the Orcs' area (the area zone while the players are at another stage than the Orcs, the staging area at the same stage)" : null);
   note(["copyOfDefender"], pick.copyOfDefender === true ? "with the title of the defending character" : null);

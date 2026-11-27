@@ -5,12 +5,18 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { moveCard } from "../rules/core/zones.ts";
 import { updateCard } from "../rules/core/state.ts";
-import { loadMirkwoodWorld, mirkwoodTable, type MirkwoodWorld } from "../../test/scenarios/passage-through-mirkwood/scene.ts";
+import { campaign, loadMirkwoodWorld, mirkwoodTable, passage, type MirkwoodWorld } from "../../test/scenarios/passage-through-mirkwood/scene.ts";
 
 import { gameReport } from "./report.ts";
+import { resolutionView } from "./resolution-view.ts";
 import { scoreOf } from "./score.ts";
+import type { World } from "./world.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
 
 let world: MirkwoodWorld;
+
+// A world with the printed cards of the table and nothing else: the loss reason reads only the cards.
+const worldOf = (cards: ReadonlyMap<string, PrintedCard>): World => ({ campaign, scenario: passage, effects: [], cards, sets: new Map() });
 
 beforeAll(async () => {
   world = await loadMirkwoodWorld();
@@ -57,5 +63,19 @@ describe("the report of a finished scenario", () => {
     // The second hero was destroyed in play; the first left with the player.
     expect(words(new Set([second ?? ""]))).toEqual(["Defeated with the player", "Destroyed"]);
     expect(words(new Set([first ?? "", second ?? ""]))).toEqual(["Destroyed", "Destroyed"]);
+  });
+
+  it("the report and the Resolution screen tell the same cause: the last hero was destroyed", () => {
+    const made = mirkwoodTable(world, { stage: "01120" });
+    const heroes = made.state.seats[0].heroes;
+    let state = made.state;
+    for (const id of heroes) state = moveCard(state, id, { zone: "discard", seat: 0 });
+    state = { ...state, seats: [{ ...state.seats[0], eliminated: true }, state.seats[1]], lost: true, lossReason: "No seats remain" };
+    const destroyed = new Set(heroes);
+    const words = "Every player is eliminated. Player 1's last hero was destroyed.";
+    expect(gameReport(state, made.ctx.cards, destroyed).lossReason).toBe(words);
+    expect(resolutionView(state, worldOf(made.ctx.cards), [], destroyed)).toEqual({ kind: "lost", reason: words });
+    // With no destroy steps known, only the engine's reason is told.
+    expect(resolutionView(state, worldOf(made.ctx.cards))).toEqual({ kind: "lost", reason: "Every player is eliminated" });
   });
 });

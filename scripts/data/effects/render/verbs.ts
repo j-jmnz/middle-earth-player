@@ -408,7 +408,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   // Only the `different` form is worded (a stage 2 that comes up again, 147002:B:2); Roam Across Rhovanion's each-once order prints as JSON.
   AdvanceToRandomStage: (i, ctx) => (i.different === true && Array.isArray(i.codes) ? { text: `advance to a random stage out of ${i.codes.map(String).join(", ")}, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)${i.stageSet === true ? "" : "; the quest advances at once, by this set alone"}`, read: ["codes", "different", "otherwise", "remove", "stageSet"] } : (FAMILY_TEMPLATES.AdvanceToRandomStage?.(i, ctx) ?? null)),
   WinGame: () => ({ text: "the players win the game", read: [] }),
-  LoseGame: (i) => ({ text: `the players lose the game${typeof i.reason === "string" ? ` (${i.reason})` : ""}`, read: ["reason"] }),
+  LoseGame: (i) => ({ text: `the players lose the game${typeof i.reason === "string" ? ` (${i.reason})` : ""}${i.saysHow === true ? " (the loss says whether the card was destroyed or left play another way)" : ""}`, read: ["reason", "saysHow"] }),
   StageDiscarded: (i) => ({ text: `add the discarded ${i.trait != null ? `${str(i.trait)} ` : ""}${plural(str(i.type), 2)} to the staging area`, read: ["type", "trait"] }),
   SearchStageCard: (i) => ({ text: `search for the card with code ${str(i.code)} and add it to the staging area`, read: ["code"] }),
   SearchBoonOrTreasureToHand: () => ({ text: "each player may search their deck for a boon or treasure card and add it to their hand", read: [] }),

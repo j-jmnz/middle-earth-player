@@ -9,6 +9,8 @@ import { FOOT_ROW, underMarkTop } from "./under-mark.ts";
 export const BADGE_TOP = 17;
 /** Where the first pill stands on a shorter rect, the phone's 62 pt card and a stacked area's covered band: it keeps two rows (or the one row that fits) and gives up the title band. */
 export const BADGE_TOP_SHORT = 3;
+/** The height of one line of a placeholder name, in points at Medium: a name of two lines pushes the effect column down by one (`titleRows`). */
+export const NAME_LINE = 14;
 
 /** What stands at the foot of a card, in the effect column's way: the held or counted pill (`under`: its rect's height, whether it counts something, whether the card wears a number at its foot), a lifted pill (the open pick's number), and the plain foot pills (an engagement cost, a progress or loss number). */
 export type FootMarks = { under: { height: number; counted: boolean; strip: boolean } | null; lifted: boolean; plain: boolean; committed: boolean; combat: boolean };
@@ -54,20 +56,20 @@ export function footStop(height: number, s: number, marks: FootMarks): number | 
  * The column starts under the title band (`BADGE_TOP`) when the rect holds two rows there and the token, else at `BADGE_TOP_SHORT`, so a short card keeps its rows. `pill` is a pill's height in points.
  * An upright card in a stacked play area's covered band (`covered`) always starts under the title band, so its name stays readable: the column stands right of the resource token (`CoveredBand.left`), so the token no longer limits the rows, and the pills that do not fit give way as they do on any card.
  */
-export function badgeLayout(height: number, s: number, pill: number, stop: number | null = null, covered: CoveredBand | null = null, lower = 0): { top: number; rows: number } {
+export function badgeLayout(height: number, s: number, pill: number, stop: number | null = null, covered: CoveredBand | null = null, titleRows = 1): { top: number; rows: number } {
   const tokenFloor = covered ? height - 1 * s : height - (TOKEN + 2) * s;
   const floor = stop == null ? tokenFloor : Math.min(tokenFloor, stop - 1 * s);
   const rowsFrom = (limit: number, top: number) => Math.max(0, Math.floor((limit - top + 2 * s) / (pill + 2 * s)));
+  // A name of two lines (a placeholder that does not fit one) pushes the column down by the second line, so no pill covers it.
+  const titleTop = (BADGE_TOP + (titleRows > 1 ? NAME_LINE : 0)) * s;
   if (covered) return { top: BADGE_TOP * s, rows: rowsFrom(floor, BADGE_TOP * s) };
-  // `lower` is the room a name on two lines takes below the title band (wrap.ts, nameDrop): the column starts under it on a card tall enough for two rows from the title band, and may then hold fewer rows (the caller decides whether that costs a pill).
-  const tall = rowsFrom(tokenFloor, BADGE_TOP * s) >= 2;
-  const top = tall ? BADGE_TOP * s + lower : BADGE_TOP_SHORT * s;
+  const top = rowsFrom(tokenFloor, titleTop) >= 2 || titleRows > 1 ? titleTop : BADGE_TOP_SHORT * s;
   return { top, rows: rowsFrom(floor, top) };
 }
 
 /** The rows of pills that fit (0 when not even one does). */
-export function badgeRoom(height: number, s: number, pill: number, stop: number | null = null, covered: CoveredBand | null = null, lower = 0): number {
-  return badgeLayout(height, s, pill, stop, covered, lower).rows;
+export function badgeRoom(height: number, s: number, pill: number, stop: number | null = null, covered: CoveredBand | null = null, titleRows = 1): number {
+  return badgeLayout(height, s, pill, stop, covered, titleRows).rows;
 }
 
 /** What `total` effect pills draw in `rows` rows: none when no row fits, else `badgeSplit`. */
@@ -76,8 +78,8 @@ export function badgeShown(total: number, rows: number): { shown: number; hidden
 }
 
 /** The effect pills left out of a card that has `total` of them in `height`: 0 when they all fit, up to all of them when the room leaves one row for the "more" pill alone. */
-export function hiddenBadges(total: number, height: number, s: number, pill: number, stop: number | null = null, covered: CoveredBand | null = null, lower = 0): number {
-  return badgeShown(total, badgeRoom(height, s, pill, stop, covered, lower)).hidden;
+export function hiddenBadges(total: number, height: number, s: number, pill: number, stop: number | null = null, covered: CoveredBand | null = null, titleRows = 1): number {
+  return badgeShown(total, badgeRoom(height, s, pill, stop, covered, titleRows)).hidden;
 }
 
 /**

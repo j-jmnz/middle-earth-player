@@ -7,3 +7,10 @@ import type { ScenarioState } from "../core/state.ts";
 export function queueEvent(state: ScenarioState, event: GameEvent): ScenarioState {
   return { ...state, pendingEvents: [...(state.pendingEvents ?? []), event] };
 }
+
+// Every exit of a played event ends here: "After an event is played" is heard once the event's own effects are done
+// (rr.forced, rr.response). The exits are the frame's end (canceled or not), an event with no Action to run, an event that
+// goes on into an attack, an event that returns to its hand, and a Response event.
+export function announceEventResolved(state: ScenarioState, seat: number, cardId: string): ScenarioState {
+  return queueEvent(state, { trigger: "eventResolved", seat, cardId });
+}

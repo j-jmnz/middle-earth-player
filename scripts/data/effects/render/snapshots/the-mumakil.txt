@@ -196,14 +196,14 @@ Scenario piles that place cards with no record (quest: 17026 Welcome to the Jung
 17024:A:1 (front): When Revealed: Each player discards a random card from his hand and assigns X damage among characters he controls. X is the discarded card's cost.
   17024:whenRevealed:1: When revealed
     - for each player, first player first:
-      - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card)
+      - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card) [also {"announce":true}]
       - the acting player assigns printed cost of the picked card damage among the character (you control), one at a time
 
 17024:A:2 (shadow): Shadow: Discard a random card from your hand and assign X damage among characters you control. X is the discarded card's cost.
   17024:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card)
+    - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card) [also {"announce":true}]
     - the acting player assigns printed cost of the picked card damage among the character (you control), one at a time
 
 ## 17025 Guardians of the Jungle
@@ -262,4 +262,4 @@ Scenario piles that place cards with no record (quest: 17026 Welcome to the Jung
   17027:questResolution:1: Quest resolution
     - the players win the game
 
-(rendered pieces: 167 by template, 0 as JSON)
+(rendered pieces: 165 by template, 2 as JSON)

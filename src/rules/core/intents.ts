@@ -55,6 +55,8 @@ export type EngineStep =
   | { kind: "attachDrawn"; cardId: string; hostId: string; seat: number | null }
   // A hero claimed an objective that announces its claim (the flag `announcesClaim`, The Black Serpent's Harad objectives): the objective lies attached to the hero, controlled by `seat`.
   | { kind: "claim"; cardId: string; heroId: string; seat: number }
+  // A character was attached to an encounter card as a Captive (`captured`), a Captive was freed by its host leaving play (`rescued`: `seat` is the owner who takes control of it, null when the owner has left the game and it went to its discard pile) or Abaan, who has no owner, was freed (`free`: `seat` is the first player who gains him) in a game whose table holds `announcesCaptives` (The Dungeons of Cirith Gurat); `hostId` is the encounter card.
+  | { kind: "captive"; event: "captured" | "rescued" | "free"; cardId: string; hostId: string; seat: number | null }
   // A grappled enemy came out from under its location, faceup, into the staging area (dcce.grapple): named, it was seen faceup when it was revealed.
   | { kind: "detach"; enemyId: string; locationId: string }
   // A Stormcaller Elite card turned to its objective ally side and a player took it (dcce.stormcaller-elite); the card is the same instance.
@@ -78,7 +80,9 @@ export type EngineStep =
   // A character was given poison (hob.venom-poison): `count` is the poison it has now, `of` its printed hit points; one more at `of` makes it unconscious.
   | { kind: "poison"; targetId: string; count: number; of: number; cause: Cause }
   // A character was made unconscious (hob.unconscious-characters), or, with `ready`, readied from it.
-  | { kind: "unconscious"; targetId: string; ready?: true; cause: Cause };
+  | { kind: "unconscious"; targetId: string; ready?: true; cause: Cause }
+  // A card discarded at random from a hand whose effect says so (`announce` on DiscardRandomFromHand: Biting Insects, 17024:A:1), so the banner names it. Only that effect pushes it: no other step log changes.
+  | { kind: "discardedRandom"; seat: number; cardId: string; cause: Cause };
 
 export type Payment = { heroId: string; amount: number };
 

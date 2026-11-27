@@ -70,8 +70,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ShuffleRandomSetAside"), name: z.string().min(1), ...when }),
   // "The players make engagement checks against each enemy in the staging area" (12122:A:1), outside the encounter phase: the engagement checks of rr.engagement-check, pass after pass, until a pass engages
   // no enemy (the tie for the highest engagement cost is the first player's choice). `lower`: "Raider Flagship gets -50 engagement cost during these engagement checks": the enemy with this title checks
-  // with `amount` less. `ordinal` and `engaged` are engine use: the seat the checks are at and whether this pass has engaged an enemy, kept while the first player chooses among tied enemies.
-  z.strictObject({ verb: z.literal("MakeEngagementChecks"), lower: z.strictObject({ name: z.string().min(1), amount: z.number().int().positive() }).optional(), ordinal: z.number().int().min(0).optional(), engaged: z.boolean().optional(), ...when }),
+  // with `amount` less. `unguardedZero`: "Reduce the engagement cost of each enemy not guarding an objective to 0 during these engagement checks" (17134:A:1): an enemy that holds no captive checks with cost 0. `ordinal` and `engaged` are engine use: the seat the checks are at and whether this pass has engaged an enemy, kept while the first player chooses among tied enemies.
+  z.strictObject({ verb: z.literal("MakeEngagementChecks"), lower: z.strictObject({ name: z.string().min(1), amount: z.number().int().positive() }).optional(), unguardedZero: z.literal(true).optional(), ordinal: z.number().int().min(0).optional(), engaged: z.boolean().optional(), ...when }),
   // "Set it aside, out of play" (12123:A:3, 110102:A:3): the source card, wherever it is, goes to the set-aside zone with no damage on it and no controller, so that a set aside copy can be taken again (PutSetAsideInPlay to the actor).
   z.strictObject({ verb: z.literal("SetAsideSelf"), ...when }),
   // "While Belfalas Islet is the active location, the chosen enemy is considered to be out of play" (12129:A:2): the last picked enemy goes facedown under the source location, out of play as any card under a location is

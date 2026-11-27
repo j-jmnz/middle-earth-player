@@ -170,6 +170,7 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "beneath-the-sands": UNDERGROUND,
   "the-black-serpent": { calm: "crossroads", combat: "pelennor" },
   "the-crossings-of-poros": { calm: "gondor", combat: "pelennor" },
+  "the-dungeons-of-cirith-gurat": UNDERGROUND,
 };
 
 /** The loop a table plays: its scenario's combat loop during the Combat phase, its calm loop otherwise, and the menu's for a scenario with no pair. */

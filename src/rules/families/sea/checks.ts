@@ -8,10 +8,12 @@ import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { addModifier } from "../../core/keywords.ts";
+import { modifiedStat } from "../../core/modified-stat.ts";
 import { printedOf } from "../../core/printed.ts";
 import { engageEnemy, engagementCheck } from "../../quest/quest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats } from "../../core/state.ts";
+import { captivesHeldBy } from "../captives/values.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 
@@ -19,8 +21,14 @@ type Checks = Extract<Instruction, { verb: "MakeEngagementChecks" }>;
 
 // The state the costs are read in: the lowered enemies hold the reduction. Only the reading uses it; the engagements are made on the real state.
 function reading(state: ScenarioState, instruction: Checks, focus: Focus, ctx: ReduceContext): ScenarioState {
-  if (!instruction.lower) return state;
   let probe = state;
+  if (instruction.unguardedZero === true) {
+    for (const id of state.staging) {
+      const enemy = state.cards[id];
+      if (enemy && printedOf(ctx.cards, enemy.code).type === "enemy" && captivesHeldBy(state, id).length === 0) probe = addModifier(probe, id, focus.sourceId ?? id, "engagementCost", -modifiedStat(state, enemy, "engagementCost", ctx.cards), "endOfPhase");
+    }
+  }
+  if (!instruction.lower) return probe;
   for (const id of state.staging) {
     if (printedOf(ctx.cards, state.cards[id]?.code ?? "").name === instruction.lower.name) probe = addModifier(probe, id, focus.sourceId ?? id, "engagementCost", -instruction.lower.amount, "endOfPhase");
   }

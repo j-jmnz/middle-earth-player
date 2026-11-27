@@ -74,7 +74,9 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       // 01129:A:3); a card that says it of itself names itself.
       const leaver = refCard(state, "subject", frameScope(state, focus.seat, focus.sourceId)) ?? focus.sourceId;
       const name = leaver && state.cards[leaver] ? printedOf(ctx.cards, state.cards[leaver]?.code ?? "").name : "A card";
-      return { ...state, lost: true, lossReason: instruction.reason ?? `${name} left play`, window: null };
+      // `saysHow`: the destroy steps of the intent tell a destroy from any other exit (a threat elimination that discards the card too).
+      const how = leaver != null && steps.some((step) => step.kind === "destroy" && step.targetId === leaver) ? "was destroyed" : "left play";
+      return { ...state, lost: true, lossReason: instruction.reason ?? (instruction.saysHow === true ? `${name} ${how}. If ${name} leaves play, the players lose` : `${name} left play`), window: null };
     }
     case "DiscardCanceled": {
       const index = state.stack.findLastIndex((entry) => entry.data.kind === "reveal" && entry.data.canceled === true);

@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
-import { positiveAmountSchema } from "../effect-schema-amount.ts";
+import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
 import { verbFlags } from "../verb-flags.ts";
@@ -78,6 +78,21 @@ const VERBS = [
   // "Search the encounter deck and discard pile for each enemy that belongs to an encounter set denoted by the first icon on each set aside stage 3 and add them to the staging area" (17163:A:1): `stages` pairs each stage 3 with the set its first icon names; each
   // such stage that is set aside counts, and every enemy of its set in the encounter deck or its discard pile joins the staging area, not revealed. The record shuffles the deck after it.
   z.strictObject({ verb: z.literal("SearchAsideStageSets"), stages: z.array(z.strictObject({ code: z.string().min(1), set: z.string().min(1) })).min(1), ...when }),
+  // The Dungeons of Cirith Gurat's captives (hrd.captives-of-cirith-gurat). "Attach it to ..." (17121:A:1, 17122:A:2, 17125:A:3, 17128:A:1, 17129:A:1, 17131:A:1, 17134:A:1, 17132:A:1): the character `card` (the last picked by default; a hero of a player, an ally in play or in a discard pile, or with `code` the set-aside
+  // card with that code, Abaan) is attached to the encounter card `to` (the source by default), a captive: in play, faceup, controlled by nobody, still its owner's (a Captive, families/captives). The `attached` event is queued about it. With `discardCopies` each other copy of its title in play is discarded.
+  // Nothing happens with no card or no host.
+  z.strictObject({ verb: z.literal("AttachCaptive"), card: cardRefSchema.optional(), code: z.string().min(1).optional(), to: cardRefSchema.optional(), discardCopies: z.literal(true).optional(), ...when }),
+  // "When an objective is free of encounters, it is rescued" (17119:A:3, 17131:A:2): each captive held by the encounter card `host` (the card the answered event is about by default, the source with `self`) returns to its owner's control exhausted (a hero among its owner's heroes, an ally in the play area); one
+  // with no owner (Abaan) returns to the staging area. A captive whose owner left the game goes to its owner's discard pile. When any is rescued `charactersRescued` is queued about the main quest stage, once.
+  z.strictObject({ verb: z.literal("RescueCaptured"), host: z.enum(["self", "subject"]).optional(), ...when }),
+  // "Discard each token and attachment on that character" (17119:A:2): the character (the answered event's subject by default) loses its damage, resource and progress tokens and each attachment on it is discarded.
+  z.strictObject({ verb: z.literal("StripCaptive"), target: cardRefSchema.optional(), ...when }),
+  // "Dungeon Warg makes an immediate attack against the player who controls the most allies" (17123:A:2): the source enemy in the staging area attacks the living player with the most cards matching `pick` they control, with a shadow card, outside the combat phase and with no engagement (rr.attacks-outside-the-combat-phase); the first
+  // player chooses among players that tie (all tie at 0).
+  z.strictObject({ verb: z.literal("AttackSeatWithMost"), pick: pickSchema, ...when }),
+  // "Discards cards from the top of his deck until an ally that is not in play is discarded" (17132:A:1; `notInPlay`) or "until he discards an ally" (17128:A:1): the actor's top cards are discarded, each announced as discarded from the deck, until an ally is; it is the last picked card. With `notInPlay` an ally whose title a unique ally in play holds is skipped
+  // (rr.in-play-and-out-of-play). With no ally in the deck nothing is picked.
+  z.strictObject({ verb: z.literal("DiscardUntilAlly"), notInPlay: z.literal(true).optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [
@@ -89,6 +104,8 @@ const TRIGGERS = [
   "orcsStageDefeated",
   // About the Search objective after it is flipped to Off Track (17074:A:2, 17078:B:2): FlipSearchObjective queues it; a flip to On Track queues none (families/haradrim/track.ts).
   "searchFlippedOff",
+  // About the main quest stage, once for everything one effect rescued: at least one captive was rescued (17132:B:2, "After any number of characters are rescued"; RescueCaptured).
+  "charactersRescued",
 ] as const;
 
 const FLAGS = [
@@ -125,12 +142,14 @@ const FLAGS = [
   "engagedWithClaimers",
   // On an enemy: it loses the text "Cannot leave the staging area" (The Black Serpent with 6 progress on stage 3B, 17108:B:2): the cannotLeaveStaging it holds is not read (rules/core/zones.ts).
   "losesCannotLeaveStaging",
-  // On an enemy that cannot leave the staging area and is only considered engaged (The Black Serpent, 17094:A:1): no player optionally engages it while it holds cannotLeaveStaging, since it would not leave (rr.optional-engagement, rr.cannot). `losesCannotLeaveStaging` ends it. Read by the family's optionalEngage hook (families/haradrim/index.ts).
+  // On an enemy that is only considered engaged (The Black Serpent, 17094:A:1): the table reads it to show the enemy as one that is never engaged. That no player optionally engages it is the general rule for cannotLeaveStaging (rules/quest/quest.ts, optionalEnemies).
   "neverEngaged",
   // On the table, while a stage holds it (a constant, 17157:B:1): an ally enters play exhausted, whether it is played or put into play. Read by entersExhausted (src/rules/player/planning.ts).
   "alliesEnterExhausted",
   // On the table, until the end of the phase: it is the end of the combat phase, the one moment a stage that "cannot be defeated except at the end of the combat phase" may be defeated (17163:B:2). The stage's Forced effect sets it; the stage's own Restrict reads it.
   "combatPhaseEnding",
+  // On the table, while The Captives of Cirith Gurat is in play (17119:A:1): a capture, a rescue and Abaan's freeing push a `captive` step, so the banner and the log say them (families/haradrim/captured.ts). No other game holds it.
+  "announcesCaptives",
 ] as const;
 
 export const manifest = { name: "haradrim", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

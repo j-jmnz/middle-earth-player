@@ -5,7 +5,8 @@ import { z } from "zod";
 // The vocabulary is split by behavior: stat modifiers (effect-schema-stats.ts), what a Pick offers (effect-schema-pick.ts), conditions and
 // targets (effect-schema-conditions.ts), and the simple verbs (effect-schema-verbs.ts). This file composes them and keeps every export.
 import { amountExprSchema, amountSchema, cardRefSchema } from "./effect-schema-amount.ts";
-import { conditionSchema, targetSchema, when } from "./effect-schema-conditions.ts";
+import { conditionSchema, when } from "./effect-schema-conditions.ts";
+import { targetSchema } from "./effect-schema-targets.ts";
 import { pickSchema, sphereSchema, whoSchema } from "./effect-schema-pick.ts";
 import { modifierStatSchema, modifierUntilSchema } from "./effect-schema-stats.ts";
 import { verbFlags } from "./verb-flags.ts";

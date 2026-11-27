@@ -1,5 +1,5 @@
 import type { Ask } from "../asks.ts";
-import { ELIMINATED, type When } from "../asks-conditions.ts";
+import { ELIMINATES_SEATS, type When } from "../asks-conditions.ts";
 import { ELIMINATION_LEVEL } from "../../../rules/core/eliminate.ts";
 
 // The choice words of Beneath the Sands (haradrim part 6), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
@@ -15,6 +15,8 @@ const GRABBED: Atom = { kind: "count", pick: { type: "attachment", control: "any
 const AT_STAGE_3: readonly Atom[] = [{ kind: "onStage", stage: 3 }, { kind: "stageProgress", min: 1 }];
 // The resources on Off Track, the raise its threat option makes (17079:A:1).
 const RESOURCES = { stat: "resources", of: "self" } as const;
+// The raise takes a seat to the elimination level: its threat plus the resources on Off Track (the condition seatThreat, read for each seat).
+const REACHES = (seat: number): When => ({ kind: "seatThreat", seat, min: ELIMINATION_LEVEL, plus: RESOURCES });
 
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 17073:whenRevealed:1 (Forced Off Track, whenRevealed): When Revealed: Either flip the Search objective to Off Track, or deal 1 damage to each questing character.
@@ -36,7 +38,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   },
   "17073:whenRevealed:1 @0 damage": { label: "Deal 1 damage to each questing character" },
   // 17079:forced:1 (Off Track, forced): Forced: At the end of the quest phase, place 1 resource here. Then, either return the topmost location in the encounter discard pile to the staging area, or raise each player's threat by 1 for each resource here.
-  // The row names the location that returns and the raise it makes (the resource it just took is counted); the threat row warns when the raise takes the first player, who chooses, to 50 (the other players' threats are not read here).
+  // The row names the location that returns and the raise it makes (the resource it just took is counted); the threat row warns, for each player the raise takes to 50, and names them.
   "17079:forced:1 @1 location": { label: "Return {location} to the staging area", named: { location: { pick: { type: "location", control: "any", from: "encounterDiscard", topmost: true }, otherwise: "the topmost location in the encounter discard pile" } } },
   "17079:forced:1 @1 threat": {
     label: [
@@ -44,7 +46,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
       { text: "Each player's threat +{x} ({x} resources on Off Track)" },
     ],
     bind: { x: RESOURCES },
-    caution: { when: ELIMINATED(RESOURCES, ELIMINATION_LEVEL), text: "Tap again: {owner} reaches 50 and is eliminated. If no player is left, the game is lost" },
+    caution: ELIMINATES_SEATS(REACHES),
   },
 
   // 17065:forced:2 (Brood Mother): at the end of the round, a Spider Broodling from the encounter deck or discard pile joins the staging area.

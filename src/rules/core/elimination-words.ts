@@ -14,10 +14,10 @@ export function lastHeroesDestroyed(before: ScenarioState, steps: readonly Engin
   return standing.length > 0 && standing.every((id) => steps.some((step) => step.kind === "destroy" && step.targetId === id));
 }
 
-/** Every hero card of the seat is in `destroyed` (the ids a destroy step named over the game), and the seat has one: its last hero was destroyed. `isHero` reads a card id's printed type. */
+/** Every hero card of the seat is in `destroyed` (the ids a destroy step named over the game), and the seat has one: its last hero was destroyed. `isHero` reads a card id's printed type. A card belongs to the seat that controls it (`owner` is set only for a captured card). */
 export function allHeroesDestroyed(state: ScenarioState, destroyed: ReadonlySet<string>, isHero: (cardId: string) => boolean): HeroCause {
   return (seat) => {
-    const owned = Object.values(state.cards).filter((card) => card.owner === seat && isHero(card.id));
+    const owned = Object.values(state.cards).filter((card) => (card.owner ?? card.controller) === seat && isHero(card.id));
     return owned.length > 0 && owned.every((card) => destroyed.has(card.id));
   };
 }
@@ -31,16 +31,18 @@ export function eliminationWords(state: ScenarioState, seat: number, heroes?: He
   return heroes?.(seat) ? `Player ${seat + 1}'s last hero was destroyed.` : null;
 }
 
-/** What the engine's reason says to a player: the reason, with "No seats remain" said as "Every player is eliminated". */
+/** The engine's reason "No seats remain" (the loss every elimination of the last seat gives) as the screens say it. The engine keeps its own string; only the words differ. */
 export const EVERY_PLAYER_ELIMINATED = "Every player is eliminated";
 
-export function lossReasonWords(reason: string | null): string | null {
-  return reason === NO_SEATS_REMAIN ? EVERY_PLAYER_ELIMINATED : reason;
+/** A loss reason as the screens say it: "No seats remain" (alone or at the start of a longer reason) is "Every player is eliminated"; any other reason as it is. Null stays null. */
+export function lossText(reason: string | null | undefined): string | null {
+  if (reason == null) return null;
+  return reason.startsWith(NO_SEATS_REMAIN) ? `${EVERY_PLAYER_ELIMINATED}${reason.slice(NO_SEATS_REMAIN.length)}` : reason;
 }
 
-/** The reason a lost game gives: the engine's reason, and for "No seats remain" the words "Every player is eliminated" and the cause of each elimination after them ("Every player is eliminated. Player 1's threat reached 50."). */
+/** The reason a lost game gives: the engine's reason, and for "No seats remain" the cause of each elimination after it ("Every player is eliminated. Player 1's threat reached 50."). */
 export function lossWithCauses(state: ScenarioState, heroes?: HeroCause): string | null {
-  if (state.lossReason !== NO_SEATS_REMAIN) return state.lossReason ?? null;
+  if (state.lossReason !== NO_SEATS_REMAIN) return lossText(state.lossReason);
   const causes = Array.from({ length: state.seatCount }, (_, seat) => eliminationWords(state, seat, heroes)).filter((words): words is string => words != null);
   return causes.length === 0 ? EVERY_PLAYER_ELIMINATED : `${EVERY_PLAYER_ELIMINATED}. ${causes.join(" ")}`;
 }

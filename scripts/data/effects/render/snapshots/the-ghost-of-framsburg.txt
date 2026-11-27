@@ -266,7 +266,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     - the Discover 3 keyword: the first player looks at the top 3 cards of the encounter deck (the discard pile is shuffled into it when it holds fewer), attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile (ignored while a card in play ignores the keyword)
 
 19105:A:2 (front): While Cursed Tower is in the staging area, it gains: "Forced: After a player plays an event, raise his threat by 1."
-  19105:forced:2: Forced when an event is played, before its effects resolve (heard about card (any player controls) or in the staging area or the active location, of card type event)
+  19105:forced:2: Forced after an event is played, once its effects have resolved and it lies in the discard pile (heard about card (any player controls) or in the staging area or the active location, of card type event)
     only if this card is in the staging area
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - raise threat by 1 (the player the event is about)

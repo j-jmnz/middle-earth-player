@@ -17,7 +17,7 @@ const ASKING = new Set<string>([...ASKING_VERBS, "PickEncounter", "ChooseX", "Re
 const ENGINE_ASKING = [
   "ActivateFromCaves", "AddEventsToHand", "AddSourceToHandOfMost", "ArrangeCaves", "ArrangeEncounter", "ArrangeLookedDeck", "ArrangeTop", "AssignFaceup",
   "AttachCollectionHero", "AttachLootFromDiscard", "AttachRandomTreasure", "AttachSacked", "AttachSearched", "AttachToActiveLocation", "AttachToHighestThreatCost",
-  "AttackHighestWillpower", "ChooseAttackers", "ChooseBoon", "ChooseBoonToHand", "ChooseCurrentQuest", "ChooseQuestStage", "ChooseStageToFlip", "ClaimRandomTreasure",
+  "AttackHighestWillpower", "AttackSeatWithMost", "ChooseAttackers", "ChooseBoon", "ChooseBoonToHand", "ChooseCurrentQuest", "ChooseQuestStage", "ChooseStageToFlip", "ClaimRandomTreasure",
   "DestroyHighestCostAlly", "DiscardAlliesToCost", "DiscardFromAnyDeck", "Discover", "EachExhaustsOne", "EngageFromVictory", "EngageLowestThreat", "EngageOrGrapple",
   "EngageSeatWith", "EngageSeatWithMost", "FitShips", "GainChosenTrait", "GuardStagedHeroes", "HealAmong", "HealLakeTownByProgress", "HealLocations", "LocateTest",
   "LookAtStages", "MakeEngagementChecks", "MayDiscardShadow", "MoveProgress", "MoveToHero", "NameCard", "NameEncounterType", "NameInvestigation", "PayResources",

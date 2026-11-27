@@ -114,6 +114,7 @@ export function Tile({
   said = "",
   hint,
   detailSpoken = true,
+  detailLines,
   reader,
 }: {
   label: string;
@@ -133,6 +134,8 @@ export function Tile({
   hint?: string;
   // The detail is drawn but not said again: its words are already in the stats ("Success" beside the success icon).
   detailSpoken?: boolean;
+  // The lines the row's printed line may take (dock/budget.ts, detailLines): the dock's rows on a short phone give it, so a longer line ends in an ellipsis on a whole line.
+  detailLines?: number;
   // How a screen reader meets the row (accessibility props only; a touch acts as it always did): its role, whether its state is "checked"
   // (a radio, a checkbox) or "selected", the name it speaks when that is not the drawn label, and for an "adjustable" row its value and the
   // increment and decrement actions that add or take away one share (tray-logic.ts, stepShares). Given only under useReaderMode.
@@ -143,7 +146,8 @@ export function Tile({
   const night = surface === "night";
   const ring = useFocusRing(!night);
   // A row's name keeps two lines at the phone's default text size and grows with larger text (capLines, ui/ui-scale.ts).
-  const labelCap = capLines(2, useWindowDimensions().fontScale);
+  const screen = useWindowDimensions();
+  const labelCap = capLines(2, screen.fontScale);
   // A screen reader's actions on the row: a share row's increment and decrement, and the long press's "Show card" (docs/design-system.md, Screen reader).
   const onStep = reader?.onStep;
   const actions = mergeA11yActions(
@@ -188,7 +192,11 @@ export function Tile({
               </Text>
               {night || dense ? null : numbers}
             </View>
-            {detail ? <Text className={`mt-0.5 text-label ${night ? "text-muted" : "text-inkMuted"}`}>{detail}</Text> : null}
+            {detail ? (
+              <Text numberOfLines={detailLines} className={`mt-0.5 text-label ${night ? "text-muted" : "text-inkMuted"}`}>
+                {detail}
+              </Text>
+            ) : null}
             {night || dense ? <View className={dense ? "" : "mt-0.5"}>{numbers}</View> : null}
           </View>
           {selected && night ? (

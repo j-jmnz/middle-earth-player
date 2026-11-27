@@ -101,7 +101,8 @@ export function backAfter(window: Window | null, enemyId: string): Pick<PendingS
 }
 
 // An event whose effect goes on into an attack and its action windows leaves the hand now: it is in its owner's discard pile
-// when its effect is done anyway, and a card still in the hand could be played again in those windows.
+// when its effect is done anyway, and a card still in the hand could be played again in those windows. It only moves the card:
+// the After records hear the event at the end of its frame (interpret/effect-frames.ts, finishEvent).
 export function discardPlayedEvent(state: ScenarioState, frameId: string | undefined): ScenarioState {
   const index = state.stack.findIndex((frame) => frame.id === frameId);
   const frame = state.stack[index];

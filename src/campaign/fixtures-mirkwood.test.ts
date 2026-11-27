@@ -8,6 +8,7 @@ import { fixture, fixtureSave } from "./fixtures.ts";
 import { campaignPath } from "./path.ts";
 import { settledSentence, resolutionView } from "./resolution-view.ts";
 import { finish, resume } from "./session.ts";
+import { lossText } from "../rules/core/elimination-words.ts";
 
 describe("Passage Through Mirkwood (Mirkwood Paths part 1, phase 29)", () => {
   it("are two-handed games of two decklists from an empty Mirkwood Paths log, with no Ring-bearer", () => {
@@ -80,7 +81,7 @@ describe("Journey Along the Anduin (Mirkwood Paths part 2, phase 30)", () => {
     const resumed = resume(save, world);
     expect(resumed.ok && resumed.state.lost).toBe(true);
     if (!resumed.ok) return;
-    expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: resumed.state.lossReason });
+    expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: lossText(resumed.state.lossReason) });
     const after = finish(save, world, resumed.state);
     expect(after.log).toEqual(save.log);
     expect(campaignPath(world.campaign, {}, after.log).map((node) => node.status).slice(0, 3)).toEqual(["completed", "current", "locked"]);

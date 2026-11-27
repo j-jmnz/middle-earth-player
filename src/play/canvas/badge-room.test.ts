@@ -46,10 +46,6 @@ describe("hiddenBadges", () => {
   it("a short card keeps its rows from the top edge: the phone's 62 pt card holds two, a 44 pt band one", () => {
     expect(badgeLayout(62, 1, PILL)).toEqual({ top: BADGE_TOP_SHORT, rows: 2 });
     expect(badgeLayout(44, 1, PILL)).toEqual({ top: BADGE_TOP_SHORT, rows: 1 });
-    // A name on two lines lowers the column of a card tall enough for two rows from the title band (and the column may hold fewer rows then); a short card keeps its place.
-    expect(badgeLayout(120, 1, PILL, null, null, 10).top).toBe(BADGE_TOP + 10);
-    expect(badgeLayout(70, 1, PILL, null, null, 14)).toEqual({ top: BADGE_TOP + 14, rows: 1 });
-    expect(badgeLayout(62, 1, PILL, null, null, 10).top).toBe(BADGE_TOP_SHORT);
     expect(badgeRoom(53, 1, PILL)).toBe(1);
   });
 

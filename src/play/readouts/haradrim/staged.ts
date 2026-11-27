@@ -6,6 +6,7 @@ import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { captivesOf, captivesUnder } from "../../../rules/families/captives/values.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 
+import { capturedDial } from "./captured.ts";
 import { ownerWords } from "../../words/owner.ts";
 import { guardedWords, guardsWords, objectiveWords, stagedDialWords, stagedReturnWords, stagedWords } from "../../words/scenarios/haradrim/staged-table.ts";
 
@@ -63,7 +64,8 @@ export function stagedDial(game: ScenarioState, card: CardInstance, nameOf: (cod
   if (card.captive !== true) return null;
   if (card.host == null) return stagedDialWords(nameOf(card.code), null);
   const host = game.cards[card.host];
-  return card.guardedHero === true && host ? stagedDialWords(nameOf(card.code), nameOf(host.code)) : null;
+  if (card.guardedHero === true && host) return stagedDialWords(nameOf(card.code), nameOf(host.code));
+  return capturedDial(game, card, nameOf);
 }
 
 /** The chip on a hero in the staging area in a game of several players: its owner, "P2", and the words the reader says ("Player 2's hero"); null for any other card and in a solo game. */

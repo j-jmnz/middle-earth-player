@@ -1,4 +1,5 @@
 // The pieces the haradrim family adds (src/catalog/families/haradrim.ts): the card placed faceup under a location, the main quest card that has been in play the whole round, the heat tracker's verbs and condition (the amount is in family-amounts.ts) and the heroes in the staging area of The Long Arm of Mordor, with the samples read-fields.test.ts checks them with.
+import { cardRef } from "../amounts.ts";
 import { amt, pck, type ConditionTemplates, type Samples } from "../family-kit.ts";
 import type { Ctx, Obj } from "../kit.ts";
 import { str } from "../kit.ts";
@@ -58,6 +59,14 @@ export const HARADRIM_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => M
     read: ["stages"],
   }),
   SetAsideCode: (i) => ({ text: `the card with code ${str(i.code)} in play, wherever it lies, is set aside, out of play, with no damage (nothing when none is in play)`, read: ["code"] }),
+  AttachCaptive: (i) => ({
+    text: `${typeof i.code === "string" ? `the set-aside card with code ${i.code}` : cardRef(i.card ?? "picked")} is attached to ${cardRef(i.to ?? "self")} as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); while attached it loses its card type and its player card status and is an objective, hrd.captives-of-cirith-gurat; the Captives of Cirith Gurat hear it${i.discardCopies === true ? "; each other card in play with its title is discarded" : ""} (nothing with no such card or no host)`,
+    read: ["card", "code", "to", "discardCopies"],
+  }),
+  RescueCaptured: (i) => ({ text: `each captive ${i.host === "self" ? "this card holds" : "the card the event is about held"} is rescued: a hero returns among its owner's heroes and an ally to its owner's play area, both exhausted and with no enters-play event, an objective with no owner (Abaan) to the staging area, and a captive whose owner left the game goes to that owner's discard pile; once for all of them the main quest stage hears that characters were rescued`, read: ["host"] }),
+  StripCaptive: (i) => ({ text: `${cardRef(i.target ?? "subject")} loses its damage, resource and progress tokens, and each attachment on it is discarded`, read: ["target"] }),
+  AttackSeatWithMost: (i, ctx) => ({ text: `this enemy, in the staging area, makes an immediate attack against the player who controls the most ${pck(i.pick, ctx)}: a shadow card is dealt and it does not engage (the first player chooses among players that tie, all players at 0)`, read: ["pick"] }),
+  DiscardUntilAlly: (i) => ({ text: `the acting player discards cards from the top of their deck until an ally${i.notInPlay === true ? " that is not in play (an ally whose title a unique ally in play holds is skipped)" : ""} is discarded; it is the last picked card (nothing is picked when the deck holds none)`, read: ["notInPlay"] }),
   EngageSeatWithMost: (i, ctx) => ({ text: `this enemy engages the player engaged with the most ${pck(i.pick, ctx)} (the first player chooses among players that tie, all players at 0; nothing changes when it is already engaged with that player, else it moves to that player)`, read: ["pick"] }),
 };
 
@@ -89,6 +98,11 @@ export const HARADRIM_SAMPLES: Samples = {
   RandomSetAside: [{ verb: "RandomSetAside", sets: ["Harad Soldiers"], cardType: "enemy", to: "pick" }, { verb: "RandomSetAside", sets: ["Desert Sands", "Mountains of Shadow"], to: "reveal" }, { verb: "RandomSetAside", sets: ["Desert Sands", "Mountains of Shadow"], to: "discard" }],
   SetStagesAside: [{ verb: "SetStagesAside", codes: ["17161", "17162"] }],
   SearchAsideStageSets: [{ verb: "SearchAsideStageSets", stages: [{ code: "17160", set: "Desert Creatures" }, { code: "17161", set: "Harad Soldiers" }] }],
+  AttachCaptive: [{ verb: "AttachCaptive" }, { verb: "AttachCaptive", card: "defender", to: "attacker", discardCopies: true }, { verb: "AttachCaptive", code: "17120", to: "picked" }],
+  RescueCaptured: [{ verb: "RescueCaptured" }, { verb: "RescueCaptured", host: "self" }],
+  StripCaptive: [{ verb: "StripCaptive" }, { verb: "StripCaptive", target: "picked" }],
+  AttackSeatWithMost: [{ verb: "AttackSeatWithMost", pick: { type: "ally", control: "you" } }],
+  DiscardUntilAlly: [{ verb: "DiscardUntilAlly" }, { verb: "DiscardUntilAlly", notInPlay: true }],
   EngageSeatWithMost: [{ verb: "EngageSeatWithMost", pick: { type: "enemy", control: "any", trait: "Orc", nonUnique: true } }],
 };
 

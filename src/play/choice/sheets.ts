@@ -54,7 +54,8 @@ import { sailingSheet, shipRow } from "./sea-sheets.ts";
 import { asksCollection, collectionLabel, collectionOrder } from "./collection-sheets.ts";
 import { answeredCard, hideCommitNote, hideNumbers, lookNote, optionalEngageNote, responseNote } from "./sheet-notes.ts";
 import { orcsLabel } from "./orcs-label.ts";
-import { captiveLabel, cardLabel, copyLabel, has, option, seatedLabel, stagedAllyLabel, statOf, step, tiedLabel } from "./sheet-parts.ts";
+import { gainedSentence } from "./gained-line.ts";
+import { captiveLabel, cardLabel, copyLabel, has, option, seatedLabel, stagedAllyLabel, statOf, statsOf, step, tiedLabel } from "./sheet-parts.ts";
 import { sackStat } from "./sack-rows.ts";
 import { nightActionNote } from "../words/scenarios/night.ts";
 import { framsburgActionCaution, framsburgActionNote } from "../words/scenarios/framsburg.ts";
@@ -67,13 +68,10 @@ import { crownRow } from "./crown-sheets.ts";
 import { fordsTimeCount, withCount } from "./ring-maker-sheets.ts";
 import { TIMING_WORDS, type SheetStat, type PickOption, type Sheet, type SheetNames, type TriggerOption } from "./sheet-types.ts";
 
-function effectOf(ctx: ReduceContext, effectId: string): Effect | undefined {
-  return effectById(ctx, effectId);
-}
-
 function lineOf(effect: Effect | undefined, names: SheetNames): string | null {
   const id = effect?.lines[0];
-  return id ? names.line(id) : null;
+  // A Response a card gives another (Mûmak Trail) is told by its own sentence, not by who gains it (gained-line.ts).
+  return id ? (effect?.timing === "response" ? gainedSentence(names.line(id)) : names.line(id)) : null;
 }
 
 /**
@@ -91,7 +89,7 @@ export function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: r
   const options: TriggerOption[] = [];
   for (const intent of legal) {
     if (intent.type !== "Trigger") continue;
-    const effect = effectOf(ctx, intent.effectId);
+    const effect = effectById(ctx, intent.effectId);
     const card = game.cards[intent.cardId];
     if (!effect || !card) continue;
     const caution = framsburgActionCaution(game, effect);
@@ -257,7 +255,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
     }
     case "choose": {
       const data = frame?.data.kind === "effect" ? frame.data : null;
-      const effect = data ? effectOf(ctx, data.effectId) : undefined;
+      const effect = data ? effectById(ctx, data.effectId) : undefined;
       const source = frame?.cardId ?? null;
       const words: ChoiceNames = { card: names.card, code: (code) => ctx.cards.get(code)?.name ?? code, traits: (code) => ctx.cards.get(code)?.traits ?? [] };
       const line = lineOf(effect, names);
@@ -363,7 +361,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const label = (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? crown?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? stagedAllyLabel(game, ctx, names, id, window.options) ?? seatedLabel(game, ctx, names, id, window.options) ?? orcsLabel(game, names, id, window.options) ?? tiedLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay || zoned ? outOfPlayLabel(game, id, words) : plainLabel);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
-          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction) || isBoonCode(wait.item.instruction, id)) ? { code: id } : {}), ...(willpower.length > 0 || eyes.length > 0 || tied.length > 0 ? { stats: [...willpower, ...eyes, ...tied] } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };
+          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction) || isBoonCode(wait.item.instruction, id)) ? { code: id } : {}), ...statsOf(game, ctx, id, asked.rowStats, willpower, eyes, tied), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };
         }),
       };
     }

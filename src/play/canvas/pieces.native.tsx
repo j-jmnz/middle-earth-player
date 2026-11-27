@@ -13,16 +13,16 @@ import { PEEK, type CardSlot, type Rect } from "../layout/layout.ts";
 import { medallionAt } from "../layout/look-strip.ts";
 import { medallionCount } from "../words/scenarios/sea.ts";
 import { progressInStrip as progressInStripOf, stripCenterX, stripText } from "./table-canvas-views.ts";
-import { badgeLayout, badgeShown, type CoveredBand, footPillSpan, lonePick, loneRow, pillFits } from "./badge-room.ts";
+import { badgeLayout, badgeShown, type CoveredBand, footPillSpan, lonePick, loneRow, NAME_LINE, pillFits } from "./badge-room.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
+import { placeholderName } from "./placeholder-name.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
-import { fit, nameScale, wrapName } from "./wrap.ts";
+import { fit } from "./wrap.ts";
 
 // Medium's sizes in points. Every piece draws them times `s`, the UI scale (ui-scale.ts, user request, 2026-10-28), which the canvas root
 // hands down as a prop beside the tokens `t`: a piece does not read the scale itself. A card's corner is the card screen's share of its
 // shorter side (`cardCorner`, user request, 2026-10-29); `RADIUS` is left for the shapes that are not cards (a drop zone's outline).
 export const RADIUS = 6;
-export const LINE = 14;
 export const BADGE_H = 15;
 // A card picture is drawn at sizes other than its copy's (a hand card at rest is smaller than the scrub's lifted copy; a card moving
 // grows and shrinks): linear filtering between mipmap levels, so it neither aliases when smaller nor blocks when larger.
@@ -150,6 +150,7 @@ export function CardBody({
   encounterBack,
   backs,
   nameLines,
+  nameFoot,
   t,
   s,
 }: {
@@ -162,15 +163,16 @@ export function CardBody({
   backs: BackImages;
   // How many lines the placeholder name may take (3 by default): one when effect pills stand down the left edge from 17 pt, so they never cover a second line of the name.
   nameLines?: number;
+  // A sideways card: where the highest pill at its foot stands, so the name stops above it (placeholder-name.ts).
+  nameFoot?: number | null;
   t: TableTokens;
   s: number;
 }) {
   const { x, y, w, h } = slot;
   const radius = cardCorner(w, h);
   const bare = slot.shown != null && slot.shown < w ? 0.7 : 1;
-  const room = bare === 1 ? w - 10 * s : ((slot.shown ?? w) - 8 * s) / bare;
-  // A name whose widest part does not fit takes a smaller type, down to a minimum, before it is cut (wrap.ts, nameScale).
-  const shrink = nameScale(name, room, (text) => fonts.names.getTextWidth(text), nameLines);
+  // The name's lines (placeholder-name.ts): shrunk to fit before they are cut, clear of the damage token, and above the foot pills of a card lying sideways.
+  const placed = image || slot.faceDown ? null : placeholderName({ name, w, s, shown: slot.shown ?? null, lines: nameLines, damage: slot.damage > 0, sideways: slot.exhausted, foot: nameFoot ?? null, measure: (text) => fonts.names.getTextWidth(text) });
   return (
     <Group>
       <RoundedRect x={x + 1 * s} y={y + 2 * s} width={w} height={h} r={radius} color={shadowOf(t)} />
@@ -185,9 +187,9 @@ export function CardBody({
           <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={t.raised} />
           <Group clip={{ x: x + 3 * s, y: y + 3 * s, width: bare === 1 ? w - 6 * s : (slot.shown ?? w) - 4 * s, height: h - 6 * s }}>
             {/* A card its guard lies over (`shown`) names itself smaller, in the part the guard leaves bare. */}
-            <Group transform={[{ translateX: x + 5 * s }, { translateY: y + 15 * s }, { scale: bare * shrink }]}>
-              {wrapName(name, room / shrink, (text) => fonts.names.getTextWidth(text), nameLines).map((line, index) => (
-                <Text key={index} x={0} y={index * LINE * s} text={line} font={fonts.names} color={t.bone} />
+            <Group transform={[{ translateX: x + 5 * s }, { translateY: y + 15 * s }, { scale: placed?.scale ?? bare }]}>
+              {(placed?.lines ?? []).map((line, index) => (
+                <Text key={index} x={index === 0 ? (placed?.indent ?? 0) : 0} y={index * NAME_LINE * s} text={line} font={fonts.names} color={t.bone} />
               ))}
             </Group>
           </Group>
@@ -234,19 +236,23 @@ export function StackMark({ slot, fonts, t, s }: { slot: CardSlot; fonts: Fonts;
 // The name on an attachment's visible band is the names face at this share of its size, so it fits the band's 10 pt.
 const BAND_NAME = 0.68;
 
-/** The short name of an attachment on the band that shows below its host (an objective a hero holds, one that hangs on an enemy): night under bone text at the left, clipped before the count pill at the right end. */
+/**
+ * The short name of an attachment on the band that shows below its host (an objective a hero holds, one that hangs on an enemy): night under bone text at the left, clipped before the count pill at the right end.
+ * A held character's strip (`slot.strip`, a hero, an ally or Abaan an encounter card holds) is taller and reads the name at the full names size, on the strip's upper line, over the owner chip's row (the chip stands at its foot, mark-pieces SeatChipView).
+ */
 export function BandName({ slot, name, fonts, t, s }: { slot: CardSlot; name: string; fonts: Fonts; t: TableTokens; s: number }) {
-  const band = PEEK * s;
+  const strip = slot.strip ?? 1;
+  const band = PEEK * s * strip;
+  const size = strip > 1 ? 1 : BAND_NAME;
   const x = slot.x;
   const y = slot.y + slot.h - band;
   const width = slot.w - (slot.stack != null ? 22 * s : 0);
-  const room = (width - 6 * s) / BAND_NAME;
-  // The name on its one line takes a smaller type, down to a minimum, before it is cut with an ellipsis (wrap.ts, nameScale).
-  const shrink = nameScale(name, room, (line) => fonts.names.getTextWidth(line), 1);
-  const text = fit(name, room / shrink, (line) => fonts.names.getTextWidth(line));
+  const text = fit(name, (width - 6 * s) / size, (line) => fonts.names.getTextWidth(line));
+  // The strip's name stands in its upper part, over the owner chip's row; the one-peek band's at its foot.
+  const base = strip > 1 ? 10.5 * s : band - 2 * s;
   return (
     <Group clip={{ x, y, width, height: band }}>
-      <Group transform={[{ translateX: x + 3 * s }, { translateY: y + band - 2 * s }, { scale: BAND_NAME * shrink }]}>
+      <Group transform={[{ translateX: x + 3 * s }, { translateY: y + base }, { scale: size }]}>
         <Text x={0} y={0} text={text} font={fonts.names} color={t.bone} />
       </Group>
     </Group>
@@ -298,12 +304,12 @@ export function Badges({
   covered,
   owner,
   stageLoses,
+  titleRows = 1,
   fonts,
   images,
   t,
   s,
   contrast = false,
-  lower = 0,
 }: {
   slot: CardSlot;
   rect: Rect;
@@ -319,21 +325,21 @@ export function Badges({
   owner?: string | null;
   // Filling the stage loses the game (143075:B:3): the strip's numbers are threat red, with the word.
   stageLoses?: boolean;
+  // How many lines the card's placeholder name takes (2 pushes the effect column down by a line, badge-room.ts).
+  titleRows?: number;
   fonts: Fonts;
   images: TokenImages;
   t: TableTokens;
   s: number;
   // Strong outlines (table-settings.ts): each pill gets a bone edge, so it reads on any picture.
   contrast?: boolean;
-  // The room the card's name takes below the title band on two lines (nameDrop): the pills start under it.
-  lower?: number;
 }) {
   const { x, y, w, h } = rect;
   const pill = BADGE_H * s;
   const strip = 15 * s;
   const label = questPoints != null ? (stripText(slot, questPoints, owner, stageLoses ?? false) ?? "") : "";
   // Rows that fit between the title band (or the top edge of a short card) and the resource token and the foot pills (badgeLayout).
-  const { top: first, rows: room } = badgeLayout(h, s, pill, stop, covered, lower);
+  const { top: first, rows: room } = badgeLayout(h, s, pill, stop, covered, titleRows);
   // The part of the card the pills may use: right of the token and left of the next card in the row on a covered card, else the whole card.
   const shift = covered?.left ?? 0;
   const avail = covered ? covered.width - shift : w;

@@ -122,7 +122,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 06017 Telemnar's Bane (Villain). A:1: each time it attacks, the top 3 cards of every player's deck are discarded. A:2: after any player plays an event card it makes an immediate attack against the first player.
   { id: "06017:forced:1", cardCode: "06017", lines: ["06017:A:1"], timing: "forced", trigger: "attacks", subject: "self", instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "DiscardFromDeck", amount: 3 }] }] },
-  { id: "06017:forced:2", cardCode: "06017", lines: ["06017:A:2"], timing: "forced", trigger: "played", subject: { type: "card", control: "any", cardType: "event" }, instructions: [{ verb: "AttackFirstPlayer" }] },
+  { id: "06017:forced:2", cardCode: "06017", lines: ["06017:A:2"], timing: "forced", trigger: "eventResolved", subject: { type: "card", control: "any", cardType: "event" }, instructions: [{ verb: "AttackFirstPlayer" }] },
 
   // 06018 Sewers. A:1: Underworld 1. A:2 (When Revealed, resolved before the card enters play): the top card of the underworld deck goes facedown under the active location, if able.
   ...UNDERWORLD("06018", ["06018:A:1"], 1),

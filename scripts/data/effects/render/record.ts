@@ -39,6 +39,7 @@ const TRIGGER: Readonly<Record<string, string>> = {
   lastTimeCounterRemoved: "after the last time counter is removed from a card, at the end of the refresh phase or by a card effect",
   timeCounterRemoved: "after a time counter is removed from the current quest, at the end of the refresh phase or by a card effect",
   afterStageRevealed: "after a quest stage is revealed and its When Revealed effects have resolved, a parallel stage that replaces the stage before fires it too; the flip of the opening stage in the Setup does not",
+  charactersRescued: "after any number of captives are rescued (once for everything one effect rescued; heard by the main quest stage)",
   searchFlippedOff: "after the Search objective is flipped to Off Track (a flip to On Track does not fire it)",
   flipped: "after a card is flipped over (the FlipCard verb)",
   questSucceeded: "after the players quest successfully",
@@ -125,6 +126,7 @@ function triggerWords(effect: Obj): string {
   const trigger = str(effect.trigger);
   const cardType = isObj(effect.subject) ? effect.subject.cardType : undefined;
   if (trigger === "played" && cardType === "event") return "when an event is played, before its effects resolve";
+  if (trigger === "eventResolved") return "after an event is played, once its effects have resolved and it lies in the discard pile";
   if (trigger === "played" && cardType === "ally") return "after an ally is played from hand (not one put into play by an effect)";
   return TRIGGER[trigger] ?? `on the event ${trigger}`;
 }

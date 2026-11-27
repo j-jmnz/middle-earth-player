@@ -1,5 +1,6 @@
 // Rules: rr.planning-phase, rr.step-2-2, rr.step-2-3, rr.resource-match, ltp.planning-order, rr.triggered-ability, ltp.paying-costs-multiple,
 // ltp.unique-cards, ltp.neutral-cards (data/rules/entries.json).
+import { withPlayed } from "../core/played.ts";
 import type { Effect } from "../../catalog/boundary.ts";
 
 import { attachmentHostIds, enforceRestricted, hostTakesControl, playCost } from "./attach.ts";
@@ -26,7 +27,7 @@ import { enterStaging, inPlayLimitReason } from "../families/sidequests/play.ts"
 import type { EngineStep, PlayerIntent } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { eventActionReason } from "./potential.ts";
-import { queueEvent } from "../windows/queue.ts";
+import { announceEventResolved, queueEvent } from "../windows/queue.ts";
 import { playerCardEffectCanChoose, raiseThreat, uniqueBlocked } from "../core/keywords.ts";
 import { planningTurn } from "../windows/pass.ts";
 import { hasResourceMatch, heroPays } from "./payments.ts";
@@ -68,7 +69,7 @@ export function playCard(
   }
   // The discount it used is spent, and the card joins this round's plays.
   next = spendDiscount(next, intent.cardId, seat, ctx);
-  next = { ...next, played: [...(next.played ?? []).filter((entry) => entry.round === next.round), { id: intent.cardId, code: instance.code, seat, round: next.round, ...(next.phase === "Planning" ? {} : { phase: next.phase }) }] };
+  next = withPlayed(next, intent.cardId, instance.code, seat);
   // Doomed X: each player raises their threat by X when the card is played (rr.doomed-x), less a reduction the seat holds for
   // its next Doomed event (families/deck/rules.ts).
   const doomed = doomedRaise(next, seat, printed, gainedDoomed(next, intent.cardId, seat, ctx));
@@ -116,7 +117,7 @@ function runningActions(state: ScenarioState, cardId: string, seat: number, ctx:
 function playEvent(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext, steps: EngineStep[], x?: number): ScenarioState {
   const running = runningActions(state, cardId, seat, ctx);
   const first = running[0];
-  if (!first) return moveCard(state, cardId, { zone: "discard", seat });
+  if (!first) return announceEventResolved(moveCard(state, cardId, { zone: "discard", seat }), seat, cardId);
   // Two Actions on different lines (an Action and a Valour Action): the player uses one (families/deck/play.ts).
   const choice = alternativeActions(running);
   const framed = pushEffectFrame(
@@ -132,6 +133,7 @@ function playEvent(state: ScenarioState, cardId: string, seat: number, ctx: Redu
       cancel: null,
       blockCancel: null,
       finish: "discardSource",
+      announceResolved: true,
       ...(x != null ? { x } : {}),
       ...(state.window ? { resume: { window: state.window, seat } } : {}),
     },

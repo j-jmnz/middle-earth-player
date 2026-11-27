@@ -54,6 +54,15 @@ describe("history cards", () => {
     expect(saveWords(save({ kind: "finished" }), [], null, false, name).spoken).toContain("No runs yet");
   });
 
+  it("says the engine's \"No seats remain\" as \"Every player is eliminated\" on a playthrough, a game and a spoken run", () => {
+    const runs = [run("b", { result: "lost", lossCause: "No seats remain" })];
+    expect(saveWords(save({ kind: "begin", node }), runs, null, false, name).spoken).toContain("Lost · Every player is eliminated");
+    const lost = game({ result: { outcome: "lost", reason: "No seats remain", rounds: 3 } });
+    const words = gameWords(lost, run("g", { kind: "standalone", result: "lost", lossCause: "No seats remain", rounds: 3, threats: [50], score: null }), "See the outcome", false, name);
+    expect(words.lines).toContainEqual({ text: "Every player is eliminated", tone: "danger" });
+    expect(JSON.stringify(words)).not.toContain("No seats remain");
+  });
+
   it("words a game with its status, setup, run and where it leads", () => {
     const lost = game({ result: { outcome: "lost", reason: "Threat reached 50", rounds: 3 } });
     const words = gameWords(lost, run("g", { kind: "standalone", result: "lost", lossCause: "Threat reached 50", rounds: 3, threats: [50], score: null }), "See the outcome", false, name);

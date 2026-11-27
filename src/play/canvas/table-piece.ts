@@ -12,6 +12,10 @@ import type { SlotNumbers } from "../cards/card-effects.ts";
 import type { Clock } from "../motion/card-motion.native.tsx";
 import type { BackImages, Fonts, TokenImages } from "./pieces.native.tsx";
 import type { CardSlot } from "../layout/layout.ts";
+import { shownBounds } from "../layout/hits.ts";
+import { footStop } from "./badge-room.ts";
+import { nameFitsOne } from "./placeholder-name.ts";
+import { underRect } from "./under-mark.ts";
 import { AT_REST, still, type Motion } from "../motion/motion.ts";
 import type { OptionMark } from "../choice/sheet-types.ts";
 import type { StagePill } from "../words/scenarios/stormcaller.ts";
@@ -28,6 +32,8 @@ export type BodyProps = {
   name: string;
   /** How many lines the name of a card drawn as its name may take, 3 when unset: one on a card with effect pills (they stand down the left edge from 17 pt and never cover a second line). */
   nameLines?: number;
+  /** A card lying sideways: where the highest pill at its foot stands from its turned top, so its placeholder name stops above it (placeholder-name.ts); null with none. */
+  nameFoot?: number | null;
   /** The sphere the card prints, for the icon of a card drawn as its name and the ring of its resource token. */
   sphere: string | null;
   /** A hand card lifted by a press: its place on the table is dimmed under the lifted copy. */
@@ -48,6 +54,10 @@ export type PieceProps = BodyProps & {
   clock: Clock;
   /** A veiled card (the open pick dims the others, a muted hand card, the Sailing test's look): card kinds only. */
   dimmed: boolean;
+  /** The face a card turning over in place shows until the turn's midpoint (motion.fromPicture): its picture, image and name; null for any other card. */
+  turnedFrom: { picture: string; image: BodyProps["image"]; name: string } | null;
+  /** How many lines the placeholder name takes (1, or 2 when it does not fit one on a card with effect pills): the effect column starts under them (badge-room.ts, badgeLayout). */
+  titleRows: number;
   /** The banner's line names this card. */
   beat: boolean;
   /** The night veil: a peek at the other seat's hand veils its cards, and the Stormcaller's area veils its cards while the players are at another stage (docs/design-system-table.md, Cards). */
@@ -61,6 +71,8 @@ export type PieceProps = BodyProps & {
   inactive: boolean;
   /** The seat tag drawn on a quest stage once the table is split between players. */
   owner: string | null;
+  /** The owner's chip ("P2") on the strip of a hero or ally an encounter card holds, in a game of several players; null on any other slot. */
+  stripChip: string | null;
   share: TableHighlight["share"];
   contrast: boolean;
   tokens: TokenImages;
@@ -107,6 +119,18 @@ const veiledByLook = (slot: CardSlot, ctx: PieceContext) => ctx.looking && slot.
 const isDimmed = (slot: CardSlot, ctx: PieceContext) =>
   (ctx.highlight.dimOthers && !isTappable(slot, ctx) && pickedCount(slot, ctx) === 0) || ctx.highlight.muted.has(slot.id) || veiledByLook(slot, ctx);
 
+// The card wears something at its foot (a stage's or active location's progress, a committed character's Willpower, a defender's or attacker's combat number, or a resource token): a pill with no count stands one row up, clear of it.
+export const wearsFootNumber = (info: { questPoints: number | null; willpower: number | null; combat?: unknown }, resources: number) => info.questPoints != null || info.willpower != null || info.combat != null || resources > 0;
+
+/** Where the highest pill at the card's foot stands from the top of its rect on screen, which the effect pills stop above (footStop in badge-room.ts), or null with none. */
+export function footStopOf(slot: CardSlot, info: SlotNumbers | null, optionMark: OptionMark | undefined, s: number): number | null {
+  if (!info) return null;
+  const rect = shownBounds(slot);
+  const under = info.under ? { height: underRect(rect, slot.zone === "hand", s).h, counted: info.under.count != null, strip: wearsFootNumber(info, slot.resources) } : null;
+  const plain = info.engagement != null || info.fire != null || info.side?.loses != null || info.loss != null;
+  return footStop(rect.h, s, { under, lifted: slot.kind === "card" && optionMark != null, plain, committed: info.willpower != null, combat: info.combat != null });
+}
+
 /** What a card's body draws from: used on its own by the cards that are leaving the table. */
 export function bodyProps(slot: CardSlot, ctx: PieceContext): BodyProps {
   const key = slot.picture ?? slot.code;
@@ -134,6 +158,12 @@ function handInfo(slot: CardSlot, ctx: PieceContext): SlotNumbers | null {
   return { effects: { stats: [], flags: [] }, willpower: null, commitStat: "willpower", questPoints: null, stageLoses: false, engagement: null, delayed: false, under, fire: null, loss: null, place: null, side: null, determined: null, dead: null, combat: null };
 }
 
+// The face a card turning over in place leaves: what its picture key names.
+function turnedFace(motion: Motion | undefined, ctx: PieceContext): PieceProps["turnedFrom"] {
+  const picture = motion?.fromPicture;
+  return picture ? { picture, image: ctx.images.get(picture) ?? null, name: ctx.nameOf(picture) } : null;
+}
+
 /** Everything the drawing of one slot reads, from the canvas's context for this render. */
 export function pieceProps(slot: CardSlot, ctx: PieceContext): PieceProps {
   const card = slot.kind === "card";
@@ -141,12 +171,22 @@ export function pieceProps(slot: CardSlot, ctx: PieceContext): PieceProps {
   const numbered = card && !slot.faceDown && slot.zone !== "hand" && slot.zone !== "deck";
   const info = numbered ? ctx.info(ctx.game, ctx.seat, slot.id) : handInfo(slot, ctx);
   const pills = info ? info.effects.stats.length + info.effects.flags.length : 0;
+  const body = bodyProps(slot, ctx);
+  // A card lying sideways has its tokens and foot pills upright over the turned name: the name stops above the highest foot pill.
+  const nameFoot = slot.exhausted && body.image == null ? footStopOf(slot, info, ctx.highlight.marks.get(slot.id), ctx.s) : null;
+  // A card with effect pills names itself on one line, since the pills stand down its left edge; a name that does not fit one line, even shrunk to the floor, takes a second and the pills start under it (the rest wait behind "N more").
+  const box = { name: body.name, w: slot.w, s: ctx.s, shown: slot.shown ?? null, lines: 1, damage: slot.damage > 0, sideways: slot.exhausted, foot: nameFoot, measure: (text: string) => ctx.fonts.names.getTextWidth(text) };
+  const twoLines = pills > 0 && body.image == null && !slot.faceDown && !nameFitsOne(box);
+  // A quest area's stage wears its number pill above its progress strip: its title keeps one line (shrunk, then cut) so the pill never covers a second.
+  const nameLines = twoLines ? 2 : pills > 0 || slot.stormcaller === "stage" ? 1 : slot.zone === "questStage" || slot.zone === "activeLocation" ? 2 : undefined;
   return {
-    ...bodyProps(slot, ctx),
-    // A quest stage or an active location wears its progress strip at the foot: its name takes two lines at most, so the strip never covers a third.
-    ...(pills > 0 ? { nameLines: 1 } : slot.zone === "questStage" || slot.zone === "activeLocation" ? { nameLines: 2 } : {}),
+    ...body,
+    ...(nameLines != null ? { nameLines } : {}),
+    nameFoot,
+    titleRows: twoLines && !slot.exhausted ? 2 : 1,
     motion: ctx.motions.get(slot.id) ?? AT_REST,
     clock: ctx.clock,
+    turnedFrom: turnedFace(ctx.motions.get(slot.id), ctx),
     dimmed: card && isDimmed(slot, ctx),
     beat: ctx.beating.has(slot.id),
     veiledHand: card && ((ctx.peeking && slot.zone === "hand") || slot.stormcaller === "apart"),
@@ -155,6 +195,7 @@ export function pieceProps(slot: CardSlot, ctx: PieceContext): PieceProps {
     optionMark: ctx.highlight.marks.get(slot.id),
     inactive: card && !slot.faceDown && ctx.inactive(slot.picture ?? slot.code),
     owner: slot.zone === "questStage" ? ctx.owner : null,
+    stripChip: slot.strip != null ? (ctx.info(ctx.game, ctx.seat, slot.id).seat?.chip ?? null) : null,
     share: ctx.highlight.share,
     contrast: ctx.contrast,
     tokens: ctx.tokens,
@@ -182,6 +223,7 @@ const SLOT_FIELDS = Object.keys({
   tilt: true,
   bandPeek: true,
   bandFloor: true,
+  strip: true,
   count: true,
   committed: true,
   held: true,
@@ -225,6 +267,7 @@ const MOTION_FIELDS = Object.keys({
   delay: true,
   arc: true,
   land: true,
+  fromPicture: true,
 } satisfies Record<keyof Motion, true>) as (keyof Motion)[];
 
 /** True when two motions are the same: a new layout makes a new object for every card, most of them at rest. */
@@ -273,6 +316,8 @@ const SAME: { readonly [K in keyof PieceProps]-?: (a: PieceProps[K], b: PiecePro
   fan: sameList,
   name: same,
   nameLines: same,
+  nameFoot: same,
+  titleRows: same,
   sphere: same,
   lifted: same,
   tappable: same,
@@ -283,6 +328,7 @@ const SAME: { readonly [K in keyof PieceProps]-?: (a: PieceProps[K], b: PiecePro
   s: same,
   motion: sameMotion,
   clock: same,
+  turnedFrom: sameData,
   dimmed: same,
   beat: same,
   veiledHand: same,
@@ -291,6 +337,7 @@ const SAME: { readonly [K in keyof PieceProps]-?: (a: PieceProps[K], b: PiecePro
   optionMark: sameData,
   inactive: same,
   owner: same,
+  stripChip: same,
   share: same,
   contrast: same,
   tokens: sameBundle,
