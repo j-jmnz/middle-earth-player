@@ -391,6 +391,6 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
   144072:constant:2: Constant
     only if any of: (the card with code 144040 is not in the victory display) or (the card with code 144075 is not in the victory display)
     note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 (rendered pieces: 254 by template, 0 as JSON)

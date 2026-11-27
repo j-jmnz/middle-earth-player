@@ -175,7 +175,7 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
     who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "time" (only if 0 is less than resources of the current quest stage):
-        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it is heard (a record that holds its events lets it resolve only after the whole effect has finished; a stage with none loses none)
       * option "location" (only if there is a location (any player controls) that is the active location to choose):
         - the active location goes to the staging area (it is not revealed)
 
@@ -220,7 +220,7 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
   07057:forced:1: Forced at the end of the phase
     only if all of: (it is the Refresh phase) and (this card is attached to a card)
     who acts: the acting player is the first player (a phase has no player of its own)
-    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it is heard (a record that holds its events lets it resolve only after the whole effect has finished; a stage with none loses none)
 
 ## 07058 In Need of Rest
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -268,7 +268,7 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
 07065:B:3 (back): The players cannot advance to stage 2 unless Mugash is attached to a hero.
   07065:constant:2: Constant
     only if not (there is a hero (any player controls) with an attachment named "Mugash" to choose)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 ## 07066 Escape from Fangorn
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -297,7 +297,7 @@ Scenario piles that place cards with no record (quest: 07065 Into the Woods; que
 07066:B:3 (back): The players cannot defeat this stage unless Mugash is attached to a hero.
   07066:constant:2: Constant
     only if not (there is a hero (any player controls) with an attachment named "Mugash" to choose)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 07066:B:4 (back): If the players defeat this stage, they win the game.
   07066:constant:3: Constant

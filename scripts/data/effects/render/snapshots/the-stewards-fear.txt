@@ -62,7 +62,7 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
 06013:B:2 (back): The players cannot defeat this stage while a Villain is in play. If this stage is defeated, the players have won the game.
   06013:constant:1: Constant
     only if there is Villain enemy in play (in the staging area or engaged)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 ## 06014 Underworld Dissident
 (the scenario deals it into the encounter pile; the piles place it, no record does)

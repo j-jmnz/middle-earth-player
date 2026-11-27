@@ -21,7 +21,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
 51001:B:2 (back): This stage cannot be defeated while Rhosgobel is in play.
   51001:constant:1: Constant
     only if the card with code 51010 is in play
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 ## 51003 Mirkwood Forest
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -45,7 +45,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
     - the players cannot travel to a location that holds resource tokens while this holds
   51003:constant:2: Constant
     only if there is a location (any player controls) with resources on it to choose
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 ## 51004 Mirkwood Forest
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -127,7 +127,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
     - the hero the event's subject (the enemy) guarded comes back among its owner's heroes, faceup and exhausted (when the enemy leaves play in any way)
   51008:constant:1: Constant
     only if there is a enemy (any player controls) or in the staging area, that guards a hero, in play or not to choose
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
   51008:questResolution:1: Quest resolution
     - the players win the game
 
@@ -154,7 +154,7 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
   51009:constant:4: Constant
     only if the card with code 51011 is in play
     note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
   51009:questResolution:1: Quest resolution
     - the players win the game
 

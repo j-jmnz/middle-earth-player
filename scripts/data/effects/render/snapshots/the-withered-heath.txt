@@ -310,7 +310,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 19022:B:2 (back): The players cannot defeat this stage unless at least 1 Dragon Sign is in the victory display.
   19022:constant:1: Constant
     only if the number of card (any player controls) in the victory display, named "Dragon Sign" is less than 1
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 ## 19023 The Cold-Drake Attacks!
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -341,7 +341,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 19023:B:4 (back): This stage cannot be defeated while Cold-Drake has hit points remaining.
   19023:constant:4: Constant
     only if damage of "Cold-Drake" is less than hit points of "Cold-Drake"
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 ## 19024 Hunting the Beast
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -373,7 +373,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 19024:B:3 (back): The players cannot defeat this stage unless at least 3 Dragon Signs are in the victory display.
   19024:constant:1: Constant
     only if the number of card (any player controls) in the victory display, named "Dragon Sign" is less than 3
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 ## 19025 A Cornered Dragon
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -403,7 +403,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 19025:B:3 (back): This stage cannot be defeated while Cold-Drake is in play. When Cold-Drake is defeated, the players win the game.
   19025:constant:2: Constant
     only if the card with code 19011 is not in the victory display
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
   19025:forced:2: Forced after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Cold-Drake")
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - later, at the end of this phase:

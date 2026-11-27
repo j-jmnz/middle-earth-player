@@ -278,10 +278,10 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
     - the players cannot travel to the location with code 19041 that guards Tiny while this holds
   19048:constant:3: Constant
     only if not (the number of card (you control) named "Urdug", chosen by the first player is at least 1)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
   19048:constant:4: Constant
     only if not (the number of card (you control) named "Tiny", chosen by the first player is at least 1)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 ## 19049 Retrieve Urdug's Horn
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -314,7 +314,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
     - each enemy (any player controls) or in the staging area, named "Grey Mountain Giant", attached as the guard of the objective titled "Urdug's Horn": stat cannotTakeDamage 1, while this card is in play
   19049:constant:3: Constant
     only if not (the number of card (you control) named "Urdug", chosen by the first player, with an attachment named "Urdug's Horn" is at least 1)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 ## 19050 Find Durin's Key
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -345,10 +345,10 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
     - the players cannot travel to the location with code 19042 that guards Durin's Key while this holds
   19050:constant:3: Constant
     only if not (the number of card (you control) named "Urdug", chosen by the first player is at least 1)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
   19050:constant:4: Constant
     only if not (the number of objective (any player controls) named "Durin's Key", that is claimed (attached to a character a player controls) is at least 1)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 ## 19051 Urdug's Gambit
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -365,7 +365,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   19051:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, while this card is in play
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 19051:B:2 (back): Forced: When the players quest unsuccessfully, they do not raise their threat. Instead, place X progress here, where X is the amount by which they would have raised their threat. Then, if this stage has progress equal to its quest points, the players lose the game.
   19051:forced:1: Forced after the players quest unsuccessfully (event happened to the controller)

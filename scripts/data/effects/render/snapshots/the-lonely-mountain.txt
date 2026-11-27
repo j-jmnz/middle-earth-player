@@ -276,7 +276,7 @@ Scenario piles that place cards with no record (quest: 132071 A Warm Welcome; qu
 132073:B:1 (back): Players cannot defeat this stage while Smaug the Magnificent is in play.
   132073:constant:1: Constant
     only if the card with code 132041 is in play
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 132073:B:2 (back): Forced: If the total number of progress on this stage is greater than the total remaining hit points on Smaug the Magnificent, remove Smaug the Magnificent from play.
   132073:forced:1: Forced on the event progressPlaced (heard about this card)

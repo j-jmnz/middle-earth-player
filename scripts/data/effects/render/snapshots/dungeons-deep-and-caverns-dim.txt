@@ -10,7 +10,7 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
 131029:B:1 (back): Players cannot advance to stage 3A unless both 1B and 2B are complete.
   131029:constant:1: Constant
     only if not (the current quest stage and stage 2 both hold their quest points (with stage 2 gone, the current stage alone))
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 131029:B:2 (back): Forced: Reveal 1 additional encounter card per player during the staging step.
   131029:forced:1: Forced when the staging step begins, before the first card is revealed
@@ -30,7 +30,7 @@ Scenario piles that place cards with no record (quest: 131029 Out of the Frying 
 131030:B:1 (back): Players cannot advance to stage 3A unless both 1B and 2B are complete.
   131030:constant:1: Constant
     only if not (the current quest stage and stage 2 both hold their quest points (with stage 2 gone, the current stage alone))
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 131030:B:2 (back): Progress tokens cannot be added to, or removed from, this quest except by answering riddles.
   131030:constant:2: Constant

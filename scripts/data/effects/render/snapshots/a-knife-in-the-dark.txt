@@ -77,7 +77,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141025:B:1 (back): The players cannot advance while The Prancing Pony is in play.
   141025:constant:1: Constant
     only if the card with code 141045 is in play
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 ## 141026 Into the Wild
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -100,7 +100,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141026:B:3 (back): The players cannot advance while Midgewater is in play.
   141026:constant:1: Constant
     only if the card with code 141048 is in play
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
 
 ## 141027 The Ringwraiths Attack
 (the scenario deals it into the quest pile; the piles place it, no record does)
