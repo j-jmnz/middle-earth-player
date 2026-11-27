@@ -1,9 +1,9 @@
-// A copy of expo-sqlite's web/WorkerChannel.ts, served in its place on the web platform by metro.config.js (the phone never bundles it). The one change is the wait in
-// `invokeWorkerSync`: a wall-clock deadline (sync-wait.ts) instead of a spin count. scripts/checks/web-copies.test.ts fails when expo-sqlite's file changes, so the copy follows it.
+// A copy of expo-sqlite's web/WorkerChannel.ts, served in its place on the web platform by metro.config.js (the phone never bundles it). The changes are in
+// `invokeWorkerSync`: the wait is a wall-clock deadline (sync-wait.ts) instead of a spin count, reported to the web app's test meter when it shows, and the calls share one lock and one answer buffer (sync-wait.ts) instead of a new megabyte each. scripts/checks/web-copies.test.ts fails when expo-sqlite's file changes, so the copy follows it.
 
 import { Deferred } from '../../../../node_modules/expo-sqlite/web/Deferred';
 import { serialize, deserialize } from '../../../../node_modules/expo-sqlite/web/SyncSerializer';
-import { SYNC_CLOCK_EVERY, syncWaitExpired } from './sync-wait';
+import { SYNC_CLOCK_EVERY, giveBackSyncBuffers, noteSyncWait, syncWaitExpired, takeSyncBuffers } from './sync-wait';
 import {
   type SQLiteWorkerMessageType,
   type MessageTypeMap,
@@ -111,9 +111,9 @@ export function invokeWorkerSync<T extends SQLiteWorkerMessageType & keyof Resul
   }
 
   const id = messageId++;
-  const lockBuffer = new SharedArrayBuffer(4);
+  const buffers = takeSyncBuffers();
+  const { lockBuffer, resultBuffer } = buffers;
   const lock = new Int32Array(lockBuffer);
-  const resultBuffer = new SharedArrayBuffer(1024 * 1024);
   const resultArray = new Uint8Array(resultBuffer);
 
   Atomics.store(lock, 0, PENDING);
@@ -139,10 +139,12 @@ export function invokeWorkerSync<T extends SQLiteWorkerMessageType & keyof Resul
       Atomics.pause();
     }
   }
+  noteSyncWait(startedAt, performance.now());
 
   const length = new Uint32Array(resultArray.buffer, 0, 1)[0];
   const resultCopy = new Uint8Array(length);
   resultCopy.set(new Uint8Array(resultArray.buffer, 4, length));
+  giveBackSyncBuffers(buffers);
   const resultJson = new TextDecoder().decode(resultCopy);
   const { result, error } = deserialize<{ result: ResultTypeMap[T]; error?: string }>(resultJson);
   if (error) throw new Error(error);

@@ -671,6 +671,8 @@ The release workflow builds the Android APK players sideload from the Releases p
 
 Development gotcha: the copy from the asset into the app sandbox runs once per database name. After changing `assets/catalog.db` during development, rebuild it with `pnpm assets catalog`, which changes `CATALOG_VERSION`, or delete the app's storage. Do not leave `forceOverwrite` unconditionally true.
 
+The web app (a browser on any device, Safari's engine included) keeps the open game in memory and copies `user.db` to the browser's private file storage a moment after each accepted move, not before the app goes on (user decision, 2026-11-23): if the system ends the page in that moment, that one move is lost and the game is whole. It opens in one tab or window at a time.
+
 The phone and the desktop app play with no network: the catalog, the booklets and every card's picture are in the binary, or on the desktop in the installer's resources. On the desktop, `user.db` and the booklets a player adds are in the origin's private file storage (OPFS) inside the app's profile folder, the same place the web build keeps them.
 
 ## Screens

@@ -18,7 +18,7 @@ export type FogTexture = {
   // alpha = gain × noise alpha + bias (the noise alpha is about 0.5 on average), clamped to 0..1 by the renderer
   gain: number;
   bias: number;
-  // The size of one tile on the web, where the noise is an SVG drawn as a repeating background (its tiles are stitched).
+  // The size of one tile on the web, where the noise is an SVG baked into a picture and drawn as a repeating background (its tiles are stitched).
   tile: readonly [w: number, h: number];
   // Points the noise is moved by: a crest sits a little above the bank it lights.
   offset?: readonly [dx: number, dy: number];
