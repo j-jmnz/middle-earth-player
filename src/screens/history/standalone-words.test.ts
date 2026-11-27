@@ -26,6 +26,6 @@ describe("standalone list words", () => {
     expect(outcomeLines({ outcome: "won", score: { rounds: 1, victoryPoints: 0, score: 40 } })).toEqual(["Score 40. Lower is better.", "1 completed round · 0 victory points"]);
     expect(outcomeLines({ outcome: "lost", reason: "The One Ring left play", rounds: 3 })).toEqual(["The One Ring left play.", "3 rounds completed."]);
     // The final game, when at hand, says why each seat went out after the engine's reason.
-    expect(outcomeLines({ outcome: "lost", reason: "No seats remain", rounds: 4 }, "No seats remain. Player 1's threat reached 50.")).toEqual(["No seats remain. Player 1's threat reached 50.", "4 rounds completed."]);
+    expect(outcomeLines({ outcome: "lost", reason: "No seats remain", rounds: 4 }, "Every player is eliminated. Player 1's threat reached 50.")).toEqual(["Every player is eliminated. Player 1's threat reached 50.", "4 rounds completed."]);
   });
 });

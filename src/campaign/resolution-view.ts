@@ -10,6 +10,7 @@ import type { Instruction } from "../catalog/boundary.ts";
 import type { CampaignEnd } from "../catalog/campaign-record.ts";
 import { andList, carryVerb, carryWords } from "./carry-words.ts";
 import { endedInDefeat } from "../rules/core/eliminate.ts";
+import { lossReasonWords } from "../rules/core/elimination-words.ts";
 import { legalIntents, type ScenarioState } from "../rules/engine/reduce.ts";
 import { answeredSeats, asksPlayers, resolutionResult, SKIP } from "../rules/setup/resolution.ts";
 import { isEncounterOption, LOG_LINE, poolTally, removalCode, removalSeat } from "../rules/families/wilderland/pool.ts";
@@ -141,7 +142,7 @@ function removalTile(world: World, optionId: string, tally: Readonly<Record<stri
 
 // `logged`: the boxes beside Beldis the campaign log holds before this game (the save's log), so the view names only the marks this game adds.
 export function resolutionView(state: ScenarioState, world: World, logged: readonly number[] = []): ResolutionView {
-  if (state.lost) return { kind: "lost", reason: state.lossReason };
+  if (state.lost) return { kind: "lost", reason: lossReasonWords(state.lossReason) };
   const settled = resolutionResult(state);
   if (settled) {
     // The tally the log will hold: the copies are capped at what one collection holds (applyResolution).

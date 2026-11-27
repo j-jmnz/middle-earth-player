@@ -28,6 +28,8 @@ export type LogNames = {
   effectCard: (effectId: string, lineId: string) => string | null;
   rule: (ruleId: string) => string | null;
   line: (lineId: string) => string | null;
+  // The printed type of a card instance ("location", "enemy"), when the table can tell it; a log with no answer reads every card as a character.
+  typeOf?: (cardId: string) => string | null;
 };
 
 // The mark beside a log line: a game icon (threat, willpower), or a token coin for damage, progress and a resource (no
@@ -112,7 +114,8 @@ function words(step: EngineStep, names: LogNames, questStat: string | null): str
       return valeStepWords(step, names.card) ?? (step.amount < 0 ? `${-step.amount} progress removed from ${names.card(step.targetId)}` : step.amount === 0 ? barredWords(names.card(step.targetId)) : `${step.amount} progress on ${names.card(step.targetId)}`);
     case "destroy":
       // A location placed facedown underneath The Havens Burn is out of play and hidden: the line never names it (dcce.aflame).
-      return step.under ? "A location burns and is placed facedown underneath The Havens Burn" : `${names.card(step.targetId)} is destroyed`;
+      // A location leaves play explored or discarded, never destroyed (rr.destroy: a hero, ally or enemy).
+      return step.under ? "A location burns and is placed facedown underneath The Havens Burn" : names.typeOf?.(step.targetId) === "location" ? `${names.card(step.targetId)} leaves play` : `${names.card(step.targetId)} is destroyed`;
     case "eliminate":
       return `${player(step.seat)} is eliminated`;
     case "reveal":

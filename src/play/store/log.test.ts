@@ -26,6 +26,12 @@ beforeAll(async () => {
 });
 
 describe("log lines", () => {
+  it("a location that leaves play is not destroyed, a character is", () => {
+    const typed: LogNames = { ...names, card: (id) => id, typeOf: (id) => (id === "ford" ? "location" : "ally") };
+    expect(logLines([{ kind: "destroy", targetId: "ford" }], typed).map((line) => line.text)).toEqual(["ford leaves play"]);
+    expect(logLines([{ kind: "destroy", targetId: "sam" }], typed).map((line) => line.text)).toEqual(["sam is destroyed"]);
+  });
+
   it("every numeric step of a whole game names a rule title or a card and its printed line", () => {
     let state: ScenarioState = expectOk(reduce(startScenario(starterStart("stealth-and-steadfastness", 2), ctx), { type: "Keep" }, ctx)).state;
     let round: ReturnType<typeof nextRoundSteps> = [];

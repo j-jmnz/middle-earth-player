@@ -8,7 +8,7 @@ import { settle } from "../engine/machine.ts";
 import { MUMAK, raceTable } from "../families/haradrim/race-kit.ts";
 import { opened, run as runInstruction, tableFromLayout } from "../../../test/harness/scene-kit.ts";
 
-import { defeatSentence, eliminationWords, lossWithCauses } from "./elimination-words.ts";
+import { defeatSentence, eliminationWords, lossReasonWords, lossWithCauses } from "./elimination-words.ts";
 
 const lost = (seats: { threat: number; heroes: number; eliminated: boolean }[]): ScenarioState => {
   const made = tableFromLayout("beneath-the-sands", { seats: 2 });
@@ -24,7 +24,7 @@ describe("why a seat left the game", () => {
     const heroes = (seat: number) => seat === 1;
     expect(eliminationWords(state, 1, heroes)).toBe("Player 2's last hero was destroyed.");
     expect(eliminationWords(state, 1)).toBeNull();
-    expect(lossWithCauses(state, heroes)).toBe("No seats remain. Player 1's threat reached 50. Player 2's last hero was destroyed.");
+    expect(lossWithCauses(state, heroes)).toBe("Every player is eliminated. Player 1's threat reached 50. Player 2's last hero was destroyed.");
   });
 
   it("rr.player-elimination a seat still in the game has no cause, and another loss reason is left as the engine gave it", () => {
@@ -74,5 +74,13 @@ describe("the cause of an elimination the engine made", () => {
     const done = (state.seats[0]?.heroes ?? []).reduce((now, id) => runInstruction(made, now, { verb: "Destroy", target: { kind: "self" } }, { sourceId: id, steps }), state);
     expect(done.seats[0]?.eliminated).toBe(true);
     expect(eliminationWords(done, 0, (seat) => destroyed(steps)(seat, state))).toBe("Player 1's last hero was destroyed.");
+  });
+});
+
+describe("the loss reason a player reads", () => {
+  it("rr.player-elimination says every player is eliminated for the engine's no-seats reason and leaves any other as it is", () => {
+    expect(lossReasonWords("No seats remain")).toBe("Every player is eliminated");
+    expect(lossReasonWords("Iârion left play")).toBe("Iârion left play");
+    expect(lossReasonWords(null)).toBeNull();
   });
 });

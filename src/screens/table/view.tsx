@@ -165,8 +165,9 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
       },
       rule: ruleTitle,
       line: ledgerLine,
+      typeOf: (cardId: string) => session.world.cards.get(store.getState().game.cards[cardId]?.code ?? "")?.type ?? null,
     }),
-    [names, nameOf, ctx, session],
+    [names, nameOf, ctx, session, store],
   );
 
   // A menu row closes the menu and then acts (src/play/chrome/table-menu-items.ts).
