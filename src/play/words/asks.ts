@@ -73,7 +73,7 @@ export type Ask = {
 export type AsksTable = Readonly<Record<string, Ask>>;
 
 /** What a Pick's entry says: the words the chain returns, with the rows that are no card and the warning of each row an entry can add. */
-export type AskedWords = PickWords & { labels?: Readonly<Record<string, string>>; cautions?: Readonly<Record<string, string>>; bare?: true; rowStats?: readonly ("threat" | "engagementCost")[] };
+export type AskedWords = PickWords & { labels?: Readonly<Record<string, string>>; cautions?: Readonly<Record<string, string>>; bare?: true; rows?: Readonly<Record<string, { label: string; detail: string | null }>>; rowStats?: readonly ("threat" | "engagementCost")[] };
 
 /** Where the instruction stands: the record (its id), the path in it, and the table of the scenario that worded it. Worked out once for a sheet (askAt) and handed to every row's lookup. */
 export type AskAt = { id: string; path: string; table: AsksTable };

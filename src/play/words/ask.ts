@@ -9,6 +9,7 @@ import { effectsOf } from "../../rules/windows/listen.ts";
 
 import { asksPick, type AskedWords } from "./asks.ts";
 import { pickWords, type ChoiceNames } from "./choice.ts";
+import { orderForcedWords } from "./forced-order.ts";
 import { grappleAsk, grappleFactsOf } from "./scenarios/grapple.ts";
 import { seaAsk } from "./scenarios/sea.ts";
 import { tradeWords } from "./scenarios/uncharted.ts";
@@ -43,6 +44,8 @@ export function askWords(a: {
   place?: { nth: number; of: number };
 }): AskedWords {
   const { game, ctx, names, instruction, queue, options, source, picked, amountNow, effectId, cause } = a;
+  // The first player's order of simultaneous Forced effects is the engine's window, not a record's (rr.forced).
+  if (instruction.verb === "OrderForced") return orderForcedWords(game, ctx, names, instruction, options);
   const asked = a.origin?.verb === "DiscardFromHand" ? a.origin : instruction;
   // The hand card step 3 of a burgle attempt makes the first player discard: before the asks, since the burgle's effect frame stands on the card that has the burgle effect and its records may ask too.
   const burgling = burglePickWords(game, ctx, names, effectId, game.window?.kind === "choose" ? game.window.seat : game.firstPlayer);

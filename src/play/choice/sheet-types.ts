@@ -28,7 +28,8 @@ export type SheetStat = { icon: IconName; value: number; word: string };
 export type OptionMark = { icon: IconName; value: number; danger: boolean };
 
 // `place`: a location of the Island Map where the marker stands, drawn as a small 5 × 3 glyph with the location lit (island-place.ts).
-export type SheetOption = { id: string; label: string; code: string | null; stats?: readonly SheetStat[]; mark?: OptionMark; place?: PlaceMark };
+// `detail`: the printed words under the row's name (the Forced effects a card brings to the order window, with what each order does).
+export type SheetOption = { id: string; label: string; code: string | null; detail?: string; stats?: readonly SheetStat[]; mark?: OptionMark; place?: PlaceMark };
 
 // `caution`: what confirming this option costs that the player may not expect (a hero destroyed and the game lost). The
 // confirm then arms on its first tap and the line above it says this (docs/design-system-table.md, Two taps).

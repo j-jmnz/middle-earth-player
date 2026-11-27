@@ -24,7 +24,7 @@ export function orderForced(state: ScenarioState, instruction: OrderForced, focu
     // The rest wait in this frame's queue and are offered again once the chosen card's effects have resolved.
     rest: (chosen) => {
       const rest = instruction.entries.filter((entry) => entry.sourceId !== chosen);
-      return rest.length > 0 ? { instruction: { verb: "OrderForced", entries: rest }, seat: state.firstPlayer, chosen: null } : null;
+      return rest.length > 0 ? { instruction: { verb: "OrderForced", entries: rest, ...(instruction.total != null ? { total: instruction.total } : {}) }, seat: state.firstPlayer, chosen: null } : null;
     },
   });
   return next.chosen == null ? next.state : pushCounted(next.state, found.filter((one) => one.instance.id === next.chosen), event, ctx, steps);

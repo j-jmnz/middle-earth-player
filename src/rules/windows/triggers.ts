@@ -84,7 +84,7 @@ function pushForced(state: ScenarioState, found: readonly Found[], event: GameEv
       peril: state.perilSeat != null,
       effectId: first.effect.id,
       orderEvent: event,
-      instructions: [{ verb: "OrderForced", entries: found.map((one) => ({ effectId: one.effect.id, sourceId: one.instance.id })) }],
+      instructions: [{ verb: "OrderForced", entries: found.map((one) => ({ effectId: one.effect.id, sourceId: one.instance.id })), total: found.length }],
       cancel: null,
       blockCancel: null,
     },

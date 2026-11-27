@@ -43,6 +43,8 @@ export type ChoiceNames = {
   code: (code: string) => string;
   // A card code's Traits, for the words that name the side a card flips to (Grotto, Underwater).
   traits?: (code: string) => readonly string[];
+  // The printed line a ledger line id names (the Forced lines of the order window).
+  line?: (lineId: string) => string | null;
 };
 
 // The claimed card's lasting effect, said after the prompt (" Forced: ..."), or nothing.
