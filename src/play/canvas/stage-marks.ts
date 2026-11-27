@@ -9,8 +9,8 @@ export const ABOVE_FLOOR = 6;
 /**
  * Where the "Apart" plate stands, from the canvas's top (`rect` is the stage's rect on the canvas, `pillY` the number pill's top). Under the picture's title
  * band when the card is tall enough for the plate and the pill both; else hanging just above the card, so the pill keeps its whole words and the title its
- * name; and where the card stands too near the canvas's top for that (the plate would leave the canvas, or stand over the row above it), just above the
- * pill inside the card, so it is always on the canvas.
+ * name; and where the card stands too near the canvas's top for that (the plate would stand above `ABOVE_FLOOR`, in the room the seats' dials and the top
+ * bar keep), just above the pill inside the card, so it is always on the canvas.
  */
 export function apartPlateY(rect: { y: number; h: number }, pillY: number, s: number): number {
   const height = STAGE_MARK_H * s;

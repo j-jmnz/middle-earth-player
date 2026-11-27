@@ -183,7 +183,7 @@ export function pieceProps(slot: CardSlot, ctx: PieceContext): PieceProps {
     ...body,
     ...(nameLines != null ? { nameLines } : {}),
     nameFoot,
-    titleRows: twoLines ? 2 : 1,
+    titleRows: twoLines && !slot.exhausted ? 2 : 1,
     motion: ctx.motions.get(slot.id) ?? AT_REST,
     clock: ctx.clock,
     turnedFrom: turnedFace(ctx.motions.get(slot.id), ctx),

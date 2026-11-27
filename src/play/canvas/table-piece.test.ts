@@ -181,6 +181,8 @@ describe("the placeholder name of a card with effect pills", () => {
     expect(pieceProps(staged, withPills(0, long)).titleRows).toBe(1);
     const pictured = { ...withPills(2, long), images: new Map([[staged.picture ?? staged.code, {} as SkImage]]) } as PieceContext;
     expect(pieceProps(staged, pictured).titleRows).toBe(1);
+    // A card lying sideways stands its pills upright over the turned name: a second name line moves none of them.
+    expect(pieceProps({ ...staged, exhausted: true }, withPills(2, long)).titleRows).toBe(1);
   });
 
   it("keeps the Stormcaller stage's title to one line, so its pill never covers a second", () => {

@@ -5,13 +5,18 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { moveCard } from "../rules/core/zones.ts";
 import { updateCard } from "../rules/core/state.ts";
-import { loadMirkwoodWorld, mirkwoodTable, type MirkwoodWorld } from "../../test/scenarios/passage-through-mirkwood/scene.ts";
+import { campaign, loadMirkwoodWorld, mirkwoodTable, passage, type MirkwoodWorld } from "../../test/scenarios/passage-through-mirkwood/scene.ts";
 
 import { gameReport } from "./report.ts";
 import { resolutionView } from "./resolution-view.ts";
 import { scoreOf } from "./score.ts";
+import type { World } from "./world.ts";
+import type { PrintedCard } from "../rules/core/printed.ts";
 
 let world: MirkwoodWorld;
+
+// A world with the printed cards of the table and nothing else: the loss reason reads only the cards.
+const worldOf = (cards: ReadonlyMap<string, PrintedCard>): World => ({ campaign, scenario: passage, effects: [], cards, sets: new Map() });
 
 beforeAll(async () => {
   world = await loadMirkwoodWorld();
@@ -69,8 +74,8 @@ describe("the report of a finished scenario", () => {
     const destroyed = new Set(heroes);
     const words = "Every player is eliminated. Player 1's last hero was destroyed.";
     expect(gameReport(state, made.ctx.cards, destroyed).lossReason).toBe(words);
-    expect(resolutionView(state, { cards: made.ctx.cards } as never, [], destroyed)).toEqual({ kind: "lost", reason: words });
+    expect(resolutionView(state, worldOf(made.ctx.cards), [], destroyed)).toEqual({ kind: "lost", reason: words });
     // With no destroy steps known, only the engine's reason is told.
-    expect(resolutionView(state, { cards: made.ctx.cards } as never)).toEqual({ kind: "lost", reason: "Every player is eliminated" });
+    expect(resolutionView(state, worldOf(made.ctx.cards))).toEqual({ kind: "lost", reason: "Every player is eliminated" });
   });
 });
