@@ -16,7 +16,7 @@ import { progressInStrip as progressInStripOf, stripCenterX, stripText } from ".
 import { badgeLayout, badgeShown, lonePick, loneRow } from "./badge-room.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
-import { wrapName } from "./wrap.ts";
+import { fit, wrapName } from "./wrap.ts";
 
 // Medium's sizes in points. Every piece draws them times `s`, the UI scale (ui-scale.ts, user request, 2026-10-28), which the canvas root
 // hands down as a prop beside the tokens `t`: a piece does not read the scale itself. A card's corner is the card screen's share of its
@@ -237,7 +237,7 @@ export function BandName({ slot, name, fonts, t, s }: { slot: CardSlot; name: st
   const x = slot.x;
   const y = slot.y + slot.h - band;
   const width = slot.w - (slot.stack != null ? 22 * s : 0);
-  const text = wrapName(name, (width - 6 * s) / BAND_NAME, (line) => fonts.names.getTextWidth(line), 1)[0] ?? "";
+  const text = fit(name, (width - 6 * s) / BAND_NAME, (line) => fonts.names.getTextWidth(line));
   return (
     <Group clip={{ x, y, width, height: band }}>
       <Group transform={[{ translateX: x + 3 * s }, { translateY: y + band - 2 * s }, { scale: BAND_NAME }]}>
