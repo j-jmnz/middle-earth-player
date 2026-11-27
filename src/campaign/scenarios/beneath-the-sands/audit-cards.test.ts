@@ -109,8 +109,7 @@ describe("17067 Spider Broodling", () => {
       expect(inDeck(off.run.state).length).toBe(3);
     }
   });
-  // FAULT: the ruling for 17067:A:2 says Broodling does not attack in the phase it enters play, but the engine lets it attack the defending player at once (2 more damage).
-  it.fails("17067:A:2 a Broodling put into play by its Shadow effect does not attack in that combat phase", () => {
+  it("17067:A:2 a Broodling put into play by its Shadow effect does not attack in that combat phase", () => {
     const on = fought(EFFECTS, BROODLING, "f0", { seats: 1, staging: [ON] }, undefendedOn(0));
     expect(engagedCodes(on.run.state)).toContain(BROODLING);
     expect(damageOf(on.run.state, "dh1")).toBe(1);

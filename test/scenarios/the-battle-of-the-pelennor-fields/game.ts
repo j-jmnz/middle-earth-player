@@ -139,7 +139,7 @@ export const FIELDS_GOLDENS: readonly FieldsGolden[] = [
   { name: "two-handed, lost, Minas Tirith destroyed", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "Minas Tirith has no hit points remaining", lossKind: "city" },
   { name: "true solo, lost, every hero destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "No seats remain", lossKind: "heroes" },
   { name: "two-handed, lost, every hero destroyed", seatCount: 2, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "No seats remain", lossKind: "heroes" },
-  { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 18, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, lossReason: "No seats remain", lossKind: "threat" },
+  { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 22, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, lossReason: "No seats remain", lossKind: "threat" },
 ];
 
 const game = campaignGame<FieldsDecks, FieldsPolicy>({

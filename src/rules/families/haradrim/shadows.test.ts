@@ -44,6 +44,12 @@ describe("17043:A:2 Uruk Pursuer's shadow comes into play engaged with the defen
     expect(state.cards[idOf(state, URUK)]?.zone).toBe("engaged");
   });
 
+  it("the Pursuer put into play engaged by its shadow makes no attack in that combat phase", () => {
+    const state = fightEnemy(table, "17043", URUK, { stage: "17048" }, options()).run.state;
+    expect(state.resolvedAttacks).toContain(idOf(state, "17043"));
+    expect(state.pendingAttack).toBeNull();
+  });
+
   it("at the same stage the shadow card does nothing and is discarded", () => {
     const fought = fightEnemy(table, "17043", URUK, { stage: "17047" }, options());
     expect(fought.run.state.cards[idOf(fought.run.state, "17043")]?.zone).not.toBe("engaged");

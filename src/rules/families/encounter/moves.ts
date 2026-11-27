@@ -29,6 +29,7 @@ import { addedToStaging, announceEntered } from "./reveal.ts";
 import { timeOnReveal } from "../angmar/time.ts";
 import { stagingDest } from "../breaking/areas.ts";
 import { keptInPlay } from "../pelargir/vale/cannot-leave.ts";
+import { attackKey } from "../south/watcher.ts";
 import { freeSlot, makeActiveIn } from "../south/locations.ts";
 
 type MoveInstruction = Extract<Instruction, { verb: "MoveEncounterCard" }>;
@@ -142,7 +143,9 @@ export function moveEncounter(
     case "engaged": {
       if (typeOf(next, id, ctx) !== "enemy") return next;
       const engaged = updateCard(engageWith(next, seat, id, steps), id, { face: "up" });
-      return wasInPlay ? engaged : announceEntered(engaged, id, seat, ctx);
+      // A shadow card an enemy puts into play engaged does not attack in that combat phase (docs/scenarios/haradrim/beneath-the-sands.md, Spider Broodling).
+      const counted = card.zone === "shadow" ? noAttackThisPhase(engaged, id, seat) : engaged;
+      return wasInPlay ? counted : announceEntered(counted, id, seat, ctx);
     }
     case "activeLocation": {
       if (!isLocationId(next, id, ctx.cards)) return next;
@@ -152,6 +155,11 @@ export function moveEncounter(
       return wasInPlay ? active : announceEntered(active, id, seat, ctx);
     }
   }
+}
+
+/** In the combat phase the enemy that was just engaged counts as having attacked: its seat's enemy attacks do not call it again (the same note startShadowAttack makes for a shadow attacker). */
+export function noAttackThisPhase(state: ScenarioState, id: string, seat: number): ScenarioState {
+  return state.phase === "Combat" ? { ...state, resolvedAttacks: [...state.resolvedAttacks, attackKey(state, id, seat)] } : state;
 }
 
 // The players travel to the location without resolving its Travel effect. An active location returns to the staging area.
