@@ -26,7 +26,7 @@ import { tableSettings, type TableSettings } from "../../ui/table-settings.ts";
 import { bannerLabel, bannerSpeech } from "../readouts/banner-speech.ts";
 import { announce } from "../../ui/announce.ts";
 import { useReaderMode } from "../../ui/screen-reader.ts";
-import { useSpotlightDrawn, useSpotlightHold } from "../spotlight/use-spotlight.ts";
+import { useSpotlightHold, useSpotlightScale } from "../spotlight/use-spotlight.ts";
 import { reportsResult } from "../chrome/moment-sounds.ts";
 import { playSound } from "../../ui/sound/sound.ts";
 
@@ -43,7 +43,7 @@ export function useLastMove(store: TableStore, ctx: ReduceContext, names: SheetN
   // Whether a spotlight is drawn at all (not under reduced motion, with the setting off, or for a reader): the lean telling leaves the attacks one
   // played to its end to it. A phone reader's table plays none.
   const reader = useReaderMode();
-  const spotlights = useSpotlightDrawn();
+  const spotlights = useSpotlightScale() > 0;
   const speed = useStore(tableSettings, (state) => state.settings.animationSpeed);
   // The line that is up (last-move-time.ts, heldLine): it outlives the moments after it that have none.
   const [held, setHeld] = useState<HeldLine | null>(null);

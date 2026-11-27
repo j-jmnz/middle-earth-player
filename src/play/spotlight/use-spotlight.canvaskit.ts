@@ -44,12 +44,6 @@ export function useSpotlightHold(store: TableStore): boolean {
   return spotlightHolds(gate, useSpotlightScale(), CANVAS);
 }
 
-/** Whether a spotlight is drawn at all: not under reduced motion, with the setting off or for a screen reader. The last move's line leaves an attack to a spotlight that played to its end (table-hooks.ts). */
-export function useSpotlightDrawn(): boolean {
-  const scale = useSpotlightScale();
-  return CANVAS && scale > 0;
-}
-
 /** Whether the skip catcher over the top bar and the dock takes touches: while the spotlight is held at all. */
 export function useScrim(store: TableStore): boolean {
   const gate = useStore(store, (state) => state.spotlight);
