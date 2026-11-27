@@ -244,6 +244,7 @@ export function TextButton({
   tight = false,
   onLongPress,
   longPressLabel = "Show card",
+  sound,
 }: {
   label: string;
   onPress: () => void;
@@ -265,8 +266,11 @@ export function TextButton({
   disabled?: boolean;
   small?: boolean;
   tight?: boolean;
+  // The tap's sound: the click by default; null for a button whose handler plays its own (Undo's).
+  sound?: SoundSlot | null;
 }) {
   const t = useTableTokens();
+  const slot = sound === undefined ? "ui.confirm" : sound;
   const s = useUiScale();
   const color = tone === "accent" ? t.accent : tone === "ink" ? t.inkLabel : tone === "danger" ? t.danger : tone === "muted" ? t.muted : t.bone;
   const row = tight ? 40 * s : touch(s, 44);
@@ -294,7 +298,7 @@ export function TextButton({
       accessibilityHint={hint}
       {...(longPress ? { accessibilityActions: longPress.accessibilityActions, onAccessibilityAction: longPress.onAccessibilityAction } : {})}
       disabled={disabled}
-      onPress={withSound(onPress, "ui.confirm")}
+      onPress={slot ? withSound(onPress, slot) : onPress}
       onLongPress={onLongPress}
       delayLongPress={350}
       hitSlop={tight ? { top: slop, bottom: slop } : undefined}

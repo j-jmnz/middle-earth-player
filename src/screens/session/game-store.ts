@@ -1,5 +1,5 @@
 // The table store of an opened game, campaign or standalone: the part of sessionStore (table-open.ts) and standaloneStore (standalone-open.ts) that is the same.
-// Each intent the reducer accepts is appended to the held game and written at once, and an Undo takes the last one off, so a kill and relaunch replays the
+// Each intent the reducer accepts is appended to the held game and written at once, and an Undo takes the last one off (a move that ended the game too: its run is taken back), so a kill and relaunch replays the
 // same game. The play clock (play-clock.ts) folds the foreground time into each write and writes once more on a pause. The checkpoint is written at a phase
 // boundary and on a pause, never per intent (campaign/checkpoint.ts).
 import { atPhaseBoundary, checkpointOf, type Checkpoint } from "../../campaign/checkpoint";
@@ -16,6 +16,8 @@ import { createPlayClock, type PlayClock } from "./play-clock";
 export type Held = { id: string; active: ActiveScenario | null };
 
 export type GameStoreParts<H extends Held, O> = {
+  /** The table opens on an Undo a result screen made (store.ts, `landed`). */
+  landed?: boolean | undefined;
   session: ReplayedGame;
   initial: H;
   cache: SessionCache<O>;
@@ -23,13 +25,15 @@ export type GameStoreParts<H extends Held, O> = {
   reopened: (saved: H, now: Pick<ReplayedGame, "game" | "roundSteps" | "history" | "destroyedHeroes">) => O;
   /** One statement each: an accepted intent, an Undo (the checkpoint behind the game goes with it) and a checkpoint. */
   writers: { active: (saved: H) => void; undone: (saved: H) => void; checkpoint: (id: string, checkpoint: Checkpoint) => void };
-  /** A lost game can no longer be undone and its run is fixed: the caller writes it now (a win waits for its Resolution choices). */
+  /** A lost game: the caller writes its run now (a win waits for its Resolution choices). */
   onLost?: (saved: H, game: ScenarioState) => void;
+  /** An Undo that left a lost game: the caller takes back what `onLost` wrote, so a move the player took back leaves no run. */
+  onLostUndone?: (saved: H, left: ScenarioState) => void;
 };
 
 export type GameStore<H> = { store: TableStore; saved: () => H; clock: PlayClock };
 
-export function gameStore<H extends Held, O>({ session, initial, cache, reopened, writers, onLost }: GameStoreParts<H, O>): GameStore<H> {
+export function gameStore<H extends Held, O>({ session, landed, initial, cache, reopened, writers, onLost, onLostUndone }: GameStoreParts<H, O>): GameStore<H> {
   let saved: H = initial;
   const base = createPlayClock();
   // How many intents the checkpoint this session last wrote counted, or null when it has written none (the row may still hold an earlier one).
@@ -51,22 +55,29 @@ export function gameStore<H extends Held, O>({ session, initial, cache, reopened
     const { game, roundSteps, history, destroyedHeroes } = store.getState();
     cache.follow(saved.id, () => ({ fingerprint: fingerprintOf(saved, CATALOG_VERSION), session: reopened(saved, { game, roundSteps, history, destroyedHeroes }) }));
   };
+  // The move that ends the game is stamped with its time and outcome, written with it: the run of a game left later is dated to this move, and History says how it ended (replay.ts, ActiveScenario.ended).
+  const ended = (held: H, game: ScenarioState): H => {
+    const over = game.lost || isWon(game);
+    return over && held.active ? { ...held, active: { ...held.active, ended: { at: Date.now(), outcome: game.lost ? ("lost" as const) : ("won" as const) } } } : held;
+  };
   const store = committingStore(
     session,
     (intent, game) => {
-      saved = fold(record(saved, intent, game));
+      saved = ended(fold(record(saved, intent, game)), game);
       writers.active(saved);
       if (atPhaseBoundary(game) && !game.lost && !isWon(game)) checkpoint(game);
       if (game.lost) onLost?.(saved, game);
       follow();
     },
-    () => {
+    (_game, left) => {
       saved = fold(unrecord(saved));
       writers.undone(saved);
+      if (left.lost) onLostUndone?.(saved, left);
       // A checkpoint that counted more intents than the game has now is behind it: the write dropped it, so a different move cannot meet it again.
       if (saved.active && checkpointed != null && checkpointed > saved.active.intents.length) checkpointed = null;
       follow();
     },
+    landed,
   );
   // A pause (the table left, the app in the background) writes the time since the last write, once, and the checkpoint when the game moved since it; a game that is over, won or lost, writes nothing
   // (its last intent folded the time already, and a pause must never write a finished scenario back).

@@ -1,6 +1,6 @@
 // How History words each card (docs/design-system.md, History): a playthrough, a standalone game, as the title, lines, chip and the sentence a screen reader hears. Where a card leads is the view's. Pure.
 import { causeWords, runEnded, type RunRecord } from "../../campaign/runs";
-import { isOpenStatus, standaloneStatus, type ListedStandalone, type StandaloneStatus } from "../../campaign/standalone";
+import { isOpenStatus, standaloneStatus, unsettledOutcome, type ListedStandalone, type StandaloneStatus } from "../../campaign/standalone";
 import { BOXES, boxOf, scenarioName } from "../data/campaign-data";
 import type { LibrarySave } from "./read";
 import { heroesWords, playthroughWords, plural, runDate, runDetail, runLabel } from "./words";
@@ -26,6 +26,8 @@ export type CardState = "live" | "archived";
 export type GameDestination = { to: "table" | "outcome" | "again"; verb: string; word: string };
 
 export function gameDestination(game: ListedStandalone, hasRun: boolean): GameDestination | null {
+  // A game that is over and was never left (the phone's back gesture) has no run yet: its card opens the outcome, where Undo and Done are.
+  if (unsettledOutcome(game)) return { to: "outcome", verb: "Outcome of", word: "See the outcome" };
   if (isOpenStatus(standaloneStatus(game))) return { to: "table", verb: "Resume", word: "Resume" };
   if (hasRun) return { to: "outcome", verb: "Outcome of", word: "See the outcome" };
   if (game.loadout) return { to: "again", verb: "Play again", word: "Play again" };
@@ -96,7 +98,7 @@ export function gameWords(game: ListedStandalone, run: RunRecord | null, opens: 
   return {
     title: scenarioName(game.scenarioId),
     lines: [...line(setup, "muted"), ...line(heroesWords(seats, nameOf), "muted"), ...runLines(run, nameOf), ...line(opens, nextTone(archived))],
-    chip: STATUS_CHIP[standaloneStatus(game)],
+    chip: STATUS_CHIP[unsettledOutcome(game) ?? standaloneStatus(game)],
     spoken: [`${scenarioName(game.scenarioId)}, ${gameCaption(game)}`, ...(run ? [runLabel(run, scenarioName(run.scenarioId), nameOf)] : [])].join(". "),
     firstSeat: seats[0] ?? [],
   };

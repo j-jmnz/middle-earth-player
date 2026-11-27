@@ -9,7 +9,7 @@ import { useCallback, useState, type ReactNode } from "react";
 import { View } from "react-native";
 
 import type { RunKind, RunRecord } from "../../campaign/runs";
-import { isOpenStatus, standaloneStatus, type ListedStandalone } from "../../campaign/standalone";
+import { isOpenStatus, standaloneStatus, unsettledOutcome, type ListedStandalone } from "../../campaign/standalone";
 import { scenarioName } from "../data/campaign-data";
 import { archiveSave, deleteSave, restoreSave } from "../data/campaign-store";
 import { BodyText, NavBar, PillButton, Screen, Section, Segmented } from "../kit/chrome";
@@ -29,6 +29,7 @@ import { deleteSentence, describe, partyCodes } from "./save-line";
 import { archiveStandalone, deleteStandalone, restoreStandalone } from "../data/standalone-store";
 import { gameCaption } from "./standalone-words";
 import { recordUnclosedRun } from "../session/table-session";
+import { recordUnsettledGame } from "../session/standalone-open";
 import { showToast } from "../kit/toast";
 import { ToastView } from "../kit/toast-view";
 import { useBottomInset } from "../nav/use-bottom-inset";
@@ -94,7 +95,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
     runs,
     folded: (section) => folds.folded(foldId(section), true),
     finished: (ref) => ref.line.next.kind === "finished",
-    playing: (game) => isOpenStatus(standaloneStatus(game)),
+    playing: (game) => isOpenStatus(standaloneStatus(game)) && unsettledOutcome(game) == null,
   });
   const anyRef = kind === "campaign" ? library.saves.length + library.archivedSaves.length > 0 : library.games.length + library.archivedGames.length > 0;
 
@@ -150,7 +151,11 @@ export function HistoryView({ initial }: { initial: RunKind }) {
     sentence: deleteGameSentence(`${scenarioName(game.scenarioId)}, ${gameCaption(game)}`),
     archive: () => archiveStandalone(user, game.id),
     restore: () => restoreStandalone(user, game.id),
-    remove: () => deleteStandalone(user, game.id),
+    // A game that is over and was never left is a run that was never recorded: it is recorded before the game goes.
+    remove: () => {
+      if (unsettledOutcome(game)) recordUnsettledGame(catalog, user, game.id);
+      deleteStandalone(user, game.id);
+    },
   });
 
   // The route of where a game's card leads (gameDestination).

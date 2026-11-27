@@ -52,7 +52,7 @@ export type StandaloneGame = {
 
 // A game as the lists show it: the open game is its engine version, data hash and world, never its intents (a list row does not parse a long game).
 // `needsChoice` is set by the store's list (needsChoiceBeforeOpen) on an open game that will ask for a choice when it opens: the row is as it was stored.
-export type ListedStandalone = Omit<StandaloneGame, "active"> & { active: Pick<ActiveScenario, "engineVersion" | "dataHash" | "world"> | null; needsChoice?: true };
+export type ListedStandalone = Omit<StandaloneGame, "active"> & { active: Pick<ActiveScenario, "engineVersion" | "dataHash" | "world"> | null; needsChoice?: true; ended?: "won" | "lost" };
 
 export type StandaloneStatus = "playing" | "needsChoice" | "won" | "lost" | "dropped";
 
@@ -63,6 +63,11 @@ export function standaloneStatus(game: ListedStandalone): StandaloneStatus {
 }
 
 // Whether the game is still open: playing, or waiting for the player to continue it or restart it.
+// How a game that is over and was never left stands (the list reads `ended` from its open game, replay.ts): History words it by that result, as it will read once the outcome is left.
+export function unsettledOutcome(game: ListedStandalone): "won" | "lost" | null {
+  return game.result == null && game.active != null && !game.needsChoice ? (game.ended ?? null) : null;
+}
+
 export function isOpenStatus(status: StandaloneStatus): boolean {
   return status === "playing" || status === "needsChoice";
 }

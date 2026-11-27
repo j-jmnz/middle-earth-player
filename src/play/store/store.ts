@@ -62,6 +62,8 @@ export type TableState = {
   // Whether the table opened on a save that had intents already (a resumed game, not a new deal): the quest screen the table opens on
   // then says Continue, not Begin (quest-advance.ts, advanceButton). Set once when the store is built.
   resumed: boolean;
+  // Whether the table opened on an Undo a result screen made (TableInput.landed). Set once when the store is built.
+  landed: boolean;
 };
 
 export type TableActions = {
@@ -136,10 +138,12 @@ export type TableInput = {
   roundSteps?: readonly EngineStep[];
   history?: readonly Undoable[];
   destroyedHeroes?: ReadonlySet<string>;
+  // The table opened on an Undo a result screen made (the table route's `landing` param): no quest screen over it, and the table answers nothing until the player's next send.
+  landed?: boolean;
   // Called after the reducer accepts an intent, with the state it returned. The screen writes the intent to the save here.
   onCommit?: (intent: PlayerIntent, game: ScenarioState) => void;
-  // Called after an undo: the screen drops the last intent from the save.
-  onUndo?: (game: ScenarioState) => void;
+  // Called after an undo with the state it went back to and the state it left: the screen drops the last intent from the save and takes back what the left state wrote.
+  onUndo?: (game: ScenarioState, left: ScenarioState) => void;
 };
 
 function windowState(game: ScenarioState, ctx: ReduceContext): Pick<TableState, "legal" | "draggable" | "faceUpDecks"> {
@@ -161,6 +165,7 @@ export function createTableStore(input: TableInput): TableStore {
     refusal: null,
     moment: null,
     shown: null,
+    landed: input.landed === true,
     history: input.history ?? [],
     destroyedHeroes: input.destroyedHeroes ?? new Set(),
     spotlight: NO_SPOTLIGHT,
@@ -217,7 +222,7 @@ export function createTableStore(input: TableInput): TableStore {
         // Undo takes the attack back: nothing is replayed, and one still playing ends.
         spotlight: endGate(get().spotlight, "skipped"),
       });
-      input.onUndo?.(last.before);
+      input.onUndo?.(last.before, game);
       return true;
     },
     select: (cardId) => {

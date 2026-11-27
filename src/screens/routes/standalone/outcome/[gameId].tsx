@@ -1,14 +1,15 @@
 // The end of a standalone game. Won: Victory and the score (ltp.scoring); there is no campaign card, so nothing to choose.
-// Lost: Defeat and the reason. Under either, the game's details (game-report.tsx): the stage reached, the heroes, the score's parts. The result is fixed by the game state and asks for nothing, so it is written as the screen
-// opens and the list shows it at once; Done returns to the scenarios, and Play again opens a new briefing with the same
+// Lost: Defeat and the reason. Under either, the game's details (game-report.tsx): the stage reached, the heroes, the score's parts. The result asks for nothing, but it is final only when the player leaves it:
+// leaving the screen any way (Done, Play again, Back, the phone's back gesture) writes it (the game's result and its run, settleStandalone), so a relaunch before that opens the same result again. Undo takes back
+// the move that ended the game and returns to the table, with nothing written. Done returns to the scenarios, and Play again opens a new briefing with the same
 // seats, decks and difficulty. A game already finished shows its stored result.
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { useEffect, useMemo } from "react";
+import { useIsFocused, useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useEffectEvent, useMemo, useRef } from "react";
 import { View } from "react-native";
 
-import { isContinued } from "../../../../campaign/replay";
 import { gameReport } from "../../../../campaign/report";
 import { finishStandalone } from "../../../../campaign/standalone";
+import { gameIsOn } from "../../../../campaign/resolution-view";
 import { ActionBar, BodyText, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, StatTile, TextButton, TwoPane } from "../../../kit/chrome";
 import { useSizeClass } from "../../../../ui/use-size-class";
 import { GameReportView } from "../../../campaign/game-report";
@@ -17,10 +18,10 @@ import { useDatabases } from "../../../data/databases";
 import { goBack } from "../../../nav/go-back";
 import { routeCode } from "../../../nav/route-code";
 import { comparisonLossNote } from "../../../../play/readouts/against-the-shadow/amon-din";
-import { useStandaloneSession } from "../../../session/standalone-session";
+import { settleStandalone } from "../../../session/standalone-open";
+import { standaloneStore, useStandaloneSession } from "../../../session/standalone-session";
+import { ResultUndo } from "../../../table/result-undo";
 import { outcomeLines } from "../../../history/standalone-words";
-import { recordStandaloneRun } from "../../../data/run-writers";
-import { writeStandalone } from "../../../data/standalone-store";
 
 export default function StandaloneOutcome() {
   const router = useRouter();
@@ -33,15 +34,32 @@ export default function StandaloneOutcome() {
   const ended = session?.ok === true && finished?.result != null;
   // The details of the game, while its final state is at hand (a game reopened from the list keeps only its result).
   const report = useMemo(() => (session?.ok && finished?.result ? gameReport(session.game, session.world.cards, session.destroyedHeroes) : null), [session, finished]);
+  // The store of the game that just ended, for Undo only: it takes the last move back and writes the shorter game, as the table's Undo does.
+  const opened = useMemo(() => (session?.ok ? standaloneStore(session, user) : null), [session, user]);
+  // Leaving the result makes it final: the game's result and its one run (History) are written, the run dated to the move that ended the game. A reopened outcome writes nothing more (its run exists, and a second write changes nothing).
+  const settle = () => {
+    if (ended && session?.ok) settleStandalone(user, session);
+  };
+  // Any leave that is not Undo's own settles: Done, Play again and Back call it at once, and the screen losing focus (the phone's back gesture, a swipe) calls it once more, which writes nothing new.
+  const undoing = useRef(false);
+  const settleOnLeave = useEffectEvent(() => {
+    if (!undoing.current) settle();
+  });
+  const focused = useIsFocused();
   useEffect(() => {
-    if (!ended || !finished) return;
-    writeStandalone(user, finished);
-    // One run for the game, written once (History); a reopened outcome writes nothing more.
-    if (session?.ok) recordStandaloneRun(user, finished, session.world, session.game, Date.now(), session.stored.active?.activeMs ?? null, session.stored.active != null && isContinued(session.stored.active), session.stored.active?.startedAt ?? null);
-  }, [ended, finished, session, user]);
+    if (!focused) return;
+    undoing.current = false;
+    return () => settleOnLeave();
+  }, [focused]);
+  // Undo went back over the move that ended the game, or a move after it: back to the table once the game is on again, with the route param that tells it (`landing=undo`).
+  const undone = () => {
+    if (!opened || !session?.ok || !gameId || !gameIsOn(opened.store.getState().game, session.world)) return;
+    undoing.current = true;
+    router.replace({ pathname: "/standalone/table/[gameId]", params: { gameId, landing: "undo" } });
+  };
   // Encounter at Amon Dîn's comparison loss says the two counts, as the Defeat sheet did (null for any other loss).
   const counts = session?.ok ? comparisonLossNote(session.game) : null;
-  const back = <NavBar onBack={() => goBack(router, "/scenarios")} backTestID="outcome-back" backLabel="Scenarios" />;
+  const back = <NavBar onBack={() => { settle(); goBack(router, "/scenarios"); }} backTestID="outcome-back" backLabel="Scenarios" />;
 
   if (!gameId || !finished || (!session?.ok && !finished.result)) {
     return (
@@ -65,8 +83,12 @@ export default function StandaloneOutcome() {
   }
 
   const won = result.outcome === "won";
-  const done = () => router.replace("/scenarios");
-  const again = () => {
+  const done = () => {
+    settle();
+    router.replace("/scenarios");
+  };
+  const playAgain = () => {
+    settle();
     router.replace({ pathname: "/standalone/briefing/[scenarioId]", params: { scenarioId: finished.scenarioId, from: finished.id } });
   };
 
@@ -92,12 +114,23 @@ export default function StandaloneOutcome() {
       </View>
     );
 
+  const undo = opened ? <ResultUndo store={opened.store} testID="outcome-undo" onUndone={undone} /> : null;
+  const again = <TextButton label="Play again" testID="outcome-again" tone="accent" onPress={playAgain} />;
+  // A short window (a phone on its side) puts Play again and Undo side by side under Done: stacked, the three buttons fill half the screen.
   const actions = (
     <>
       <PrimaryButton label="Done" testID="outcome-done" onPress={done} />
-      <View className="mt-1 items-center">
-        <TextButton label="Play again" testID="outcome-again" tone="accent" onPress={again} />
-      </View>
+      {short ? (
+        <View className="mt-1 flex-row items-center justify-center gap-4">
+          {again}
+          {undo}
+        </View>
+      ) : (
+        <View className="mt-1 items-center">
+          {again}
+          {undo}
+        </View>
+      )}
     </>
   );
   const twoPane = size === "expanded" && report != null;
