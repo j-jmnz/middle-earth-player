@@ -162,7 +162,7 @@ export function destroyCard(
   // "Add each ally that leaves play to its owner's hand instead of placing it in the discard pile" (families/deck/rules.ts).
   // An enemy that "gains victory" (the flag gainsVictory, 11178:A:1) goes to the victory display as one that prints it does.
   const victorious = heldAmount(state, id, "gainsVictory") > 0 && printed.type === "enemy" && printed.victory == null ? { ...printed, victory: heldAmount(state, id, "gainsVictory") } : printed;
-  next = moveCard(next, id, alliesToHandDestination(next, latest, victorious) ?? defeatedDestination(latest, victorious, next), { released: instance.attachments, defeated: byDamage });
+  next = moveCard(next, id, alliesToHandDestination(next, latest, victorious) ?? defeatedDestination(latest, victorious, next), { released: instance.attachments, defeated: byDamage, destroyed: true });
   steps.push({ kind: "destroy", targetId: id });
   next = announceAllyLeft(next, instance, cards);
   next = discardedFromPlay(next, instance, byDamage);

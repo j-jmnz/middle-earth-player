@@ -111,6 +111,8 @@ export function moveEncounter(
   const card = state.cards[id];
   if (!card) return state;
   const wasInPlay = inPlay(card.zone);
+  // A card that cannot leave play unless destroyed (Murzag, 06144:B:1) stays as it is, with its damage, attachments and shadow cards: nothing here takes it out of play.
+  if (wasInPlay && state.modifiers.length > 0 && flagged(state, id, "cannotLeaveUnlessDestroyed") && (to === "deckTop" || to === "deckBottom" || to === "shuffle" || to === "discard" || to === "victory" || to === "removed")) return state;
   const next = forgetLooked(state, id);
   switch (to) {
     case "deckTop":
