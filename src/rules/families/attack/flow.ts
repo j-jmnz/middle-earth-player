@@ -10,7 +10,7 @@ import type { Modifier } from "../../windows/frame-types.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { announceEventResolved, queueEvent } from "../../windows/queue.ts";
+import { queueEvent } from "../../windows/queue.ts";
 import { heard, strikeWaits } from "./events.ts";
 import type { PendingStrike, ScenarioState, Window } from "../../core/state.ts";
 import { pushFrame } from "../../windows/windows.ts";
@@ -101,7 +101,8 @@ export function backAfter(window: Window | null, enemyId: string): Pick<PendingS
 }
 
 // An event whose effect goes on into an attack and its action windows leaves the hand now: it is in its owner's discard pile
-// when its effect is done anyway, and a card still in the hand could be played again in those windows.
+// when its effect is done anyway, and a card still in the hand could be played again in those windows. It only moves the card:
+// the After records hear the event at the end of its frame (interpret/effect-frames.ts, finishEvent).
 export function discardPlayedEvent(state: ScenarioState, frameId: string | undefined): ScenarioState {
   const index = state.stack.findIndex((frame) => frame.id === frameId);
   const frame = state.stack[index];
@@ -110,8 +111,7 @@ export function discardPlayedEvent(state: ScenarioState, frameId: string | undef
   if (card?.zone !== "hand" || card.controller == null) return state;
   const { finish: _done, ...data } = frame.data;
   const moved = moveCard(state, frame.cardId, { zone: "discard", seat: card.controller });
-  const announced = frame.data.announceResolved ? announceEventResolved(moved, frame.data.actor, frame.cardId) : moved;
-  return { ...announced, stack: announced.stack.map((entry, at) => (at === index ? { ...entry, data } : entry)) };
+  return { ...moved, stack: moved.stack.map((entry, at) => (at === index ? { ...entry, data } : entry)) };
 }
 
 // What the instructions after DeclareAttack act on: the attacker, as the last picked card.

@@ -14,7 +14,7 @@ import { RECORDS as ENCOUNTER_RECORDS } from "../../effects/authored/families/en
 import { ENCOUNTER_CARDS, put, seat } from "../families/encounter/fixture.ts";
 
 const ev = (code: string) => definePrinted({ code, name: code, type: "event", sphere: "spirit", cost: 0 });
-const extra: PrintedCard[] = [ev("ev"), ev("evnone"), ev("evback"), ev("evresp"), ev("evatk"), ev("evfree"), definePrinted({ code: "tower", name: "Tower", type: "location", questPoints: 1, threat: 1 })];
+const extra: PrintedCard[] = [ev("ev"), ev("evnone"), ev("evback"), ev("evresp"), ev("evatk"), ev("evfree"), ev("evdraw"), definePrinted({ code: "tower", name: "Tower", type: "location", questPoints: 1, threat: 1 })];
 const cards = new Map([...ENCOUNTER_CARDS, ...extra.map((card) => [card.code, card] as const)]);
 
 const lower = (code: string, instructions: Effect["instructions"] = [{ verb: "LowerThreat", amount: 3, who: "actor" }]): Effect => ({ id: `${code}:action:1`, cardCode: code, lines: [`${code}:A:1`], timing: "action", instructions });
@@ -41,8 +41,9 @@ const response: Effect = {
 const effects = [
   lower("ev"),
   lower("evback", [{ verb: "LowerThreat", amount: 3, who: "actor" }, { verb: "ReturnEventToHand" }]),
-  lower("evatk", [{ verb: "Pick", pick: { type: "character", control: "you", state: "ready" } }, { verb: "Pick", pick: { type: "enemy", control: "any", stagingOnly: true } }, { verb: "DeclareAttack" }]),
+  lower("evatk", [{ verb: "Pick", pick: { type: "character", control: "you", state: "ready" } }, { verb: "Pick", pick: { type: "enemy", control: "any", stagingOnly: true } }, { verb: "DeclareAttack" }, { verb: "LowerThreat", amount: 1, who: "actor" }]),
   lower("evfree"),
+  lower("evdraw", [{ verb: "ReturnEventToHand" }, { verb: "Draw", amount: 1 }]),
   response,
   after,
 ];
@@ -111,7 +112,39 @@ describe("After an event is played, on every exit of the event", () => {
       steps.push(...result.steps);
     }
     expect(result.state.cards[id]?.zone).toBe("discard");
-    expect(threats(steps)).toEqual([2]);
+    expect(threats(steps)).toEqual([-1, 2]);
+  });
+
+  it("rr.event-cards: an event that goes on into an attack is announced after the attack's damage and its last instruction", () => {
+    const kit = table();
+    kit.state = put(kit.state, "orc", "staging").state;
+    const id = kit.hand("evatk");
+    let result = expectOk(reduce(kit.state, { type: "PlayCard", cardId: id, payments: [] }, ctx()));
+    const steps = [...result.steps];
+    // The attacker is picked, the attack declared and every seat passes the windows until the strike is done.
+    for (let guard = 0; guard < 12 && result.state.window; guard += 1) {
+      const window = result.state.window;
+      if (window.kind !== "choose" && window.kind !== "pass") break;
+      result = expectOk(reduce(result.state, window.kind === "choose" ? { type: "Choose", optionId: window.options[0] ?? "" } : { type: "Pass" }, ctx()));
+      steps.push(...result.steps);
+    }
+    const damage = steps.findIndex((step) => step.kind === "damage");
+    const announced = steps.findIndex((step) => step.kind === "threat" && step.amount === 2);
+    expect(damage).toBeGreaterThanOrEqual(0);
+    expect(announced).toBeGreaterThan(damage);
+    expect(steps.findIndex((step) => step.kind === "threat" && step.amount === -1)).toBeLessThan(announced);
+  });
+
+  it("rr.event-cards: an event that returns to its hand is announced after the rest of its effects (a draw)", () => {
+    const kit = table();
+    const id = kit.hand("evdraw");
+    kit.state = put(kit.state, "hobbit", "deck").state;
+    const result = expectOk(reduce(kit.state, { type: "PlayCard", cardId: id, payments: [] }, ctx()));
+    const draw = result.steps.findIndex((step) => step.kind === "draw");
+    const announced = result.steps.findIndex((step) => step.kind === "threat" && step.amount === 2);
+    expect(draw).toBeGreaterThanOrEqual(0);
+    expect(announced).toBeGreaterThan(draw);
+    expect(result.state.cards[id]?.zone).toBe("hand");
   });
 
   it("rr.forced: an event played for no cost from the top of a deck is announced", () => {
