@@ -366,7 +366,7 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   // A card that cannot enter the staging area stays where it is ("Shrine to Morgoth ... cannot enter the staging area", 12094:A:1).
   if (dest.zone === "staging" && flagged(state, id, "cannotEnterStaging")) return state;
   // A card that cannot leave the staging area stays in it, whatever moves it (Uglúk, 143069:B:2).
-  if (current.zone === "staging" && dest.zone !== "staging" && flagged(state, id, "cannotLeaveStaging") && !supersedes && !(defeated && flagged(state, id, "leavesStagingWhenDefeated"))) return state;
+  if (current.zone === "staging" && dest.zone !== "staging" && flagged(state, id, "cannotLeaveStaging") && !flagged(state, id, "losesCannotLeaveStaging") && !supersedes && !(defeated && flagged(state, id, "leavesStagingWhenDefeated"))) return state;
   // A card that cannot leave the hand stays in it, whatever moves it (Ill Tidings, 07023:A:1).
   if (current.zone === "hand" && heldInHand(state, id)) return state;
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";

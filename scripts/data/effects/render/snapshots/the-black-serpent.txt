@@ -1,0 +1,345 @@
+Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort; quest: 17107 Battle in the Camp; quest: 17108 Defeat the Serpent; staging: 17094 The Black Serpent; setAside: 17091 Banner of the Serpent; setAside: 17092 The Serpent's Garb; setAside: 17093 Summons from Mordor)
+
+## 17091 Banner of the Serpent
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+17091:A:1 (front): Guarded (enemy or location).
+  17091:whenRevealed:1: When revealed
+    - the Guarded keyword: this objective in the staging area is guarded by the first encounter enemy or location discarded from the deck, added to the staging area
+  17091:constant:1: Constant
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
+
+17091:A:2 (front): While Banner of the Serpent is attached to an encounter card, each Harad enemy gets +1 Attack.
+  17091:constant:2: Constant
+    only if this card is a objective (any player controls) that is attached to an encounter card (an encounter card guards it, or it hangs on an enemy or a location)
+    - each Harad enemy (any player controls) or in the staging area: stat attack 1, while this card is in play
+
+17091:A:3 (front): Action: Exhaust Banner of the Serpent and raise your threat by 1 to give each Harad enemy engaged with you -1 Attack until the end of the phase.
+  17091:action:1: Action (cost: exhaust this card and raise your threat by 1)
+    who acts: any player may trigger it; the acting player is the one who does
+    - each Harad enemy (any player controls) engaged with you (only the cards that match now: one that arrives later does not get it): stat attack -1, until the end of the phase
+
+## 17092 The Serpent's Garb
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+17092:A:1 (front): Guarded (enemy).
+  17092:whenRevealed:1: When revealed
+    - the Guarded keyword: this objective in the staging area is guarded by the first encounter enemy discarded from the deck, added to the staging area
+  17092:constant:1: Constant
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
+
+17092:A:2 (front): Attached encounter card gets +2 Threat and is immune to player card effects.
+  17092:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) or in the staging area, that is attached to this objective as its guard, or is the card this objective hangs on: stat threat 2, while this card is in play
+    - each enemy (any player controls) or in the staging area, that is attached to this objective as its guard, or is the card this objective hangs on: stat immuneToPlayerCards 1, while this card is in play
+    - each location (any player controls) or in the staging area, that is attached to this objective as its guard, or is the card this objective hangs on: stat threat 2, while this card is in play
+    - each location (any player controls) or in the staging area, that is attached to this objective as its guard, or is the card this objective hangs on: stat immuneToPlayerCards 1, while this card is in play
+
+17092:A:3 (front): Action: Exhaust The Serpent's Garb and raise your threat by 1 to give a Harad enemy in the staging area -2 Threat until the end of the phase.
+  17092:action:1: Action (cost: exhaust this card and raise your threat by 1)
+    who acts: any player may trigger it; the acting player is the one who does
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose Harad enemy (any player controls) or in the staging area, in the staging area only
+    - the picked card: stat threat -2, until the end of the phase
+
+## 17093 Summons from Mordor
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+17093:A:1 (front): Guarded (location).
+  17093:whenRevealed:1: When revealed
+    - the Guarded keyword: this objective in the staging area is guarded by the first encounter location discarded from the deck, added to the staging area
+  17093:constant:1: Constant
+    - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
+
+17093:A:2 (front): While Summons from Mordor is attached to an encounter card, each player's threat cannot be reduced.
+  17093:constant:2: Constant
+    only if this card is a objective (any player controls) that is attached to an encounter card (an encounter card guards it, or it hangs on an enemy or a location)
+    - each player: stat threatReductionBarred 1, while this card is in play
+
+17093:A:3 (front): Action: Exhaust Summons from Mordor and raise your threat by 1 to add 1 resource to attached hero's pool.
+  17093:action:1: Action (cost: exhaust this card and raise your threat by 1)
+    who acts: any player may trigger it; the acting player is the one who does
+    - add 1 resources to its host
+
+## 17094 The Black Serpent
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+17094:A:1 (front): Cannot leave the staging area or take damage. X is the stage number of the main quest.
+  17094:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+    - this card: stat cannotTakeDamage 1, while this card is in play
+
+17094:A:2 (front): The Black Serpent gets +X Threat, +X Attack and +X Defense.
+  17094:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat the stage number of the quest, while this card is in play
+    - this card: stat attack the stage number of the quest, while this card is in play
+    - this card: stat defense the stage number of the quest, while this card is in play
+
+17094:A:3 (front): Forced: At the end of the encounter phase, either remove X progress from the main quest, or The Black Serpent makes an attack against the first player.
+  17094:forced:1: Forced at the end of the phase
+    only if it is the Encounter phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the first player chooses one of:
+      * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 1 progress):
+        - remove the stage number of the quest progress from the main quest (all of it when it holds less)
+      * option "attack":
+        - this card attacks the first player now, from the staging area, dealt a shadow card
+
+## 17095 Serpent Guard
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17095:A:1 (front): Forced: After Serpent Guard engages you, either remove 2 progress from the main quest, or enemies engaged with you cannot take damage this round.
+  17095:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    - the acting player chooses one of:
+      * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 1 progress):
+        - remove 2 progress from the main quest (all of it when it holds less)
+      * option "noDamage":
+        - each enemy (any player controls) engaged with you (only the cards that match now: one that arrives later does not get it): stat cannotTakeDamage 1, until the end of the round
+
+17095:A:2 (shadow): Shadow: Either remove 2 progress from main quest, or attacking enemy cannot take damage this round.
+  17095:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player chooses one of:
+      * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 1 progress):
+        - remove 2 progress from the main quest (all of it when it holds less)
+      * option "noDamage":
+        - the attacking enemy: stat cannotTakeDamage 1, until the end of the round
+
+## 17096 The Serpent's Redoubt
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17096:A:1 (front): While The Serpent's Redoubt is in the staging area, it gains: "Forced: After a player plays an ally from his hand, either remove 1 progress from the main quest, or exhaust that ally."
+  17096:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type ally)
+    only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the acting player chooses one of:
+      * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 1 progress):
+        - remove 1 progress from the main quest (all of it when it holds less)
+      * option "exhaust":
+        - exhaust the card the event is about
+
+17096:A:2 (front): Travel: The first player searches the encounter deck and discard pile for an enemy and puts it into play engaged with him. Shuffle the encounter deck.
+  17096:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one enemy in the encounter deck or its discard pile and puts it into play engaged with the first player (it is not revealed)
+    - shuffle the encounter deck
+
+## 17097 Roofless Tower
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17097:A:1 (front): While Roofless Tower is in the staging area, it gains: "Forced: When a player plays an event, either remove 1 progress from the main quest, or cancel the effects of that event."
+  17097:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
+    only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the acting player chooses one of:
+      * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 1 progress):
+        - remove 1 progress from the main quest (all of it when it holds less)
+      * option "cancel":
+        - the effects of the event just played are canceled (it is still played, its cost paid, and it goes to its owner's discard pile)
+
+17097:A:2 (front): Travel: Exhaust a hero to travel here.
+  17097:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when the line's choose step finds fewer cards than it must exhaust
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready hero (any player controls) chosen by the first player
+    - exhaust the picked card
+
+## 17098 Desert Bastion
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17098:A:1 (front): Desert Bastion gets +1 Threat for each Harad objective the players control.
+  17098:constant:1: Constant
+    - this card: stat threat the number of Harad objective (any player controls) that is claimed (attached to a character a player controls), while this card is in play
+
+17098:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each Harad objective the players control.
+  17098:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack the number of Harad objective (any player controls) that is claimed (attached to a character a player controls), until the end of the attack
+
+## 17099 Southron Camp
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17099:A:1 (front): While Southron Camp is in the staging area, it gains: "Forced: At the end of the round, remove all progress from each location in play."
+  17099:forced:1: Forced at the end of the round
+    only if this card is in the staging area
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - remove all the progress from each location (any player controls)
+
+17099:A:2 (front): Travel: Raise each player's threat by 1 to travel here.
+  17099:travel:1: Travel
+    - raise threat by 1 (each player)
+
+## 17100 Broken Courtyard
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17100:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+17100:A:2 (front): While Broken Courtyard is in the staging area, the main quest cannot have progress tokens beyond its printed quest points value.
+  17100:constant:1: Constant
+    only if this card is in the staging area
+    - currentQuest: stat stageCapped (the stage takes no more progress than its quest points even while it cannot advance; the rest is not placed) 1, while this card is in play
+
+17100:A:3 (shadow): Shadow: Either remove 2 progress from the main quest, or return attacking enemy to the staging area after this attack.
+  17100:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player chooses one of:
+      * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 1 progress):
+        - remove 2 progress from the main quest (all of it when it holds less)
+      * option "staging":
+        - when the attack in progress ends:
+          - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 17101 Bold and Grim
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17101:A:1: Surge. Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+17101:A:2 (front): When Revealed: Deal 1 damage to each hero with an objective attached.
+  17101:whenRevealed:1: When revealed
+    - deal 1 damage to each hero (any player controls) with an objective card attached
+
+17101:A:3 (shadow): Shadow: If attacking enemy is non-unique, either attach a Harad objective you control to attacking enemy, or it makes an additional attack after this one.
+  17101:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player chooses one of:
+      * option "attach" (only if all of: (the attacking enemy is a non-unique enemy (any player controls)) and (there is a Harad objective (you control) that is claimed (attached to a character a player controls) to choose)):
+        - choose Harad objective (you control) that is claimed (attached to a character a player controls)
+        - the attacking enemy becomes the guard of the picked card, attached to it in the staging area (an engaged guard stays engaged) (an objective a character holds is detached first, into the staging area faceup and unclaimed)
+      * option "attack" (only if the attacking enemy is a non-unique enemy (any player controls)):
+        - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
+
+## 17102 No Quarter
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17102:A:1 (front): When Revealed: Either reveal 2 encounter cards, or detach a Harad objective from a hero, reveal it, and add it to the staging area.
+  17102:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    - the first player chooses one of:
+      * option "reveal":
+        - the first player reveals 2 encounter cards, one after the other, each in a staging of its own
+      * option "detach" (only if there is a Harad objective (any player controls) that is claimed (attached to a character a player controls) to choose):
+        - choose Harad objective (any player controls) chosen by the first player, that is claimed (attached to a character a player controls)
+        - the last picked objective, claimed and attached to a hero, is detached from it and revealed by the acting player as an encounter card: it is faceup and unclaimed, its When Revealed (Guarded (X)) resolves and it is added to the staging area (nothing with another card picked)
+
+17102:A:2 (shadow): Shadow: If this attack destroys a character, attach a Harad objective you control to a non-unique encounter card in the staging area.
+  17102:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (there is a Harad objective (you control) that is claimed (attached to a character a player controls) to choose) and (there is a non-unique card (any player controls) in the staging area only, that is not an objective to choose): choose Harad objective (you control) that is claimed (attached to a character a player controls)
+      - then, if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (there is a Harad objective (you control) that is claimed (attached to a character a player controls) to choose) and (there is a non-unique card (any player controls) in the staging area only, that is not an objective to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): choose non-unique card (any player controls) in the staging area only, that is not an objective
+      - then, if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (there is a Harad objective (you control) that is claimed (attached to a character a player controls) to choose) and (there is a non-unique card (any player controls) in the staging area only, that is not an objective to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card becomes the guard of the card picked before, attached to it in the staging area (an objective a character holds is detached first, into the staging area faceup and unclaimed)
+
+## 17103 Chaos in the Night
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17103:A:1 (front): When Revealed: The first player must choose: either raise each player's threat by 3, or progress cannot be placed on quest cards until the end of the round.
+  17103:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    - the first player chooses one of:
+      * option "threat":
+        - raise threat by 3 (each player)
+      * option "noProgress":
+        - the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, until the end of the round
+
+17103:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, remove all progress from the main quest.
+  17103:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): all progress on this stage (the main quest card) is discarded
+
+## 17104 Don't Let Them Escape!
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17104:A:1 (front): Forced: At the end of the round, discard all progress from the main quest.
+  17104:forced:1: Forced at the end of the round
+    only if this card is the current quest
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - all progress on this stage (the main quest card) is discarded
+
+17104:A:2 (front): Forced: After this quest is chosen as the current quest, reveal an encounter card.
+  17104:forced:2: Forced on the event becameCurrentQuest (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the acting player reveals an encounter card
+
+## 17106 The Crossroads Fort
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17106:A:1 (front): Setup: Set each Harad objective aside, out of play. Add The Black Serpent to the staging area. Shuffle the encounter deck. The first player randomly selects 1 set aside Harad objective, reveals it, and adds it to the staging area.
+  17106:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter deck
+    - the acting player reveals one random set-aside card with the trait Harad (drawn by the game seed) as an encounter card: its When Revealed (Guarded (X)) resolves and it is added to the staging area (nothing with none set aside)
+
+17106:B:1 (back): If a Harad objective is not attached, the first player claims it and attaches it to a hero he controls.
+  17106:constant:1: Constant
+    - (constant on a quest stage, does nothing when run) while this stage is the main quest, each Harad objective in the staging area with no encounter card attached is claimed by the first player, who chooses one of their heroes to attach it to (an objective that is guarded, or that hangs on an encounter card, is not claimed)
+
+17106:B:2 (back): This stage cannot be defeated unless each Harad objective in play is attached to a hero.
+  17106:constant:2: Constant
+    only if any of: (there is a Harad objective (any player controls) that is attached to an encounter card (an encounter card guards it, or it hangs on an enemy or a location) to choose) or (there is a Harad objective (any player controls) in the staging area only, that is attached to no encounter card to choose)
+    - the players cannot defeat this stage while this holds
+
+## 17107 Battle in the Camp
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17107:A:1 (front): When Revealed: Shuffle the encounter discard pile into the encounter deck. The first player randomly selects 1 set aside Harad objective, reveals it, and adds it to the staging area.
+  17107:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - the rest of the effect is carried out by the first player
+    - the acting player reveals one random set-aside card with the trait Harad (drawn by the game seed) as an encounter card: its When Revealed (Guarded (X)) resolves and it is added to the staging area (nothing with none set aside)
+
+17107:B:1 (back): If a Harad objective is not attached, the first player claims it and attaches it to a hero he controls.
+  17107:constant:1: Constant
+    - (constant on a quest stage, does nothing when run) while this stage is the main quest, each Harad objective in the staging area with no encounter card attached is claimed by the first player, who chooses one of their heroes to attach it to (an objective that is guarded, or that hangs on an encounter card, is not claimed)
+
+17107:B:2 (back): The Black Serpent is considered to be engaged with each player who controls a Harad objective.
+  17107:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) or in the staging area, named "The Black Serpent": stat engagedWithClaimers (in the staging area it is considered engaged with each player who controls an objective, read live: it attacks each of them once in the combat phase and only they declare attackers against it) 1, while this card is in play
+    - then, if there is a Harad objective (any player controls) that is claimed (attached to a character a player controls) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): each enemy (any player controls) or in the staging area, named "The Black Serpent": stat noThreatContribution 1, while this card is in play
+
+17107:B:3 (back): This stage cannot be defeated unless each Harad objective in play is attached to a hero.
+  17107:constant:3: Constant
+    only if any of: (there is a Harad objective (any player controls) that is attached to an encounter card (an encounter card guards it, or it hangs on an enemy or a location) to choose) or (there is a Harad objective (any player controls) in the staging area only, that is attached to no encounter card to choose)
+    - the players cannot defeat this stage while this holds
+
+## 17108 Defeat the Serpent
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17108:A:1 (front): When Revealed: Randomly select 1 set aside Harad objective and attach it to The Black Serpent. Shuffle the encounter discard pile into the encounter deck and reveal 1 encounter card per player.
+  17108:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "The Black Serpent"
+    - the last picked card in play receives one random set-aside card with the trait Harad (drawn by the game seed): it lies attached to it faceup, controlled by nobody and no player's card, and leaves play with its host (nothing with no host picked or no such card set aside)
+    - shuffle the encounter discard pile into the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+17108:B:1 (back): If a Harad objective is not attached, the first player claims it and attaches it to a hero he controls.
+  17108:constant:1: Constant
+    - (constant on a quest stage, does nothing when run) while this stage is the main quest, each Harad objective in the staging area with no encounter card attached is claimed by the first player, who chooses one of their heroes to attach it to (an objective that is guarded, or that hangs on an encounter card, is not claimed)
+
+17108:B:2 (back): While there are at least 6 progress tokens on this stage, The Black Serpent loses the text: "Cannot leave the staging area or take damage."
+  17108:constant:2: Constant
+    only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 6 progress
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) or in the staging area, named "The Black Serpent": stat losesNoDamage 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "The Black Serpent": stat losesCannotLeaveStaging (the enemy loses the text "Cannot leave the staging area": its cannotLeaveStaging is not read) 1, while this card is in play
+
+17108:B:3 (back): This stage cannot be defeated unless each Harad objective in play is attached to a hero. If the players defeat this stage, they win the game.
+  17108:constant:3: Constant
+    only if any of: (there is a Harad objective (any player controls) that is attached to an encounter card (an encounter card guards it, or it hangs on an enemy or a location) to choose) or (there is a Harad objective (any player controls) in the staging area only, that is attached to no encounter card to choose)
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
+    - the players cannot defeat this stage while this holds
+
+(rendered pieces: 252 by template, 0 as JSON)

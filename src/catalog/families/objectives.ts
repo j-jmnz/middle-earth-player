@@ -34,6 +34,12 @@ const VERBS = [
   // by the players as soon as it is free of encounters and no effect is resolving (the settle sweep, families/objectives/control.ts): it is marked `claimed`, with no controller,
   // so it stays in the staging area. It does nothing when run.
   z.strictObject({ verb: z.literal("ControlWhenFree"), ...when }),
+  // A constant marker on a quest stage (17106:B:1, 17107:B:1, 17108:B:1, "If a Harad objective is not attached, the first player claims it and attaches it to a hero he controls"): while the stage is the main quest, the settle sweep (families/objectives/claim.ts) has the first player
+  // claim each objective with this Trait that lies in the staging area with no encounter card attached: he chooses one of his heroes and it is attached there. A guarded objective or one hanging on an encounter card is not claimed (rr.guarded). It does nothing when run.
+  z.strictObject({ verb: z.literal("ClaimUnattached"), trait: z.string().min(1) }),
+  // "detach a Harad objective from a hero, reveal it, and add it to the staging area" (17102:A:1): the last picked objective, claimed and attached to a hero, is detached (faceup, unclaimed, controlled by nobody) and revealed by the actor as an encounter card (rr.reveal, faq.reveal-and-add),
+  // so its When Revealed (Guarded (X), hrd.guarded-x) resolves and it is added to the staging area. Nothing happens with no such objective picked.
+  z.strictObject({ verb: z.literal("RevealDetached"), ...when }),
 ] as const;
 
 const TRIGGERS = [

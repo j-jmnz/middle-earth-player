@@ -108,6 +108,9 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["participating"], pick.participating === true ? "that took part in the attack this effect answers" : null);
   note(["controlledBy"], pick.controlledBy === "firstPlayer" ? "controlled by the first player" : pick.controlledBy === "actor" ? "controlled by the player this effect runs for" : pick.controlledBy === "attackers" ? "controlled by a player whose character took part in the attack this effect answers" : pick.controlledBy === "source" ? "controlled by the player this card is engaged with" : pick.controlledBy === "host" ? "controlled by the player who controls this card's host" : pick.controlledBy === "picked" ? "controlled by the player picked last" : null);
   note(["hasGuard"], pick.hasGuard === true ? "that has an encounter card attached as its guard" : pick.hasGuard === false ? "that has no encounter card attached (free of encounters)" : null);
+  note(["onEncounter"], pick.onEncounter === true ? "that is attached to an encounter card (an encounter card guards it, or it hangs on an enemy or a location)" : pick.onEncounter === false ? "that is attached to no encounter card" : null);
+  note(["linkedToSource"], pick.linkedToSource === true ? "that is attached to this objective as its guard, or is the card this objective hangs on" : null);
+  note(["holdsObjective"], pick.holdsObjective === true ? "with an objective card attached" : null);
   note(["isGuard"], pick.isGuard === true ? "that is attached to an objective as its guard" : pick.isGuard === false ? "that is not guarding an objective" : null);
   note(["questedThisRound"], pick.questedThisRound === true ? "that was committed to this round's quest (the quest's resolution already cleared the commitment)" : null);
   note(["guardedByTrait"], typeof pick.guardedByTrait === "string" ? `guarded by (attached to) a ${pick.guardedByTrait} enemy` : null);

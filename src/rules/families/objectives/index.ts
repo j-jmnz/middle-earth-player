@@ -28,6 +28,7 @@ import { effectsOf } from "../../windows/listen.ts";
 import type { Focus } from "../index.ts";
 import { controlSweep } from "./control.ts";
 import { freeOfEncounters } from "./free.ts";
+import { claimUnattached, revealDetached } from "./claim.ts";
 import { attachGuard, guardWith } from "./guard.ts";
 import { objectivesPickMatches } from "./pick.ts";
 
@@ -43,7 +44,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return attachGuard(state, instruction, focus, ctx);
     // A constant kept by the settle sweep (control.ts): it does nothing when run.
     case "ControlWhenFree":
+    case "ClaimUnattached":
       return state;
+    case "RevealDetached":
+      return revealDetached(state, focus, ctx, steps);
     default:
       return null;
   }
@@ -99,8 +103,8 @@ function claimObjective(state: ScenarioState, instruction: Extract<Instruction, 
 
 export const manifest: RulesFamily = {
   name: "objectives",
-  settle: { sweep: (state, ctx) => controlSweep(state, ctx) },
-  pick: (state, id, spec, _at, ctx) => objectivesPickMatches(state, id, spec, ctx),
-  verbs: ["GuardObjective", "ClaimObjective", "AttachGuard", "ControlWhenFree"],
+  settle: { sweep: (state, ctx, steps) => claimUnattached(controlSweep(state, ctx), ctx, steps) },
+  pick: (state, id, spec, at, ctx) => objectivesPickMatches(state, id, spec, ctx, at),
+  verbs: ["GuardObjective", "ClaimObjective", "AttachGuard", "ControlWhenFree", "ClaimUnattached", "RevealDetached"],
   run,
 };

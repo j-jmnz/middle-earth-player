@@ -65,6 +65,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("AddTopmostFromDiscard"), cardType: z.literal("location"), ...when }),
   // "Set Brood Mother aside, out of play" (17068:A:3): the card in play with this code, from play, wherever it lies, goes to the set-aside pile with no damage and no controller. Nothing happens with none in play.
   z.strictObject({ verb: z.literal("SetAsideCode"), code: z.string().min(1), ...when }),
+  // "The first player randomly selects 1 set aside Harad objective, reveals it, and adds it to the staging area" (17106:A:1, 17107:A:1; hrd.guarded-x-example): one set-aside card with this trait, drawn by the game seed, is revealed by the actor as an encounter card (rr.reveal: its
+  // Guarded (X) resolves and it is added to the staging area). Nothing happens with none set aside. The players see which card it is, so the others stay known.
+  verbFlags(z.strictObject({ verb: z.literal("RevealRandomSetAside"), trait: z.string().min(1), ...when }), { setupRuns: "top" }),
 ] as const;
 
 const TRIGGERS = [
@@ -105,6 +108,11 @@ const FLAGS = [
   "cannotFlipSearch",
   // On the table, while Off Track is in play: "Progress cannot be placed on the main quest." (17079:A:2): no progress is placed on the main quest card, though a side quest that is the current quest takes it (17079:A:2; mainQuestBlocked in families/haradrim/track.ts, read by quest.ts).
   "noMainQuestProgress",
+  // On an enemy in the staging area: it is considered engaged with each player who controls an objective (claimed, attached to a hero), read live: it attacks each of them once in the combat phase and only they declare attackers against it (The Black Serpent on stage 2B,
+  // "The Black Serpent is considered to be engaged with each player who controls a Harad objective", 17107:B:2; rr.engaged). Read by core/engaged.ts and families/south/watcher.ts.
+  "engagedWithClaimers",
+  // On an enemy: it loses the text "Cannot leave the staging area" (The Black Serpent with 6 progress on stage 3B, 17108:B:2): the cannotLeaveStaging it holds is not read (rules/core/zones.ts).
+  "losesCannotLeaveStaging",
 ] as const;
 
 export const manifest = { name: "haradrim", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

@@ -15,6 +15,7 @@ export const HARADRIM_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => M
   ReleaseStagedHero: () => ({ text: "the acting player chooses a hero they own in the staging area (a Captive held by no card), takes control of it and exhausts it; it returns to its old place among their heroes with its tokens and attachments (nothing when they own none; asked when they own several)", read: [] }),
   GuardStagedHeroes: () => ({ text: "the first player attaches each hero in the staging area to a different Orc enemy in the staging area that guards no hero: the hero is guarded by that enemy, under no player's control, immune to player card effects, and with a blank text box (the settle sweep marks each guarded hero; asked which Orc when several are free; a hero with no Orc left stays in the staging area)", read: [] }),
   AttachRandomSetAside: (i) => ({ text: `the last picked card in play receives one random set-aside card with the trait ${str(i.trait)} (drawn by the game seed): it lies attached to it faceup, controlled by nobody and no player's card, and leaves play with its host (nothing with no host picked or no such card set aside)`, read: ["trait"] }),
+  RevealRandomSetAside: (i) => ({ text: `the acting player reveals one random set-aside card with the trait ${str(i.trait)} (drawn by the game seed) as an encounter card: its When Revealed (Guarded (X)) resolves and it is added to the staging area (nothing with none set aside)`, read: ["trait"] }),
   AddWithHostToVictory: () => ({ text: "this card and its host enemy are added to the victory display, this card first (the host and its remaining hit points are read before this card leaves play)", read: [] }),
   PrepareOrcsArea: (i) => ({
     text: `Setup: the set-aside quest cards with codes ${(Array.isArray(i.stages) ? i.stages : []).map(str).join(", ")} become the Orcs' quest deck in this order, the top one the Orcs' current stage (stage ${str(i.number)}), side D up (its C side is passed through only by an advance)${Array.isArray(i.place) && i.place.length > 0 ? `; each set-aside card with a code of ${i.place.map(str).join(", ")} is placed in the Orcs' area` : ""}; the area is separate from the staging area and has no ship behaviour`,
@@ -60,6 +61,7 @@ export const HARADRIM_SAMPLES: Samples = {
   ReleaseStagedHero: [{ verb: "ReleaseStagedHero" }],
   GuardStagedHeroes: [{ verb: "GuardStagedHeroes" }],
   AttachRandomSetAside: [{ verb: "AttachRandomSetAside", trait: "Capture" }],
+  RevealRandomSetAside: [{ verb: "RevealRandomSetAside", trait: "Harad" }],
   AddWithHostToVictory: [{ verb: "AddWithHostToVictory" }],
   PrepareOrcsArea: [{ verb: "PrepareOrcsArea", stages: ["17051", "17052"], number: 1, place: ["16061"] }],
   MoveToOrcsArea: [{ verb: "MoveToOrcsArea", target: "picked" }, { verb: "MoveToOrcsArea", code: "16063" }, { verb: "MoveToOrcsArea" }],
