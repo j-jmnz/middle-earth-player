@@ -1,4 +1,4 @@
-// The card of a pile nearest its top that matches a printed type and Traits: the one reader behind "the topmost ..." of a player discard pile, the encounter discard pile and Beneath the Sands' AddTopmostFromDiscard.
+// The card of a pile nearest its top that matches a printed type and Traits: the one reader behind "the topmost ..." of a player discard pile, the encounter discard pile and AddTopmostFromDiscard (Beneath the Sands).
 import { printedOf } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";
 import type { ReduceContext } from "./interpret.ts";
