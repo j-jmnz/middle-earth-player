@@ -17,7 +17,7 @@ Scenario piles that place cards with no record (quest: 50301 The Disappearance; 
 50301:B:2 (back): Players cannot defeat this stage while Tarlang's Neck is in play.
   50301:constant:1: Constant
     only if the card with code 50307 is in play
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 50302 Terror of the Dead
 (the scenario deals it into the quest pile; the piles place it, no record does)

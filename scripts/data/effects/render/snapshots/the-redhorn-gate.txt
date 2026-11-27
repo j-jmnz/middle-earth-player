@@ -129,7 +129,7 @@ Scenario piles that place cards with no record (quest: 04011 Up the Pass; quest:
 04013:B:3 (back): Players cannot defeat this stage unless they have 5 victory points.
   04013:constant:2: Constant
     only if the Victory points of the cards in the victory display added up (read live) is less than 5
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 04013:B:4 (back): If the players defeat this stage, they have won the game.
   04013:constant:3: Constant

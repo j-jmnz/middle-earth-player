@@ -352,6 +352,6 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146073:B:3 (back): This stage cannot be defeated. Each round the players survive gives the Ring-bearer more time to fulfill the quest to Mount Doom.
   146073:constant:2: Constant
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 (rendered pieces: 237 by template, 0 as JSON)

@@ -28,6 +28,7 @@ const CARDS = cardMap([
   hero("cf", "Fellowship Hero", "fellowship", 5),
   hero("cb", "Baggins Hero", "baggins", 5),
   hero("cu", "Hero Two", "lore", 5),
+  hero("lo", "Low One", "leadership", 4),
   hero("h1b", "Hero One", "lore", 9),
   hero("h1c", "Hero One", "spirit", 7),
   hero("h1f", "Hero One", "fellowship", 7),
@@ -53,10 +54,10 @@ describe("Helm of Secrecy (22090:A:2)", () => {
     // Which hero: both are offered.
     expect(state.window).toMatchObject({ kind: "choose" });
     state = send(state, { type: "Choose", optionId: one ?? "" }, ctx);
-    // The tokens are gone; the collection offers only c1 and c2 (c3 costs too much, cf and cb are Fellowship and Baggins, cu shares a title in play).
+    // The tokens are gone; the collection offers c1, c2 and lo (c3 costs too much, cf and cb are Fellowship and Baggins, cu shares a title in play).
     expect(state.cards[one ?? ""]).toMatchObject({ damage: 0, resources: 0 });
     const names = choices(state).map((id) => state.cards[id]?.code).sort();
-    expect(names).toEqual(["c1", "c2"]);
+    expect(names).toEqual(["c1", "c2", "lo"]);
     const wanted = choices(state).find((id) => state.cards[id]?.code === "c1") ?? "";
     state = send(state, { type: "Choose", optionId: wanted }, ctx);
     // The new hero took the old one's place; the old one left the game; the other candidates never existed.
@@ -69,6 +70,28 @@ describe("Helm of Secrecy (22090:A:2)", () => {
     expect(state.cards[blade.id]?.host).toBe(wanted);
     expect(state.cards[crownCard.id]?.zone).toBe("discard");
     expect(state.cards[helm.id]?.zone).toBe("discard");
+  });
+});
+
+describe("Helm of Secrecy, the hero it can change (rr.the-word-choose, rr.triggered-ability)", () => {
+  // The hero chosen must be one the effect can act on: with no token to discard and no hero of the collection at its Threat cost or less, a hero is not offered.
+  const offered = (tokens: boolean) => {
+    const table = seat(1, ["h1", "lo"]);
+    const [one, low] = table.heroes;
+    const helm = put(table.state, "22090", "hand");
+    // The fixture's heroes hold resources: the swap is read with none on the low hero, and then with some.
+    const state = updateCard(updateCard(helm.state, low ?? "", { resources: tokens ? 2 : 0 }), one ?? "", { resources: 0 });
+    const played = play(state, helm.id, ctx);
+    return { one, low, ids: choices(played), zones: choices(played).map((id) => played.cards[id]?.zone) };
+  };
+  it("takes the hero with a collection hero to swap in without asking when the other has no tokens: the next choice is a collection hero", () => {
+    const made = offered(false);
+    expect(made.zones.length).toBeGreaterThan(0);
+    expect(made.zones.every((zone) => zone === "setAside")).toBe(true);
+  });
+  it("offers the hero with tokens to discard too", () => {
+    const made = offered(true);
+    expect(made.ids.sort()).toEqual([made.one, made.low].sort());
   });
 });
 

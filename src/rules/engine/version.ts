@@ -192,7 +192,7 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 52, scenarios: ["into-ithilien", "assault-on-osgiliath", "the-siege-of-cair-andros"], note: "A Haradrim Elite that Southron Support adds to the staging area attacks at once, as its Forced effect says." },
   { version: 52, scenarios: ["the-wizards-quest"], note: "Bane of Amon Lanc makes the player it attacks discard cards when it destroys an ally, also when another player's Sentinel ally defended." },
   { version: 52, scenarios: ["the-morgul-vale"], note: "A Captain that cannot leave play unless destroyed stays where it is, with its damage, attachments and shadow cards, when an effect tries to move it out of play." },
-  { version: 52, scenarios: ["the-fate-of-numenor", "temple-of-the-deceived", "the-drowned-ruins"], note: "Only the player who controls an objective ally, like Calphon, can use its Action." },
+  { version: 52, scenarios: ["a-storm-on-cobas-haven", "conflict-at-the-carrock", "flight-of-the-stormcaller", "raid-on-the-grey-havens", "temple-of-the-deceived", "the-battle-of-five-armies", "the-blood-of-gondor", "the-city-of-corsairs", "the-drowned-ruins", "the-fate-of-numenor", "the-fords-of-isen", "the-road-to-isengard", "the-thing-in-the-depths"], note: "Only the player who controls an objective ally in his play area, like Calphon, can use its Action; one still in the staging area keeps the Action of any player." },
   { version: 52, scenarios: "all", note: "Hobbit-sense lasts this phase, as printed. Helm of Secrecy leaves a Permanent attachment behind. An attachment with no printed host can be played on another player's character. A card that returns to a hand or a deck is no longer exhausted and holds no tokens." },
   { version: 53, scenarios: "all", note: "A hero destroyed by damage that Song of Mocking sent to it counts as destroyed by the attack, and when Alcaron's Scroll also redirects the damage, the Song moves it first and the Scroll then sends it to its hero. A character that damage destroys outside an attack is heard as having taken that damage." },
   { version: 53, scenarios: "all", note: "Archery damage that an ally's death leaves undealt (The Drúadan Forest, An Untimely End) is assigned again by the players, and an enemy a Shadow or location effect returns to the staging area has a step in the log." },
@@ -201,9 +201,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 53, scenarios: "all", note: "The effects at the end of the round resolve while the table shows the End of round phase, not Beginning of round." },
   { version: 54, scenarios: ["the-siege-of-cair-andros"], note: "A quest stage that a Response removed from the quest deck is marked as removed, and the stage list names it so." },
   { version: 55, scenarios: "all", note: "Déorwine's printed Action cancels a shadow effect dealt to the attacking enemy in the action window after the defender is declared, before the shadow card is turned over; it is no longer a Response to the shadow effect." },
+  { version: 56, scenarios: "all", note: "Helm of Secrecy offers only a hero it can change: one with tokens to discard or a hero of the collection to swap in. Déorwine's Action is offered for a shadow card dealt face up too. An attachment an effect puts into play with no host filter and no Attach to line can go on a character of any player." },
 ];
 
-export const ENGINE_VERSION = 55;
+export const ENGINE_VERSION = 56;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

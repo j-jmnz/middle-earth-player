@@ -16,7 +16,7 @@ import { pickedList } from "../../interpret/player-verbs.ts";
 import { playerSource } from "../quest/threat.ts";
 
 import type { Focus } from "../index.ts";
-import { attachCollectionHero, swapHero, takeFromCollection } from "./collection.ts";
+import { attachCollectionHero, swapHero, collectionIdle, takeFromCollection } from "./collection.ts";
 import { attachAsMount } from "./mount.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -87,4 +87,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "misc", verbs: ["DrawEach", "MoveDamage", "ShuffleIntoEncounterDeck", "PayFromHero", "SwapHero", "AttachCollectionHero", "AddPhaseInstance", "TakeHeroFromCollection", "TakeCardFromCollection", "AttachAsMount", "LoseGame", "DiscardCanceled"], run };
+export const manifest: RulesFamily = { name: "misc", verbs: ["DrawEach", "MoveDamage", "ShuffleIntoEncounterDeck", "PayFromHero", "SwapHero", "AttachCollectionHero", "AddPhaseInstance", "TakeHeroFromCollection", "TakeCardFromCollection", "AttachAsMount", "LoseGame", "DiscardCanceled"], run, idle: collectionIdle };

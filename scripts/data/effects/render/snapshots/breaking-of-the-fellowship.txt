@@ -17,7 +17,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142061:B:2 (back): The players cannot advance while The Argonath is in play.
   142061:constant:1: Constant
     only if the card with code 142075 is in play
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 142062 The Company Divided
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -275,7 +275,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142073:A:3 (front): While Parth Galen is in play, the players cannot win the game.
   142073:constant:1: Constant
-    - the players cannot defeat the main quest stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat the main quest stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 142074 Seat of Seeing
 (the scenario deals it into the setAside pile; the piles place it, no record does)

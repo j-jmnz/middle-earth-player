@@ -26,7 +26,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51301:B:2 (back): This stage cannot be defeated while Dark Pit is in play.
   51301:constant:1: Constant
     only if any of: (the card with code 51310 is in play) or (a copy of the card with code 51310 was explored and the Forced effect that hears it has not finished (its explored event waits in the queue, or the record 51301:forced:1 is running))
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 51303 Search for an Exit
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -137,7 +137,7 @@ Scenario piles that place cards with no record (quest: 51301 Out of the Depths; 
 51308:B:3 (back): This stage cannot be defeated while Durin's Bane is in play. If the players defeat this stage, they win the game.
   51308:constant:3: Constant
     only if the card with code 51311 is in play
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
   51308:questResolution:1: Quest resolution
     - the players win the game
 

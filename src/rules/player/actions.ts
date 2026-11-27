@@ -40,7 +40,8 @@ function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, 
   // The campaign card next to the quest deck belongs to no player either, and its Action is any player's (11197:A:3, "Travel Action"); so is the Quest Action of a mode card (40002:B:1).
   // An objective ally a player controls is an ally under that player's control: only the controller uses its Action (rr.action, rr.objective-cards: "If a player claims an objective, then that player gains control of that objective").
   const printed = printedOf(ctx.cards, instance.code);
-  const controlledAlly = isAllyLike(printed) && instance.controller != null;
+  // A revealed card carries its revealing seat as controller, so "controlled" means in a player's play area, not a set controller.
+  const controlledAlly = isAllyLike(printed) && instance.zone === "play" && instance.controller != null;
   const shared = inPlay(instance.zone) && !controlledAlly && (SHARED_TYPES.has(printed.type) || instance.zone === "campaign" || instance.zone === "modeCard");
   // An Action used from the hand ("put ~ into play from your hand", effect.fromHand) is used there; any other in play.
   if (effect?.fromHand ? instance.zone !== "hand" : instance.zone !== "heroes" && instance.zone !== "play" && instance.zone !== "attached" && !shared) return undefined;

@@ -33,7 +33,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 
 09026:A:3 (front): The players cannot win while Amon Forn is in play.
   09026:constant:2: Constant
-    - the players cannot defeat the main quest stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat the main quest stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 09027 Weathered Hilltop
 (the scenario deals it into the staging pile; the piles place it, no record does)

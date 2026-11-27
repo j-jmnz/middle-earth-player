@@ -254,7 +254,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 
 01121:B:2 (back): The players must find and defeat Ungoliant's Spawn to win this game.
   01121:constant:1: Constant
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
   01121:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) named "Ungoliant's Spawn")
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
@@ -265,7 +265,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 01122:B:1 (back): Players cannot defeat this stage while Ungoliant's Spawn is in play. If players defeat this stage, they have won the game.
   01122:constant:1: Constant
     only if the card with code 01076 is in play
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 01129 Passage Through Mirkwood
 

@@ -104,7 +104,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 10015:B:3 (back): The players cannot defeat this stage while Pack Leader is in play. If Pack Leader is destroyed, the players win the game.
   10015:constant:2: Constant
     only if the card with code 10017 is in play
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
   10015:forced:2: Forced after an enemy is destroyed (heard about enemy (any player controls) named "Pack Leader")
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game

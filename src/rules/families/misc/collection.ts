@@ -7,6 +7,7 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { attachmentHostIds } from "../../player/attach.ts";
+import type { IdleHook } from "../../interpret/family-manifest.ts";
 import { askTarget } from "../../windows/choices.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -85,6 +86,29 @@ export function swapHero(state: ScenarioState, instruction: Verb<"SwapHero">, fo
   if (picked.asked || !picked.chosen) return picked.state;
   return swap(picked.state, hero, picked.chosen, seat, ctx, steps);
 }
+
+// Whether the instruction is the SwapHero of the hero the Pick before it chose (Helm of Secrecy).
+export function swapsPicked(instruction: Instruction | undefined): boolean {
+  return instruction?.verb === "SwapHero";
+}
+
+// Whether SwapHero can change the game for the hero: it holds tokens to discard, or a hero of the collection fits its threat cost. A hero with neither is not offered as the target, as no player is offered a target whose effect cannot happen
+// (rr.the-word-choose, rr.triggered-ability: an ability can be initiated only when its effect has the potential to change the game state).
+export function swappable(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
+  const hero = state.cards[id];
+  if (!hero) return false;
+  if (hero.damage || hero.resources || hero.progress) return true;
+  const threat = printedOf(ctx.cards, hero.code).threat ?? 0;
+  const inGame = titlesInPlay(state, ctx);
+  return collectionCodes(ctx, (printed) => (printed.threat ?? 0) <= threat && !inGame.has(printed.name)).length > 0;
+}
+
+// SwapHero changes nothing when no hero can be picked for it.
+export const collectionIdle: IdleHook = (state, instruction, _sourceId, frame, ctx) => {
+  if (instruction.verb !== "SwapHero") return null;
+  if (frame.picked == null) return false;
+  return frame.picked.every((id) => !swappable(state, id, ctx));
+};
 
 function swap(state: ScenarioState, oldId: string, newId: string, seat: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const old = state.cards[oldId];

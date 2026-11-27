@@ -23,7 +23,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 41002:B:2 (back): This stage cannot be defeated unless at least 1 copy of Goblin Trail is in the victory display.
   41002:constant:1: Constant
     only if the card with code 41014 is not in the victory display
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 41003 The Rearguard
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -38,7 +38,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 41003:B:1 (back): This stage cannot be defeated while Goblin Troop is in play. When this stage is defeated, the heroes discover the trail to the Goblins' secret lair and the players win the game.
   41003:constant:1: Constant
     only if the card with code 41019 is in play
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 41008 Spiders of Mirkwood
 (the scenario deals it into the encounter pile; the piles place it, no record does)

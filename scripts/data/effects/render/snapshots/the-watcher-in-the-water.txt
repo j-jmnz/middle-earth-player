@@ -50,7 +50,7 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 04064:B:2 (back): If the players have at least 3 victory points and defeat this stage, they have won the game.
   04064:constant:1: Constant
     only if the Victory points of the cards in the victory display added up (read live) is less than 3
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
   04064:constant:2: Constant
     (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
 
@@ -216,10 +216,10 @@ Scenario piles that place cards with no record (quest: 04063 To the West-door; q
 901501:A:4 (front): The players cannot win the game unless both Doors of Durin and The Watcher are in the victory display.
   901501:constant:2: Constant
     only if all of: (the card with code 04064 is in play) and (the card with code 04065 is not in the victory display)
-    - the players cannot defeat the main quest stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat the main quest stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
   901501:constant:3: Constant
     only if all of: (the card with code 04064 is in play) and (the card with code 04072 is not in the victory display)
-    - the players cannot defeat the main quest stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat the main quest stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 901501:B:1 (back): Begin with the standard quest deck and encounter deck for The Watcher in the Water scenario.
   (inert: the engine applies it by rule, no record)

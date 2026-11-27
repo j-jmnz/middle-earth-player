@@ -156,6 +156,15 @@ describe("Déorwine (12060:A:2)", () => {
     expect(triggers(run.state, tab)).not.toContain("12060:action:1");
   });
 
+  // A shadow card dealt face up (Silver Lamp, 07009) is pending as well, until its effect resolves.
+  it("12060:A:2 Déorwine: the Action is offered for a shadow card dealt face up", () => {
+    const { tab, run } = defended(EFFECTS, DEORWINE);
+    const shadowId = run.state.cards[idsOf(tab, RIDER)]?.shadowId ?? "";
+    expect(run.state.cards[shadowId]?.face).toBe("down");
+    const faceUp = { ...run.state, cards: { ...run.state.cards, [shadowId]: { ...run.state.cards[shadowId]!, face: "up" as const } } };
+    expect(triggers(faceUp, tab)).toContain("12060:action:1");
+  });
+
   // The shadow effect is resolved before the damage window: there is nothing left to cancel, so the Action is not offered there.
   it("12060:A:2 Déorwine: no Action once the shadow effect has resolved", () => {
     const { tab, run: pending } = defended(EFFECTS, DEORWINE);

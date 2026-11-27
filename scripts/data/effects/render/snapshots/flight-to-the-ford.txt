@@ -18,7 +18,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 141028:B:1 (back): The players cannot advance unless The Last Bridge is in the victory display.
   141028:constant:1: Constant
     only if the card with code 141058 is not in the victory display
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 141028:B:2 (back): Forced: At the end of the round, reduce the Ring-bearer's life by 1.
   141028:forced:1: Forced at the end of the round
@@ -331,7 +331,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 906301:A:2 (front): The players cannot win while Ford of Bruinen is in play.
   906301:constant:1: Constant
     only if all of: (the card with code 906303 is in play) and (the card with code 141029 is in play)
-    - the players cannot defeat the main quest stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat the main quest stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 906301:B:1 (back): Begin with the standard quest deck and encounter deck for the Flight to the Ford scenario.
   (inert: the engine applies it by rule, no record)

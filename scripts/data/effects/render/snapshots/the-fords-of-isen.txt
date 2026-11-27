@@ -259,7 +259,7 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
   07059:constant:2: Constant
     only if not (the actor controls the card with code 07016)
     who acts: the acting player is the first player (a quest stage belongs to no player; while the stages are split between the players, the player whose stage it is)
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 07060 Dunlending Attack
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -310,7 +310,7 @@ Scenario piles that place cards with no record (quest: 07059 Fight at the Fords;
   07061:constant:2: Constant
     only if there is enemy in play (in the staging area or engaged)
     note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
   07061:questResolution:1: Quest resolution
     - the players win the game
 

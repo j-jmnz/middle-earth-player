@@ -187,7 +187,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 12121:B:3 (back): You cannot advance while at least 1 objective is guarded by an encounter.
   12121:constant:2: Constant
     only if the number of objective (any player controls) in the staging area only, that has an encounter card attached as its guard is at least 1
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 12122 Break Through the Fleet!
 (the scenario deals it into the quest pile; the piles place it, no record does)

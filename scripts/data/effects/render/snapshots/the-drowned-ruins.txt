@@ -94,7 +94,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 12092:B:3 (back): You cannot advance unless there are at least 3 Underwater locations in the victory display.
   12092:constant:2: Constant
     only if the number of Underwater card (any player controls) in the victory display is at most 2
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 12093 Sahír's Betrayal
 (the scenario deals it into the quest pile; the piles place it, no record does)

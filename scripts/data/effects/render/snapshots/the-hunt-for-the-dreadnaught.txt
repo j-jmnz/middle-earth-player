@@ -129,7 +129,7 @@ Scenario piles that place cards with no record (quest: 40004 Searching the High 
 40004:B:3 (back): The players can only advance at the end of the quest phase.
   40004:constant:3: Constant
     only if not (the Quest phase has just ended)
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 40005 Destroy the Dreadnaught
 (the scenario deals it into the quest pile; the piles place it, no record does)

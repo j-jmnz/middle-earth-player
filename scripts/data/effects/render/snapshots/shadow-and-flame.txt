@@ -42,7 +42,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
 04140:B:2 (back): Players cannot win the game while Durin's Bane is in play. If Durin's Bane leaves play by the effect on Dark Pit, the players have won the game.
   04140:constant:1: Constant
     only if the card with code 04150 is in play
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
   04140:constant:2: Constant
     only if the card with code 04150 is not in play
     - the players win the game

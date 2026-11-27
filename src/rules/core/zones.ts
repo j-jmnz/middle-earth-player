@@ -2,7 +2,7 @@
 import type { CardFace, CardInstance, ScenarioState, ZoneName } from "./state.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { leaveWith } from "../families/play/zones.ts";
-import { heldInHand } from "../families/ring-maker/hand.ts";
+import { heldInHand, keptInPlay } from "../families/pelargir/vale/cannot-leave.ts";
 import { endLastingOn } from "./lasting.ts";
 import { releaseOrcGuard } from "../families/dungeon/guard.ts";
 import { dealtFace } from "../families/dreamchaser/facts.ts";
@@ -369,7 +369,7 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   // A card that cannot leave the staging area stays in it, whatever moves it (Uglúk, 143069:B:2).
   if (current.zone === "staging" && dest.zone !== "staging" && flagged(state, id, "cannotLeaveStaging") && !supersedes && !(defeated && flagged(state, id, "leavesStagingWhenDefeated"))) return state;
   // A card that cannot leave play unless destroyed stays where it is, with its damage, tokens, attachments and shadow cards, whatever else moves it out of play (families/pelargir/vale/cannot-leave.ts).
-  if (!destroyed && !defeated && inPlay(current.zone) && !inPlay(dest.zone) && state.modifiers.length > 0 && flagged(state, id, "cannotLeaveUnlessDestroyed")) return state;
+  if (!destroyed && !defeated && inPlay(current.zone) && !inPlay(dest.zone) && keptInPlay(state, id)) return state;
   // A card that cannot leave the hand stays in it, whatever moves it (Ill Tidings, 07023:A:1).
   if (current.zone === "hand" && heldInHand(state, id)) return state;
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";

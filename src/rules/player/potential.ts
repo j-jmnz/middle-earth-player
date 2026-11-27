@@ -35,6 +35,7 @@ import { deckPool } from "../families/uncharted/pick.ts";
 import { aboutCard } from "../windows/listen.ts";
 import { placesPicked } from "../families/pelargir/progress-bar.ts";
 import { leavesPlayPicked } from "../families/pelargir/vale/cannot-leave.ts";
+import { swapsPicked } from "../families/misc/collection.ts";
 import { spendsLockedHost, spendsPicked } from "../families/pelargir/spending.ts";
 import { allIdle } from "./idle.ts";
 import { readsEffect } from "./idle-reads.ts";
@@ -70,7 +71,7 @@ export function noTargetReason(state: ScenarioState, instructions: readonly Inst
       continue;
     }
     if (instruction.verb !== "Pick" || searchOrLaterPick(instruction.pick, instruction.when)) continue;
-    if (pickCandidates(state, instruction.pick, seat, [], cardId, ctx, undefined, undefined, false, { spends: spendsPicked(instructions[index + 1]), places: placesPicked(instructions[index + 1]), leaves: leavesPlayPicked(instructions.slice(index + 1)) }).length === 0) return NO_TARGET;
+    if (pickCandidates(state, instruction.pick, seat, [], cardId, ctx, undefined, undefined, false, { spends: spendsPicked(instructions[index + 1]), places: placesPicked(instructions[index + 1]), leaves: leavesPlayPicked(instructions.slice(index + 1)), swaps: swapsPicked(instructions[index + 1]) }).length === 0) return NO_TARGET;
   }
   return null;
 }
@@ -129,7 +130,7 @@ export function noChangeReason(state: ScenarioState, effect: Effect, sourceId: s
   // A search of a deck with no card in it finds nothing and shuffles nothing; with cards in it, it may find none and still shuffle (rr.search).
   if (pick.from === "deck" && !pick.looked) return seatsOf(state, pick, seat).every((index) => deckPool(state, index, pick).length === 0) ? NO_TARGET : null;
   if (searchOrLaterPick(pick, first.when)) return null;
-  const found = pickCandidates(state, pick, seat, [], sourceId, ctx, event?.amount, event?.participants, false, { ...(event ? { subject: about ?? null, other: event.other ?? null } : {}), spends: spendsPicked(steps[1]), places: placesPicked(steps[1]), leaves: leavesPlayPicked(steps.slice(1)) });
+  const found = pickCandidates(state, pick, seat, [], sourceId, ctx, event?.amount, event?.participants, false, { ...(event ? { subject: about ?? null, other: event.other ?? null } : {}), spends: spendsPicked(steps[1]), places: placesPicked(steps[1]), leaves: leavesPlayPicked(steps.slice(1)), swaps: swapsPicked(steps[1]) });
   if (found.length === 0) return NO_TARGET;
   const idle = pickedStepsIdle(state, steps, found, sourceId, seat, ctx) || allIdle(state, steps, sourceId, seat, ctx, scope, { eventSeat: event?.seat ?? undefined });
   return idle ? IDLE : null;

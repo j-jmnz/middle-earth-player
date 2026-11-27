@@ -339,7 +339,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
   09074:constant:2: Constant
     only if the card with code 09033 in play has damage below its hit points (any hit points remaining)
     note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
-    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, and it is defeated at once when this stops holding: faq.progress-without-advancing)
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
   09074:questResolution:1: Quest resolution
     - the players win the game
 
