@@ -66,7 +66,7 @@ describe("Boarding's beat", () => {
     const state = { ...built.state, corsairDeck: [], corsairDiscard: [] };
     // Only the engine's own mark (`boarding`, the ship whose keyword revealed it) joins an engagement to a ship's beat.
     const other = momentOf(state, state, [{ kind: "engage", seat: 0, enemyId: built.ids.galley! }, { kind: "engage", seat: 0, enemyId: built.ids.pirate! }], names);
-    expect(other?.lines.map((line) => line.text)).toEqual(["Engaged with you", "Pirate engages", "Engaged with you"]);
+    expect(other?.lines.map((line) => line.text)).toEqual(["Galley engages you", "Pirate engages you"]);
     expect(other?.lines.some((line) => line.text.startsWith("Boarding"))).toBe(false);
     const boarded = momentOf(state, state, [{ kind: "engage", seat: 0, enemyId: built.ids.galley! }, { kind: "engage", seat: 0, enemyId: built.ids.pirate!, boarding: built.ids.galley! }], names);
     expect(boarded?.lines.map((line) => line.text)).toContain("Boarding 1 · Galley: 1 Corsair engages you");
