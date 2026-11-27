@@ -348,6 +348,9 @@ export type ScenarioState = {
   // saw, so an instance of the phase in progress ends like any other phase. Absent in every game with no additional instance.
   phaseSeq?: number;
   boundarySeq?: number;
+  // The lasting effects (modifiers) that expired as a phase or round ended, until the Forced effects of that end have been collected: "until the end of the phase" holds through the phase's own end-of-phase Forced
+  // effects (docs/scenarios/haradrim/beneath-the-sands.md, Lost Underground). enterMode sets it, crossBoundary reads and clears it; absent in every settled state.
+  lapsedModifiers?: readonly Modifier[];
   // The seats that have had their travel opportunity this round while stages are separate: each seat in player order may travel to a location of its own
   // staging area (machine.ts, travel.ts).
   travelDone?: readonly number[];

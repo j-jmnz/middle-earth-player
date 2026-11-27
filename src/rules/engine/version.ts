@@ -204,9 +204,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 56, scenarios: "all", note: "Helm of Secrecy offers only a hero it can change: one with tokens to discard or a hero of the collection to swap in. Déorwine's Action is offered for a shadow card dealt face up too. An attachment an effect puts into play with no host filter and no Attach to line can go on a character of any player." },
   { version: 57, scenarios: ["desert-crossing", "beneath-the-sands", "the-crossings-of-poros"], note: "The Giant Scorpion's Shadow effect keeps a character from readying only when a defending character takes damage: an undefended attack has no defending character, so the hero it hits can ready." },
   { version: 58, scenarios: "all", note: "An enemy that its own Shadow effect puts into play engaged with the defending player, like Spider Broodling, Uruk Pursuer and Ungoliant's Swarm, makes no attack in that combat phase." },
+  { version: 59, scenarios: "all", note: "A lasting effect that lasts until the end of the phase or round holds while the Forced effects at that end are collected, so after Lost Underground is defeated On Track does not flip back to Off Track at the end of the quest phase." },
 ];
 
-export const ENGINE_VERSION = 58;
+export const ENGINE_VERSION = 59;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

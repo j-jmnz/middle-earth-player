@@ -137,8 +137,16 @@ export function crossBoundary(state: ScenarioState, ctx: ReduceContext, steps: E
   // The frames the refresh phase's first player token pass pushed (Gollum follows the token, rr.step-7-4) resolve before the phase's end (rr.step-7-5).
   if (state.boundaryPhase === "Refresh" && state.stack.length > 0) return state;
   const ended = state.boundaryPhase;
-  let next: ScenarioState = { ...state, boundaryPhase: state.phase, ...(instance > 0 ? { boundarySeq: instance } : {}) };
+  const { lapsedModifiers, ...settled } = state;
+  let next: ScenarioState = { ...settled, boundaryPhase: state.phase, ...(instance > 0 ? { boundarySeq: instance } : {}) };
   if (ctx.effects.length === 0 && next.delayed.length === 0) return next;
+  // The Forced effects of the end of a phase or round are collected while the lasting effects that ended with it still hold ("until the end of the phase" includes that phase's own end).
+  const lapsed = lapsedModifiers ?? [];
+  const forcedAtEnd = (current: ScenarioState, event: GameEvent): ScenarioState => {
+    if (lapsed.length === 0) return fireForced(current, event, ctx, steps);
+    const fired = fireForced({ ...current, modifiers: [...current.modifiers, ...lapsed] }, event, ctx, steps);
+    return { ...fired, modifiers: fired.modifiers.filter((modifier) => !lapsed.includes(modifier)) };
+  };
   next = pushDue(next, ended, "endOfRound", steps);
   next = pushDue(next, ended, "endOfPhase", steps);
   // The effects delayed to the beginning of the travel phase (148004:B:2) come due as it begins.
@@ -153,9 +161,9 @@ export function crossBoundary(state: ScenarioState, ctx: ReduceContext, steps: E
     // The Responses to the end of the round are offered once its Forced effects have resolved ("Response: At the end of each round, place 1
     // resource token here", 41050:A:3): their frame goes under the Forced ones.
     const event = { trigger: "endOfRound", seat: null, phase: ended } as const;
-    next = fireForced(offerResponses(next, event, ctx, steps), event, ctx, steps);
+    next = forcedAtEnd(offerResponses(next, event, ctx, steps), event);
   }
-  const fired = fireForced(next, { trigger: "endOfPhase", seat: null, phase: ended }, ctx, steps);
+  const fired = forcedAtEnd(next, { trigger: "endOfPhase", seat: null, phase: ended });
   // The effects of the end of the round resolve while the table is still in the End of round phase; the beginning of the round shows again once they are done (machine.ts, beginRound).
   return ended === "End of round" && fired.stack.length > state.stack.length && state.mode === "beginRound" ? { ...fired, phase: "End of round", boundaryPhase: "End of round" } : fired;
 }
