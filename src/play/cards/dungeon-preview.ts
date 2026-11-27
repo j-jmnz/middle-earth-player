@@ -24,6 +24,7 @@ import { keptDetail } from "../readouts/standalone-scenarios/wizards-quest.ts";
 import { angmarDetail } from "./angmar-preview.ts";
 import { ringMakerDetail } from "./ring-maker/preview.ts";
 import { barrowDetail } from "../readouts/standalone-scenarios/barrow-downs.ts";
+import { capturedDetail } from "../readouts/haradrim/captured.ts";
 import { objectiveDetail, stagedDetail } from "../readouts/haradrim/staged.ts";
 import { stageXDetail } from "../readouts/stage-number/stage-x.ts";
 import { ungolDetail } from "./ungol-preview.ts";
@@ -115,7 +116,7 @@ function ownDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name
   const kept = keptDetail(game, cardId, name);
   if (kept) return kept;
   // The heroes in the staging area, the heroes an Orc guards and the objective-heroes (The Long Arm of Mordor) are told before the Captives' words, which would call them Captives of The Uruk-hai.
-  const staged = stagedDetail(game, cardId, name) ?? objectiveDetail(game, ctx, cardId) ?? mumakDetail(game, ctx, cardId) ?? serpentLine(game, ctx, cardId, name);
+  const staged = stagedDetail(game, cardId, name) ?? capturedDetail(game, cardId, name) ?? objectiveDetail(game, ctx, cardId) ?? mumakDetail(game, ctx, cardId) ?? serpentLine(game, ctx, cardId, name);
   if (staged) return staged;
   const captive = captiveDetail(game, ctx, card, name);
   if (captive) return captive;

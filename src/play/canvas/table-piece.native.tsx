@@ -121,6 +121,7 @@ function drawOverlay(p: PieceProps) {
         {slot.kind === "card" && slot.faceDown && slot.dead ? <HeldMark rect={rect} icon="threat" t={t} s={s} /> : null}
         {slot.stack != null ? <StackMark slot={slot} fonts={fonts} t={t} s={s} /> : null}
         {slot.kind === "attachment" && !slot.faceDown ? <BandName slot={slot} name={p.name} fonts={fonts} t={t} s={s} /> : null}
+        {p.stripChip ? <SeatChipView rect={rect} text={p.stripChip} fonts={fonts} t={t} s={s} /> : null}
       </Group>
       {slot.success != null && slot.success > 0 ? <SuccessMedallion slot={slot} fonts={fonts} t={t} s={s} /> : null}
       {slot.kind === "card" ? <PickRing rect={rect} picked={p.picked} share={p.share} dimmed={veiled} fonts={fonts} t={t} s={s} /> : null}

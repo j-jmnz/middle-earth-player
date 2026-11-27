@@ -54,7 +54,7 @@ import { sailingSheet, shipRow } from "./sea-sheets.ts";
 import { asksCollection, collectionLabel, collectionOrder } from "./collection-sheets.ts";
 import { answeredCard, hideCommitNote, hideNumbers, lookNote, optionalEngageNote, responseNote } from "./sheet-notes.ts";
 import { orcsLabel } from "./orcs-label.ts";
-import { captiveLabel, cardLabel, copyLabel, has, option, seatedLabel, stagedAllyLabel, statOf, step, tiedLabel } from "./sheet-parts.ts";
+import { captiveLabel, cardLabel, copyLabel, has, option, seatedLabel, stagedAllyLabel, statOf, statsOf, step, tiedLabel } from "./sheet-parts.ts";
 import { sackStat } from "./sack-rows.ts";
 import { nightActionNote } from "../words/scenarios/night.ts";
 import { framsburgActionCaution, framsburgActionNote } from "../words/scenarios/framsburg.ts";
@@ -363,7 +363,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const label = (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? crown?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? stagedAllyLabel(game, ctx, names, id, window.options) ?? seatedLabel(game, ctx, names, id, window.options) ?? orcsLabel(game, names, id, window.options) ?? tiedLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay || zoned ? outOfPlayLabel(game, id, words) : plainLabel);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
-          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction) || isBoonCode(wait.item.instruction, id)) ? { code: id } : {}), ...(willpower.length > 0 || eyes.length > 0 || tied.length > 0 ? { stats: [...willpower, ...eyes, ...tied] } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };
+          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction) || isBoonCode(wait.item.instruction, id)) ? { code: id } : {}), ...statsOf(game, ctx, id, asked.rowStats, willpower, eyes, tied), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };
         }),
       };
     }

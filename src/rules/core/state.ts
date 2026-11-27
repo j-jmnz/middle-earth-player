@@ -222,6 +222,11 @@ export function heldHero(card: CardInstance): boolean {
   return (card.guardedHero === true || card.captive === true) && card.zone === "captive";
 }
 
+/** The zones whose cards can hold a Captive: an enemy in the staging area or engaged, a location active or in the staging area. The leaving of such a card is announced (core/zones.ts) and the table draws what it holds under it (play/store/selectors.ts). */
+export function hostsCaptives(zone: ZoneName): boolean {
+  return zone === "engaged" || zone === "staging" || zone === "activeLocation" || zone === "secondActiveLocation";
+}
+
 // The choices among cards a player picks from. Copies of one card in a deck, a hand or a pile are the same choice, so only the
 // first is offered. A card in play is its own choice, as copies there differ (which one is attacking, its damage, its
 // attachments, whose area it is in): two engaged Black Riders are two choices for Mr. Underhill (141017:A:3).

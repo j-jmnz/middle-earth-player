@@ -19,9 +19,9 @@ import { campaignPath, nextStep, openNode } from "./path.ts";
 import { choiceSentence, promptSentence, resolutionView, settledSentence } from "./resolution-view.ts";
 import { contextOf, finish, resume } from "./session.ts";
 import { finishStandalone, resumeStandalone, standaloneBriefing } from "./standalone.ts";
-import { lossReasonWords } from "../rules/core/elimination-words.ts";
 import { reduce } from "../rules/engine/reduce.ts";
 import { askingToCommit } from "../rules/families/sea/sailing-legal.ts";
+import { lossText } from "../rules/core/elimination-words.ts";
 
 // The fixtures (src/campaign/fixtures/*.json) are real games of saved deck cards: a briefing would deal each
 // loadout, the reducer replays each to its moment, and the A Knife in the Dark one starts from the log scenario 1's won
@@ -119,7 +119,7 @@ describe("Save fixtures", () => {
     const resumed = resume(save, world);
     expect(resumed.ok && resumed.state.lost).toBe(true);
     if (!resumed.ok) return;
-    expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: lossReasonWords(resumed.state.lossReason) });
+    expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: lossText(resumed.state.lossReason) });
     const after = finish(save, world, resumed.state);
     expect(after.log).toEqual(save.log);
     expect(after.active).toBeNull();
@@ -171,7 +171,7 @@ describe("Save fixtures", () => {
     const world = worldFor("lost");
     const resumed = resume(fixtureSave("lost", "s", CATALOG_VERSION), world);
     expect(resumed.ok && resumed.state.lost).toBe(true);
-    if (resumed.ok) expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: lossReasonWords(resumed.state.lossReason) });
+    if (resumed.ok) expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: lossText(resumed.state.lossReason) });
   });
 });
 
@@ -245,7 +245,7 @@ describe("Voyage Across Belegaer (Dream-chaser part 1, phase 40)", () => {
     const resumed = resume(save, world);
     expect(resumed.ok && resumed.state.lost).toBe(true);
     if (!resumed.ok) return;
-    expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: lossReasonWords(resumed.state.lossReason) });
+    expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: lossText(resumed.state.lossReason) });
     const after = finish(save, world, resumed.state);
     expect(after.log).toEqual(save.log);
     expect(after.active).toBeNull();

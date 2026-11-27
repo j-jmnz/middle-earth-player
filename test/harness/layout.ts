@@ -94,8 +94,8 @@ export type Layout = {
   exhaustedCards?: readonly string[];
   // The pursuit value of The Uruk-hai, as its quest card's Setup set it (mec112.pursuit); absent: no tracker.
   pursuit?: number;
-  // A hero stand-in lies faceup as a Captive under the card with the code `under` (The Uruk-hai, 143069:A:1).
-  captive?: { hero: string; under: string };
+  // A hero stand-in lies faceup as a Captive under the card with the code `under` (The Uruk-hai, 143069:A:1); a list holds one for each (the allies and Abaan under the cards of The Dungeons of Cirith Gurat: the card named is the character).
+  captive?: { hero: string; under: string } | readonly { hero: string; under: string }[];
   // Hero stand-ins held as The Long Arm of Mordor leaves them (16071:A:1, 16073:A:1): with no `under`, a hero in the staging area (a Captive no card holds); with `under`, a hero the enemy with that code guards.
   staged?: readonly { hero: string; under?: string }[];
   // Cards lying facedown under the first card with the code `to` (the enemies under The Black Gate, 144027:A:2); `up` lays one faceup (the enemy under Narrow Alleyway, 16016:A:1).
@@ -281,7 +281,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     const placed = holdCaptive(state, idOf(state, held.hero), held.under ? idOf(state, held.under) : null);
     state = held.under ? updateCard(placed, idOf(placed, held.hero), { guardedHero: true }) : placed;
   }
-  if (layout.captive) state = holdCaptive(state, idOf(state, layout.captive.hero), idOf(state, layout.captive.under));
+  for (const held of layout.captive ? [layout.captive].flat() : []) state = holdCaptive(state, idOf(state, held.hero), idOf(state, held.under));
   if (layout.pursuit != null) state = { ...state, pursuit: layout.pursuit };
   for (const code of layout.exhaustedCards ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { exhausted: true });
   if (layout.timeCounters != null && state.questStage) state = updateCard(state, state.questStage, { resources: layout.timeCounters });

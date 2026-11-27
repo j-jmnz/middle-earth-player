@@ -8,7 +8,7 @@ import { settle } from "../engine/machine.ts";
 import { MUMAK, raceTable } from "../families/haradrim/race-kit.ts";
 import { opened, run as runInstruction, tableFromLayout } from "../../../test/harness/scene-kit.ts";
 
-import { defeatSentence, eliminationWords, lossReasonWords, lossWithCauses } from "./elimination-words.ts";
+import { defeatSentence, eliminationWords, lossText, lossWithCauses } from "./elimination-words.ts";
 
 const lost = (seats: { threat: number; heroes: number; eliminated: boolean }[]): ScenarioState => {
   const made = tableFromLayout("beneath-the-sands", { seats: 2 });
@@ -75,12 +75,11 @@ describe("the cause of an elimination the engine made", () => {
     expect(done.seats[0]?.eliminated).toBe(true);
     expect(eliminationWords(done, 0, (seat) => destroyed(steps)(seat, state))).toBe("Player 1's last hero was destroyed.");
   });
-});
 
-describe("the loss reason a player reads", () => {
-  it("rr.player-elimination says every player is eliminated for the engine's no-seats reason and leaves any other as it is", () => {
-    expect(lossReasonWords("No seats remain")).toBe("Every player is eliminated");
-    expect(lossReasonWords("Iârion left play")).toBe("Iârion left play");
-    expect(lossReasonWords(null)).toBeNull();
+  it("rr.player-elimination the screens say \"Every player is eliminated\" for the engine's \"No seats remain\", whatever follows it, and nothing else", () => {
+    expect(lossText("No seats remain")).toBe("Every player is eliminated");
+    expect(lossText("No seats remain. Player 1's threat reached 50.")).toBe("Every player is eliminated. Player 1's threat reached 50.");
+    expect(lossText("The One Ring left play")).toBe("The One Ring left play");
+    expect(lossText(null)).toBeNull();
   });
 });

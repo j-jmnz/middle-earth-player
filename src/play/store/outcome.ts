@@ -301,6 +301,7 @@ export function momentsOf(before: ScenarioState, after: ScenarioState, steps: re
         return;
       case "attachDrawn":
       case "claim":
+      case "captive":
         staging(attachedWords(step, names.card, after.seatCount), [step.cardId, step.kind === "claim" ? step.heroId : step.hostId]);
         return;
       // The enemies grappled with a location that became the active location or was explored come out from under it, faceup, into the staging area (dcce.grapple).

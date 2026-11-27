@@ -4,7 +4,7 @@ import { attackingHolds } from "../../families/attack/strike.ts";
 import { defendingAgainst } from "../../families/angmar/combat.ts";
 import { inAreaOf } from "../../families/breaking/areas.ts";
 import { encounterUncancelable } from "../../families/encounter/cancel.ts";
-import { flagged } from "../../core/state.ts";
+import { flagged, livingSeats } from "../../core/state.ts";
 import { hasShadowEffect } from "../../families/defense/shadow.ts";
 import { combatStepIs } from "../../families/defense/conditions.ts";
 import { engagedThisPhase } from "../../families/quest/conditions.ts";
@@ -51,7 +51,7 @@ export const combatHandlers = {
     const id = scope.holderId ?? (condition.card === "host" ? hostOf(state, scope.sourceId) : condition.card === "subject" ? scope.subject : scope.sourceId);
     return attackingHolds(state, condition, id ? state.cards[id] : undefined, ctx, scope.against);
   },
-  engagedThisRound: (state, condition, scope) => engagedThisRound(state, scope.actor) === condition.is,
+  engagedThisRound: (state, condition, scope) => (condition.anySeat === true ? livingSeats(state).some((seat) => engagedThisRound(state, seat)) : engagedThisRound(state, scope.actor)) === condition.is,
   engagedThisPhase: (state, condition) => engagedThisPhase(state) === condition.is,
   // The combat step a card may be played in (09008, 02118, 143012).
   combatStep: (state, condition) => combatStepIs(state, condition.is),

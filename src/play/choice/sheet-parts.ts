@@ -2,6 +2,7 @@
 // whether an intent type is legal now.
 import type { LegalIntent, ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
+import { engagementCostOf } from "../../rules/quest/quest.ts";
 import { isReanimatedCode, printedOf } from "../../rules/core/printed.ts";
 import { inPlay, type CardInstance } from "../../rules/core/state.ts";
 
@@ -22,6 +23,20 @@ const STAT_WORDS: Record<StatName, string> = { willpower: "Willpower", attack: "
 export function statOf(game: ScenarioState, ctx: ReduceContext, id: string, stat: StatName): SheetStat[] {
   const card = game.cards[id];
   return card ? [{ icon: stat, value: modifiedStat(game, card, stat, ctx.cards), word: STAT_WORDS[stat] }] : [];
+}
+
+/** The stats an asks entry's `rowStats` puts on each row of its pick: the Threat and the engagement cost of an enemy the players choose among (17132:A:1), each as the engine reads it now. */
+export function rowStats(game: ScenarioState, ctx: ReduceContext, id: string, kinds: readonly ("threat" | "engagementCost")[] | undefined): SheetStat[] {
+  const card = game.cards[id];
+  if (!kinds || !card) return [];
+  const cost = engagementCostOf(game, card, ctx.cards);
+  return kinds.flatMap((kind): SheetStat[] => (kind === "threat" ? statOf(game, ctx, id, "threat") : cost == null ? [] : [{ icon: "engagementCost", value: cost, word: "Engagement cost" }]));
+}
+
+/** The stats a row of a pick shows, as a sheet option takes them (`{ stats }`, none for none): the lists the row already has (a Willpower, the Eye icons, a Sack tie) and then the enemy stats its entry's `rowStats` names. */
+export function statsOf(game: ScenarioState, ctx: ReduceContext, id: string, kinds: readonly ("threat" | "engagementCost")[] | undefined, ...lists: readonly (readonly SheetStat[])[]): { stats?: SheetStat[] } {
+  const stats = [...lists.flat(), ...rowStats(game, ctx, id, kinds)];
+  return stats.length > 0 ? { stats } : {};
 }
 
 /** A card's name as a tile or row reads it; a Lost Island's is followed by what tells it from the others (progress, place in staging). */

@@ -24,7 +24,7 @@ import { writeStandalone } from "../../../data/standalone-store";
 
 export default function StandaloneOutcome() {
   const router = useRouter();
-  const { size } = useSizeClass();
+  const { size, short } = useSizeClass();
   const params = useLocalSearchParams<{ gameId: string }>();
   const gameId = routeCode(params.gameId);
   const { user } = useDatabases();
@@ -83,7 +83,7 @@ export default function StandaloneOutcome() {
         <Label className="mt-2 text-center">Lower score is better.</Label>
       </View>
     ) : (
-      <View className="mt-6 gap-1" testID="outcome-lines">
+      <View className={short ? "mt-2 gap-1" : "mt-6 gap-1"} testID="outcome-lines">
         {outcomeLines(result, counts ?? report?.lossReason).map((line) => (
           <BodyText key={line} tone="muted" className="text-center">
             {line}

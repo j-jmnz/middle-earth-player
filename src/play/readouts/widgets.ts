@@ -5,6 +5,7 @@ import { useMemo } from "react";
 
 import type { Effect } from "../../catalog/boundary.ts";
 import { captivesOf } from "../../rules/families/captives/values.ts";
+import { isHeldCharacter } from "./haradrim/captured.ts";
 import { stagedDial } from "./haradrim/staged.ts";
 import { stageOf } from "../../rules/families/breaking/areas.ts";
 import type { ScenarioState } from "../../rules/engine/reduce.ts";
@@ -53,7 +54,7 @@ export function ringWords(readout: LocationReadout | null, nameOf: (code: string
 
 // The seat whose dial says it holds something facedown, what the dial says and which mark it wears: the Ring-bearer under the Watcher (a Ring
 // mark, mec109.stage-4), or the hero that is the prisoner of Escape from Dol Guldur (a hero mark, 01123:B:1), or a hero an enemy holds in Carried Away (18074:A:1, the same mark). A hero is never two of these.
-export type HeldDial = { seat: number; words: string; mark: "oneRing" | "hero" };
+export type HeldDial = { seat: number; words: string; mark: "oneRing" | "hero" | "ally" };
 
 export function heldDial(game: ScenarioState, nameOf: (code: string) => string): HeldDial | null {
   return heldDialList(game, nameOf)[0] ?? null;
@@ -90,7 +91,8 @@ export function heldDials(game: ScenarioState, nameOf: (code: string) => string,
     const host = card.host ? game.cards[card.host] : undefined;
     const words = stagedDial(game, card, nameOf) ?? `${nameOf(card.code)} is a Captive${host ? ` ${isEnemy(host.code) ? "held by" : "under"} ${nameOf(host.code)}` : ""}`;
     const before = dials.get(card.owner);
-    dials.set(card.owner, { seat: card.owner, words: before ? `${before.words}. ${words}` : words, mark: before?.mark ?? "hero" });
+    // An ally an enemy holds wears the ally mark and says its words on the dial; a hero wears the hero mark. A seat that holds several wears the mark of the one held last, whose words come last.
+    dials.set(card.owner, { seat: card.owner, words: before ? `${before.words}. ${words}` : words, mark: isHeldCharacter(card) ? "ally" : "hero" });
   }
   for (const gollum of [...gollumHeld(game), ...guardianHeld(game)]) {
     const before = dials.get(gollum.seat);

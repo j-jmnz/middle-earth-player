@@ -4,6 +4,7 @@ import { threatSaved } from "../families/quest/threat.ts";
 import { GOLLUM, SMEAGOL, isGollum } from "../families/gollum/index.ts";
 import { DIRE_ELIMINATION_LEVEL } from "../families/black-gate/dire.ts";
 import { heroWaiting } from "../families/deck/hero.ts";
+import { seatThreat } from "../families/play/hooks.ts";
 import { discardArea } from "../families/breaking/areas.ts";
 import { discardIsolated } from "../families/breaking/barrow.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
@@ -144,6 +145,11 @@ export function eliminationLevel(state: ScenarioState, seat: number): number {
   return (state.dire ? DIRE_ELIMINATION_LEVEL : ELIMINATION_LEVEL) - Math.max(0, heldAmount(state, `seat:${seat}`, "eliminationReduction"));
 }
 
+/** Whether a living seat would reach its elimination level if its threat rose by `raise`: the one read the words of a raise and the condition `raiseEliminates` share. */
+export function raiseEliminates(state: ScenarioState, seat: number, raise: number): boolean {
+  return livingSeats(state).includes(seat) && seatThreat(state, seat) + raise >= eliminationLevel(state, seat);
+}
+
 // `final`: the play sweep has already let an ally gain the hero card type, so a seat in heroSavers with no heroes is eliminated now.
 export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], final = false): ScenarioState {
   let next = state;
@@ -152,8 +158,8 @@ export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], fina
     if (!seat || seat.eliminated) continue;
     const level = eliminationLevel(next, index);
     if (!final && seat.threat < level && seat.heroes.length === 0 && (state.heroSavers ?? []).includes(index)) continue;
-    // A hero an enemy guards is in play, not killed (Carried Away, 18074:B:1; rr.player-elimination): its owner is not out of heroes while it is held.
-    const held = seat.threat < level && seat.heroes.length === 0 && Object.values(next.cards).some((card) => heldHero(card) && card.owner === index);
+    // A hero an enemy guards is in play, not killed (Carried Away, 18074:B:1; rr.player-elimination): its owner is not out of heroes while it is held (a held ally is no hero: it has neither `guardedHero` nor `heroSlot`).
+    const held = seat.threat < level && seat.heroes.length === 0 && Object.values(next.cards).some((card) => heldHero(card) && (card.guardedHero === true || card.heroSlot != null) && card.owner === index);
     if (held) continue;
     // A hero in a captured deck or under a card is not killed (rr.player-elimination): a seat whose last hero in play left play stays in the game while one of its heroes is captured (families/captured/).
     const captured = seat.threat < level && seat.heroes.length === 0 && next.capture != null && Object.values(next.cards).some((card) => card.zone === "captured" && card.heroSlot != null && card.owner === index);

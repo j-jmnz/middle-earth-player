@@ -28,7 +28,8 @@ export function holdUnder(state: ScenarioState, instruction: Verb<"HoldUnder">, 
 export function releaseHeldOnDefeat(state: ScenarioState, questId: string): ScenarioState {
   const heldId = captiveUnder(state, questId);
   const held = heldId ? state.cards[heldId] : undefined;
-  if (!heldId || !held) return state;
+  // A Captive of Cirith Gurat is its owner's and is rescued by the side quest's own record (families/haradrim/captured.ts).
+  if (!heldId || !held || held.captive === true) return state;
   const seat = state.firstPlayer;
   const next = releaseHero(state, heldId, seat, { face: "up", exhausted: true }, {}, false, "play");
   return queueEvent(next, { trigger: "changedControl", seat, cardId: heldId });

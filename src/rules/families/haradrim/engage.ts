@@ -1,4 +1,4 @@
-// Rules: rr.engaged, rr.first-player (data/rules/entries.json); ledger line 16061:A:3.
+// Rules: rr.engaged, rr.first-player, rr.attacks-outside-the-combat-phase (data/rules/entries.json); ledger lines 16061:A:3, 17123:A:2.
 //
 // EngageSeatWithMost: "Uruk Chieftain engages the player engaged with the most non-unique Orc enemies". Each living player is counted for the enemies that match the filter and are engaged with them (the source never counts); the players with the most tie, and at 0 every
 // living player ties. The first player chooses among tied players (a target choice of "seat:N", as EngageSeatWith in the nightmare family). A source already engaged with the chosen player stays as it is, with no new engagement; one engaged with another player moves to the chosen one.
@@ -11,6 +11,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { matchesPick } from "../../interpret/pick.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { engageEnemy, engageWith } from "../../quest/quest.ts";
+import { attackNowFromStaging } from "../south/watcher.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 import { orcsOf } from "./orcs-zone.ts";
@@ -22,15 +23,32 @@ export function engageSeatWithMost(state: ScenarioState, instruction: Extract<In
   if (!id || !enemy || !inPlay(enemy.zone)) return state;
   // A card of the Orcs' area cannot leave it while the players are at another stage (hrd.orcs-area-different-stage), nor a member that holds `cannotLeaveOrcsArea` (17051:B:1).
   if (enemy.zone === "orcsArea" || (flagged(state, id, "cannotLeaveOrcsArea") && orcsOf(state)?.members.includes(id))) return state;
-  const counts = livingSeats(state).map((seat) => ({ seat, count: (state.seats[seat]?.engaged ?? []).filter((other) => other !== id && matchesPick(state, other, instruction.pick, { seat, sourceId: id }, ctx)).length }));
-  const most = Math.max(...counts.map((entry) => entry.count));
-  const seats = counts.filter((entry) => entry.count === most).map((entry) => entry.seat);
-  if (seats.length === 0) return state;
-  const options = seats.map((seat) => `seat:${seat}`);
-  const chosen = chosenOf(options, focus);
-  if (!chosen) return effectData(state) ? askTarget(state, { instruction, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, options) : { ...state, failure: `${instruction.verb} needs a choice, and no effect is asking` };
-  const seat = Number(chosen.slice("seat:".length));
+  const found = seatWithMost(state, instruction, id, focus, ctx, steps, (seat) => (state.seats[seat]?.engaged ?? []).filter((other) => other !== id));
+  if (found == null) return state;
+  if (typeof found !== "number") return found;
+  const seat = found;
   if (enemy.zone === "engaged" && enemy.controller === seat) return state;
   if (enemy.zone === "engaged") return flagged(state, id, "cannotBeEngaged") ? state : engageWith(state, seat, id, steps);
   return engageEnemy(state, seat, id, steps);
+}
+
+// The seat with the most of the cards `held` names for it (the cards that match the instruction's pick are counted; the source never counts): the living seats with the most tie, and at 0 every living seat ties; the first player chooses among them. A number when a seat is
+// found, the state asking the choice, or null with no living seat.
+function seatWithMost(state: ScenarioState, instruction: Extract<Instruction, { verb: "EngageSeatWithMost" | "AttackSeatWithMost" }>, id: string, focus: Focus, ctx: ReduceContext, steps: EngineStep[], held: (seat: number) => readonly string[]): number | ScenarioState | null {
+  const counts = livingSeats(state).map((seat) => ({ seat, count: held(seat).filter((other) => matchesPick(state, other, instruction.pick, { seat, sourceId: id }, ctx)).length }));
+  const most = Math.max(...counts.map((entry) => entry.count));
+  const options = counts.filter((entry) => entry.count === most).map((entry) => `seat:${entry.seat}`);
+  if (options.length === 0) return null;
+  const chosen = chosenOf(options, focus);
+  if (chosen) return Number(chosen.slice("seat:".length));
+  return effectData(state) ? askTarget(state, { instruction, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, options) : { ...state, failure: `${instruction.verb} needs a choice, and no effect is asking` };
+}
+
+/** AttackSeatWithMost: the source enemy, in the staging area, makes an immediate attack against the player who controls the most cards matching the pick (a shadow card is dealt; it does not engage). The first player chooses among players that tie. */
+export function attackSeatWithMost(state: ScenarioState, instruction: Extract<Instruction, { verb: "AttackSeatWithMost" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const id = focus.sourceId;
+  if (!id || state.cards[id]?.zone !== "staging") return state;
+  const seat = seatWithMost(state, instruction, id, focus, ctx, steps, (held) => state.seats[held]?.play ?? []);
+  if (seat == null) return state;
+  return typeof seat === "number" ? attackNowFromStaging(state, id, seat, ctx, steps, { shadow: true }) : seat;
 }

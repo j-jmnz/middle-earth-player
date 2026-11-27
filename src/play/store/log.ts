@@ -157,6 +157,7 @@ function words(step: EngineStep, names: LogNames, questStat: string | null): str
       return grappleLine(names.card(step.enemyId), names.card(step.locationId));
     case "attachDrawn":
     case "claim":
+    case "captive":
       return attachedWords(step, names.card, 2);
     case "detach":
       return detachLine(names.card(step.enemyId), names.card(step.locationId));
