@@ -23,6 +23,8 @@ import { replayForTable, type ReplayedGame } from "./open-game";
 import { flushRunsOnLeave } from "./flush-runs-on-leave";
 import { flushRuns, queueRun } from "../data/pending-runs";
 import { recordCampaignRun } from "../data/run-writers";
+import { deleteRun } from "../data/run-store";
+import { campaignRunId } from "../../campaign/runs";
 import type { PlayClock } from "./play-clock";
 import { fingerprintOf, sessionCacheOf } from "./cache";
 import { gameStore } from "./game-store";
@@ -129,6 +131,10 @@ export function sessionStore<TRun>(session: Opened, user: Db<TRun>): SessionStor
     writers: { active: (save) => writeActive(user, save), undone: (save) => writeUndone(user, save), checkpoint: (id, checkpoint) => writeCheckpoint(user, id, checkpoint) },
     // A lost game: write the run now, so closing the Resolution any way (or never) still leaves it.
     onLost: (save, game: ScenarioState) => recordCampaignRun(user, save, finish(save, session.world, game), session.world, game),
+    // Undo takes the lost move back: the run it wrote goes (a new run has the same id, and a second write would change nothing).
+    onLostUndone: (save, left) => {
+      if (save.active) deleteRun(user, campaignRunId(save.id, left.scenarioId, save.active.seed, save.active.startedAt));
+    },
   });
   return { store, save: saved, clock };
 }

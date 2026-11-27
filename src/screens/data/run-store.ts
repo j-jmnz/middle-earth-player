@@ -17,6 +17,11 @@ export function writeRun<TRun>(user: UserDb<TRun>, run: RunRecord): void {
   user.insert(runs).values(run).onConflictDoNothing().run();
 }
 
+/** Takes a run back: an Undo that leaves the lost game the run was written for. A run that is not there is left alone. */
+export function deleteRun<TRun>(user: UserDb<TRun>, id: string): void {
+  user.delete(runs).where(eq(runs.id, id)).run();
+}
+
 /** Every run in the order it was written (the queued ones flushed first); History sorts and groups them (history/list.ts). */
 export function listRuns<TRun>(user: UserDb<TRun>): RunRecord[] {
   // A run queued by a tap that has not been written yet (table-session.ts, recordUnclosedRun) is written first.

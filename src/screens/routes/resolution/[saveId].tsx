@@ -24,6 +24,7 @@ import { goBack } from "../../nav/go-back";
 import { CardThumb } from "../../images/picture";
 import { GameReportView } from "../../campaign/game-report";
 import { routeCode } from "../../nav/route-code";
+import { ResultUndo } from "../../table/result-undo";
 import { sessionStore, useTableSession, type SessionStore, type TableSession } from "../../session/table-session";
 import { useUiScale } from "../../../ui/ui-scale";
 import { useSizeClass } from "../../../ui/use-size-class";
@@ -90,6 +91,11 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   // resolution waits on the path (Resume).
   const back = <NavBar onBack={() => goBack(router, { pathname: "/path/[saveId]", params: { saveId } })} backTestID="resolution-path" backLabel="Path" />;
 
+  // Undo takes back the move that ended the game, or a choice made since, and returns to the table once the game is on again (the table's own Undo, result-undo.tsx).
+  const undone = () => {
+    if (resolutionView(opened.store.getState().game, session.world, opened.save().log.beldisUses, session.destroyedHeroes).kind === "playing") router.replace({ pathname: "/table/[saveId]", params: { saveId } });
+  };
+  const undo = <ResultUndo store={opened.store} testID="resolution-undo" onUndone={undone} />;
   // A loss writes nothing to the log: the open scenario is dropped and the scenario stays current.
   // The loss is a run all the same (History), written beside the log, not in it.
   const close = () => {
@@ -122,6 +128,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
         </ScreenScroll>
         <ActionBar>
           <PrimaryButton label="Back to path" testID="resolution-back" onPress={close} />
+          <View className="mt-1 items-center">{undo}</View>
         </ActionBar>
       </Screen>
     );
@@ -280,6 +287,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
                   {declined ? <Text className="text-label font-semibold text-accentHigh">Selected</Text> : null}
                 </View>
               ) : null}
+              <View className="mt-1 items-center">{undo}</View>
             </>
           ) : (
             <>
@@ -291,6 +299,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
                 testID="resolution-confirm"
                 onPress={() => close()}
               />
+              <View className="mt-1 items-center">{undo}</View>
             </>
           )}
         </ActionBar>

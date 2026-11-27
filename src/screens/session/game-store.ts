@@ -1,5 +1,5 @@
 // The table store of an opened game, campaign or standalone: the part of sessionStore (table-open.ts) and standaloneStore (standalone-open.ts) that is the same.
-// Each intent the reducer accepts is appended to the held game and written at once, and an Undo takes the last one off, so a kill and relaunch replays the
+// Each intent the reducer accepts is appended to the held game and written at once, and an Undo takes the last one off (a move that ended the game too: its run is taken back), so a kill and relaunch replays the
 // same game. The play clock (play-clock.ts) folds the foreground time into each write and writes once more on a pause. The checkpoint is written at a phase
 // boundary and on a pause, never per intent (campaign/checkpoint.ts).
 import { atPhaseBoundary, checkpointOf, type Checkpoint } from "../../campaign/checkpoint";
@@ -23,13 +23,15 @@ export type GameStoreParts<H extends Held, O> = {
   reopened: (saved: H, now: Pick<ReplayedGame, "game" | "roundSteps" | "history" | "destroyedHeroes">) => O;
   /** One statement each: an accepted intent, an Undo (the checkpoint behind the game goes with it) and a checkpoint. */
   writers: { active: (saved: H) => void; undone: (saved: H) => void; checkpoint: (id: string, checkpoint: Checkpoint) => void };
-  /** A lost game can no longer be undone and its run is fixed: the caller writes it now (a win waits for its Resolution choices). */
+  /** A lost game: the caller writes its run now (a win waits for its Resolution choices). */
   onLost?: (saved: H, game: ScenarioState) => void;
+  /** An Undo that left a lost game: the caller takes back what `onLost` wrote, so a move the player took back leaves no run. */
+  onLostUndone?: (saved: H, left: ScenarioState) => void;
 };
 
 export type GameStore<H> = { store: TableStore; saved: () => H; clock: PlayClock };
 
-export function gameStore<H extends Held, O>({ session, initial, cache, reopened, writers, onLost }: GameStoreParts<H, O>): GameStore<H> {
+export function gameStore<H extends Held, O>({ session, initial, cache, reopened, writers, onLost, onLostUndone }: GameStoreParts<H, O>): GameStore<H> {
   let saved: H = initial;
   const base = createPlayClock();
   // How many intents the checkpoint this session last wrote counted, or null when it has written none (the row may still hold an earlier one).
@@ -60,9 +62,10 @@ export function gameStore<H extends Held, O>({ session, initial, cache, reopened
       if (game.lost) onLost?.(saved, game);
       follow();
     },
-    () => {
+    (_game, left) => {
       saved = fold(unrecord(saved));
       writers.undone(saved);
+      if (left.lost) onLostUndone?.(saved, left);
       // A checkpoint that counted more intents than the game has now is behind it: the write dropped it, so a different move cannot meet it again.
       if (saved.active && checkpointed != null && checkpointed > saved.active.intents.length) checkpointed = null;
       follow();

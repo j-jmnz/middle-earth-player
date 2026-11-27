@@ -36,7 +36,7 @@ function playGame(seed: number): Played[] {
 }
 
 describe("which intents can be taken back", () => {
-  it("not one that drew, revealed or turned a card, nor one that ended the game; a commit or a play can be", () => {
+  it("not one that drew, revealed or turned a card; a commit, a play or one that ended the game can be", () => {
     const clean = new Set<string>();
     let hidden = 0;
     for (const seed of STARTER_SEEDS.slice(0, 3)) {
@@ -47,7 +47,7 @@ describe("which intents can be taken back", () => {
         }
         if (shows) hidden += 1;
         else if (!isOver(after)) clean.add(intent.type);
-        expect(nextUndoable([], after, { before, roundSteps: [], intent, steps }).length).toBe(shows || isOver(after) ? 0 : 1);
+        expect(nextUndoable([], after, { before, roundSteps: [], intent, steps }).length).toBe(shows ? 0 : 1);
       }
     }
     expect(hidden).toBeGreaterThan(10);
