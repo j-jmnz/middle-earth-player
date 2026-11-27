@@ -117,3 +117,47 @@ describe("scenario measures: several blocks, list blocks, totals and the commit"
     expect(calls.some((call) => call.includes("bbb"))).toBe(false);
   });
 });
+
+// The body of the squash commit of Escape from Umbar (a5550d01, #281): the label as a bare line, its parts as list items, the older "Times" item with no colon after the task, and
+// "Review findings by class."
+const UMBAR = `### repo: Record the Escape from Umbar pipeline measures
+
+Pipeline measure:
+- Open lines at the start: 36 (pnpm effects draft); templates and copies took 198 more.
+- Mechanics added, family haradrim: flag stageCapped, condition stageInPlayWholeRound with its settle hook (stat stageEntered). Core files edited outside a family: src/rules/quest/quest.ts (putOnStage).
+- Build diff: 24 files, +959 -62. Fix-pass diff (six fix commits, the merges of main left out): +456 -283.
+- Judge: 40 lines, 7 wrong (4 came from the shared render words "the current quest card", 1 record fault in 16020), 3 render-gap; 23 checks, 1 wrong.
+- Review findings by class. Code review: 1 block (a helper copied three times), duplication 2, words 1, a test that checks less than its title 1. UX: a mark that cannot be found at phone size 1. All fixed but two.
+- Readings asked: 0. Readings ruled by the user: 0.
+- Times (pnpm scenario time; Judge and Review added by the orchestrator): Read 0 wait minutes, 8 writing minutes; Build 10 wait minutes, 21 writing minutes; Judge 0 wait minutes, 3 writing minutes; Tests 0 wait minutes, 12 writing minutes; Words 0 wait minutes, 14 writing minutes; Games 12 wait minutes, 6 writing minutes; Review 0 wait minutes, 21 writing minutes (reviewer 9, ux 12); Fix 8 wait minutes, 21 writing minutes, plus about 12 writing minutes for the two follow-up fixes.
+- Full test runs: Fix 2 (the second green but for this measure line).
+
+### fix: Write the Escape from Umbar two-handed goldens again
+
+Cause: text.`;
+
+describe("scenario measures: the list form of the Escape from Umbar body", () => {
+  const measure = parseMeasure(measureText(UMBAR) ?? "");
+
+  it("ends a label's part at the next list item, so Judge's numbers stay its own", () => {
+    expect(measure.tasks.Judge).toEqual({ wait: 0, writing: 3 });
+    expect(measure.tasks.Research).toEqual({});
+  });
+
+  it("reads the Times item and adds the follow-up fix minutes to Fix", () => {
+    expect(measure.tasks.Read).toEqual({ wait: 0, writing: 8 });
+    expect(measure.tasks.Build).toEqual({ wait: 10, writing: 21 });
+    expect(measure.tasks.Tests).toEqual({ wait: 0, writing: 12 });
+    expect(measure.tasks.Words).toEqual({ wait: 0, writing: 14 });
+    expect(measure.tasks.Games).toEqual({ wait: 12, writing: 6 });
+    expect(measure.tasks.Review).toEqual({ wait: 0, writing: 21 });
+    expect(measure.tasks.Fix).toEqual({ wait: 8, writing: 33 });
+    expect(totalWriting(measure)).toBe("118");
+  });
+
+  it("reads Review findings by class as the findings sentence of its item", () => {
+    expect(measure.findings?.startsWith("Review findings by class. Code review: 1 block")).toBe(true);
+    expect(measure.findings?.endsWith("All fixed but two.")).toBe(true);
+    expect(parseMeasure("Review findings. 2 blocks.").findings).toBe("Review findings. 2 blocks.");
+  });
+});
