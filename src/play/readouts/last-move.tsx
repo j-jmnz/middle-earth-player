@@ -1,5 +1,5 @@
 // The last move's line in the command column's head (docs/design-system-table.md, Last move): what the last intent did that the table does not
-// show, as a title and one or two rows of words, or folded into one run of text (the title, then the words, on two rows at most) where the head is short. It covers nothing, nothing times it, and a tap
+// show, as a title and one or two rows of words, or folded into one run of text (the title, then the words, on two rows at most) where the head is short. It floats over no part of the table but the band a covered row may hold when the head has no room (command-head.ts, movePlan), nothing times it, and a tap
 // opens the Log. It draws the lean telling only (store/outcome.ts, momentsOf); a screen reader hears the full one (table-hooks.ts).
 import { useMemo } from "react";
 import { Pressable, View } from "react-native";

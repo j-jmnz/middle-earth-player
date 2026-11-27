@@ -54,11 +54,11 @@ describe("headHeight", () => {
 
 describe("movePlan", () => {
   it("gives the last move's line what the meter's mode leaves: whole, folded, or folded over the covered band", () => {
-    // No meter: the whole line from 78 pt, the folded one from 52.
-    expect(movePlan(78, 78, "hidden")).toEqual({ mode: "full", inside: true });
+    // No meter: the whole line from 81 pt, the folded one from 55.
+    expect(movePlan(81, 81, "hidden")).toEqual({ mode: "full", inside: true });
     expect(movePlan(60, 60, "hidden")).toEqual({ mode: "row", inside: true });
     // A full meter keeps its least height; the line takes the rest.
-    expect(movePlan(180, 180, "full")).toEqual({ mode: "full", inside: true });
+    expect(movePlan(181, 181, "full")).toEqual({ mode: "full", inside: true });
     expect(movePlan(160, 160, "full")).toEqual({ mode: "row", inside: true });
     // The head has no room under a covered row, but the column is free above the dock: the folded line stands there.
     expect(movePlan(30, 110, "hidden")).toEqual({ mode: "row", inside: false });
@@ -70,7 +70,10 @@ describe("movePlan", () => {
   });
 
   it("scales with the UI and takes room of the head only when it stands inside it", () => {
-    expect(movePlan(78 * 1.3 - 1, 200, "hidden", 1.3).mode).toBe("row");
+    expect(movePlan(81 * 1.3 - 1, 200, "hidden", 1.3).mode).toBe("row");
+    // A larger text size needs more room for the same line.
+    expect(movePlan(81, 81, "hidden", 1, 1.3).mode).toBe("row");
+    expect(moveRoom({ mode: "row", inside: true }, 1, 2)).toBe(MOVE_ROW * 2 + MOVE_GAP);
     expect(moveRoom({ mode: "full", inside: true })).toBe(MOVE_FULL + MOVE_GAP);
     expect(moveRoom({ mode: "row", inside: true }, 2)).toBe((MOVE_ROW + MOVE_GAP) * 2);
     expect(moveRoom({ mode: "row", inside: false })).toBe(0);

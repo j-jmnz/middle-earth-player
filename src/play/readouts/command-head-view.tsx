@@ -2,7 +2,7 @@
 // meter under it, standing above the dock in the room the dock leaves free. It is positioned from the column's top to the dock's top, its content at
 // the foot so the meter sits just above the dock, and never pushes the dock; command-head.ts says what it draws in that room. A tap on the meter lists
 // the cards that make up its threat (`onMeter`); a tap on the line opens the Log (`onMove`).
-import { View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 
 import { headPlan, METER_MOST, MOVE_GAP, movePlan, moveRoom, type MovePlan } from "./command-head.ts";
 import { LastMove } from "./last-move.tsx";
@@ -16,9 +16,11 @@ const HIDDEN: MovePlan = { mode: "hidden", inside: false };
 export function CommandHead({ scale, room, bare, bottom, move, moveKey, onMeter, onMove }: { scale: QuestScale; room: number; bare: number; bottom: number; move: Moment | null; moveKey: string; onMeter?: () => void; onMove: () => void }) {
   const s = useUiScale();
   const mode = headPlan(room, s, scale.live);
-  const line = move ? movePlan(room, bare, mode, s) : HIDDEN;
+  // The line's words follow the phone's text size, so its planned height does too.
+  const text = useWindowDimensions().fontScale;
+  const line = move ? movePlan(room, bare, mode, s, text) : HIDDEN;
   if (mode === "hidden" && line.mode === "hidden") return null;
-  const meterRoom = room - moveRoom(line, s);
+  const meterRoom = room - moveRoom(line, s, text);
   return (
     <View testID="command-head" pointerEvents="box-none" className="absolute inset-x-0 top-0 justify-end" style={{ bottom, paddingHorizontal: 12 * s, paddingTop: 2 * s }}>
       {move && line.mode !== "hidden" ? (

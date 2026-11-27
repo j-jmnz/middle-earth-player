@@ -17,7 +17,7 @@ import { cardSize, HAND_SHOW, handCardSize, tableLayout } from "../layout/layout
 import { hitSlot } from "../layout/hits.ts";
 import { inspectTargets, onTableFor, pileSelector, PILES, threatSelector, zoneSelector, type PileId, type PileView, type ZoneId } from "./selectors.ts";
 import { draggableIds, dropOutcome, dropRects, dropTargets, targetFromKey, targetKey } from "./selection.ts";
-import { intentWords } from "./outcome.ts";
+import { intentWords } from "./intent-words.ts";
 import { playSheet } from "../choice/bar-sheets.ts";
 import { createTableStore, nextRoundSteps } from "./store.ts";
 import { EFFECTS } from "../../effects/index.ts";

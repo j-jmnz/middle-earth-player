@@ -209,10 +209,9 @@ export function useTableChoice({
     (intent: PlayerIntent, confirm = false) => {
       // The Sent tick plays the moment the reducer accepts the intent, before the next state is built and the save written; a refused intent
       // gets the Refused tick, never both. The moments the table answers after it are answered in the same tap (table-hooks.ts, follow).
-      const told = store.getState().shown?.seq ?? 0;
       if (store.getState().dispatch(intent, tickSent)) {
         // The player's own send ends the last move's line; the moment this send makes brings its own.
-        closeMove(told);
+        closeMove();
         if (confirm) playSound("ui.confirm");
         reset();
         // An accepted send keeps the card the reader last activated, so focus can stay on it in the next moment.

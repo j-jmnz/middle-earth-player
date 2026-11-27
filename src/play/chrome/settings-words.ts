@@ -34,7 +34,7 @@ export const FOG_LINE = "Animated fog behind every screen. Off saves battery.";
 // saves its value).
 export const FOG_LIGHT_LINE = "Animated fog behind the table. Off saves battery.";
 export const FOG_REDUCED_LINE = "No effect: Reduce motion already stops the fog.";
-export const SPEED_LINE = "Quick shortens animations and skips the phase title. Slow makes animations and the banner's pauses one and a half times as long.";
+export const SPEED_LINE = "Quick shortens animations and skips the phase title. Slow makes animations one and a half times as long.";
 export const REDUCE_MOTION_LINE = "Always turns off most animation, the fog and the combat replay, which lowers the load on the device. Follow system uses the device's setting.";
 export const SPOTLIGHT_LINE = "A replay of each attack that deals or blocks damage. Tap to skip.";
 export const HAPTICS_LINE = "Vibration at key moments.";

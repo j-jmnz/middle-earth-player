@@ -41,6 +41,16 @@ describe("the lean telling", () => {
     expect(texts(lean)).toEqual(["Revealed treachery"]);
   });
 
+  it("keeps a fact about the seat the table does not draw", async () => {
+    const table = buildTable(await sceneCards(), { seats: 2, engaged: [{ code: "f3", seat: 1 }] });
+    const enemy = idsOf(table, "f3");
+    const steps: EngineStep[] = [{ kind: "engage", enemyId: enemy, seat: 1 }];
+    // The table draws Player 1: the enemy in Player 2's engagement area is not on screen.
+    expect(texts(momentsOf(table.state, table.state, steps, { ...names, seat: 0 }).lean)).toEqual(["Engaged with Player 2"]);
+    // Drawn for Player 2, it is.
+    expect(momentsOf(table.state, table.state, steps, { ...names, seat: 1 }).lean).toBeNull();
+  });
+
   it("leaves damage and healing to the tokens, and an attack to the spotlight only when it played", async () => {
     const table = buildTable(await sceneCards(), { engaged: [{ code: "f3", seat: 0 }] });
     const sam = idsOf(table, SAM);
