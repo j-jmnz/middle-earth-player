@@ -40,6 +40,7 @@ export type TableLayout = {
   peekRoom: number;
   reach: ReturnType<typeof columnReach>;
   room: number;
+  bare: number;
   meterShown: boolean;
   barTop: number;
   barBottom: number;
@@ -62,6 +63,8 @@ export function useTableLayout(input: TableLayoutInput): TableLayout {
   const reach = columnReach(column, feet);
   const covered = coveredTop(column, feet, reach);
   const room = headRoom(columnHeight, footPad, dockHeight, HEAD_GAP * s, covered);
+  // The same room with no row counted: what the last move's line may stand in when the head has none (command-head.ts, movePlan).
+  const bare = headRoom(columnHeight, footPad, dockHeight, HEAD_GAP * s, 0);
   const planRoom = headRoom(columnHeight, footPad, planDock, HEAD_GAP * s, covered);
   const headShown = columnHeight > 0 && dockHeight > 0 && headPlan(planRoom, s, scaleLive) !== "hidden";
   const meterShown = headShown && scaleLive;
@@ -76,5 +79,5 @@ export function useTableLayout(input: TableLayoutInput): TableLayout {
   const narrow = (screen.width - insets.left - insets.right) / s < 760;
   // A tap on a covered row reaches the canvas, which folds the tray or picks, so the tray's outside layer over the column starts under it.
   const columnClear = reach === 0 || !feet ? 0 : peekRoom + (reach === 2 ? feet.engaged : feet.staging);
-  return { commandWidth, footPad, peekRoom, reach, room, meterShown, barTop, barBottom, stageArea, narrow, columnClear };
+  return { commandWidth, footPad, peekRoom, reach, room, bare, meterShown, barTop, barBottom, stageArea, narrow, columnClear };
 }

@@ -329,7 +329,7 @@ export function discoverTitle(depth: number): string {
 
 /**
  * The lines of the Discover beat in the order the rule resolves them: the look, the Loot objective, the Hazard, and the rest in the discard pile. Each says which cards the table rings. The last line lays the rest in the
- * look strip and rings the Loot objective and the staged Hazard, which stand above the strip's veil; it is the beat the banner holds until it is dismissed (and the only one drawn under reduced motion).
+ * look strip and rings the Loot objective and the staged Hazard, which stand above the strip's veil; the strip lies there for its hold (readouts/last-move-time.ts, lookHoldMs).
  */
 export function discoverLines(facts: DiscoverFacts): readonly { text: string; cards: readonly string[] }[] {
   const { location, loot, hazard, rest } = facts;

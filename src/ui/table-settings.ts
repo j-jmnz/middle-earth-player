@@ -60,8 +60,6 @@ export type TableSettings = {
   tableAsList: TableListOption;
   // Confirm time: how long an armed two-tap button waits for its second tap (dock/armed-room.ts, armMs).
   confirmTime: ConfirmTimeOption;
-  // Banner closes: after a few seconds (readouts/banner-time.ts), or only when the player taps or swipes it, or a new moment replaces it.
-  bannerCloses: BannerClosesOption;
   // Title face: Carved is Marcellus SC (small capitals) for every `font-display` text and the canvas's numbers; Plain is Barlow Semi Condensed semibold.
   titleFace: TitleFaceOption;
   // Explain timing words: the table's card preview also draws a chip for each timing word the card's text opens a line with (When Revealed, Shadow, Forced, ...).
@@ -83,8 +81,6 @@ export const TABLE_LIST_OPTIONS = ["system", "always"] as const;
 export type TableListOption = (typeof TABLE_LIST_OPTIONS)[number];
 export const CONFIRM_TIME_OPTIONS = ["standard", "long", "none"] as const;
 export type ConfirmTimeOption = (typeof CONFIRM_TIME_OPTIONS)[number];
-export const BANNER_CLOSES_OPTIONS = ["timer", "tap"] as const;
-export type BannerClosesOption = (typeof BANNER_CLOSES_OPTIONS)[number];
 export const STRONG_OUTLINES_OPTIONS = ["system", "always", "off"] as const;
 export type StrongOutlinesOption = (typeof STRONG_OUTLINES_OPTIONS)[number];
 export const TITLE_FACE_OPTIONS = ["carved", "plain"] as const;
@@ -101,7 +97,7 @@ export function strongOutlines(option: StrongOutlinesOption, increaseContrast: b
 // The stops the video uses: after staging ("the golden action window") and before the shadow card turns.
 export const DEFAULT_STOPS: readonly string[] = ["3.3", "shadow"];
 
-export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: "system", guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, sounds: true, soundVolume: 0.8, music: true, musicVolume: 0.5, stopOtherAudio: true, reduceMotion: "system", keepAwake: true, theme: "dark", cardQuality: "high", fogDrift: true, tableAsList: "system", confirmTime: "standard", bannerCloses: "timer", titleFace: "carved", timingTips: false, checkUpdates: true, debugTools: false };
+export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: "system", guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, sounds: true, soundVolume: 0.8, music: true, musicVolume: 0.5, stopOtherAudio: true, reduceMotion: "system", keepAwake: true, theme: "dark", cardQuality: "high", fogDrift: true, tableAsList: "system", confirmTime: "standard", titleFace: "carved", timingTips: false, checkUpdates: true, debugTools: false };
 
 /** Settings read back from storage: unknown keys dropped, missing ones defaulted, wrong types replaced. */
 export function parseSettings(raw: unknown): TableSettings {
@@ -136,7 +132,6 @@ export function parseSettings(raw: unknown): TableSettings {
     fogDrift: flag(value.fogDrift, DEFAULT_SETTINGS.fogDrift),
     tableAsList: TABLE_LIST_OPTIONS.find((option) => option === value.tableAsList) ?? DEFAULT_SETTINGS.tableAsList,
     confirmTime: CONFIRM_TIME_OPTIONS.find((option) => option === value.confirmTime) ?? DEFAULT_SETTINGS.confirmTime,
-    bannerCloses: BANNER_CLOSES_OPTIONS.find((option) => option === value.bannerCloses) ?? DEFAULT_SETTINGS.bannerCloses,
     titleFace: TITLE_FACE_OPTIONS.find((option) => option === value.titleFace) ?? DEFAULT_SETTINGS.titleFace,
     timingTips: flag(value.timingTips, DEFAULT_SETTINGS.timingTips),
     checkUpdates: flag(value.checkUpdates, DEFAULT_SETTINGS.checkUpdates),

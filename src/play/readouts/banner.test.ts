@@ -1,4 +1,4 @@
-// Rules: rr.step-6-4-3, rr.damage, rr.step-7-3, rr.framework-steps (data/rules/entries.json). The banner resolves in beats
+// Rules: rr.step-6-4-3, rr.damage, rr.step-7-3, rr.framework-steps (data/rules/entries.json). The full telling of a move
 // (each line names the cards it touches), says when a destroyed defender left the attack undefended, reads a heal as a
 // heal, and sums the round when it ends; the store keeps the last moment worth showing; the first-game guide has a line
 // for each step.

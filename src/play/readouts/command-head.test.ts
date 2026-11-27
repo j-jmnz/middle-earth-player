@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { dockWithNumbers, HEAD_COMPACT, headHeight, headPlan, headRoom, METER_FULL_LEAST, METER_MOST, NUMBERS_ROW } from "./command-head.ts";
+import { dockWithNumbers, HEAD_COMPACT, headHeight, headPlan, headRoom, METER_FULL_LEAST, METER_MOST, NUMBERS_ROW, MOVE_FULL, MOVE_GAP, MOVE_ROW, movePlan, moveRoom } from "./command-head.ts";
 
 describe("headPlan", () => {
   it("gives way by height: the full meter, then the compact one, then nothing", () => {
@@ -49,5 +49,34 @@ describe("headHeight", () => {
     expect(headHeight("full", 150)).toBe(152);
     expect(headHeight("compact", 70)).toBe(70);
     expect(headHeight("hidden", 400)).toBe(0);
+  });
+});
+
+describe("movePlan", () => {
+  it("gives the last move's line what the meter's mode leaves: whole, folded, or folded over the covered band", () => {
+    // No meter: the whole line from 81 pt, the folded one from 55.
+    expect(movePlan(81, 81, "hidden")).toEqual({ mode: "full", inside: true });
+    expect(movePlan(60, 60, "hidden")).toEqual({ mode: "row", inside: true });
+    // A full meter keeps its least height; the line takes the rest.
+    expect(movePlan(181, 181, "full")).toEqual({ mode: "full", inside: true });
+    expect(movePlan(160, 160, "full")).toEqual({ mode: "row", inside: true });
+    // The head has no room under a covered row, but the column is free above the dock: the folded line stands there.
+    expect(movePlan(30, 110, "hidden")).toEqual({ mode: "row", inside: false });
+    // A compact meter takes all of the head's room; the line needs its row above it.
+    expect(movePlan(60, 120, "compact")).toEqual({ mode: "row", inside: false });
+    expect(movePlan(60, 100, "compact")).toEqual({ mode: "hidden", inside: false });
+    // A dock that fills the column leaves nothing.
+    expect(movePlan(0, 20, "hidden")).toEqual({ mode: "hidden", inside: false });
+  });
+
+  it("scales with the UI and takes room of the head only when it stands inside it", () => {
+    expect(movePlan(81 * 1.3 - 1, 200, "hidden", 1.3).mode).toBe("row");
+    // A larger text size needs more room for the same line.
+    expect(movePlan(81, 81, "hidden", 1, 1.3).mode).toBe("row");
+    expect(moveRoom({ mode: "row", inside: true }, 1, 2)).toBe(MOVE_ROW * 2 + MOVE_GAP);
+    expect(moveRoom({ mode: "full", inside: true })).toBe(MOVE_FULL + MOVE_GAP);
+    expect(moveRoom({ mode: "row", inside: true }, 2)).toBe((MOVE_ROW + MOVE_GAP) * 2);
+    expect(moveRoom({ mode: "row", inside: false })).toBe(0);
+    expect(moveRoom({ mode: "hidden", inside: false })).toBe(0);
   });
 });

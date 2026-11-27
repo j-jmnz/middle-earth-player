@@ -1,6 +1,5 @@
 // How the table peels its layers: the Android hardware Back and a hardware keyboard's Escape and Z (src/ui/key-shortcuts.ts). Back peels one
-// layer at a time (src/play/chrome/back.ts) and only then leaves the table; Escape is the same peel without the leave, after the banner,
-// which Back does not dismiss. Z is the dock's Undo button, run through the same handler, and only while that button is there and no
+// layer at a time (src/play/chrome/back.ts) and only then leaves the table; Escape is the same peel without the leave. Z is the dock's Undo button, run through the same handler, and only while that button is there and no
 // layer is open over the table. Key events reach a View only on Android (key-shortcuts.ts); the table's root takes `onKeyDown`.
 import { useEffect, useEffectEvent } from "react";
 import { BackHandler } from "react-native";
@@ -17,8 +16,6 @@ export type TableBackArgs = {
   // The open layers the table's own state holds, and how each one closes.
   open: { menu: boolean; more: boolean; lines: boolean; preview: boolean; reading: boolean; overlay: boolean; panel: boolean };
   close: { menu: () => void; more: () => void; preview: () => void; reading: () => void; overlay: () => void; panel: () => void };
-  banner: boolean;
-  dismissBanner: () => void;
   // The dock's Undo button, or null when it is not there.
   undo: DockExtra | null;
   // Leaves the table (the last step of Back, never of Escape).
@@ -56,8 +53,7 @@ function undoByKey(a: TableBackArgs): void {
 function onKey(a: TableBackArgs, event: KeyInput): void {
   const action = keyAction(event);
   if (action === "escape") {
-    if (a.banner) a.dismissBanner();
-    else peel(a, false);
+    peel(a, false);
   } else if (action === "undo") undoByKey(a);
 }
 

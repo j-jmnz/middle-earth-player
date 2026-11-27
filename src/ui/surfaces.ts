@@ -61,7 +61,7 @@ export function floatingSurface(t: TableTokens = dark): Lifted {
 }
 
 /**
- * The banner's plain fill (docs/design-system-table.md, Banner), shared by the table menu and a discard pile's list (user request,
+ * The notice fill of the last move's line (docs/design-system-table.md, Last move), shared by the table menu and a discard pile's list (user request,
  * 2026-11-08): night on Dark, the pale `raisedTop` on Light, with no gradient and no lit edge, and a soft drop shadow. `alpha` is the
  * fill's share: the banner's 0.9, or FLOATING_ALPHA for a panel over the dock's words. Under Reduce Transparency it is opaque (fillAlpha).
  */

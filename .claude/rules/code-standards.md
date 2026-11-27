@@ -38,7 +38,7 @@ Every agent that changes code follows these. `docs/architecture.md` (State, Pers
 
 ## Making a change
 
-- Keep the behaviour the user sees exactly: the spotlight gate, skip, Back, the haptics, the banner wait, Undo and relaunch replay. If a speed-up cannot be had without changing one, stop and ask the user. Do not work around it silently.
+- Keep the behaviour the user sees exactly: the spotlight gate, skip, Back, the haptics, the last move's line, Undo and relaunch replay. If a speed-up cannot be had without changing one, stop and ask the user. Do not work around it silently.
 - Measure a speed-up before and after with a scratch script in the session scratchpad, and report both numbers. The script is not committed.
 - A change that makes the app send, store or share anything it did not before (a new request, a new kind of saved data, an SDK) updates `PRIVACY.md` in the same change.
 - `src/screens` imports nothing from `src/rules`. The lint zones (`pnpm lint`) decide where a new helper lives.
