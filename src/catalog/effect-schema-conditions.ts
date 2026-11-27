@@ -310,6 +310,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The source enemy was dealt a shadow card and one of them has no shadow effect ("If Wargs is dealt a shadow card with no effect",
   // 01085:A:1). A card that was dealt none is not blank.
   z.strictObject({ kind: z.literal("shadowBlank") }),
+  // The attack in progress was dealt a facedown shadow card with a shadow effect that has not resolved or been canceled: an Action taken after the defender is declared can still cancel it ("cancel a shadow effect dealt to the attacking enemy", 12060:A:2).
+  z.strictObject({ kind: z.literal("shadowPending") }),
   // The card is attacking in the player attack in progress (rr.step-6-8-4): read while a stat is read, for the stat's holder
   // (src/rules/families/attack/strike.ts); elsewhere for `card` (the source by default). `enemy`: the attacked enemy matches the filter
   // (from that card's controller's side: `engaged`, `stagingOnly`, then its predicates); `notEnemy`: it does not ("an enemy

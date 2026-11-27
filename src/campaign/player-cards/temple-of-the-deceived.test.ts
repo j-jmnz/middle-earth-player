@@ -1,8 +1,9 @@
 // Rules: rr.attachment-cards, rr.restricted, rr.modifiers, rr.lasting-effects, rr.response, rr.action, rr.cancel, rr.shadow-effects,
 // rr.sentinel, rr.play-restrictions-and-permissions, rr.quest-phase, rr.explored, rr.staging-area, rr.step-5-3, rr.engagement-check,
 // rr.play-and-put-into-play, rr.triggered-ability (data/rules/entries.json).
-// The Temple of the Deceived player cards, written from their card text (data/cards/TotD.json; data/printed holds no ledger for these cards
-// yet, so every intent goes through sendUnledgered): Elfhelm 12057:A:1, A:2 and A:3, Armored Destrier 12059:A:1, Déorwine 12060:A:2,
+// The Temple of the Deceived player cards, written from their card text (data/cards/TotD.json). The ledger in data/printed holds Déorwine
+// and Ered Luin Miner, read from their scans, so their intents go through send; the other cards have no ledger entry yet, so their intents go
+// through sendUnledgered: Elfhelm 12057:A:1, A:2 and A:3, Armored Destrier 12059:A:1, Déorwine 12060:A:2,
 // Revealed in Wrath 12061:A:1, Rhovanion Outrider 12062:A:1, Scouting Party 12063:A:1, Entangling Nets 12064:A:1, A:2 and A:3, Arrows from
 // the Trees 12065:A:1 and A:2, Ered Luin Miner 12066:A:1.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -14,7 +15,7 @@ import { withMode } from "../../rules/core/state.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
+import { begin, idsOf, send, type Run, type Table } from "../../../test/harness/scene.ts";
 import { atDefense, attach, canPlay, choices, fillers, hosts, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ELFHELM = "12057";
@@ -133,36 +134,48 @@ describe("Déorwine (12060:A:2)", () => {
   function defended(effects: readonly Effect[], defender: string): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: [{ code: PAL, seat: 0 }, { code: SPIRIT, seat: 0 }], allies: [{ code: DEORWINE, seat: 0 }], engaged: [{ code: RIDER, seat: 0 }], deck: [GREEN_HILL] });
     let run = atDefense(tab);
-    run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx), tab.ctx);
+    run = send(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx);
     return { tab, run };
   }
   const strikes = (run: Run, from: number) => run.steps.slice(from).flatMap((step) => (step.kind === "strike" && step.side === "enemy" ? [step.attack] : []));
 
-  // "While Déorwine is defending, he gains: "Response: Spend 1 Leadership resource to cancel a shadow effect just triggered."": the Pal
-  // spends 1 and the Rider strikes with its printed Attack 5, not 6.
+  // "Action: While Déorwine is defending, spend 1 Leadership resource to cancel a shadow effect dealt to the attacking enemy.": in the
+  // action window after the defender is declared, the Pal spends 1 and the Rider strikes with its printed Attack 5, not 6.
   lineSpec("12060:A:2", "Déorwine: while defending, spend 1 Leadership resource to cancel a shadow effect", (effects) => {
     const { tab, run: pending } = defended(effects, DEORWINE);
-    expect(triggers(pending.state, tab)).toContain("12060:response:1");
+    expect(triggers(pending.state, tab)).toContain("12060:action:1");
     const from = pending.steps.length;
-    const run = passAll(sendUnledgered(pending, { type: "Trigger", cardId: idsOf(tab, DEORWINE), effectId: "12060:response:1", payments: [{ heroId: idsOf(tab, PAL), amount: 1 }] }, tab.ctx), tab.ctx, { responses: true });
+    const run = passAll(send(pending, { type: "Trigger", cardId: idsOf(tab, DEORWINE), effectId: "12060:action:1", payments: [{ heroId: idsOf(tab, PAL), amount: 1 }] }, tab.ctx), tab.ctx, { responses: true });
     expect(run.state.cards[idsOf(tab, PAL)]?.resources).toBe(6 - 1);
     expect(strikes(run, from)).toEqual([printed(tab, RIDER, "attack")]);
   });
 
-  // Not defending, Déorwine has no Response: the Spirit hero defends and the shadow effect is not cancelled.
-  it("12060:A:2 Déorwine: no Response while another character defends", () => {
+  // Not defending, Déorwine has no Action: the Spirit hero defends and the shadow effect is not cancelled.
+  it("12060:A:2 Déorwine: no Action while another character defends", () => {
     const { tab, run } = defended(EFFECTS, SPIRIT);
-    expect(triggers(run.state, tab)).not.toContain("12060:response:1");
+    expect(triggers(run.state, tab)).not.toContain("12060:action:1");
   });
 
-  // "Any player may trigger this response.": the first player has no Leadership hero; the second player's Pal spends the resource.
-  it("12060:A:2 Déorwine: another player may trigger the Response and pay for it", () => {
+  // The shadow effect is resolved before the damage window: there is nothing left to cancel, so the Action is not offered there.
+  it("12060:A:2 Déorwine: no Action once the shadow effect has resolved", () => {
+    const { tab, run: pending } = defended(EFFECTS, DEORWINE);
+    expect(triggers(pending.state, tab)).toContain("12060:action:1");
+    const run = send(pending, { type: "Pass" }, tab.ctx);
+    expect(run.steps.length).toBeGreaterThan(pending.steps.length);
+    expect(triggers(run.state, tab)).not.toContain("12060:action:1");
+  });
+
+  // "Any player may trigger this action.": the first player has no Leadership hero; the second player's Pal spends the resource.
+  it("12060:A:2 Déorwine: another player may trigger the Action and pay for it", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: SPIRIT, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: DEORWINE, seat: 0 }], engaged: [{ code: RIDER, seat: 0 }], deck: [GREEN_HILL] });
     let run = atDefense(tab);
-    run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, DEORWINE) }, tab.ctx), tab.ctx);
-    expect(triggers(run.state, tab)).toContain("12060:response:1");
+    run = send(run, { type: "DeclareDefender", defenderId: idsOf(tab, DEORWINE) }, tab.ctx);
+    // The window opens for the defending player, who has no Leadership hero; passing hands it to the second player.
+    expect(triggers(run.state, tab)).not.toContain("12060:action:1");
+    run = send(run, { type: "Pass" }, tab.ctx);
+    expect(triggers(run.state, tab)).toContain("12060:action:1");
     const from = run.steps.length;
-    run = passAll(sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, DEORWINE), effectId: "12060:response:1", payments: [{ heroId: idsOf(tab, PAL), amount: 1 }] }, tab.ctx), tab.ctx, { responses: true });
+    run = passAll(send(run, { type: "Trigger", cardId: idsOf(tab, DEORWINE), effectId: "12060:action:1", payments: [{ heroId: idsOf(tab, PAL), amount: 1 }] }, tab.ctx), tab.ctx, { responses: true });
     expect(run.state.cards[idsOf(tab, PAL)]?.resources).toBe(6 - 1);
     expect(strikes(run, from)).toEqual([printed(tab, RIDER, "attack")]);
   });

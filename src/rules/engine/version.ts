@@ -200,9 +200,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 53, scenarios: ["the-battle-of-lake-town"], note: "A location the Fisherman's Dock split explores is heard by the cards that answer an explored location." },
   { version: 53, scenarios: "all", note: "The effects at the end of the round resolve while the table shows the End of round phase, not Beginning of round." },
   { version: 54, scenarios: ["the-siege-of-cair-andros"], note: "A quest stage that a Response removed from the quest deck is marked as removed, and the stage list names it so." },
+  { version: 55, scenarios: "all", note: "Déorwine's printed Action cancels a shadow effect dealt to the attacking enemy in the action window after the defender is declared, before the shadow card is turned over; it is no longer a Response to the shadow effect." },
 ];
 
-export const ENGINE_VERSION = 54;
+export const ENGINE_VERSION = 55;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

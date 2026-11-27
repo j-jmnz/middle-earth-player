@@ -141,17 +141,17 @@ describe("Gwaihir's Debt (19151)", () => {
 });
 
 describe("Reforged (19153:A:1)", () => {
-  // "Action: Choose an Item attachment with a printed cost of X in any player's discard pile and play that attachment for no cost. (The
-  // chosen attachment can belong to any sphere of influence.)": X is 1. Horn of Gondor (Tactics Item, cost 1) in your discard pile and
-  // Blade of Gondolin (Tactics Item, cost 1) in the other player's are choices; Citadel Plate (Item, cost 4) and the Relic (cost 1, not
-  // an Item) are not. Éowyn (Spirit) pays the 1 and nothing more for the Blade.
-  lineSpec("19153:A:1", "Reforged: play an Item attachment of printed cost X from any discard pile for no cost", (effects) => {
+  // "Action: Choose an attachment with a printed cost of X in any player's discard pile and play that attachment for no cost. (The chosen
+  // attachment can belong to any sphere of influence.)": X is 1. Horn of Gondor (Tactics, cost 1) and the Relic (Spirit, cost 1, not an Item)
+  // in your discard pile and Blade of Gondolin (Tactics, cost 1) in the other player's are choices; Citadel Plate (cost 4) is not. Éowyn
+  // (Spirit) pays the 1 and nothing more for the Blade.
+  lineSpec("19153:A:1", "Reforged: play an attachment of printed cost X from any discard pile for no cost", (effects) => {
     const scene = table(effects, { seats: 2, heroes: [{ code: EOWYN, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: REFORGED, seat: 0 }] }, 1);
     const { tab, ids } = discarded(scene, [[HORN, 0], [PLATE, 0], [RELIC, 0], [BLADE, 1]]);
-    const [horn, , , blade] = ids;
+    const [horn, , relic, blade] = ids;
     const eowyn = idsOf(tab, EOWYN);
     let run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, REFORGED), payments: [{ heroId: eowyn, amount: 1 }] }, tab.ctx);
-    expect(choices(run.state, tab).sort()).toEqual([horn, blade].sort());
+    expect(choices(run.state, tab).sort()).toEqual([horn, relic, blade].sort());
     run = sendUnledgered(run, { type: "Choose", optionId: blade ?? "" }, tab.ctx);
     expect(run.state.window?.kind).toBe("choose");
     run = sendUnledgered(run, { type: "Choose", optionId: eowyn }, tab.ctx);
