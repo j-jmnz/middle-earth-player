@@ -9,7 +9,7 @@ import { createPlayClock } from "../play-clock";
 import { useStandaloneSessionAfterPaint as phoneAfterPaint, standaloneStore as phoneStore, type StandaloneSession, type StandaloneTable } from "../standalone-session";
 import { openScene, SCENE_GAME, sceneOfWindow } from "./scene-dump";
 
-export { continueStandaloneGame, openStandalone, restartStandaloneGame, standaloneCodes, useStandaloneSession, type StandaloneSession, type StandaloneTable } from "../standalone-session";
+export { continueStandaloneGame, openStandalone, recordUnsettledGame, restartStandaloneGame, settleStandalone, standaloneCodes, useStandaloneSession, type StandaloneSession, type StandaloneTable } from "../standalone-session";
 
 // The scene the page was given, read once: the runner sets it before the page loads, and only the e2e-test build looks at it.
 const SCENE_DUMP = e2eBuild() ? sceneOfWindow() : null;
@@ -31,6 +31,6 @@ export function useStandaloneSessionAfterPaint(gameId: string | null, attempt: n
   return scene ? given : opened;
 }
 
-export function standaloneStore<TRun>(session: Extract<StandaloneSession, { ok: true }>, user: Parameters<typeof phoneStore<TRun>>[1]): StandaloneTable {
-  return session.stored.id === SCENE_GAME && e2eBuild() ? sceneStore(session) : phoneStore(session, user);
+export function standaloneStore<TRun>(session: Extract<StandaloneSession, { ok: true }>, user: Parameters<typeof phoneStore<TRun>>[1], landing?: Parameters<typeof phoneStore<TRun>>[2]): StandaloneTable {
+  return session.stored.id === SCENE_GAME && e2eBuild() ? sceneStore(session) : phoneStore(session, user, landing);
 }
