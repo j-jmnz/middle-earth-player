@@ -50,10 +50,11 @@ export async function standInWorld(codes: readonly string[], stats: HeroStats): 
   return cards;
 }
 
+// `stepsBy`: the engine steps of each intent, kept with `trail`, so a check that reads what each intent did (a scenario's moments) reads them from the one play (`stepsByIntent`).
 // `checks` is the tableDigest of the table after each of `intents` (src/campaign/digest.ts): the golden snapshot pins them, so a scenario's checks move only when a change reaches its games.
 // `trail`: the state after each intent, kept when the play asks for it, so a check that reads the moments between (a golden suite's
 // `checks`) reads them from the one play instead of playing the game again (.claude/rules/code-standards.md, Test cost).
-export type PlayedGame = { start: StartScenario; kept: ScenarioState; state: ScenarioState; intents: PlayerIntent[]; steps: EngineStep[]; checks?: number[]; trail?: ScenarioState[] };
+export type PlayedGame = { start: StartScenario; kept: ScenarioState; state: ScenarioState; intents: PlayerIntent[]; steps: EngineStep[]; checks?: number[]; trail?: ScenarioState[]; stepsBy?: (readonly EngineStep[])[] };
 
 /**
  * Plays a game from its start: the first seat keeps its opening hand (a second seat's Keep is the first of `intents`), then
@@ -67,6 +68,7 @@ export function playToEnd(start: StartScenario, ctx: ReduceContext, answer: (sta
   const intents: PlayerIntent[] = [];
   const checks: number[] = [];
   const trail: ScenarioState[] = [];
+  const stepsBy: (readonly EngineStep[])[] = [];
   const memory = new Set<string>();
   for (let turn = 0; turn < limit && !state.lost && !(state.stageCleared && state.window == null); turn += 1) {
     const intent = answer(state, memory);
@@ -75,12 +77,26 @@ export function playToEnd(start: StartScenario, ctx: ReduceContext, answer: (sta
     steps.push(...result.steps);
     intents.push(intent);
     checks.push(tableDigest(state));
-    if (options.trail) trail.push(state);
+    if (options.trail) {
+      trail.push(state);
+      stepsBy.push(result.steps);
+    }
     // A card in the staging area, engaged or active shows its face (face-check.ts).
     const facedown = faceProblems(state);
     if (facedown.length > 0) throw new Error(`After intent ${intents.length} (${JSON.stringify(intent)}): ${facedown.join("; ")}`);
   }
-  return { start, kept, state, intents, steps, checks, ...(options.trail ? { trail } : {}) };
+  return { start, kept, state, intents, steps, checks, ...(options.trail ? { trail, stepsBy } : {}) };
+}
+
+/** The engine steps of each intent of a played game: the ones the play kept with its trail, else the game replayed (a play that kept no trail). */
+export function stepsByIntent(played: PlayedGame, ctx: ReduceContext): (readonly EngineStep[])[] {
+  if (played.stepsBy) return played.stepsBy;
+  let state = played.kept;
+  return played.intents.map((intent) => {
+    const result = expectOk(reduce(state, intent, ctx));
+    state = result.state;
+    return result.steps;
+  });
 }
 
 /**

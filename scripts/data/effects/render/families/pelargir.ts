@@ -29,8 +29,8 @@ export const PELARGIR_TEMPLATES: Templates = {
     read: ["trait"],
   }),
   RemoveStage: (i) => ({
-    text: `the stage with code ${str(i.code)} is set aside and no longer part of the quest deck: the stage that is defeated before it goes to the next stage still in the quest deck; if it is the current stage, the quest advances at once to the next stage still in the quest deck and that stage is revealed; a stage already gone is not an error`,
-    read: ["code"],
+    text: `the stage with code ${str(i.code)} is set aside and no longer part of the quest deck: the stage that is defeated before it goes to the next stage still in the quest deck; if it is the current stage, the quest advances at once to the next stage still in the quest deck and that stage is revealed; a stage already gone is not an error${i.announce === true ? "; a stage removed while the quest is at another stage is told in the log" : ""}`,
+    read: ["code", "announce"],
   }),
   ResolveTopmostTreachery: (i) => ({
     text: `resolve the When Revealed effects (not Doomed, not Surge) of the last treachery card placed in the encounter discard pile; the card stays in the discard pile; with no treachery there nothing happens${i.uncancelable === true ? "; these effects cannot be canceled" : ""}`,
@@ -145,7 +145,7 @@ export const PELARGIR_SAMPLES: Samples = {
   DiscardEncounterTopMore: [{ verb: "DiscardEncounterTopMore", count: 2, reset: true }],
   RaiseThreatPerDiscarded: [{ verb: "RaiseThreatPerDiscarded", type: "location", amount: 2 }],
   TakeControlOfStagedObjectives: [{ verb: "TakeControlOfStagedObjectives", trait: "Ranger" }],
-  RemoveStage: [{ verb: "RemoveStage", code: "05075" }],
+  RemoveStage: [{ verb: "RemoveStage", code: "05075", announce: true }],
   ResolveTopmostTreachery: [{ verb: "ResolveTopmostTreachery", uncancelable: true }],
   ShuffleStagingIntoEncounterDeck: [{ verb: "ShuffleStagingIntoEncounterDeck" }],
   BuildUnderworldDeck: [{ verb: "BuildUnderworldDeck", codes: ["05037", "06026"] }],

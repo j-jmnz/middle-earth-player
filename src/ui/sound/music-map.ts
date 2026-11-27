@@ -169,6 +169,7 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "race-across-harad": { calm: "rohan", combat: "uruk" },
   "beneath-the-sands": UNDERGROUND,
   "the-black-serpent": { calm: "crossroads", combat: "pelennor" },
+  "the-crossings-of-poros": { calm: "gondor", combat: "pelennor" },
   "the-dungeons-of-cirith-gurat": UNDERGROUND,
 };
 

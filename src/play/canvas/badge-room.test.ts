@@ -1,7 +1,7 @@
 // Rules: docs/design-system-table.md (Tokens and effects). The count of effect pills hidden behind the "N more" pill, which badgeReach keeps a word pill clear of.
 import { describe, expect, it } from "vitest";
 
-import { BADGE_TOP, BADGE_TOP_SHORT, badgeLayout, badgeRoom, badgeShown, coveredBand, footStop, hiddenBadges, footPillSpan, loneRow, pillFits, type FootMarks } from "./badge-room.ts";
+import { BADGE_TOP, BADGE_TOP_SHORT, NAME_LINE, badgeLayout, badgeRoom, badgeShown, coveredBand, footStop, hiddenBadges, footPillSpan, loneRow, pillFits, type FootMarks } from "./badge-room.ts";
 import { TOKEN } from "./token-spots.ts";
 import { underMarkBox } from "./under-mark.ts";
 
@@ -205,5 +205,13 @@ describe("footPillSpan", () => {
     expect(footPillSpan(46, 32, 0, 1)).toEqual({ left: 7, width: 32 });
     // A 46 pt card with a token: the pill starts at the token's edge and keeps inside the card.
     expect(footPillSpan(46, 32, 1, 1)).toEqual({ left: TOKEN + 1, width: 46 - 1 - (TOKEN + 1) });
+  });
+});
+
+describe("badgeLayout with a name of several lines", () => {
+  it("starts the pill column one line lower for each line the name takes after the first", () => {
+    const one = badgeLayout(120, 1, 13, null, null, 1).top;
+    expect(badgeLayout(120, 1, 13, null, null, 2).top).toBe(one + NAME_LINE);
+    expect(badgeLayout(120, 1, 13, null, null, 3).top).toBe(one + 2 * NAME_LINE);
   });
 });

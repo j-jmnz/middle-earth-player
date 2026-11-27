@@ -8,7 +8,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { LANDSCAPE, PORTRAIT, pointOf, selectorOf, slugOf } from "./app.ts";
 import { CONTAINER_CHROMIUM, chooseChromium } from "./chromium.ts";
 import { parseShotArgs, routesOf } from "./shot-args.ts";
-import { inputsStamp } from "./web-export.ts";
+import { exportDirFor, inputsStamp } from "./web-export.ts";
 
 const OWN = "/playwright/chromium";
 
@@ -105,5 +105,12 @@ describe("inputsStamp", () => {
     expect(inputsStamp(root)).toBe(first);
     writeFileSync(path.join(root, "src", "a.ts"), "two");
     expect(inputsStamp(root)).not.toBe(first);
+  });
+});
+
+describe("exportDirFor", () => {
+  it("gives each repo root its own export folder, the same one every time", () => {
+    expect(exportDirFor("/a/repo")).toBe(exportDirFor("/a/repo"));
+    expect(exportDirFor("/a/repo")).not.toBe(exportDirFor("/b/repo"));
   });
 });

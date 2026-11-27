@@ -15,6 +15,7 @@ import { guardianLocked, guardianSeat } from "../../rules/families/guardian/seat
 import { captiveDialWords } from "../words/scenarios/ungol.ts";
 import { guardianHeldWords } from "../words/scenarios/guardian.ts";
 import { gollumHeld } from "./marshes.ts";
+import { porosHeld } from "./haradrim/poros.ts";
 
 export type WidgetReadouts = {
   // The Ring-bearer's life (mec109.ringbearers-life), or null when the scenario has no life tracker.
@@ -94,7 +95,7 @@ export function heldDials(game: ScenarioState, nameOf: (code: string) => string,
     // An ally an enemy holds wears the ally mark and says its words on the dial; a hero wears the hero mark. A seat that holds several wears the mark of the one held last, whose words come last.
     dials.set(card.owner, { seat: card.owner, words: before ? `${before.words}. ${words}` : words, mark: isHeldCharacter(card) ? "ally" : "hero" });
   }
-  for (const gollum of [...gollumHeld(game), ...guardianHeld(game)]) {
+  for (const gollum of [...gollumHeld(game), ...guardianHeld(game), ...porosHeld(game)]) {
     const before = dials.get(gollum.seat);
     dials.set(gollum.seat, { seat: gollum.seat, words: before ? `${before.words}. ${gollum.words}` : gollum.words, mark: before?.mark ?? gollum.mark });
   }

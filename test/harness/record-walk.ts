@@ -47,13 +47,16 @@ function asksWithOption(instruction: Instruction): boolean {
     // The first player orders the Scour effects in play; the topmost card of the discard pile is one card.
     case "TriggerScour":
       return instruction.scope === "inPlay";
+    // Of several sets the one with the most cards left is drawn from, and the first player chooses among tied sets (hrd.multiple-encounter-sets).
+    case "RandomSetAside":
+      return instruction.sets.length > 1;
     default:
       return false;
   }
 }
 
 /** Every verb the words check counts as asking, with or without an option (scripts/checks/engine-asks.test.ts reads it). */
-export const ASKING_VERB_NAMES: ReadonlySet<string> = new Set([...ASKING, "RevealCorsair", "RemoveTimeCounters", "RevealOutOfPlay", "Each", "TriggerScour"]);
+export const ASKING_VERB_NAMES: ReadonlySet<string> = new Set([...ASKING, "RevealCorsair", "RemoveTimeCounters", "RevealOutOfPlay", "Each", "TriggerScour", "RandomSetAside"]);
 
 /**
  * Does the instruction ask a player something the sheet has to word: a verb of ASKING, or RevealCorsair when the first player names who reveals it (12154:A:1; its other readings name nobody). The one predicate the words

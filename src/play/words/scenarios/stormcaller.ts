@@ -5,6 +5,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 
 import type { ChoiceNames } from "../choice.ts";
+import { listAnd } from "../list.ts";
 
 /** The preview sentence of a card in the Stormcaller's area while the players are at another stage than the Stormcaller's (the zone `stormcallerArea`). */
 export const AREA_APART = "In the Stormcaller's area: not in the staging area, immune to player card effects";
@@ -45,7 +46,7 @@ export const STAGE_APART_WORD = "Apart";
 
 const stages = (codes: readonly string[]): string => {
   const names = codes.map((_, at) => `${at + 2}C`);
-  return names.length <= 1 ? (names[0] ?? "") : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+  return listAnd(names);
 };
 
 /** One instruction of the family in words, or null when it is not one of them. */

@@ -1,8 +1,6 @@
 import type { ScenarioState } from "../../../src/rules/core/state.ts";
-import { expectOk } from "../../../src/rules/core/test-fixture.ts";
-import type { EngineStep } from "../../../src/rules/core/intents.ts";
-import { reduce, type ReduceContext } from "../../../src/rules/engine/reduce.ts";
-import type { PlayedGame } from "../../harness/game-kit.ts";
+import type { ReduceContext } from "../../../src/rules/engine/reduce.ts";
+import { stepsByIntent, type PlayedGame } from "../../harness/game-kit.ts";
 import { TOWER } from "../../../src/rules/families/pelargir/ruined-tower.ts";
 import { controlledIds, UNIQUE } from "./game.ts";
 
@@ -48,15 +46,8 @@ export function momentsOf(played: PlayedGame): Moment[] {
 
 export const isUnique = (code: string): boolean => (UNIQUE as readonly string[]).includes(code);
 
-/** The engine steps of each intent of the game (the game replayed: a played game keeps its steps in one list). */
-export function stepsByIntent(played: PlayedGame, ctx: ReduceContext): (readonly EngineStep[])[] {
-  let state = played.kept;
-  return played.intents.map((intent) => {
-    const result = expectOk(reduce(state, intent, ctx));
-    state = result.state;
-    return result.steps;
-  });
-}
+// The engine steps of each intent come from the play itself (game-kit.ts, `stepsByIntent`), never from a second replay.
+export { stepsByIntent };
 
 /** The shadow cards whose Shadow line returns a location when the attack destroys a character (West Quarter, East Quarter, Pinned Down). */
 export const RETURNING_SHADOWS: readonly string[] = ["06100", "06101", "06104"];

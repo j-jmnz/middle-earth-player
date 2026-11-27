@@ -32,7 +32,12 @@ export type EngineStep =
   | { kind: "fortitudeTest"; seat: number; discardedIds: readonly string[]; willpower: number; eyes: number; success: boolean }
   | { kind: "hideTest"; cardId: string; discardedIds: readonly string[]; willpower: number; threat: number; success: boolean }
   // `stormcaller`: the Stormcaller's quest stage advanced (dcce.stormcallers-area-stages), not the players' quest.
-  | { kind: "advance"; cardId: string; stormcaller?: true }
+  // `random`: a stage chosen at random by a record that announces it (`announce`, The Crossings of Poros): the stages it was chosen among (the ones the quest deck still held) and the card line that named the draw.
+  | { kind: "advance"; cardId: string; stormcaller?: true; random?: { from: readonly string[]; cause: Cause } }
+  // A stage left the quest by a record that announces it (`announce`): removed from the game (RemoveStage) or set aside (SetStagesAside). `cause` is its line.
+  | { kind: "stageLeaves"; cardId: string; how: "removed" | "setAside"; cause: Cause }
+  // A card whose control follows the first player token (ControlledBy `announce`) passed to the seat that holds the token now.
+  | { kind: "controlPasses"; cardId: string; seat: number; cause: Cause }
   // The numbers quest resolution compared (rr.step-3-4): committed willpower against the threat in staging. It reports what
   // the engine read; the threat or progress that followed is its own step.
   | { kind: "quest"; willpower: number; threat: number; cause: Cause }

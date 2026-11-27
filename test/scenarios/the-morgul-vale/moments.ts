@@ -1,8 +1,7 @@
 import type { ScenarioState } from "../../../src/rules/core/state.ts";
-import { expectOk } from "../../../src/rules/core/test-fixture.ts";
 import type { EngineStep } from "../../../src/rules/core/intents.ts";
-import { reduce, type ReduceContext } from "../../../src/rules/engine/reduce.ts";
-import type { PlayedGame } from "../../harness/game-kit.ts";
+import type { ReduceContext } from "../../../src/rules/engine/reduce.ts";
+import { stepsByIntent, type PlayedGame } from "../../harness/game-kit.ts";
 import { ALCARON, BODYGUARD, POWER, BRIDGE, CAPTAINS, MURZAG, NAZGUL, TOWER } from "./game.ts";
 
 // Test helper. The moments of a played Morgul Vale game that its goldens and its seed finder name, read from the engine steps and the states between the intents (`trail`): each is the index of the intent that made it, so a
@@ -23,20 +22,8 @@ export const effectOf = (step: EngineStep): string => {
   return cause?.effect ?? (cause?.rule ? `rule:${cause.rule}` : "");
 };
 
-/** The engine steps of each intent of the game (the game replayed: a played game keeps its steps in one list). */
-const STEPS = new WeakMap<PlayedGame, (readonly EngineStep[])[]>();
-export function stepsByIntent(played: PlayedGame, ctx: ReduceContext): (readonly EngineStep[])[] {
-  const known = STEPS.get(played);
-  if (known) return known;
-  let state = played.kept;
-  const steps = played.intents.map((intent) => {
-    const result = expectOk(reduce(state, intent, ctx));
-    state = result.state;
-    return result.steps;
-  });
-  STEPS.set(played, steps);
-  return steps;
-}
+// The engine steps of each intent come from the play itself (game-kit.ts, `stepsByIntent`), never from a second replay.
+export { stepsByIntent };
 
 const MOMENTS = new WeakMap<PlayedGame, Moment[]>();
 export function momentsOf(played: PlayedGame, ctx: ReduceContext): Moment[] {

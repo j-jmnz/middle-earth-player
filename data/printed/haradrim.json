@@ -3253,7 +3253,7 @@
         "sha256": "71598d0f7baec2a090d3744b6d27552d2f643346d9f57a673b56df0904d54e57"
       },
       "lines": [
-        "Forced: After a player plays an ally, he must exhaust that ally or raise his threat by 1.",
+        "Forced: After a player plays an ally, he must either exhaust that ally or raise his threat by 1.",
         "Forced: When this stage is defeated, advance to a random stage 3."
       ],
       "inert": [],

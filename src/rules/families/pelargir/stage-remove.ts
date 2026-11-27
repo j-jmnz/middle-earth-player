@@ -3,6 +3,7 @@
 // stage still in the quest deck, which is revealed (docs/scenarios/against-the-shadow/the-siege-of-cair-andros.md, Readings).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
@@ -15,5 +16,7 @@ export function removeStage(state: ScenarioState, instruction: Extract<Instructi
   // The removal is recorded on the card, so the stage list names a removed stage as removed, not as an earlier stage.
   if (current?.code === instruction.code) return advanceNow(updateCard(state, current.id, { removedStage: true }), ctx, steps);
   const id = state.questDeck.find((candidate) => state.cards[candidate]?.code === instruction.code);
-  return id ? moveCard(updateCard(state, id, { removedStage: true }), id, { zone: "setAside" }) : state;
+  if (!id) return state;
+  if (instruction.announce === true) steps.push({ kind: "stageLeaves", cardId: id, how: "removed", cause: currentCause(steps, UNATTRIBUTED) });
+  return moveCard(updateCard(state, id, { removedStage: true }), id, { zone: "setAside" });
 }

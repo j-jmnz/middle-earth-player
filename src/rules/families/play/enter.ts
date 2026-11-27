@@ -68,7 +68,7 @@ export function enterPlay(state: ScenarioState, id: string, seat: number, terms:
   const fromHand = card.zone === "hand" ? (card.controller ?? owner) : null;
   let next = moveCard(state, id, { zone: printed.type === "hero" ? "heroes" : "play", seat });
   if (fromHand != null) next = noteHandPlay(next, ctx, fromHand, id);
-  next = updateCard(next, id, { exhausted: terms.exhausted === true || entersExhausted(ctx, card.code), committed: terms.committed === true, owner: owner !== seat ? owner : undefined, ...(terms.then === "removeFromGame" ? { temporary: true as const } : {}) });
+  next = updateCard(next, id, { exhausted: terms.exhausted === true || entersExhausted(state, ctx, card.code), committed: terms.committed === true, owner: owner !== seat ? owner : undefined, ...(terms.then === "removeFromGame" ? { temporary: true as const } : {}) });
   if (terms.damage) {
     next = updateCard(next, id, { damage: terms.damage });
     steps.push({ kind: "damage", targetId: id, amount: terms.damage, cause: currentCause(steps, UNATTRIBUTED) });

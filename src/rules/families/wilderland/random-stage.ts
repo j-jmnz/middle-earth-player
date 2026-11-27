@@ -15,7 +15,7 @@ import type { PrintedCard } from "../../core/printed.ts";
  * The stage the quest proceeds to from the stage `currentCode` when that stage names AdvanceToRandomStage: one of the stages it lists that is still in the quest deck, chosen with the game's seed, else its `otherwise`. `remove`: the stage left is removed from the game.
  * Null for a stage that names none, so every other quest is untouched; `id` is undefined when no stage is left to go to. `own` is the set a record names for this one advance (08095:B:2); without it the stage's own set (its defeat) is read.
  */
-export function randomStageFrom(state: ScenarioState, currentCode: string, own?: RandomNext): { state: ScenarioState; id: string | undefined; remove: boolean; back: boolean } | null {
+export function randomStageFrom(state: ScenarioState, currentCode: string, own?: RandomNext): { state: ScenarioState; id: string | undefined; remove: boolean; back: boolean; from?: readonly string[]; cause?: Cause } | null {
   const named = own ?? state.stages.find((stage) => stage.code === currentCode)?.randomNext;
   if (!named) return null;
   const inDeck = (code: string): string | undefined => state.questDeck.find((candidate) => state.cards[candidate]?.code === code);
@@ -25,7 +25,8 @@ export function randomStageFrom(state: ScenarioState, currentCode: string, own?:
   if (left.length === 0) return { state, id: named.otherwise ? inDeck(named.otherwise) : undefined, remove: named.remove === true, back };
   const rolled = shuffleIds(left, state.seed, state.seedCursor);
   const chosen = rolled.ids[0];
-  return { state: { ...state, seedCursor: rolled.cursor }, id: chosen ? inDeck(chosen) : undefined, remove: named.remove === true, back };
+  const told = named.announce ? { from: left.flatMap((code) => inDeck(code) ?? []), cause: { effect: named.announce.effect, line: named.announce.line } } : {};
+  return { state: { ...state, seedCursor: rolled.cursor }, id: chosen ? inDeck(chosen) : undefined, remove: named.remove === true, back, ...told };
 }
 
 /**

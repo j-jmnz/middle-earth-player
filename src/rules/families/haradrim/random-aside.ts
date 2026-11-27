@@ -9,10 +9,10 @@ import type { ScenarioState } from "../../core/state.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { startReveal } from "../../windows/frames.ts";
 import type { Focus } from "../index.ts";
-import { drawRandomSetAside } from "./capture.ts";
+import { drawRandomSetAside, withTrait } from "../../core/set-aside-draw.ts";
 
 /** RevealRandomSetAside: one set-aside card with the trait (the ids in order, one step of the seed) is revealed by the actor. Nothing happens with none set aside. */
 export function revealRandomSetAside(state: ScenarioState, instruction: Extract<Instruction, { verb: "RevealRandomSetAside" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const drawn = drawRandomSetAside(state, instruction.trait, ctx);
+  const drawn = drawRandomSetAside(state, withTrait(state, ctx.cards, instruction.trait));
   return drawn ? startReveal({ ...state, seedCursor: state.seedCursor + 1 }, focus.seat, ctx, steps, drawn) : state;
 }

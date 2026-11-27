@@ -1,6 +1,7 @@
 // Rules: mec112.mire, mec112.gollum-smeagol (data/rules/entries.json); ledger lines 144019:A:1, 144020:A:2, 144021:A:1, 144022:A:1, 144023:A:1, 144064:B:1, 144075:A:1, 144075:A:3, 144076:A:1. The words of The Passage of the Marshes' table dials and held marks (src/play/readouts/marshes.ts).
 
 /** One location with Mire as the table holds it: its name, the mire tokens on it and its Mire X. */
+import { listAnd } from "../list.ts";
 export type MireRow = { name: string; tokens: number; limit: number };
 
 const tokensWord = (count: number): string => (count === 1 ? "1 mire token" : `${count} mire tokens`);
@@ -14,7 +15,7 @@ export function nearestRows(rows: readonly MireRow[]): readonly MireRow[] {
 /** "A", "A and B", "A, B and C". */
 export function listNames(rows: readonly MireRow[]): string {
   const names = rows.map((row) => row.name);
-  return names.length < 2 ? (names[0] ?? "") : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+  return listAnd(names);
 }
 
 /** The Mire dial's own warning (mec112.mire): at 1 mire token left a location is one token from being discarded; with more left the ring's proportion speaks alone. */

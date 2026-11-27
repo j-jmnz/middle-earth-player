@@ -46,6 +46,18 @@ export const HARADRIM_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => M
     read: ["count", "marked"],
   }),
   AddTopmostFromDiscard: (i) => ({ text: `the ${str(i.cardType)} put on the encounter discard pile last is added to the staging area (nothing with none there)`, read: ["cardType"] }),
+  RandomSetAside: (i) => {
+    const sets = (Array.isArray(i.sets) ? i.sets : []).map(str);
+    const from = sets.length === 1 ? `the set aside ${sets[0]} set` : `the set aside encounter set with the most cards remaining (among ${sets.join(", ")}; the first player chooses among tied sets; a set removed from the game has none left)`;
+    const card = `1 random card${i.cardType === "enemy" ? " that is an enemy" : ""} of ${from}, drawn by the game seed (nothing when none is left)`;
+    const to = i.to === "pick" ? "it becomes the last picked card and stays set aside (an option that reads it is offered only while there is one)" : i.to === "discard" ? "it is placed into the encounter discard pile and is part of the encounter deck from then on" : i.to !== "reveal" ? "it stays set aside" : "the acting player reveals it as if it were the top card of the encounter deck (Surge, Doomed and When Revealed apply) and it is part of the encounter deck from then on";
+    return { text: `choose ${card}: ${to}`, read: ["sets", "cardType", "to"] };
+  },
+  SetStagesAside: (i) => ({ text: `each stage with code ${(Array.isArray(i.codes) ? i.codes : []).map(str).join(", ")} still in the quest deck is set aside, out of play (the quest no longer reaches it)`, read: ["codes"] }),
+  SearchAsideStageSets: (i) => ({
+    text: `search the encounter deck and its discard pile for each enemy of the encounter set that the first icon names on each of the stages ${(Array.isArray(i.stages) ? i.stages : []).map((stage) => `${str((stage as Obj).code)} (${str((stage as Obj).set)})`).join(", ")} that is set aside, and add them to the staging area, not revealed (the record shuffles the deck after)`,
+    read: ["stages"],
+  }),
   SetAsideCode: (i) => ({ text: `the card with code ${str(i.code)} in play, wherever it lies, is set aside, out of play, with no damage (nothing when none is in play)`, read: ["code"] }),
   AttachCaptive: (i) => ({
     text: `${typeof i.code === "string" ? `the set-aside card with code ${i.code}` : cardRef(i.card ?? "picked")} is attached to ${cardRef(i.to ?? "self")} as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); while attached it loses its card type and its player card status and is an objective, hrd.captives-of-cirith-gurat; the Captives of Cirith Gurat hear it${i.discardCopies === true ? "; each other card in play with its title is discarded" : ""} (nothing with no such card or no host)`,
@@ -83,6 +95,9 @@ export const HARADRIM_SAMPLES: Samples = {
   StageMarkedFromTop: [{ verb: "StageMarkedFromTop", count: 3, marked: ["17066", "17067"] }],
   AddTopmostFromDiscard: [{ verb: "AddTopmostFromDiscard", cardType: "location" }],
   SetAsideCode: [{ verb: "SetAsideCode", code: "17065" }],
+  RandomSetAside: [{ verb: "RandomSetAside", sets: ["Harad Soldiers"], cardType: "enemy", to: "pick" }, { verb: "RandomSetAside", sets: ["Desert Sands", "Mountains of Shadow"], to: "reveal" }, { verb: "RandomSetAside", sets: ["Desert Sands", "Mountains of Shadow"], to: "discard" }],
+  SetStagesAside: [{ verb: "SetStagesAside", codes: ["17161", "17162"] }],
+  SearchAsideStageSets: [{ verb: "SearchAsideStageSets", stages: [{ code: "17160", set: "Desert Creatures" }, { code: "17161", set: "Harad Soldiers" }] }],
   AttachCaptive: [{ verb: "AttachCaptive" }, { verb: "AttachCaptive", card: "defender", to: "attacker", discardCopies: true }, { verb: "AttachCaptive", code: "17120", to: "picked" }],
   RescueCaptured: [{ verb: "RescueCaptured" }, { verb: "RescueCaptured", host: "self" }],
   StripCaptive: [{ verb: "StripCaptive" }, { verb: "StripCaptive", target: "picked" }],

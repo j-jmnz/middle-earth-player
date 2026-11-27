@@ -81,7 +81,7 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
   17094:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
-    - this card: stat neverEngaged (no player optionally engages it while it cannot leave the staging area: it is only considered engaged) 1, while this card is in play
+    - this card: stat neverEngaged (it is only considered engaged: the table shows it as never engaged; no check and no optional engagement reaches it while it cannot leave the staging area, rr.cannot) 1, while this card is in play
     - this card: stat cannotTakeDamage 1, while this card is in play
 
 17094:A:2 (front): The Black Serpent gets +X Threat, +X Attack and +X Defense.

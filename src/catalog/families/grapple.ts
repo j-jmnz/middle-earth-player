@@ -35,7 +35,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("FlipEliteAndAttack"), name: z.string().min(1), ...when }),
   // "Search the encounter deck, discard pile and all play areas for each encounter card from the Corsair Raiders encounter set and remove each of those cards from the game" (12040:B:1): every
   // card of the set in the encounter deck, the encounter discard pile, the staging area, a player's engaged enemies, the active location and the cards attached to them leaves the game.
-  z.strictObject({ verb: z.literal("RemoveEncounterSet"), set: z.string().min(1), ...when }),
+  // With `setAsideOnly` only the cards of the set still set aside leave the game: a card an earlier effect put into the deck, the discard pile or play is part of the encounter deck by then and stays ("Remove the Mountains of Shadow encounter set", 17158:A:1; hrd.removed-from-the-game, hrd.multiple-encounter-sets).
+  z.strictObject({ verb: z.literal("RemoveEncounterSet"), set: z.string().min(1), setAsideOnly: z.literal(true).optional(), ...when }),
   // "Shuffle ... the previously set aside The Thing in the Depths encounter set into the encounter deck" (12040:B:1): every set-aside card of the set joins the encounter deck. The deck is
   // shuffled by the ShuffleEncounterDeck after it.
   z.strictObject({ verb: z.literal("ShuffleSetAsideSet"), set: z.string().min(1), ...when }),
