@@ -4,7 +4,7 @@
 // (docs/design-system-table.md, Motion). The rule is already resolved when a card moves; the motion only shows it. This file
 // says what each card does (flip, wait its turn, rise on an arc, land with a squash or a pop); motion/pose.ts works out the pose
 // at a moment from src/ui/motion-tokens.ts, and the UI never computes a number of its own.
-import type { ZoneName } from "../../rules/core/state.ts";
+import type { ScenarioState, ZoneName } from "../../rules/core/state.ts";
 
 import type { CardSlot, Rect, TableLayout } from "../layout/layout.ts";
 import { MOTION, SHAPE } from "../../ui/motion-tokens.ts";
@@ -27,6 +27,8 @@ export type Motion = {
   delay: number;
   arc: number;
   land: "squash" | "pop" | null;
+  // A card turned over in place to the other face of its double-sided card (Beneath the Sands' Search objective, Day and Night, a Grotto, a Gundabad stage): the picture it showed, which the turn shows until its midpoint.
+  fromPicture?: string;
 };
 
 // The decks of the second slot a card is revealed from, and the decks that are refilled from a discard pile of their own.
@@ -48,7 +50,16 @@ export type MotionOptions = {
   zoneWas?: (cardId: string) => ZoneName | null;
   // The location a card was grappled with in the state before, or null: a detached enemy starts under that location, facedown, and turns over as it lands in the staging area (dcce.grapple).
   grappledFrom?: (cardId: string) => string | null;
+  // The code a card showed in the state before when it now shows the other face of the same double-sided card (its `other` is that code), or null: a card that only changed code, or lay facedown, does not turn.
+  turnedFrom?: (cardId: string) => string | null;
 };
+
+/** The code a card showed in `prev` when it now shows the other face of the same double-sided card (`other` is the code it showed, as every flip writes it), else null: a card that only changed code does not turn. */
+export function turnedFrom(prev: ScenarioState, next: ScenarioState, cardId: string): string | null {
+  const was = prev.cards[cardId];
+  const now = next.cards[cardId];
+  return was && now && was.code !== now.code && now.other === was.code ? was.code : null;
+}
 
 /** The turn a slot is drawn at: an exhausted card lies sideways, an unconscious character is upside down, a hand card keeps its slight fan. */
 export function slotRotation(slot: CardSlot): number {
@@ -124,7 +135,9 @@ export function motionsBetween(
       const played = was.zone === "hand" && slot.zone !== "hand";
       // The one enemy of a grappled stack that showed under its location turns over as it is detached.
       const turned = was.kind === "attachment" && was.faceDown && !slot.faceDown && slot.kind === "card";
-      motions.set(slot.id, { ...from(slot, was, slotRotation(was), 1), flip: turned, land: played ? "squash" : turned ? "pop" : null });
+      // The card shows the other face of its double-sided card: it turns over where it lies, from the face it showed (never a facedown card turning up, which is a reveal, nor another card in the slot).
+      const overturned = slot.kind === "card" && was.kind === "card" && !was.faceDown && !slot.faceDown && was.code !== slot.code && options.turnedFrom?.(slot.id) === was.code;
+      motions.set(slot.id, { ...from(slot, was, slotRotation(was), 1), flip: turned || overturned, land: played ? "squash" : turned ? "pop" : null, ...(overturned ? { fromPicture: was.picture ?? was.code } : {}) });
       continue;
     }
     // A detached enemy comes out from under the location it was grappled with and turns over.

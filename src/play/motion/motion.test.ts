@@ -2,13 +2,13 @@
 // where a card starts, whether it flips, how long it waits, how high it rises, how it lands.
 import { describe, expect, it } from "vitest";
 
-import type { ZoneName } from "../../rules/core/state.ts";
+import type { ScenarioState, ZoneName } from "../../rules/core/state.ts";
 
 import type { CardSlot, Rect, SlotKind, SlotZone, TableLayout } from "../layout/layout.ts";
 import { ease } from "./curves.ts";
 import { ghostEnd, ghostPoseAt, landAt, motionEnd, motionSpan, poseAt } from "./pose.ts";
 import { MOTION, SHAPE } from "../../ui/motion-tokens.ts";
-import { motionsBetween, still } from "./motion.ts";
+import { motionsBetween, still, turnedFrom } from "./motion.ts";
 
 const CARD = { w: 50, h: 70 };
 const piles = {
@@ -361,5 +361,44 @@ describe("motionsBetween: the fold stack", () => {
     const { ghosts } = motionsBetween(before, after, () => "staging");
     expect(ghosts).toHaveLength(1);
     expect(ghosts[0]).toMatchObject({ leave: "glide", dx: 125 - 225, dy: 0 });
+  });
+});
+
+describe("motionsBetween: a card turned over in place to the other face of its double-sided card", () => {
+  const rect = at(200, 100);
+  const objective = (over: Partial<CardSlot> = {}, id = "obj") => slot(id, "staging", rect, { code: "17080", ...over });
+  const turned = (id: string) => (cardId: string) => (cardId === id ? "17079" : null);
+
+  it("turns the card over where it lies, showing the face it leaves until the midpoint", () => {
+    const before = layout([slot("obj", "staging", rect, { code: "17079", picture: "17079.B" })]);
+    const { motions } = motionsBetween(before, layout([objective()]), nowhere, { turnedFrom: turned("obj") });
+    const motion = motions.get("obj");
+    expect(motion?.flip).toBe(true);
+    expect(motion?.fromPicture).toBe("17079.B");
+    expect([motion?.dx, motion?.dy, motion?.scale, motion?.land]).toEqual([0, 0, 1, null]);
+    expect(still(motion!)).toBe(false);
+    expect(poseAt(motion!, 0, 1).back).toBe(true);
+  });
+
+  it("does not turn a card that only changed code, one that lay facedown, or one the state does not say turned", () => {
+    const code = (id: string) => (id === "obj" ? "17079" : null);
+    const before = layout([slot("obj", "staging", rect, { code: "17079" })]);
+    expect(motionsBetween(before, layout([objective()]), nowhere).motions.get("obj")?.flip).toBe(false);
+    expect(motionsBetween(before, layout([objective()]), nowhere, { turnedFrom: () => null }).motions.get("obj")?.flip).toBe(false);
+    const down = layout([slot("obj", "staging", rect, { code: "17079", faceDown: true })]);
+    expect(motionsBetween(down, layout([objective()]), nowhere, { turnedFrom: code }).motions.get("obj")?.flip).toBe(false);
+  });
+});
+
+describe("turnedFrom", () => {
+  it("names the code a card showed when it now shows the other face, and nothing for a new card or the same code", () => {
+    const card = (code: string, other?: string) => ({ id: "c", code, ...(other ? { other } : {}) });
+    const game = (cards: object) => ({ cards }) as unknown as ScenarioState;
+    expect(turnedFrom(game({ c: card("17079") }), game({ c: card("17080", "17079") }), "c")).toBe("17079");
+    expect(turnedFrom(game({ c: card("17079") }), game({ c: card("17080") }), "c")).toBeNull();
+    expect(turnedFrom(game({ c: card("17080") }), game({ c: card("17080", "17079") }), "c")).toBeNull();
+    expect(turnedFrom(game({}), game({ c: card("17080", "17079") }), "c")).toBeNull();
+    // A different card in the slot: the old code is not the other face of the new one.
+    expect(turnedFrom(game({ c: card("17079") }), game({ c: card("99999", "17080") }), "c")).toBeNull();
   });
 });

@@ -48,6 +48,8 @@ export type PieceProps = BodyProps & {
   clock: Clock;
   /** A veiled card (the open pick dims the others, a muted hand card, the Sailing test's look): card kinds only. */
   dimmed: boolean;
+  /** The face a card turning over in place shows until the turn's midpoint (motion.fromPicture): its picture, image and name; null for any other card. */
+  turnedFrom: { picture: string; image: BodyProps["image"]; name: string } | null;
   /** The banner's line names this card. */
   beat: boolean;
   /** The night veil: a peek at the other seat's hand veils its cards, and the Stormcaller's area veils its cards while the players are at another stage (docs/design-system-table.md, Cards). */
@@ -134,6 +136,12 @@ function handInfo(slot: CardSlot, ctx: PieceContext): SlotNumbers | null {
   return { effects: { stats: [], flags: [] }, willpower: null, commitStat: "willpower", questPoints: null, stageLoses: false, engagement: null, delayed: false, under, fire: null, loss: null, place: null, side: null, determined: null, dead: null, combat: null };
 }
 
+// The face a card turning over in place leaves: what its picture key names.
+function turnedFace(motion: Motion | undefined, ctx: PieceContext): PieceProps["turnedFrom"] {
+  const picture = motion?.fromPicture;
+  return picture ? { picture, image: ctx.images.get(picture) ?? null, name: ctx.nameOf(picture) } : null;
+}
+
 /** Everything the drawing of one slot reads, from the canvas's context for this render. */
 export function pieceProps(slot: CardSlot, ctx: PieceContext): PieceProps {
   const card = slot.kind === "card";
@@ -147,6 +155,7 @@ export function pieceProps(slot: CardSlot, ctx: PieceContext): PieceProps {
     ...(pills > 0 ? { nameLines: 1 } : slot.zone === "questStage" || slot.zone === "activeLocation" ? { nameLines: 2 } : {}),
     motion: ctx.motions.get(slot.id) ?? AT_REST,
     clock: ctx.clock,
+    turnedFrom: turnedFace(ctx.motions.get(slot.id), ctx),
     dimmed: card && isDimmed(slot, ctx),
     beat: ctx.beating.has(slot.id),
     veiledHand: card && ((ctx.peeking && slot.zone === "hand") || slot.stormcaller === "apart"),
@@ -224,6 +233,7 @@ const MOTION_FIELDS = Object.keys({
   delay: true,
   arc: true,
   land: true,
+  fromPicture: true,
 } satisfies Record<keyof Motion, true>) as (keyof Motion)[];
 
 /** True when two motions are the same: a new layout makes a new object for every card, most of them at rest. */
@@ -282,6 +292,7 @@ const SAME: { readonly [K in keyof PieceProps]-?: (a: PieceProps[K], b: PiecePro
   s: same,
   motion: sameMotion,
   clock: same,
+  turnedFrom: sameData,
   dimmed: same,
   beat: same,
   veiledHand: same,

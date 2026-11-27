@@ -118,8 +118,9 @@ function drawOverlay(p: PieceProps) {
 }
 
 function Piece(p: PieceProps) {
-  // A card that flips shows its printed back until the midpoint of the turn.
-  const back = p.motion.flip ? drawBody(p, { ...p.slot, faceDown: true }, false) : undefined;
+  // A card that flips shows its printed back until the midpoint of the turn; one that turns over in place shows the face it leaves.
+  const from = p.turnedFrom;
+  const back = p.motion.flip ? (from ? drawBody({ ...p, image: from.image, name: from.name }, { ...p.slot, picture: from.picture }, false) : drawBody(p, { ...p.slot, faceDown: true }, false)) : undefined;
   return (
     <Moving slot={p.slot} motion={p.motion} clock={p.clock} back={back} frame={drawFrame(p)} overlay={drawOverlay(p)}>
       {drawBody(p, p.slot, p.lifted)}
