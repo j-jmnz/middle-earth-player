@@ -187,6 +187,7 @@ describe("static stat modifiers (141013:A:2, 141014:A:2, 01027:A:2, 142004:A:1, 
       { trigger: "damageDealt", seat: 0, cardId: axehand, subject: axehand, amount: 9 },
       { trigger: "leftPlay", seat: 0, cardId: axehand },
       { trigger: "allyLeftPlay", seat: 0, subject: axehand },
+      { trigger: "damaged", seat: 0, cardId: axehand, subject: axehand, amount: 9 },
       { trigger: "characterDestroyed", seat: 0, subject: axehand },
     ]);
     const after = send(begin(hit), { type: "Pass" }, tab.ctx).state;

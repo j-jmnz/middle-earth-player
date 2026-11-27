@@ -34,6 +34,8 @@ export type AttackDefense = {
   excess?: number;
   // The hit points (with their modifiers) of each character whose damage went beyond them, noted when a card reads the excess (excessOf, 18049:A:2): the excess is the damage left on the destroyed character beyond them.
   hitPointsOn?: Readonly<Record<string, number>>;
+  // The cards this attack placed combat damage on, as the damage went to them (a redirect of Song of Mocking or Alcaron's Scroll that ends with the attack, or its host that left play, is not read again at the attack's end): destroyedByAttack reads them.
+  hit?: readonly string[];
   // The attacking enemy's Attack when its shadow cards began to resolve, to tell whether one increased it.
   attackBefore?: number;
   // The characters this attack placed damage on, each with the damage it held before, noted while a card hears `attackDamagedCharacter` (families/angmar/damage.ts).
