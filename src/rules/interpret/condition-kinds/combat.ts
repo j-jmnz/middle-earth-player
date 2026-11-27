@@ -4,14 +4,13 @@ import { attackingHolds } from "../../families/attack/strike.ts";
 import { defendingAgainst } from "../../families/angmar/combat.ts";
 import { inAreaOf } from "../../families/breaking/areas.ts";
 import { encounterUncancelable } from "../../families/encounter/cancel.ts";
-import { flagged } from "../../core/state.ts";
+import { flagged, livingSeats } from "../../core/state.ts";
 import { hasShadowEffect } from "../../families/defense/shadow.ts";
 import { combatStepIs } from "../../families/defense/conditions.ts";
 import { engagedThisPhase } from "../../families/quest/conditions.ts";
 import { seatThreat } from "../../families/play/hooks.ts";
 import { modifiedStat, versusDefender, versusHighEngagement } from "../../core/modified-stat.ts";
 import { printedOf } from "../../core/printed.ts";
-import { livingSeats } from "../../core/state.ts";
 import { hostOf } from "../amounts.ts";
 import type { ConditionHandlers } from "../condition-scope.ts";
 

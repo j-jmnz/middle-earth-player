@@ -47,13 +47,13 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
     who acts: the acting player is the player the enemy engaged
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ally (you control)
-    - the picked card is attached to this card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+    - the picked card is attached to this card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); while attached it loses its card type and its player card status and is an objective, hrd.captives-of-cirith-gurat; the Captives of Cirith Gurat hear it (nothing with no such card or no host)
 
 17121:A:2 (shadow): Shadow: If attacking enemy's Threat is greater than defending ally's Willpower, attach defending ally to attacking enemy. Then, cancel this attack.
   17121:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if all of: (the attacking enemy's current Threat is greater than the defending character's current Willpower (false when the attack has no defending character)) and (the defender is a ally (any player controls)): the defender is attached to the attacking enemy as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+    - if all of: (the attacking enemy's current Threat is greater than the defending character's current Willpower (false when the attack has no defending character)) and (the defender is a ally (any player controls)): the defender is attached to the attacking enemy as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); while attached it loses its card type and its player card status and is an objective, hrd.captives-of-cirith-gurat; the Captives of Cirith Gurat hear it (nothing with no such card or no host)
     - then, if all of: (the attacking enemy's current Threat is greater than the defending character's current Willpower (false when the attack has no defending character)) and (the defender is a card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free)) (checked when this step runs, after the steps above; not tied to whether they did anything): the attack in progress is canceled: no shadow effect or damage resolves after this, and the enemy's attack is used up
 
 ## 17122 Prison Guard
@@ -68,7 +68,7 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
   17122:forced:1: Forced on the event attackDamagedCharacter (heard about this card)
     only if all of: (this card is a enemy (any player controls) that holds no captive) and (the event's other card is a ally (any player controls) that is in play now)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the event's other card is attached to this card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+    - the event's other card is attached to this card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); while attached it loses its card type and its player card status and is an objective, hrd.captives-of-cirith-gurat; the Captives of Cirith Gurat hear it (nothing with no such card or no host)
 
 ## 17123 Dungeon Warg
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -120,7 +120,7 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
   17125:forced:1: Forced on the event characterDestroyed (heard about card (any player controls) or in the staging area or the active location, of card type ally)
     only if all of: (this card is in the staging area) and (this card is a location (any player controls) that holds no captive)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the card the event is about is attached to this card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+    - the card the event is about is attached to this card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); while attached it loses its card type and its player card status and is an objective, hrd.captives-of-cirith-gurat; the Captives of Cirith Gurat hear it (nothing with no such card or no host)
 
 ## 17126 Uruk Guardroom
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -160,7 +160,7 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the rest of the effect is carried out by the first player
     - the acting player discards cards from the top of their deck until an ally is discarded; it is the last picked card (nothing is picked when the deck holds none)
-    - the picked card is attached to this card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it; each other card in play with its title is discarded (nothing with no such card or no host)
+    - the picked card is attached to this card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); while attached it loses its card type and its player card status and is an objective, hrd.captives-of-cirith-gurat; the Captives of Cirith Gurat hear it; each other card in play with its title is discarded (nothing with no such card or no host)
 
 17128:A:2 (front): While Torture Room is guarding an objective, it gains: "Forced: At the end of the round, raise each player's threat by 1."
   17128:forced:1: Forced at the end of the round
@@ -179,7 +179,7 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
     - then, if any of: (the number of ally (you control) is less than 1) or (the number of card (any player controls) in the staging area only, that is an enemy or a location, with nothing attached to it, no attachment of any kind and no captive is less than 1) (checked when this step runs, after the steps above; not tied to whether they did anything): each player raises their threat by 2 from the doomed keyword this card gains (doomedRaised is announced for each)
     - choose ally (you control)
     - choose card (any player controls) in the staging area only, that is an enemy or a location, with nothing attached to it, no attachment of any kind and no captive
-    - the card picked before is attached to the picked card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+    - the card picked before is attached to the picked card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); while attached it loses its card type and its player card status and is an objective, hrd.captives-of-cirith-gurat; the Captives of Cirith Gurat hear it (nothing with no such card or no host)
 
 17129:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys an ally, reveal the top card of the encounter deck.
   17129:shadow:1: Shadow
@@ -214,7 +214,7 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - choose ally (you control)
-      - the picked card is attached to this card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+      - the picked card is attached to this card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); while attached it loses its card type and its player card status and is an objective, hrd.captives-of-cirith-gurat; the Captives of Cirith Gurat hear it (nothing with no such card or no host)
     - then, if not (there is a card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free), that this card holds to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): discard this card
     - then, if not (there is a card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free), that this card holds to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player reveals an encounter card
 
@@ -237,14 +237,14 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
   17132:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose location (any player controls) in the staging area only, named "Dungeon Cell"
-    - the set-aside card with code 17120 is attached to the picked card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+    - the set-aside card with code 17120 is attached to the picked card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); while attached it loses its card type and its player card status and is an objective, hrd.captives-of-cirith-gurat; the Captives of Cirith Gurat hear it (nothing with no such card or no host)
     - for each player, first player first:
       - the acting player finds one Orc enemy in the encounter deck and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
     - shuffle the encounter deck
     - for each player, first player first:
       - the acting player discards cards from the top of their deck until an ally that is not in play (an ally whose title a unique ally in play holds is skipped) is discarded; it is the last picked card (nothing is picked when the deck holds none)
       - choose enemy (any player controls) in the staging area only, with nothing attached to it, no attachment of any kind and no captive
-      - the card picked before is attached to the picked card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+      - the card picked before is attached to the picked card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); while attached it loses its card type and its player card status and is an objective, hrd.captives-of-cirith-gurat; the Captives of Cirith Gurat hear it (nothing with no such card or no host)
 
 17132:B:1 (back): Each enemy and location in the staging area that is guarding an objective is immune to player card effects.
   17132:constant:1: Constant
@@ -298,7 +298,7 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
       - choose hero (you control)
       - the picked card loses its damage, resource and progress tokens, and each attachment on it is discarded
       - choose enemy (any player controls) in the staging area only, with nothing attached to it, no attachment of any kind and no captive
-      - the card picked before is attached to the picked card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
+      - the card picked before is attached to the picked card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); while attached it loses its card type and its player card status and is an objective, hrd.captives-of-cirith-gurat; the Captives of Cirith Gurat hear it (nothing with no such card or no host)
     - then, if not (the number of hero (in play, controlled by no player) that is a Captive (held by an enemy or lying free) is less than the number of players) (checked when this step runs, after the steps above; not tied to whether they did anything): the players make engagement checks against each enemy in the staging area, outside the encounter phase: in player order each engages the enemy of the highest engagement cost at or below their threat, pass after pass until a pass engages none [also {"unguardedZero":true}]
 
 17134:B:1 (back): Forced: At the beginning of the quest phase, discard cards from the encounter deck until an enemy is discarded and add that enemy to the staging area.
