@@ -19,7 +19,6 @@ import { useReaderPanelOpen } from "../choice/reader-panel.ts";
 import { hidesFace, isDead, shownSeat } from "../store/selectors.ts";
 import type { ReaderSeed, TableCanvasProps } from "./table-canvas-types.ts";
 import { readerRows, type ReaderItem } from "./reader-table-rows.ts";
-import { useBannerHeight } from "../readouts/banner-height.ts";
 import { useFocusRing } from "../../ui/focus-ring.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
@@ -135,14 +134,12 @@ export function ReaderTable({ store, width, height, bottomInset, nameOf, inactiv
   useReaderGateEnd(store);
   // A reading panel over the table is modal on iOS; Android hides the table from TalkBack while it is open (reader-panel.ts).
   const panelOpen = useReaderPanelOpen();
-  // The outcome banner lies over the table's top, 4 pt under the top bar; while it is up the rows start under it, so a focused row is never covered (banner-height.ts).
-  const banner = useBannerHeight();
   const seat = useStore(store, (state) => shownSeat(state.game, state.viewedSeat));
   const game = useStore(store, (state) => state.game);
   // Peeking at the other seat: nothing is outlined, a tap only previews (use-table-choice.ts).
   const peeking = useStore(store, (state) => state.viewedSeat != null);
   const highlight = peeking ? NO_HIGHLIGHT : marked;
-  // The cards the banner's Discover beat lays in the look strip.
+  // The cards the last move's Discover lines lay in the look strip.
   const beatKey = useStore(beats, (state) => state.key);
   const discover = peeking ? 0 : lookIdsOf(beatIds(beatKey)).length;
   const lookWord = lookWordOf(beatIds(beatKey));
@@ -154,7 +151,7 @@ export function ReaderTable({ store, width, height, bottomInset, nameOf, inactiv
   const rows = readerRows(game, seat, { facts, cards: readerSeed.cards, nameOf, playable: highlight.tappable, discover, lookWord, deckFaceUp });
   const deps: CardSpeechDeps = { nameOf, inactive, facts, info, highlight, cards: readerSeed.cards, sheet: readerSeed.sheet, peeking };
   return (
-    <ScrollView testID="reader-table" importantForAccessibility={tableVisibility(Platform.OS, panelOpen)} style={{ width, height }} contentContainerStyle={{ padding: 12 * s, paddingTop: 12 * s + (banner > 0 ? banner + 4 * s : 0), paddingBottom: 12 * s + bottomInset }}>
+    <ScrollView testID="reader-table" importantForAccessibility={tableVisibility(Platform.OS, panelOpen)} style={{ width, height }} contentContainerStyle={{ padding: 12 * s, paddingBottom: 12 * s + bottomInset }}>
       {rows.map((section) => (
         <View key={section.key} className="mb-3 gap-1">
           {section.heading ? (
