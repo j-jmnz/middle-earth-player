@@ -6,6 +6,9 @@ import { describe, expect, it } from "vitest";
 import { idOf, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
 import { hitSlot } from "../layout/hits.ts";
 import { tableLayout, type LayoutViews, type PileViews } from "../layout/layout.ts";
+import { lineCount } from "../choice/dock/armed-room.ts";
+import { labelChars } from "../choice/dock/budget.ts";
+import { clickWords } from "../../ui/web/click-words.ts";
 import { PILES, TABLE_ZONES, pileSelector, secondPilesOf, zoneSelector } from "../store/selectors.ts";
 import { zoneFactsOf } from "../store/zone-facts.ts";
 import { effectById } from "../../rules/windows/listen.ts";
@@ -86,9 +89,24 @@ describe("the choice words", () => {
     expect(asked({ staging: [{ code: "17079", resources: 1 }] }, "17079:forced:1", 1)("location")?.label).toBe("Return the topmost location in the encounter discard pile to the staging area");
   });
 
-  it("17079:A:1 asks for a second tap when the raise takes the player who chooses to 50", () => {
-    expect(asked({ staging: [{ code: "17079", resources: 2 }], threat: [48, 28] }, "17079:forced:1", 1)("threat")?.caution).toBe("Tap again: Player 1 reaches 50 and is eliminated. If no player is left, the game is lost");
-    expect(asked({ staging: [{ code: "17079", resources: 2 }], threat: [47, 28] }, "17079:forced:1", 1)("threat")?.caution).toBeUndefined();
+  it("17079:A:1 asks for a second tap when the raise takes a player to 50, and names each player it takes", () => {
+    const threat = (resources: number, threats: [number, number], seats: 1 | 2 = 2) => asked({ seats, staging: [{ code: "17079", resources }], threat: threats }, "17079:forced:1", 1)("threat")?.caution;
+    expect(threat(2, [48, 28], 1)).toBe("Tap again: this takes your threat to 50 and eliminates you. If you are the last player, the game is lost");
+    expect(threat(2, [47, 28], 1)).toBeUndefined();
+    expect(threat(2, [48, 28])).toBe("Tap again: Player 1 reaches 50 and is eliminated. The game is lost if no player is left");
+    expect(threat(2, [28, 48])).toBe("Tap again: Player 2 reaches 50 and is eliminated. The game is lost if no player is left");
+    expect(threat(2, [48, 49])).toBe("Tap again: Player 1 and Player 2 reach 50 and are eliminated. The game is lost");
+    expect(threat(2, [47, 47])).toBeUndefined();
+  });
+
+  it("17079:A:1 keeps each two-seat caution to the three lines the dock holds at 667 x 375, with the web's \"Click again:\" (every word shows)", () => {
+    const threat = (threats: [number, number]) => asked({ seats: 2, staging: [{ code: "17079", resources: 2 }], threat: threats }, "17079:forced:1", 1)("threat")?.caution ?? "";
+    for (const threats of [[48, 28], [28, 48], [48, 49]] as [number, number][]) {
+      const words = clickWords(threat(threats));
+      expect(words.startsWith("Click again:"), words).toBe(true);
+      // The dock's text column is 198 pt wide at 667 x 375: labelChars of it, in label type.
+      expect(lineCount(words, labelChars(198)), words).toBeLessThanOrEqual(3);
+    }
   });
 
   it("17073:A:1 says what the flip does now: it flips from On Track, or changes nothing when Off Track is up or Lost Underground blocks it", () => {

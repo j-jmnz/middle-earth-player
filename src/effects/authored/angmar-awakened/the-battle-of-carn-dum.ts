@@ -126,7 +126,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     copyLine("41041:A:2", "10130:A:3"),
 
     // 10131 Werewolf of Angmar. Forced: after any event card is played it is dealt 1 shadow card; with exactly 3 shadow cards dealt to it in the staging area it engages the first player and attacks at once, with no new shadow card.
-    { id: "10131:forced:1", cardCode: "10131", lines: ["10131:A:1"], timing: "forced", trigger: "played", subject: { type: "card", control: "any", cardType: "event" }, instructions: [{ verb: "DealShadowInPlay", target: "self" }] },
+    { id: "10131:forced:1", cardCode: "10131", lines: ["10131:A:1"], timing: "forced", trigger: "eventResolved", subject: { type: "card", control: "any", cardType: "event" }, instructions: [{ verb: "DealShadowInPlay", target: "self" }] },
     {
       id: "10131:forced:2",
       cardCode: "10131",

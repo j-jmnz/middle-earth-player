@@ -1,4 +1,5 @@
 import type { Ask } from "../asks.ts";
+import { ELIMINATES_SEATS } from "../asks-conditions.ts";
 import type { Condition } from "../../../catalog/boundary.ts";
 import { ELIMINATION_LEVEL } from "../../../rules/core/eliminate.ts";
 
@@ -8,15 +9,7 @@ import { ELIMINATION_LEVEL } from "../../../rules/core/eliminate.ts";
 // threat or progress choice and the Redoubt's travel, so those sentences are not owned. Removing progress is a cost with no loss, so it has no caution; a threat raise that reaches the elimination level warns.
 // Chaos in the Night raises every player's threat, so the warning reads each seat's threat (the condition seatThreat) and names the players it eliminates; a solo game says "your".
 const REACHES = (seat: number): Condition => ({ kind: "seatThreat", seat, min: ELIMINATION_LEVEL - 3 });
-const ELIMINATED_BY_THREAT = {
-  when: { kind: "any", conditions: [REACHES(0), REACHES(1)] } as Condition,
-  text: [
-    { when: { kind: "all", conditions: [{ kind: "not", condition: { kind: "otherPlayer" } }, REACHES(0)] } as Condition, text: "Tap again: this takes your threat to 50 and eliminates you. If you are the last player, the game is lost" },
-    { when: { kind: "all", conditions: [REACHES(0), REACHES(1)] } as Condition, text: "Tap again: this takes Player 1's and Player 2's threat to 50 and eliminates both. The game is lost" },
-    { when: REACHES(0), text: "Tap again: this takes Player 1's threat to 50 and eliminates Player 1. The game is lost when no other player is left" },
-    { text: "Tap again: this takes Player 2's threat to 50 and eliminates Player 2. The game is lost when no other player is left" },
-  ],
-} as const;
+const ELIMINATED_BY_THREAT = ELIMINATES_SEATS(REACHES);
 
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 16042:A:2 (Southron Soldier, shadow): engage a non-unique enemy in the staging area and deal it a shadow card.

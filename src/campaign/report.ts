@@ -97,6 +97,11 @@ function scoreLines(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard
   ];
 }
 
+/** Why a lost game was lost, in words: the engine's reason, and for "No seats remain" the cause of each elimination, the heroes told from the destroy steps the table kept (`destroyed`). The Resolution screen and the report share it. */
+export function lossReasonOf(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, destroyed?: ReadonlySet<string>): string | null {
+  return lossWithCauses(state, destroyed && allHeroesDestroyed(state, destroyed, (id) => cards.get(state.cards[id]?.code ?? "")?.type === "hero"));
+}
+
 /** The report of a finished scenario: a win when the game is not lost. `destroyed` holds the heroes a destroy step named; with it, a hero of an eliminated player that is in no such step is told as defeated with the player. */
 export function gameReport(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, destroyed?: ReadonlySet<string>): GameReport {
   const phase = PHASE_WORDS[state.phase];
@@ -107,5 +112,5 @@ export function gameReport(state: ScenarioState, cards: ReadonlyMap<string, Prin
     const printed = printedOf(cards, card.code);
     return [printed.victory ? `${printed.name} (${printed.victory})` : printed.name];
   });
-  return { ended, stage: stageLine(state, cards), seats: seatLines(state, cards, destroyed), victory, score: state.lost ? null : scoreLines(state, cards), lossReason: state.lost ? lossWithCauses(state, destroyed && allHeroesDestroyed(state, destroyed, (id) => cards.get(state.cards[id]?.code ?? "")?.type === "hero")) : null };
+  return { ended, stage: stageLine(state, cards), seats: seatLines(state, cards, destroyed), victory, score: state.lost ? null : scoreLines(state, cards), lossReason: state.lost ? lossReasonOf(state, cards, destroyed) : null };
 }

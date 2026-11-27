@@ -74,7 +74,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   const game = useStore(opened.store, (state) => state.game);
   const refusal = useStore(opened.store, (state) => state.refusal);
   const [chosen, setChosen] = useState<string | null>(null);
-  const view = useMemo(() => resolutionView(game, session.world, opened.save().log.beldisUses), [game, session, opened]);
+  const view = useMemo(() => resolutionView(game, session.world, opened.save().log.beldisUses, session.destroyedHeroes), [game, session, opened]);
   // The scenario's details under Victory or Defeat: when it ended, the stage reached, the heroes, the score's parts.
   const report = useMemo(() => (view.kind === "playing" ? null : gameReport(game, session.world.cards, session.destroyedHeroes)), [view.kind, game, session]);
   // A loss is a run the moment it is reached (the table wrote it already; a game lost before this build is written here). The

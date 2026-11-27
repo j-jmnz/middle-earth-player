@@ -8,13 +8,15 @@ import { heavyFirst } from "./scripts/tools/test-sequencer.ts";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 
-// The files that play many whole games or compile every component.
+// The files that play many whole games, compile every component or spawn tools for each case.
 // `pnpm test fast` (VITEST_FAST=1) leaves them out; `pnpm test` and CI run them, first and spread over the shards (scripts/tools/test-sequencer.ts).
 const slowFiles = [
   "scripts/card-smoke/**",
   "src/play/compiler.test.ts",
   "src/campaign/fixtures.test.ts",
   "src/play/choice/*-sheets.test.ts",
+  // Spawns the scenario scaffold's CLI and tsrs for each case: about 35 s alone.
+  "scripts/tools/scenario-new.test.ts",
 ];
 
 function inlineSql(): Plugin {

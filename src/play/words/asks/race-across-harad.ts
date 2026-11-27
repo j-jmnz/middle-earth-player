@@ -14,7 +14,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "17047:setup:1 @0.0 TakeObjectiveAlly": { owned: true, note: "Setup: take control of a Tamed Mûmak. It enters play under your control, ready.", verb: "Take" },
 
   // 16064:A:1 (Mordor Warg): it attaches to an Orc enemy in play, also one in the Orcs' area; that enemy returns to the staging area.
-  "16064:whenRevealed:1 @0 Pick": { owned: true, note: "Mordor Warg: choose an Orc enemy in play, in the staging area, engaged or in the Orcs' area, to attach to. It returns to the staging area.", verb: "Attach" },
+  "16064:whenRevealed:1 @0 Pick": { owned: true, note: "Mordor Warg: choose an Orc enemy to attach to, also one in the Orcs' area. It returns to the staging area.", verb: "Attach" },
 
   // 17044:A:2 (Racing Warg): it attaches to an Orc enemy in play, the Chieftain and Orcs in the Orcs' area included; with no Orc it is discarded.
   "17044:whenRevealed:1 @0 Pick": { owned: true, note: "Racing Warg: choose an Orc enemy to attach to, in the staging area, engaged or in the Orcs' area. It gets +1 Threat, +1 Attack, +1 Defense and +1 hit point.", verb: "Attach" },

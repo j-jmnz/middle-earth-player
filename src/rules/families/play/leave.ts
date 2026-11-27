@@ -50,10 +50,7 @@ export function attachFacedown(state: ScenarioState, instruction: Extract<Instru
   const card = id ? state.cards[id] : undefined;
   const host = focus.sourceId ? state.cards[focus.sourceId] : undefined;
   const owner = card ? (card.owner ?? card.controller) : null;
-  // The card is in a discard pile, or is the event being played, which still lies in the hand while its effect resolves and is discarded when that is done ("place it facedown under Lonely Lands", 18024:A:2):
-  // moved under the host, it is not discarded then.
-  const playing = id != null && state.stack.some((frame) => frame.cardId === id && frame.data.kind === "effect" && frame.data.finish === "discardSource");
-  if (!id || (card?.zone !== "discard" && !(card?.zone === "hand" && playing)) || owner == null || !host || !inPlay(host.zone)) return state;
+  if (!id || card?.zone !== "discard" || owner == null || !host || !inPlay(host.zone)) return state;
   return updateCard(moveCard(state, id, { zone: "under", locationId: host.id }), id, { owner });
 }
 

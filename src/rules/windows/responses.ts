@@ -10,6 +10,7 @@ import { aboutCard, answeringController, answeringSeat, effectById, hears, hears
 import { effectsOfCard } from "../families/misc/text.ts";
 import { playableFromDeck } from "../player/deck-play.ts";
 import { effectCause } from "../core/cause.ts";
+import { withPlayed } from "../core/played.ts";
 import { pushEffectFrame } from "../interpret/effect-frames.ts";
 import type { EngineStep, LegalIntent, PlayerIntent } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
@@ -17,6 +18,7 @@ import type { GameEvent, ResponseOffer, ScenarioState } from "../core/state.ts";
 import { inPlay, livingSeats, perilLock } from "../core/state.ts";
 import { hostLostToCost, payUsage, offerable, usable, usageReason } from "../player/usage.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
+import { queueEvent } from "./queue.ts";
 import { announceAbility, announcePlayerAbility } from "../families/deck/pressure.ts";
 import { isPlayerCardEffect } from "../core/keywords.ts";
 import { guardianSeat } from "../families/guardian/seats.ts";
@@ -60,6 +62,11 @@ function answeredSeat(state: ScenarioState, effect: Effect, event: GameEvent, so
   }
 }
 
+// Whether the card is the source of an effect frame on the stack: the event it is playing has not finished.
+function resolving(state: ScenarioState, cardId: string): boolean {
+  return state.stack.some((frame) => frame.data.kind === "effect" && frame.cardId === cardId);
+}
+
 // Responses are optional. After an event, each Response that applies is offered to the seat that
 // controls its card (the first player, for an encounter or quest card). A seat may use it or pass.
 // `only` narrows the records by `whenFirst`: "when" takes those that resolve before the event's Forced effects, "rest" the others; unset takes all.
@@ -88,6 +95,8 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, onl
       // for an event about itself ("After ~ leaves play").
       const fromHand = costOfKind(effect, "playEvent") != null || effect.fromHand === true;
       if (fromHand ? !inHand : !(inPlay(instance.zone) || hearsFromAnywhere(effect, instance, event))) continue;
+      // A card whose own effect is resolving (an event just played) cannot answer its own play from the hand.
+      if (fromHand && resolving(state, instance.id)) continue;
       // "The engaged player may ...": the seat the event happened to answers it, whoever controls the card (12125:A:3).
       const answering = answeredSeat(state, effect, event, instance.id, seat);
       if (answering == null || !order.includes(answering) || (locked != null && answering !== locked)) continue;
@@ -195,8 +204,11 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
   const left = frame.data.offers.filter((offer) => !(offer.cardId === intent.cardId && offer.effectId === intent.effectId && (offer.event ?? opened) === event));
   // The seat answering pays: its threat for a raiseThreat cost, its deck for discardDeckTop, its use of a per-player limit.
   const paid = payUsage(patchTop(state, { data: { ...frame.data, offers: left } }), effect, intent.cardId, intent.payments ?? [], ctx, steps, seat);
+  // A Response event is played like an Action event: it joins this round's plays, and its card hears "When an event is played" first (planning.ts, playEvent).
+  const played = costOfKind(effect, "playEvent") ? withPlayed(paid, intent.cardId, paid.cards[intent.cardId]?.code ?? "", seat) : paid;
+  const heard = costOfKind(effect, "playEvent") ? queueEvent(played, { trigger: "played", seat, cardId: intent.cardId }) : played;
   const framed = pushEffectFrame(
-    { ...paid, window: null },
+    { ...heard, window: null },
     {
       frame: "ResolveEffect",
       sourceId: intent.cardId,
@@ -218,7 +230,7 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
       ...(event.trigger !== "damageDealt" && event.amount != null ? { x: event.amount } : {}),
       // "For each point of damage he just suffered": the damage a damaged event reports.
       ...((event.trigger === "damaged" || event.trigger === "damagedByAttack") && event.amount != null ? { dealt: event.amount } : {}),
-      ...(costOfKind(effect, "playEvent") ? { finish: "discardSource" as const } : {}),
+      ...(costOfKind(effect, "playEvent") ? { finish: "discardSource" as const, announceResolved: true as const } : {}),
     },
     steps,
   );

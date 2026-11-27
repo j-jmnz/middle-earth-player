@@ -56,7 +56,7 @@ function cli(...args: string[]): { status: number | null; output: string } {
   return { status: run.status, output: `${run.stdout}${run.stderr}` };
 }
 
-// Each CLI run starts a node process that loads the planner and the data, and each type check starts tsrs: both take 5 s or more on a loaded machine, so the group gets the time the type check has.
+// Each `cli` call starts node and loads the planner (about 2 s alone, more on a loaded machine) and each skeleton check starts tsrs, so the file runs about 35 s and is a slow file (vitest.config.mts, slowFiles): its tests get a minute, not the default 5 s.
 describe("pnpm scenario new", { timeout: 60_000 }, () => {
   it("refuses an id that is not in data/scenarios", () => {
     const { plan, problems } = planScenario("the-lost-road", {}, repo, exists);

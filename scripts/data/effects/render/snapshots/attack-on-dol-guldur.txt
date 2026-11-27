@@ -467,7 +467,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the players cannot travel to this location while this holds
     - this card: stat noProgressPlaced 1, while this card is in play
-  50922:forced:1: Forced when an event is played, before its effects resolve (heard about card (any player controls) or in the staging area or the active location, of card type event)
+  50922:forced:1: Forced after an event is played, once its effects have resolved and it lies in the discard pile (heard about card (any player controls) or in the staging area or the active location, of card type event)
     only if all of: (it is the Quest phase) and (this card is in the staging area)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the card the event is about, now in a discard pile, is attached facedown to this card: out of play under it, with no text, and discarded to its owner's discard pile when this card leaves play

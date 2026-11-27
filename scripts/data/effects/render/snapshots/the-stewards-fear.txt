@@ -119,7 +119,7 @@ Scenario piles that place cards with no record (quest: 06011 Conspiracy; quest: 
       - the top 3 card(s) of the acting player's deck go to their discard pile
 
 06017:A:2 (front): Forced: After a player plays an event card, Telemnar's Bane makes an immediate attack against the first player.
-  06017:forced:2: Forced when an event is played, before its effects resolve (heard about card (any player controls) or in the staging area or the active location, of card type event)
+  06017:forced:2: Forced after an event is played, once its effects have resolved and it lies in the discard pile (heard about card (any player controls) or in the staging area or the active location, of card type event)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - this enemy, in the staging area or engaged with any player, attacks the first player now, dealt a shadow card for the attack
 

@@ -418,8 +418,9 @@ export function dockNote(title: string, note: string | null): string | null {
  * two-handed play), the moment, a sentence, and the engine's numbers for it.
  */
 export function headerOf(sheet: Sheet, game: ScenarioState): { step: string; lead: string; title: string; note: string | null; stats: readonly SheetStat[] } {
-  // What leads the dock's title: the seat that is asked in two-handed play ("Player 1 · "), and for a Response or an Action the timing, since the
-  // step overline is not drawn ("Response · Pathless Country"). The step names both for a screen reader too.
+  // What leads the dock's title: the seat that is asked in two-handed play ("Player 1 · "). A Response or an Action names its timing after the
+  // card ("Pathless Country · Response"), since the step overline is not drawn: on a short screen the title is cut at its end, so the
+  // card's name stays and only the timing can go. The step names both for a screen reader too.
   const seat = game.seatCount > 1 ? `Player ${game.activeSeat + 1} · ` : "";
   switch (sheet.kind) {
     case "pick":
@@ -429,8 +430,8 @@ export function headerOf(sheet: Sheet, game: ScenarioState): { step: string; lea
       return { step: `${seat}${sheet.step}`, lead: seat, title: sheet.title, note: dockNote(sheet.title, sheet.note), stats: [] };
     case "trigger": {
       // A title that already says the timing ("Response") is not led by it twice.
-      const timing = sheet.title.startsWith(sheet.timing) ? "" : `${sheet.timing} · `;
-      return { step: `${seat}${sheet.timing} · ${sheet.step}`, lead: seat + timing, title: sheet.title, note: dockNote(sheet.title, sheet.note), stats: [] };
+      const title = sheet.title.startsWith(sheet.timing) ? sheet.title : `${sheet.title} · ${sheet.timing}`;
+      return { step: `${seat}${sheet.timing} · ${sheet.step}`, lead: seat, title, note: dockNote(sheet.title, sheet.note), stats: [] };
     }
     case "window":
       return { step: `${seat}${sheet.step}`, lead: seat, title: sheet.title, note: dockNote(sheet.title, sheet.note), stats: [] };

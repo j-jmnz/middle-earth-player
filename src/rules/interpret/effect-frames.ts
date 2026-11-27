@@ -30,6 +30,7 @@ import { offerResponses } from "../windows/responses.ts";
 import { holdsNow } from "./verbs.ts";
 import { releaseLooks } from "../families/encounter/looked.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "../windows/windows.ts";
+import { announceEventResolved } from "../windows/queue.ts";
 import { dealOut } from "../families/breaking/deal.ts";
 import { moveCard } from "../core/zones.ts";
 import { chooseAmount } from "../families/defense/index.ts";
@@ -50,6 +51,7 @@ export type EffectSpec = {
   // The window to open again when the frame pops.
   resume?: EffectData["resume"];
   finish?: EffectData["finish"];
+  announceResolved?: true;
   eventSeat?: number | null;
   participants?: readonly string[];
   // The X an event was played for.
@@ -98,6 +100,7 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     wait: null,
     resume: spec.resume ?? null,
     ...(spec.finish ? { finish: spec.finish } : {}),
+    ...(spec.announceResolved ? { announceResolved: true as const } : {}),
     ...(spec.eventSeat != null ? { eventSeat: spec.eventSeat } : {}),
     ...(spec.x != null ? { x: spec.x } : {}),
     ...(spec.participants ? { participants: spec.participants } : {}),
@@ -190,16 +193,20 @@ function finishWhenDone(state: ScenarioState, frameId: string): ScenarioState {
   if (!top || top.id !== frameId || top.data.kind !== "effect") return state;
   const data = top.data;
   if (data.finish !== "discardSource" || data.queue.length > 0 || data.wait || state.window) return state;
-  const { finish: _done, ...rest } = data;
+  const { finish: _done, announceResolved: _announced, ...rest } = data;
   return patchTop(finishEvent(state, top, data), { data: rest });
 }
 
-// An event played from the hand is discarded once its effect is done, canceled or not (rr.cancel).
+// An event played from the hand is discarded once its effect is done, canceled or not (rr.cancel). "After an event is played"
+// resolves here and nowhere else, with the event's effect done, whatever zone the card is in: an event that left the hand early
+// (attack/flow.ts, discardPlayedEvent) or stays in it (ReturnEventToHand) keeps `announceResolved` and only loses `finish`.
 function finishEvent(state: ScenarioState, frame: Frame, data: EffectData): ScenarioState {
   const id = frame.cardId;
   const instance = id ? state.cards[id] : undefined;
-  if (data.finish !== "discardSource" || !id || !instance || instance.zone !== "hand" || instance.controller == null) return state;
-  return moveCard(state, id, { zone: "discard", seat: instance.controller });
+  const owner = instance?.controller;
+  const discarded = data.finish === "discardSource" && id && instance?.zone === "hand" && owner != null ? moveCard(state, id, { zone: "discard", seat: owner }) : state;
+  // The After records hear it now (families/play/hooks.ts, triggerHears).
+  return data.announceResolved && id ? announceEventResolved(discarded, data.actor, id) : discarded;
 }
 
 // An Action used in a window gives that window back once its frame is done.

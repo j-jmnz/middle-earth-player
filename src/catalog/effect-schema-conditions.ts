@@ -154,11 +154,12 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("survivorsThreat"), max: z.number().int().min(0) }),
   // Some living player's threat is at most `max` ("if any player's threat is 20 or less", 08081:A:1): read in the effect that runs, whichever player it acts for.
   z.strictObject({ kind: z.literal("anyThreat"), max: z.number().int().min(0) }),
-  // The living player in seat `seat` (0 for Player 1) has a threat of at least `min`: a warning that names the player a raise would eliminate (Chaos in the Night, 17103:A:1). False for a seat that is not in the game or is eliminated.
-  z.strictObject({ kind: z.literal("seatThreat"), seat: z.number().int().min(0), min: z.number().int().min(0) }),
+  // The living player in seat `seat` (0 for Player 1) has a threat of at least `min`: a warning that names the player a raise would eliminate (Chaos in the Night, 17103:A:1). With `plus`, the seat's threat and that amount, a raise read now (the resources on Off Track, 17079:A:1), are at least `min`. False for a seat that is not in the game or is eliminated.
+  z.strictObject({ kind: z.literal("seatThreat"), seat: z.number().int().min(0), min: z.number().int().min(0), plus: amountSchema.optional() }),
   // The living player in seat `seat` would reach its threat elimination level (50, or the level the game now holds) if its threat rose by `raise`: the same read as the names of the players such a raise eliminates (The Gate of Iron, 17124:A:2). False for a seat that is not in the game or is eliminated.
   z.strictObject({ kind: z.literal("raiseEliminates"), seat: z.number().int().min(0), raise: z.number().int().min(1) }),
-  // The attack that left this effect for its end (AfterAttack), or the damage the answered event placed, dealt at least `min` damage (1 by default): "If this attack deals damage to a Ship objective" (11051:A:2; read with a `matches` condition on the defender).
+  // The attack that left this effect for its end (AfterAttack), or the damage the answered event placed, dealt at least `min` damage (1 by default):
+  // "If this attack deals damage to a Ship objective" (11051:A:2; read with a `matches` condition on the defender).
   // The attack that left this effect for its end sent at least `min` damage on past its defender (excessToShip; 11055:A:2).
   // The heal or ready the effect answers was made by a player card's effect (11217:B:3), not by a rule, the refresh phase or an encounter card.
   z.strictObject({ kind: z.literal("byPlayerCard") }),
@@ -474,27 +475,5 @@ export type Condition = z.infer<typeof conditionSchema>;
 export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" | "versusDefender" | "versusVictoryTrait" | "inArea" | "defendingAgainst" | "holderExhausted" }> {
   return condition?.kind === "versusHighEngagement" || condition?.kind === "defendingAgainst" || condition?.kind === "attacking" || condition?.kind === "versusDefender" || condition?.kind === "versusVictoryTrait" || condition?.kind === "inArea" || condition?.kind === "holderExhausted";
 }
-
-export const targetSchema = z.discriminatedUnion("kind", [
-  z.strictObject({ kind: z.literal("self") }),
-  z.strictObject({ kind: z.literal("host") }),
-  // The last picked card, the card the answered event was about, the attacking enemy.
-  z.strictObject({ kind: z.literal("picked") }),
-  z.strictObject({ kind: z.literal("subject") }),
-  z.strictObject({ kind: z.literal("attacker") }),
-  z.strictObject({ kind: z.literal("activeLocation") }),
-  // The card picked before the last ("discard that character" after the top card of the encounter deck was discarded, 142058:A:2).
-  z.strictObject({ kind: z.literal("previous") }),
-  // The second card the answered event names (the enemy a character attacked).
-  z.strictObject({ kind: z.literal("other") }),
-  z.strictObject({
-    kind: z.literal("engagedEnemies"),
-    trait: z.string().min(1).optional(),
-    // Only the enemies with the ambush keyword, printed or gained ("Return each engaged enemy with the ambush keyword to the staging area", 901409:A:1).
-    keyword: z.literal("ambush").optional(),
-    who: z.enum(["actor", "each"]),
-    pick: z.enum(["all", "choose"]),
-  }),
-]);
 
 export const when = { when: conditionSchema.optional() };
