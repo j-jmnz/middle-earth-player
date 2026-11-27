@@ -10,8 +10,7 @@ import { settle } from "../../engine/machine.ts";
 import { matchesPick, pickCandidates } from "../../interpret/pick.ts";
 import { resolveAmount, frameScope } from "../../interpret/amounts.ts";
 import { defeatSideQuest } from "../sidequests/quest.ts";
-import { captivesOf } from "../captives/values.ts";
-import { captivesHeldBy } from "./captured.ts";
+import { captivesHeldBy, captivesOf } from "../captives/values.ts";
 
 const table = (layout: Layout = {}) => tableFromLayout("the-dungeons-of-cirith-gurat", { seats: 1, stage: "17132", ...layout }, { extra: ["01017", "01028"] });
 const JAILER = "17121";

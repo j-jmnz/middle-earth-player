@@ -22,9 +22,8 @@ import { attack, defend } from "../../../../test/harness/card-spec.ts";
 import { costIncrease } from "../../../rules/player/cost-rules.ts";
 import { idOf, opened, resolveRecords, run as runInstruction, statOf, tableFromLayout, where, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
-import { captivesOf } from "../../../rules/families/captives/values.ts";
+import { captivesHeldBy, captivesOf } from "../../../rules/families/captives/values.ts";
 import { defeatSideQuest } from "../../../rules/families/sidequests/quest.ts";
-import { captivesHeldBy } from "../../../rules/families/haradrim/captured.ts";
 
 const CAPTIVES = "17119";
 const GUARD = "17122";
@@ -48,9 +47,8 @@ describe("17119:A:1 a captive is a guarded objective until it is rescued", () =>
     const state = settle(resolveRecords(opened(made).state, made.ctx, "17129", "whenRevealed").state, made.ctx, none);
     const held = idOf(state, AXEHAND);
     expect(flagged(state, held, "blankText")).toBe(true);
-    expect(flagged(state, held, "guardedObjective")).toBe(true);
     const freed = settle(destroyCard(state, idOf(state, GUARD) in state.cards && state.cards[held]?.host ? (state.cards[held]?.host ?? "") : "", made.ctx.cards, none), made.ctx, none);
-    expect(flagged(freed, held, "guardedObjective")).toBe(false);
+    expect(flagged(freed, held, "blankText")).toBe(false);
   });
 });
 

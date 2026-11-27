@@ -17,7 +17,7 @@ import { joinOrcsArea } from "../families/haradrim/orcs-zone.ts";
 import { joinUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "../families/uncharted/zone.ts";
 import { deckRoute, isDeckZone, joinPile, leavePile, shufflePile, type PileZone } from "./piles.ts";
 import { isReanimatedCode, ORC_GUARD_CODE, reanimatedBase } from "./printed.ts";
-import { flagged, heldHero, inPlay, updateCard, updateCards, withSeat } from "./state.ts";
+import { flagged, heldHero, hostsCaptives, inPlay, updateCard, updateCards, withSeat } from "./state.ts";
 
 export type Destination =
   | { zone: "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "seatStaging"; seat: number }
@@ -412,7 +412,7 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   // A card that holds the sponge (Forbidden Descent, 10101:A:2) leaves play from the staging area: announced to its own Forced effect, whether it was explored there by progress or discarded.
   if (current.zone === "staging" && !inPlay(dest.zone) && flagged(state, id, "progressSponge")) moved = queueEvent(moved, { trigger: "leftStagingArea", seat: null, cardId: id });
   // An enemy or location that holds a hero or ally (Carried Away, 18074:B:2; the captives of Cirith Gurat) is announced when it leaves play in any way; only a game that holds such a captive asks.
-  if ((current.zone === "engaged" || current.zone === "staging" || current.zone === "activeLocation") && !inPlay(dest.zone) && Object.values(moved.cards).some((card) => heldHero(card) && card.host === id)) moved = queueEvent(moved, { trigger: "leftPlay", seat: null, cardId: id });
+  if (hostsCaptives(current.zone) && !inPlay(dest.zone) && Object.values(moved.cards).some((card) => heldHero(card) && card.host === id)) moved = queueEvent(moved, { trigger: "leftPlay", seat: null, cardId: id });
   // A card a player card put out of play under itself "while ~ is in play" comes back to the staging area when it leaves (07003:A:3).
   if ((current.zone === "play" || current.zone === "heroes") && !inPlay(dest.zone)) for (const under of cardsUnder(moved, id)) moved = updateCard(moveCard(moved, under, { zone: "staging" }), under, { face: "up" });
   // An enemy that leaves play takes its dealt shadow cards to the encounter discard (Learn to Play p16).

@@ -134,8 +134,8 @@ const FLAGS = [
   "losesCannotLeaveStaging",
   // On an enemy that cannot leave the staging area and is only considered engaged (The Black Serpent, 17094:A:1): no player optionally engages it while it holds cannotLeaveStaging, since it would not leave (rr.optional-engagement, rr.cannot). `losesCannotLeaveStaging` ends it. Read by the family's optionalEngage hook (families/haradrim/index.ts).
   "neverEngaged",
-  // On a character attached to an encounter card (The Captives of Cirith Gurat, 17119:A:1): it is a guarded objective, with no card type and no player card status until it is rescued. The captive zone holds this (families/haradrim/captured.ts); the flag states it for the render.
-  "guardedObjective",
+  // On the table, while The Captives of Cirith Gurat is in play (17119:A:1): a capture, a rescue and Abaan's freeing push a `captive` step, so the banner and the log say them (families/haradrim/captured.ts). No other game holds it.
+  "announcesCaptives",
 ] as const;
 
 export const manifest = { name: "haradrim", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

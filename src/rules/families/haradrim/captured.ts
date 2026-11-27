@@ -9,23 +9,18 @@ import type { EngineStep } from "../../core/intents.ts";
 import { destroyCard, releaseAttachments } from "../../core/destroy.ts";
 import { uniqueBlocked } from "../../core/keywords.ts";
 import { printedOf } from "../../core/printed.ts";
-import { inPlay, livingSeats, updateCard, type CardInstance, type ScenarioState } from "../../core/state.ts";
+import { flagged, inPlay, livingSeats, updateCard, type CardInstance, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { frameScope, refCard, type AmountScope } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { PickContext } from "../../interpret/pick.ts";
 import { queueEvent } from "../../windows/queue.ts";
-import { holdCaptive, releaseCaptive } from "../captives/index.ts";
-import { captivesOf } from "../captives/values.ts";
+import { discardHeld, holdCaptive, releaseCaptive } from "../captives/index.ts";
+import { captivesHeldBy, captivesOf } from "../captives/values.ts";
 import { pushPicked } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
-
-/** The captives the encounter card holds, in card order: Captives lying in the captive zone under it. */
-export function captivesHeldBy(state: ScenarioState, hostId: string): CardInstance[] {
-  return captivesOf(state).filter((card) => card.host === hostId);
-}
 
 // The seat a card belongs to: its owner, the seat that controls it, or the seat whose discard pile holds it. Undefined for a card no seat has (Abaan).
 function seatOf(state: ScenarioState, card: CardInstance): number | undefined {
@@ -43,8 +38,14 @@ export function captureCharacter(state: ScenarioState, id: string, hostId: strin
   if (card.zone === "captive" && card.captive === true) return card.host === hostId ? state : updateCard(state, id, { host: hostId });
   if (card.zone === "heroes") return queued(updateCard(holdCaptive(state, id, hostId), id, { guardedHero: true }));
   const seat = seatOf(state, card);
-  const moved = moveCard(state, id, { zone: "captive", hostId });
-  return queued(updateCard(moved, id, { face: "up", captive: true, committed: false, ...(seat != null ? { owner: seat } : {}) }));
+  const held = holdCaptive(state, id, hostId);
+  return queued(seat != null ? updateCard(held, id, { owner: seat }) : held);
+}
+
+// The step that tells a capture or a rescue; the table's flag `announcesCaptives` (17119:A:1) gates it, so no other game's step log has it.
+function announce(state: ScenarioState, steps: EngineStep[], event: "captured" | "rescued" | "free", cardId: string, hostId: string, seat: number | null): ScenarioState {
+  if (flagged(state, "table", "announcesCaptives")) steps.push({ kind: "captive", event, cardId, hostId, seat });
+  return state;
 }
 
 /** AttachCaptive: the character (`card`, or the set-aside card with `code`) is attached to `to`; with `discardCopies` each other card in play with its title is discarded. */
@@ -54,7 +55,7 @@ export function attachCaptive(state: ScenarioState, instruction: Verb<"AttachCap
   const id = instruction.code != null ? state.setAside.find((setAside) => state.cards[setAside]?.code === instruction.code) : refCard(state, instruction.card ?? "picked", scope);
   const card = id ? state.cards[id] : undefined;
   if (!id || !hostId || !card || !state.cards[hostId]) return state;
-  const captured = captureCharacter(state, id, hostId);
+  const captured = announce(captureCharacter(state, id, hostId), steps, "captured", id, hostId, null);
   if (instruction.discardCopies !== true) return captured;
   const title = printedOf(ctx.cards, card.code).name;
   let next = captured;
@@ -71,23 +72,24 @@ export function stripCaptive(state: ScenarioState, instruction: Verb<"StripCapti
   return updateCard(releaseAttachments(state, id, ctx.cards, steps), id, { damage: 0, resources: 0, progress: 0 });
 }
 
-// One captive returns to its owner (the owner is still in the game) or goes to the owner's discard pile (the owner left it).
-function release(state: ScenarioState, card: CardInstance, ctx: ReduceContext): ScenarioState {
+// One captive returns to its owner (the owner is still in the game) or goes to the owner's discard pile (the owner left it); Abaan, with no owner, lies in the staging area for the first player to gain.
+function release(state: ScenarioState, card: CardInstance, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const seat = card.owner;
+  const host = card.host ?? "";
   const printed = printedOf(ctx.cards, card.code);
-  if (seat == null) return updateCard(moveCard(state, card.id, { zone: "staging" }), card.id, { face: "up" });
-  if (state.seats[seat]?.eliminated) return updateCard(moveCard(state, card.id, { zone: "discard", seat }), card.id, { face: "up", guardedHero: undefined, heroSlot: undefined });
-  if (printed.type === "hero") return releaseCaptive(state, card.id, { exhausted: true });
+  if (seat == null) return announce(updateCard(moveCard(state, card.id, { zone: "staging" }), card.id, { face: "up" }), steps, "free", card.id, host, state.firstPlayer);
+  if (state.seats[seat]?.eliminated) return announce(discardHeld(state, card.id, seat), steps, "rescued", card.id, host, null);
+  if (printed.type === "hero") return announce(releaseCaptive(state, card.id, { exhausted: true }), steps, "rescued", card.id, host, seat);
   // The ally is controlled by its owner again: it does not enter play, so no "enters play" Response is heard (docs/scenarios/haradrim/the-dungeons-of-cirith-gurat.md, Readings).
-  return updateCard(moveCard(state, card.id, { zone: "play", seat }), card.id, { face: "up", exhausted: true, controller: seat });
+  return announce(updateCard(moveCard(state, card.id, { zone: "play", seat }), card.id, { face: "up", exhausted: true, controller: seat }), steps, "rescued", card.id, host, seat);
 }
 
 /** RescueCaptured: each captive the encounter card holds (the source with `host: self`, the card the event is about otherwise) is rescued; once for the whole batch `charactersRescued` is queued about the main quest stage. */
-export function rescueCaptured(state: ScenarioState, instruction: Verb<"RescueCaptured">, focus: Focus, ctx: ReduceContext): ScenarioState {
+export function rescueCaptured(state: ScenarioState, instruction: Verb<"RescueCaptured">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const hostId = instruction.host === "self" ? focus.sourceId : refCard(state, "subject", frameScope(state, focus.seat, focus.sourceId));
   const held = hostId ? captivesHeldBy(state, hostId) : [];
   if (held.length === 0) return state;
-  const next = held.reduce((current, card) => release(current, card, ctx), state);
+  const next = held.reduce((current, card) => release(current, card, ctx, steps), state);
   return next.questStage ? queueEvent(next, { trigger: "charactersRescued", seat: null, subject: next.questStage }) : next;
 }
 

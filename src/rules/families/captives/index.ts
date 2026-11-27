@@ -86,6 +86,11 @@ export function releaseCaptive(state: ScenarioState, heroId: string, options: { 
   return hero.heroSlot == null ? released : backInPlace(released, seat, heroId, hero.heroSlot);
 }
 
+/** A held card goes to the discard pile of its owner, who has left the game (or whose hero a stage discards): faceup, no longer held and no longer its owner's place-holder (rr.player-elimination). The one move every such release makes. */
+export function discardHeld(state: ScenarioState, id: string, seat: number): ScenarioState {
+  return updateCard(moveCard(state, id, { zone: "discard", seat }), id, { face: "up", guardedHero: undefined, owner: undefined, heroSlot: undefined });
+}
+
 /**
  * The players win by defeating Rescue the Captives (143070:B:3, "they have rescued each Captive hero"; 143071:B:1 reads the rescued heroes): each Captive returns among its owner's heroes in the place it held, controlled by its owner
  * again, with its damage, tokens and attachments kept. It is no longer a Captive, so To Isengard!'s blank no longer reaches it. No event. The settle loop calls it as soon as the stage is cleared, in a campaign game and in a standalone one alike, before the score or the Resolution reads the heroes.

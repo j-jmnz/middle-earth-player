@@ -9,7 +9,7 @@ import { BLACK_GATE } from "../../rules/families/harad/under.ts";
 import { live as stewardsFear, stackUnder } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { isReanimatedCode } from "../../rules/core/printed.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
-import { flagged, inPlay, type CardInstance, type ScenarioState } from "../../rules/core/state.ts";
+import { flagged, hostsCaptives, inPlay, type CardInstance, type ScenarioState } from "../../rules/core/state.ts";
 import { cardsUnder, shadowCards } from "../../rules/core/zones.ts";
 import { lookedIds } from "../../rules/families/sea/sailing.ts";
 import { captivesOf, captivesUnder } from "../../rules/families/captives/values.ts";
@@ -241,7 +241,7 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     // beside it, not a card drawn under it.
     const captive = card.zone === "staging" || card.zone === "captive" || card.zone === "activeLocation" ? captiveUnder(game, id) : null;
     // The Captives of The Uruk-hai lie under To Isengard! or the enemy that holds one, wherever that enemy is (staging or engaged): every one of them is drawn (families/captives).
-    const captives = card.zone === "staging" || card.zone === "engaged" || card.zone === "captive" || card.zone === "activeLocation" || card.zone === "secondActiveLocation" ? (held.length === 0 ? NONE : captivesUnder(game, id, held)) : NONE;
+    const captives = card.zone === "captive" || hostsCaptives(card.zone) ? (held.length === 0 ? NONE : captivesUnder(game, id, held)) : NONE;
     const capturedHere = captured?.get(id) ?? NONE;
     const under = captives.length > 0 ? captives : captive ? [captive] : capturedHere;
     // The enemies grappled with a location are drawn facedown under it, as its attachments are (dcce.grapple).

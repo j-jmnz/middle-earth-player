@@ -20,3 +20,13 @@ export const holdsCapturedWords = (held: readonly { name: string; owned: boolean
 
 /** The line a seat's dial says of one ally an encounter card holds. */
 export const capturedDialWords = (ally: string, host: string): string => `${ally} is captured by ${host}`;
+
+// Who takes control: a named player in a game of more than one, "you" alone. The log names a player as "Player N" in every game (`seats` 2).
+const takes = (seat: number, seats: number, what: string): string => (seats > 1 ? `Player ${seat + 1} takes control of ${what}` : `You take control of ${what}`);
+
+/** The banner and log line of a `captive` step: a character attached to an encounter card, a captive rescued to its owner (null: the owner left the game and it went to the discard pile), or Abaan freed to the first player. `seats` is 2 for the log. */
+export function capturedStepWords(step: { event: "captured" | "rescued" | "free"; seat: number | null }, character: string, host: string, seats: number): string {
+  if (step.event === "captured") return `${character} is captured by ${host}.`;
+  if (step.event === "free") return `${character} is free: ${takes(step.seat ?? 0, seats, "him")}.`;
+  return step.seat == null ? `${character} is rescued: its owner has left the game, so it goes to the discard pile.` : `${character} is rescued: ${takes(step.seat, seats, "it")}, exhausted.`;
+}

@@ -23,22 +23,19 @@ export function engageSeatWithMost(state: ScenarioState, instruction: Extract<In
   if (!id || !enemy || !inPlay(enemy.zone)) return state;
   // A card of the Orcs' area cannot leave it while the players are at another stage (hrd.orcs-area-different-stage), nor a member that holds `cannotLeaveOrcsArea` (17051:B:1).
   if (enemy.zone === "orcsArea" || (flagged(state, id, "cannotLeaveOrcsArea") && orcsOf(state)?.members.includes(id))) return state;
-  const counts = livingSeats(state).map((seat) => ({ seat, count: (state.seats[seat]?.engaged ?? []).filter((other) => other !== id && matchesPick(state, other, instruction.pick, { seat, sourceId: id }, ctx)).length }));
-  const most = Math.max(...counts.map((entry) => entry.count));
-  const seats = counts.filter((entry) => entry.count === most).map((entry) => entry.seat);
-  if (seats.length === 0) return state;
-  const options = seats.map((seat) => `seat:${seat}`);
-  const chosen = chosenOf(options, focus);
-  if (!chosen) return effectData(state) ? askTarget(state, { instruction, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, options) : { ...state, failure: `${instruction.verb} needs a choice, and no effect is asking` };
-  const seat = Number(chosen.slice("seat:".length));
+  const found = seatWithMost(state, instruction, id, focus, ctx, steps, (seat) => (state.seats[seat]?.engaged ?? []).filter((other) => other !== id));
+  if (found == null) return state;
+  if (typeof found !== "number") return found;
+  const seat = found;
   if (enemy.zone === "engaged" && enemy.controller === seat) return state;
   if (enemy.zone === "engaged") return flagged(state, id, "cannotBeEngaged") ? state : engageWith(state, seat, id, steps);
   return engageEnemy(state, seat, id, steps);
 }
 
-// "The player who controls the most allies": the living seats counted by the cards that match the pick and sit in their play area, the seats with the most tied (all tie at 0); the first player chooses among them. A string when the choice is asked.
-function seatWithMost(state: ScenarioState, instruction: Extract<Instruction, { verb: "AttackSeatWithMost" }>, id: string, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): number | ScenarioState | null {
-  const counts = livingSeats(state).map((seat) => ({ seat, count: (state.seats[seat]?.play ?? []).filter((other) => matchesPick(state, other, instruction.pick, { seat, sourceId: id }, ctx)).length }));
+// The seat with the most of the cards `held` names for it (the cards that match the instruction's pick are counted; the source never counts): the living seats with the most tie, and at 0 every living seat ties; the first player chooses among them. A number when a seat is
+// found, the state asking the choice, or null with no living seat.
+function seatWithMost(state: ScenarioState, instruction: Extract<Instruction, { verb: "EngageSeatWithMost" | "AttackSeatWithMost" }>, id: string, focus: Focus, ctx: ReduceContext, steps: EngineStep[], held: (seat: number) => readonly string[]): number | ScenarioState | null {
+  const counts = livingSeats(state).map((seat) => ({ seat, count: held(seat).filter((other) => matchesPick(state, other, instruction.pick, { seat, sourceId: id }, ctx)).length }));
   const most = Math.max(...counts.map((entry) => entry.count));
   const options = counts.filter((entry) => entry.count === most).map((entry) => `seat:${entry.seat}`);
   if (options.length === 0) return null;
@@ -51,7 +48,7 @@ function seatWithMost(state: ScenarioState, instruction: Extract<Instruction, { 
 export function attackSeatWithMost(state: ScenarioState, instruction: Extract<Instruction, { verb: "AttackSeatWithMost" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = focus.sourceId;
   if (!id || state.cards[id]?.zone !== "staging") return state;
-  const seat = seatWithMost(state, instruction, id, focus, ctx, steps);
+  const seat = seatWithMost(state, instruction, id, focus, ctx, steps, (held) => state.seats[held]?.play ?? []);
   if (seat == null) return state;
   return typeof seat === "number" ? attackNowFromStaging(state, id, seat, ctx, steps, { shadow: true }) : seat;
 }

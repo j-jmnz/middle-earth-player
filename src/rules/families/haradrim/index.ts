@@ -49,7 +49,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "AttachCaptive":
       return attachCaptive(state, instruction, focus, ctx, steps);
     case "RescueCaptured":
-      return rescueCaptured(state, instruction, focus, ctx);
+      return rescueCaptured(state, instruction, focus, ctx, steps);
     case "StripCaptive":
       return stripCaptive(state, instruction, focus, ctx, steps);
     case "DiscardUntilAlly":
@@ -101,7 +101,12 @@ export const manifest: RulesFamily = {
         return haradrimCondition(state, condition) ?? orcsCondition(state, condition) ?? exploredCondition(state, condition) ?? temperatureCondition(state, condition);
     }
   },
-  amount: (state, found, scope, ctx) => (found.seatsWithoutCaptives ? seatsWithoutCaptives(state) : found.heldPrinted ? heldPrintedAmount(state, found.heldPrinted, scope, ctx) : found.willpowerGap ? willpowerGap(state, scope.sourceId ?? null, ctx.cards) : temperatureAmount(state, found)),
+  amount: (state, found, scope, ctx) => {
+    if (found.seatsWithoutCaptives) return seatsWithoutCaptives(state);
+    if (found.heldPrinted) return heldPrintedAmount(state, found.heldPrinted, scope, ctx);
+    if (found.willpowerGap) return willpowerGap(state, scope.sourceId ?? null, ctx.cards);
+    return temperatureAmount(state, found);
+  },
   pick: haradrimPickMatches,
   // An enemy that cannot leave the staging area and is only considered engaged (The Black Serpent, 17094:A:1) is never optionally engaged: it would not leave (rr.optional-engagement, rr.cannot).
   // `cannotBeOptionallyEngaged` cannot serve for `neverEngaged`: the bar must end with `losesCannotLeaveStaging` (the enemy can be engaged again once it can leave), which that stat never does.

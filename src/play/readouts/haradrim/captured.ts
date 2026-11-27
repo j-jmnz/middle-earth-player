@@ -2,7 +2,7 @@
 // The allies and Abaan an encounter card holds in The Dungeons of Cirith Gurat: a Captive lying under its host (captive zone, `captive`), with no hero slot and no guarded-hero flag, which tells it from a held hero (`staged.ts`) and from the Captives of The Uruk-hai (heroes).
 // The table draws each under its host by the draw of every Captive (store/selectors.ts entriesOf); these say who it is and who holds it. Each is read from the state's own facts, never the scenario id. Pure, so a test reads it.
 import type { CardInstance, ScenarioState } from "../../../rules/core/state.ts";
-import { captivesOf } from "../../../rules/families/captives/values.ts";
+import { captivesHeldBy } from "../../../rules/families/captives/values.ts";
 
 import { ownerWords } from "../../words/owner.ts";
 import { capturedAbaanWords, capturedAllyWords, capturedDialWords, holdsCapturedWords } from "../../words/scenarios/haradrim/captured-table.ts";
@@ -11,7 +11,7 @@ import { capturedAbaanWords, capturedAllyWords, capturedDialWords, holdsCaptured
 export const isHeldCharacter = (card: CardInstance): boolean => card.captive === true && card.zone === "captive" && card.host != null && card.guardedHero !== true && card.heroSlot == null && card.prisoner !== true;
 
 /** The ids of the allies and objectives the card holds, in card order (empty for any other card): its preview lists them after it. */
-export const heldCharactersUnder = (game: ScenarioState, hostId: string): readonly string[] => captivesOf(game).filter((card) => card.host === hostId && isHeldCharacter(card)).map((card) => card.id);
+export const heldCharactersUnder = (game: ScenarioState, hostId: string): readonly string[] => captivesHeldBy(game, hostId).filter(isHeldCharacter).map((card) => card.id);
 
 /** The role of a held ally or Abaan in a preview (it is no attachment), or null. */
 export const capturedRole = (game: ScenarioState, cardId: string): string | null => {

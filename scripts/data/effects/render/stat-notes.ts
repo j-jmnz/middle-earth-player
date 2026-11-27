@@ -56,7 +56,6 @@ export const FLAG_NOTES: Readonly<Record<string, string>> = {
   noEngagementChecks: " (no engagement check engages it; held by the table, no engagement check is made at all and Ambush does nothing)",
   optionalEngageThreat: " (a player whose threat is at least this much cannot optionally engage it; an engagement check still engages him)",
   engagedWithClaimers: " (in the staging area it is considered engaged with each player who controls an objective, read live: it attacks each of them once in the combat phase and only they declare attackers against it)",
-  guardedObjective: " (the character is a guarded objective: while it is attached it loses its card type and its player card status, and it gets both back when it is rescued; it lies in the captive zone)",
   threatReductionToOne: " (a player card effect lowers this player's threat by at most 1; an encounter card's reduction is not capped)",
   neverEngaged: " (no player optionally engages it while it cannot leave the staging area: it is only considered engaged)",
   losesCannotLeaveStaging: " (the enemy loses the text \"Cannot leave the staging area\": its cannotLeaveStaging is not read)",
@@ -64,6 +63,7 @@ export const FLAG_NOTES: Readonly<Record<string, string>> = {
   archeryBonus: " (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends)",
   archeryToAllies: " (archery damage must be assigned to allies, if able)",
   // Cards that return, leave or are kept.
+  announcesCaptives: " (held by the table: a capture, a rescue and the freeing of Abaan are announced, so the banner and the log say them)",
   announcesClaim: " (claiming it is announced: the banner and the log say which hero it is attached to)",
   returnsWhenHung: " (while unclaimed and hanging on an encounter card: when that card leaves play it goes back to the staging area faceup, controlled by nobody, not to a discard pile)",
   returnsToStagingArea: " (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile)",

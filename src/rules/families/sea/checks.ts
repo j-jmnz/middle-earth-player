@@ -13,6 +13,7 @@ import { printedOf } from "../../core/printed.ts";
 import { engageEnemy, engagementCheck } from "../../quest/quest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats } from "../../core/state.ts";
+import { captivesHeldBy } from "../captives/values.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 
@@ -24,7 +25,7 @@ function reading(state: ScenarioState, instruction: Checks, focus: Focus, ctx: R
   if (instruction.unguardedZero === true) {
     for (const id of state.staging) {
       const enemy = state.cards[id];
-      if (enemy && printedOf(ctx.cards, enemy.code).type === "enemy" && !Object.values(state.cards).some((other) => other.captive === true && other.host === id)) probe = addModifier(probe, id, focus.sourceId ?? id, "engagementCost", -modifiedStat(state, enemy, "engagementCost", ctx.cards), "endOfPhase");
+      if (enemy && printedOf(ctx.cards, enemy.code).type === "enemy" && captivesHeldBy(state, id).length === 0) probe = addModifier(probe, id, focus.sourceId ?? id, "engagementCost", -modifiedStat(state, enemy, "engagementCost", ctx.cards), "endOfPhase");
     }
   }
   if (!instruction.lower) return probe;
