@@ -54,6 +54,7 @@ import { sailingSheet, shipRow } from "./sea-sheets.ts";
 import { asksCollection, collectionLabel, collectionOrder } from "./collection-sheets.ts";
 import { answeredCard, hideCommitNote, hideNumbers, lookNote, optionalEngageNote, responseNote } from "./sheet-notes.ts";
 import { orcsLabel } from "./orcs-label.ts";
+import { gainedSentence } from "./gained-line.ts";
 import { captiveLabel, cardLabel, copyLabel, has, option, seatedLabel, stagedAllyLabel, statOf, step, tiedLabel } from "./sheet-parts.ts";
 import { sackStat } from "./sack-rows.ts";
 import { nightActionNote } from "../words/scenarios/night.ts";
@@ -73,7 +74,9 @@ function effectOf(ctx: ReduceContext, effectId: string): Effect | undefined {
 
 function lineOf(effect: Effect | undefined, names: SheetNames): string | null {
   const id = effect?.lines[0];
-  return id ? names.line(id) : null;
+  const line = id ? names.line(id) : null;
+  // A Response a card gives another (Mûmak Trail) is told by its own sentence, not by who gains it (gained-line.ts).
+  return line != null && effect?.timing === "response" ? gainedSentence(line) : line;
 }
 
 /**

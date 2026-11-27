@@ -20,14 +20,14 @@ export const RING_DESTROYED_BY = (damage: number): When => ({ kind: "all", condi
 
 /**
  * The caution of a raise that reaches every player's threat: `reaches(seat)` says the raise takes that seat to the elimination level (the condition `seatThreat`, with `plus` for a raise read now).
- * The words name the players it eliminates (Player 1, Player 2, both); a solo game, or the player who chooses alone, reads "you".
+ * The words name the players it eliminates (Player 1, Player 2, both); a solo game, or the player who chooses alone, reads "you". The two-seat words are short on purpose: at 667 x 375 the armed caution has three lines, and the web build says "Click" for "Tap" (ui/web/click-words.ts).
  */
 export const ELIMINATES_SEATS = (reaches: (seat: number) => When): NonNullable<Ask["caution"]> => ({
   when: { kind: "any", conditions: [reaches(0), reaches(1)] } as When,
   text: [
     { when: { kind: "all", conditions: [{ kind: "not", condition: { kind: "otherPlayer" } }, reaches(0)] } as When, text: "Tap again: this takes your threat to 50 and eliminates you. If you are the last player, the game is lost" },
-    { when: { kind: "all", conditions: [reaches(0), reaches(1)] } as When, text: "Tap again: this takes Player 1's and Player 2's threat to 50 and eliminates both. The game is lost" },
-    { when: reaches(0), text: "Tap again: this takes Player 1's threat to 50 and eliminates Player 1. The game is lost when no other player is left" },
-    { text: "Tap again: this takes Player 2's threat to 50 and eliminates Player 2. The game is lost when no other player is left" },
+    { when: { kind: "all", conditions: [reaches(0), reaches(1)] } as When, text: "Tap again: Player 1 and Player 2 reach 50 and are eliminated. The game is lost" },
+    { when: reaches(0), text: "Tap again: Player 1 reaches 50 and is eliminated. The game is lost if no player is left" },
+    { text: "Tap again: Player 2 reaches 50 and is eliminated. The game is lost if no player is left" },
   ],
 });

@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import { armedLines, armedRoom, armedWords } from "./armed-room.ts";
-import { detailLines, DOCK_PAD_DENSE_PX, DOCK_PAD_PX, LABEL_PX, labelChars, linesPlace, LIST_PICTURE, LIST_PICTURE_SMALL, PILL_PT, planWords, rowsRoom, smallPictures, titleLinesOf, TITLE_PX, TRAY_LABEL_LINE_PX, TRAY_ROW_FRAME_PX, trayRoom, wordsWindow } from "./budget.ts";
+import { detailLines, moreBelow, DOCK_PAD_DENSE_PX, DOCK_PAD_PX, LABEL_PX, labelChars, linesPlace, LIST_PICTURE, LIST_PICTURE_SMALL, PILL_PT, planWords, rowsRoom, smallPictures, titleLinesOf, TITLE_PX, TRAY_LABEL_LINE_PX, TRAY_ROW_FRAME_PX, trayRoom, wordsWindow } from "./budget.ts";
 import { dockColumn } from "./fit.ts";
 import { dockLines } from "./lines.ts";
 
@@ -222,5 +222,17 @@ describe("the lines a choice row's printed line may take", () => {
     const column375 = dockColumn(375, 1, { top: 0, bottom: 0 });
     const room = rowsRoom({ column: column375, block: 124, titleLines: 1, dense: true });
     expect(detailLines(room)).toBeGreaterThanOrEqual(1);
+  });
+});
+
+describe("the cue that more rows lie below", () => {
+  it("shows while the rows' window is not at the end of its content, and never before it is measured", () => {
+    expect(moreBelow(0, 300, 0)).toBe(false);
+    expect(moreBelow(120, 120, 0)).toBe(false);
+    expect(moreBelow(120, 300, 0)).toBe(true);
+    expect(moreBelow(120, 300, 100)).toBe(true);
+    expect(moreBelow(120, 300, 180)).toBe(false);
+    expect(moreBelow(120, 300, 179)).toBe(false);
+    expect(moreBelow(120, 300, 170)).toBe(true);
   });
 });

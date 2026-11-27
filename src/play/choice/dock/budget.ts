@@ -82,6 +82,11 @@ export function detailLines(room: number, text = 1): number {
   return Math.max(1, Math.floor(left / (LABEL_PX * text)));
 }
 
+/** Whether rows lie below those a scroll view shows: its content is taller than its window, and the window is not at the end (a point of play, so a row cut at the foot is not taken for the last). */
+export function moreBelow(viewport: number, content: number, offset: number): boolean {
+  return viewport > 0 && content - viewport - offset > 2;
+}
+
 /** The height of the words' window: the dock's room (the column less its padding) less its measured pinned block. */
 export function wordsWindow(a: { room: number; block: number; dense?: boolean }, scale = 1): number {
   return Math.max(0, (a.room - a.block) / scale - (a.dense ? DOCK_PAD_DENSE_PX : DOCK_PAD_PX)) * scale;
