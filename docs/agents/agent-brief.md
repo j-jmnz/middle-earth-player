@@ -124,6 +124,19 @@ Each is cited in that section.
 
 **Screen half exit:** the scenario's words and widgets are written and tested, and no control types damage, resources, threat, progress, or life.
 
+## What the review finds twice
+
+The Haradrim cycle's reviews found each of these in more than one scenario. Check your diff against them before the review.
+
+- **Copied code.** A helper written again in a second family or a third test file. Search for it first (`pnpm doc find`, grep the families); `scripts/checks/copied-code.test.ts` fails on a function body of eight lines or more that two files of `src` share.
+- **A render sentence false for other cards.** The rule is in `docs/agents/effect-authoring.md`, Readings the review catches (A render sentence shared with other cards).
+- **A doc that tells history, or a reading with no sources.** A doc says what is true now (`.claude/rules/docs-standards.md`, Current state, not history). A researched or recommended reading lists its source URLs or says "agent recommendation" (`.claude/rules/authority.md`, Open points); `scripts/checks/scenario-sources.test.ts` fails on a scenario file with neither.
+- **A test that proves nothing, or less than its title.** Write the title from the assertion. A test of a limit, a second use or a phase's end tries that case (`docs/agents/effect-authoring.md`, Readings the review catches), and a golden that adds no new path to an earlier one is dropped (`.claude/rules/code-standards.md`, Test cost).
+- **A shared file kept at its size limit.** Do not delete a line to stay under 500: split the file along behaviour (`.claude/rules/code-standards.md`, Making a change; `scripts/checks/file-size.test.ts`).
+- **A choice window or a caution that reads one seat only.** A pick that spans seats, a threat or hit-point caution and an elimination each read every seat: test with the second player choosing and with a player out.
+- **A table piece cut or hidden at 667 x 375.** A strip, a dial name or a pill is looked at with `pnpm browser shot` at 667 x 375, the shortest phone, with the most cards the scenario can put there (`docs/design-system-table.md`, Command column).
+- **A step the banner or the log does not tell.** A new engine step (a capture, a claim, a track, a flip, a loss cause) gets its banner beat and log line in the same change (`docs/design-system-table.md`, Choice tray), and the loss and the end screen name the cause.
+
 ## Measure
 
 The last commit of a scenario phase records these after a line `Pipeline measure:`, so `git log --grep "Pipeline measure"` lists every scenario run. The label is for scenario phases only; any other measured change writes `Measure:` (`.claude/rules/commit-standards.md`, Body).

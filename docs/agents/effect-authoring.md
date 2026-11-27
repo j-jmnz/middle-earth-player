@@ -308,6 +308,7 @@ Read each new record against these before the review. Each one is a card bug a r
 - **A limit on the card.** "Limit 1 per hero", "limit once per phase" and "until the end of the phase" each get a test that tries the second copy, the second use, and the next phase.
 - **A general change.** A fix in a reader that many records share changes other cards: list them by code and read each printed line before the fix lands (`docs/agents/card-audit.md`, Fix and review).
 - **New core state.** Test it at its boundaries, not only on the normal path: a phase's end, an Undo, a save and load.
+- **A render sentence shared with other cards.** A sentence added to the render for one scenario's card (`scripts/data/effects/render`) is printed for every record that uses the same verb, flag or condition, and a timing or a condition it names can be false for them: run `pnpm effects render --checks` on the other cards that use it (`pnpm effects reach origin/main`) and read each against its printed line.
 - **The options of a choice.** Every new `Choose` or `Pick` gets words in `src/play/words` that name the number, the side and whose deck (`docs/design-system-table.md`, Choice tray).
 
 ## Not expressible yet: leave open, report

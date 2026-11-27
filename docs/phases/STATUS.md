@@ -12,7 +12,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 
 ## Phases
 
-No phase is open.
+No phase is open. The Haradrim cycle is closed except its card audit, which waits to merge on `fix/haradrim-card-audit`.
 
 | Phase | Work | Status | Note |
 | --- | --- | --- | --- |
