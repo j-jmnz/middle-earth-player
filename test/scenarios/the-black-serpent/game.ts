@@ -4,13 +4,13 @@ import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/ru
 import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenarios.ts";
 import type { PolicyOptions } from "../../harness/auto-player.ts";
 import { fillerLoadout, HERO_STATS, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
-import { chooseFirstOrLast, policyIntent, type Policy } from "../../harness/policy-kit.ts";
+import { archeryLeastDamaged, attackAllTogether, chooseFirstOrLast, commitAllBut, engageUpTo, policyIntent, undefendedLeastDamaged, type Policy } from "../../harness/policy-kit.ts";
 
 const cycle = loadCampaign("haradrim");
 const serpent = loadAnyScenario("the-black-serpent");
 
 // Test helper. A whole standalone game of The Black Serpent played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. TODO: say how the players travel, engage and answer the choices this scenario asks.
+// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. Every character quests, the first character who may defends every attack, the players engage what their threat lets them and attack together, and a Choose window takes its first option (the Serpent's end-of-phase choice removes progress when the main quest holds some, else it attacks; the stages' claims and the objectives' guards are picks the first option answers); the auto-player travels.
 export const SERPENT_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type SerpentDecks = "strong" | "weak" | "brittle";
@@ -25,7 +25,7 @@ export type SerpentPolicy = {
   // The option a Choose window with these answers takes: the first or the last.
   choose: "first" | "last";
 };
-export const DEFAULT_POLICY: SerpentPolicy = { choose: "first" };
+export const DEFAULT_POLICY: SerpentPolicy = { choose: "last" };
 
 // The policy (test/harness/policy-kit.ts): a list of rules tried in order, then the auto-player's answer with SERPENT_POLICY. A rule answers its own window and returns null for any other. The kit's rules:
 //   chooseFirstOrLast(which)  a Choose window takes the first or the last option
@@ -42,8 +42,11 @@ export const DEFAULT_POLICY: SerpentPolicy = { choose: "first" };
 //   engageUpTo(most, options)  the optional engagement step: engage the enemy of the lowest `rank` (`allow` permits) while engaged with fewer than `most`
 //   triggerActions(effectIds, oncePerRound)  an Action or Response of the records named, each time (or once a round) the engine offers it and the seat can pay
 //   passCommitWhile(when)  the quest commit: pass without committing while `when` holds
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go in the list, before the auto-player's.
-const rules = (policy: SerpentPolicy): Policy => [chooseFirstOrLast(policy.choose)];
+const SERPENT = "17094";
+// The Serpent cannot leave the staging area until stage 3B holds 6 progress, so it is engaged then and not before (stage 2B only considers it engaged with the claimers).
+const serpentMayEngage = (state: ScenarioState, id: string): boolean => state.cards[id]?.code !== SERPENT || (state.questStage != null && state.cards[state.questStage]?.code === "17108" && (state.cards[state.questStage]?.progress ?? 0) >= 6);
+// Used: the commit, the archery, the defense, the engagement and the attack; the auto-player answers the rest (travel included).
+const rules = (policy: SerpentPolicy): Policy => [chooseFirstOrLast(policy.choose), commitAllBut(1), archeryLeastDamaged(), undefendedLeastDamaged(), engageUpTo(undefined, { allow: serpentMayEngage }), attackAllTogether((state, id) => (state.cards[id]?.code === SERPENT ? 0 : 1))];
 
 // Every intent is one the reducer listed.
 export function serpentIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: SerpentPolicy = DEFAULT_POLICY): PlayerIntent {
@@ -55,18 +58,25 @@ export type SerpentGame = PlayedGame;
 // The goldens (src/campaign/scenarios/the-black-serpent/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type SerpentGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: SerpentDecks; outcome: "won" | "lost"; policy?: Partial<SerpentPolicy>; lossReason?: string };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Nightmare) and a few losses (each way the scenario can be lost), each on a fixed seed.
-export const SERPENT_GOLDENS: readonly SerpentGolden[] = [];
+// The games to pin (.claude/rules/code-standards.md, Test cost): wins true solo and two-handed (Easy deals the same Setup, standalone.test.ts, and the scenario has no Nightmare deck, so neither has a golden of its own) and each way to lose: every player's threat at 50
+// (heroes that cannot quest, so the staging area's Threat is the shortfall each round), every hero destroyed (heroes too brittle for the attacks) and, two-handed only, the first player eliminated while his hero holds an objective: it returns to the staging area and the other
+// player claims it, a path no true solo game reaches.
+export const SERPENT_GOLDENS: readonly SerpentGolden[] = [
+  { name: "true solo, won, Normal", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed, won, Normal", seatCount: 2, seed: 7, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
+  { name: "true solo, lost, every hero destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed, lost, the first player is eliminated holding an objective and the other player claims it", seatCount: 2, seed: 26, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+];
 
 const game = standaloneGame<SerpentDecks, SerpentPolicy>({
   campaign: cycle,
   scenario: serpent,
   stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles and its Nightmare deck.
   codes: [...serpent.cards.map((card) => card.code)],
   intent: serpentIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,
 });
 
-export const playGolden = (golden: SerpentGolden, ctx: ReduceContext): SerpentGame => game.playGolden(golden, ctx);
+export const playGolden = (golden: SerpentGolden, ctx: ReduceContext): SerpentGame => game.playGolden(golden, ctx, { trail: true });
