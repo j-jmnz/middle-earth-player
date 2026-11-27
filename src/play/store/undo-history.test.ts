@@ -47,12 +47,28 @@ describe("which intents can be taken back", () => {
         }
         if (shows) hidden += 1;
         else if (!isOver(after)) clean.add(intent.type);
-        expect(nextUndoable([], after, { before, roundSteps: [], intent, steps }).length).toBe(shows ? 0 : 1);
+        expect(nextUndoable([], after, { before, roundSteps: [], intent, steps }).length).toBe(shows && !isOver(after) ? 0 : 1);
       }
     }
     expect(hidden).toBeGreaterThan(10);
     expect(clean.has("Commit")).toBe(true);
     expect(clean.has("PlayCard")).toBe(true);
+  });
+});
+
+describe("the move that ends the game", () => {
+  it("can be taken back even when it showed a hidden card; the moves before a reveal still cannot", () => {
+    const [{ before, intent, steps }] = playGame(1).slice(-1);
+    const entry = { before, roundSteps: [], intent, steps };
+    const earlier = { before, roundSteps: [], intent, steps };
+    const reveal = { ...before, seedCursor: before.seedCursor + 1 };
+    expect(showedHidden(before, reveal)).toBe(true);
+    // A reveal that loses the game (a shadow card turned up by a defender): that one move stays, and nothing before it.
+    expect(nextUndoable([earlier], { ...reveal, lost: true }, entry)).toEqual([entry]);
+    expect(nextUndoable([earlier], { ...reveal, stageCleared: true }, entry)).toEqual([entry]);
+    // A reveal that leaves the game on drops the list, as before; a move that shows nothing keeps what came before it.
+    expect(nextUndoable([earlier], reveal, entry)).toEqual([]);
+    expect(nextUndoable([earlier], { ...before, lost: true }, entry)).toEqual([earlier, entry]);
   });
 });
 

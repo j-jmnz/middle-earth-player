@@ -5,7 +5,7 @@
 // the state to go back to, and sending the same intent again gives the same result. Pure: the store keeps the list
 // (store.ts) and the save drops the intent (src/campaign).
 import type { EngineStep, PlayerIntent, ScenarioState } from "../../rules/engine/reduce.ts";
-import { showedHidden } from "../../rules/engine/undo.ts";
+import { isOver, showedHidden } from "../../rules/engine/undo.ts";
 
 // A state the table can go back to, with the log of its round as it was then, and the intent that left it and the steps it
 // ran (for the banner that says what was taken back).
@@ -13,9 +13,10 @@ export type Undoable = { before: ScenarioState; roundSteps: readonly EngineStep[
 
 /**
  * The states the table can go back to after one more accepted intent: one more, or none when the intent showed a hidden
- * card. One that ended the scenario is kept. `entry` is the state before the intent, the round's log then, the intent and its steps.
+ * card. One that ended the scenario is kept even when it showed one (nothing is left to protect once the game is over): the
+ * list is then that one move, as the moves before a reveal stay behind it. `entry` is the state before the intent, the round's log then, the intent and its steps.
  */
 export function nextUndoable(history: readonly Undoable[], after: ScenarioState, entry: Undoable): readonly Undoable[] {
-  if (showedHidden(entry.before, after)) return [];
+  if (showedHidden(entry.before, after)) return isOver(after) ? [entry] : [];
   return [...history, entry];
 }
