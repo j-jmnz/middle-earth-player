@@ -30,6 +30,7 @@ The brief already fixes targets, thumb reach, the phase rail, legal actions, mot
 - An irreversible choice states the consequence before it commits.
 - Undo has a label. It is not a hidden gesture.
 - The notch, the status bar, and the home indicator do not cover the phase rail or the choice buttons. Nothing depends on hover.
+- A strip, a dial name or a pill is looked at with `pnpm browser shot` at 667 x 375, the shortest phone, with the most cards the scenario can put there (`docs/design-system-table.md`, Spacing and the play area's rows).
 - Contrast is enough to read the phase rail and sheet text in both themes (Dark and Light).
 - Spacing and type repeat. A screen that invents its own scale is a finding.
 - The phase rail and the choice buttons are real controls a screen reader can reach. A card that exists only as pixels still opens on the inspect screen.
