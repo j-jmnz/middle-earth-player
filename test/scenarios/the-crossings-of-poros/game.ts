@@ -4,7 +4,7 @@ import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/ru
 import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenarios.ts";
 import type { PolicyOptions } from "../../harness/auto-player.ts";
 import { fillerLoadout, HERO_STATS, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
-import { chooseFirstOrLast, policyIntent, type Policy } from "../../harness/policy-kit.ts";
+import { archeryLeastDamaged, attackAllTogether, chooseFirstOrLast, commitAllBut, engageUpTo, policyIntent, undefendedLeastDamaged, type Policy } from "../../harness/policy-kit.ts";
 
 const cycle = loadCampaign("haradrim");
 const poros = loadAnyScenario("the-crossings-of-poros");
@@ -43,7 +43,7 @@ export const DEFAULT_POLICY: PorosPolicy = { choose: "first" };
 //   triggerActions(effectIds, oncePerRound)  an Action or Response of the records named, each time (or once a round) the engine offers it and the seat can pay
 //   passCommitWhile(when)  the quest commit: pass without committing while `when` holds
 // TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go in the list, before the auto-player's.
-const rules = (policy: PorosPolicy): Policy => [chooseFirstOrLast(policy.choose)];
+const rules = (policy: PorosPolicy): Policy => [chooseFirstOrLast(policy.choose), commitAllBut(1), archeryLeastDamaged(), undefendedLeastDamaged(), engageUpTo(), attackAllTogether()];
 
 // Every intent is one the reducer listed.
 export function porosIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: PorosPolicy = DEFAULT_POLICY): PlayerIntent {
@@ -56,7 +56,15 @@ export type PorosGame = PlayedGame;
 export type PorosGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: PorosDecks; outcome: "won" | "lost"; policy?: Partial<PorosPolicy>; lossReason?: string };
 
 // TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Nightmare) and a few losses (each way the scenario can be lost), each on a fixed seed.
-export const POROS_GOLDENS: readonly PorosGolden[] = [];
+export const POROS_GOLDENS: readonly PorosGolden[] = [
+  { name: "true solo, won, Normal, Desert Path then Orc Patrols", seatCount: 1, seed: 3, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, won, Normal, Ephel Duath then Deadly Creatures", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed, won, Normal, Ephel Duath then Southron Pursuit", seatCount: 2, seed: 8, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed, won, Normal, Desert Path then Deadly Creatures", seatCount: 2, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
+  { name: "true solo, lost, every hero destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+  { name: "true solo, lost, Poros Garrison leaves play", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "Poros Garrison left play" },
+];
 
 const game = standaloneGame<PorosDecks, PorosPolicy>({
   campaign: cycle,
@@ -69,4 +77,4 @@ const game = standaloneGame<PorosDecks, PorosPolicy>({
   limit: 6000,
 });
 
-export const playGolden = (golden: PorosGolden, ctx: ReduceContext): PorosGame => game.playGolden(golden, ctx);
+export const playGolden = (golden: PorosGolden, ctx: ReduceContext): PorosGame => game.playGolden(golden, ctx, { trail: true });
