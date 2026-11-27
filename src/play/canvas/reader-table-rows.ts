@@ -8,7 +8,7 @@ import { lookedIds } from "../../rules/families/sea/sailing.ts";
 import { headingLook, headingStepOf } from "../dream-chaser/heading.ts";
 import { stagingThreatOf, zoneSpeech } from "../words/card-speech.ts";
 import { headingLine, shipsLine } from "../words/scenarios/sea.ts";
-import { lookStripWords } from "../words/scenarios/wilderland.ts";
+import { lookStripWords } from "../words/look-strip.ts";
 import { PILES, secondPilesOf, pileSelector, victoryPileSelector, zoneSelector, type PileId, type PileView, type ZoneFacts, type ZoneId } from "../store/selectors.ts";
 import { nameOfCard } from "./picture-key.ts";
 import { pileSpeech } from "./pile-speech.ts";

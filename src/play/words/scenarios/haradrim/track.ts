@@ -1,7 +1,7 @@
 // Rules: hrd.track, hrd.search-objective (data/rules/entries.json); ledger lines 17069:A:1 to 17072:A:1, 17073:A:1, 17075:A:1, 17075:A:2, 17077:A:1, 17078:A:1, 17080:A:1.
 // What the table says when Beneath the Sands' Track keyword resolves and when the Search objective flips: the banner's beat (with the cards the Track discarded in the look strip, as a Discover's) and the log's line. The engine's `track` and `searchFlip` steps hold the facts. Pure.
 import type { EngineStep } from "../../../../rules/core/intents.ts";
-import { lookBeat, lookWordBeat } from "../wilderland.ts";
+import { lookBeat, lookWordBeat } from "../../look-strip.ts";
 
 export type TrackBeat = { title: string; lines: readonly { text: string; cards: readonly string[] }[] };
 

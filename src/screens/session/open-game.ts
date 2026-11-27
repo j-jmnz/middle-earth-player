@@ -25,7 +25,7 @@ export function factsOf<TRun>(catalog: Db<TRun>, codes: Iterable<string>): Map<s
   return new Map(rows.map((row) => [row.code, { imagesrc: row.imagesrc, backImagesrc: row.backImagesrc, text: row.text, pack: row.pack }]));
 }
 
-export type ReplayedGame = { world: World; ctx: ReduceContext; game: ScenarioState; roundSteps: readonly EngineStep[]; history: readonly Undoable[]; facts: ReadonlyMap<string, CardFacts>; destroyedHeroes?: ReadonlySet<string> };
+export type ReplayedGame = { world: World; ctx: ReduceContext; game: ScenarioState; roundSteps: readonly EngineStep[]; history: readonly Undoable[]; facts: ReadonlyMap<string, CardFacts>; destroyedHeroes: ReadonlySet<string> };
 
 /** A replay for the table: the game and the open scenario to write once (`stamp`, session.ts Resumed), or the index of the first intent a checked replay refused or did not match (`at`, null when there was nothing to check). */
 export type ReplayedOpen = { ok: true; game: ReplayedGame; stamp: ActiveScenario | null } | { ok: false; at: number | null };
@@ -34,15 +34,13 @@ export type ReplayedOpen = { ok: true; game: ReplayedGame; stamp: ActiveScenario
 export function replayForTable<TRun>(catalog: Db<TRun>, world: World, resume: (observe: ReplayObserver) => Resumed): ReplayedOpen {
   // The same fold the store runs on each intent it sends (keepIntent), so a reopened game can be undone as far as before.
   const ctx = contextOf(world);
+  // `kept` also holds the heroes a destroy step named, over the whole game: the outcome tells them apart from the heroes that left play with an eliminated player (campaign/report.ts).
   let kept: Kept = { roundSteps: [], history: [] };
-  // The heroes a destroy step named, over the whole game: the outcome tells them apart from the heroes that left play with an eliminated player (campaign/report.ts).
-  const destroyed = new Set<string>();
   const resumed = resume((before, after, steps, intent) => {
     kept = keepIntent(kept, before, after, steps, intent, ctx);
-    for (const step of steps) if (step.kind === "destroy" && before.cards[step.targetId]?.zone === "heroes") destroyed.add(step.targetId);
   });
   if (!resumed.ok) return { ok: false, at: resumed.at ?? null };
-  return { ok: true, game: { world, ctx, game: resumed.state, ...kept, destroyedHeroes: destroyed, facts: factsOf(catalog, world.cards.keys()) }, stamp: resumed.stamp };
+  return { ok: true, game: { world, ctx, game: resumed.state, roundSteps: kept.roundSteps, history: kept.history, destroyedHeroes: kept.destroyedHeroes ?? new Set(), facts: factsOf(catalog, world.cards.keys()) }, stamp: resumed.stamp };
 }
 
 /**
@@ -50,5 +48,5 @@ export function replayForTable<TRun>(catalog: Db<TRun>, world: World, resume: (o
  * drops the last one when Undo goes back over it.
  */
 export function committingStore(game: ReplayedGame, persist: (intent: PlayerIntent, game: ScenarioState) => void, takeBack: () => void): TableStore {
-  return createTableStore({ ctx: game.ctx, game: game.game, roundSteps: game.roundSteps, history: game.history, onCommit: persist, onUndo: takeBack });
+  return createTableStore({ ctx: game.ctx, game: game.game, roundSteps: game.roundSteps, history: game.history, destroyedHeroes: game.destroyedHeroes, onCommit: persist, onUndo: takeBack });
 }

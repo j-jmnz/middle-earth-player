@@ -7,11 +7,11 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
-import { printedOf } from "../../core/printed.ts";
 import { flagged, inPlay, livingSeats, updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
+import { topmostMatching } from "../../interpret/topmost.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { moveEncounter } from "../encounter/moves.ts";
 import { discardTopCards } from "../uncharted/cards.ts";
@@ -63,7 +63,7 @@ export function stageMarkedFromTop(state: ScenarioState, instruction: Verb<"Stag
 
 /** AddTopmostFromDiscard: the card of the type put on the encounter discard pile last goes to the staging area. */
 export function addTopmostFromDiscard(state: ScenarioState, instruction: Verb<"AddTopmostFromDiscard">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const id = [...state.encounterDiscard].reverse().find((candidate) => printedOf(ctx.cards, state.cards[candidate]?.code ?? "").type === instruction.cardType);
+  const id = topmostMatching(state, ctx, [...state.encounterDiscard].reverse(), { cardType: instruction.cardType });
   return id ? moveEncounter(state, id, "staging", focus.seat, ctx, steps) : state;
 }
 

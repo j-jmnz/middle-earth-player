@@ -20,7 +20,7 @@ import { firstTreacheryNote, stageArrivalNote, stageBeats } from "../words/scena
 import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape.ts";
 import { locateResultTitle } from "../words/scenarios/locate.ts";
 import { TRAPPED_TITLE } from "../readouts/standalone-scenarios/barrow-downs-words.ts";
-import { eliminationWords } from "../../rules/core/elimination-words.ts";
+import { eliminationWords, lastHeroesDestroyed } from "../../rules/core/elimination-words.ts";
 import { tellTrack } from "../words/scenarios/haradrim/track.ts";
 import { discoverLines, discoverTitle, POOL_COPY } from "../words/scenarios/wilderland.ts";
 import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poison.ts";
@@ -312,7 +312,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         line(`${names.card(step.by)}: ${names.card(step.cardId)} is canceled and discarded`, null, [step.cardId]);
         return;
       case "eliminate":
-        open(0, `Player ${step.seat + 1} is eliminated`, "bad").lines.push(...[eliminationWords(after, step.seat)].flatMap((text) => (text ? [{ text, mark: null }] : [])));
+        open(0, `Player ${step.seat + 1} is eliminated`, "bad").lines.push(...[eliminationWords(after, step.seat, (seat) => lastHeroesDestroyed(before, steps, seat))].flatMap((text) => (text ? [{ text, mark: null }] : [])));
         return;
       // Discover X (emce.discover): one beat for the look and one for each result, kept together and last; the cards that went to the discard pile lie in the look strip on the last beat (the Hazard's own reveal is not told again).
       case "discover": {
@@ -345,7 +345,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         line(reshuffleWords(step.deck));
         return;
       // Beneath the Sands' Track keyword and the Search objective's flips (hrd.track): the discarded cards lie in the look strip.
-      default:
+      case "track": case "searchFlip":
         tellTrack(step, names.card, { open, line, close });
         return;
     }

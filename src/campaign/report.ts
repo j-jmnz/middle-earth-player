@@ -7,7 +7,7 @@ import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 import { reanimatedHeroes } from "../rules/families/angmar/reanimate/standing.ts";
 
-import { lossWithCauses } from "../rules/core/elimination-words.ts";
+import { allHeroesDestroyed, lossWithCauses } from "../rules/core/elimination-words.ts";
 import { scoreParts, scoreTotal } from "./score.ts";
 
 export type ReportHero = { name: string; words: string; destroyed: boolean };
@@ -104,5 +104,5 @@ export function gameReport(state: ScenarioState, cards: ReadonlyMap<string, Prin
     const printed = printedOf(cards, card.code);
     return [printed.victory ? `${printed.name} (${printed.victory})` : printed.name];
   });
-  return { ended, stage: stageLine(state, cards), seats: seatLines(state, cards, destroyed), victory, score: state.lost ? null : scoreLines(state, cards), lossReason: state.lost ? lossWithCauses(state) : null };
+  return { ended, stage: stageLine(state, cards), seats: seatLines(state, cards, destroyed), victory, score: state.lost ? null : scoreLines(state, cards), lossReason: state.lost ? lossWithCauses(state, destroyed && allHeroesDestroyed(state, destroyed, (id) => cards.get(state.cards[id]?.code ?? "")?.type === "hero")) : null };
 }

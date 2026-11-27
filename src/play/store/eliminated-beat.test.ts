@@ -18,7 +18,16 @@ describe("the elimination beat", () => {
     const made = tableFromLayout("beneath-the-sands", { seats: 2 });
     const [one, two] = made.state.seats;
     const after = { ...made.state, seats: [{ ...one, heroes: [], eliminated: true }, two] as const };
+    const destroys = (one?.heroes ?? []).map((id) => ({ kind: "destroy", targetId: id }) as const);
+    const moment = momentOf(made.state, after, [...destroys, { kind: "eliminate", seat: 0 }], { card: (id) => id });
+    expect(moment?.lines.map((line) => line.text)).toContain("Player 1's last hero was destroyed.");
+  });
+
+  it("rr.player-elimination an elimination with no destroy step for the heroes in play names no cause", () => {
+    const made = tableFromLayout("beneath-the-sands", { seats: 2 });
+    const [one, two] = made.state.seats;
+    const after = { ...made.state, seats: [{ ...one, heroes: [], eliminated: true }, two] as const };
     const moment = momentOf(made.state, after, [{ kind: "eliminate", seat: 0 }], { card: (id) => id });
-    expect(moment?.lines.map((line) => line.text)).toEqual(["Player 1's last hero was destroyed."]);
+    expect(moment?.lines.map((line) => line.text)).toEqual([]);
   });
 });

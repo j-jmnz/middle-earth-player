@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import type { EngineStep } from "../../../../rules/core/intents.ts";
 import { momentOf } from "../../../store/outcome.ts";
 import { tableFromLayout } from "../../../../../test/harness/scene-kit.ts";
-import { lookIdsOf, lookStripWords, lookWordOf } from "../wilderland.ts";
+import { lookIdsOf, lookStripWords, lookWordOf } from "../../look-strip.ts";
 import { lineSpeech } from "../../../readouts/banner-speech.ts";
 import { tellTrack, trackBeat, trackLogLine } from "./track.ts";
 

@@ -1,5 +1,6 @@
 // Rules: emce.treasure, rr.guarded (data/rules/entries.json); ledger lines 12168:A:2, 12189:B:2, 18074:A:1, 18075:A:1, 18076:A:1. What the table says when the players look at random undiscovered treasures and choose one to attach as a
 // guarded objective (AttachRandomTreasure). The sentence the choice sheet reads from. Pure.
+import { lookBeat } from "../look-strip.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 import { recordsOfFace } from "../../../rules/families/dreamchaser/faces.ts";
 import { printedOf } from "../../../rules/core/printed.ts";
@@ -24,6 +25,9 @@ import { nightAsk, nightBranchWords, nightChooseNote, nightMainNow, nightQuestsN
 import { rhovanionAsk, rhovanionBranchWords, rhovanionChooseNote } from "./rhovanion.ts";
 import { askedSeat, seatSays } from "../seat.ts";
 import { assignDamageWords } from "./south.ts";
+
+// The phone table canvas (a file desktop work leaves untouched) still reads the look strip's ids from here.
+export { lookIdsOf } from "../look-strip.ts";
 
 /** The table the words read: what is dealt now, the records, and the options the window offers. */
 type Facts = { game: ScenarioState; ctx: ReduceContext; options: readonly string[] };
@@ -304,28 +308,6 @@ export function wilderlandTravel(game: ScenarioState, ctx: ReduceContext, locati
 // Discover X (emce.discover): the banner's beats, and the cards of the look strip. The engine's `discover` step names the cards looked at, the Loot objective that was attached and the Hazard card that was revealed;
 // the rest went to the encounter discard pile. The strip lays out those (the Loot and the Hazard stand where they went, ringed by the same beat). Pure.
 
-/** The prefix a banner beat puts on a card id to say "lay this card in the look strip" (store/beat-store.ts keeps the ids as a string). */
-const LOOK_PREFIX = "look:";
-
-/** A beat's card ids with the cards of the look strip told apart: the ids for the strip are returned without the prefix. */
-export function lookIdsOf(beat: ReadonlySet<string>): readonly string[] {
-  return [...beat].filter((id) => id.startsWith(LOOK_PREFIX)).map((id) => id.slice(LOOK_PREFIX.length));
-}
-
-/** The id a beat carries to name the keyword whose look strip it lays (Beneath the Sands' Track); a beat with none is a Discover's. It is no card, so no card is ringed for it. */
-export const lookWordBeat = (word: string): string => `lookword:${word}`;
-
-/** The keyword whose look strip a beat lays: `Discover` unless the beat says another. */
-export function lookWordOf(beat: Iterable<string>): string {
-  for (const id of beat) if (id.startsWith("lookword:")) return id.slice("lookword:".length);
-  return "Discover";
-}
-
-/** The beat ids that lay these cards in the look strip. */
-export function lookBeat(ids: readonly string[]): readonly string[] {
-  return ids.map((id) => `${LOOK_PREFIX}${id}`);
-}
-
 /**
  * What a Discover resolved: the location and how many cards were looked at, the Loot objective and the Hazard card (name and id) if any, and the ids of the rest, which went to the encounter discard pile.
  * `staged` says the Hazard stands in the staging area (an enemy or a location); a treachery is resolved and lies in the discard pile.
@@ -364,11 +346,6 @@ export function discoverLines(facts: DiscoverFacts): readonly { text: string; ca
 /** The log's one line for the step, and the reader's name for the strip ("Discover look, 2 cards"). */
 export function discoverLogLine(facts: Pick<DiscoverFacts, "looked"> & { location: string; loot: string | null; hazard: string | null }): string {
   return `Discover at ${facts.location}: looked at ${cards(facts.looked)}${facts.loot ? `, attached ${facts.loot}` : ""}${facts.hazard ? `, revealed ${facts.hazard}` : ""}`;
-}
-
-/** What a screen reader hears of the strip, and the reader table's line for it. */
-export function lookStripWords(count: number, word = "Discover"): string {
-  return `${word} look, ${cards(count)} placed in the encounter discard pile`;
 }
 
 /** What winning does with a card A Growing Threat set aside (emce.campaign-pool-encounter). */

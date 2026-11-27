@@ -25,6 +25,7 @@ import { sidequestsPickMatches } from "../families/sidequests/pick.ts";
 import { attachmentsOn, lootUnder } from "../core/attached.ts";
 import { lookedPool } from "../families/deck/pick.ts";
 import type { ReduceContext } from "./interpret.ts";
+import { topmostMatching } from "./topmost.ts";
 import { hasKeyword, isPlayerCardEffect, modifiedStat, playerCardEffectCanChoose, sourcePrinted, uniqueBlocked } from "../core/keywords.ts";
 import { flaggedByClass } from "../core/holder-classes.ts";
 import { cardTypeOf, isAllyLike, isCharacterType, isQuestCardType, isSideQuestType, isPlayerType, printedOf } from "../core/printed.ts";
@@ -132,7 +133,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   // With `topmost`, only the card of the pick's type nearest the top: "the topmost location in the encounter discard pile" (17079:A:1).
   else if (from === "encounterDiscard") {
     const pile = [...state.encounterDiscard].reverse();
-    raw.push(...(spec.topmost ? pile.filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === spec.type).slice(0, 1) : pile));
+    const top = spec.topmost ? topmostMatching(state, ctx, pile, { cardType: spec.type, trait: spec.trait, traits: spec.traits }) : null;
+    raw.push(...(spec.topmost ? (top ? [top] : []) : pile));
   }
   // The Raven deck of The Antlered Crown, top first (rm.raven-deck).
   else if (from === "ravenDeck") raw.push(...pileOf(state, "ravenDeck"));
@@ -144,13 +146,7 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
       if (!spec.topmost) raw.push(...pile);
       else {
         // The last card put on a discard pile is its top.
-        const top = [...pile].reverse().find((id) => {
-          const instance = state.cards[id];
-          // The topmost card of those that match: "the topmost Harad ally" is the Harad ally nearest the top, with plain allies above it (Kahliel's Headdress, 17010:A:3).
-          if (instance == null) return false;
-          const printed = printedOf(ctx.cards, instance.code);
-          return (!spec.cardType || printed.type === spec.cardType) && (!spec.trait || printed.traits.includes(spec.trait)) && (!spec.traits || spec.traits.some((trait) => printed.traits.includes(trait)));
-        });
+        const top = topmostMatching(state, ctx, [...pile].reverse(), spec);
         if (top) raw.push(top);
       }
     }

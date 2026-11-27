@@ -258,8 +258,10 @@ function ThreatDial({
   const pop = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));
   // A seat that left the game wears the word "Out" on its dimmed dial, where a sighted player reads its number (the spoken label says "eliminated").
   const shown = word ?? (threat.eliminated ? "Out" : undefined);
-  const delta = change && word == null ? threatDelta(change.before, change.after) : null;
-  const deltaWords = change && word == null ? threatDeltaWords(name, change.before, change.after) : null;
+  // A seat that is out wears "Out" and no change: its threat no longer counts.
+  const moved = change != null && word == null && !threat.eliminated;
+  const delta = moved ? threatDelta(change.before, change.after) : null;
+  const deltaWords = moved ? threatDeltaWords(name, change.before, change.after) : null;
   const critical = level === "critical" && !threat.eliminated;
   // The words for a dial near its limit: its own warning first, then what the number alone says.
   const losesAtLimit = limit != null && eliminates !== true;

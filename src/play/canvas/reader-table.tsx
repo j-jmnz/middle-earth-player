@@ -10,7 +10,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 
 import type { CardSpeechDeps } from "../words/card-speech.ts";
 import { cardSpeech } from "../words/card-speech.ts";
-import { lookIdsOf, lookWordOf } from "../words/scenarios/wilderland.ts";
+import { lookIdsOf, lookWordOf } from "../words/look-strip.ts";
 import { beatIds } from "../store/beat-store.ts";
 import { NO_HIGHLIGHT } from "../store/peek.ts";
 import { useReaderGateEnd } from "../spotlight/reader-gate.ts";

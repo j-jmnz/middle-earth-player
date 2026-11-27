@@ -49,6 +49,8 @@ export type TableState = {
   shown: TableMoment | null;
   // The states Undo can go back to, oldest first.
   history: readonly Undoable[];
+  // The heroes a destroy step named over the whole game, kept with each accepted intent and dropped with an Undo: the outcome tells them from the heroes that left play with an eliminated player (campaign/report.ts).
+  destroyedHeroes: ReadonlySet<string>;
   // The combat spotlight of the moment in `shown`: the attacks it resolved, and whether the canvas is still playing them
   // (spotlight/gate.ts). The banner, the settle after a new moment and the card motions wait for it; it holds no rule.
   spotlight: SpotlightGate;
@@ -93,8 +95,17 @@ export type TableMoment =
   | { seq: number; kind: "sent"; before: ScenarioState; after: ScenarioState; steps: readonly EngineStep[]; ended?: { round: number; steps: readonly EngineStep[] } }
   | { seq: number; kind: "undone"; intent: PlayerIntent; left: ScenarioState; after: ScenarioState; steps: readonly EngineStep[] };
 
-/** What the table keeps of the intents sent so far: the round's log and the states Undo can go back to. */
-export type Kept = { roundSteps: readonly EngineStep[]; history: readonly Undoable[] };
+/** What the table keeps of the intents sent so far: the round's log, the states Undo can go back to and the heroes destroyed (`destroyedHeroes`, none when a caller gives none). */
+export type Kept = { roundSteps: readonly EngineStep[]; history: readonly Undoable[]; destroyedHeroes?: ReadonlySet<string> };
+
+function withDestroyed(held: ReadonlySet<string> | undefined, more: readonly string[]): ReadonlySet<string> {
+  return more.length === 0 && held ? held : new Set([...(held ?? []), ...more]);
+}
+
+/** The heroes in play before an intent that its steps destroy. */
+export function heroesDestroyed(before: ScenarioState, steps: readonly EngineStep[]): string[] {
+  return steps.flatMap((step) => (step.kind === "destroy" && before.cards[step.targetId]?.zone === "heroes" ? [step.targetId] : []));
+}
 
 /**
  * One more accepted intent folded into what the table keeps. The store calls it for each intent sent, and reopening a save
@@ -105,6 +116,7 @@ export function keepIntent(kept: Kept, before: ScenarioState, after: ScenarioSta
   return {
     roundSteps: nextRoundSteps(kept.roundSteps, before, after, steps, ctx),
     history: nextUndoable(kept.history, after, { before, roundSteps: kept.roundSteps, intent, steps: stampVale(steps, before, after) }),
+    destroyedHeroes: withDestroyed(kept.destroyedHeroes, heroesDestroyed(before, steps)),
   };
 }
 
@@ -123,6 +135,7 @@ export type TableInput = {
   game: ScenarioState;
   roundSteps?: readonly EngineStep[];
   history?: readonly Undoable[];
+  destroyedHeroes?: ReadonlySet<string>;
   // Called after the reducer accepts an intent, with the state it returned. The screen writes the intent to the save here.
   onCommit?: (intent: PlayerIntent, game: ScenarioState) => void;
   // Called after an undo: the screen drops the last intent from the save.
@@ -149,6 +162,7 @@ export function createTableStore(input: TableInput): TableStore {
     moment: null,
     shown: null,
     history: input.history ?? [],
+    destroyedHeroes: input.destroyedHeroes ?? new Set(),
     spotlight: NO_SPOTLIGHT,
     viewedSeat: null,
     rowFolds: NO_ROW_FOLDS,
@@ -197,6 +211,7 @@ export function createTableStore(input: TableInput): TableStore {
         ...showing(last.before),
         roundSteps: last.roundSteps,
         history: history.slice(0, -1),
+        destroyedHeroes: new Set([...get().destroyedHeroes].filter((id) => !heroesDestroyed(last.before, last.steps).includes(id))),
         moment: undone,
         shown: undone,
         // Undo takes the attack back: nothing is replayed, and one still playing ends.
