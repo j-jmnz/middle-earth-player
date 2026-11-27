@@ -19,6 +19,7 @@ import { moveToOrcsArea, prepareOrcsArea, syncOrcsArea } from "./orcs-area.ts";
 import { addOrcsProgress, orcsProgress } from "./orcs-stage.ts";
 import { orcsCondition } from "./orcs-values.ts";
 import { revealRandomSetAside } from "./random-aside.ts";
+import { randomSetAside, searchAsideStageSets, setStagesAside } from "./set-aside.ts";
 import { haradrimPickMatches } from "./pick.ts";
 import { allyBelowThreat, threatAboveWillpower, willpowerGap } from "./combat.ts";
 import { engageSeatWithMost } from "./engage.ts";
@@ -47,6 +48,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return attachRandomSetAside(state, instruction, ctx, steps);
     case "RevealRandomSetAside":
       return revealRandomSetAside(state, instruction, focus, ctx, steps);
+    case "RandomSetAside":
+      return randomSetAside(state, instruction, focus, ctx, steps);
+    case "SetStagesAside":
+      return setStagesAside(state, instruction);
+    case "SearchAsideStageSets":
+      return searchAsideStageSets(state, instruction, focus, ctx, steps);
     case "AddWithHostToVictory":
       return addWithHostToVictory(state, focus, ctx);
     case "PrepareOrcsArea":
@@ -78,7 +85,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "haradrim",
-  verbs: ["PlaceUnderSelfFaceup", "SetTemperature", "RaiseTemperature", "LowerTemperature", "MoveHeroesToStaging", "TakeObjectiveHero", "ReleaseStagedHero", "GuardStagedHeroes", "EngageSeatWithMost", "AttachRandomSetAside", "RevealRandomSetAside", "AddWithHostToVictory", "PrepareOrcsArea", "MoveToOrcsArea", "OrcsProgress", "AddOrcsProgress", "TakeObjectiveAlly", "EliminateAfterAttack", "FlipSearchObjective", "ResolveTrack", "StageMarkedFromTop", "AddTopmostFromDiscard", "SetAsideCode"],
+  verbs: ["PlaceUnderSelfFaceup", "SetTemperature", "RaiseTemperature", "LowerTemperature", "MoveHeroesToStaging", "TakeObjectiveHero", "ReleaseStagedHero", "GuardStagedHeroes", "EngageSeatWithMost", "AttachRandomSetAside", "RevealRandomSetAside", "AddWithHostToVictory", "PrepareOrcsArea", "MoveToOrcsArea", "OrcsProgress", "AddOrcsProgress", "TakeObjectiveAlly", "EliminateAfterAttack", "FlipSearchObjective", "ResolveTrack", "StageMarkedFromTop", "AddTopmostFromDiscard", "SetAsideCode", "RandomSetAside", "SetStagesAside", "SearchAsideStageSets"],
   run,
   condition: (state, condition, scope, ctx) => {
     switch (condition.kind) {

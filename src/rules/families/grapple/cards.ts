@@ -81,12 +81,12 @@ export function flipEliteAndAttack(state: ScenarioState, instruction: Verb<"Flip
   return turned ? attackFirstPlayer(turned.state, { seat: state.firstPlayer, sourceId: turned.id }, ctx, steps) : state;
 }
 
-/** RemoveEncounterSet: every card of the encounter set in a deck, the discard pile or a play area (and the shadow cards it dealt) leaves the game; the cards attached to those in play are discarded. */
+/** RemoveEncounterSet: every card of the encounter set in a deck, the discard pile or a play area (and the shadow cards it dealt) leaves the game; the cards attached to those in play are discarded. With `setAsideOnly` only the cards still set aside leave. */
 export function removeEncounterSet(state: ScenarioState, instruction: Verb<"RemoveEncounterSet">, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
   let count = 0;
   for (const card of Object.values(state.cards)) {
-    if (!SET_ZONES.has(card.zone) || printedOf(ctx.cards, card.code).encounterSet !== instruction.set) continue;
+    if (!(instruction.setAsideOnly === true ? card.zone === "setAside" : SET_ZONES.has(card.zone)) || printedOf(ctx.cards, card.code).encounterSet !== instruction.set) continue;
     count += 1;
     next = inPlay(card.zone) ? moveEncounter(next, card.id, "removed", state.firstPlayer, ctx, steps) : moveCard(next, card.id, { zone: "removed" });
   }

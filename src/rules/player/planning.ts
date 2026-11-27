@@ -33,7 +33,7 @@ import { hasResourceMatch, heroPays } from "./payments.ts";
 import { playsOntoHost, printedOf, type PrintedCard } from "../core/printed.ts";
 import { attachBlocked } from "../interpret/restrictions.ts";
 import type { ScenarioState } from "../core/state.ts";
-import { livingSeats, updateCard } from "../core/state.ts";
+import { flagged, livingSeats, updateCard } from "../core/state.ts";
 import { attachTo, moveCard } from "../core/zones.ts";
 
 export function playCard(
@@ -86,7 +86,7 @@ export function playCard(
   const elsewhere = playsOntoHost(printed) ? playElsewhere(next, intent.cardId, intent.hostId, seat, ctx, steps) : null;
   if (elsewhere) return elsewhere;
   next = moveCard(next, intent.cardId, { zone: "play", seat });
-  next = updateCard(next, intent.cardId, { exhausted: entersExhausted(ctx, instance.code) });
+  next = updateCard(next, intent.cardId, { exhausted: entersExhausted(next, ctx, instance.code) });
   if (playsOntoHost(printed) && intent.hostId) {
     // Played on another player's character, it is that player's to control (rr.attachment-cards).
     next = hostTakesControl(attachTo(next, intent.cardId, intent.hostId), intent.cardId, ctx);
@@ -173,9 +173,9 @@ function playRules(ctx: ReduceContext, code: string) {
     .flatMap((effect) => effect.instructions);
 }
 
-// "Enters play exhausted" (a constant on the card itself).
-export function entersExhausted(ctx: ReduceContext, code: string): boolean {
-  return playRules(ctx, code).some((instruction) => instruction.verb === "EntersPlayExhausted");
+// "Enters play exhausted" (a constant on the card itself), or "Allies enter play exhausted" (a stage's constant, the table flag `alliesEnterExhausted`, 17157:B:1).
+export function entersExhausted(state: ScenarioState, ctx: ReduceContext, code: string): boolean {
+  return playRules(ctx, code).some((instruction) => instruction.verb === "EntersPlayExhausted") || (flagged(state, "table", "alliesEnterExhausted") && printedOf(ctx.cards, code).type === "ally");
 }
 
 // The card may be played from its owner's discard pile; `only`: and from nowhere else.

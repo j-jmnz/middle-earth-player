@@ -1,0 +1,369 @@
+Scenario piles that place cards with no record (quest: 17157 Flight to Gondor; quest: 17158 The Desert Path; quest: 17159 The Ephel Dúath; quest: 17160 Deadly Creatures; quest: 17161 Southron Pursuit; quest: 17162 Orc Patrols; quest: 17163 Battle at the Crossings; staging: 17146 The Black Serpent; setAside: 17145 Poros Garrison; setAside: 17153 Foothills of Mordor; setAside: 17154 Shadowy Vale; setAside: 17155 Mountains of Shadow; setAside: 17156 Find a Way Down; setAside: 16048 Find Water; setAside: 16049 Towering Dunes; setAside: 16050 Desert Oasis; setAside: 16051 Sandstorm; setAside: 16052 Heat Exhaustion; setAside: 16053 Craft Remedy; setAside: 16054 Sand Viper; setAside: 16055 Giant Scorpion; setAside: 16040 Southron Champion; setAside: 16041 Southron Captain; setAside: 16042 Southron Soldier; setAside: 16043 Southron Archer; setAside: 16044 Nowhere to Hide; setAside: 16060 Uruks of the Eye; setAside: 16061 Uruk Chieftain; setAside: 16062 Uruk of Mordor; setAside: 16063 Uruk Warg-rider; setAside: 16064 Mordor Warg; setAside: 16065 Fear of Mordor)
+
+## 17145 Poros Garrison
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+17145:A:1 (front): The first player gains control of Poros Garrison.
+  17145:constant:1: Constant
+    - this card is controlled by the first player while this holds
+
+17145:A:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+17145:A:3 (front): You can optionally engage an additional enemy during the encounter phase.
+  17145:constant:2: Constant
+    - actorSeat: stat extraOptionalEngage 1, while this card is in play
+
+17145:A:4 (front): If Poros Garrison leaves play, the players lose the game.
+  17145:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players lose the game
+
+## 17146 The Black Serpent
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+17146:A:1 (front): Cannot leave the staging area or take damage. X is the stage number of the main quest.
+  17146:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+    - this card: stat neverEngaged (no player optionally engages it while it cannot leave the staging area: it is only considered engaged) 1, while this card is in play
+    - this card: stat cannotTakeDamage 1, while this card is in play
+
+17146:A:2 (front): The Black Serpent gets +X Threat, +X Attack and +X Defense.
+  17146:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat the stage number of the main quest (also while a side quest is the current quest), while this card is in play
+    - this card: stat attack the stage number of the main quest (also while a side quest is the current quest), while this card is in play
+    - this card: stat defense the stage number of the main quest (also while a side quest is the current quest), while this card is in play
+
+17146:A:3 (front): Forced: At the end of the encounter phase, either remove X progress from the main quest, or The Black Serpent makes an attack against the first player.
+  17146:forced:1: Forced at the end of the phase
+    only if it is the Encounter phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the first player chooses one of:
+      * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 1 progress):
+        - remove the stage number of the main quest (also while a side quest is the current quest) progress from the main quest (all of it when it holds less)
+      * option "attack":
+        - this card attacks the first player now, from the staging area, dealt a shadow card
+
+## 17147 Southron Outrider
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17147:A:1 (front): Forced: After Southron Outrider engages you, either place a random enemy from the set aside Harad Soldiers set into the encounter discard pile, or Southron Outrider gets +3 Attack this round.
+  17147:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose 1 random card that is an enemy of the set aside Harad Soldiers set, drawn by the game seed (nothing when none is left): it becomes the last picked card and stays set aside (an option that reads it is offered only while there is one)
+    - the acting player chooses one of:
+      * option "place" (only if the picked card is a enemy (any player controls) that is out of play now):
+        - the picked card goes to the encounter discard pile
+      * option "attack":
+        - this card: stat attack 3, until the end of the round
+
+17147:A:2 (shadow): Shadow: Exhaust a character you control.
+  17147:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 17148 Uruk Prowler
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17148:A:1 (front): When Revealed: Either place a random enemy from the set aside Mordor Orcs set into the encounter discard pile, or Uruk Prowler makes an immediate attack against the first player.
+  17148:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose 1 random card that is an enemy of the set aside Mordor Orcs set, drawn by the game seed (nothing when none is left): it becomes the last picked card and stays set aside (an option that reads it is offered only while there is one)
+    - the first player chooses one of:
+      * option "place" (only if the picked card is a enemy (any player controls) that is out of play now):
+        - the picked card goes to the encounter discard pile
+      * option "attack":
+        - this card attacks the first player now, from the staging area, dealt a shadow card
+
+17148:A:2 (shadow): Shadow: Discard a random card from your hand.
+  17148:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player discards 1 random card(s) from hand
+
+## 17149 Desert Warg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17149:A:1 (front): When Revealed: Either place a random enemy from the set aside Desert Creatures set into the encounter discard pile, or Desert Warg gains surge.
+  17149:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose 1 random card that is an enemy of the set aside Desert Creatures set, drawn by the game seed (nothing when none is left): it becomes the last picked card and stays set aside (an option that reads it is offered only while there is one)
+    - the first player chooses one of:
+      * option "place" (only if the picked card is a enemy (any player controls) that is out of play now):
+        - the picked card goes to the encounter discard pile
+      * option "surge":
+        - this card gains surge (one more encounter card is revealed when it has been resolved)
+
+17149:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
+  17149:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
+
+## 17150 Desolate Land
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17150:A:1 (front): X is the highest number of characters controlled by a single player.
+  17150:constant:1: Constant
+    - this card: stat threat the most character (you control) any one player controls, each player counted from their own side, while this card is in play
+
+17150:A:2 (front): Forced: After Desolate Land becomes the active location, choose 1 random card from the set aside encounter set with the most cards remaining. Reveal that card as if it was part of the encounter deck.
+  17150:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - choose 1 random card of the set aside encounter set with the most cards remaining (among Mountains of Shadow, Desert Sands, Desert Creatures, Harad Soldiers, Mordor Orcs; the first player chooses among tied sets; a set removed from the game has none left), drawn by the game seed (nothing when none is left): the acting player reveals it as if it were the top card of the encounter deck (Surge, Doomed and When Revealed apply) and it is part of the encounter deck from then on
+
+## 17151 Harondor Waste
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17151:A:1 (front): Forced: After Harondor Waste becomes the active location, choose 1 random card from the set aside encounter set with the most cards remaining and place it into the encounter discard pile. Then, shuffle the encounter discard pile into the encounter deck.
+  17151:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose 1 random card of the set aside encounter set with the most cards remaining (among Mountains of Shadow, Desert Sands, Desert Creatures, Harad Soldiers, Mordor Orcs; the first player chooses among tied sets; a set removed from the game has none left), drawn by the game seed (nothing when none is left): it is placed into the encounter discard pile and is part of the encounter deck from then on
+    - shuffle the encounter discard pile into the encounter deck
+
+17151:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
+  17151:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 17152 Danger Close Behind
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+17152:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+17152:A:2 (front): When Revealed: Choose 1 random card from the set aside encounter set with the most cards remaining. Reveal that card as if it was the top card of the encounter deck.
+  17152:whenRevealed:1: When revealed
+    - choose 1 random card of the set aside encounter set with the most cards remaining (among Mountains of Shadow, Desert Sands, Desert Creatures, Harad Soldiers, Mordor Orcs; the first player chooses among tied sets; a set removed from the game has none left), drawn by the game seed (nothing when none is left): the acting player reveals it as if it were the top card of the encounter deck (Surge, Doomed and When Revealed apply) and it is part of the encounter deck from then on
+
+17152:A:3 (shadow): Shadow: If this attack destroys a character, resolve the 'when revealed' effect on this card.
+  17152:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose 1 random card of the set aside encounter set with the most cards remaining (among Mountains of Shadow, Desert Sands, Desert Creatures, Harad Soldiers, Mordor Orcs; the first player chooses among tied sets; a set removed from the game has none left), drawn by the game seed (nothing when none is left): the acting player reveals it as if it were the top card of the encounter deck (Surge, Doomed and When Revealed apply) and it is part of the encounter deck from then on
+
+## 17153 Foothills of Mordor
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+17153:A:1 (front): While Foothills of Mordor is in the staging area, 'when revealed' effects cannot be canceled.
+  17153:constant:1: Constant
+    only if this card is in the staging area
+    - while this card is in play (under its condition), the When Revealed effects of cards cannot be canceled
+
+17153:A:2 (front): Forced: After Foothills of Mordor becomes the active location, raise each player's threat by 2.
+  17153:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - raise threat by 2 (each player)
+
+## 17154 Shadowy Vale
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+17154:A:1 (front): While any player has threat of 35 or higher, Shadowy Vale gets +3 Threat.
+  17154:constant:1: Constant
+    - this card: stat threat the number of living players with a threat of 35 or higher x 3, at most 3, while this card is in play
+
+17154:A:2 (front): Forced: After Shadowy Vale becomes the active location, reveal the top card of the encounter deck.
+  17154:forced:1: Forced after this location becomes the active location (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the acting player reveals an encounter card
+
+## 17155 Mountains of Shadow
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+17155:A:1 (front): When Revealed: Raise each player's threat by X, where X is the printed quest points of the active location. If there is no active location, Mountains of Shadow gains surge.
+  17155:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - raise threat by printed quest points of the active location (each player)
+    - then, if not (there is a location (any player controls) that is the active location to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+17155:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, raise your threat by 2.
+  17155:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 2 (the acting player)
+
+## 17156 Find a Way Down
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+17156:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+17156:A:2 (front): Each player's threat cannot be reduced.
+  17156:constant:1: Constant
+    only if this card is in the staging area
+    - each player: stat threatReductionBarred 1, while this card is in play
+
+17156:A:3 (front): Response: When Find a Way Down is defeated, each player reduces his threat by 3.
+  17156:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card only: with no subject, an event about one card is heard by that card alone)
+    - lower threat by 3 (each player)
+
+## 17157 Flight to Gondor
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17157:A:1 (front): Setup: Set Poros Garrison and each of the following encounter sets aside, out of play: Mountains of Shadow, Desert Sands, Desert Creatures, Harad Soldiers, and Mordor Orcs. The first player adds The Black Serpent to the staging area and shuffles the encounter deck. Each other player reveals an encounter card.
+  17157:setup:1: Setup
+    (no instructions: the record only names the printed line, and the engine runs no step for it)
+
+17157:B:1 (back): Allies enter play exhausted.
+  17157:constant:1: Constant
+    - the table: stat alliesEnterExhausted (held by the table: an ally enters play exhausted, played or put into play; it still enters play and the cards that hear it do) 1, while this card is in play
+
+17157:B:2 (back): Forced: At the end of the planning phase, advance to a random stage 2.
+  17157:forced:1: Forced at the end of the phase
+    only if it is the Planning phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the quest proceeds to one of the stages with codes 17158 and 17159, each played once in a random order (the game's seed): one still in the quest deck (the scenario definition copies it onto the stage and the quest takes it when the stage is defeated; run on the stage the quest is at, it advances the quest at once)
+
+## 17158 The Desert Path
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17158:A:1 (front): When Revealed: Shuffle the Desert Sands encounter set into the encounter deck. Remove the Mountains of Shadow encounter set and the other stage 2A from the game.
+  17158:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - every set-aside card of the encounter set "Desert Sands" joins the encounter deck (the deck is shuffled by the step after)
+    - shuffle the encounter deck
+    - every card of the encounter set "Mountains of Shadow" that is still set aside leaves the game (a card of the set already in the deck, the discard pile or play stays)
+    - the stage with code 17159 is set aside and no longer part of the quest deck: the stage that is defeated before it goes to the next stage still in the quest deck; if it is the current stage, the quest advances at once to the next stage still in the quest deck and that stage is revealed; a stage already gone is not an error
+
+17158:B:1 (back): Forced: After a player plays an ally, he must either exhaust that ally or deal 1 damage to it.
+  17158:forced:1: Forced after an ally is played from hand (not one put into play by an effect) (heard about card (any player controls) or in the staging area or the active location, of card type ally)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the acting player chooses one of:
+      * option "exhaust":
+        - exhaust the card the event is about
+      * option "damage":
+        - deal 1 damage to the card the event is about
+
+17158:B:2 (back): Forced: When this stage is defeated, advance to a random stage 3.
+  17158:forced:2: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the quest proceeds to one of the stages with codes 17160, 17161 and 17162, each played once in a random order (the game's seed): one still in the quest deck (the scenario definition copies it onto the stage and the quest takes it when the stage is defeated; run on the stage the quest is at, it advances the quest at once)
+
+## 17159 The Ephel Dúath
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17159:A:1 (front): When Revealed: Shuffle the Mountains of Shadow encounter set into the encounter deck. Remove the Desert Sands encounter set and the other stage 2A from the game.
+  17159:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - every set-aside card of the encounter set "Mountains of Shadow" joins the encounter deck (the deck is shuffled by the step after)
+    - shuffle the encounter deck
+    - every card of the encounter set "Desert Sands" that is still set aside leaves the game (a card of the set already in the deck, the discard pile or play stays)
+    - the stage with code 17158 is set aside and no longer part of the quest deck: the stage that is defeated before it goes to the next stage still in the quest deck; if it is the current stage, the quest advances at once to the next stage still in the quest deck and that stage is revealed; a stage already gone is not an error
+
+17159:B:1 (back): Forced: After a player plays an ally, he must either exhaust that ally or raise his threat by 1.
+  17159:forced:1: Forced after an ally is played from hand (not one put into play by an effect) (heard about card (any player controls) or in the staging area or the active location, of card type ally)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the acting player chooses one of:
+      * option "exhaust":
+        - exhaust the card the event is about
+      * option "threat":
+        - raise threat by 1 (the acting player)
+
+17159:B:2 (back): Forced: When this stage is defeated, advance to a random stage 3.
+  17159:forced:2: Forced on the event questCardDefeated (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the quest proceeds to one of the stages with codes 17160, 17161 and 17162, each played once in a random order (the game's seed): one still in the quest deck (the scenario definition copies it onto the stage and the quest takes it when the stage is defeated; run on the stage the quest is at, it advances the quest at once)
+
+## 17160 Deadly Creatures
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17160:A:1 (front): When Revealed: Set each other stage 3A aside, out of play. Shuffle the encounter discard pile and the Desert Creatures encounter set into the encounter deck. Then, each player reveals an encounter card.
+  17160:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each stage with code 17161, 17162 still in the quest deck is set aside, out of play (the quest no longer reaches it)
+    - every set-aside card of the encounter set "Desert Creatures" joins the encounter deck (the deck is shuffled by the step after)
+    - shuffle the encounter discard pile into the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+17160:B:1 (back): Enemies in the staging area cannot take damage.
+  17160:constant:1: Constant
+    - each enemy (any player controls) in the staging area only: stat cannotTakeDamage 1, while this card is in play
+
+17160:B:2 (back): Forced: After an enemy engages a player, deal 1 damage to a hero that player controls.
+  17160:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about enemy (any player controls))
+    who acts: the acting player is the player the enemy engaged
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control)
+    - deal 1 damage to the picked card
+
+## 17161 Southron Pursuit
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17161:A:1 (front): When Revealed: Set each other stage 3A aside, out of play. Shuffle the encounter discard pile and the Harad Soldiers encounter set into the encounter deck. Then, each player reveals an encounter card.
+  17161:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each stage with code 17160, 17162 still in the quest deck is set aside, out of play (the quest no longer reaches it)
+    - every set-aside card of the encounter set "Harad Soldiers" joins the encounter deck (the deck is shuffled by the step after)
+    - shuffle the encounter discard pile into the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+17161:B:1 (back): Each enemy in the staging area gets -10 engagement cost.
+  17161:constant:1: Constant
+    - each enemy (any player controls) in the staging area only: stat engagementCost -10, while this card is in play
+
+17161:B:2 (back): Forced: After an enemy engages a player, remove 1 progress from this stage.
+  17161:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about enemy (any player controls))
+    who acts: the acting player is the player the enemy engaged
+    - remove 1 progress from the main quest (all of it when it holds less)
+
+## 17162 Orc Patrols
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17162:A:1 (front): When Revealed: Set each other stage 3A aside, out of play. Shuffle the encounter discard pile and the Mordor Orcs encounter set into the encounter deck. Then, each player reveals an encounter card.
+  17162:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each stage with code 17160, 17161 still in the quest deck is set aside, out of play (the quest no longer reaches it)
+    - every set-aside card of the encounter set "Mordor Orcs" joins the encounter deck (the deck is shuffled by the step after)
+    - shuffle the encounter discard pile into the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+17162:B:1 (back): Orc Patrols gets +2 quest points for each enemy in the staging area.
+  17162:constant:1: Constant
+    - this card: stat questPoints the number of enemy (any player controls) in the staging area only x 2, while this card is in play
+
+17162:B:2 (back): Forced: After an enemy engages a player, raise that player's threat by 1.
+  17162:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about enemy (any player controls))
+    who acts: the acting player is the player the enemy engaged
+    - raise threat by 1 (the player the event is about)
+
+## 17163 Battle at the Crossings
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+17163:A:1 (front): When Revealed: The first player takes control of Poros Garrison. Search the encounter deck and discard pile for each enemy that belongs to an encounter set denoted by the first icon on each set aside stage 3 and add them to the staging area. Shuffle the encounter deck.
+  17163:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the rest of the effect is carried out by the first player
+    - the acting player takes control of one of the set-aside objective allies (17145) into their play area, ready (asked only when different cards are left, copies of one card are one choice); it is an ally in play
+    - search the encounter deck and its discard pile for each enemy of the encounter set that the first icon names on each of the stages 17160 (Desert Creatures), 17161 (Harad Soldiers), 17162 (Mordor Orcs) that is set aside, and add them to the staging area, not revealed (the record shuffles the deck after)
+    - shuffle the encounter deck
+
+17163:B:1 (back): Forced: After an enemy attacks and destroys a character, remove X progress from this stage. X is the attacking enemy's printed Threat.
+  17163:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - remove printed threat of the event's other card progress from the main quest (all of it when it holds less)
+
+17163:B:2 (back): This stage cannot be defeated except at the end of the combat phase. If the players defeat this stage, they win the game.
+  17163:constant:1: Constant
+    only if the table does not hold the flag combatPhaseEnding
+    note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
+  17163:forced:2: Forced at the end of the phase
+    only if it is the Combat phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the table: stat combatPhaseEnding (held by the table for the end of the combat phase: the stage that cannot be defeated except then may be defeated now) 1, until the end of the phase
+
+(rendered pieces: 196 by template, 0 as JSON)

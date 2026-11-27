@@ -57,6 +57,8 @@ export const FLAG_NOTES: Readonly<Record<string, string>> = {
   optionalEngageThreat: " (a player whose threat is at least this much cannot optionally engage it; an engagement check still engages him)",
   engagedWithClaimers: " (in the staging area it is considered engaged with each player who controls an objective, read live: it attacks each of them once in the combat phase and only they declare attackers against it)",
   neverEngaged: " (no player optionally engages it while it cannot leave the staging area: it is only considered engaged)",
+  alliesEnterExhausted: " (held by the table: an ally enters play exhausted, played or put into play; it still enters play and the cards that hear it do)",
+  combatPhaseEnding: " (held by the table for the end of the combat phase: the stage that cannot be defeated except then may be defeated now)",
   losesCannotLeaveStaging: " (the enemy loses the text \"Cannot leave the staging area\": its cannotLeaveStaging is not read)",
   engagedWithThreatening: " (in the staging area it is considered engaged with each player whose threat is 1 or higher, read live: it attacks each of them once in the combat phase and only they declare attackers against it)",
   archeryBonus: " (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends)",

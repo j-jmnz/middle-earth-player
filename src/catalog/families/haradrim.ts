@@ -68,6 +68,16 @@ const VERBS = [
   // "The first player randomly selects 1 set aside Harad objective, reveals it, and adds it to the staging area" (17106:A:1, 17107:A:1; hrd.guarded-x-example): one set-aside card with this trait, drawn by the game seed, is revealed by the actor as an encounter card (rr.reveal: its
   // Guarded (X) resolves and it is added to the staging area). Nothing happens with none set aside. The players see which card it is, so the others stay known.
   verbFlags(z.strictObject({ verb: z.literal("RevealRandomSetAside"), trait: z.string().min(1), ...when }), { setupRuns: "top" }),
+  // "Place a random enemy from the set aside Harad Soldiers set into the encounter discard pile" (17147:A:1, 17148:A:1, 17149:A:1), "choose 1 random card from the set aside encounter set with the most cards remaining. Reveal that card as if it was the top card of the
+  // encounter deck" (17150:A:2, 17152:A:2), "... and place it into the encounter discard pile" (17151:A:1; hrd.multiple-encounter-sets): one card still set aside is drawn by the game seed from the only set named, or from the set with the most cards left among `sets`
+  // (the first player chooses among tied sets; a set removed from the game has none left), of the type `cardType` when named. `to`: `pick` makes it the last picked card and leaves it set aside (a Choose option reads it with `matches`, so the option is offered only while
+  // such a card is left), `reveal` has the actor reveal it as a card of the encounter deck, `discard` places it in the encounter discard pile. A card placed or revealed is part of the encounter deck from then on. With none left nothing happens.
+  z.strictObject({ verb: z.literal("RandomSetAside"), sets: z.array(z.string().min(1)).min(1), cardType: z.literal("enemy").optional(), to: z.enum(["pick", "reveal", "discard"]), ...when }),
+  // "Set each other stage 3A aside, out of play" (17160:A:1 to 17162:A:1): each stage with one of these codes still in the quest deck is set aside; the quest no longer reaches it.
+  z.strictObject({ verb: z.literal("SetStagesAside"), codes: z.array(z.string().min(1)).min(1), ...when }),
+  // "Search the encounter deck and discard pile for each enemy that belongs to an encounter set denoted by the first icon on each set aside stage 3 and add them to the staging area" (17163:A:1): `stages` pairs each stage 3 with the set its first icon names; each
+  // such stage that is set aside counts, and every enemy of its set in the encounter deck or its discard pile joins the staging area, not revealed. The record shuffles the deck after it.
+  z.strictObject({ verb: z.literal("SearchAsideStageSets"), stages: z.array(z.strictObject({ code: z.string().min(1), set: z.string().min(1) })).min(1), ...when }),
 ] as const;
 
 const TRIGGERS = [
@@ -117,6 +127,10 @@ const FLAGS = [
   "losesCannotLeaveStaging",
   // On an enemy that cannot leave the staging area and is only considered engaged (The Black Serpent, 17094:A:1): no player optionally engages it while it holds cannotLeaveStaging, since it would not leave (rr.optional-engagement, rr.cannot). `losesCannotLeaveStaging` ends it. Read by the family's optionalEngage hook (families/haradrim/index.ts).
   "neverEngaged",
+  // On the table, while a stage holds it (a constant, 17157:B:1): an ally enters play exhausted, whether it is played or put into play. Read by entersExhausted (src/rules/player/planning.ts).
+  "alliesEnterExhausted",
+  // On the table, until the end of the phase: it is the end of the combat phase, the one moment a stage that "cannot be defeated except at the end of the combat phase" may be defeated (17163:B:2). The stage's Forced effect sets it; the stage's own Restrict reads it.
+  "combatPhaseEnding",
 ] as const;
 
 export const manifest = { name: "haradrim", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

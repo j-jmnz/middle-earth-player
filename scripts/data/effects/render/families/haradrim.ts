@@ -45,6 +45,18 @@ export const HARADRIM_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => M
     read: ["count", "marked"],
   }),
   AddTopmostFromDiscard: (i) => ({ text: `the ${str(i.cardType)} put on the encounter discard pile last is added to the staging area (nothing with none there)`, read: ["cardType"] }),
+  RandomSetAside: (i) => {
+    const sets = (Array.isArray(i.sets) ? i.sets : []).map(str);
+    const from = sets.length === 1 ? `the set aside ${sets[0]} set` : `the set aside encounter set with the most cards remaining (among ${sets.join(", ")}; the first player chooses among tied sets; a set removed from the game has none left)`;
+    const card = `1 random card${i.cardType === "enemy" ? " that is an enemy" : ""} of ${from}, drawn by the game seed (nothing when none is left)`;
+    const to = i.to === "pick" ? "it becomes the last picked card and stays set aside (an option that reads it is offered only while there is one)" : i.to === "discard" ? "it is placed into the encounter discard pile and is part of the encounter deck from then on" : "the acting player reveals it as if it were the top card of the encounter deck (Surge, Doomed and When Revealed apply) and it is part of the encounter deck from then on";
+    return { text: `choose ${card}: ${to}`, read: ["sets", "cardType", "to"] };
+  },
+  SetStagesAside: (i) => ({ text: `each stage with code ${(Array.isArray(i.codes) ? i.codes : []).map(str).join(", ")} still in the quest deck is set aside, out of play (the quest no longer reaches it)`, read: ["codes"] }),
+  SearchAsideStageSets: (i) => ({
+    text: `search the encounter deck and its discard pile for each enemy of the encounter set that the first icon names on each of the stages ${(Array.isArray(i.stages) ? i.stages : []).map((stage) => `${str((stage as Obj).code)} (${str((stage as Obj).set)})`).join(", ")} that is set aside, and add them to the staging area, not revealed (the record shuffles the deck after)`,
+    read: ["stages"],
+  }),
   SetAsideCode: (i) => ({ text: `the card with code ${str(i.code)} in play, wherever it lies, is set aside, out of play, with no damage (nothing when none is in play)`, read: ["code"] }),
   EngageSeatWithMost: (i, ctx) => ({ text: `this enemy engages the player engaged with the most ${pck(i.pick, ctx)} (the first player chooses among players that tie, all players at 0; nothing changes when it is already engaged with that player, else it moves to that player)`, read: ["pick"] }),
 };
@@ -74,6 +86,9 @@ export const HARADRIM_SAMPLES: Samples = {
   StageMarkedFromTop: [{ verb: "StageMarkedFromTop", count: 3, marked: ["17066", "17067"] }],
   AddTopmostFromDiscard: [{ verb: "AddTopmostFromDiscard", cardType: "location" }],
   SetAsideCode: [{ verb: "SetAsideCode", code: "17065" }],
+  RandomSetAside: [{ verb: "RandomSetAside", sets: ["Harad Soldiers"], cardType: "enemy", to: "pick" }, { verb: "RandomSetAside", sets: ["Desert Sands", "Mountains of Shadow"], to: "reveal" }, { verb: "RandomSetAside", sets: ["Desert Sands", "Mountains of Shadow"], to: "discard" }],
+  SetStagesAside: [{ verb: "SetStagesAside", codes: ["17161", "17162"] }],
+  SearchAsideStageSets: [{ verb: "SearchAsideStageSets", stages: [{ code: "17160", set: "Desert Creatures" }, { code: "17161", set: "Harad Soldiers" }] }],
   EngageSeatWithMost: [{ verb: "EngageSeatWithMost", pick: { type: "enemy", control: "any", trait: "Orc", nonUnique: true } }],
 };
 
