@@ -13,7 +13,7 @@ import { PEEK, type CardSlot, type Rect } from "../layout/layout.ts";
 import { medallionAt } from "../layout/look-strip.ts";
 import { medallionCount } from "../words/scenarios/sea.ts";
 import { progressInStrip as progressInStripOf, stripCenterX, stripText } from "./table-canvas-views.ts";
-import { badgeLayout, badgeShown, lonePick, loneRow } from "./badge-room.ts";
+import { badgeLayout, badgeShown, coveredBand, lonePick, loneRow } from "./badge-room.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 import { fit, wrapName } from "./wrap.ts";
@@ -321,7 +321,10 @@ export function Badges({
   const strip = 15 * s;
   const label = questPoints != null ? (stripText(slot, questPoints, owner, stageLoses ?? false) ?? "") : "";
   // Rows that fit between the title band (or the top edge of a short card) and the resource token and the foot pills (badgeLayout).
-  const { top: first, rows: room } = badgeLayout(h, s, pill, stop);
+  // An upright card in a stacked area's covered band stands its column under the title and right of its resource token, so its name shows.
+  const covered = coveredBand(slot.coveredFrom != null, slot.exhausted, slot.resources, s);
+  const { top: first, rows: room } = badgeLayout(h, s, pill, stop, covered);
+  const px = x + (covered?.left ?? 0);
   const items = [...effects.stats.map((badge) => ({ kind: "stat" as const, badge })), ...effects.flags.map((flag) => ({ kind: "flag" as const, flag }))];
   const split = badgeShown(items.length, room);
   // A single row with more than one effect on the card: keep the Attack chip (or the first) with "N more" beside it when the card is wide enough, never "N more" alone.
@@ -332,7 +335,7 @@ export function Badges({
   // The words "N more" when they fit beside the chip; on a narrower card the bare count in a round pill ("3": a count with no sign, never read as a change).
   const countOnly = fonts.badge.getTextWidth(String(items.length - 1)) + 10 * s;
   // On a card too narrow for even that, the count is a small round pill over the chip's right end (loneRow).
-  const row = loneRow(keptWidth, countOnly, fullMore, s, w);
+  const row = loneRow(keptWidth, countOnly, fullMore, s, w - (covered?.left ?? 0));
   const overlap = row.mode === "overlap";
   const lone = row.mode != null;
   const compact = row.compact;
@@ -347,19 +350,19 @@ export function Badges({
       const width = 15 * s + fonts.badge.getTextWidth(MUST_COMMIT_WORD) + 5 * s;
       return (
         <Group key="fmustCommit">
-          <RoundedRect x={x + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={t.accent} />
-          {contrast ? <RoundedRect x={x + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={t.night} style="stroke" strokeWidth={1.5 * s} /> : null}
-          <BadgeIcon name={item.flag.icon} x={x + 5 * s} y={top + 2 * s} size={11 * s} color={t.onAccent} images={images} />
-          <Text x={x + 18 * s} y={top + 11.5 * s} text={MUST_COMMIT_WORD} font={fonts.badge} color={t.onAccent} />
+          <RoundedRect x={px + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={t.accent} />
+          {contrast ? <RoundedRect x={px + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={t.night} style="stroke" strokeWidth={1.5 * s} /> : null}
+          <BadgeIcon name={item.flag.icon} x={px + 5 * s} y={top + 2 * s} size={11 * s} color={t.onAccent} images={images} />
+          <Text x={px + 18 * s} y={top + 11.5 * s} text={MUST_COMMIT_WORD} font={fonts.badge} color={t.onAccent} />
         </Group>
       );
     }
     if (item.kind === "flag") {
       return (
         <Group key={`f${item.flag.flag}`}>
-          <RoundedRect x={x + 2 * s} y={top} width={pill + 4 * s} height={pill} r={pill / 2} color={t.night} />
-          <BadgeIcon name={item.flag.icon} x={x + 5 * s} y={top + 2 * s} size={11 * s} color={t.danger} images={images} />
-          <Line p1={vec(x + 4 * s, top + 2 * s)} p2={vec(x + pill + 2 * s, top + pill - 2 * s)} color={t.danger} strokeWidth={1.5 * s} />
+          <RoundedRect x={px + 2 * s} y={top} width={pill + 4 * s} height={pill} r={pill / 2} color={t.night} />
+          <BadgeIcon name={item.flag.icon} x={px + 5 * s} y={top + 2 * s} size={11 * s} color={t.danger} images={images} />
+          <Line p1={vec(px + 4 * s, top + 2 * s)} p2={vec(px + pill + 2 * s, top + pill - 2 * s)} color={t.danger} strokeWidth={1.5 * s} />
         </Group>
       );
     }
@@ -369,24 +372,24 @@ export function Badges({
     const width = 15 * s + fonts.badge.getTextWidth(text) + 5 * s;
     return (
       <Group key={`s${badge.stat}`}>
-        <RoundedRect x={x + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={up ? t.accent : t.night} />
-        {up ? null : <RoundedRect x={x + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={t.danger} style="stroke" strokeWidth={1 * s} />}
-        {contrast ? <RoundedRect x={x + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={up ? t.night : t.bone} style="stroke" strokeWidth={1.5 * s} /> : null}
+        <RoundedRect x={px + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={up ? t.accent : t.night} />
+        {up ? null : <RoundedRect x={px + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={t.danger} style="stroke" strokeWidth={1 * s} />}
+        {contrast ? <RoundedRect x={px + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={up ? t.night : t.bone} style="stroke" strokeWidth={1.5 * s} /> : null}
         {/* An effect that ends with the phase, the round or the attack: a dashed edge says it will go (the preview says when). */}
         {badge.lasting ? (
-          <RoundedRect x={x + 1 * s} y={top - 1 * s} width={width + 2 * s} height={pill + 2 * s} r={pill / 2 + 1 * s} color={up ? t.bone : t.danger} style="stroke" strokeWidth={1 * s}>
+          <RoundedRect x={px + 1 * s} y={top - 1 * s} width={width + 2 * s} height={pill + 2 * s} r={pill / 2 + 1 * s} color={up ? t.bone : t.danger} style="stroke" strokeWidth={1 * s}>
             <DashPathEffect intervals={[2 * s, 2 * s]} />
           </RoundedRect>
         ) : null}
-        <BadgeIcon name={badge.icon} x={x + 5 * s} y={top + 2 * s} size={11 * s} color={up ? t.onAccent : t.danger} images={images} />
-        <Text x={x + 18 * s} y={top + 11.5 * s} text={text} font={fonts.badge} color={up ? t.onAccent : t.danger} />
+        <BadgeIcon name={badge.icon} x={px + 5 * s} y={top + 2 * s} size={11 * s} color={up ? t.onAccent : t.danger} images={images} />
+        <Text x={px + 18 * s} y={top + 11.5 * s} text={text} font={fonts.badge} color={up ? t.onAccent : t.danger} />
       </Group>
     );
   });
   if (hidden > 0) {
     // Beside the kept chip on its row, else on the next row down.
     const top = lone ? y + first : y + first + shown.length * (pill + 2 * s);
-    const left = overlap ? x + keptWidth - 4 * s : lone ? x + 4 * s + keptWidth : x + 2 * s;
+    const left = overlap ? px + keptWidth - 4 * s : lone ? px + 4 * s + keptWidth : px + 2 * s;
     const more = compact ? String(hidden) : moreText(hidden);
     const width = fonts.badge.getTextWidth(more) + (compact ? 10 * s : 12 * s);
     rows.push(

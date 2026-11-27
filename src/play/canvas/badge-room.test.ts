@@ -1,7 +1,7 @@
 // Rules: docs/design-system-table.md (Tokens and effects). The count of effect pills hidden behind the "N more" pill, which badgeReach keeps a word pill clear of.
 import { describe, expect, it } from "vitest";
 
-import { BADGE_TOP, BADGE_TOP_SHORT, badgeLayout, badgeRoom, badgeShown, footStop, hiddenBadges, loneRow, type FootMarks } from "./badge-room.ts";
+import { BADGE_TOP, BADGE_TOP_SHORT, badgeLayout, badgeRoom, badgeShown, coveredBand, footStop, hiddenBadges, loneRow, type FootMarks } from "./badge-room.ts";
 import { TOKEN } from "./token-spots.ts";
 import { underMarkBox } from "./under-mark.ts";
 
@@ -136,3 +136,38 @@ describe("the effect rows, the resource token and the foot pills never overlap",
     expect(footStop(100, 1, { under: { height: 60, counted: true, strip: false }, lifted: false, plain: false })).toBe(18);
   });
 });
+
+describe("an upright card in a stacked area's covered band", () => {
+  it("keeps the title band clear and puts its one pill row right of the resource token", () => {
+    for (const s of SCALES) {
+      const band = 44 * s;
+      const covered = coveredBand(true, false, 2, s);
+      expect(covered, `s ${s}`).toEqual({ left: (TOKEN + 1) * s });
+      // Without the rule the column starts at the top edge and covers the name.
+      expect(badgeLayout(band, s, PILL * s, null, null).top).toBe(BADGE_TOP_SHORT * s);
+      expect(badgeLayout(band, s, PILL * s, null, covered)).toEqual({ top: BADGE_TOP * s, rows: 1 });
+      // A hero with no token needs no shift.
+      expect(coveredBand(true, false, 0, s)).toEqual({ left: 0 });
+    }
+  });
+
+  it("the pill clears the token, and gives way to a committed hero's Willpower pill", () => {
+    const covered = coveredBand(true, false, 1, 1)!;
+    const { top, rows } = badgeLayout(44, 1, PILL, null, covered);
+    expect(overlap({ name: "row", x: 2 + covered.left, y: top, w: 32, h: PILL }, { name: "token", x: 0, y: 44 - (TOKEN + 1), w: TOKEN + 1, h: TOKEN + 1 })).toBe(false);
+    expect(rows).toBe(1);
+    const committed = footStop(44, 1, { under: null, lifted: false, plain: false, committed: true });
+    expect(committed).toBe(44 - 18);
+    expect(badgeRoom(44, 1, PILL, committed, covered)).toBe(0);
+  });
+
+  it("changes no other card: an exhausted card, a card outside a covered band and the committed foot stop on a tall card", () => {
+    expect(coveredBand(false, false, 3, 1)).toBeNull();
+    expect(coveredBand(true, true, 3, 1)).toBeNull();
+    for (const h of HEIGHTS) {
+      const free = badgeRoom(h, 1, PILL, null);
+      expect(badgeRoom(h, 1, PILL, footStop(h, 1, { under: null, lifted: false, plain: false, committed: true }))).toBe(free);
+    }
+  });
+});
+

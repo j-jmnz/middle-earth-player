@@ -11,7 +11,18 @@ export const BADGE_TOP = 17;
 export const BADGE_TOP_SHORT = 3;
 
 /** What stands at the foot of a card, in the effect column's way: the held or counted pill (`under`: its rect's height, whether it counts something, whether the card wears a number at its foot), a lifted pill (the open pick's number), and the plain foot pills (an engagement cost, a progress or loss number). */
-export type FootMarks = { under: { height: number; counted: boolean; strip: boolean } | null; lifted: boolean; plain: boolean };
+export type FootMarks = { under: { height: number; counted: boolean; strip: boolean } | null; lifted: boolean; plain: boolean; committed?: boolean };
+
+/** A committed hero's Willpower pill (`Badges`): 15 pt tall, 3 pt above the card's foot. */
+const WILL_TOP = 15 + 3;
+
+/** The effect column of an upright card in a stacked play area's covered band, or null on any other card: `left` is how far it stands right of the card's edge, clear of the resource token that stands at the band's foot. */
+export type CoveredBand = { left: number };
+
+/** The covered-band column for a card (`covered`: its slot has `coveredFrom`, `sideways`: it is exhausted, so its name runs along its turned side and its top edge holds tokens only), or null. */
+export function coveredBand(covered: boolean, sideways: boolean, resources: number, s: number): CoveredBand | null {
+  return covered && !sideways ? { left: resources > 0 ? (TOKEN + 1) * s : 0 } : null;
+}
 
 /** How far below the card's top edge the highest pill at the foot stands (what the effect pills stop above), or null with none. `height` is the card's rect. */
 export function footStop(height: number, s: number, marks: FootMarks): number | null {
@@ -19,6 +30,7 @@ export function footStop(height: number, s: number, marks: FootMarks): number | 
     marks.under ? underMarkTop(marks.under.height, s, marks.under.counted, marks.under.strip) : null,
     marks.lifted ? height - (2 * TOKEN + FOOT_ROW + 2) * s : null,
     marks.plain ? height - (TOKEN + FOOT_ROW) * s : null,
+    marks.committed ? height - WILL_TOP * s : null,
   ].filter((top): top is number => top != null);
   return tops.length === 0 ? null : Math.min(...tops);
 }
@@ -26,18 +38,20 @@ export function footStop(height: number, s: number, marks: FootMarks): number | 
 /**
  * Where the effect column starts and how many rows it holds. The rows stop 1 pt above the resource token (always reserved) and above the pill `stop` says stands at the foot (`footStop`); a pill that would run past either is left out, down to none, since the preview lists every effect.
  * The column starts under the title band (`BADGE_TOP`) when the rect holds two rows there and the token, else at `BADGE_TOP_SHORT`, so a short card keeps its rows. `pill` is a pill's height in points.
+ * An upright card in a stacked play area's covered band (`covered`) always starts under the title band, so its name stays readable: the column stands right of the resource token (`CoveredBand.left`), so the token no longer limits the rows, and the pills that do not fit give way as they do on any card.
  */
-export function badgeLayout(height: number, s: number, pill: number, stop: number | null = null): { top: number; rows: number } {
-  const tokenFloor = height - (TOKEN + 2) * s;
+export function badgeLayout(height: number, s: number, pill: number, stop: number | null = null, covered: CoveredBand | null = null): { top: number; rows: number } {
+  const tokenFloor = covered ? height - 1 * s : height - (TOKEN + 2) * s;
   const floor = stop == null ? tokenFloor : Math.min(tokenFloor, stop - 1 * s);
   const rowsFrom = (limit: number, top: number) => Math.max(0, Math.floor((limit - top + 2 * s) / (pill + 2 * s)));
+  if (covered) return { top: BADGE_TOP * s, rows: rowsFrom(floor, BADGE_TOP * s) };
   const top = rowsFrom(tokenFloor, BADGE_TOP * s) >= 2 ? BADGE_TOP * s : BADGE_TOP_SHORT * s;
   return { top, rows: rowsFrom(floor, top) };
 }
 
 /** The rows of pills that fit (0 when not even one does). */
-export function badgeRoom(height: number, s: number, pill: number, stop: number | null = null): number {
-  return badgeLayout(height, s, pill, stop).rows;
+export function badgeRoom(height: number, s: number, pill: number, stop: number | null = null, covered: CoveredBand | null = null): number {
+  return badgeLayout(height, s, pill, stop, covered).rows;
 }
 
 /** What `total` effect pills draw in `rows` rows: none when no row fits, else `badgeSplit`. */
@@ -46,8 +60,8 @@ export function badgeShown(total: number, rows: number): { shown: number; hidden
 }
 
 /** The effect pills left out of a card that has `total` of them in `height`: 0 when they all fit, up to all of them when the room leaves one row for the "more" pill alone. */
-export function hiddenBadges(total: number, height: number, s: number, pill: number, stop: number | null = null): number {
-  return badgeShown(total, badgeRoom(height, s, pill, stop)).hidden;
+export function hiddenBadges(total: number, height: number, s: number, pill: number, stop: number | null = null, covered: CoveredBand | null = null): number {
+  return badgeShown(total, badgeRoom(height, s, pill, stop, covered)).hidden;
 }
 
 /**

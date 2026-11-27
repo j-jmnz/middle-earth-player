@@ -11,7 +11,7 @@ import { BLANK_WORD } from "../words/card-bars.ts";
 import { CHAMPION_WORD } from "../words/scenarios/haradrim/umbar-table.ts";
 import { SHIELD_WORD } from "../words/scenarios/against-the-shadow/vale.ts";
 import { badgeReach, BlankMarkView, CombatPill, CurrentQuestMark, DelayedMark, DeterminedMarkView, EngagementMark, FireMarkView, OptionMarkView, PlaceMarkView, SeatChipView, ShipLossView, StageMarks, UnderMarkView } from "./mark-pieces.native.tsx";
-import { footStop } from "./badge-room.ts";
+import { coveredBand, footStop } from "./badge-room.ts";
 import { underRect } from "./under-mark.ts";
 import { sphereIcon } from "../../ui/icon-map.ts";
 import { Pile } from "./pile-piece.native.tsx";
@@ -73,7 +73,7 @@ function footStopOf(p: PieceProps, rect: Rect): number | null {
   if (!info) return null;
   const under = info.under ? { height: underRect(rect, slot.zone === "hand", p.s).h, counted: info.under.count != null, strip: wearsFootNumber(info, slot.resources) } : null;
   const plain = info.engagement != null || info.fire != null || info.side?.loses != null || info.loss != null;
-  return footStop(rect.h, p.s, { under, lifted: slot.kind === "card" && p.optionMark != null, plain });
+  return footStop(rect.h, p.s, { under, lifted: slot.kind === "card" && p.optionMark != null, plain, committed: info.willpower != null });
 }
 
 // What stays upright over the card: badges, tokens, effect pills, the check ring, the open moment's number.
@@ -94,9 +94,9 @@ function drawOverlay(p: PieceProps) {
         {info?.engagement ? <EngagementMark rect={rect} cost={info.engagement.cost} engages={info.engagement.engages} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.fire ? <FireMarkView rect={rect} mark={info.fire} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.side?.loses ? <FireMarkView rect={rect} mark={info.side.loses} fonts={fonts} images={tokens} t={t} s={s} /> : null}
-        {info?.side?.current ? <CurrentQuestMark rect={rect} clear={badgeReach(info.effects, fonts, s, rect.h, stop, rect.w)} fonts={fonts} t={t} s={s} /> : null}
+        {info?.side?.current ? <CurrentQuestMark rect={rect} clear={badgeReach(info.effects, fonts, s, rect.h, stop, rect.w, coveredBand(slot.coveredFrom != null, slot.exhausted, slot.resources, s))} fonts={fonts} t={t} s={s} /> : null}
         {info?.determined && FOOT_WORDS.has(info.determined.word) ? <BlankMarkView rect={rect} word={info.determined.word} lifted={info.under != null || info.seat != null || info.engagement != null || info.combat != null || info.fire != null || info.loss != null || info.questPoints != null} fonts={fonts} t={t} s={s} /> : null}
-        {info?.determined && !FOOT_WORDS.has(info.determined.word) ? <DeterminedMarkView rect={rect} word={info.determined.word} clear={badgeReach(info.effects, fonts, s, rect.h, stop, rect.w)} fonts={fonts} t={t} s={s} /> : null}
+        {info?.determined && !FOOT_WORDS.has(info.determined.word) ? <DeterminedMarkView rect={rect} word={info.determined.word} clear={badgeReach(info.effects, fonts, s, rect.h, stop, rect.w, coveredBand(slot.coveredFrom != null, slot.exhausted, slot.resources, s))} fonts={fonts} t={t} s={s} /> : null}
         {info?.seat ? <SeatChipView rect={rect} text={info.seat.chip} fonts={fonts} t={t} s={s} /> : null}
         {info?.loss ? <ShipLossView rect={rect} mark={info.loss} fonts={fonts} t={t} s={s} /> : null}
         {info?.place ? <PlaceMarkView rect={rect} mark={info.place} t={t} s={s} /> : null}
