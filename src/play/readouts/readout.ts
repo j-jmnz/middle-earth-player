@@ -221,7 +221,7 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const willpower = committedWillpower(game, ctx.cards, seat) + added;
     const threat = stagingThreatNow(game, ctx, seat);
     const stat = questStatNow(game, ctx);
-    if (game.mode === "questCommit") return { kind: "quest", stats: [QUEST(stat, willpower), THREAT(threat)], result: `${commitWords(game, ctx, picked)}${blackGateQuestEnd(game)}${mountDoomQuestNote(game, ctx)}${addsNoThreatNotes(game, seat ?? 0, cardName)}` };
+    if (game.mode === "questCommit") return { kind: "quest", stats: [QUEST(stat, willpower), THREAT(threat)], result: `${commitWords(game, ctx, picked, cardName)}${blackGateQuestEnd(game)}${mountDoomQuestNote(game, ctx)}` };
     // A stage with Defense (mec112.defense): the Threat that beats the Willpower is progress the encounter deck places, so no player's threat rises and no elimination is warned of.
     if (stageHasDefense(game)) return { kind: "quest", stats: [QUEST(stat, willpower), THREAT(threat)], result: defenseQuestResult(willpower, threat, defenseOutcome(game, ctx)) };
     // Stage 3B of The Battle of the Pelennor Fields (Assault) places no progress on the stage and damages Minas Tirith instead of raising threat, and stage 4B deals the progress as damage: neither warns of an elimination.
@@ -243,7 +243,7 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
 
 // While committing: what staging reveals next, and what the commit leaves for combat (the video's "hold back some heroes"):
 // the seat's characters still ready after the commit against the enemies it will face this round.
-function commitWords(game: ScenarioState, ctx: ReduceContext, picked: readonly string[]): string {
+function commitWords(game: ScenarioState, ctx: ReduceContext, picked: readonly string[], cardName: (cardId: string) => string): string {
   const seat = game.activeSeat;
   const reveals = game.seatCount > 1 ? "Staging reveals 1 card per player next" : "Staging reveals 1 card next";
   const owner = game.seats[seat];
@@ -253,13 +253,15 @@ function commitWords(game: ScenarioState, ctx: ReduceContext, picked: readonly s
     const type = card ? ctx.cards.get(card.code)?.type : undefined;
     return card != null && (type === "hero" || type === "ally") && !card.exhausted && !card.committed && !picked.includes(id);
   }).length;
+  // An enemy considered engaged that adds no Threat is said before the enemies to face, so a narrow dock still reads it.
+  const quiet = addsNoThreatNotes(game, seat, cardName);
   const enemies = enemiesToFace(game, ctx, seat);
-  if (enemies.length === 0) return `${reveals}. Ready after this: ${ready}`;
+  if (enemies.length === 0) return `${reveals}. Ready after this: ${ready}${quiet}`;
   const attacks = enemies.map((id) => {
     const enemy = game.cards[id];
     return enemy ? modifiedStat(game, enemy, "attack", ctx.cards) : 0;
   });
-  return `${reveals}. Ready after this: ${ready} · Enemies to face: ${enemies.length} (${attacks.join(", ")} attack)`;
+  return `${reveals}. Ready after this: ${ready}${quiet} · Enemies to face: ${enemies.length} (${attacks.join(", ")} attack)`;
 }
 
 // A quest that would fail by `shortfall`, as the engine fails it on a copy (failQuest): a seat whose threat reaches 50 is

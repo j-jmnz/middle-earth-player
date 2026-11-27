@@ -31,13 +31,15 @@ function foldSlot(zone: "staging" | "engaged", stack: { x: number; w: number; ca
 export function placeRow(placed: readonly ZoneEntry[], zone: ZoneId, area: Rect, size: { w: number; h: number }, out: CardSlot[], m: Metrics, folding?: RowFolding, reach: RowReach | null = null): boolean {
   // The selector orders a guard right after the objective it guards (selectors.ts, stagingOrder). A guard lies over the objective it guards, shifted by PAIR_STEP of its width, and the pair keeps a wider gap from its neighbours (rr.guarded).
   const groups: ZoneEntry[][] = [];
+  // The guard's step over its objective: PAIR_STEP of a card, and never less than a 44 pt target of the objective left bare, so the objective's name and Guarded chip are not cut to a few letters on a small card (as the Stormcaller's area steps, stormcaller-layout.ts).
+  const step = size.w * PAIR_STEP;
   for (const entry of placed) {
     const last = groups[groups.length - 1];
     if (zone === "staging" && entry.card.guard === true && last && last[0]?.card.id === entry.card.host) last.push(entry);
     else if (zone === "staging" && entry.area != null && entry.area !== "stage" && last && isAreaGroup(last)) last.push(entry);
     else groups.push([entry]);
   }
-  const widths = groups.map((group) => (isAreaGroup(group) ? areaWidth(group.length - 1, size, m) : footprint((group[0] as ZoneEntry).card, size) + (group.length - 1) * size.w * PAIR_STEP + (group.length > 1 ? m.gap : 0)));
+  const widths = groups.map((group) => (isAreaGroup(group) ? areaWidth(group.length - 1, size, m) : footprint((group[0] as ZoneEntry).card, size) + (group.length - 1) * step + (group.length > 1 ? m.gap : 0)));
   // The area's group never folds its stage, which carries the Stormcaller's progress; its cards fold first, those the moment does not ask about (stormcaller-layout.ts).
   const fold = folding && zone === "staging" ? reachRow(groups.map((group, at): FoldGroup => areaGroupFold(group, widths[at] ?? 0, size, m, folding.keep) ?? { id: group[0]?.card.id ?? "", width: widths[at] ?? 0, cards: groupCards(group), rank: stagingRank(group), pinned: keeps(group, folding.keep) }), { x: area.x, width: area.w, gap: m.gap, target: folding.target, stackW: folding.pile.w }, reach) : null;
   const xs = fold ? fold.xs : rowXs(widths, area.x, area.w, m.gap);
@@ -57,14 +59,14 @@ export function placeRow(placed: readonly ZoneEntry[], zone: ZoneId, area: Rect,
       return;
     }
     group.forEach((entry, at) => {
-      const rect = cardRect(entry.card, left + at * size.w * PAIR_STEP, area.y, size);
+      const rect = cardRect(entry.card, left + at * step, area.y, size);
       if (zone === "staging" && folding?.stacks) placeStaging(entry, rect, out, m);
       else placeUnder(entry, zone, rect, out, [], m.peek);
       // A committed character stands a step higher, sent toward the quest.
       const lift = entry.card.committed ? -m.peek / 2 : 0;
       // An objective its guard lies over shows its name, pills and tokens in the part the guard leaves uncovered (`shown`, shownBounds).
       const covered = zone === "staging" && at < group.length - 1;
-      out.push({ ...slotOf(entry.card, zone, "card", { ...rect, y: rect.y + lift }), ...(covered ? { shown: size.w * PAIR_STEP } : {}) });
+      out.push({ ...slotOf(entry.card, zone, "card", { ...rect, y: rect.y + lift }), ...(covered ? { shown: step } : {}) });
     });
   });
   // Whether the row took the room past its own span (row-reach.ts).

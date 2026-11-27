@@ -182,13 +182,17 @@ export function SeatChipView({ rect, text, fonts, t, s }: { rect: Rect; text: st
   const words = fonts.badge.getTextWidth(text);
   const height = BADGE_H * s;
   const width = Math.min(rect.w - 4 * s, words + 8 * s);
+  // A word wider than the chip is shrunk to fit it, never cut off at the card's edge.
+  const k = Math.min(1, (width - 6 * s) / Math.max(words, 1));
   const x = rect.x + rect.w - width - 2 * s;
   const y = rect.y + rect.h - height - 2 * s;
   return (
     <Group>
       <RoundedRect x={x} y={y} width={width} height={height} r={height / 2} color={t.night} />
       <RoundedRect x={x} y={y} width={width} height={height} r={height / 2} color={t.bone} style="stroke" strokeWidth={1 * s} />
-      <Text x={x + (width - words) / 2} y={y + height - 5 * s} text={text} font={fonts.badge} color={t.bone} />
+      <Group transform={[{ translateX: x + (width - words * k) / 2 }, { translateY: y + height - 5 * s }, { scale: k }]}>
+        <Text x={0} y={0} text={text} font={fonts.badge} color={t.bone} />
+      </Group>
     </Group>
   );
 }

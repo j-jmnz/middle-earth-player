@@ -167,6 +167,7 @@ export function CardBody({
 }) {
   const { x, y, w, h } = slot;
   const radius = cardCorner(w, h);
+  const bare = slot.shown != null && slot.shown < w ? 0.7 : 1;
   return (
     <Group>
       <RoundedRect x={x + 1 * s} y={y + 2 * s} width={w} height={h} r={radius} color={shadowOf(t)} />
@@ -179,10 +180,13 @@ export function CardBody({
       ) : (
         <Group>
           <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={t.raised} />
-          <Group clip={{ x: x + 3 * s, y: y + 3 * s, width: w - 6 * s, height: h - 6 * s }}>
-            {wrapName(name, Math.min(w, slot.shown ?? w) - 10 * s, (text) => fonts.names.getTextWidth(text), nameLines).map((line, index) => (
-              <Text key={index} x={x + 5 * s} y={y + (15 + index * LINE) * s} text={line} font={fonts.names} color={t.bone} />
-            ))}
+          <Group clip={{ x: x + 3 * s, y: y + 3 * s, width: bare === 1 ? w - 6 * s : (slot.shown ?? w) - 4 * s, height: h - 6 * s }}>
+            {/* A card its guard lies over (`shown`) names itself smaller, in the part the guard leaves bare. */}
+            <Group transform={[{ translateX: x + 5 * s }, { translateY: y + 15 * s }, { scale: bare }]}>
+              {wrapName(name, bare === 1 ? w - 10 * s : ((slot.shown ?? w) - 8 * s) / bare, (text) => fonts.names.getTextWidth(text), nameLines).map((line, index) => (
+                <Text key={index} x={0} y={index * LINE * s} text={line} font={fonts.names} color={t.bone} />
+              ))}
+            </Group>
           </Group>
           {sphere ? <CanvasIcon name={sphere} x={x + w - 16 * s} y={y + h - 16 * s} size={12 * s} color={t[SPHERE_TINT[sphere] ?? "faint"]} /> : null}
         </Group>
@@ -335,10 +339,16 @@ export function Badges({
   const fullMore = fonts.badge.getTextWidth(moreText(items.length - 1)) + 12 * s;
   // The words "N more" when they fit beside the chip; on a narrower card the bare count in a round pill ("3": a count with no sign, never read as a change).
   const countOnly = fonts.badge.getTextWidth(String(items.length - 1)) + 10 * s;
-  const lone = keptItem != null && keptWidth > 0 && 2 * s + keptWidth + 2 * s + Math.min(fullMore, countOnly) <= w - 2 * s;
+  // On a card too narrow for even that, the count is a small round pill over the chip's right end.
+  const beside = keptItem != null && keptWidth > 0 && 2 * s + keptWidth + 2 * s + countOnly <= w - 2 * s;
+  const overlap = keptItem != null && keptWidth > 0 && !beside && 2 * s + keptWidth + 6 * s <= w - 2 * s;
+  const lone = beside || overlap;
   const compact = lone && 2 * s + keptWidth + 2 * s + fullMore > w - 2 * s;
   const hidden = lone ? items.length - 1 : split.hidden;
-  const shown = lone && keptItem ? [keptItem] : items.slice(0, split.shown);
+  // When some pills are left out, the Attack chip (the first when there is none) leads, so it is the one that stays.
+  const lead = split.hidden > 0 ? lonePick(effects.stats) : 0;
+  const ordered = lead > 0 ? [...items.slice(lead, lead + 1), ...items.slice(0, lead), ...items.slice(lead + 1)] : items;
+  const shown = lone && keptItem ? [keptItem] : ordered.slice(0, split.shown);
   const rows: ReactElement[] = shown.map((item, index) => {
     const top = y + first + index * (pill + 2 * s);
     if (item.kind === "flag" && item.flag.flag === "mustCommit") {
@@ -384,7 +394,7 @@ export function Badges({
   if (hidden > 0) {
     // Beside the kept chip on its row, else on the next row down.
     const top = lone ? y + first : y + first + shown.length * (pill + 2 * s);
-    const left = lone ? x + 4 * s + keptWidth : x + 2 * s;
+    const left = overlap ? x + keptWidth - 4 * s : lone ? x + 4 * s + keptWidth : x + 2 * s;
     const more = compact ? String(hidden) : moreText(hidden);
     const width = fonts.badge.getTextWidth(more) + (compact ? 10 * s : 12 * s);
     rows.push(
