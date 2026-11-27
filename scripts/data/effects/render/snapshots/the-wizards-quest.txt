@@ -244,10 +244,11 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
     - no player card that is not an objective can be attached to this card (an encounter card, an objective and a Condition an encounter card makes can)
 
 51015:A:2 (front): Forced: After Bane of Amon Lanc attacks and destroys an ally, the defending player discards 1 card from his hand for each excess point of damage dealt by this attack.
-  51015:forced:1: Forced on the event characterDestroyedByAttack (heard about ally (any player controls); event happened to the controller)
+  51015:forced:1: Forced on the event characterDestroyedByAttack (heard about ally (any player controls))
     only if the event's other card is a enemy (any player controls) that is this card itself
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - discard the damage on the card the event is about beyond its printed hit points cards from hand
+    - for the player this enemy is engaged with:
+      - discard the damage on the card the event is about beyond its printed hit points cards from hand
 
 ## 51016 Oak-wood Grove
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -813,4 +814,4 @@ Scenario piles that place cards with no record (quest: 51001 Radagast's Request;
     - choose attachment (any player controls) attached to the defending character
     - discard the picked card
 
-(rendered pieces: 489 by template, 0 as JSON)
+(rendered pieces: 490 by template, 0 as JSON)

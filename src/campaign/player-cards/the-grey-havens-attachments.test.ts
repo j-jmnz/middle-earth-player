@@ -12,7 +12,7 @@ import { definePrinted } from "../../rules/core/printed.ts";
 import { updateCard } from "../../rules/core/state.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
-import { lineSpec } from "../../../test/harness/line-spec.ts";
+import { lineDefault, lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
 import { choices, enter, hosts, passAll, play, playerTableFor, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
 
@@ -55,7 +55,7 @@ beforeAll(async () => {
 describe("Grappling Hook (11005:A:1)", () => {
   // "Attach to a character.": Legolas (a hero), the other player's hero and the Axehand (an ally) are offered; an engaged enemy and a location
   // are not.
-  lineSpec("11005:A:1", "Grappling Hook: Attach to a character", (effects) => {
+  lineDefault("11005:A:1", "Grappling Hook: Attach to a character", (effects) => {
     const tab = table(effects, { seats: 2, heroes: [{ code: LEGOLAS, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: AXEHAND, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }], staging: [PLACE], hand: [{ code: HOOK, seat: 0 }] });
     const hook = idsOf(tab, HOOK);
     expect(hosts(tab, hook)).toEqual([idsOf(tab, LEGOLAS), idsOf(tab, PAL), idsOf(tab, AXEHAND)].sort());

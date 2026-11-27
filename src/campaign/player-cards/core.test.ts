@@ -12,7 +12,7 @@ import { legalIntents, legalTargets } from "../../rules/engine/reduce.ts";
 import { stagingThreat } from "../../rules/quest/quest.ts";
 import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
-import { lineSpec } from "../../../test/harness/line-spec.ts";
+import { lineDefault, lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf, passWindows, send, type Table } from "../../../test/harness/scene.ts";
 import { combat, playerTableFor, printed, stat } from "../../../test/harness/player-table.ts";
 
@@ -92,7 +92,7 @@ describe("Attach to a hero (the attach-to lines)", () => {
 
 describe("Self Preservation (01072:A:1)", () => {
   // "Attach to a character.": every hero and ally in play is offered, the other player's too (rr.attachment-cards).
-  lineSpec("01072:A:1", "Self Preservation: Attach to a character.", (effects) => {
+  lineDefault("01072:A:1", "Self Preservation: Attach to a character.", (effects) => {
     const tab = table(effects, { seats: 2, heroes: [{ code: DENETHOR, seat: 0 }, { code: PAL, seat: 1 }], allies: [{ code: ALLY, seat: 0 }, { code: ALLY, seat: 1 }], hand: [{ code: PRESERVATION, seat: 0 }] });
     expect(hosts(tab, PRESERVATION)).toEqual([idsOf(tab, DENETHOR), idsOf(tab, PAL), ...(tab.ids[ALLY] ?? [])].sort());
     const card = idsOf(tab, PRESERVATION);

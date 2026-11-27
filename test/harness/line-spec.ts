@@ -27,3 +27,14 @@ export function lineSpec(line: string, name: string, check: (effects: readonly E
     throw new Error(`${line}: the check threw something other than a failed expectation or a refused intent`, { cause: thrown.error });
   });
 }
+
+/**
+ * A printed line whose record states what the engine does with no record at all (an attachment's "Attach to a character." is the default for an attachment with no host record, rr.attachment-cards): `check` runs on every record and must pass; it is not run
+ * without the record, because the behaviour is the same either way. A line no record names is an error.
+ */
+export function lineDefault(line: string, name: string, check: (effects: readonly Effect[]) => void | Promise<void>, effects: readonly Effect[] = EFFECTS): void {
+  it(`${line} ${name}`, async () => {
+    if (!effects.some((effect) => effect.lines.includes(line))) throw new Error(`no record names line ${line}`);
+    await check(effects);
+  });
+}
