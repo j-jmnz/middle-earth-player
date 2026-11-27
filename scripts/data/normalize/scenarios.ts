@@ -22,6 +22,7 @@ import { nightmareOf } from "./nightmare.ts";
 import { sagaStartOf } from "./saga-start.ts";
 import { reprintsOf, isReprint } from "./reprints.ts";
 import { dragnResolver } from "./dragn-resolve.ts";
+import { applyCountRule } from "./count-rules.ts";
 import { campaignsOf, indexCards, mentions } from "./scenario-indexes.ts";
 import { isNightmareCard } from "../nightmare-defs.ts";
 import type { RawData } from "./load-raw.ts";
@@ -312,22 +313,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     }
     // A printed count the sources disagree on: the card's own set size or Setup text settles it (overrides.scenarioCounts).
     for (const rule of overrides.scenarioCounts.filter((item) => item.scenario === id)) {
-      const pile = (rule.pile ?? "encounter") as Pile;
-      let item = placed.find((candidate) => candidate.code === rule.code && candidate.pile === pile);
-      if (rule.add === true) {
-        // `add` places a card the load list has no line for: a card it already places makes the rule stale, and the placement needs a `normal`.
-        if (item) local.push(`${id}: scenarioCounts adds ${nameOf(rule.code)}, which the load list already places in the ${pile} pile (stale rule: ${rule.reason})`);
-        else if (rule.normal == null) local.push(`${id}: scenarioCounts adds ${nameOf(rule.code)} with no \`normal\` count (${rule.reason})`);
-        else {
-          item = { code: rule.code, pile, normal: rule.normal, easy: rule.easy ?? rule.normal };
-          placed.push(item);
-        }
-      }
-      if (!item) local.push(`${id}: scenarioCounts names ${nameOf(rule.code)}, which the ${pile} pile does not hold`);
-      else if (rule.normal != null) item.normal = rule.normal;
-      if (item && rule.easy != null) item.easy = rule.easy;
-      if (item) item.easy = Math.min(item.easy, item.normal);
-      if (item && item.normal === 0) placed.splice(placed.indexOf(item), 1);
+      applyCountRule(placed, rule, id, nameOf, local);
     }
     // The campaign card's Setup also deals cards the load list put in an encounter deck or a hand.
     for (const code of codesOf(camp, ["stage", "attachRingBearer", "shuffleInto"])) {

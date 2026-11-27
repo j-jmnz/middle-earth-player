@@ -215,8 +215,7 @@ export type Phase =
   | "End of round";
 
 export type ModeName =
-  | "mulligan"
-  | "openingHands"
+  | "mulligan" | "openingHands"
   | "afterOpening"
   | "beginRound"
   | "resourceGrant"
