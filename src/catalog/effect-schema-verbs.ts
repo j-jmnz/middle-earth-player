@@ -17,7 +17,6 @@ function codeVerb<const Verb extends string>(name: Verb) {
   return z.strictObject({ verb: z.literal(name), code: z.string().min(1), ...when });
 }
 
-
 // A card in the encounter deck or discard pile: by code, by trait, and by printed type ("each Nazgûl enemy", 141027:A:1).
 const searchSelector = {
   code: z.string().min(1).optional(),

@@ -68,15 +68,10 @@ import { crownRow } from "./crown-sheets.ts";
 import { fordsTimeCount, withCount } from "./ring-maker-sheets.ts";
 import { TIMING_WORDS, type SheetStat, type PickOption, type Sheet, type SheetNames, type TriggerOption } from "./sheet-types.ts";
 
-function effectOf(ctx: ReduceContext, effectId: string): Effect | undefined {
-  return effectById(ctx, effectId);
-}
-
 function lineOf(effect: Effect | undefined, names: SheetNames): string | null {
   const id = effect?.lines[0];
-  const line = id ? names.line(id) : null;
   // A Response a card gives another (Mûmak Trail) is told by its own sentence, not by who gains it (gained-line.ts).
-  return line != null && effect?.timing === "response" ? gainedSentence(line) : line;
+  return id ? (effect?.timing === "response" ? gainedSentence(names.line(id)) : names.line(id)) : null;
 }
 
 /**
@@ -94,7 +89,7 @@ export function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: r
   const options: TriggerOption[] = [];
   for (const intent of legal) {
     if (intent.type !== "Trigger") continue;
-    const effect = effectOf(ctx, intent.effectId);
+    const effect = effectById(ctx, intent.effectId);
     const card = game.cards[intent.cardId];
     if (!effect || !card) continue;
     const caution = framsburgActionCaution(game, effect);
@@ -260,7 +255,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
     }
     case "choose": {
       const data = frame?.data.kind === "effect" ? frame.data : null;
-      const effect = data ? effectOf(ctx, data.effectId) : undefined;
+      const effect = data ? effectById(ctx, data.effectId) : undefined;
       const source = frame?.cardId ?? null;
       const words: ChoiceNames = { card: names.card, code: (code) => ctx.cards.get(code)?.name ?? code, traits: (code) => ctx.cards.get(code)?.traits ?? [] };
       const line = lineOf(effect, names);

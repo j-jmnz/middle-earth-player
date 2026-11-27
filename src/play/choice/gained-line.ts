@@ -4,7 +4,7 @@
 
 const GAINED = /\bgains?:\s*["“]\s*(?:Response|Action|Forced|Travel|Shadow|Quest Action|Combat Action|Valour [A-Za-z]+|Planning Action|Resource Action|Refresh Action):\s*([\s\S]*?)["”]\.?$/;
 
-/** The sentence a printed "... it gains: "Response: <sentence>"" line gives the ability, or the line itself when it is no such line. */
-export function gainedSentence(line: string): string {
-  return GAINED.exec(line.trim())?.[1]?.trim() ?? line;
+/** The sentence a printed "... it gains: "Response: <sentence>"" line gives the ability, or the line itself when it is no such line (or none). */
+export function gainedSentence(line: string | null): string | null {
+  return line == null ? null : (GAINED.exec(line.trim())?.[1]?.trim() ?? line);
 }

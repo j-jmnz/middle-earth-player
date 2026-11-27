@@ -16,6 +16,6 @@ describe("the sentence of a gained ability", () => {
 
   it("fits the six lines of a row on a short phone: the sentence is shorter than the printed line by the lead", () => {
     const line = "While Mûmak Trail is the active location, it gains: \"Response: When Mûmak Trail leaves play as an explored location, search the encounter deck and discard pile for a Wild Mûmak and add it to the staging area. Shuffle the encounter deck.\"";
-    expect(gainedSentence(line).length).toBeLessThan(line.length - 40);
+    expect(gainedSentence(line)?.length ?? 0).toBeLessThan(line.length - 40);
   });
 });
