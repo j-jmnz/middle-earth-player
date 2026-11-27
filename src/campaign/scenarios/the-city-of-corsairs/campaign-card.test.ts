@@ -15,6 +15,7 @@ import { spawn } from "../../../rules/core/zones.ts";
 import { updateCard } from "../../../rules/core/state.ts";
 import { corsairsStart, corsairsWorld } from "../../../../test/scenarios/the-city-of-corsairs/game.ts";
 import { CODES, finish } from "../../../../test/scenarios/the-city-of-corsairs/scene.ts";
+import { inForcedOrder } from "../../../../test/harness/forced-order.ts";
 
 let ctx: ReduceContext;
 beforeAll(async () => {
@@ -130,7 +131,7 @@ describe("11216:A:4 The Black Sword's Forced effect and 12158:A:3 the additional
   };
   const resolved = (state: ScenarioState, sahir: string): ScenarioState => {
     const steps: EngineStep[] = [];
-    return settle({ ...queueEvent(state, { trigger: "attackResolved", seat: 0, cardId: sahir }), window: null }, ctx, steps);
+    return inForcedOrder(settle({ ...queueEvent(state, { trigger: "attackResolved", seat: 0, cardId: sahir }), window: null }, ctx, steps), ctx, steps);
   };
 
   it("after Sahír attacks he attacks the other player, who defends, in turn order", () => {

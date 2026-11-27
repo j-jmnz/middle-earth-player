@@ -12,6 +12,7 @@ import { spawn } from "../../core/zones.ts";
 import { holds } from "../../interpret/conditions.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
 import { settle } from "../../engine/machine.ts";
+import { applyChoice } from "../../windows/choices.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { idOf, resolveRecords, revealFromTop } from "../../../../test/harness/scene-kit.ts";
 import { codeOf, focus, fogTable as table, GREAT_BARROW, STAGE_3, trapped } from "../../../../test/scenarios/fog-on-the-barrow-downs/scene.ts";
@@ -22,7 +23,9 @@ describe("148003:B:2 and B:3 the shared stage", () => {
     const { t, state } = trapped();
     const steps: EngineStep[] = [];
     const eliminated = eliminateSeat({ ...state, firstPlayer: 0 }, 1, steps);
-    const heard = settle({ ...eliminated, mode: "stopped", window: null }, t.ctx, steps);
+    let heard = settle({ ...eliminated, mode: "stopped", window: null }, t.ctx, steps);
+    // The Forced effects of the elimination differ: the first player is asked the order (rr.forced) and takes the first.
+    for (let guard = 0; guard < 8 && heard.window?.kind === "choose"; guard += 1) heard = settle(applyChoice(heard, heard.window.options[0] ?? ""), t.ctx, steps);
     // Seat 0 is the only seat left at stage 3B: raised by 10 once.
     expect(heard.seats[0].threat).toBe(state.seats[0].threat + 10);
     expect(livingSeats(heard)).toEqual([0]);

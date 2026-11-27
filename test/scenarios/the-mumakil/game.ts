@@ -62,8 +62,8 @@ export type MumakilGolden = { name: string; seatCount: 1 | 2; seed: number; diff
 // has no Nightmare deck, so neither has a golden of its own) and each way to lose: every player's threat at 50 (heroes that start at a threat of 10, so the Wild Mûmak's engagement cost of 40 is reached and the Mûmakil are engaged) and every player eliminated by destroyed heroes (heroes too brittle for the attacks).
 export const MUMAKIL_GOLDENS: readonly MumakilGolden[] = [
   { name: "true solo, won, Normal", seatCount: 1, seed: 4, difficulty: "Normal", decks: "bold", outcome: "won" },
-  { name: "two-handed, won, Normal", seatCount: 2, seed: 1, difficulty: "Normal", decks: "bold", outcome: "won" },
-  { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "bold", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed, won, Normal", seatCount: 2, seed: 3, difficulty: "Normal", decks: "bold", outcome: "won" },
+  { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 2, difficulty: "Normal", decks: "bold", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed, lost, threat reaches 50", seatCount: 2, seed: 2, difficulty: "Normal", decks: "bold", outcome: "lost", lossReason: "No seats remain" },
   { name: "true solo, lost, every hero destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed, lost, every hero destroyed", seatCount: 2, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },

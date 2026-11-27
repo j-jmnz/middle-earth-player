@@ -143,7 +143,7 @@ export function moveEncounter(
     case "engaged": {
       if (typeOf(next, id, ctx) !== "enemy") return next;
       const engaged = updateCard(engageWith(next, seat, id, steps), id, { face: "up" });
-      // A shadow card an enemy puts into play engaged does not attack in that combat phase (docs/scenarios/haradrim/beneath-the-sands.md, Spider Broodling).
+      // A shadow card an enemy puts into play engaged does not attack in that combat phase (docs/scenarios/haradrim/beneath-the-sands.md, Readings).
       const counted = card.zone === "shadow" ? noAttackThisPhase(engaged, id, seat) : engaged;
       return wasInPlay ? counted : announceEntered(counted, id, seat, ctx);
     }

@@ -135,7 +135,7 @@ describe("The Blood of Gondor golden", () => {
         expect(counts(after)[0]).toBe(0);
         expect(codeOf(after, after.questStage)).toBe(CAPTURED);
         const two = momentsOf(game(golden(TWO)), world(golden(TWO)).ctx);
-        expect(list(two, "turnFive")).toEqual(["195/0"]);
+        expect(list(two, "turnFive")).toEqual(["200/0"]);
       });
 
       it("places Faramir and Lord Alcaron under Captured! (still in play, controlled by nobody), turns every hidden card, and gives stage 2 Siege while The Cross-roads is in the staging area", () => {
@@ -199,9 +199,9 @@ describe("The Blood of Gondor golden", () => {
         const played = game(golden(TWO));
         const { ctx } = world(golden(TWO));
         const moments = momentsOf(played, ctx);
-        expect(list(moments, "control")).toEqual(["28/1", "60/0", "94/1", "132/0", "168/1", "204/0"]);
+        expect(list(moments, "control")).toEqual(["29/1", "62/0", "97/1", "136/0", "173/1", "210/0"]);
         const captured = Number(list(moments, "captured")[0]);
-        expect(captured).toBe(108);
+        expect(captured).toBe(111);
         for (const moment of moments.filter((item) => item.kind === "control")) {
           const held = moment.at < captured ? `${FARAMIR}:${moment.seat}:play,${ALCARON}:${moment.seat}:play` : `${FARAMIR}:-:captive,${ALCARON}:-:captive`;
           expect(moment.codes[0]?.replace(/\b06133:/, `${ALCARON}:`), `${moment.at}`).toBe(held);
@@ -212,8 +212,8 @@ describe("The Blood of Gondor golden", () => {
           const controller = Object.values(beforeOf(played, moment.at).cards).find((card) => card.code === code)?.controller;
           expect(controller, `${moment.kind} ${moment.at}`).toBe(moment.seat);
         }
-        expect(list(moments, "faramir")).toEqual(["20/0", "48/1", "80/0"]);
-        expect(list(moments, "alcaron")).toEqual(["14/0", "31/1", "63/0", "97/1"]);
+        expect(list(moments, "faramir")).toEqual(["20/0", "49/1", "82/0"]);
+        expect(list(moments, "alcaron")).toEqual(["14/0", "32/1", "65/0", "100/1"]);
         // The other seat is never offered either Action while it does not control the card.
         const trail = played.trail ?? [];
         for (let at = 0; at < Math.min(trail.length, captured); at += 1) {
@@ -231,7 +231,7 @@ describe("The Blood of Gondor golden", () => {
         const solo = momentsOf(game(golden(SOLO)), world(golden(SOLO)).ctx);
         expect(list(solo, "conflict")).toEqual(["96"]);
         const two = momentsOf(game(golden(TWO)), world(golden(TWO)).ctx);
-        expect(list(two, "conflict")).toEqual(["0", "42", "142"]);
+        expect(list(two, "conflict")).toEqual(["0", "43", "146"]);
       });
 
       it("discards a random hidden card of the first player when Dark Woods is explored and turns the hidden cards of a destroyed character's controller (Brutal Uruk)", () => {

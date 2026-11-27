@@ -22,7 +22,7 @@ import { leavesPlayPicked, leavesPlayPickedInEach } from "../families/pelargir/v
 import { swapsPicked } from "../families/misc/collection.ts";
 import { spendsPicked } from "../families/pelargir/spending.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
-import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "../core/state.ts";
+import type { CancelOffer, EffectData, Frame, FrameName, GameEvent, QueueItem, ScenarioState } from "../core/state.ts";
 import { distinctChoices, livingSeats, withSeat } from "../core/state.ts";
 import { firstPlayerFor, isolatedAreas, sharing } from "../families/breaking/areas.ts";
 import { guardianSeats, otherThanGuardian } from "../families/guardian/seats.ts";
@@ -74,6 +74,7 @@ export type EffectSpec = {
   destroyedCharacter?: string;
   hold?: string;
   holdsEvents?: true;
+  orderEvent?: GameEvent;
   // Why the instructions run: the effect record and its printed line. `causes` names one per instruction when several
   // records share a frame.
   cause?: Cause;
@@ -113,6 +114,7 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     ...(spec.destroyedCharacter ? { destroyedCharacter: spec.destroyedCharacter } : {}),
     ...(spec.hold ? { hold: spec.hold } : {}),
     ...(spec.holdsEvents ? { holdsEvents: true as const } : {}),
+    ...(spec.orderEvent ? { orderEvent: spec.orderEvent } : {}),
   };
   return pushFrame(state, { frame: spec.frame, cardId: spec.sourceId, seat: spec.actor, peril: spec.peril, data }, steps);
 }

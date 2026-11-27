@@ -37,6 +37,7 @@ import { returnFromDiscard } from "./returned.ts";
 import { queueFront } from "../play/refs.ts";
 import { freeSlot } from "../south/locations.ts";
 import { encounterIdle } from "./idle.ts";
+import { orderForced } from "./forced-order.ts";
 
 const WATCH_STATS = { threatZero: "watchThreatZero", damage: "watchDamage", discard: "watchDiscard", readyHost: "watchReadyHost" } as const;
 
@@ -82,6 +83,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return returnFromDiscard(state, instruction, focus, ctx, steps);
     case "ShuffleEncounterDiscard":
       return instruction.alsoVictory === true ? shuffleDiscardAndVictoryIn(state, ctx, instruction.trait, instruction.type, instruction.name) : shuffleDiscardIn(state, ctx, instruction.trait, instruction.type, instruction.name, instruction.exceptSource === true ? focus.sourceId : null);
+    case "OrderForced":
+      return orderForced(state, instruction, focus, ctx, steps);
     case "DiscardUntil":
       return discardUntil(state, instruction.types ?? (instruction.type ? [instruction.type] : []), ctx, instruction.trait, instruction.reshuffle === true);
     case "DamageEachWithAttachment":
@@ -158,6 +161,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 function shielded(state: ScenarioState, id: string, sourceId: string | null, ctx: ReduceContext): boolean {
   const card = state.cards[id];
   const source = sourceId ? state.cards[sourceId] : undefined;
+  // A card's own effect always reaches the card (an immune objective ally that removes itself from the game when it leaves play, 50909:A:4).
+  if (id === sourceId) return false;
   if (!card || !inPlay(card.zone) || playerCardEffectCanChoose(printedOf(ctx.cards, card.code), state, id)) return false;
   return source == null || isPlayerType(printedOf(ctx.cards, source.code));
 }
@@ -173,4 +178,4 @@ function travelUnpayable(state: ScenarioState, instruction: Instruction, ctx: Re
   return instruction.verb === "RevealFromDiscard" && topmostInDiscard(state, instruction.trait, ctx) == null;
 }
 
-export const manifest: RulesFamily = { name: "encounter", verbs: ["LookAtTop", "PickEncounter", "ArrangeEncounter", "PayResources", "PlayRevealedFree", "MoveEncounterCard", "CountEncounterTop", "RevealEncounter", "RevealTopEnemies", "SearchCollection", "ReturnFromDiscard", "ShuffleEncounterDiscard", "ShuffleVictoryIntoEncounterDeck", "DiscardUntil", "ResolveWhenRevealed", "RevealFewer", "RevealMore", "WatchReveals", "TravelTo", "ProgressQuest", "RaiseThreatTo", "LowerThreatByRaise", "ReturnEventToHand", "AmbushChecks", "DiscardTopEncounter", "RevealEnemies", "FirstEnemyGains", "RevealFromDiscard", "ReplaceEncounterDeck", "DamageEachWithAttachment"], run, revealed: noteFirstEnemy, condition: discardCondition, amount: (state, found, scope, ctx) => attackDamageAmount(state, found, scope, ctx), travel: { unpayable: travelUnpayable }, settle: { sweep: exploreFull }, idle: encounterIdle };
+export const manifest: RulesFamily = { name: "encounter", verbs: ["LookAtTop", "PickEncounter", "ArrangeEncounter", "PayResources", "PlayRevealedFree", "MoveEncounterCard", "CountEncounterTop", "RevealEncounter", "RevealTopEnemies", "SearchCollection", "ReturnFromDiscard", "ShuffleEncounterDiscard", "ShuffleVictoryIntoEncounterDeck", "DiscardUntil", "OrderForced", "ResolveWhenRevealed", "RevealFewer", "RevealMore", "WatchReveals", "TravelTo", "ProgressQuest", "RaiseThreatTo", "LowerThreatByRaise", "ReturnEventToHand", "AmbushChecks", "DiscardTopEncounter", "RevealEnemies", "FirstEnemyGains", "RevealFromDiscard", "ReplaceEncounterDeck", "DamageEachWithAttachment"], run, revealed: noteFirstEnemy, condition: discardCondition, amount: (state, found, scope, ctx) => attackDamageAmount(state, found, scope, ctx), travel: { unpayable: travelUnpayable }, settle: { sweep: exploreFull }, idle: encounterIdle };

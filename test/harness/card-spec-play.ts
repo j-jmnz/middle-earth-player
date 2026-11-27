@@ -8,6 +8,7 @@ import type { EngineStep } from "../../src/rules/core/intents.ts";
 import type { PlayerIntent } from "../../src/rules/engine/reduce.ts";
 
 import type { Act, Done, Row } from "./card-spec-types.ts";
+import { asksForcedOrder } from "./forced-order.ts";
 import { fightEnemy, finish, first, idOf, legalIntents, opening, resolveRecords, revealFromTop, secondSeatHero, send, start as begin, tableFromLayout, type Layout, type LayoutTable, type Run, type ScenePhase } from "./scene-kit.ts";
 
 // Test helper. Plays the actions of a card-spec row (card-spec-types.ts, Act) on a table built from its layout: each action is the scene kit's helper for it (`resolveRecords`, `revealFromTop`, `fightEnemy`, `send` of an
@@ -18,6 +19,12 @@ import { fightEnemy, finish, first, idOf, legalIntents, opening, resolveRecords,
 function picker(queue: string[], lenient: boolean): (state: ScenarioState) => string {
   return (state) => {
     if (state.window?.kind !== "choose") return "";
+    // The order the Forced effects of one moment initiate in is asked of the first player (rr.forced): a row answers the effect's own choices, so the engine's default order (the first option) stands unless the row's next answer names one of the cards.
+    if (asksForcedOrder(state)) {
+      const named = queue[0] === undefined ? undefined : (state.window.options.find((option) => option === queue[0] || state.cards[option]?.code === queue[0]));
+      if (named !== undefined) queue.shift();
+      return named ?? state.window.options[0] ?? "";
+    }
     const asked = queue.shift();
     // A choice among cards (a Pick) offers instance ids: an answer may name the card's code instead.
     const wanted = asked === undefined ? undefined : state.window.options.includes(asked) ? asked : (state.window.options.find((option) => state.cards[option]?.code === asked) ?? asked);

@@ -5,7 +5,7 @@ import { mireAtRefreshEnd } from "../families/mire/index.ts";
 import { timeAtRefreshEnd } from "../families/angmar/time.ts";
 
 import { holds } from "../interpret/conditions.ts";
-import { aboutCard, hears, hearsFromAnywhere } from "./listen.ts";
+import { aboutCard, effectById, hears, hearsFromAnywhere } from "./listen.ts";
 import { effectsOfCard } from "../families/misc/text.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { syncConstants } from "../interpret/constants.ts";
@@ -22,7 +22,7 @@ import { inPlay } from "../core/state.ts";
 import { patchTop, popFrame, pushFrame } from "./windows.ts";
 import { sideOf } from "../families/breaking/areas.ts";
 
-type Found = { effect: Effect; instance: CardInstance };
+export type Found = { effect: Effect; instance: CardInstance };
 
 // Whose a Forced effect is: a player card's, its controller's ("Forced: After ~ attacks, discard ~ or discard a card from your
 // hand"); an encounter card's, the player the event happened to, or, when the event is no player's and the areas are isolated by a stage (Fog on the Barrow-downs, Flies and Spiders, not the captured areas of Escape from Mount Gram), the first player of the area the card lies in
@@ -66,12 +66,61 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, tim
   );
 }
 
+// The Forced effects of one event are initiated in the order the first player chooses (rr.forced: "the first player determines the order in which the abilities initiate, regardless of who controls the cards bearing those
+// abilities"; "each forced ability must resolve as completely as possible before the next ... may initiate"). With effects that differ on two or more cards a frame asks the first player (OrderForced); otherwise the
+// default order stands: an `early` effect first, then the oldest card first.
+function pushForced(state: ScenarioState, found: readonly Found[], event: GameEvent, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const first = found[0];
+  if (!first || !differs(found)) return pushFound(state, found, event, ctx, steps);
+  // An effect with a limit spends its use as it triggers, so an effect that waits for the order cannot fire a second time meanwhile ("Limit once per round").
+  const spent = found.reduce((current, one) => noteForcedUse(current, one.effect, one.instance.id, forcedActor(state, one.instance, event, ctx)), state);
+  return pushEffectFrame(
+    spent,
+    {
+      frame: "ResolveEffect",
+      sourceId: null,
+      actor: state.firstPlayer,
+      eventSeat: event.seat,
+      peril: state.perilSeat != null,
+      effectId: first.effect.id,
+      orderEvent: event,
+      instructions: [{ verb: "OrderForced", entries: found.map((one) => ({ effectId: one.effect.id, sourceId: one.instance.id })) }],
+      cancel: null,
+      blockCancel: null,
+    },
+    steps,
+  );
+}
+
+// Two or more cards bear effects, and not all of them the same effects (two copies of one card change nothing by their order).
+function differs(found: readonly Found[]): boolean {
+  return new Set(found.map(signature)).size >= 2;
+}
+
+// The effects the card of `one` bears among `found`, as one string.
+function signature(one: Found, _at: number, found: readonly Found[]): string {
+  return found.filter((other) => other.instance.id === one.instance.id).map((other) => other.effect.id).join(",");
+}
+
+/** The effects OrderForced still has to initiate, as the effects and the cards that bear them (an entry whose card or effect is gone is left out). */
+export function foundOf(state: ScenarioState, ctx: ReduceContext, entries: readonly { effectId: string; sourceId: string }[]): Found[] {
+  return entries.flatMap((entry) => {
+    const effect = effectById(ctx, entry.effectId);
+    const instance = state.cards[entry.sourceId];
+    return effect && instance ? [{ effect, instance }] : [];
+  });
+}
+
+/** Whether the cards bearing these effects differ: the first player has a choice of order. */
+export const forcedOrderDiffers = differs;
+
 // Each matching effect gets its own forced frame. The oldest resolves first, so it is pushed last.
-function pushFound(state: ScenarioState, found: readonly Found[], event: GameEvent, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+// `counted`: the uses of the effects with a limit were already spent when they triggered (pushForced), so none is spent again.
+export function pushFound(state: ScenarioState, found: readonly Found[], event: GameEvent, ctx: ReduceContext, steps: EngineStep[], counted = false): ScenarioState {
   let next = state;
   for (const { effect, instance } of [...found].reverse()) {
     const actor = forcedActor(state, instance, event, ctx);
-    next = announceAbility(noteForcedUse(next, effect, instance.id, actor), instance.id, actor, ctx);
+    next = announceAbility(counted ? next : noteForcedUse(next, effect, instance.id, actor), instance.id, actor, ctx);
     next = pushEffectFrame(
       next,
       {
@@ -107,7 +156,7 @@ function pushFound(state: ScenarioState, found: readonly Found[], event: GameEve
 export function fireForced(state: ScenarioState, event: GameEvent, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (ctx.effects.length === 0) return state;
   const triggered = collect(state, event, ctx, "triggered");
-  if (triggered.length === 0) return pushFound(state, collect(state, event, ctx, "forced"), event, ctx, steps);
+  if (triggered.length === 0) return pushForced(state, collect(state, event, ctx, "forced"), event, ctx, steps);
   const marker = pushFrame(
     state,
     { frame: "event", cardId: null, seat: event.seat ?? state.firstPlayer, peril: false, data: { kind: "event", event } },
@@ -121,7 +170,7 @@ export function eventStep(state: ScenarioState, frame: Frame, ctx: ReduceContext
   if (frame.data.kind !== "event") throw new Error("Event frame lost its event");
   if (frame.step > 0) return popFrame(state, steps);
   const event = frame.data.event;
-  return pushFound(patchTop(state, { step: 1 }), collect(state, event, ctx, "forced"), event, ctx, steps);
+  return pushForced(patchTop(state, { step: 1 }), collect(state, event, ctx, "forced"), event, ctx, steps);
 }
 
 // Called whenever the phase may have moved. When it has, the phase that ended fires its Forced

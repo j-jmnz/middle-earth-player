@@ -4,6 +4,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { holds } from "../../interpret/conditions.ts";
 import { outOfPlayCopies } from "../../interpret/search.ts";
+import { applyChoice } from "../../windows/choices.ts";
 import { settle } from "../../engine/machine.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ScenarioState } from "../../core/state.ts";
@@ -31,7 +32,9 @@ const underBurn = (state: ScenarioState): string[] => Object.values(state.cards)
 // The round ends: the phase after "End of round" is reached, as the engine does when the refresh phase is over.
 function endRound(made: Table, state: ScenarioState = made.state): Run {
   const steps: EngineStep[] = [];
-  const settled = settle({ ...state, phase: "Beginning of round", boundaryPhase: "End of round", mode: "beginRound", window: null }, made.ctx, steps);
+  let settled = settle({ ...state, phase: "Beginning of round", boundaryPhase: "End of round", mode: "beginRound", window: null }, made.ctx, steps);
+  // The Forced effects of the end of the round differ: the first player is asked the order (rr.forced), and takes the first as the engine's default order has it.
+  for (let guard = 0; guard < 8 && settled.window?.kind === "choose"; guard += 1) settled = settle(applyChoice(settled, settled.window.options[0] ?? ""), made.ctx, steps);
   return { state: settled, steps };
 }
 type Run = { state: ScenarioState; steps: EngineStep[] };

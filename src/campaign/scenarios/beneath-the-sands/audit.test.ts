@@ -173,7 +173,7 @@ describe("17075 Lost Underground", () => {
 });
 
 describe("17075:A:2 Lost Underground, the Forced effects On Track ignores until the end of the phase", () => {
-  // "Until the end of the phase" includes the end of that phase: On Track's "At the end of the quest phase" Forced (17080:A:1) does not fire in the phase the side quest was defeated (docs/scenarios/haradrim/beneath-the-sands.md, Lost Underground).
+  // "Until the end of the phase" includes the end of that phase: On Track's "At the end of the quest phase" Forced (17080:A:1) does not fire in the phase the side quest was defeated (docs/scenarios/haradrim/beneath-the-sands.md, Readings).
   lineSpec("17075:A:2", "the Forced effect On Track has at the end of the quest phase does not fire in the phase Lost Underground was defeated, and fires with no Lost Underground", (effects) => {
     const layout: Layout = { seats: 1, phase: "Planning", staging: [{ code: OFF, resources: 2 }, { code: LOST, progress: 1 }], deck: ["f0", "f0", "f0", "f0"] };
     const made = tableOf(effects)(layout);

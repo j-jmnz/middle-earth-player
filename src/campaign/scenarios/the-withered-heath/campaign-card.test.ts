@@ -15,6 +15,7 @@ import { reduce, startScenario, type PlayerIntent, type ReduceContext } from "..
 import { openResolution, resolutionResult } from "../../../rules/setup/resolution.ts";
 import { heathLoadout, heathPlan, heathStart, heathWorld } from "../../../../test/scenarios/the-withered-heath/game.ts";
 import { CODES, campaign, heath, heathTable, idOf, loadHeathWorld, send, start, finish, legalIntents, legalTargets, type HeathWorld } from "../../../../test/scenarios/the-withered-heath/scene.ts";
+import { asksForcedOrder } from "../../../../test/harness/forced-order.ts";
 
 let ctx: ReduceContext;
 let table: HeathWorld;
@@ -267,6 +268,8 @@ describe("12175:B Forced: the Accolade boons", () => {
     const drake = idOf(t.state, CODES.coldDrake);
     const strong: ScenarioState = { ...t.state, modifiers: [...t.state.modifiers, { instanceId: t.hero, sourceId: t.hero, stat: "attack", amount: 9, until: "endOfPhase" }] };
     let run = send(start(strong), { type: "DeclareAttackers", enemyId: drake, attackerIds: [t.hero] }, t.ctx);
+    // The Forced effects of Cold-Drake's defeat differ: the first player is asked their order (rr.forced) and takes the first.
+    if (asksForcedOrder(run.state)) run = send(run, { type: "Choose", optionId: run.state.window?.kind === "choose" ? (run.state.window.options[0] ?? "") : "" }, t.ctx);
     expect(run.state.window).toMatchObject({ kind: "choose", seat: 0, options: ["attach", "decline"] });
     run = finish(run, t.ctx, (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : ""));
     expect([t.hero, t.hero2].some((id) => boonsOn(run, id).includes(CODES.dragonSlayer))).toBe(true);

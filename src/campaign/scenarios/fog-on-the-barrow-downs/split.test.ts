@@ -11,6 +11,7 @@ import { settle } from "../../../rules/engine/machine.ts";
 import { parkedStage, sharedStaging, stageOf, viewOf } from "../../../rules/families/breaking/areas.ts";
 import { restricted } from "../../../rules/interpret/restrictions.ts";
 import { runInstruction } from "../../../rules/interpret/interpret.ts";
+import { inForcedOrder as inOrder } from "../../../../test/harness/forced-order.ts";
 import { idOf, resolveRecords, revealFromTop, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 import { codeOf, focus, fogTable as table, type FogLayout as Layout, GREAT_BARROW, STAGE_3, STAGE_4, STANDING_STONES, stopped, trapped, withCopies, WIGHT } from "../../../../test/scenarios/fog-on-the-barrow-downs/scene.ts";
 
@@ -50,7 +51,8 @@ describe("148004:B:2 returning to stage 3B", () => {
   it("148004:B:2 a stage 4B that leaves play with its eliminated player sends one Great Barrow to the victory display, and adds no progress (the designer's ruling)", () => {
     const { state } = trapped();
     const steps: EngineStep[] = [];
-    const settled = settle(stopped(eliminateSeat({ ...state, firstPlayer: 0 }, 1, steps)), tableFromLayout(SCENARIO, { stage: STAGE_3 }).ctx, steps);
+    const ctx = tableFromLayout(SCENARIO, { stage: STAGE_3 }).ctx;
+    const settled = inOrder(settle(stopped(eliminateSeat({ ...state, firstPlayer: 0 }, 1, steps)), ctx, steps), ctx, steps);
     expect(livingSeats(settled)).toEqual([0]);
     const barrows = Object.values(settled.cards).filter((card) => card.code === GREAT_BARROW);
     expect(barrows.filter((card) => card.zone === "victory")).toHaveLength(1);
@@ -72,7 +74,7 @@ describe("148003:B:2 an elimination while the areas are apart", () => {
   it("148003:B:2 the player at stage 3B raises his threat by 10 when the trapped player is eliminated, and the areas are one again", () => {
     const { t, state } = trapped();
     const steps: EngineStep[] = [];
-    const settled = settle(stopped(eliminateSeat({ ...state, firstPlayer: 0 }, 1, steps)), t.ctx, steps);
+    const settled = inOrder(settle(stopped(eliminateSeat({ ...state, firstPlayer: 0 }, 1, steps)), t.ctx, steps), t.ctx, steps);
     expect(settled.seats[0].threat).toBe(state.seats[0].threat + 10);
     expect(settled.separate).toBeUndefined();
     expect(codeOf(settled, settled.questStage)).toBe(STAGE_3);

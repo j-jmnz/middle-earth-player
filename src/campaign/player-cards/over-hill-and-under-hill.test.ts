@@ -8,7 +8,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { updateCard } from "../../rules/core/state.ts";
+import { flagged, updateCard } from "../../rules/core/state.ts";
+import { syncConstants } from "../../rules/interpret/constants.ts";
 import { payFor, refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
@@ -134,6 +135,9 @@ describe("Beorn (131005:A:1, A:3)", () => {
   // "Sentinel. Cannot have attachments." (the keyword is the card's own)
   lineSpec("131005:A:1", "cannot have an attachment that another hero can", (effects) => {
     const tab = table(effects, { heroes: [{ code: BEORN, seat: 0 }, { code: THORIN, seat: 0 }], hand: [{ code: STEWARD, seat: 0 }] });
+    // Beorn is also immune to player card effects (a keyword of his own), which keeps a player card's attachment off him; the record is what stops any other card's.
+    expect(flagged(syncConstants(tab.state, tab.ctx), idsOf(tab, BEORN), "cannotHaveAttachments")).toBe(true);
+    expect(flagged(syncConstants(tab.state, tab.ctx), idsOf(tab, THORIN), "cannotHaveAttachments")).toBe(false);
     expect(onto(tab, STEWARD, idsOf(tab, BEORN))).not.toBeNull();
     expect(onto(tab, STEWARD, idsOf(tab, THORIN))).toBeNull();
   });

@@ -100,6 +100,9 @@ const VERBS = [
   // `types` instead of `type`: a card of any of them ("until he discards an enemy or location", 18078:A:1).
   // `reshuffle`: a deck that runs out first has the encounter discard pile shuffled back in and the discarding goes on, when the discard pile holds such a card (faq.last-encounter-card, 148004:A:1); with none in either pile nothing is found.
   z.strictObject({ verb: z.literal("DiscardUntil"), type: discardType.optional(), types: z.array(encounterType).min(2).optional(), trait: z.string().min(1).optional(), reshuffle: z.literal(true).optional(), ...when }),
+  // Engine use (windows/triggers.ts): the Forced effects of one event that differ are put in the first player's order (rr.forced). `entries` are the effects not yet initiated, each with the card that bears it, in the order the engine
+  // would take them; the first player picks the card whose effects initiate next, and the rest wait in a frame of their own until those have resolved.
+  verbFlags(z.strictObject({ verb: z.literal("OrderForced"), entries: z.array(z.strictObject({ effectId: z.string().min(1), sourceId: z.string().min(1) })).min(1), ...when }), { runsInFrame: true }),
   // The "when revealed" effects of the picked card (or `card`) resolve for the actor, as if it had just been revealed. It
   // was not revealed from the encounter deck, so they are not offered to cancels of a card just revealed. With `reveal` the card is
   // revealed in full (rr.reveal: its keywords and its staging too: "Reveal that treachery", 51007:B:1).
