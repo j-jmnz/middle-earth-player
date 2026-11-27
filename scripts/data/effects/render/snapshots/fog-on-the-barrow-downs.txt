@@ -270,7 +270,7 @@ Scenario piles that place cards with no record (quest: 148001 The House of Tom B
 148015:A:2 (front): When Revealed: Until the end of the phase, each Wight enemy engaged with you contributes its Threat to the total Threat in the staging area. If no enemies are engaged with you, search the encounter deck and discard pile for a Wight enemy and put it into play engaged with you. Shuffle the encounter deck.
   148015:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - actorSeat (Wight only): stat engagedThreatSeat (each enemy engaged with that player adds its Threat to the staging area's total, counted live: an enemy that engages later counts too) 1, until the end of the phase
+    - the player who controls this card (the first player when none does) (Wight only): stat engagedThreatSeat (each enemy engaged with that player adds its Threat to the staging area's total, counted live: an enemy that engages later counts too) 1, until the end of the phase
     - then, if the number of enemy (any player controls) engaged with you is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one Wight enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
     - shuffle the encounter deck
 

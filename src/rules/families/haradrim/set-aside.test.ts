@@ -3,11 +3,13 @@
 // (RemoveEncounterSet `setAsideOnly`), allies entering play exhausted, and the stage defeated only at the end of the combat phase.
 import { describe, expect, it } from "vitest";
 
-import { updateCard, type ScenarioState } from "../../core/state.ts";
+import { heldAmount, updateCard, type ScenarioState } from "../../core/state.ts";
 import { modifiedStat } from "../../core/keywords.ts";
 import { codesIn, idOf, opened, resolveRecords, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { playSweep } from "../play/sweep.ts";
 import { advanceFreed } from "../../quest/stage-reveal.ts";
 import { qualifyingEnemies } from "../../quest/quest.ts";
+import { syncConstants } from "../../interpret/constants.ts";
 import { settle } from "../../engine/machine.ts";
 import type { EngineStep } from "../../core/intents.ts";
 
@@ -105,6 +107,15 @@ describe("17151:A:1 RandomSetAside `discard`, then the discard pile is shuffled 
   });
 });
 
+describe("17151:A:1 #then: no shuffle when no card was placed", () => {
+  it("leaves the discard pile unshuffled when no set has a card left set aside (rr.then)", () => {
+    const made = table({ staging: ["17151"], deck: ["17147"], discard: ["17148"] });
+    const run = resolveRecords(made.state, made.ctx, "17151", "forced", idOf(made.state, "17151"));
+    expect(run.state.encounterDiscard).toHaveLength(1);
+    expect(run.state.encounterDeck).toHaveLength(1);
+  });
+});
+
 describe("17152:A:2, 17152:A:3 RandomSetAside `reveal`", () => {
   it("reveals a card of a set aside set when the treachery is revealed", () => {
     const made = table({ staging: ["17152"], setAside: DESERT_CREATURES });
@@ -128,6 +139,36 @@ describe("17158:A:1 RemoveEncounterSet `setAsideOnly`, ShuffleSetAsideSet and Re
     const made = table({ staging: ["17150"], stage: "17158", setAside: [...MOUNTAINS.slice(0, 3), "16049"] });
     const removed = resolveRecords(made.state, made.ctx, "17158", "whenRevealed", idOf(made.state, "17158")).state;
     expect(removed.setAside.map((id) => codeOf(removed, id))).not.toContain("17153");
+  });
+});
+
+describe("17157:A:1 the Setup shuffles the encounter deck and each other player reveals an encounter card", () => {
+  it("reveals one card for the second player and none for the first player", () => {
+    const made = table({ seats: 2, deck: ["16041", "16042", "16043"], staging: ["17146"] });
+    const run = resolveRecords(made.state, made.ctx, "17157", "setup", idOf(made.state, "17157"));
+    expect(run.state.encounterDeck).toHaveLength(2);
+    expect(run.state.staging.length + run.state.seats.reduce((sum, seat) => sum + seat.engaged.length, 0)).toBeGreaterThan(1);
+  });
+
+  it("reveals none in a solo game", () => {
+    const made = table({ seats: 1, deck: ["16041", "16042", "16043"], staging: ["17146"] });
+    const run = resolveRecords(made.state, made.ctx, "17157", "setup", idOf(made.state, "17157"));
+    expect(run.state.encounterDeck).toHaveLength(3);
+  });
+});
+
+describe("17145:A:1, 17145:A:3 the controller of Poros Garrison may engage one more enemy", () => {
+  it("gives the extra optional engagement to the player who controls it, and to the next first player once the token passes", () => {
+    const made = table({ seats: 2, firstPlayer: 1, play: [{ code: "17145", seat: 1 }] });
+    const garrison = idOf(made.state, "17145");
+    const held = opened(made).state;
+    expect(held.cards[garrison]?.controller).toBe(1);
+    expect(heldAmount(held, "seat:1", "extraOptionalEngage")).toBe(1);
+    expect(heldAmount(held, "seat:0", "extraOptionalEngage")).toBe(0);
+    const passed = opened(made, syncConstants(playSweep({ ...held, firstPlayer: 0 }, made.ctx, []), made.ctx)).state;
+    expect(passed.cards[garrison]?.controller).toBe(0);
+    expect(heldAmount(passed, "seat:0", "extraOptionalEngage")).toBe(1);
+    expect(heldAmount(passed, "seat:1", "extraOptionalEngage")).toBe(0);
   });
 });
 

@@ -404,7 +404,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142082:A:1 (front): When Revealed: Until the end of the round, add 1 to the archery total at this stage for each ally currently at this stage.
   142082:whenRevealed:1: When revealed
-    - actorSeat: stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) the number of ally (any player controls) at the acting player's staging area (every area before they are separate), until the end of the round
+    - the player who controls this card (the first player when none does): stat archeryBonus (archery added to the total at its stage: from a card in the staging area, at its stage; from a player's stat, at that player's stage until the modifier ends) the number of ally (any player controls) at the acting player's staging area (every area before they are separate), until the end of the round
 
 142082:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character has fewer printed hit points than the attacking enemy).
   142082:shadow:1: Shadow

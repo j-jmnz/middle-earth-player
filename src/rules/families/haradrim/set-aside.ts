@@ -13,6 +13,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { startReveal } from "../../windows/frames.ts";
 import { moveEncounter, pushPicked } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
+import { markShort } from "../../interpret/effect-verbs.ts";
 import { ask, chosenOf } from "./staged.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -51,10 +52,12 @@ function chosenSet(state: ScenarioState, instruction: Verb<"RandomSetAside">, fo
  */
 export function randomSetAside(state: ScenarioState, instruction: Verb<"RandomSetAside">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const set = chosenSet(state, instruction, focus, ctx, steps);
-  if (typeof set !== "string") return set ?? (instruction.to === "pick" ? pushPicked(state, undefined) : state);
+  // With no card left a `discard` is not resolved in full, so the text after "Then" is not attempted (thenResolves, rr.then).
+  const none = (at: ScenarioState): ScenarioState => (instruction.to === "pick" ? pushPicked(at, undefined) : instruction.to === "discard" ? markShort(at, ctx) : at);
+  if (typeof set !== "string") return set ?? none(state);
   const ids = asideOf(state, set, ctx).filter((id) => instruction.cardType == null || printedOf(ctx.cards, state.cards[id]?.code ?? "").type === instruction.cardType);
   const drawn = ids[nextUint(state.seed, state.seedCursor) % Math.max(ids.length, 1)];
-  if (!drawn) return instruction.to === "pick" ? pushPicked(state, undefined) : state;
+  if (!drawn) return none(state);
   const next = { ...state, seedCursor: state.seedCursor + 1 };
   if (instruction.to === "pick") return pushPicked(next, drawn);
   if (instruction.to === "discard") return moveEncounter(next, drawn, "discard", state.firstPlayer, ctx, steps);

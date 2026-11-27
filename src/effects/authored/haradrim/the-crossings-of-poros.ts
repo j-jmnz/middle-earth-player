@@ -3,7 +3,7 @@ import { copyLines, withCopies } from "../reprint.ts";
 import { AUTHORED_EFFECTS as BLACK_SERPENT } from "./the-black-serpent.ts";
 
 // Records for The Crossings of Poros (haradrim cycle part 9, no campaign card). Every line is read from the scan ledger (data/printed/haradrim.json). See docs/scenarios/haradrim/the-crossings-of-poros.md, Readings, for each reading.
-// The piles set Poros Garrison and five encounter sets aside and put The Black Serpent in the staging area (the Setup sentences are theirs: 17157:A:1 has an empty record). A card of a set aside set is part of the encounter deck once it is revealed, placed in the
+// The piles set Poros Garrison and five encounter sets aside and put The Black Serpent in the staging area (the Setup sentences that place cards are theirs: the record of 17157:A:1 shuffles the deck and has each other player reveal a card). A card of a set aside set is part of the encounter deck once it is revealed, placed in the
 // discard pile or shuffled in (RandomSetAside, ShuffleSetAsideSet; hrd.multiple-encounter-sets); a set removed from the game has no card left set aside (RemoveEncounterSet `setAsideOnly`, hrd.removed-from-the-game).
 // The quest branches: stage 1B and each stage 2B advance to a random stage (AdvanceToRandomStage with `stageSet`); a stage 2A removes the other; a stage 3A sets the other two aside, and stage 4A searches for the enemies of the sets of those two (SearchAsideStageSets).
 // Rules: hrd.multiple-encounter-sets, hrd.removed-from-the-game, hrd.encounter-keyword, hrd.stage-number, rr.optional-engagement, rr.first-player, rr.forced, rr.printed, rr.cancel, rr.reveal
@@ -115,7 +115,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "forced",
       trigger: "becameActive",
       subject: "self",
-      instructions: [{ verb: "RandomSetAside", sets: SETS, to: "discard" }, { verb: "ShuffleEncounterDiscard" }],
+      instructions: [{ verb: "RandomSetAside", sets: SETS, to: "discard" }, { verb: "ShuffleEncounterDiscard", when: { kind: "thenResolves" } }],
     },
 
     // 17152 Danger Close Behind. When Revealed: a random card of the set aside set with the most cards left is revealed. Shadow: if the attack destroys a character, resolve that effect (Doomed is not applied: the card is not revealed).
@@ -159,7 +159,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "17156:response:1", cardCode: "17156", lines: ["17156:A:3"], timing: "response", trigger: "questDefeated", instructions: [{ verb: "LowerThreat", amount: 3, who: "eachSeat" }] },
 
     // 17157 Flight to Gondor (stage 1). Setup: the piles do it. Side B: allies enter play exhausted; at the end of the planning phase the quest advances to a random stage 2.
-    { id: "17157:setup:1", cardCode: "17157", lines: ["17157:A:1"], timing: "setup", instructions: [] },
+    { id: "17157:setup:1", cardCode: "17157", lines: ["17157:A:1"], timing: "setup", instructions: [{ verb: "ShuffleEncounterDeck" }, { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "RevealEncounter", when: { kind: "not", condition: { kind: "firstPlayer" } } }] }] },
     { id: "17157:constant:1", cardCode: "17157", lines: ["17157:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "alliesEnterExhausted", amount: 1, until: "whileSourceInPlay", target: "table" }] },
     {
       id: "17157:forced:1",

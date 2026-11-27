@@ -9,7 +9,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 
 145016:A:2 (front): Your threat cannot be reduced.
   145016:constant:1: Constant
-    - actorSeat: stat threatReductionBarred 1, while this card is in play
+    - the player who controls this card (the first player when none does): stat threatReductionBarred 1, while this card is in play
 
 145016:A:3 (front): Forced: At the end of the round, raise your threat by 1. Then, you may spend 1 Fellowship resource to detach Overcome by Fear and set it aside, out of play.
   145016:forced:1: Forced at the end of the round
@@ -302,7 +302,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
         * option "threat":
           - raise threat by 1 (the acting player)
         * option "noPlay":
-          - actorSeat: stat cannotPlayCards 1, until the end of the phase
+          - the player who controls this card (the first player when none does): stat cannotPlayCards 1, until the end of the phase
 
 ## 145065 The Dead are Following
 (the scenario deals it into the quest pile; the piles place it, no record does)

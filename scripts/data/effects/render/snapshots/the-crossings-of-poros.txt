@@ -12,7 +12,7 @@ Scenario piles that place cards with no record (quest: 17157 Flight to Gondor; q
 
 17145:A:3 (front): You can optionally engage an additional enemy during the encounter phase.
   17145:constant:2: Constant
-    - actorSeat: stat extraOptionalEngage 1, while this card is in play
+    - the player who controls this card (the first player when none does): stat extraOptionalEngage 1, while this card is in play
 
 17145:A:4 (front): If Poros Garrison leaves play, the players lose the game.
   17145:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
@@ -125,7 +125,7 @@ Scenario piles that place cards with no record (quest: 17157 Flight to Gondor; q
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose 1 random card of the set aside encounter set with the most cards remaining (among Mountains of Shadow, Desert Sands, Desert Creatures, Harad Soldiers, Mordor Orcs; the first player chooses among tied sets; a set removed from the game has none left), drawn by the game seed (nothing when none is left): it is placed into the encounter discard pile and is part of the encounter deck from then on
-    - shuffle the encounter discard pile into the encounter deck
+    - then, if every draw, every discard from a deck, every discard of resources and every ready this effect ran so far resolved in full: a draw or a discard that found fewer cards or tokens than it named, and a ready that did not happen (the card was ready already, or cannot ready), did not (what follows "then" is attempted only when they all did) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter discard pile into the encounter deck
 
 17151:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   17151:shadow:1: Shadow
@@ -211,7 +211,10 @@ Scenario piles that place cards with no record (quest: 17157 Flight to Gondor; q
 
 17157:A:1 (front): Setup: Set Poros Garrison and each of the following encounter sets aside, out of play: Mountains of Shadow, Desert Sands, Desert Creatures, Harad Soldiers, and Mordor Orcs. The first player adds The Black Serpent to the staging area and shuffles the encounter deck. Each other player reveals an encounter card.
   17157:setup:1: Setup
-    (no instructions: the record only names the printed line, and the engine runs no step for it)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - if not (the actor holds the first player token): the acting player reveals an encounter card
 
 17157:B:1 (back): Allies enter play exhausted.
   17157:constant:1: Constant
@@ -366,4 +369,4 @@ Scenario piles that place cards with no record (quest: 17157 Flight to Gondor; q
     who acts: the acting player is the first player (a phase has no player of its own)
     - the table: stat combatPhaseEnding (held by the table for the end of the combat phase: the stage that cannot be defeated except then may be defeated now) 1, until the end of the phase
 
-(rendered pieces: 196 by template, 0 as JSON)
+(rendered pieces: 202 by template, 0 as JSON)

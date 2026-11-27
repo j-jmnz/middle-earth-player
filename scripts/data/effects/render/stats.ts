@@ -45,6 +45,7 @@ const TARGET_STAT: Readonly<Record<string, string>> = {
   table: "the table",
   currentQuest: "the main quest card (also while a side quest is the current quest)",
   eachSeat: "each player",
+  actorSeat: "the player who controls this card (the first player when none does)",
   questingCharacters: "every character committed to the quest, now and committing later while the effect lasts",
 };
 const targetStat = (value: string): string => TARGET_STAT[value] ?? cardRef(value);
