@@ -6,7 +6,7 @@ import { useDatabases } from "../data/databases";
 import { cachedStandalone, openStandalone, type StandaloneSession } from "./standalone-open";
 import { writeOpenedStandalone } from "./write-opened";
 
-export { continueStandaloneGame, openStandalone, recordUnsettledGame, restartStandaloneGame, settleStandalone, standaloneCodes, standaloneStore, type StandaloneSession, type StandaloneTable } from "./standalone-open";
+export { continueStandaloneGame, openStandalone, restartStandaloneGame, standaloneCodes, standaloneStore, type StandaloneSession, type StandaloneTable } from "./standalone-open";
 
 /** The open game, opened once per id, during the render (the outcome screen: the table just left it cached). A drop or stamp it decided on is written once, after the render. */
 export function useStandaloneSession(gameId: string | null): StandaloneSession | null {

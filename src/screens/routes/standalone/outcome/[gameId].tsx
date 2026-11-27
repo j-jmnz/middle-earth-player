@@ -18,7 +18,8 @@ import { useDatabases } from "../../../data/databases";
 import { goBack } from "../../../nav/go-back";
 import { routeCode } from "../../../nav/route-code";
 import { comparisonLossNote } from "../../../../play/readouts/against-the-shadow/amon-din";
-import { settleStandalone, standaloneStore, useStandaloneSession } from "../../../session/standalone-session";
+import { settleStandalone } from "../../../session/standalone-open";
+import { standaloneStore, useStandaloneSession } from "../../../session/standalone-session";
 import { ResultUndo } from "../../../table/result-undo";
 import { outcomeLines } from "../../../history/standalone-words";
 

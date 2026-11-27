@@ -29,7 +29,7 @@ import { deleteSentence, describe, partyCodes } from "./save-line";
 import { archiveStandalone, deleteStandalone, restoreStandalone } from "../data/standalone-store";
 import { gameCaption } from "./standalone-words";
 import { recordUnclosedRun } from "../session/table-session";
-import { recordUnsettledGame } from "../session/standalone-session";
+import { recordUnsettledGame } from "../session/standalone-open";
 import { showToast } from "../kit/toast";
 import { ToastView } from "../kit/toast-view";
 import { useBottomInset } from "../nav/use-bottom-inset";

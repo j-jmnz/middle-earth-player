@@ -25,7 +25,7 @@ type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
 export type StandaloneSession =
   // `stamp` is the game to write once when the open left it different from its row (table-open.ts, TableSession). `takenBack` on a stale result is how many moves Continue would take back, when a checked replay found one that does not match; `fromCheckpoint` says Continue will rebase onto the game's checkpoint instead; `changes` is what changed under the game, for the sheet.
-  | ({ ok: true; stored: StandaloneGame; stamp: StandaloneGame | null } & ReplayedGame)
+  | ({ ok: true; stored: StandaloneGame; stamp: StandaloneGame | null; landed?: boolean } & ReplayedGame)
   | { ok: false; reason: "missing" | "none" | "dropped" | "stale"; stored: StandaloneGame | null; write: StandaloneGame | null; takenBack?: number | null; fromCheckpoint?: boolean; changes?: readonly string[] };
 
 /** The codes the game can show: the Ring-bearer and every card of each dealt deck. */
@@ -93,10 +93,10 @@ export type StandaloneTable = { store: TableStore; game: () => StandaloneGame; c
  * The table store for an opened game (game-store.ts). Each intent the reducer accepts is appended and written at once; Undo takes it off. `game` is the game as last written. `clock`
  * counts the foreground time as the session store's does (table-open.ts): folded into each write, and written once on a pause.
  */
-export function standaloneStore<TRun>(session: Opened, user: Db<TRun>, landed?: boolean): StandaloneTable {
+export function standaloneStore<TRun>(session: Opened, user: Db<TRun>): StandaloneTable {
   const { store, saved, clock } = gameStore<StandaloneGame, Opened>({
     session,
-    landed,
+    landed: session.landed,
     initial: session.stored,
     cache: sessionCacheOf<Opened>(user, "standalone"),
     // The open's stamp is written already (table-open.ts, sessionStore).

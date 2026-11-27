@@ -33,7 +33,7 @@ export default function StandaloneTableScreen() {
   useEffect(() => {
     if (params.landing != null) router.setParams({ landing: undefined });
   }, [params.landing, router]);
-  const table = useMemo(() => (session?.ok ? standaloneStore(session, user, landed) : null), [session, user, landed]);
+  const table = useMemo(() => (session?.ok ? standaloneStore({ ...session, landed }, user) : null), [session, user, landed]);
 
   if (gameId && (!session || choice.running)) {
     // The replay has not run yet (a miss in the session cache): the table's own frame, so the table replaces it without a jump.
