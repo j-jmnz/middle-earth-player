@@ -16,6 +16,7 @@ import { scenarioName } from "../../../data/campaign-data";
 import { useDatabases } from "../../../data/databases";
 import { goBack } from "../../../nav/go-back";
 import { routeCode } from "../../../nav/route-code";
+import { comparisonLossNote } from "../../../../play/readouts/against-the-shadow/amon-din";
 import { useStandaloneSession } from "../../../session/standalone-session";
 import { outcomeLines } from "../../../history/standalone-words";
 import { recordStandaloneRun } from "../../../data/run-writers";
@@ -38,6 +39,8 @@ export default function StandaloneOutcome() {
     // One run for the game, written once (History); a reopened outcome writes nothing more.
     if (session?.ok) recordStandaloneRun(user, finished, session.world, session.game, Date.now(), session.stored.active?.activeMs ?? null, session.stored.active != null && isContinued(session.stored.active), session.stored.active?.startedAt ?? null);
   }, [ended, finished, session, user]);
+  // Encounter at Amon Dîn's comparison loss says the two counts, as the Defeat sheet did (null for any other loss).
+  const counts = session?.ok ? comparisonLossNote(session.game) : null;
   const back = <NavBar onBack={() => goBack(router, "/scenarios")} backTestID="outcome-back" backLabel="Scenarios" />;
 
   if (!gameId || !finished || (!session?.ok && !finished.result)) {
@@ -81,7 +84,7 @@ export default function StandaloneOutcome() {
       </View>
     ) : (
       <View className="mt-6 gap-1" testID="outcome-lines">
-        {outcomeLines(result, report?.lossReason).map((line) => (
+        {outcomeLines(result, counts ?? report?.lossReason).map((line) => (
           <BodyText key={line} tone="muted" className="text-center">
             {line}
           </BodyText>
