@@ -32,6 +32,12 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "17149:whenRevealed:1 @1 place": { label: "Place a random set aside Desert Creatures enemy in the encounter discard pile" },
   "17149:whenRevealed:1 @1 surge": { label: "Desert Warg gains surge: reveal an additional encounter card" },
 
+  // 17150:A:2, 17151:A:1, 17152:A:2 and 17152:A:3 (Desolate Land, Harondor Waste, Danger Close Behind): several set aside sets hold the most cards, so the first player chooses a set by one of its cards; a random card of that set is drawn.
+  "17150:forced:1 @0 RandomSetAside": { owned: true, note: "Desolate Land: sets tie for the most cards left. Choose one by a card of it; a random card of that set is revealed.", verb: "Reveal" },
+  "17151:forced:1 @0 RandomSetAside": { owned: true, note: "Harondor Waste: sets tie for the most cards left. Choose one by a card of it; a random card of that set goes to the encounter discard pile.", verb: "Place" },
+  "17152:whenRevealed:1 @0 RandomSetAside": { owned: true, note: "Danger Close Behind: sets tie for the most cards left. Choose one by a card of it; a random card of that set is revealed.", verb: "Reveal" },
+  "17152:shadow:1 @0.0 RandomSetAside": { owned: true, note: "Danger Close Behind: sets tie for the most cards left. Choose one by a card of it; a random card of that set is revealed.", verb: "Reveal" },
+
   // 17158:B:1 (Pelargir Defences stage 2, forced): the player who played the ally chooses.
   "17158:forced:1 @0 Choose": { owned: true, note: "You played {subject}: exhaust it, or deal 1 damage to it." },
   "17158:forced:1 @0 exhaust": { label: "Exhaust {subject}" },

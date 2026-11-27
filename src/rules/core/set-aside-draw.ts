@@ -4,7 +4,7 @@ import type { ScenarioState } from "./state.ts";
 
 /**
  * The id of one set-aside card for which `matches` holds, drawn by the game seed: the matching ids in id order (so one seed always picks the same card), one step of the seed. Undefined when none matches. The caller advances `seedCursor` when it uses the card.
- * What the card does next (revealed, attached, left facedown) is the caller's, and so is whether the players see which one it was (scripts/checks/set-aside-sites.ts).
+ * What the card does next (revealed, attached, left facedown) is the caller's, and so is whether the players see which one it was (the set-aside sites check).
  */
 export function drawRandomSetAside(state: ScenarioState, matches: (id: string) => boolean): string | undefined {
   const ids = state.setAside.filter(matches).sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
