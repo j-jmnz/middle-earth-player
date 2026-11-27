@@ -71,7 +71,7 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, tim
 // default order stands: an `early` effect first, then the oldest card first.
 function pushForced(state: ScenarioState, found: readonly Found[], event: GameEvent, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const first = found[0];
-  if (!first || !differs(found)) return pushFound(state, found, event, ctx, steps);
+  if (!first || !forcedOrderDiffers(found)) return pushFound(state, found, event, ctx, steps);
   // An effect with a limit spends its use as it triggers, so an effect that waits for the order cannot fire a second time meanwhile ("Limit once per round").
   const spent = found.reduce((current, one) => noteForcedUse(current, one.effect, one.instance.id, forcedActor(state, one.instance, event, ctx)), state);
   return pushEffectFrame(
@@ -93,7 +93,8 @@ function pushForced(state: ScenarioState, found: readonly Found[], event: GameEv
 }
 
 // Two or more cards bear effects, and not all of them the same effects (two copies of one card change nothing by their order).
-function differs(found: readonly Found[]): boolean {
+/** Whether the cards bearing these effects differ: the first player has a choice of order. */
+export function forcedOrderDiffers(found: readonly Found[]): boolean {
   return new Set(found.map(signature)).size >= 2;
 }
 
@@ -110,9 +111,6 @@ export function foundOf(state: ScenarioState, ctx: ReduceContext, entries: reado
     return effect && instance ? [{ effect, instance }] : [];
   });
 }
-
-/** Whether the cards bearing these effects differ: the first player has a choice of order. */
-export const forcedOrderDiffers = differs;
 
 // Each matching effect gets its own forced frame. The oldest resolves first, so it is pushed last.
 // `counted`: the uses of the effects with a limit were already spent when they triggered (pushForced), so none is spent again.
