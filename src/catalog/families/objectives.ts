@@ -34,7 +34,7 @@ const VERBS = [
   // by the players as soon as it is free of encounters and no effect is resolving (the settle sweep, families/objectives/control.ts): it is marked `claimed`, with no controller,
   // so it stays in the staging area. It does nothing when run.
   z.strictObject({ verb: z.literal("ControlWhenFree"), ...when }),
-  // A constant marker on a quest stage (17106:B:1, 17107:B:1, 17108:B:1, "If a Harad objective is not attached, the first player claims it and attaches it to a hero he controls"): while the stage is the main quest, the settle sweep (families/objectives/claim.ts) has the first player
+  // A constant marker on a quest stage (17106:B:1, 17107:B:1, 17108:B:1, "If a Harad objective is not attached, the first player claims it and attaches it to a hero he controls"): while the stage is the main quest, the settle sweep (families/objectives/stage-claim.ts) has the first player
   // claim each objective with this Trait that lies in the staging area with no encounter card attached: he chooses one of his heroes and it is attached there. A guarded objective or one hanging on an encounter card is not claimed (rr.guarded). It does nothing when run.
   z.strictObject({ verb: z.literal("ClaimUnattached"), trait: z.string().min(1) }),
   // "detach a Harad objective from a hero, reveal it, and add it to the staging area" (17102:A:1): the last picked objective, claimed and attached to a hero, is detached (faceup, unclaimed, controlled by nobody) and revealed by the actor as an encounter card (rr.reveal, faq.reveal-and-add),
@@ -56,6 +56,10 @@ const FLAGS = [
   // On a claimed objective: when the hero it is attached to leaves play, or it is discarded, the objective returns to the staging area ("If detached, return Gandalf's Map to the staging area", 01108:A:2). A claimed objective
   // without it counts as an attachment and is discarded with its host (Athelas 02063, the Rhudaur Clues). Read where a card is sent away (families/objectives/claimed.ts).
   "returnsToStagingArea",
+  // On an objective that hangs unclaimed on an encounter card (The Black Serpent's stage 3A, 17108:A:1): when the host leaves play the objective returns to the staging area, where the stage's claim line gives it to a hero. Read where a card is sent away (families/objectives/claimed.ts).
+  "returnsWhenHung",
+  // On an objective: claiming it adds a `claim` step, so the banner and the log say which hero holds it (The Black Serpent's claim line gives the objective to a hero the first player chooses; read in families/objectives/index.ts). An objective without it claims silently, as every other scenario's does.
+  "announcesClaim",
 ] as const;
 
 export const manifest = { name: "objectives", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

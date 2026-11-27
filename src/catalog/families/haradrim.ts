@@ -115,6 +115,8 @@ const FLAGS = [
   "engagedWithClaimers",
   // On an enemy: it loses the text "Cannot leave the staging area" (The Black Serpent with 6 progress on stage 3B, 17108:B:2): the cannotLeaveStaging it holds is not read (rules/core/zones.ts).
   "losesCannotLeaveStaging",
+  // On an enemy that cannot leave the staging area and is only considered engaged (The Black Serpent, 17094:A:1): no player optionally engages it while it holds cannotLeaveStaging, since it would not leave (rr.optional-engagement, rr.cannot). `losesCannotLeaveStaging` ends it. Read by the family's optionalEngage hook (families/haradrim/index.ts).
+  "neverEngaged",
 ] as const;
 
 export const manifest = { name: "haradrim", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

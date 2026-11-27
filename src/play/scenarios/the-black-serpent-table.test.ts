@@ -5,9 +5,7 @@
 import { describe, expect, it } from "vitest";
 
 import { consideredEngagedSeats } from "../../rules/core/engaged.ts";
-import { updateCard } from "../../rules/core/state.ts";
-import { attachTo, moveCard } from "../../rules/core/zones.ts";
-import { idOf, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
+import { claimedBy, idOf, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
 import { zoneSelector } from "../store/selectors.ts";
 
 const BANNER = "17091";
@@ -17,8 +15,7 @@ const GUARD = "17095";
 const SIDE_QUEST = "17104";
 const at = (layout: Layout = {}) => tableFromLayout("the-black-serpent", { seats: 1, phase: "Quest", ...layout });
 // An objective a hero holds, as the claim leaves it: zone attached, on the hero, faceup, controlled by the hero's player and claimed.
-const claimedBy = (state: ReturnType<typeof at>["state"], code: string, hero: string) =>
-  updateCard(attachTo(moveCard(state, idOf(state, code), { zone: "attached" }), idOf(state, code), idOf(state, hero)), idOf(state, code), { face: "up", controller: 0, claimed: true });
+const claim = (state: ReturnType<typeof at>["state"], code: string, hero: string) => claimedBy(state, idOf(state, code), idOf(state, hero));
 const attachedTo = (t: ReturnType<typeof at>, zone: "staging" | "play", code: string): string[] =>
   zoneSelector(zone, 0)(t.state).entries.find((entry) => entry.card.code === code)?.attached.map((card) => card.code) ?? [];
 
@@ -36,7 +33,7 @@ describe("the Harad objectives", () => {
 
   it("17106:A:1 and 17107:B:2 draw an objective a hero holds under that hero", () => {
     const t = at({ staging: [BANNER] });
-    const held = { ...t, state: claimedBy(t.state, BANNER, "dh1") };
+    const held = { ...t, state: claim(t.state, BANNER, "dh1") };
     expect(held.state.cards[idOf(held.state, BANNER)]).toMatchObject({ zone: "attached", claimed: true });
     expect(attachedTo(held, "play", "dh1")).toEqual([BANNER]);
   });
@@ -55,7 +52,7 @@ describe("The Black Serpent", () => {
     const none = at(layout);
     expect(consideredEngagedSeats(none.state, idOf(none.state, SERPENT), [0])).toEqual([]);
     const held = at({ ...layout, staging: [SERPENT, BANNER] });
-    const claimed = claimedBy(held.state, BANNER, "dh1");
+    const claimed = claim(held.state, BANNER, "dh1");
     expect(consideredEngagedSeats(claimed, idOf(claimed, SERPENT), [0])).toEqual([0]);
     expect(zoneSelector("staging", 0)(claimed).entries.map((entry) => entry.card.code)).toContain(SERPENT);
   });

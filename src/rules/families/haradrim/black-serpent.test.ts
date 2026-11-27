@@ -8,8 +8,10 @@ import { flagged, updateCard, type ScenarioState } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import { modifiedStat } from "../../core/keywords.ts";
 import { matchesPick, pickCandidates } from "../../interpret/pick.ts";
-import { finish, first, idOf, opened, resolveRecords, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { claimedBy, finish, first, idOf, opened, resolveRecords, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { canAttack } from "../../combat/combat.ts";
+import { rejectionReason } from "../../engine/legal.ts";
+import { optionalEnemies } from "../../quest/quest.ts";
 import { consideredEngagedSeats } from "../../core/engaged.ts";
 import { stagingAttackers } from "../south/watcher.ts";
 import { guardWith } from "../objectives/guard.ts";
@@ -23,11 +25,7 @@ const ARCHER = "16043";
 const table = (layout: Layout = {}) => tableFromLayout("the-black-serpent", { seats: 1, stage: "17106", ...layout });
 
 /** The objective lies attached to the hero, claimed, as ClaimObjective leaves it. */
-function claimed(state: ScenarioState, code: string, heroId: string): ScenarioState {
-  const id = idOf(state, code);
-  const hero = state.cards[heroId];
-  return updateCard(attachTo(moveCard(state, id, { zone: "attached" }), id, heroId), id, { face: "up", controller: hero?.controller ?? 0, claimed: true });
-}
+const claimed = (state: ScenarioState, code: string, heroId: string): ScenarioState => claimedBy(state, idOf(state, code), heroId);
 
 describe("17091:A:1 Guarded (enemy or location): the first card of a listed type discarded from the encounter deck guards the objective", () => {
   it("discards the treachery, adds the enemy to the staging area and attaches it as the guard", () => {
@@ -111,8 +109,11 @@ describe("17106:B:1 ClaimUnattached: the first player claims a Harad objective t
     const made = table({ staging: [GARB, BANNER, ARCHER] });
     const state = guardWith(made.state, idOf(made.state, ARCHER), idOf(made.state, BANNER));
     const steps: EngineStep[] = [];
-    const settled = finish({ state: settle({ ...opened(made, state).state, window: null, mode: "stopped" }, made.ctx, steps), steps }, made.ctx).state;
+    const run = finish({ state: settle({ ...opened(made, state).state, window: null, mode: "stopped" }, made.ctx, steps), steps }, made.ctx);
+    const settled = run.state;
     expect(settled.cards[idOf(settled, GARB)]).toMatchObject({ claimed: true, host: made.hero, controller: 0 });
+    // The claim is a step the banner and the log read.
+    expect(run.steps).toContainEqual({ kind: "claim", cardId: idOf(settled, GARB), heroId: made.hero, seat: 0 });
     expect(settled.cards[idOf(settled, BANNER)]?.claimed).toBeUndefined();
     expect(settled.cards[idOf(settled, BANNER)]?.zone).toBe("staging");
   });
@@ -193,6 +194,26 @@ describe("17107:B:2 The Black Serpent is considered engaged with each player who
     const made = table({ seats: 2, stage: "17107", staging: [SERPENT] });
     const state = opened(made).state;
     expect(consideredEngagedSeats(state, idOf(state, SERPENT), [0, 1])).toEqual([]);
+  });
+});
+
+describe("17094:A:1 The Black Serpent is never optionally engaged: it cannot leave the staging area", () => {
+  const optional = (progress: number) => {
+    const made = table({ stage: "17108", progress, staging: [SERPENT, ARCHER] });
+    const state = { ...opened(made).state, phase: "Encounter" as const, window: { kind: "optionalEngage" as const } };
+    return { made, state };
+  };
+
+  it("is not offered and the Engage intent for it is refused, while another enemy is offered", () => {
+    const { made, state } = optional(3);
+    expect(optionalEnemies(state, made.ctx.cards)).toEqual([idOf(state, ARCHER)]);
+    expect(rejectionReason(state, { type: "Engage", enemyId: idOf(state, SERPENT) }, made.ctx)).toBe("That enemy cannot be optionally engaged");
+    expect(rejectionReason(state, { type: "Engage", enemyId: idOf(state, ARCHER) }, made.ctx)).toBeNull();
+  });
+
+  it("is offered again once 6 progress let it leave the staging area", () => {
+    const { made, state } = optional(6);
+    expect(optionalEnemies(state, made.ctx.cards)).toContain(idOf(state, SERPENT));
   });
 });
 

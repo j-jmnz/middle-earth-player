@@ -3,11 +3,10 @@
 import type { Instruction, PickSpec } from "../../../catalog/boundary.ts";
 import { randomNextOf } from "../../../catalog/random-next.ts";
 
-import { currentCause, effectCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { gameReads } from "../../core/game-reads.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { constantVerbCodes } from "../../interpret/constant-records.ts";
-import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import { restricted } from "../../interpret/restrictions.ts";
@@ -17,9 +16,11 @@ import { hostOf, inPlay, updateCard } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import { advanceStage } from "../../quest/quest.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
+import { effectById } from "../../windows/listen.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { guardWith } from "../objectives/guard.ts";
 import { freeOfEncounters } from "../objectives/free.ts";
+import { pushFirstPlayerClaim } from "../objectives/stage-claim.ts";
 import { queueFront } from "../play/refs.ts";
 import type { Focus } from "../index.ts";
 
@@ -114,10 +115,9 @@ export function claimFreed(state: ScenarioState, ctx: ReduceContext, steps: Engi
     const rule = claimers(ctx).find((entry) => entry.code === card.code);
     if (!rule) continue;
     if (rule.host == null) {
-      const record = ctx.effects.find((effect) => effect.id === rule.id);
+      const record = effectById(ctx, rule.id);
       if (!record || state.seats[state.firstPlayer]?.eliminated) continue;
-      const instructions: Instruction[] = [{ verb: "Pick", pick: { type: "hero", control: "you" } }, { verb: "ClaimObjective" }];
-      return pushEffectFrame(state, { frame: "ResolveEffect", sourceId: id, actor: state.firstPlayer, peril: false, effectId: record.id, instructions, picked: [], cancel: null, blockCancel: null, cause: effectCause(record) }, steps);
+      return pushFirstPlayerClaim(state, id, record, steps);
     }
     const hostId = Object.values(state.cards).find((other) => inPlay(other.zone) && other.id !== id && printedOf(ctx.cards, other.code).name === rule.host)?.id;
     const host = hostId ? state.cards[hostId] : undefined;

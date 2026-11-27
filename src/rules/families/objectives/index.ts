@@ -18,7 +18,7 @@ import { lastPicked } from "../../interpret/player-verbs.ts";
 import { printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { updateCard } from "../../core/state.ts";
+import { flagged, updateCard } from "../../core/state.ts";
 import { resetEncounterDeck } from "../../interpret/verbs.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import { discardUntilType } from "../encounter/discard-until.ts";
@@ -28,7 +28,7 @@ import { effectsOf } from "../../windows/listen.ts";
 import type { Focus } from "../index.ts";
 import { controlSweep } from "./control.ts";
 import { freeOfEncounters } from "./free.ts";
-import { claimUnattached, revealDetached } from "./claim.ts";
+import { claimUnattached, revealDetached } from "./stage-claim.ts";
 import { attachGuard, guardWith } from "./guard.ts";
 import { objectivesPickMatches } from "./pick.ts";
 
@@ -98,6 +98,7 @@ function claimObjective(state: ScenarioState, instruction: Extract<Instruction, 
   if (!id || !objective || !claimable || !freeOfEncounters(state, id) || !hero || (hero.zone !== "heroes" && hero.zone !== "play") || hero.controller == null) return state;
   const attached = attachTo(moveCard(state, id, { zone: "attached" }), id, heroId);
   const claimed = updateCard(attached, id, { face: "up", controller: hero.controller, claimed: true });
+  if (flagged(state, id, "announcesClaim")) steps.push({ kind: "claim", cardId: id, heroId, seat: hero.controller });
   return queueEvent(enforceRestricted(claimed, heroId, ctx, steps), { trigger: "claimed", seat: hero.controller, cardId: id });
 }
 

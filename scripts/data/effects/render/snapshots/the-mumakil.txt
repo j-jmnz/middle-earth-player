@@ -246,7 +246,7 @@ Scenario piles that place cards with no record (quest: 17026 Welcome to the Jung
   17027:whenRevealed:1: When revealed
     - for each player, first player first:
       - choose enemy (any player controls) or in the staging area, named "Wild Mûmak"
-      - the last picked card in play receives one random set-aside card with the trait Capture (drawn by the game seed): it lies attached to it faceup, controlled by nobody and no player's card, and leaves play with its host (nothing with no host picked or no such card set aside)
+      - the last picked card in play receives one random set-aside card with the trait Capture (drawn by the game seed): it lies attached to it faceup, controlled by nobody and no player's card, and leaves play with its host unless a rule of its own sends it elsewhere (nothing with no host picked or no such card set aside)
 
 17027:B:1 (back): Forced: At the beginning of the quest phase, if there is no active location, reveal an additional encounter card this phase.
   17027:forced:1: Forced when a phase begins

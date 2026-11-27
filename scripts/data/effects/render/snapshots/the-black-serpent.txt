@@ -7,7 +7,10 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
   17091:whenRevealed:1: When revealed
     - the Guarded keyword: this objective in the staging area is guarded by the first encounter enemy or location discarded from the deck, added to the staging area
   17091:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
+    - this card: stat returnsWhenHung (while unclaimed and hanging on an encounter card: when that card leaves play it goes back to the staging area faceup, controlled by nobody, not to a discard pile) 1, while this card is in play
+    - this card: stat announcesClaim (claiming it is announced: the banner and the log say which hero it is attached to) 1, while this card is in play
 
 17091:A:2 (front): While Banner of the Serpent is attached to an encounter card, each Harad enemy gets +1 Attack.
   17091:constant:2: Constant
@@ -27,7 +30,10 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
   17092:whenRevealed:1: When revealed
     - the Guarded keyword: this objective in the staging area is guarded by the first encounter enemy discarded from the deck, added to the staging area
   17092:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
+    - this card: stat returnsWhenHung (while unclaimed and hanging on an encounter card: when that card leaves play it goes back to the staging area faceup, controlled by nobody, not to a discard pile) 1, while this card is in play
+    - this card: stat announcesClaim (claiming it is announced: the banner and the log say which hero it is attached to) 1, while this card is in play
 
 17092:A:2 (front): Attached encounter card gets +2 Threat and is immune to player card effects.
   17092:constant:2: Constant
@@ -52,7 +58,10 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
   17093:whenRevealed:1: When revealed
     - the Guarded keyword: this objective in the staging area is guarded by the first encounter location discarded from the deck, added to the staging area
   17093:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat returnsToStagingArea (a claimed objective: when it is discarded, or the card or hero it lies on leaves play, it goes back to the staging area faceup, not to a discard pile) 1, while this card is in play
+    - this card: stat returnsWhenHung (while unclaimed and hanging on an encounter card: when that card leaves play it goes back to the staging area faceup, controlled by nobody, not to a discard pile) 1, while this card is in play
+    - this card: stat announcesClaim (claiming it is announced: the banner and the log say which hero it is attached to) 1, while this card is in play
 
 17093:A:2 (front): While Summons from Mordor is attached to an encounter card, each player's threat cannot be reduced.
   17093:constant:2: Constant
@@ -72,6 +81,7 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
   17094:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+    - this card: stat neverEngaged (no player optionally engages it while it cannot leave the staging area: it is only considered engaged) 1, while this card is in play
     - this card: stat cannotTakeDamage 1, while this card is in play
 
 17094:A:2 (front): The Black Serpent gets +X Threat, +X Attack and +X Defense.
@@ -116,7 +126,7 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 17096:A:1 (front): While The Serpent's Redoubt is in the staging area, it gains: "Forced: After a player plays an ally from his hand, either remove 1 progress from the main quest, or exhaust that ally."
-  17096:forced:1: Forced after an ally is played from a hand (not one put into play by an effect) (heard about card (any player controls) or in the staging area or the active location, of card type ally)
+  17096:forced:1: Forced after an ally is played from hand (not one put into play by an effect) (heard about card (any player controls) or in the staging area or the active location, of card type ally)
     only if this card is in the staging area
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player chooses one of:
@@ -324,7 +334,7 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
   17108:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) or in the staging area, named "The Black Serpent"
-    - the last picked card in play receives one random set-aside card with the trait Harad (drawn by the game seed): it lies attached to it faceup, controlled by nobody and no player's card, and leaves play with its host (nothing with no host picked or no such card set aside)
+    - the last picked card in play receives one random set-aside card with the trait Harad (drawn by the game seed): it lies attached to it faceup, controlled by nobody and no player's card, and leaves play with its host unless a rule of its own sends it elsewhere (nothing with no host picked or no such card set aside)
     - shuffle the encounter discard pile into the encounter deck
     - for each player, first player first:
       - the acting player reveals an encounter card
@@ -346,4 +356,4 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
     note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 266 by template, 0 as JSON)
+(rendered pieces: 273 by template, 0 as JSON)

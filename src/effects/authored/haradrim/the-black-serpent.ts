@@ -57,7 +57,7 @@ const noDamageOption = (target: "attacker" | "engaged"): Option => ({
 // A Harad objective a hero holds that leaves play stays in play: it returns to the staging area (rr.objective-cards "Objective cards remain in play", agent recommendation: docs/scenarios/haradrim/the-black-serpent.md, Readings).
 const guarded = (code: string, types: ("enemy" | "location")[]): Effect[] => [
   { id: `${code}:whenRevealed:1`, cardCode: code, lines: [`${code}:A:1`], timing: "whenRevealed", instructions: [{ verb: "GuardObjective", types }] },
-  { id: `${code}:constant:1`, cardCode: code, lines: [`${code}:A:1`], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "returnsToStagingArea", amount: 1, until: "whileSourceInPlay", target: "self" }] },
+  { id: `${code}:constant:1`, cardCode: code, lines: [`${code}:A:1`], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "returnsToStagingArea", amount: 1, until: "whileSourceInPlay", target: "self" }, { verb: "ModifyStat", stat: "returnsWhenHung", amount: 1, until: "whileSourceInPlay", target: "self" }, { verb: "ModifyStat", stat: "announcesClaim", amount: 1, until: "whileSourceInPlay", target: "self" }] },
 ];
 
 // "Each Harad objective the players control" is a count of controlled objectives.
@@ -138,6 +138,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "constant",
     instructions: [
       { verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", target: "self" },
+      { verb: "ModifyStat", stat: "neverEngaged", amount: 1, until: "whileSourceInPlay", target: "self" },
       { verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "whileSourceInPlay", target: "self" },
     ],
   },

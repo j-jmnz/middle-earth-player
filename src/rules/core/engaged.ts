@@ -8,7 +8,20 @@ import { flagged, livingSeats, type ScenarioState } from "./state.ts";
 // The seats a staging enemy is considered engaged with, as the immediate attacks of an encounter card read them ("each enemy engaged with a player", 132064:A:1; rr.engaged): every seat for the Watcher, the first player for the Balrog and Bolg, the seats with a threat of 1 or more for Durin's Bane. An enemy that only attacks through a relay (viaRelay) is not engaged with anyone.
 export function consideredEngagedSeats(state: ScenarioState, id: string, among: number[]): number[] {
   if (state.cards[id]?.zone !== "staging") return [];
-  return among.filter((seat) => flagged(state, id, "engagedWithAll") || (flagged(state, id, "engagedWithFirst") && seat === state.firstPlayer) || engagedWithThreatening(state, id, seat) || engagedWithClaimers(state, id, seat));
+  return among.filter((seat) => flagged(state, id, "engagedWithAll") || engagedWithBySeatRule(state, id, seat));
+}
+
+// The flags that make a staging enemy considered engaged with the seats a rule picks, not with every seat. A new such flag is added here and in engagedWithBySeatRule, and combat, targets and the watcher helpers read both.
+const SEAT_RULE_FLAGS = ["engagedWithFirst", "engagedWithThreatening", "engagedWithClaimers"] as const;
+
+// The staging enemy carries a flag whose seats a rule picks (the Balrog, Durin's Bane, The Black Serpent): only those seats declare attackers against it, and an attack on it is not "the staging area only alone".
+export function hasSeatRuleEngagement(state: ScenarioState, id: string): boolean {
+  return state.cards[id]?.zone === "staging" && SEAT_RULE_FLAGS.some((flag) => flagged(state, id, flag));
+}
+
+// Whether the staging enemy is considered engaged with this seat by a seat-rule flag.
+export function engagedWithBySeatRule(state: ScenarioState, id: string, seat: number): boolean {
+  return (flagged(state, id, "engagedWithFirst") && seat === state.firstPlayer) || engagedWithThreatening(state, id, seat) || engagedWithClaimers(state, id, seat);
 }
 
 // The seat an enemy is engaged with, or null while it is in the staging area, gone or no enemy (rr.engaged). Only an enemy in an engagement area has one: `considered` engagement of a staging enemy names no seat here.

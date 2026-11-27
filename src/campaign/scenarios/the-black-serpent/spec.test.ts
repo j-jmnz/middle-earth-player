@@ -45,10 +45,10 @@ const ROWS: readonly Row[] = [
   { line: "17093:A:3", name: "Action: add 1 resource to the pool of the hero it is attached to", layout: { staging: [SUMMONS] }, act: [CLAIM, resolve(SUMMONS, "action")], expect: [resourcesOn("dh1", 1), resourcesOn("dh2", 0)] },
 
   // 17094 The Black Serpent (the attack from the staging area and the stage 2B engagement are in black-serpent.test.ts, src/rules/families/haradrim).
-  { line: "17094:A:1", name: "Cannot leave the staging area or take damage", layout: { staging: [SERPENT] }, act: [], expect: [flag(SERPENT, "cannotLeaveStaging"), flag(SERPENT, "cannotTakeDamage")] },
+  { line: "17094:A:1", name: "Cannot leave the staging area or take damage", layout: { staging: [SERPENT] }, act: [], expect: [flag(SERPENT, "cannotLeaveStaging"), flag(SERPENT, "neverEngaged"), flag(SERPENT, "cannotTakeDamage")] },
   { line: "17094:A:2", name: "X is the stage number of the main quest: at stage 2 it gets +2 Threat, +2 Attack and +2 Defense", layout: { stage: STAGE_2, staging: [SERPENT] }, act: [], expect: [stat(SERPENT, "threat", 2), stat(SERPENT, "attack", 4), stat(SERPENT, "defense", 3)] },
-  { line: "17094:A:3", name: "Forced at the end of the encounter phase: the first player removes X progress from the main quest", layout: { phase: "Encounter", progress: 4, stage: STAGE_2, staging: [SERPENT] }, act: [announce("endOfPhase"), answer("progress")], expect: progressOn(STAGE_2, 2) },
-  { line: "17094:A:3", name: "Forced at the end of the encounter phase: or the Black Serpent attacks the first player from the staging area", layout: { phase: "Encounter", progress: 4, staging: [SERPENT] }, act: [announce("endOfPhase"), answer("attack")], expect: [window("defense"), progressOn(STAGE_1, 4)] },
+  { line: "17094:A:3", name: "Forced at the end of the encounter phase: the first player removes X progress from the main quest", layout: { phase: "Encounter", progress: 4, stage: STAGE_2, staging: [SERPENT, "f0"] }, act: [announce("endOfPhase"), answer("progress")], expect: progressOn(STAGE_2, 2) },
+  { line: "17094:A:3", name: "Forced at the end of the encounter phase: or the Black Serpent attacks the first player from the staging area", layout: { phase: "Encounter", progress: 4, staging: [SERPENT, "f0"] }, act: [announce("endOfPhase"), answer("attack")], expect: [window("defense"), progressOn(STAGE_1, 4)] },
 
   // 17095 Serpent Guard.
   { line: "17095:A:1", name: "Forced after it engages you: remove 2 progress from the main quest", layout: { progress: 4, engaged: [GUARD] }, act: [announce("engaged", GUARD), answer("progress")], expect: progressOn(STAGE_1, 2) },

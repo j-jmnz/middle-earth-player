@@ -2,7 +2,7 @@
 //
 // The Black Serpent's objectives. The stages claim a Harad objective that nothing holds (ClaimUnattached, a settle sweep): the first player chooses a hero and it is attached there, unless an encounter card guards it or it hangs on one. A Harad objective a hero holds can be
 // detached, revealed and added to the staging area again (RevealDetached, 17102:A:1); revealing it resolves its Guarded (X).
-import type { Instruction } from "../../../catalog/boundary.ts";
+import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 
 import { effectCause } from "../../core/cause.ts";
 import { gameReads } from "../../core/game-reads.ts";
@@ -16,6 +16,7 @@ import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import { startReveal } from "../../windows/frames.ts";
+import { effectsOf } from "../../windows/listen.ts";
 import type { Focus } from "../index.ts";
 import { freeOfEncounters } from "./free.ts";
 
@@ -26,11 +27,16 @@ import { freeOfEncounters } from "./free.ts";
 export function claimUnattached(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.stack.length > 0 || state.lost || state.failure || state.stageCleared || state.staging.length === 0 || !gameReads(state, ctx, '"ClaimUnattached"')) return state;
   const stage = state.questStage ? state.cards[state.questStage] : undefined;
-  const record = stage ? ctx.effects.find((effect) => effect.cardCode === stage.code && effect.timing === "constant" && effect.instructions.some((instruction) => instruction.verb === "ClaimUnattached")) : undefined;
+  const record = stage ? effectsOf(ctx, stage.code).find((effect) => effect.timing === "constant" && effect.instructions.some((instruction) => instruction.verb === "ClaimUnattached")) : undefined;
   const verb = record?.instructions.find((instruction): instruction is Extract<Instruction, { verb: "ClaimUnattached" }> => instruction.verb === "ClaimUnattached");
   if (!record || !verb || state.seats[state.firstPlayer]?.eliminated) return state;
   const id = state.staging.find((candidate) => printedOf(ctx.cards, state.cards[candidate]?.code ?? "").type === "objective" && state.cards[candidate]?.claimed !== true && hasTrait(state, candidate, verb.trait, ctx) && freeOfEncounters(state, candidate));
   if (!id) return state;
+  return pushFirstPlayerClaim(state, id, record, steps);
+}
+
+/** The first player picks one of their heroes and the objective `id` is claimed by it (Pick, ClaimObjective in a frame of the record that claims it). Shared by every settle sweep that claims a free objective for the first player. */
+export function pushFirstPlayerClaim(state: ScenarioState, id: string, record: Effect, steps: EngineStep[]): ScenarioState {
   const instructions: Instruction[] = [{ verb: "Pick", pick: { type: "hero", control: "you" } }, { verb: "ClaimObjective" }];
   return pushEffectFrame(state, { frame: "ResolveEffect", sourceId: id, actor: state.firstPlayer, peril: false, effectId: record.id, instructions, picked: [], cancel: null, blockCancel: null, cause: effectCause(record) }, steps);
 }

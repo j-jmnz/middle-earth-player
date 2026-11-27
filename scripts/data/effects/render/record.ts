@@ -118,12 +118,12 @@ function renderSubject(value: unknown, ctx: Ctx): string {
   return `${renderPick(value, ctx)}${note}`;
 }
 
-// The `played` event of a card another card hears: an event is heard when it is played, before its effects resolve (the heard effect resolves above the event's own, so it may cancel them); an ally is heard only when played from a hand (a card played from the discard pile or the top of the deck counts as from hand; one put into play by an effect is not played).
+// The `played` event of a card another card hears: an event is heard when it is played, before its effects resolve (the heard effect resolves above the event's own, so it may cancel them); an ally is heard only when played from hand (a card played from the discard pile or the top of the deck counts as from hand; one put into play by an effect is not played).
 function triggerWords(effect: Obj): string {
   const trigger = str(effect.trigger);
   const cardType = isObj(effect.subject) ? effect.subject.cardType : undefined;
   if (trigger === "played" && cardType === "event") return "when an event is played, before its effects resolve";
-  if (trigger === "played" && cardType === "ally") return "after an ally is played from a hand (not one put into play by an effect)";
+  if (trigger === "played" && cardType === "ally") return "after an ally is played from hand (not one put into play by an effect)";
   return TRIGGER[trigger] ?? `on the event ${trigger}`;
 }
 

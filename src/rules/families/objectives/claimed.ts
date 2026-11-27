@@ -4,14 +4,17 @@
 // Gandalf's Map to the staging area", 01108:A:2; "If unattached, return Gate Key to the staging area", 12071:A:1; the flag `returnsToStagingArea`
 // those records set) goes back to the staging area when it is discarded or loses its hero. Any other claimed objective (Athelas 02063, the
 // Rhudaur Clues 10110, 10112, 10114) counts as an attachment and is discarded with its host to its own deck's discard pile (rr.attachment-cards).
+// An unclaimed objective that hangs on an encounter card and carries `returnsWhenHung` (The Black Serpent's stage 3A attaches one to the Serpent, 17108:A:1) goes back to the staging area when its host leaves play, controlled by nobody.
 // Every place that sends a card away asks here (one decision, not four).
 import { flagged, updateCard, type CardInstance, type ScenarioState } from "../../core/state.ts";
 import type { Destination } from "../../core/zones.ts";
 import { moveCard } from "../../core/zones.ts";
 
-// The card is a claimed objective whose printed text returns it to the staging area.
+// The card is a claimed objective whose printed text returns it to the staging area, or an unclaimed one that hangs on its host and returns when it is released.
 function returnsToStaging(state: ScenarioState, card: CardInstance | undefined): boolean {
-  return card?.claimed === true && flagged(state, card.id, "returnsToStagingArea");
+  if (!card) return false;
+  if (card.claimed === true) return flagged(state, card.id, "returnsToStagingArea");
+  return card.controller == null && card.host != null && flagged(state, card.id, "returnsWhenHung");
 }
 
 // The staging area when the card is a claimed objective, otherwise `otherwise` (where the card would normally go).

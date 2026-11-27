@@ -21,14 +21,14 @@ const heldByHero = (state: ScenarioState, id: string) => {
   return host?.zone === "heroes";
 };
 // An objective in play that blocks the stages: it has a guard attached to it (it lies in the staging area with its guard) or hangs on an encounter card. A free objective in the staging area is claimed by the stage at once.
-const blocking = (state: ScenarioState) => cardsOf(state, OBJECTIVES).filter((card) => card.zone !== "setAside" && card.zone !== "encounterDiscard" && !heldByHero(state, card.id) && (card.attachments.length > 0 || card.host != null));
+const blocking = (state: ScenarioState) => cardsOf(state, OBJECTIVES).filter((card) => card.zone !== "setAside" && !heldByHero(state, card.id) && (card.attachments.length > 0 || card.host != null));
 // An objective in play that no hero holds (blocking or free).
-const notHeld = (state: ScenarioState) => cardsOf(state, OBJECTIVES).filter((card) => card.zone !== "setAside" && card.zone !== "encounterDiscard" && !heldByHero(state, card.id));
+const notHeld = (state: ScenarioState) => cardsOf(state, OBJECTIVES).filter((card) => card.zone !== "setAside" && !heldByHero(state, card.id));
 const stageCode = (state: ScenarioState) => state.cards[state.questStage ?? ""]?.code;
 
 // A permanent golden: whole standalone games of The Black Serpent played by the auto-player (test/scenarios/the-black-serpent/game.ts) on fixed seeds, through a win and through each way to lose.
 // A cycle has no Campaign Mode, so a win settles at once with a score and nothing earned. The wins are true solo and two-handed: the players claim a Harad objective on each stage, the objective of stage 3A hangs on The Black Serpent, the heroes carry 6 progress on
-// stage 3B, engage the Serpent (it loses "Cannot leave the staging area or take damage"), defeat it and win. The losses are every player's threat at 50, every hero destroyed and, two-handed, the first player eliminated while his hero holds an objective.
+// stage 3B, engage the Serpent (it loses "Cannot leave the staging area or take damage"), defeat it and win. The losses are every player's threat at 50, every hero destroyed.
 // Update the snapshot only when the change is meant.
 describe("The Black Serpent golden", () => {
   goldenSuite<SerpentGolden, SerpentDecks>({
@@ -60,6 +60,9 @@ describe("The Black Serpent golden", () => {
       expect(serpentCard?.damage, golden.name).toBeGreaterThanOrEqual(8);
       expect(state.cards[state.questStage ?? ""]?.progress ?? 0, golden.name).toBeGreaterThanOrEqual(QUEST_POINTS);
       expect(notHeld(state), golden.name).toEqual([]);
+      // An objective hung on the Serpent came back to the staging area and a hero claimed it: none is in the encounter discard pile, and each one that is not set aside is on a hero.
+      expect(cardsOf(state, OBJECTIVES).filter((card) => card.zone === "encounterDiscard"), golden.name).toEqual([]);
+      expect(cardsOf(state, OBJECTIVES).filter((card) => card.zone !== "setAside").every((card) => heldByHero(state, card.id)), golden.name).toBe(true);
       expect(state.seats.slice(0, golden.seatCount).some((seat) => !seat.eliminated), golden.name).toBe(true);
     },
     lost(state, golden) {
@@ -126,21 +129,6 @@ describe("The Black Serpent golden", () => {
           });
         }
         expect(offers).toBeGreaterThan(0);
-      });
-
-      // The loss only a two-handed game reaches: the first player is eliminated while his hero holds a Harad objective (it goes back to the staging area) and the other player claims it.
-      it("the first player's held objective returns to the staging area when he is eliminated, and the other player claims it", () => {
-        const golden = SERPENT_GOLDENS.find((item) => item.name.includes("the first player is eliminated holding an objective"));
-        expect(golden).toBeDefined();
-        const trail = trailOf(golden as SerpentGolden);
-        const out = trail.findIndex((state) => !state.lost && state.seats[0]?.eliminated && !state.seats[1]?.eliminated);
-        expect(out).toBeGreaterThan(0);
-        const held = cardsOf(trail[out - 1] as ScenarioState, OBJECTIVES).filter((card) => card.controller === 0 && heldByHero(trail[out - 1] as ScenarioState, card.id));
-        expect(held.length).toBeGreaterThan(0);
-        const after = trail[out] as ScenarioState;
-        for (const card of held) expect(after.cards[card.id]?.zone, card.code).toBe("staging");
-        const claimed = trail.slice(out).some((state) => held.every((card) => state.cards[card.id]?.controller === 1 && heldByHero(state, card.id)));
-        expect(claimed).toBe(true);
       });
     },
   });

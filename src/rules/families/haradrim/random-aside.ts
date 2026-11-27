@@ -5,16 +5,14 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
-import { printedOf } from "../../core/printed.ts";
-import { nextUint } from "../../core/seed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { startReveal } from "../../windows/frames.ts";
 import type { Focus } from "../index.ts";
+import { drawRandomSetAside } from "./capture.ts";
 
 /** RevealRandomSetAside: one set-aside card with the trait (the ids in order, one step of the seed) is revealed by the actor. Nothing happens with none set aside. */
 export function revealRandomSetAside(state: ScenarioState, instruction: Extract<Instruction, { verb: "RevealRandomSetAside" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const ids = state.setAside.filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").traits.includes(instruction.trait)).sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
-  const drawn = ids[nextUint(state.seed, state.seedCursor) % Math.max(ids.length, 1)];
+  const drawn = drawRandomSetAside(state, instruction.trait, ctx);
   return drawn ? startReveal({ ...state, seedCursor: state.seedCursor + 1 }, focus.seat, ctx, steps, drawn) : state;
 }

@@ -59,14 +59,12 @@ export type SerpentGame = PlayedGame;
 export type SerpentGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: SerpentDecks; outcome: "won" | "lost"; policy?: Partial<SerpentPolicy>; lossReason?: string };
 
 // The games to pin (.claude/rules/code-standards.md, Test cost): wins true solo and two-handed (Easy deals the same Setup, standalone.test.ts, and the scenario has no Nightmare deck, so neither has a golden of its own) and each way to lose: every player's threat at 50
-// (heroes that cannot quest, so the staging area's Threat is the shortfall each round), every hero destroyed (heroes too brittle for the attacks) and, two-handed only, the first player eliminated while his hero holds an objective: it returns to the staging area and the other
-// player claims it, a path no true solo game reaches.
+// (heroes that cannot quest, so the staging area's Threat is the shortfall each round) and every hero destroyed (heroes too brittle for the attacks). The first player eliminated while his hero holds an objective is a scene-kit test (lines.test.ts).
 export const SERPENT_GOLDENS: readonly SerpentGolden[] = [
   { name: "true solo, won, Normal", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed, won, Normal", seatCount: 2, seed: 7, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "true solo, lost, every hero destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
-  { name: "two-handed, lost, the first player is eliminated holding an objective and the other player claims it", seatCount: 2, seed: 26, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
 ];
 
 const game = standaloneGame<SerpentDecks, SerpentPolicy>({

@@ -31,7 +31,7 @@ import { countsDefense, rangedAttack, struck } from "../families/attack/strike.t
 import { attackStatOf, placeAttackDamage } from "../families/pelargir/stage-attack.ts";
 import { mustBeDeclared } from "../families/armies/defender.ts";
 import { attackHere, dealForAttack, engagedWithAll, noteBelowThreat, stagingAttackers, undefendedLocations, viaRelay } from "../families/south/watcher.ts";
-import { engagedWithClaimers, engagedWithThreatening } from "../core/engaged.ts";
+import { engagedWithBySeatRule, hasSeatRuleEngagement } from "../core/engaged.ts";
 import { offeredTargets, stagingAttackable, withCardTargets } from "../families/attack/targets.ts";
 import { barredFromDreadnaught } from "../families/sea/dreadnaught.ts";
 
@@ -278,25 +278,14 @@ export function canAttack(
   if (barredFromDreadnaught(state, attackerId, enemyId, cards)) return false;
   // "You cannot attack ... enemies with a title other than Marshland Outlaws" (attackOnlyTitle, 900202:A:1).
   if (titleBarred(state, attacker.controller, enemyId, cards)) return false;
-  // An enemy in the staging area that is considered engaged with the first player (the Balrog, 142044:A:2): only the first player declares
-  // attackers against it, with their own characters and ranged characters of the others (rr.ranged).
-  if (enemy.zone === "staging" && flagged(state, enemyId, "engagedWithFirst")) {
-    if (flagged(state, attackerId, "cannotAttack") || seat !== state.firstPlayer) return false;
-    return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
-  }
   // The Dreadnaught (Massive): in the staging area but engaged with every player, so each player attacks it with their own characters, and ranged characters of the others join (rr.ranged).
   if (enemy.zone === "staging" && flagged(state, enemyId, "attackableEngagedWithAll")) {
     if (flagged(state, attackerId, "cannotAttack") || state.phase !== "Combat") return false;
     return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
   }
-  // An enemy in the staging area that is considered engaged with each player whose threat is 1 or greater (Durin's Bane, 04150:A:2): such a player declares attackers against it, with their own characters and ranged characters of the others (rr.ranged).
-  if (enemy.zone === "staging" && flagged(state, enemyId, "engagedWithThreatening")) {
-    if (flagged(state, attackerId, "cannotAttack") || !engagedWithThreatening(state, enemyId, seat)) return false;
-    return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
-  }
-  // An enemy in the staging area that is considered engaged with each player who controls an objective (The Black Serpent, 17107:B:2): such a player declares attackers against it, with their own characters and ranged characters of the others (rr.ranged).
-  if (enemy.zone === "staging" && flagged(state, enemyId, "engagedWithClaimers")) {
-    if (flagged(state, attackerId, "cannotAttack") || !engagedWithClaimers(state, enemyId, seat)) return false;
+  // An enemy in the staging area that is considered engaged with the seats a rule picks (the first player for the Balrog, 142044:A:2; each player whose threat is 1 or greater for Durin's Bane, 04150:A:2; each player who controls an objective for The Black Serpent, 17107:B:2): only such a player declares attackers against it, with their own characters and ranged characters of the others (rr.ranged).
+  if (hasSeatRuleEngagement(state, enemyId)) {
+    if (flagged(state, attackerId, "cannotAttack") || !engagedWithBySeatRule(state, enemyId, seat)) return false;
     return attacker.controller === seat || hasKeyword(state, attackerId, "ranged", cards);
   }
   // Goblin Archer (03032:A:2): in the staging area it is attacked by characters with ranged, of any player, in the combat phase.

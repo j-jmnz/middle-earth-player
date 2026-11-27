@@ -6,14 +6,16 @@ import { EFFECTS } from "../../../effects/index.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { addModifier } from "../../../rules/core/modified-stat.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
-import { expireModifiers, flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
-import { attachTo, moveCard } from "../../../rules/core/zones.ts";
+import { expireModifiers, flagged, type ScenarioState } from "../../../rules/core/state.ts";
+import { moveCard } from "../../../rules/core/zones.ts";
+import { destroyCard } from "../../../rules/core/destroy.ts";
+import { eliminateSeat } from "../../../rules/core/eliminate.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { guardWith } from "../../../rules/families/objectives/guard.ts";
 import { restricted } from "../../../rules/interpret/restrictions.ts";
 import { placeOnMainQuest, placeQuestProgress } from "../../../rules/quest/quest.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
-import { finish, idOf, legalIntents, opened, resolveRecords, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { claimedBy, finish, idOf, legalIntents, opened, resolveRecords, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const BANNER = "17091";
 const GARB = "17092";
@@ -31,10 +33,7 @@ const STAGE_3 = "17108";
 const table = (layout: Layout = {}, extra: readonly string[] = []) => tableFromLayout("the-black-serpent", { seats: 1, ...layout }, { effects: EFFECTS, extra });
 
 /** The objective lies attached to the hero, claimed, as the stage's claim line leaves it. */
-function held(state: ScenarioState, code: string, heroId: string): ScenarioState {
-  const id = idOf(state, code);
-  return updateCard(attachTo(moveCard(state, id, { zone: "attached" }), id, heroId), id, { face: "up", controller: state.cards[heroId]?.controller ?? 0, claimed: true });
-}
+const held = (state: ScenarioState, code: string, heroId: string): ScenarioState => claimedBy(state, idOf(state, code), heroId);
 
 /** The side quest in the staging area is the current quest until the end of the phase. */
 const sideQuestCurrent = (state: ScenarioState): ScenarioState => addModifier(state, idOf(state, SIDE_QUEST), idOf(state, SIDE_QUEST), "currentQuest", 1, "endOfPhase");
@@ -119,6 +118,39 @@ describe("17106:B:2 17107:B:3 17108:B:3 the stage cannot be defeated while a Har
   it("17108:B:3 an objective hanging on The Black Serpent in the staging area bars the stage", () => {
     const made = table({ stage: STAGE_3, staging: [SERPENT], attached: [{ code: SUMMONS, to: SERPENT, encounter: true }] });
     expect(restricted(opened(made).state, made.ctx, "advance")).not.toHaveLength(0);
+  });
+});
+
+describe("17108:A:1 the objective hanging on The Black Serpent returns to the staging area when the Serpent is defeated", () => {
+  const defeated = () => {
+    const made = table({ stage: STAGE_3, progress: 6, staging: [SERPENT], attached: [{ code: BANNER, to: SERPENT, encounter: true }] });
+    const state = opened(made).state;
+    expect(restricted(state, made.ctx, "advance")).not.toHaveLength(0);
+    const steps: EngineStep[] = [];
+    return { made, state: destroyCard(state, idOf(state, SERPENT), made.ctx.cards, steps), steps };
+  };
+
+  it("lies faceup in the staging area, controlled by nobody, and is not in the encounter discard pile", () => {
+    const { state } = defeated();
+    expect(state.cards[idOf(state, BANNER)]).toMatchObject({ zone: "staging", face: "up", controller: null, host: null });
+    expect(state.encounterDiscard).not.toContain(idOf(state, BANNER));
+  });
+
+  it("is claimed by a hero of the first player, and then stage 3B can be defeated", () => {
+    const { made, state, steps } = defeated();
+    expect(restricted(state, made.ctx, "advance")).not.toHaveLength(0);
+    const settled = finish({ state: settle({ ...state, window: null, mode: "stopped" }, made.ctx, steps), steps }, made.ctx).state;
+    expect(settled.cards[idOf(settled, BANNER)]).toMatchObject({ zone: "attached", host: made.hero, claimed: true, controller: 0 });
+    expect(restricted(settled, made.ctx, "advance")).toHaveLength(0);
+  });
+});
+
+describe("17106:B:2 17107:B:3 17108:B:3 the Black Serpent's objectives that are not hung keep their discard rule", () => {
+  it("an objective guarded by an enemy that leaves play stays in the staging area, free to claim", () => {
+    const made = table({ staging: [BANNER, GUARD] });
+    const state = guardWith(made.state, idOf(made.state, GUARD), idOf(made.state, BANNER));
+    const gone = destroyCard(opened(made, state).state, idOf(state, GUARD), made.ctx.cards, []);
+    expect(gone.cards[idOf(gone, BANNER)]).toMatchObject({ zone: "staging" });
   });
 });
 
@@ -238,6 +270,20 @@ describe("17092:A:1 17093:A:1 a Harad objective a hero holds that leaves play re
     const state = held(made.state, GARB, made.hero);
     const gone = moveCard(state, made.hero, { zone: "discard", seat: 0 });
     expect(gone.cards[idOf(gone, GARB)]).toMatchObject({ zone: "staging", face: "up" });
+  });
+});
+
+describe("17092:A:1 an eliminated player's objective goes back to the staging area and the other player claims it", () => {
+  it("the Garb of the first player, who is eliminated, lies in the staging area; the new first player claims it for a hero", () => {
+    const made = table({ seats: 2, staging: [SERPENT], claimed: [{ code: GARB, by: "dh1" }] });
+    const garb = idOf(made.state, GARB);
+    expect(made.state.cards[garb]).toMatchObject({ zone: "attached", claimed: true, controller: 0 });
+    const steps: EngineStep[] = [];
+    const out = finish({ state: settle({ ...eliminateSeat(opened(made).state, 0, steps), window: null, mode: "stopped" }, made.ctx, steps), steps }, made.ctx).state;
+    expect(out.firstPlayer).toBe(1);
+    expect(out.encounterDiscard).not.toContain(garb);
+    expect(out.cards[garb]).toMatchObject({ zone: "attached", claimed: true, controller: 1 });
+    expect(out.cards[out.cards[garb]?.host ?? ""]?.controller).toBe(1);
   });
 });
 

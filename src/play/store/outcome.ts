@@ -11,7 +11,7 @@ import type { LogMark } from "./log.ts";
 import { plural } from "../words/list.ts";
 import { reshuffleWords } from "./pile-ids.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
-import { captureAttachedLine, mumakPlace } from "../words/scenarios/haradrim/capture.ts";
+import { attachedWords } from "../words/scenarios/haradrim/capture.ts";
 import { boardingWords } from "../words/scenarios/sea.ts";
 import type { FateNames } from "../words/scenarios/fate-beats.ts";
 import { ignoredRevealNote } from "../readouts/ettenmoors.ts";
@@ -96,8 +96,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
     line(text, null, cards);
   };
 
-  // Boarding (dcce.boarding): the Corsair cards a ship-enemy's Boarding revealed engage after it in the same steps (the engine names the ship on each: `boarding`). They are one beat of
-  // the ship's own, "Boarding 2 · Corsair Warship: 2 Corsairs engage Player 1", not a beat each; a Corsair card another effect revealed keeps its own engage beat.
+  // Boarding (dcce.boarding): the Corsair cards a ship-enemy's Boarding revealed engage after it in the same steps (the engine names the ship on each: `boarding`). They are one beat of the ship's own, "Boarding 2 · Corsair Warship: 2 Corsairs engage Player 1", not a beat each; a Corsair card another effect revealed keeps its own engage beat.
   const boarded = new Map<number, number>();
   const joined = new Set<number>();
   steps.forEach((step, index) => {
@@ -268,7 +267,8 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         staging(grappleLine(names.card(step.enemyId), names.card(step.locationId)), [step.locationId]);
         return;
       case "attachDrawn":
-        staging(captureAttachedLine(names.card(step.cardId), names.card(step.hostId), mumakPlace(step.seat, after.seatCount)), [step.cardId, step.hostId]);
+      case "claim":
+        staging(attachedWords(step, names.card, after.seatCount), [step.cardId, step.kind === "claim" ? step.heroId : step.hostId]);
         return;
       // The enemies grappled with a location that became the active location or was explored come out from under it, faceup, into the staging area (dcce.grapple).
       case "detach":

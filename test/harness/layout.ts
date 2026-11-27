@@ -85,6 +85,8 @@ export type Layout = {
   // Cards attached to the first card of `to`, wherever it lies (an attachment is spawned in play and attached).
   // `encounter`: an encounter card attached the way its own effect attaches it (zone attached, controlled by no one, not claimed): the Sack cards, the Troll Key and the Troll Purse; an enemy lies as an attachment (Mugash, 07024:A:2).
   attached?: readonly { code: string; to: string; encounter?: true }[];
+  // Objectives a hero holds, as ClaimObjective leaves them: `code` lies attached to the first card of `by` (zone attached, faceup, claimed, controlled by that hero's player).
+  claimed?: readonly { code: string; by: string }[];
   // The codes of the cards committed to the quest (a hero stand-in, an ally of `play`).
   committed?: readonly string[];
   // The codes of the cards that lie exhausted (every card of the code: a hero stand-in, an ally of `play`).
@@ -256,6 +258,10 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     const hostPrinted = hostCard ? cards.get(hostCard.code) : undefined;
     if (cards.get(attachment.code)?.type === "objective" && hostCard?.controller != null && hostPrinted != null && isCharacterType(hostPrinted)) state = updateCard(state, spawned.id, { claimed: true, controller: hostCard.controller, face: "up" });
   }
+  for (const claim of layout.claimed ?? []) {
+    const spawned = spawn(state, claim.code, { zone: "staging" });
+    state = claimedBy(spawned.state, spawned.id, idOf(spawned.state, claim.by));
+  }
   for (const hidden of layout.under ?? []) {
     const spawned = spawn(state, hidden.code, { zone: "under", locationId: idOf(state, hidden.to) }, "down");
     state = hidden.up ? updateCard(spawned.state, spawned.id, { face: "up" }) : spawned.state;
@@ -321,4 +327,9 @@ export function engagedHandTable(scenarioId: string, hand: string, enemy: string
 /** A scenario's `make`: `tableFromLayout` for `scenarioId` on the records it is given (all records by default). Write `const make = layoutTableFor(ID);`. */
 export function layoutTableFor(scenarioId: string): (layout: Layout, effects?: readonly Effect[]) => LayoutTable {
   return (layout, effects = EFFECTS) => tableFromLayout(scenarioId, layout, { effects });
+}
+
+/** The objective `objectiveId` lies attached to the hero `heroId`, faceup, claimed and controlled by the hero's player, as ClaimObjective leaves it (families/objectives/index.ts). */
+export function claimedBy(state: ScenarioState, objectiveId: string, heroId: string): ScenarioState {
+  return updateCard(attachTo(moveCard(state, objectiveId, { zone: "attached" }), objectiveId, heroId), objectiveId, { face: "up", controller: state.cards[heroId]?.controller ?? 0, claimed: true });
 }
