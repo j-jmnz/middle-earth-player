@@ -21,8 +21,8 @@ No phase is open.
 
 Open work that users filed is tracked as GitHub issues. Read the issue of the area your task touches, not all of them. An agent creates no issue and adds no line to one: it fixes an open item it finds (user instruction, 2026-11-25; `.claude/rules/docs-standards.md`, `docs/phases/STATUS.md`).
 
-- Rules and engine: #274. Angmar Awakened: #184. The Two Towers and The Return of the King: #186. Dwarrowdelf: #185. Shadows of Mirkwood: #182. Standalone scenarios: #183. Against the Shadow: #245.
-- Screens and code: #187. Against the Shadow screens and data: #246. Desktop: #181. Cards tab views: #178. Sound and music: #179. README showcase: #180. Releases: #177.
+- Rules, engine, render, screens and data: #305.
+- More undo opportunity: #165.
 
 ## Standing decisions
 - A scenario has a `-lost` save fixture and no `-won` one; no agent searches for a won game, and `--won` and `--search` run only when the user asks (user, 2026-11-22; `docs/architecture.md`, Tests).
