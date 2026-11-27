@@ -78,9 +78,6 @@ export function pickKeepsInPlay(state: ScenarioState, id: string): boolean {
   return state.modifiers.length > 0 && (flagged(state, id, "cannotLeavePlay") || heldInHand(state, id));
 }
 
-// `moveCard` (core/zones.ts) reads the two holds of a card that cannot leave (play, hand) from here.
-export { heldInHand };
-
 /** Whether the card holds `cannotLeaveUnlessDestroyed` (a Captain, 06144:B:1): any move out of play but its destruction leaves it where it is. The one reader behind `moveCard` and the encounter family's moves. False in every game without the flag. */
 export function keptInPlay(state: ScenarioState, id: string): boolean {
   return state.modifiers.length > 0 && flagged(state, id, "cannotLeaveUnlessDestroyed");

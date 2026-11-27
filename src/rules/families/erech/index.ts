@@ -1,9 +1,10 @@
 // Rules: docs/scenarios/standalone-scenarios/the-stone-of-erech.md (The Stone of Erech); ledger lines 50301:A:1, 50302:A:1, 50303:B:2, 50304:A:1, 50308:A:2, 50312:A:2, 50321:A:1, 50324:A:1. The Stone of Erech's mechanics: the Night objectives (night.ts), Derufin attached to the Stone and freed to the first player (derufin.ts),
 // the hand passed to the left (hand.ts), and the table flags the quest and the encounter cards set. The flags are read where their rule is: skipPlanning (a breaking flag) and noCollect by the round (engine/machine.ts),
 // cannotPlayEvents by the play hook below. (losesIcons, the Haunted Valley flag, is a costs flag: families/costs/pay.ts.)
-import type { Effect, Instruction } from "../../../catalog/boundary.ts";
+import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
+import { verbCodes } from "../../interpret/constant-records.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
@@ -21,21 +22,10 @@ function eventsBarred(state: ScenarioState, cardId: string, ctx: ReduceContext):
   return card != null && state.modifiers.length > 0 && flagged(state, "table", "cannotPlayEvents") && printedOf(ctx.cards, card.code).type === "event";
 }
 
-const NIGHT_STAGES = new WeakMap<readonly Effect[], ReadonlySet<string>>();
-
-// The codes of the cards whose records put a Night objective in play. Which cards do depends on the effect list only, which is never changed after the reducer is handed it.
-function nightStageCodes(ctx: ReduceContext): ReadonlySet<string> {
-  let codes = NIGHT_STAGES.get(ctx.effects);
-  if (!codes) {
-    codes = new Set(ctx.effects.filter((effect) => effect.instructions.some((instruction) => instruction.verb === "PutNightObjective")).map((effect) => effect.cardCode));
-    NIGHT_STAGES.set(ctx.effects, codes);
-  }
-  return codes;
-}
-
 // The settle sweep: only a game whose quest stages hold the card that puts a Night objective in play (The Stone of Erech) can have one lie in its slot, so every other game skips the scan of its cards.
 function sweepNight(state: ScenarioState, ctx: ReduceContext): ScenarioState {
-  const codes = nightStageCodes(ctx);
+  // The cards whose records put a Night objective in play, whatever their timing.
+  const codes = verbCodes(ctx, "PutNightObjective");
   if (!state.stages.some((stage) => codes.has(stage.code))) return state;
   return Object.values(state.cards).some((card) => card.zone === "nightObjective") ? advanceNight(state, ctx) : state;
 }

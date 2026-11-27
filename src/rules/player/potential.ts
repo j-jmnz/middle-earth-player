@@ -25,7 +25,7 @@ import type { Effect, Instruction, PickSpec } from "../../catalog/boundary.ts";
 
 import { costsOf } from "../../catalog/costs.ts";
 import { isPlayerCardEffect } from "../core/keywords.ts";
-import { inPlay, type GameEvent, type ScenarioState } from "../core/state.ts";
+import { inPlayerArea, type GameEvent, type ScenarioState } from "../core/state.ts";
 import { printedOf } from "../core/printed.ts";
 import { targetCandidates } from "../interpret/effect-verbs.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
@@ -109,7 +109,7 @@ function counted(effect: Effect): readonly Instruction[] {
 // An objective in play that a player controls: the players use its Action or Response themselves.
 function playerObjective(state: ScenarioState, sourceId: string, ctx: ReduceContext): boolean {
   const source = state.cards[sourceId];
-  return source != null && source.controller != null && inPlay(source.zone) && printedOf(ctx.cards, source.code).type === "objective";
+  return source != null && inPlayerArea(source) && printedOf(ctx.cards, source.code).type === "objective";
 }
 
 /** Why a Trigger of a player card's Action or Response cannot change the game state, or null. `event` is the one a Response answers. */

@@ -1,5 +1,5 @@
 // Rules: rr.attachment-cards, rr.engaged, rr.cannot (data/rules/entries.json).
-// Stuart's attachment restriction, read on a table built from a layout (tableFromLayout) and run again without the records of its line (lineSpec), where it must fail. Each test title starts with the line id it tests.
+// Stuart's attachment restriction, read on a table built from a layout (tableFromLayout) and run again without the records of its line (lineSpec), where it must fail; and Grimbeorn's Action used from the staging area. Each test title starts with the line id it tests.
 import { describe, expect, it } from "vitest";
 
 import { attachBlocked } from "../../../rules/interpret/restrictions.ts";

@@ -11,7 +11,7 @@ import { applyResponse, responseIntents, responseReason } from "../windows/respo
 import { applyMulliganTrigger, mulliganTriggerReason } from "../families/deck/play.ts";
 import { textBlank } from "../families/attachments/hold.ts";
 import { isAllyLike, printedOf } from "../core/printed.ts";
-import { flagged, inPlay, type ScenarioState } from "../core/state.ts";
+import { flagged, inPlay, inPlayerArea, type ScenarioState } from "../core/state.ts";
 import { hostLostToCost, payUsage, usable, usageReason } from "./usage.ts";
 import { announcePlayerAbility } from "../families/deck/pressure.ts";
 import { areaHeadOf, headOf, isolatedAreas, stageSeat } from "../families/breaking/areas.ts";
@@ -41,7 +41,7 @@ function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, 
   // An objective ally a player controls is an ally under that player's control: only the controller uses its Action (rr.action, rr.objective-cards: "If a player claims an objective, then that player gains control of that objective").
   const printed = printedOf(ctx.cards, instance.code);
   // A revealed card carries its revealing seat as controller, so "controlled" means in a player's play area, not a set controller.
-  const controlledAlly = isAllyLike(printed) && instance.zone === "play" && instance.controller != null;
+  const controlledAlly = isAllyLike(printed) && inPlayerArea(instance);
   const shared = inPlay(instance.zone) && !controlledAlly && (SHARED_TYPES.has(printed.type) || instance.zone === "campaign" || instance.zone === "modeCard");
   // An Action used from the hand ("put ~ into play from your hand", effect.fromHand) is used there; any other in play.
   if (effect?.fromHand ? instance.zone !== "hand" : instance.zone !== "heroes" && instance.zone !== "play" && instance.zone !== "attached" && !shared) return undefined;
