@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { nameFitsOne, NAME_FLOOR, placeholderName, type NameBox } from "./placeholder-name.ts";
+import { nameFitsOne, NAME_FLOOR, nameRows, placeholderName, type NameBox } from "./placeholder-name.ts";
 import { damageReach } from "./token-spots.ts";
 
 // One unit per character, so a card 100 wide holds a line of 90 (a 5 pt margin each side).
@@ -56,5 +56,20 @@ describe("the placeholder name", () => {
     // A shrink that reaches the floor still fits; one past it does not.
     expect(nameFitsOne(box({ name: "x".repeat(Math.floor(90 / 0.75)) }))).toBe(true);
     expect(nameFitsOne(box({ name: "x".repeat(Math.ceil(90 / 0.65)) }))).toBe(false);
+  });
+
+  it("shrinks a long name to the floor so it keeps its lines, then takes the lines it needs, so it reads whole", () => {
+    const name = "The Black Serpent";
+    // Ten units a line: "The Black" and "Serpent" make two lines; the pill column starts under them.
+    expect(nameRows(box({ name, w: 20 }), 3)).toBe(2);
+    expect(placeholderName(box({ name, w: 20, lines: 2 })).lines).toEqual(["The Black", "Serpent"]);
+    // Six units a line: even at the floor "The Black" does not fit, so three lines hold the whole name, and a short card (two lines at most) cuts it.
+    expect(nameRows(box({ name, w: 16 }), 3)).toBe(3);
+    const three = placeholderName(box({ name, w: 16, lines: 3 }));
+    expect(three.lines).toEqual(["The", "Black", "Serpent"]);
+    expect(three.cut).toBe(false);
+    expect(nameRows(box({ name, w: 16 }), 2)).toBe(2);
+    // A name of one word per line is shrunk to the floor, never below it.
+    expect(placeholderName(box({ name: "Poros Garrison", w: 18, lines: 2 })).scale).toBeGreaterThanOrEqual(NAME_FLOOR);
   });
 });
