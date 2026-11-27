@@ -3,12 +3,9 @@
 import type { EngineStep } from "../../core/intents.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { restricted } from "../../interpret/restrictions.ts";
-import { advanceStage } from "../../quest/quest.ts";
-import { afterProgress } from "../../quest/stage-reveal.ts";
+import { advanceAndReveal } from "../../quest/stage-reveal.ts";
 
 /** The quest advances now, unless a restriction forbids an advance, and the new stage's When Revealed effects resolve. */
 export function advanceNow(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const before = steps.length;
-  return afterProgress(advanceStage(state, ctx.cards, steps, (now) => !restricted(now, ctx, "advance").length), before, ctx, steps);
+  return advanceAndReveal(state, ctx, steps);
 }

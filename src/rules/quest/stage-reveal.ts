@@ -15,6 +15,7 @@ import { unflippedStage } from "../families/quest/order.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { restricted } from "../interpret/restrictions.ts";
+import type { RandomNext } from "../../catalog/random-next.ts";
 import { flagged, inPlay, updateCards, withMode, type ScenarioState } from "../core/state.ts";
 import { areaSeats, stageSeat } from "../families/breaking/areas.ts";
 import { payOwed } from "../families/breaking/progress.ts";
@@ -145,8 +146,17 @@ export function advanceFreed(state: ScenarioState, ctx: ReduceContext, steps: En
   const points = questPointsOf(state, stage, ctx.cards);
   const canAdvance = (current: ScenarioState) => restricted(current, ctx, "advance").length === 0;
   if (points == null || stage.progress < points || !canAdvance(state)) return state;
+  return advanceAndReveal(state, ctx, steps, { canAdvance });
+}
+
+/**
+ * The quest advances to the next stage and what that stage reveals resolves (advanceStage, then afterProgress). An advance a restriction forbids does not happen. `randomSet` stands in for the stage's own random-next set for this advance only.
+ * `canAdvance` replaces the restriction gate (advanceFreed has already checked it for the stage it holds back).
+ */
+export function advanceAndReveal(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[], options?: { canAdvance?: (state: ScenarioState) => boolean; randomSet?: RandomNext }): ScenarioState {
   const before = steps.length;
-  return afterProgress(advanceStage(state, ctx.cards, steps, canAdvance), before, ctx, steps);
+  const canAdvance = options?.canAdvance ?? ((current: ScenarioState) => !restricted(current, ctx, "advance").length);
+  return afterProgress(advanceStage(state, ctx.cards, steps, canAdvance, options?.randomSet), before, ctx, steps);
 }
 
 // A card left play: Responses are offered once its Forced effects have resolved, so their frame goes under the Forced ones

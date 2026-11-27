@@ -23,10 +23,8 @@ import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { lowerCardThreat, makeActive, moveProgress, removeAllProgress, removeProgressEach, removeProgressFromQuest } from "./places.ts";
 import { playerSource, raiseQuestThreat, resetThreat } from "./threat.ts";
-import { advanceStage } from "../../quest/quest.ts";
 import { bottomStage, keepStage, lookedStages, shuffleStages } from "./order.ts";
-import { restricted } from "../../interpret/restrictions.ts";
-import { afterProgress } from "../../quest/stage-reveal.ts";
+import { advanceAndReveal } from "../../quest/stage-reveal.ts";
 import { placeProgressOnQuestCard } from "./quest-card.ts";
 import { announceEliminated } from "./eliminated.ts";
 import { resetSweep } from "./reset.ts";
@@ -71,10 +69,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     }
     case "SkipQuestPhase":
       return withModifier(state, { instanceId: "table", sourceId: focus.sourceId ?? "table", stat: "skipQuestPhase", amount: 1, until: "endOfRound" });
-    case "AdvanceStage": {
-      const before = steps.length;
-      return afterProgress(advanceStage(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length), before, ctx, steps);
-    }
+    case "AdvanceStage":
+      return advanceAndReveal(state, ctx, steps);
     case "RaiseQuestThreat":
       return raiseQuestThreat(state, focus.seat, instruction.amount, ctx, steps);
     case "ResetThreat":
@@ -112,8 +108,7 @@ function lookAtStages(state: ScenarioState, instruction: Verb<"LookAtStages">, f
     const cause = currentCause(steps, UNATTRIBUTED);
     return askTarget(state, { instruction, seat: focus.seat, chosen: null, cause }, looked);
   }
-  const before = steps.length;
-  return afterProgress(advanceStage(instruction.bottom ? bottomStage(state, chosen) : keepStage(state, looked, chosen), ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length), before, ctx, steps);
+  return advanceAndReveal(instruction.bottom ? bottomStage(state, chosen) : keepStage(state, looked, chosen), ctx, steps);
 }
 
 function withModifier(state: ScenarioState, modifier: Modifier): ScenarioState {

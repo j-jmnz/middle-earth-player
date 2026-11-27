@@ -38,14 +38,12 @@ function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: 
   }
 }
 
-const ERECH = "the-stone-of-erech";
-
 export const manifest: RulesFamily = {
   name: "erech",
   verbs: ["PutNightObjective", "PlaceNightProgress", "NightAdvance", "FreeAttachedObjective", "PassHand"],
   run,
-  // Only The Stone of Erech has a Night slot: any other scenario skips the scan of its cards.
-  settle: { sweep: (state, ctx) => (state.scenarioId === ERECH && Object.values(state.cards).some((card) => card.zone === "nightObjective") ? advanceNight(state, ctx) : state) },
+  // Only The Stone of Erech puts a card in the Night slot (PutNightObjective): the sweep does nothing while no card lies there.
+  settle: { sweep: (state, ctx) => (Object.values(state.cards).some((card) => card.zone === "nightObjective") ? advanceNight(state, ctx) : state) },
   condition: (state, condition) => {
     if (condition.kind === "night") return nightHolds(state, condition.is);
     return null;

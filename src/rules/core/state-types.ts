@@ -136,7 +136,7 @@ export type CardInstance = {
   heldExhausted?: true;
   // A card the encounter deck found and Hidden Threat placed facedown under the main quest (families/wizards-quest/hidden.ts, 51241:A:1): it is revealed after the next time the players quest successfully. The number is the order it was placed in.
   hiddenAt?: number;
-  // A card stacked facedown under a card in a stack with an order (The Lonely Mountain's treasures, families/burgle/stack.ts): its place in the stack, 0 for the top. The cards stay out of play under their host.
+  // A card stacked facedown in a stack with an order, 0 for the top: under its host in play (The Lonely Mountain's treasures, families/burgle/stack.ts), or set aside in the underworld deck of The Steward's Fear (families/pelargir/underworld.ts). The cards stay out of play.
   stackedAt?: number;
   // A Captive of The Uruk-hai (families/captives): a hero faceup in the captive zone under To Isengard! or an enemy, in play, controlled by nobody. `owner` is the seat it belongs to, `heroSlot` its place among that seat's heroes.
   captive?: true;
