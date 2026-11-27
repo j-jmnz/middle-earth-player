@@ -124,6 +124,7 @@ export function momentsOf(before: ScenarioState, after: ScenarioState, steps: re
     joined.add(index);
     boarded.set(shipAt, (boarded.get(shipAt) ?? 0) + 1);
   });
+
   // The cards of The Blood of Gondor turned faceup in this intent: an enemy among them engages under its turn line (hiddenLines), not in a beat of its own.
   const hidden = hiddenChanges(before, after, steps, after.questStage != null && after.cards[after.questStage]?.code === "06118", names.typeOf);
   const turnedEngaged = new Set(hidden?.seats.flatMap((entry) => entry.turned.filter((turned) => turned.fate.kind === "engaged").map((turned) => turned.id)) ?? []);

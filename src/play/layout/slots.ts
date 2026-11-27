@@ -1,8 +1,9 @@
 // The pieces the table's layout places cards with (layout.ts, play-area.ts): a card's slot, its footprint in a row, a row's left
 // edges, and the cards peeking out under a host. Pure.
 import { isReanimatedCode } from "../../rules/core/printed.ts";
-import { heldStrip, isExhausted, type CardInstance } from "../../rules/core/state.ts";
+import { isExhausted, type CardInstance } from "../../rules/core/state.ts";
 
+import { heldStrip } from "./held.ts";
 import type { CardSlot, Rect, SlotKind, SlotZone } from "./layout.ts";
 import type { ZoneEntry, ZoneId } from "../store/selectors.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
@@ -99,6 +100,17 @@ export function deepestUnder(entries: readonly ZoneEntry[]): number {
 export function heldDepth(entries: readonly ZoneEntry[]): number {
   return entries.some((entry) => entry.attached.some(heldStrip)) ? deepestUnder(entries) : 0;
 }
+
+// The depth in peeks the staging row hangs below its cards where the table stacks what lies under a card (placeStaging): a card with more than one card under it shows one peek and a count, one with a single card (a held character's strip too) shows it whole.
+export function stackedDepth(entries: readonly ZoneEntry[]): number {
+  return Math.max(0, ...entries.map((entry) => {
+    const under = entry.attached.filter((attached) => !(attached.zone === "shadow" && attached.face !== "down"));
+    return under.length > 1 ? 1 : under.reduce((sum, attached) => sum + peeksOf(attached), 0);
+  }));
+}
+
+/** Whether a card of these entries holds a character under it with a strip (held.ts): the rows then hang deeper than the three peeks cardSize keeps. */
+export const holdsStrip = (entries: readonly ZoneEntry[]): boolean => entries.some((entry) => entry.attached.some(heldStrip));
 
 // One peek under a card of the left column (the quest stage, an active location) that holds cards, with the count when there are several: the last put is the one that shows. `landscape` is a sideways card's (the quest stage).
 export function placeCounted(entry: ZoneEntry, zone: ZoneId, rect: Rect, out: CardSlot[], peek: number, landscape = false): void {

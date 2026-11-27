@@ -222,11 +222,6 @@ export function heldHero(card: CardInstance): boolean {
   return (card.guardedHero === true || card.captive === true) && card.zone === "captive";
 }
 
-/** A faceup character an encounter card holds under it: a guarded hero, or an ally or objective Captive of Cirith Gurat (no place among its owner's heroes). The table draws it a taller strip than an attachment, with its owner (play/layout/slots.ts). */
-export function heldStrip(card: CardInstance): boolean {
-  return card.zone === "captive" && card.host != null && card.face !== "down" && card.prisoner !== true && (card.guardedHero === true || (card.captive === true && card.heroSlot == null));
-}
-
 /** The zones whose cards can hold a Captive: an enemy in the staging area or engaged, a location active or in the staging area. The leaving of such a card is announced (core/zones.ts) and the table draws what it holds under it (play/store/selectors.ts). */
 export function hostsCaptives(zone: ZoneName): boolean {
   return zone === "engaged" || zone === "staging" || zone === "activeLocation" || zone === "secondActiveLocation";
