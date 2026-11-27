@@ -2,6 +2,7 @@
 // the same objects, so a Zustand subscriber of one zone does not render when another zone changes: a threat change leaves
 // the hand slice alone (docs/architecture.md, State). The reducer keeps the references of the zones it did not touch;
 // these selectors only keep that property through the join of ids and instances.
+import { heldCharactersUnder } from "../readouts/haradrim/captured.ts";
 import { guardedUnder, stagedHeroIds } from "../readouts/haradrim/staged.ts";
 import { underAlleyway } from "../readouts/haradrim/umbar.ts";
 import { BLACK_GATE } from "../../rules/families/harad/under.ts";
@@ -240,7 +241,7 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     // beside it, not a card drawn under it.
     const captive = card.zone === "staging" || card.zone === "captive" || card.zone === "activeLocation" ? captiveUnder(game, id) : null;
     // The Captives of The Uruk-hai lie under To Isengard! or the enemy that holds one, wherever that enemy is (staging or engaged): every one of them is drawn (families/captives).
-    const captives = card.zone === "staging" || card.zone === "engaged" || card.zone === "captive" ? (held.length === 0 ? NONE : captivesUnder(game, id, held)) : NONE;
+    const captives = card.zone === "staging" || card.zone === "engaged" || card.zone === "captive" || card.zone === "activeLocation" || card.zone === "secondActiveLocation" ? (held.length === 0 ? NONE : captivesUnder(game, id, held)) : NONE;
     const capturedHere = captured?.get(id) ?? NONE;
     const under = captives.length > 0 ? captives : captive ? [captive] : capturedHere;
     // The enemies grappled with a location are drawn facedown under it, as its attachments are (dcce.grapple).
@@ -395,7 +396,7 @@ export function inspectTargets(game: ScenarioState, cardId: string): readonly st
   const host = (card.host ? game.cards[card.host] : undefined) ?? card;
   // The loot a location guards is faceup (22024:B:2): a card to read with the location's attachments; so is the enemy under Narrow Alleyway (16016:A:1).
   const loot = game.lootDecks ? lootUnder(game, host.id) : NONE;
-  const under = [...host.attachments, ...loot, ...underAlleyway(game, host.id), ...guardedUnder(game, host.id), ...shadowCards(host)].filter((id) => game.cards[id] != null && game.cards[id]?.face !== "down");
+  const under = [...host.attachments, ...loot, ...underAlleyway(game, host.id), ...guardedUnder(game, host.id), ...heldCharactersUnder(game, host.id), ...shadowCards(host)].filter((id) => game.cards[id] != null && game.cards[id]?.face !== "down");
   return [host.id, ...under];
 }
 
