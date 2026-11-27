@@ -13,6 +13,19 @@ Haradrim part 7 (The Black Serpent, `TBS`), standalone only, on Easy and Normal 
 - Stage 1B, 2B and 3B require the first player to claim any unattached Harad objective and attach it to a hero, and cannot be defeated until each Harad objective in play is attached to a hero. Stage 3A attaches a random objective to The Black Serpent.
 - The Black Serpent (17094) cannot leave the staging area or take damage; X is the stage number.
 
+## Table
+
+What the table shows of the pieces this scenario's records create (`docs/agents/agent-brief.md`, Scenario procedure, The Table step). The engine decides each number; no control types damage, resources, threat, progress or life. The test is `src/play/scenarios/the-black-serpent-table.test.ts`; the sentences are in `src/play/words/asks/the-black-serpent.ts`. No widget is new: each piece is drawn by the table code that is on `main`.
+
+- **Harad objectives set aside** (`17106:setup:1`, Setup sets each Harad objective aside, out of play). A set-aside card is in no table zone, so nothing is drawn for it, as for any set-aside card.
+- **An objective in the staging area** (`17091:A:1`, `17108:A:1`, `17102:A:1`). It is a card of the staging zone like any other staged card; a guarded one is followed by its guard (Guarded (X), `GuardObjective`; `src/play/store/selectors.ts`, the staging order).
+- **An objective hung on an encounter card** (`17108:A:1` attaches one to The Black Serpent, `17101:A:3` and `17102:A:2` attach one to a guard). The objective is an attachment of that card and draws under it as the attachments of an encounter card already do (the peek), in the staging area.
+- **An objective held by a hero** (`17091:A:3`, `17092:A:3`, `17093:A:3`, claimed by stages 1B, 2B and 3B). It draws under its hero in every zone the hero can be in, as a held card.
+- **The Black Serpent considered engaged** (`17107:B:2`, flag `engagedWithClaimers`). The card stays in the staging area; the engine reads it as engaged with each player who holds an objective. No engagement marker is drawn, since FAQ 1.50 says such an enemy engages no one; its words in the preview are the printed line.
+- **Don't Let Them Escape! as a side quest** (`17104:A:1`). The encounter side quest lies in the staging area as a card the table already draws; as the current quest it takes the existing side-quest place.
+- **Setup records that create nothing new.** The One Ring's Setup (`141085:setup:1`, the first player claims it) adds a card attached to a hero, which the table already draws; The Crossroads Fort's Setup (`17106:setup:1`) adds The Black Serpent to the staging area and sets the objectives aside, drawn by the existing zones.
+- **The owner on each row of a pick that spans seats.** Each choice is the first player's (No Quarter's reveal, Chaos in the Night, the Redoubt's travel) or the defending or acting player's own; the asks entries name the card, the number and the owner (`src/play/words/asks/the-black-serpent.ts`).
+
 ## Readings
 
 The statuses are those of the Readings bullet of `docs/scenarios/haradrim.md`. Each key is the scan-read ledger line (`data/printed/haradrim.json`), `<code>:<side>:<n>`. Sources read: `hrd.guarded-x`, `hrd.guarded-x-example`, https://lotr-lcg-quest-companion.gamersdungeon.net/haradrim-cycle-quest-the-black-serpent.html (a fan site that restates the empty-deck rule), https://visionofthepalantir.com/2019/12/03/the-black-serpent/.
