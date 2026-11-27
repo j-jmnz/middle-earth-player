@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
+import { moveCard } from "../../../rules/core/zones.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { fightEnemy, finish, idOf, idsOf, legalIntents, resolveRecords, revealedTop, send, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { CODES, DECK_CODES, codeOf, deckCodes, discarded, explored, run, stackOne, stagedCodes, table, underCodes, withDeck } from "../../../../test/scenarios/the-stewards-fear/table.ts";
@@ -54,6 +55,19 @@ describe("06018:A:1 and 06018:A:2 Sewers", () => {
       expect(underCodes(gone, sewers)).toHaveLength(0);
       expect(gone.staging.map((id) => gone.cards[id]?.code)).toContain(under[0]);
     }
+  });
+});
+
+describe("ats.underworld the reveal of a stacked card", () => {
+  it("06018:A:1 the reveal step of a card released from under a location that left play cites ats.underworld, not the staging step", () => {
+    const t = withDeck({ active: CODES.sewers });
+    const sewers = idOf(t.state, CODES.sewers);
+    const stacked = stackOne(t, t.state, sewers);
+    const steps: EngineStep[] = [];
+    settle({ ...moveCard(stacked, sewers, { zone: "encounterDiscard" }), window: null }, t.ctx, steps);
+    const reveals = steps.filter((step): step is Extract<EngineStep, { kind: "reveal" }> => step.kind === "reveal");
+    expect(reveals).toHaveLength(1);
+    expect(reveals[0]?.cause).toEqual({ rule: "ats.underworld" });
   });
 });
 

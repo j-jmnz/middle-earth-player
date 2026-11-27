@@ -157,7 +157,7 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       next = updateCard(next, id, { face: turnedUp(next, id), controller: seat });
       // A guard is attached to its objective as it is placed (rr.guarded); the objective may have left play since.
       if (frame.data.guards && next.cards[frame.data.guards] && inPlay(next.cards[frame.data.guards]?.zone ?? "removed")) next = updateCard(attachTo(next, id, frame.data.guards), id, { guard: true });
-      steps.push({ kind: "reveal", seat, cardId: id, cause: currentCause(steps, ruleCause("mec109.saga-staging-rules")) });
+      steps.push({ kind: "reveal", seat, cardId: id, cause: currentCause(steps, frame.data.cause ?? ruleCause("mec109.saga-staging-rules")) });
       if (printed.keywords.peril) next = { ...next, perilSeat: seat };
       // The families that note a reveal (the first treachery of the round, families/wilderland/rounds.ts) hear it before the card's own effects.
       next = familyRevealed(next, id, ctx);
