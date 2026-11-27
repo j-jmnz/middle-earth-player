@@ -31,6 +31,10 @@ const ROWS: readonly Row[] = [
   // 17091 Banner of the Serpent.
   { line: "17091:A:3", name: "Action: each Harad enemy engaged with you gets -1 Attack until the end of the phase", layout: { engaged: [GUARD], staging: [BANNER] }, act: [CLAIM, resolve(BANNER, "action")], expect: stat(GUARD, "attack", 2) },
 
+  { line: "17091:A:1", name: "Guarded (enemy or location): the first enemy or location discarded guards it", layout: { staging: [BANNER], deck: ["treachery", "place", "f0"] }, act: resolve(BANNER, "whenRevealed"), expect: [attachedTo("place", BANNER), zone("treachery", "encounterDiscard"), deckCount(1)] },
+  { line: "17091:A:2", name: "While attached to an encounter card that guards it in the staging area: each Harad enemy gets +1 Attack", layout: { staging: [BANNER, GUARD], deck: ["f0"] }, act: resolve(BANNER, "whenRevealed"), expect: stat(GUARD, "attack", 4) },
+  { line: "17091:A:2", name: "While attached to an encounter card it hangs on in the staging area: each Harad enemy gets +1 Attack", layout: { staging: [GUARD, "place"], attached: [HUNG_ON(BANNER, "place")] }, act: [], expect: stat(GUARD, "attack", 4) },
+
   // 17092 The Serpent's Garb.
   { line: "17092:A:1", name: "Guarded (enemy): the first enemy discarded guards it, a location discarded before it is not a guard", layout: { staging: [GARB], deck: ["place", "f0", "f3"] }, act: resolve(GARB, "whenRevealed"), expect: [attachedTo("f0", GARB), zone("place", "encounterDiscard"), deckCount(1)] },
   { line: "17092:A:2", name: "While attached to an encounter card that guards it in the staging area: +2 Threat and immune to player card effects", layout: { staging: [GARB], deck: ["f0"] }, act: resolve(GARB, "whenRevealed"), expect: [stat("f0", "threat", 2), flag("f0", "immuneToPlayerCards")] },
@@ -80,6 +84,10 @@ const ROWS: readonly Row[] = [
   // 17102 No Quarter. The When Revealed line is in black-serpent.test.ts (RevealDetached).
   { line: "17102:A:2", name: "Shadow: if the attack destroys a character, a Harad objective the defender controls is attached to a non-unique encounter card in the staging area (never a player card there)", layout: { attached: [ON_HERO(BANNER)], staging: ["attachment", "f3"], play: [{ code: "ally", damage: 1 }] }, act: [attack(GUARD, { shadow: "17102" }), defend("ally")], expect: [attachedTo("f3", BANNER), zone("ally", "discard")] },
 
+  // 17102 No Quarter, When Revealed (RevealDetached is also in black-serpent.test.ts, src/rules/families/haradrim).
+  { line: "17102:A:1", name: "When Revealed: the first player reveals 2 encounter cards (no Harad objective is on a hero, so the other option is not offered)", layout: { stage: STAGE_2, deck: ["17102", "f0", "f3"] }, act: reveal("17102"), expect: [zone("f0", "staging"), zone("f3", "staging")] },
+  { line: "17102:A:1", name: "When Revealed: or a Harad objective is detached from a hero, revealed (its Guarded resolves) and added to the staging area", layout: { stage: STAGE_2, deck: ["17102", "f0", "f3"], attached: [ON_HERO(BANNER)] }, act: [reveal("17102"), answer("detach")], expect: [zone(BANNER, "staging"), attachedTo("f0", BANNER), deckCount(1)] },
+
   // 17103 Chaos in the Night.
   { line: "17103:A:1", name: "When Revealed: the first player raises each player's threat by 3", layout: { deck: ["17103", "f0"] }, act: [reveal("17103"), answer("threat")], expect: [threat(31), flag("table", "noQuestProgress", false)] },
   { line: "17103:A:1", name: "When Revealed: or progress cannot be placed on quest cards (the main quest, current or not) until the end of the round", layout: { deck: ["17103", "f0"] }, act: [reveal("17103"), answer("noProgress")], expect: [flag("table", "noQuestProgress"), flag("table", "noMainQuestProgress"), threat(28)] },
@@ -90,12 +98,21 @@ const ROWS: readonly Row[] = [
   { line: "17104:A:1", name: "Forced at the end of the round: all progress comes off the main quest while it lies in the staging area", layout: { progress: 3, staging: [SIDE_QUEST] }, act: announce("endOfRound"), expect: progressOn(STAGE_1, 0) },
   { line: "17104:A:2", name: "Forced after it becomes the current quest: an encounter card is revealed", layout: { staging: [SIDE_QUEST], deck: ["f0", "f3"] }, act: announce("becameCurrentQuest", SIDE_QUEST), expect: [zone("f0", "staging"), deckCount(1)] },
 
+  // 17106 The Crossroads Fort.
+  { line: "17106:A:1", name: "Setup: the first player reveals a random set aside Harad objective and adds it to the staging area, its Guarded (location) resolves", layout: { side: "A", setAside: [SUMMONS], staging: [SERPENT], deck: ["f0", "place", "f3"] }, act: resolve(STAGE_1, "setup"), expect: [zone(SUMMONS, "staging"), attachedTo("place", SUMMONS), zone("f0", "encounterDiscard")] },
+  { line: "17106:A:1", name: "Setup: with no card of its type in the deck or the discard pile the objective is unguarded, so the stage claims it for a hero", layout: { side: "A", setAside: [SUMMONS], staging: [SERPENT], deck: ["f0"] }, act: resolve(STAGE_1, "setup"), expect: [attachedTo(SUMMONS, "dh1"), deckCount(1)] },
+  { line: "17106:B:1", name: "A Harad objective that is not attached is claimed by the first player and attached to a hero he controls", layout: { staging: [BANNER] }, act: CLAIM, expect: attachedTo(BANNER, "dh1") },
+  { line: "17106:B:2", name: "The stage cannot be defeated while a Harad objective hangs on an encounter card", layout: { progress: 6, staging: ["place"], attached: [HUNG_ON(SUMMONS, "place")] }, act: quest("success"), expect: [zone(STAGE_1, "questStage"), zone(STAGE_2, "questDeck")] },
+
   // 17107 Battle in the Camp.
   { line: "17107:A:1", name: "When Revealed: the discard pile is shuffled into the deck and the first player reveals a random set aside Harad objective", layout: { stage: STAGE_2, side: "A", setAside: [BANNER], discard: ["f3"], deck: ["f0"] }, act: resolve(STAGE_2, "whenRevealed"), expect: [zone(BANNER, "staging"), deckCount(1)] },
   { line: "17107:B:1", name: "A Harad objective that is not attached is claimed by the first player and attached to a hero he controls", layout: { stage: STAGE_2, staging: [BANNER] }, act: CLAIM, expect: attachedTo(BANNER, "dh1") },
+  { line: "17107:B:2", name: "The Black Serpent is considered engaged with each player who controls a Harad objective and adds no Threat to the staging area", layout: { stage: STAGE_2, staging: [SERPENT, BANNER] }, act: CLAIM, expect: [flag(SERPENT, "engagedWithClaimers"), flag(SERPENT, "noThreatContribution")] },
   { line: "17107:B:3", name: "The stage cannot be defeated while a Harad objective hangs on an encounter card", layout: { stage: STAGE_2, progress: 6, staging: ["place"], attached: [HUNG_ON(SUMMONS, "place")] }, act: quest("success"), expect: [zone(STAGE_2, "questStage"), zone(STAGE_3, "questDeck")] },
 
   // 17108 Defeat the Serpent.
+  { line: "17108:A:1", name: "When Revealed: a random set aside Harad objective is attached to The Black Serpent (not revealed), the discard pile is shuffled in and each player reveals 1 encounter card", layout: { stage: STAGE_3, side: "A", setAside: [SUMMONS], staging: [SERPENT], discard: ["f0"], deck: ["f3"] }, act: resolve(STAGE_3, "whenRevealed"), expect: [attachedTo(SUMMONS, SERPENT), deckCount(1)] },
+  { line: "17108:B:2", name: "With 6 progress on the stage The Black Serpent loses its first sentence", layout: { stage: STAGE_3, progress: 6, staging: [SERPENT] }, act: [], expect: [flag(SERPENT, "losesNoDamage"), flag(SERPENT, "losesCannotLeaveStaging")] },
   { line: "17108:B:1", name: "A Harad objective that is not attached is claimed by the first player and attached to a hero he controls", layout: { stage: STAGE_3, staging: [GARB] }, act: CLAIM, expect: attachedTo(GARB, "dh1") },
   { line: "17108:B:3", name: "The stage cannot be defeated while the objective hangs on The Black Serpent in the staging area", layout: { stage: STAGE_3, progress: 5, staging: [SERPENT], attached: [HUNG_ON(SUMMONS, SERPENT)] }, act: quest("success"), expect: [notWon, progressOn(STAGE_3, 6)] },
 ];

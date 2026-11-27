@@ -96,7 +96,7 @@ describe("17091:A:3 17092:A:3 17093:A:3 the Action of a Harad objective is used 
 });
 
 describe("17093:A:2 while attached to an encounter card no player's threat can be reduced", () => {
-  it("holds while an encounter card guards the objective in the staging area, and stops when a hero holds it", () => {
+  it("17093:A:2 holds while an encounter card guards the objective in the staging area, and stops when a hero holds it", () => {
     const made = table({ staging: [SUMMONS, "place"] });
     const guarded = opened(made, guardWith(made.state, idOf(made.state, "place"), idOf(made.state, SUMMONS))).state;
     expect(flagged(guarded, "seat:0", "threatReductionBarred")).toBe(true);
@@ -106,8 +106,8 @@ describe("17093:A:2 while attached to an encounter card no player's threat can b
 });
 
 describe("17106:B:2 17107:B:3 17108:B:3 the stage cannot be defeated while a Harad objective in play is not on a hero", () => {
-  for (const stage of [STAGE_1, STAGE_2, STAGE_3]) {
-    it(`${stage} #in-play: an objective guarded in the staging area bars the stage, one on a hero does not`, () => {
+  for (const [stage, line] of [[STAGE_1, "17106:B:2"], [STAGE_2, "17107:B:3"], [STAGE_3, "17108:B:3"]] as const) {
+    it(`${line} #in-play (${stage}): an objective guarded in the staging area bars the stage, one on a hero does not`, () => {
       const made = table({ stage, staging: [SUMMONS, "place"] });
       const guarded = opened(made, guardWith(made.state, idOf(made.state, "place"), idOf(made.state, SUMMONS)));
       expect(restricted(guarded.state, made.ctx, "advance")).not.toHaveLength(0);
