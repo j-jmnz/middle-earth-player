@@ -16,7 +16,11 @@ import { contentType, resolveFile } from "../../desktop/serve.ts";
 import type { Log } from "../log.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
-export const EXPORT_DIR = path.join(tmpdir(), "middle-earth-player-web-export");
+/** The export folder of one checkout: its name holds a hash of the repo root, so two checkouts never share an export. */
+export function exportDirFor(root: string): string {
+  return path.join(tmpdir(), `middle-earth-player-web-export-${createHash("sha256").update(root).digest("hex").slice(0, 10)}`);
+}
+export const EXPORT_DIR = exportDirFor(ROOT);
 const STAMP = ".inputs-stamp";
 
 // What the web bundle is built from. Folders are walked; a missing entry is skipped.
