@@ -3,7 +3,8 @@
 // wears the play mark. The other pieces of a card are canvas/pieces.native.tsx.
 import { Circle, DashPathEffect, Group, Image, Path, RoundedRect, Text, type SkImage, vec } from "@shopify/react-native-skia";
 
-import { Back, LINE, Outlined, PICTURE_SAMPLING, shadowOf, stripOf, type BackImages, type Fonts } from "./pieces.native.tsx";
+import { NAME_LINE } from "./badge-room.ts";
+import { Back, Outlined, PICTURE_SAMPLING, shadowOf, stripOf, type BackImages, type Fonts } from "./pieces.native.tsx";
 import { cardCorner } from "../../ui/card-corner.ts";
 import type { CardSlot } from "../layout/layout.ts";
 import { FOLD_WORD, foldCount } from "../layout/row-fold.ts";
@@ -159,7 +160,7 @@ export function Pile({
           <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={t.raised} />
           <Group clip={{ x: x + 3 * s, y: y + 3 * s, width: w - 6 * s, height: h - 21 * s }}>
             {wrapName(name, w - 10 * s, (text) => fonts.names.getTextWidth(text)).map((line, index) => (
-              <Text key={index} x={x + 5 * s} y={y + (15 + index * LINE) * s} text={line} font={fonts.names} color={t.bone} />
+              <Text key={index} x={x + 5 * s} y={y + (15 + index * NAME_LINE) * s} text={line} font={fonts.names} color={t.bone} />
             ))}
           </Group>
         </Group>

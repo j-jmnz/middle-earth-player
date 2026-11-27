@@ -13,7 +13,7 @@ import { PEEK, type CardSlot, type Rect } from "../layout/layout.ts";
 import { medallionAt } from "../layout/look-strip.ts";
 import { medallionCount } from "../words/scenarios/sea.ts";
 import { progressInStrip as progressInStripOf, stripCenterX, stripText } from "./table-canvas-views.ts";
-import { badgeLayout, badgeShown, type CoveredBand, footPillSpan, lonePick, loneRow, pillFits } from "./badge-room.ts";
+import { badgeLayout, badgeShown, type CoveredBand, footPillSpan, lonePick, loneRow, NAME_LINE, pillFits } from "./badge-room.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { placeholderName } from "./placeholder-name.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
@@ -23,7 +23,6 @@ import { fit } from "./wrap.ts";
 // hands down as a prop beside the tokens `t`: a piece does not read the scale itself. A card's corner is the card screen's share of its
 // shorter side (`cardCorner`, user request, 2026-10-29); `RADIUS` is left for the shapes that are not cards (a drop zone's outline).
 export const RADIUS = 6;
-export const LINE = 14;
 export const BADGE_H = 15;
 // A card picture is drawn at sizes other than its copy's (a hand card at rest is smaller than the scrub's lifted copy; a card moving
 // grows and shrinks): linear filtering between mipmap levels, so it neither aliases when smaller nor blocks when larger.
@@ -190,7 +189,7 @@ export function CardBody({
             {/* A card its guard lies over (`shown`) names itself smaller, in the part the guard leaves bare. */}
             <Group transform={[{ translateX: x + 5 * s }, { translateY: y + 15 * s }, { scale: placed?.scale ?? bare }]}>
               {(placed?.lines ?? []).map((line, index) => (
-                <Text key={index} x={index === 0 ? (placed?.indent ?? 0) : 0} y={index * LINE * s} text={line} font={fonts.names} color={t.bone} />
+                <Text key={index} x={index === 0 ? (placed?.indent ?? 0) : 0} y={index * NAME_LINE * s} text={line} font={fonts.names} color={t.bone} />
               ))}
             </Group>
           </Group>

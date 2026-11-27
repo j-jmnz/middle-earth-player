@@ -177,7 +177,7 @@ function words(step: EngineStep, names: LogNames, questStat: string | null): str
     case "unconscious":
       return unconsciousLine(names.card(step.targetId), step.ready === true);
     case "discardedRandom":
-      return discardedRandomWords(names.card(step.cardId), step.seat, 2);
+      return discardedRandomWords(names.card(step.cardId), player(step.seat));
     case "resetEncounterDeck":
       return `The encounter discard pile (${step.count}) is shuffled into the encounter deck`;
     case "reshuffleDeck":
