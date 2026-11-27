@@ -21,7 +21,7 @@ type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name 
 const byId = (left: string, right: string): number => left.localeCompare(right, undefined, { numeric: true });
 
 /** The ids set aside that belong to the encounter set, in id order (a boon or burden of the campaign is no card of the set). */
-function asideOf(state: ScenarioState, set: string, ctx: ReduceContext): string[] {
+export function asideOf(state: ScenarioState, set: string, ctx: ReduceContext): string[] {
   return state.setAside.filter((id) => {
     const printed = printedOf(ctx.cards, state.cards[id]?.code ?? "");
     return printed.encounterSet === set && printed.campaignKind == null;

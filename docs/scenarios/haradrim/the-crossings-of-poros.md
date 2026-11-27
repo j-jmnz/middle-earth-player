@@ -14,6 +14,17 @@ Haradrim part 9 (The Crossings of Poros, `CoP`), standalone only, on Easy and No
 - Danger Close Behind, Desolate Land and Harondor Waste choose a random card from the set aside set with the most cards remaining and reveal or place it.
 - Southron Outrider, Uruk Prowler and Desert Warg place a random enemy of a set aside set into the encounter discard pile.
 
+## Table
+
+What the table shows of the pieces this scenario's records create (`docs/agents/agent-brief.md`, Scenario procedure, The Table step). The engine decides each number; no control types damage, resources, threat, progress or life. The test is `src/play/scenarios/the-crossings-of-poros-table.test.ts`; the sentences are in `src/play/words/scenarios/haradrim/poros-table.ts`, the readouts in `src/play/readouts/haradrim/poros.ts` (`porosDials`, `porosHands`).
+
+- **The set aside sets** (`17157:A:1`, `17150:A:2`, `17151:A:1`, `17158:A:1`, `17159:A:1`). The cards the verbs `RandomSetAside` and `ShuffleSetAsideSet` count lie in the set-aside zone, which no screen draws, and three cards read "the set with the most cards remaining". A top-bar dial "Aside" shows the most cards left in one set; its panel lists the five sets with the cards each still holds, the leader marked "(most)", and its note names every tied set and says the first player chooses on a tie. A set removed from the game shows 0 cards left. The count is the engine's own (`asideOf`).
+- **The stage path** (`17157:B:2`, `17158:B:2`, `17159:B:2`, `17160:A:1` to `17162:A:1`). The stage 2 and stage 3 cards are drawn at random and the others leave the game, so a dial "Path" shows the stage in play out of 4 (an accent ring, as a goal), and its panel lists the stage 2 and stage 3 cards as in play, played, removed or not chosen yet (`removedStage`, the quest deck).
+- **Poros Garrison** (`17145:A:1`, `17145:A:4`). A top-bar dial "Garrison" shows its damage against its hit points and warms near them, the form of Erech's Derufin dial; its limit words and note say that the players lose when it leaves play. A tap shows the card. The seat that controls it (the first player) wears the mark "Garrison" ("P1 · Garrison" two-handed) with the same loss line.
+- **The Black Serpent** (`17146:A:1`). It lies in the staging area, so the existing staging row draws it, and its preview says its Threat, Attack and Defense now (`serpentDetail`, read from the `neverEngaged` flag, the same line as in The Black Serpent). It is never considered engaged here: there is no objective to claim, so no chip shows.
+- **Setup records.** The One Ring's Setup (`141085:setup:1`) adds a card attached to a hero, which the table already draws. Stage 1A's Setup (`17157:setup:1`) sets the sets aside (the "Aside" dial), adds The Black Serpent to the staging area and has each other player reveal an encounter card, which the staging area draws.
+- **The owner on each row of a pick that spans seats.** The picks are the first player's (Uruk Prowler, Desert Warg, Battle at the Crossings, the Chieftain's tied players) or the player's own (Southron Outrider, the ally played under stages 2B, Deadly Creatures); the asks entries name the card, the number and the player (`src/play/words/asks/the-crossings-of-poros.ts`).
+
 ## Readings
 
 The statuses are those of the Readings bullet of `docs/scenarios/haradrim.md`. Each key is the scan-read ledger line (`data/printed/haradrim.json`), `<code>:<side>:<n>`. Sources read: `hrd.multiple-encounter-sets`, `hrd.removed-from-the-game`, `hrd.encounter-keyword`; no forum thread settles the points below.

@@ -10,7 +10,9 @@ import { AUTHORED_EFFECTS as BLACK_SERPENT } from "./the-black-serpent.ts";
 type Instruction = Effect["instructions"][number];
 type Option = Extract<Instruction, { verb: "Choose" }>["options"][number];
 
-const SETS = ["Mountains of Shadow", "Desert Sands", "Desert Creatures", "Harad Soldiers", "Mordor Orcs"];
+/** The encounter sets 17157:A:1 sets aside, which the table counts (src/play/readouts/haradrim/poros.ts). */
+export const ASIDE_SETS = ["Mountains of Shadow", "Desert Sands", "Desert Creatures", "Harad Soldiers", "Mordor Orcs"] as const;
+const SETS: string[] = [...ASIDE_SETS];
 const IN_STAGING: Condition = { kind: "sourceIn", zone: "staging" };
 const PHASE_PLANNING: Condition = { kind: "phase", is: "Planning" };
 const PHASE_COMBAT: Condition = { kind: "phase", is: "Combat" };
