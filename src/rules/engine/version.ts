@@ -204,9 +204,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 56, scenarios: "all", note: "Helm of Secrecy offers only a hero it can change: one with tokens to discard or a hero of the collection to swap in. Déorwine's Action is offered for a shadow card dealt face up too. An attachment an effect puts into play with no host filter and no Attach to line can go on a character of any player." },
   { version: 57, scenarios: ["the-stewards-fear", "the-battle-of-carn-dum", "journey-up-the-anduin", "roam-across-rhovanion", "the-fate-of-wilderland", "the-ghost-of-framsburg", "attack-on-dol-guldur", "the-mines-of-moria"], note: "A card that says \"After an event is played\" (Telemnar's Bane, Werewolf of Angmar, Lonely Lands, Cursed Tower, The Shadow Road, Ancient Guardroom) resolves once the event's own effects are done and the event lies in the discard pile, not before them." },
   { version: 58, scenarios: ["journey-to-the-cross-roads", "mount-doom", "the-passage-of-the-marshes", "the-battle-of-carn-dum", "the-uruk-hai", "the-black-gate-opens", "the-dead-marshes", "the-hunt-for-the-dreadnaught", "the-wizards-quest", "the-morgul-vale", "the-road-to-isengard", "shelobs-lair", "the-lonely-mountain", "the-battle-of-five-armies", "the-black-serpent"], note: "An enemy that cannot leave the staging area is no longer offered for optional engagement, since the engagement would be refused. It is offered again once it loses that bar." },
+  { version: 59, scenarios: "all", note: "A Response event is announced as played, and every played event is announced as done on each way it can end: canceled, with no Action to run, going on into an attack, or returning to its hand. Cards that hear \"When an event is played\" or \"After an event is played\" now hear a Response event, an attack event and an event that returns to its hand." },
 ];
 
-export const ENGINE_VERSION = 58;
+export const ENGINE_VERSION = 59;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

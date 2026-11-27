@@ -18,6 +18,7 @@ import { afterProgress } from "../../quest/stage-reveal.ts";
 import type { Modifier, ScenarioState } from "../../core/state.ts";
 import { inPlay, livingSeats } from "../../core/state.ts";
 import { patchTop } from "../../windows/windows.ts";
+import { announceEventResolved } from "../../windows/queue.ts";
 import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
 import type { Focus } from "../index.ts";
 import { runEncounterItem } from "./items.ts";
@@ -144,7 +145,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       const data = effectData(state);
       if (data?.finish !== "discardSource") return state;
       const { finish: _discard, ...kept } = data;
-      return patchTop(state, { data: kept });
+      const held = patchTop(state, { data: kept });
+      // The event is done though it stays in the hand: its After records hear it (windows/queue.ts, announceEventResolved).
+      const id = focus.sourceId;
+      return data.announceResolved && id ? announceEventResolved(held, data.actor, id) : held;
     }
     default:
       return null;

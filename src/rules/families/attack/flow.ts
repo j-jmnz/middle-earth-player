@@ -10,7 +10,7 @@ import type { Modifier } from "../../windows/frame-types.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { queueEvent } from "../../windows/queue.ts";
+import { announceEventResolved, queueEvent } from "../../windows/queue.ts";
 import { heard, strikeWaits } from "./events.ts";
 import type { PendingStrike, ScenarioState, Window } from "../../core/state.ts";
 import { pushFrame } from "../../windows/windows.ts";
@@ -110,7 +110,8 @@ export function discardPlayedEvent(state: ScenarioState, frameId: string | undef
   if (card?.zone !== "hand" || card.controller == null) return state;
   const { finish: _done, ...data } = frame.data;
   const moved = moveCard(state, frame.cardId, { zone: "discard", seat: card.controller });
-  return { ...moved, stack: moved.stack.map((entry, at) => (at === index ? { ...entry, data } : entry)) };
+  const announced = frame.data.announceResolved ? announceEventResolved(moved, frame.data.actor, frame.cardId) : moved;
+  return { ...announced, stack: announced.stack.map((entry, at) => (at === index ? { ...entry, data } : entry)) };
 }
 
 // What the instructions after DeclareAttack act on: the attacker, as the last picked card.

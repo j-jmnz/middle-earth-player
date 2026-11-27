@@ -30,7 +30,7 @@ import { offerResponses } from "../windows/responses.ts";
 import { holdsNow } from "./verbs.ts";
 import { releaseLooks } from "../families/encounter/looked.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "../windows/windows.ts";
-import { queueEvent } from "../windows/queue.ts";
+import { announceEventResolved } from "../windows/queue.ts";
 import { dealOut } from "../families/breaking/deal.ts";
 import { moveCard } from "../core/zones.ts";
 import { chooseAmount } from "../families/defense/index.ts";
@@ -204,7 +204,7 @@ function finishEvent(state: ScenarioState, frame: Frame, data: EffectData): Scen
   if (data.finish !== "discardSource" || !id || !instance || instance.zone !== "hand" || instance.controller == null) return state;
   const discarded = moveCard(state, id, { zone: "discard", seat: instance.controller });
   // "After an event is played" resolves now, with the event done (families/play/hooks.ts, triggerHears).
-  return data.announceResolved ? queueEvent(discarded, { trigger: "eventResolved", seat: data.actor, cardId: id }) : discarded;
+  return data.announceResolved ? announceEventResolved(discarded, data.actor, id) : discarded;
 }
 
 // An Action used in a window gives that window back once its frame is done.

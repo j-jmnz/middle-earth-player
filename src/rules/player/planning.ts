@@ -26,7 +26,7 @@ import { enterStaging, inPlayLimitReason } from "../families/sidequests/play.ts"
 import type { EngineStep, PlayerIntent } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { eventActionReason } from "./potential.ts";
-import { queueEvent } from "../windows/queue.ts";
+import { announceEventResolved, queueEvent } from "../windows/queue.ts";
 import { playerCardEffectCanChoose, raiseThreat, uniqueBlocked } from "../core/keywords.ts";
 import { planningTurn } from "../windows/pass.ts";
 import { hasResourceMatch, heroPays } from "./payments.ts";
@@ -116,7 +116,7 @@ function runningActions(state: ScenarioState, cardId: string, seat: number, ctx:
 function playEvent(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext, steps: EngineStep[], x?: number): ScenarioState {
   const running = runningActions(state, cardId, seat, ctx);
   const first = running[0];
-  if (!first) return queueEvent(moveCard(state, cardId, { zone: "discard", seat }), { trigger: "eventResolved", seat, cardId });
+  if (!first) return announceEventResolved(moveCard(state, cardId, { zone: "discard", seat }), seat, cardId);
   // Two Actions on different lines (an Action and a Valour Action): the player uses one (families/deck/play.ts).
   const choice = alternativeActions(running);
   const framed = pushEffectFrame(

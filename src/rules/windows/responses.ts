@@ -17,6 +17,7 @@ import type { GameEvent, ResponseOffer, ScenarioState } from "../core/state.ts";
 import { inPlay, livingSeats, perilLock } from "../core/state.ts";
 import { hostLostToCost, payUsage, offerable, usable, usageReason } from "../player/usage.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
+import { queueEvent } from "./queue.ts";
 import { announceAbility, announcePlayerAbility } from "../families/deck/pressure.ts";
 import { isPlayerCardEffect } from "../core/keywords.ts";
 import { guardianSeat } from "../families/guardian/seats.ts";
@@ -195,8 +196,10 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
   const left = frame.data.offers.filter((offer) => !(offer.cardId === intent.cardId && offer.effectId === intent.effectId && (offer.event ?? opened) === event));
   // The seat answering pays: its threat for a raiseThreat cost, its deck for discardDeckTop, its use of a per-player limit.
   const paid = payUsage(patchTop(state, { data: { ...frame.data, offers: left } }), effect, intent.cardId, intent.payments ?? [], ctx, steps, seat);
+  // A Response event is played like an Action event: its card hears "When an event is played" first (planning.ts, playEvent).
+  const heard = costOfKind(effect, "playEvent") ? queueEvent(paid, { trigger: "played", seat, cardId: intent.cardId }) : paid;
   const framed = pushEffectFrame(
-    { ...paid, window: null },
+    { ...heard, window: null },
     {
       frame: "ResolveEffect",
       sourceId: intent.cardId,
@@ -218,7 +221,7 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
       ...(event.trigger !== "damageDealt" && event.amount != null ? { x: event.amount } : {}),
       // "For each point of damage he just suffered": the damage a damaged event reports.
       ...((event.trigger === "damaged" || event.trigger === "damagedByAttack") && event.amount != null ? { dealt: event.amount } : {}),
-      ...(costOfKind(effect, "playEvent") ? { finish: "discardSource" as const } : {}),
+      ...(costOfKind(effect, "playEvent") ? { finish: "discardSource" as const, announceResolved: true as const } : {}),
     },
     steps,
   );
