@@ -86,9 +86,14 @@ describe("the choice words", () => {
     expect(asked({ staging: [{ code: "17079", resources: 1 }] }, "17079:forced:1", 1)("location")?.label).toBe("Return the topmost location in the encounter discard pile to the staging area");
   });
 
-  it("17079:A:1 asks for a second tap when the raise takes the player who chooses to 50", () => {
-    expect(asked({ staging: [{ code: "17079", resources: 2 }], threat: [48, 28] }, "17079:forced:1", 1)("threat")?.caution).toBe("Tap again: Player 1 reaches 50 and is eliminated. If no player is left, the game is lost");
-    expect(asked({ staging: [{ code: "17079", resources: 2 }], threat: [47, 28] }, "17079:forced:1", 1)("threat")?.caution).toBeUndefined();
+  it("17079:A:1 asks for a second tap when the raise takes a player to 50, and names each player it takes", () => {
+    const threat = (resources: number, threats: number[], seats = threats.length) => asked({ seats, staging: [{ code: "17079", resources }], threat: threats }, "17079:forced:1", 1)("threat")?.caution;
+    expect(threat(2, [48])).toBe("Tap again: this takes your threat to 50 and eliminates you. If you are the last player, the game is lost");
+    expect(threat(2, [47])).toBeUndefined();
+    expect(threat(2, [48, 28])).toBe("Tap again: this takes Player 1's threat to 50 and eliminates Player 1. The game is lost when no other player is left");
+    expect(threat(2, [28, 48])).toBe("Tap again: this takes Player 2's threat to 50 and eliminates Player 2. The game is lost when no other player is left");
+    expect(threat(2, [48, 49])).toBe("Tap again: this takes Player 1's and Player 2's threat to 50 and eliminates both. The game is lost");
+    expect(threat(2, [47, 47])).toBeUndefined();
   });
 
   it("17073:A:1 says what the flip does now: it flips from On Track, or changes nothing when Off Track is up or Lost Underground blocks it", () => {
