@@ -10,8 +10,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { pickedList } from "../../interpret/player-verbs.ts";
 import { printedOf } from "../../core/printed.ts";
 import { inPlay, updateCard, type ScenarioState } from "../../core/state.ts";
-import { moveCard } from "../../core/zones.ts";
-import { releaseCaptive } from "../captives/index.ts";
+import { discardHeld, releaseCaptive } from "../captives/index.ts";
 import { captureHero, heldFrom } from "../south/captive.ts";
 
 /** The hero the enemy guards, or null: the guarded hero lying under it, whether or not the enemy is still in play. */
@@ -41,7 +40,7 @@ export function releaseGuardedHero(state: ScenarioState, subject: string | null)
   if (!heroId || !hero || hero.owner == null) return state;
   const seat = hero.owner;
   // An eliminated owner has left the game (rr.player-elimination): the hero goes to its discard pile instead of back among no one's heroes.
-  if (state.seats[seat]?.eliminated) return updateCard(moveCard(state, heroId, { zone: "discard", seat }), heroId, { face: "up", guardedHero: undefined, owner: undefined, heroSlot: undefined });
+  if (state.seats[seat]?.eliminated) return discardHeld(state, heroId, seat);
   return releaseCaptive(state, heroId, { exhausted: true });
 }
 
@@ -50,7 +49,7 @@ export function discardGuardedHeroes(state: ScenarioState, steps: EngineStep[]):
   let next = state;
   for (const card of Object.values(state.cards)) {
     if (card.guardedHero !== true || card.zone !== "captive" || card.owner == null) continue;
-    next = updateCard(moveCard(next, card.id, { zone: "discard", seat: card.owner }), card.id, { face: "up", guardedHero: undefined, owner: undefined, heroSlot: undefined });
+    next = discardHeld(next, card.id, card.owner);
   }
   return next === state ? state : eliminateEmpties(next, steps);
 }
@@ -69,7 +68,7 @@ export function discardHeldHero(state: ScenarioState, stage: number, steps: Engi
   const shuffled = shuffleIds(held, state.seed, state.seedCursor);
   const chosen = state.cards[shuffled.ids[0] ?? ""];
   if (!chosen || chosen.owner == null) return state;
-  const moved = updateCard(moveCard({ ...state, seedCursor: shuffled.cursor }, chosen.id, { zone: "discard", seat: chosen.owner }), chosen.id, { face: "up", guardedHero: undefined, owner: undefined, heroSlot: undefined });
+  const moved = discardHeld({ ...state, seedCursor: shuffled.cursor }, chosen.id, chosen.owner);
   return eliminateEmpties(moved, steps);
 }
 
@@ -81,7 +80,7 @@ export function returnHeldHeroes(state: ScenarioState, stage: number): ScenarioS
     if (!hero || hero.owner == null) continue;
     const seat = hero.owner;
     if (next.seats[seat]?.eliminated) {
-      next = updateCard(moveCard(next, id, { zone: "discard", seat }), id, { face: "up", guardedHero: undefined, owner: undefined, heroSlot: undefined });
+      next = discardHeld(next, id, seat);
       continue;
     }
     next = releaseCaptive(next, id, { exhausted: true });

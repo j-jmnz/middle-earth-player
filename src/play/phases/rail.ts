@@ -79,8 +79,10 @@ export function railFor(game: ScenarioState): Rail {
   // An additional instance of a phase (Send for Help (Spirit), 11213:A:2) is owed: it runs next, and once the last one is running the round goes on at the phase it was added to.
   const extraNext = game.extraPhases?.[0] ?? (game.extraResume != null ? phaseOf(game.extraResume) : undefined);
   const additional = game.extraResume != null;
+  // The Setup's own choices open in round 0, at the engine's beginning-of-round step: the rail says "Setup" there, not "Beginning of round".
+  const setup = game.round === 0 && game.mode === "beginRound";
   const base = {
-    phase: PILL_PHASE[game.phase] ?? game.phase,
+    phase: setup ? "" : (PILL_PHASE[game.phase] ?? game.phase),
     round: game.round,
     previousPhase: additional && game.extraFollowed ? game.extraFollowed : phaseAt < 0 ? "" : (ROUND_PHASES[(Math.min(phaseAt, count) + count - 1) % count] ?? ""),
     nextPhase: extraNext ?? ROUND_PHASES[phaseAt >= count ? 0 : (phaseAt + 1) % count] ?? "",
@@ -98,7 +100,7 @@ export function railFor(game: ScenarioState): Rail {
   const leaving = phaseOf(following) !== game.phase;
   const owed = game.extraPhases?.[0];
   const next = leaving ? ((owed ? extraPhaseMode(owed) : undefined) ?? game.extraResume ?? following) : following;
-  return { ...base, previous: STEP_WORDS[previous], current: STEP_WORDS[game.mode], next: STEP_WORDS[next] };
+  return { ...base, previous: STEP_WORDS[previous], current: setup ? STEP_WORDS.afterOpening : STEP_WORDS[game.mode], next: STEP_WORDS[next] };
 }
 
 /**

@@ -113,6 +113,7 @@ import crownFixtures from "./fixtures/the-antlered-crown.json";
 import haradFixtures from "./fixtures/race-across-harad.json";
 import sandsFixtures from "./fixtures/beneath-the-sands.json";
 import serpentFixtures from "./fixtures/the-black-serpent.json";
+import guratFixtures from "./fixtures/the-dungeons-of-cirith-gurat.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -244,6 +245,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "race-across-harad": haradFixtures,
   "beneath-the-sands": sandsFixtures,
   "the-black-serpent": serpentFixtures,
+  "the-dungeons-of-cirith-gurat": guratFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

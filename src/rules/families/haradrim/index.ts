@@ -19,7 +19,8 @@ import { orcsCondition } from "./orcs-values.ts";
 import { revealRandomSetAside } from "./random-aside.ts";
 import { haradrimPickMatches } from "./pick.ts";
 import { allyBelowThreat, threatAboveWillpower, willpowerGap } from "./combat.ts";
-import { engageSeatWithMost } from "./engage.ts";
+import { attackSeatWithMost, engageSeatWithMost } from "./engage.ts";
+import { attachCaptive, discardUntilAlly, heldPrintedAmount, rescueCaptured, seatsWithoutCaptives, stripCaptive } from "./captured.ts";
 import { announceOverLimit } from "./hand.ts";
 import { runHeat, temperatureAmount, temperatureCondition } from "./heat.ts";
 import { guardStagedHeroes, markStagedHeroes, moveHeroesToStaging, releaseStagedHero, takeObjectiveHero, undefendedStaged } from "./staged.ts";
@@ -41,6 +42,16 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return guardStagedHeroes(state, instruction, focus, ctx, steps);
     case "EngageSeatWithMost":
       return engageSeatWithMost(state, instruction, focus, ctx, steps);
+    case "AttackSeatWithMost":
+      return attackSeatWithMost(state, instruction, focus, ctx, steps);
+    case "AttachCaptive":
+      return attachCaptive(state, instruction, focus, ctx, steps);
+    case "RescueCaptured":
+      return rescueCaptured(state, instruction, focus, ctx, steps);
+    case "StripCaptive":
+      return stripCaptive(state, instruction, focus, ctx, steps);
+    case "DiscardUntilAlly":
+      return discardUntilAlly(state, instruction, focus, ctx);
     case "AttachRandomSetAside":
       return attachRandomSetAside(state, instruction, ctx, steps);
     case "RevealRandomSetAside":
@@ -76,7 +87,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "haradrim",
-  verbs: ["PlaceUnderSelfFaceup", "SetTemperature", "RaiseTemperature", "LowerTemperature", "MoveHeroesToStaging", "TakeObjectiveHero", "ReleaseStagedHero", "GuardStagedHeroes", "EngageSeatWithMost", "AttachRandomSetAside", "RevealRandomSetAside", "AddWithHostToVictory", "PrepareOrcsArea", "MoveToOrcsArea", "OrcsProgress", "AddOrcsProgress", "TakeObjectiveAlly", "EliminateAfterAttack", "FlipSearchObjective", "ResolveTrack", "StageMarkedFromTop", "AddTopmostFromDiscard", "SetAsideCode"],
+  verbs: ["PlaceUnderSelfFaceup", "SetTemperature", "RaiseTemperature", "LowerTemperature", "MoveHeroesToStaging", "TakeObjectiveHero", "ReleaseStagedHero", "GuardStagedHeroes", "EngageSeatWithMost", "AttackSeatWithMost", "AttachCaptive", "RescueCaptured", "StripCaptive", "DiscardUntilAlly", "AttachRandomSetAside", "RevealRandomSetAside", "AddWithHostToVictory", "PrepareOrcsArea", "MoveToOrcsArea", "OrcsProgress", "AddOrcsProgress", "TakeObjectiveAlly", "EliminateAfterAttack", "FlipSearchObjective", "ResolveTrack", "StageMarkedFromTop", "AddTopmostFromDiscard", "SetAsideCode"],
   run,
   condition: (state, condition, scope, ctx) => {
     switch (condition.kind) {
@@ -88,7 +99,12 @@ export const manifest: RulesFamily = {
         return haradrimCondition(state, condition) ?? orcsCondition(state, condition) ?? exploredCondition(state, condition) ?? temperatureCondition(state, condition);
     }
   },
-  amount: (state, found, scope, ctx) => (found.willpowerGap ? willpowerGap(state, scope.sourceId ?? null, ctx.cards) : temperatureAmount(state, found)),
+  amount: (state, found, scope, ctx) => {
+    if (found.seatsWithoutCaptives) return seatsWithoutCaptives(state);
+    if (found.heldPrinted) return heldPrintedAmount(state, found.heldPrinted, scope, ctx);
+    if (found.willpowerGap) return willpowerGap(state, scope.sourceId ?? null, ctx.cards);
+    return temperatureAmount(state, found);
+  },
   pick: haradrimPickMatches,
   combat: {
     defense: (state, defender, cards, defenderId) => allyBelowThreat(state, defender, cards, defenderId),

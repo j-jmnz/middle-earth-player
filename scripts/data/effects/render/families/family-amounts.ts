@@ -26,6 +26,10 @@ export function familyAmount(expr: Obj): Made | null {
   if (expr.temperature === "value") return { text: "the temperature of the heat tracker (0 while none is set)", read: ["temperature"] };
   if (expr.temperature === "tens") return { text: "the tens digit of the temperature of the heat tracker (0 while none is set)", read: ["temperature"] };
   if (expr.willpowerGap === true) return { text: "while this enemy attacks a defending character with less Willpower than its own Threat: its Threat less that Willpower (otherwise 0; an undefended attack has no defending character)", read: ["willpowerGap"] };
+  if (typeof expr.heldPrinted === "object" && expr.heldPrinted !== null) {
+    const held = expr.heldPrinted as { stat?: unknown; ownedByActor?: unknown };
+    return { text: `the printed ${held.stat === "cost" ? "cost" : "Willpower"} of the captive this card holds${held.ownedByActor === true ? " that the acting player owns" : ""} (0 when it holds none)`, read: ["heldPrinted"] };
+  }
   if (expr.part === true) return { text: "the part number of the campaign card of the scenario being played: its place in its campaign, counting from 1", read: ["part"] };
   return null;
 }
@@ -46,6 +50,8 @@ export const FAMILY_AMOUNT_SAMPLES: readonly Obj[] = [
   { temperature: "value" },
   { temperature: "tens" },
   { willpowerGap: true },
+  { heldPrinted: { stat: "willpower" } },
+  { heldPrinted: { stat: "cost", ownedByActor: true } },
   { poison: "picked" },
   { hidden: "own" },
   { hidden: "all" },

@@ -173,7 +173,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
-      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the event's other card is a ally (any player controls) that is out of play now): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the character the attack destroyed (the event's other card) is a ally (any player controls) that is out of play now): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
 ## 09044 Angmar Marauder
 (the scenario deals it into the encounter pile; the piles place it, no record does)

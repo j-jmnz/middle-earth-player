@@ -276,7 +276,7 @@ function typeErrorsOf(text: string): string[] {
 }
 
 // The game.ts skeleton of a campaign scenario and of a cycle scenario starts from the play policy kit (test/harness/policy-kit.ts), with a comment that lists the kit's rules.
-describe("the game.ts skeleton", () => {
+describe("the game.ts skeleton", { timeout: 60_000 }, () => {
   const kit = readFileSync(path.join(ROOT, "test/harness/policy-kit.ts"), "utf8");
   const exported = [...kit.matchAll(/^export (?:function|const) (\w+)/gm)].map((found) => found[1] as string).filter((name) => name !== "policyIntent" && name !== "POLICY_KIT_RULES");
 

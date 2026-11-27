@@ -273,6 +273,14 @@ export const pickSchema = z.strictObject({
   allInPlay: z.literal(true).optional(),
   // A card the chooser's seat controls whose printed title is that of a card the running effect discarded from the chooser's own deck ("each card he controls that shares a title with any of the 5 cards he just discarded", 17022:A:1). Read by the haradrim family.
   sameTitleAsDiscarded: z.literal(true).optional(),
+  // The Dungeons of Cirith Gurat (read by the haradrim family, src/rules/families/haradrim/captured.ts). `guardsCaptive`: an encounter card that holds a captive (`false`: one that holds none), "guarding an objective" (17122:A:1); with `captive: "only"` the
+  // captive is the card picked: `heldBySource` one the source holds ("no objective attached to Dungeon Cell", 17125:A:3), `ownedByActor` one the acting seat owns ("each guarded objective he owns", 17130:A:1). `unattached`: a card with nothing attached to it, no attachment
+  // and no captive ("an unattached enemy", 17132:A:1). `costAboveDiscardedThreat`: a card whose printed cost is greater than the printed Threat (0 with none) of the card last discarded from the encounter deck (17124:A:2).
+  guardsCaptive: z.boolean().optional(),
+  heldBySource: z.literal(true).optional(),
+  ownedByActor: z.literal(true).optional(),
+  unattached: z.literal(true).optional(),
+  costAboveDiscardedThreat: z.literal(true).optional(),
   // A card of the Orcs' area, in the area zone or in the staging area at the Orcs' stage ("each enemy at this stage", 17053:B:1). Read by the haradrim family.
   inOrcsArea: z.literal(true).optional(),
   // A card with the printed title of the defending character in the attack in progress ("a copy of the defending character in your discard pile", 101160:A:2). Read by the angmar family.

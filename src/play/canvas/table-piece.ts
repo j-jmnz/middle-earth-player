@@ -71,6 +71,8 @@ export type PieceProps = BodyProps & {
   inactive: boolean;
   /** The seat tag drawn on a quest stage once the table is split between players. */
   owner: string | null;
+  /** The owner's chip ("P2") on the strip of a hero or ally an encounter card holds, in a game of several players; null on any other slot. */
+  stripChip: string | null;
   share: TableHighlight["share"];
   contrast: boolean;
   tokens: TokenImages;
@@ -193,6 +195,7 @@ export function pieceProps(slot: CardSlot, ctx: PieceContext): PieceProps {
     optionMark: ctx.highlight.marks.get(slot.id),
     inactive: card && !slot.faceDown && ctx.inactive(slot.picture ?? slot.code),
     owner: slot.zone === "questStage" ? ctx.owner : null,
+    stripChip: slot.strip != null ? (ctx.info(ctx.game, ctx.seat, slot.id).seat?.chip ?? null) : null,
     share: ctx.highlight.share,
     contrast: ctx.contrast,
     tokens: ctx.tokens,
@@ -220,6 +223,7 @@ const SLOT_FIELDS = Object.keys({
   tilt: true,
   bandPeek: true,
   bandFloor: true,
+  strip: true,
   count: true,
   committed: true,
   held: true,
@@ -333,6 +337,7 @@ const SAME: { readonly [K in keyof PieceProps]-?: (a: PieceProps[K], b: PiecePro
   optionMark: sameData,
   inactive: same,
   owner: same,
+  stripChip: same,
   share: same,
   contrast: same,
   tokens: sameBundle,

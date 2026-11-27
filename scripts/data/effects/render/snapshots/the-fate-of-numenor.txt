@@ -319,7 +319,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
   11068:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the event's other card is a card (any player controls) or in the staging area or the active location, of card type ally that is out of play now): the event's other card (only from discard) goes to the bottom of its owner's deck
+      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the character the attack destroyed (the event's other card) is a card (any player controls) or in the staging area or the active location, of card type ally that is out of play now): the event's other card (only from discard) goes to the bottom of its owner's deck
 
 ## 11069 Soulless Cadaver
 (the scenario deals it into the encounter pile; the piles place it, no record does)

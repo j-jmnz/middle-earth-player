@@ -50,6 +50,7 @@ import { roadsDials } from "./roads.ts";
 import { sackDials } from "./hobbit/sack.ts";
 import { siegeDials, siegeHands } from "./siege.ts";
 import { heatDials } from "./haradrim/heat.ts";
+import { capturedHands } from "./haradrim/captured.ts";
 import { umbarHands } from "./haradrim/umbar.ts";
 import { ungolDials, ungolHands } from "./ungol.ts";
 import { wastesDials, wastesHands } from "./wastes.ts";
@@ -67,7 +68,7 @@ export function useScenarioDials(game: ScenarioState, ctx: ReduceContext, nameOf
 /** The marks the seat dials wear: The Road to Isengard's cards in hand on stage 3B, Shelob's Lair's allies this round, The Passing of the Grey Company's Overcome by Fear and threat floor, The Siege of Gondor's Army of the Dead, The Battle of the Pelennor Fields' Aragorn, The Tower of Cirith Ungol's hero with Last of the Company, The Black Gate Opens' controller of Gwaihir, Mount Doom's hero with Heavy and Tired and Intruders in Chetwood's hands under Lost in the Wilderness and controller of Iârion, Deadmen's Dike's decks The Wastes of Eriador's starting threat lowered by Fend Off Despair, Escape from Mount Gram's captured deck and The Dread Realm's Reanimated Dead and Fog on the Barrow-downs' players apart.
  * A seat wears one mark: when two scenarios' pieces fall on the same seat (Fear and the Army, the Army and Aragorn) their labels, notes and notches are merged into it. */
 export function seatMarks(game: ScenarioState, ctx: ReduceContext): readonly HandMark[] {
-  return mergedBySeat([...isengardHands(game), ...lairHands(game, ctx), ...companyHands(game, ctx), ...siegeHands(game), ...pelennorHands(game), ...ungolHands(game, ctx), ...blackGateHands(game), ...mountDoomHands(game, ctx), ...angmarHands(game), ...wastesHands(game), ...gramHands(game, ctx), ...realmHands(game), ...erechHands(game), ...downsHands(game, ctx), ...riddleHands(game), ...bloodHands(game), ...umbarHands(game)]);
+  return mergedBySeat([...isengardHands(game), ...lairHands(game, ctx), ...companyHands(game, ctx), ...siegeHands(game), ...pelennorHands(game), ...ungolHands(game, ctx), ...blackGateHands(game), ...mountDoomHands(game, ctx), ...angmarHands(game), ...wastesHands(game), ...gramHands(game, ctx), ...realmHands(game), ...erechHands(game), ...downsHands(game, ctx), ...riddleHands(game), ...bloodHands(game), ...umbarHands(game), ...capturedHands(game)]);
 }
 
 // The label after the seat prefix ("P1 · Fear" is "Fear"); a bare seat ("P1") or "Threat" says nothing more.

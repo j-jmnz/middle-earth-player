@@ -237,16 +237,23 @@ export function StackMark({ slot, fonts, t, s }: { slot: CardSlot; fonts: Fonts;
 // The name on an attachment's visible band is the names face at this share of its size, so it fits the band's 10 pt.
 const BAND_NAME = 0.68;
 
-/** The short name of an attachment on the band that shows below its host (an objective a hero holds, one that hangs on an enemy): night under bone text at the left, clipped before the count pill at the right end. */
+/**
+ * The short name of an attachment on the band that shows below its host (an objective a hero holds, one that hangs on an enemy): night under bone text at the left, clipped before the count pill at the right end.
+ * A held character's strip (`slot.strip`, a hero, an ally or Abaan an encounter card holds) is taller and reads the name at the full names size, on the strip's upper line, over the owner chip's row (the chip stands at its foot, mark-pieces SeatChipView).
+ */
 export function BandName({ slot, name, fonts, t, s }: { slot: CardSlot; name: string; fonts: Fonts; t: TableTokens; s: number }) {
-  const band = PEEK * s;
+  const strip = slot.strip ?? 1;
+  const band = PEEK * s * strip;
+  const size = strip > 1 ? 1 : BAND_NAME;
   const x = slot.x;
   const y = slot.y + slot.h - band;
   const width = slot.w - (slot.stack != null ? 22 * s : 0);
-  const text = fit(name, (width - 6 * s) / BAND_NAME, (line) => fonts.names.getTextWidth(line));
+  const text = fit(name, (width - 6 * s) / size, (line) => fonts.names.getTextWidth(line));
+  // The strip's name stands in its upper part, over the owner chip's row; the one-peek band's at its foot.
+  const base = strip > 1 ? 10.5 * s : band - 2 * s;
   return (
     <Group clip={{ x, y, width, height: band }}>
-      <Group transform={[{ translateX: x + 3 * s }, { translateY: y + band - 2 * s }, { scale: BAND_NAME }]}>
+      <Group transform={[{ translateX: x + 3 * s }, { translateY: y + base }, { scale: size }]}>
         <Text x={0} y={0} text={text} font={fonts.names} color={t.bone} />
       </Group>
     </Group>
