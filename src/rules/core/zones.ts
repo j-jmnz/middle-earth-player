@@ -398,6 +398,8 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   if (current.zone === "staging" && dest.zone !== "staging") moved = dest.zone === "activeLocation" || dest.zone === "secondActiveLocation" ? releaseGrappled(moved, id) : discardGrappled(moved, id);
   // The lasting modifiers it held end with its time in play (rr.in-play-and-out-of-play, core/lasting.ts).
   if (inPlay(current.zone) && !inPlay(dest.zone)) moved = endLastingOn(moved, id);
+  // A card that goes back to a hand or a deck has left play: it is no longer exhausted or committed and holds no tokens (rr.in-play-and-out-of-play: Sneak Attack returns an exhausted Halfling Bounder to the hand, and he is ready when played again).
+  if (inPlay(current.zone) && (dest.zone === "hand" || dest.zone === "deck" || dest.zone === "encounterDeck")) moved = updateCard(moved, id, { exhausted: false, committed: false, damage: 0, progress: 0, resources: 0 });
   // Its attachments leave play with it, however it left (rr.attachment-cards, families/play/zones.ts).
   if (inPlay(current.zone) && !inPlay(dest.zone)) moved = leaveWith(moved, current, released);
   // An Orc Guard that leaves play takes the deck card it is made of to its owner's discard pile and leaves the game (families/dungeon/guard.ts).
