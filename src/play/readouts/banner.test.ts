@@ -43,6 +43,18 @@ describe("banner lines", () => {
   });
 });
 
+describe("the engage banner", () => {
+  it("rr.engaged names the enemy once, in the title, and the line says who it engages", async () => {
+    const base = await sceneCards();
+    const table = buildTable(base, { engaged: [{ code: "f3", seat: 0 }] });
+    const enemy = idsOf(table, "f3");
+    const steps: EngineStep[] = [{ kind: "engage", enemyId: enemy, seat: 0 }];
+    const moment = momentOf(table.state, table.state, steps, { card: (id) => id });
+    expect(moment?.title).toBe(`${enemy} engages`);
+    expect(moment?.lines.map((line) => line.text)).toEqual(["Engaged with you"]);
+  });
+});
+
 describe("the round summary", () => {
   it("keeps the round's steps up to the refresh's threat, and sums them", () => {
     const steps: EngineStep[] = [

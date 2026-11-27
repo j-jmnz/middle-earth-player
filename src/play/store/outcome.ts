@@ -278,7 +278,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
       case "engage": {
         if (joined.has(index) || turnedEngaged.has(step.enemyId)) return;
         open(4, valeOf(step)?.by != null ? "" : `${names.card(step.enemyId)} engages`, "bad");
-        line(valeStepWords(step, names.card, null, { count: after.seatCount }) ?? (after.seatCount > 1 ? `${names.card(step.enemyId)} engages Player ${step.seat + 1}` : `${names.card(step.enemyId)} engages you`));
+        line(valeStepWords(step, names.card, null, { count: after.seatCount }) ?? (after.seatCount > 1 ? `Engaged with Player ${step.seat + 1}` : "Engaged with you"));
         const count = boarded.get(index);
         // The ship's ring follows this beat.
         if (count) line(boardingWords({ ship: names.card(step.enemyId), count, seat: step.seat, seats: after.seatCount }), null, [step.enemyId]);
