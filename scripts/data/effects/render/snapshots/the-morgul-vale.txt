@@ -11,7 +11,9 @@ Scenario piles that place cards with no record (staging: 06155 Morgul Vale; ques
 
 06144:B:1 (back): Murzag cannot leave play unless destroyed. If Murzag is defeated, advance to the next stage.
   06144:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - each enemy (any player controls) or in the staging area, named "Murzag": stat cannotLeavePlay (held by a Captain enemy while its stage is current: it cannot leave play unless destroyed; a pick that feeds a discard, a shuffle, a return to a hand or deck, the victory display or a removal from the game does not offer it, the staging area shuffled into the encounter deck leaves it where it is, and a settle sweep puts it back in the staging area if an effect with no pick moved it out of play) 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Murzag": stat cannotLeaveUnlessDestroyed 1, while this card is in play
   06144:forced:1: Forced after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Murzag")
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - advance to the next quest stage
@@ -25,7 +27,9 @@ Scenario piles that place cards with no record (staging: 06155 Morgul Vale; ques
 
 06145:B:1 (back): Lord Alcaron cannot leave play unless destroyed. If Lord Alcaron is defeated, advance to the next stage.
   06145:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - each enemy (any player controls) or in the staging area, named "Lord Alcaron": stat cannotLeavePlay (held by a Captain enemy while its stage is current: it cannot leave play unless destroyed; a pick that feeds a discard, a shuffle, a return to a hand or deck, the victory display or a removal from the game does not offer it, the staging area shuffled into the encounter deck leaves it where it is, and a settle sweep puts it back in the staging area if an effect with no pick moved it out of play) 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Lord Alcaron": stat cannotLeaveUnlessDestroyed 1, while this card is in play
   06145:forced:1: Forced after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Lord Alcaron")
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - advance to the next quest stage
@@ -46,7 +50,9 @@ Scenario piles that place cards with no record (staging: 06155 Morgul Vale; ques
 
 06146:B:2 (back): Nazgûl of Minas Morgul cannot leave play unless destroyed.
   06146:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - each enemy (any player controls) or in the staging area, named "Nazgûl of Minas Morgul": stat cannotLeavePlay (held by a Captain enemy while its stage is current: it cannot leave play unless destroyed; a pick that feeds a discard, a shuffle, a return to a hand or deck, the victory display or a removal from the game does not offer it, the staging area shuffled into the encounter deck leaves it where it is, and a settle sweep puts it back in the staging area if an effect with no pick moved it out of play) 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Nazgûl of Minas Morgul": stat cannotLeaveUnlessDestroyed 1, while this card is in play
 
 06146:B:3 (back): If Nazgûl of Minas Morgul is defeated, the players have won the game.
   06146:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Nazgûl of Minas Morgul")
@@ -258,4 +264,4 @@ Scenario piles that place cards with no record (staging: 06155 Morgul Vale; ques
     who acts: the acting player is the defending player (the player the attack is against)
     - the attacking enemy: stat attack progress of "To the Tower", until the end of the attack
 
-(rendered pieces: 146 by template, 0 as JSON)
+(rendered pieces: 152 by template, 0 as JSON)

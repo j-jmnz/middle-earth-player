@@ -9,7 +9,6 @@ import { heldAmount, type CardInstance, type ScenarioState } from "../../../rule
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
 import { battlegroundsInPlay, undefendedBattlegrounds } from "../../../rules/families/pelargir/siege.ts";
 import { stagePlace } from "../../../rules/families/quest/branch.ts";
-import { questPointsOf } from "../../../rules/quest/quest.ts";
 import { effectsOf } from "../../../rules/windows/listen.ts";
 
 import { battleTurnWords, removesWords, battlegroundDialWords, battlegroundNearWords, extraRevealWords, removedStagesWords, stagingThreatWords, undefendedSheetWords, undefendedWords } from "../../words/scenarios/against-the-shadow/cair-andros.ts";
@@ -57,15 +56,12 @@ export function cairAndrosDials(game: ScenarioState, ctx: ReduceContext): readon
     });
 }
 
-/** The quest cards the Responses took out of the quest deck, by stage number. A removed stage lies set aside with less progress than its quest points, which a defeated stage never has (stage 1 is never removed, so one that advanced at once for want of a Battleground location is no removed stage). */
-export function removedStageNumbers(game: ScenarioState, ctx: ReduceContext): readonly number[] {
-  const codes = new Set(ctx.effects.flatMap((effect) => effect.instructions.flatMap((step) => (step.verb === "RemoveStage" ? [step.code] : []))));
-  if (codes.size === 0) return [];
+/** The quest cards the Responses took out of the quest deck, by stage number: the cards the engine marked `removedStage` (stage-remove.ts), set aside and never played. */
+export function removedStageNumbers(game: ScenarioState): readonly number[] {
   return game.setAside
     .flatMap((id) => {
       const card = game.cards[id];
-      const points = card ? questPointsOf(game, card, ctx.cards) : null;
-      return card && codes.has(card.code) && points != null && card.progress < points ? [stagePlace(game, card.code)?.at ?? 0] : [];
+      return card?.removedStage ? [stagePlace(game, card.code)?.at ?? 0] : [];
     })
     .filter((at) => at > 0)
     .sort((a, b) => a - b);
@@ -109,7 +105,7 @@ export function cairAndrosStageLines(game: ScenarioState, ctx: ReduceContext, co
   if (threat > 0) lines.push(stagingThreatWords(threat));
   const turn = battleTurn(game, ctx, code);
   if (turn) lines.push(battleTurnWords(turn.points, turn.needed));
-  const removed = removedStageNumbers(game, ctx);
+  const removed = removedStageNumbers(game);
   if (removed.length > 0) lines.push(removedStagesWords(removed));
   return lines;
 }

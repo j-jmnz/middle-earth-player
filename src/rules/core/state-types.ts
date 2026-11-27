@@ -118,11 +118,11 @@ export type CardInstance = {
   temporary?: true;
   // On an attachment: the id of the hero card from the collection attached to it, whose game text and resource icon its host has.
   lends?: string;
-  // A double-sided card whose two sides are two catalog cards (the Grotto and Underwater locations, dcce.grotto-deck): the code of the side it does not show. `code` is the side it shows,
-  // so every read of the card (traits, Threat, records) sees the side faceup; a flip swaps the two (families/uncharted/grotto.ts).
+  // A double-sided card whose two sides are two catalog cards (the Grotto and Underwater locations, dcce.grotto-deck): the code of the side it does not show. `code` is the side it shows, so every read of the card (traits, Threat, records) sees the side faceup; a flip swaps the two (families/uncharted/grotto.ts).
   other?: string;
-  // A card held facedown as part of a prisoner (the hero, the cards attached to it, Mendor captured with it): it is blank and unusable
-  // until it is rescued (families/prisoner.ts, 01123:B:1).
+  // A quest stage a Response took out of the quest deck (RemoveStage, The Siege of Cair Andros, ats.cair-andros-remove-stage): it lies set aside, never played, and the stage list says so.
+  removedStage?: true;
+  // A card held facedown as part of a prisoner (the hero, the cards attached to it, Mendor captured with it): it is blank and unusable until it is rescued (families/prisoner.ts, 01123:B:1).
   prisoner?: true;
   // The place the prisoner hero had among its seat's heroes, so a rescued (or swapped back) hero returns where it was (families/prisoner.ts).
   heroSlot?: number;
@@ -136,7 +136,7 @@ export type CardInstance = {
   heldExhausted?: true;
   // A card the encounter deck found and Hidden Threat placed facedown under the main quest (families/wizards-quest/hidden.ts, 51241:A:1): it is revealed after the next time the players quest successfully. The number is the order it was placed in.
   hiddenAt?: number;
-  // A card stacked facedown under a card in a stack with an order (The Lonely Mountain's treasures, families/burgle/stack.ts): its place in the stack, 0 for the top. The cards stay out of play under their host.
+  // A card stacked facedown in a stack with an order, 0 for the top: under its host in play (The Lonely Mountain's treasures, families/burgle/stack.ts), or set aside in the underworld deck of The Steward's Fear (families/pelargir/underworld.ts). The cards stay out of play.
   stackedAt?: number;
   // A Captive of The Uruk-hai (families/captives): a hero faceup in the captive zone under To Isengard! or an enemy, in play, controlled by nobody. `owner` is the seat it belongs to, `heroSlot` its place among that seat's heroes.
   captive?: true;

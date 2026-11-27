@@ -16,10 +16,10 @@ Scenario piles that place cards with no record (quest: 02082 The Hills of Emyn M
 02082:B:2 (back): Players cannot defeat this stage until there are no Emyn Muil locations in play, and they have collected at least 20 victory points.
   02082:constant:2: Constant
     only if there is a Emyn Muil location (any player controls) to choose
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
   02082:constant:3: Constant
     only if not (the victory display holds at least 20 Victory points)
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 02083 Amon Hen
 (the scenario deals it into the staging pile; the piles place it, no record does)

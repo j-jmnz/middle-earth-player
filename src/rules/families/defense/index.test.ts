@@ -6,6 +6,8 @@ import { RECORDS } from "../../../effects/authored/families/defense.ts";
 import { legalIntents, legalTargets } from "../../engine/reduce.ts";
 import { definePrinted } from "../../core/printed.ts";
 import { syncConstants } from "../../interpret/constants.ts";
+import { combatDamage } from "./excess.ts";
+import { destroyedByAttack } from "../burden/attack.ts";
 import { ally, enemy, hero, offered, recordsOf, send, table, treachery, until } from "./table.ts";
 
 // Rules: rr.cancel, rr.damage, rr.response, rr.step-6-4-3, rr.timing-of-ability-resolution (data/rules/entries.json).
@@ -144,6 +146,19 @@ describe("damage moved to another character", () => {
     const hit = send(attacked, { type: "Undefended", heroId: ids.chosen! }, ctx);
     expect(hit.cards[ids.chosen!]?.damage).toBe(0);
     expect(hit.cards[ids.host!]?.damage).toBe(3);
+  });
+
+  // rr.destroy: the character the damage was redirected to and that it destroyed is a character the attack destroyed (issue 305), though the redirect no longer names it once it left play.
+  it("counts Song of Mocking's host, destroyed by the damage assigned to the chosen hero, as destroyed by the attack", () => {
+    const built = table({ cards: [hero("host", { health: 2 }), hero("chosen", { health: 10 }), definePrinted({ code: "02099", name: "Song of Mocking", type: "attachment", sphere: "tactics", cost: 1 }), orc, shade], effects: recordsOf(RECORDS, "02099"), heroes: [{ code: "host" }, { code: "chosen" }], attachments: [{ code: "02099", host: "host" }], enemies: [{ code: "orc" }], encounter: ["shade"] });
+    const { ids, ctx } = built;
+    const window = until(send(built.state, { type: "DeclineEngage" }, ctx), ctx, (state, legal) => state.phase === "Combat" && offered(legal, "02099:action:1"));
+    const sung = send(window, { type: "Trigger", cardId: ids["02099"]!, effectId: "02099:action:1" }, ctx);
+    const attacked = until(sung, ctx, (state) => state.window?.kind === "defense");
+    // The attack's damage lands on the chosen hero's redirect, the host; the host's destruction ends the redirect.
+    const hit = combatDamage({ ...attacked, pendingAttack: { ...attacked.pendingAttack!, undefended: true, heroId: ids.chosen! } }, ids.orc!, ids.chosen!, 3, ctx, []);
+    expect(hit.cards[ids.host!]?.zone).toBe("discard");
+    expect(destroyedByAttack(hit, hit.pendingAttack!, ctx)).toEqual([ids.host]);
   });
 });
 

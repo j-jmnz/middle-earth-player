@@ -338,7 +338,7 @@ Scenario piles that place cards with no record (staging: 08106 Fen of Reeds; sta
 
 08110:A:2 (front): When Revealed: Remove 1 time counter from the current quest.
   08110:whenRevealed:1: When revealed
-    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it is heard (a record that holds its events lets it resolve only after the whole effect has finished; a stage with none loses none)
 
 08110:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
   08110:shadow:1: Shadow

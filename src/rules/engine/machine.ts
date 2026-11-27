@@ -222,7 +222,8 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
       return waiting !== state ? waiting : finishSetup(state, ctx, steps);
     }
     case "beginRound":
-      return enterBegin(state, ctx);
+      // The end-of-round effects are done (they held the table in the End of round phase): the round begins.
+      return state.phase === "End of round" ? { ...state, phase: "Beginning of round", boundaryPhase: "Beginning of round" } : enterBegin(state, ctx);
     case "resourceGrant":
       return askCurrentStage(state, steps) ?? grant(state, steps, ctx);
     case "resourceActions":

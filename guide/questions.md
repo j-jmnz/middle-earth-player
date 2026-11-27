@@ -67,9 +67,9 @@ Yes. A Response with no cost and nothing to choose offers Always use. To be aske
 
 </details>
 <details>
-<summary>Where can I read a banner I missed?</summary>
+<summary>Where can I read what the last move did?</summary>
 
-Open Log from the table menu (the three dots). It keeps every step of the round with its cause. If the banner closes too soon for you, set Settings, Banner closes to When tapped. Swipe a banner sideways or up to dismiss it.
+The line above the buttons says what the last move did that the table does not show. It stays until your next move. Tap it, or open Log from the table menu (the three dots), to read every step of the round with its cause.
 
 </details>
 <details>

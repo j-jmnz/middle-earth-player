@@ -127,5 +127,5 @@ No tracker, dial or zone: no record creates one. The one held card is Alcaron's 
 
 Where the engine does not read a reading above to the letter, and why.
 
-- `05041:A:1` (counts-as text): the engine announces an exhaust that is the cost of an Action only through the Action (`abilityTriggered`), not as `exhausted` (`docs/agents/effect-authoring.md`, Not expressible yet): a hero that exhausts to pay for another card's Action raises the controller's threat once through the ability, not once more for the exhaust.
+- `05041:A:1` (counts-as text): an exhaust paid as the cost of an Action is announced as `exhausted` (`src/rules/player/usage.ts`) and the Action as `abilityTriggered`, so a hero that exhausts to pay for his own Action raises the controller's threat twice, once for each.
 - `05066:B:2` and `05067:B:3` (later attach): the stage advances at the next settle with no window open (`advanceFreed`, `src/rules/quest/stage-reveal.ts`), so a Scroll attached in an action window advances it when the window closes.

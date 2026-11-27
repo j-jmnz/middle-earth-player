@@ -1,5 +1,4 @@
-// The cards the outcome banner's current line names, ringed on the table while the banner is at that line (moment-banner.tsx calls
-// `onBeat` as it reaches each line; use-table-choice.ts hands it on). They live in a small store the screen creates once and only the table
+// The cards the last move's line names, ringed on the table while the line is up (table-hooks.ts, useLastMove, sets them). They live in a small store the screen creates once and only the table
 // canvas reads, so a beat draws the canvas and not the whole table view or the hooks above it. Nothing here draws.
 import { createStore, type StoreApi } from "zustand/vanilla";
 

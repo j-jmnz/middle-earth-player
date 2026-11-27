@@ -4,6 +4,7 @@
 // closes on a tap outside. The card lists stand on night, each card as the table draws it; the log and the threat panel stay on paper:
 // they are what gets read and recorded; the settings panel is on night like the Settings tab. Nothing here sends an intent but a playable
 // discard card's play, which the table's own pick sends.
+import { useRef, type ComponentRef } from "react";
 import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 
 import { CardImage } from "../../ui/card-image.tsx";
@@ -267,11 +268,14 @@ export function DialPanel({ title, lists, said, note, onClose }: { title: string
   );
 }
 
-export function LogPanel({ round, lines, onClose }: { round: number; lines: readonly LogLine[]; onClose: () => void }) {
+/** `latest`: opened from the last move's line, so it opens scrolled to the newest lines, the move the player tapped. */
+export function LogPanel({ round, lines, latest = false, onClose }: { round: number; lines: readonly LogLine[]; latest?: boolean; onClose: () => void }) {
   const t = useTableTokens();
   const s = useUiScale();
   // The log reads oldest first; a screen reader's focus opens on the newest line (the header when there is none).
   const focus = usePanelFocus();
+  const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
+  const toEnd = () => scroll.current?.scrollToEnd({ animated: false });
   return (
     <View testID="log-sheet" collapsable={false} style={{ flexShrink: 1 }}>
       <View className="items-center" style={{ paddingHorizontal: CLOSE_CLEAR * s }}>
@@ -280,7 +284,7 @@ export function LogPanel({ round, lines, onClose }: { round: number; lines: read
         </Text>
       </View>
       <PanelClose testID="log-close" onPress={onClose} />
-      <ScrollView className="mt-3" style={{ flexGrow: 0, flexShrink: 1 }}>
+      <ScrollView ref={scroll} onContentSizeChange={latest ? toEnd : undefined} className="mt-3" style={{ flexGrow: 0, flexShrink: 1 }}>
         {lines.length === 0 ? <Text className="text-center text-body text-inkMuted">Nothing has happened this round yet.</Text> : null}
         {lines.map((line, index) => (
           <View key={line.key} ref={index === lines.length - 1 ? focus : undefined} testID={`log-line-${line.key}`} accessible accessibilityLabel={logLineSpeech(line)} className="border-b py-2" style={{ borderColor: t.inkLine }}>

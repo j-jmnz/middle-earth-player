@@ -32,22 +32,28 @@ export function memoOf<T>(memo: StateMemo<T>, state: ScenarioState, ctx: ReduceC
   return built;
 }
 
-const VERB_CODES = new WeakMap<readonly Effect[], Map<Instruction["verb"], ReadonlySet<string>>>();
+const VERB_CODES = new WeakMap<readonly Effect[], Map<string, ReadonlySet<string>>>();
 
-// The codes of the cards with a constant record of this verb (a keyword marker such as Deep, Loot or ControlWhenFree), found by card code. Which cards print one depends on the effect list only, which is never changed
+// The codes of the cards with a record of this verb (a keyword marker such as Deep, Loot or ControlWhenFree), found by card code, of one timing or of any when `timing` is left out. Which cards print one depends on the effect list only, which is never changed
 // after the reducer is handed it, so the index is kept for the list (a state-keyed `memoOf` would rebuild it for every state the settle sweeps read it on).
-export function constantVerbCodes(ctx: Pick<ReduceContext, "effects">, verb: Instruction["verb"]): ReadonlySet<string> {
+export function verbCodes(ctx: Pick<ReduceContext, "effects">, verb: Instruction["verb"], timing?: Effect["timing"]): ReadonlySet<string> {
   let byVerb = VERB_CODES.get(ctx.effects);
   if (!byVerb) {
     byVerb = new Map();
     VERB_CODES.set(ctx.effects, byVerb);
   }
-  let codes = byVerb.get(verb);
+  const key = `${timing ?? "*"}:${verb}`;
+  let codes = byVerb.get(key);
   if (!codes) {
-    codes = new Set(ctx.effects.filter((effect) => effect.timing === "constant" && effect.instructions.some((instruction) => instruction.verb === verb)).map((effect) => effect.cardCode));
-    byVerb.set(verb, codes);
+    codes = new Set(ctx.effects.filter((effect) => (timing == null || effect.timing === timing) && effect.instructions.some((instruction) => instruction.verb === verb)).map((effect) => effect.cardCode));
+    byVerb.set(key, codes);
   }
   return codes;
+}
+
+// The codes of the cards with a constant record of this verb.
+export function constantVerbCodes(ctx: Pick<ReduceContext, "effects">, verb: Instruction["verb"]): ReadonlySet<string> {
+  return verbCodes(ctx, verb, "constant");
 }
 
 const CONSTANTS: StateMemo<readonly ConstantInstruction[]> = new WeakMap();

@@ -1,7 +1,6 @@
 // Rules: rr.printed, rr.resource-match, rr.play-restrictions-and-permissions, rr.action, rr.lasting-effects, rr.ready, hon.battle,
 // rr.engagement-check, rr.optional-engagement, rr.triggered-ability (data/rules/entries.json).
-// The Drúadan Forest events, written from their card text (data/cards/TDF.json; data/printed holds no ledger for this pack, so the lines
-// are the text of data/cards and every intent goes through sendUnledgered): Strength of Arms 06034:A:1 and A:2, Trained for War 06036:A:1
+// The Drúadan Forest events, written from their card text (data/cards/TDF.json; the lines are the ledger lines in data/printed, read from the scans): Strength of Arms 06034:A:1 and A:2, Trained for War 06036:A:1
 // and A:2, Against the Shadow 06038:A:1 and A:2, Advance Warning 06040:A:1 and A:2. The heroes, allies and attachment are in
 // the-druadan-forest.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -13,8 +12,8 @@ import { updateCard } from "../../rules/core/state.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf } from "../../../test/harness/scene.ts";
-import { canPlay, combat, enter, passAll, passWhile, play, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { canPlay, combat, enter, passAll, passWhile, play, playerTableFor } from "../../../test/harness/player-table.ts";
 
 const STRENGTH = "06034";
 const TRAINED = "06036";
@@ -104,7 +103,7 @@ describe("Trained for War (06036:A:1, A:2)", () => {
     const tab = table(effects, { start: "quest", heroes: [{ code: LEGOLAS, seat: 0 }, { code: GIMLI, seat: 0 }], hand: [{ code: TRAINED, seat: 0 }], deck: ["f0", "f0"] });
     const stage = tab.state.questStage ?? "";
     let run = play(begin(tab.state), tab, idsOf(tab, TRAINED));
-    run = sendUnledgered(run, { type: "Commit", cardIds: [idsOf(tab, LEGOLAS), idsOf(tab, GIMLI)] }, tab.ctx);
+    run = send(run, { type: "Commit", cardIds: [idsOf(tab, LEGOLAS), idsOf(tab, GIMLI)] }, tab.ctx);
     run = passWhile(run, tab, (run) => run.state.mode === "questCommit", 5);
     run = passAll(run, tab.ctx, { responses: true });
     expect(run.state.mode).toBe("travel");
@@ -114,7 +113,7 @@ describe("Trained for War (06036:A:1, A:2)", () => {
   // Without the event the same two heroes quest with their Willpower: 3 progress.
   it("06036:A:2 Trained for War: without it the heroes quest with their Willpower", () => {
     const tab = table(EFFECTS, { start: "quest", heroes: [{ code: LEGOLAS, seat: 0 }, { code: GIMLI, seat: 0 }], deck: ["f0", "f0"] });
-    let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, LEGOLAS), idsOf(tab, GIMLI)] }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, LEGOLAS), idsOf(tab, GIMLI)] }, tab.ctx);
     run = passWhile(run, tab, (run) => run.state.mode === "questCommit", 5);
     run = passAll(run, tab.ctx, { responses: true });
     expect(run.state.cards[tab.state.questStage ?? ""]?.progress).toBe(1 + 2);
@@ -139,9 +138,9 @@ describe("Against the Shadow (06038:A:1, A:2)", () => {
     expect(canPlay(run.state, tab, idsOf(tab, AGAINST))).toBe(true);
     run = passAll(play(run, tab, idsOf(tab, AGAINST)), tab.ctx);
     for (const [enemy, defender] of [[first, EOWYN], [second, SPIRIT_DREAMER], [third, DREAMER]] as const) {
-      if (run.state.window?.kind === "chooseEnemy") run = passAll(sendUnledgered(run, { type: "ChooseEnemy", enemyId: enemy }, tab.ctx), tab.ctx);
+      if (run.state.window?.kind === "chooseEnemy") run = passAll(send(run, { type: "ChooseEnemy", enemyId: enemy }, tab.ctx), tab.ctx);
       expect(run.state.window?.kind).toBe("defense");
-      run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx), tab.ctx, { responses: true });
+      run = passAll(send(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx), tab.ctx, { responses: true });
     }
     const strikes = run.steps.flatMap((step) => (step.kind === "strike" && step.side === "enemy" ? [[step.targetId, step.defense]] : []));
     expect(strikes).toEqual([[idsOf(tab, EOWYN), 4], [idsOf(tab, SPIRIT_DREAMER), 3], [idsOf(tab, DREAMER), 0]]);
@@ -166,7 +165,7 @@ describe("Advance Warning (06040:A:1, A:2)", () => {
   // over. In the next encounter phase its engagement check engages it.
   lineSpec("06040:A:2", "Advance Warning: enemies make no engagement checks this phase", (effects) => {
     const tab = encounter(effects);
-    let run = sendUnledgered(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
     expect(run.state.window?.kind).toBe("frameAction");
     expect(canPlay(run.state, tab, idsOf(tab, WARNING))).toBe(true);
     run = passAll(play(run, tab, idsOf(tab, WARNING)), tab.ctx);

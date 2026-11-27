@@ -199,6 +199,7 @@ const SLOT_FIELDS = Object.keys({
   stormcaller: true,
   shown: true,
   coveredFrom: true,
+  coveredStep: true,
   fan: true,
   points: true,
 } satisfies Record<keyof CardSlot, true>) as (keyof CardSlot)[];

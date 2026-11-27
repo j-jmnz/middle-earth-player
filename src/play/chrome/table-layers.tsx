@@ -146,11 +146,11 @@ function ThreatSourceReading({ store, ctx, names, picture, onRead, onClose }: { 
   return <ThreatSourceList title={title} total={read.total} cards={cards} adjust={adjustWords(read.adjust)} onRead={onRead} onClose={onClose} />;
 }
 
-function LogReading({ store, logNames, onClose }: { store: TableStore; logNames: LogNames; onClose: () => void }) {
+function LogReading({ store, logNames, latest, onClose }: { store: TableStore; logNames: LogNames; onClose: () => void; latest: boolean }) {
   // Only the round and its steps: the log does not rebuild on an intent that changes neither. The quest line names the stat the quest counted, which the table kept with the step (store/counted.ts).
   const round = useStore(store, (state) => state.game.round);
   const roundSteps = useStore(store, (state) => state.roundSteps);
-  return <LogPanel round={round} lines={logLines(roundSteps, logNames)} onClose={onClose} />;
+  return <LogPanel round={round} lines={logLines(roundSteps, logNames)} latest={latest} onClose={onClose} />;
 }
 
 // The Island Map: the map as the game lays it out, fitted to the room the panel has (island-table.ts); a tile shows its card large.
@@ -305,7 +305,7 @@ export function TableLayers({
         {held?.kind === "row" ? <RowReading store={store} ctx={ctx} row={held.row} names={names} picture={picture} onRead={onPreview} onClose={close} /> : null}
         {held?.kind === "setAside" ? <SetAsideReading store={store} ctx={ctx} names={names} picture={picture} onRead={onPreview} onClose={close} /> : null}
         {held?.kind === "stagingThreat" ? <ThreatSourceReading store={store} ctx={ctx} names={names} picture={picture} onRead={onPreview} onClose={close} /> : null}
-        {held?.kind === "log" ? <LogReading store={store} logNames={logNames} onClose={close} /> : null}
+        {held?.kind === "log" ? <LogReading store={store} logNames={logNames} latest={held.latest === true} onClose={close} /> : null}
         {held?.kind === "threat" ? <ThreatReading store={store} ctx={ctx} names={names} seat={held.seat} onClose={close} /> : null}
         {held?.kind === "dial" ? <DialReading store={store} ctx={ctx} nameOf={nameOf} id={held.id} onClose={close} /> : null}
         {held?.kind === "island" ? <IslandReading store={store} ctx={ctx} width={shown} maxHeight={room - (trayShown ? WAITING * s : 0)} onRead={onPreview} onClose={close} /> : null}

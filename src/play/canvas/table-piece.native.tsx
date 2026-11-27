@@ -6,10 +6,12 @@ import { memo } from "react";
 
 import { Moving } from "../motion/card-motion.native.tsx";
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
-import { Badges, BandName, CardBody, HeldMark, NotAppliedMark, StackMark, SuccessMedallion, Tokens } from "./pieces.native.tsx";
+import { Badges, BADGE_H, BandName, CardBody, type Fonts, HeldMark, NotAppliedMark, StackMark, SuccessMedallion, Tokens } from "./pieces.native.tsx";
 import { BLANK_WORD } from "../words/card-bars.ts";
-import { badgeReach, BlankMarkView, CombatPill, CurrentQuestMark, DelayedMark, DeterminedMarkView, EngagementMark, FireMarkView, OptionMarkView, PlaceMarkView, SeatChipView, ShipLossView, StageMarks, UnderMarkView } from "./mark-pieces.native.tsx";
-import { footStop } from "./badge-room.ts";
+import { CHAMPION_WORD } from "../words/scenarios/haradrim/umbar-table.ts";
+import { SHIELD_WORD } from "../words/scenarios/against-the-shadow/vale.ts";
+import { badgeReach, BlankMarkView, CombatPill, CurrentQuestMark, DelayedMark, DeterminedMarkView, EngagementMark, FireMarkView, FootCount, OptionMarkView, PlaceMarkView, SeatChipView, ShipLossView, StageMarks, UnderMarkView } from "./mark-pieces.native.tsx";
+import { badgeRoom, coveredBand, footPillSpan, footStop } from "./badge-room.ts";
 import { underRect } from "./under-mark.ts";
 import { sphereIcon } from "../../ui/icon-map.ts";
 import { Pile } from "./pile-piece.native.tsx";
@@ -60,6 +62,9 @@ function drawFrame(p: PieceProps) {
 }
 
 // The card wears something at its foot (a stage's or active location's progress, a committed character's Willpower, a defender's or attacker's combat number, or a resource token): a pill with no count stands one row up, clear of it.
+// The words a card wears in the foot pill column, not on its name at the top: Blank, Shield (the Morgul Bodyguard) and Champion (Escape from Umbar).
+const FOOT_WORDS: ReadonlySet<string> = new Set([BLANK_WORD, SHIELD_WORD, CHAMPION_WORD]);
+
 const wearsFootNumber = (info: { questPoints: number | null; willpower: number | null; combat?: unknown }, resources: number) => info.questPoints != null || info.willpower != null || info.combat != null || resources > 0;
 
 // Where the highest pill at the card's foot stands, which the effect pills stop above (footStop in badge-room.ts).
@@ -68,7 +73,15 @@ function footStopOf(p: PieceProps, rect: Rect): number | null {
   if (!info) return null;
   const under = info.under ? { height: underRect(rect, slot.zone === "hand", p.s).h, counted: info.under.count != null, strip: wearsFootNumber(info, slot.resources) } : null;
   const plain = info.engagement != null || info.fire != null || info.side?.loses != null || info.loss != null;
-  return footStop(rect.h, p.s, { under, lifted: slot.kind === "card" && p.optionMark != null, plain });
+  return footStop(rect.h, p.s, { under, lifted: slot.kind === "card" && p.optionMark != null, plain, committed: info.willpower != null, combat: info.combat != null });
+}
+
+// The x where the pill a card wears at its foot ends (a committed character's Willpower pill, a defender's or attacker's combat pill), or null with none.
+function footEnd(info: NonNullable<PieceProps["info"]>, rect: Rect, visible: number, resources: number, fonts: Fonts, s: number): number | null {
+  const width = info.willpower != null ? 32 * s : info.combat ? 18 * s + fonts.badge.getTextWidth(String(info.combat.value)) + 5 * s : null;
+  if (width == null) return null;
+  const span = footPillSpan(visible, width, resources, s);
+  return rect.x + span.left + span.width;
 }
 
 // What stays upright over the card: badges, tokens, effect pills, the check ring, the open moment's number.
@@ -81,17 +94,21 @@ function drawOverlay(p: PieceProps) {
   // here instead; the option pill stays bright.
   const veiled = p.dimmed;
   const stop = footStopOf(p, rect);
+  // An upright card in a stacked area's covered band stands its effect column under the title and right of its resource token, so its name shows; `coveredStep` is the width the next card in its row leaves.
+  const covered = coveredBand(slot.coveredFrom != null, slot.exhausted, slot.resources, s, slot.coveredStep ?? rect.w);
+  const footCountEnd = covered && info && info.effects.stats.length + info.effects.flags.length > 0 && badgeRoom(rect.h, s, BADGE_H * s, stop, covered) === 0 ? footEnd(info, rect, covered.width, slot.resources, fonts, s) : null;
   return (
     <Group>
       <Group opacity={veiled ? 0.55 : 1}>
-        {info ? <Badges slot={slot} rect={rect} effects={info.effects} willpower={info.willpower} commitStat={info.commitStat} questPoints={info.questPoints} stop={stop} stageLoses={info.stageLoses} owner={p.owner} fonts={fonts} images={tokens} t={t} s={s} contrast={contrast} /> : null}
-        {info?.combat ? <CombatPill rect={rect} combat={info.combat} fonts={fonts} t={t} s={s} /> : null}
+        {info ? <Badges slot={slot} rect={rect} effects={info.effects} willpower={info.willpower} commitStat={info.commitStat} questPoints={info.questPoints} stop={stop} covered={covered} stageLoses={info.stageLoses} owner={p.owner} fonts={fonts} images={tokens} t={t} s={s} contrast={contrast} /> : null}
+        {info?.combat ? <CombatPill rect={rect} combat={info.combat} resources={slot.resources} visible={covered?.width ?? rect.w} fonts={fonts} t={t} s={s} /> : null}
+        {covered && info && footCountEnd != null ? <FootCount rect={rect} count={info.effects.stats.length + info.effects.flags.length} end={footCountEnd} visible={covered.width} fonts={fonts} t={t} s={s} /> : null}
         {info?.engagement ? <EngagementMark rect={rect} cost={info.engagement.cost} engages={info.engagement.engages} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.fire ? <FireMarkView rect={rect} mark={info.fire} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.side?.loses ? <FireMarkView rect={rect} mark={info.side.loses} fonts={fonts} images={tokens} t={t} s={s} /> : null}
-        {info?.side?.current ? <CurrentQuestMark rect={rect} clear={badgeReach(info.effects, fonts, s, rect.h, stop, rect.w)} fonts={fonts} t={t} s={s} /> : null}
-        {info?.determined?.word === BLANK_WORD ? <BlankMarkView rect={rect} lifted={info.under != null || info.seat != null || info.engagement != null || info.combat != null || info.fire != null || info.loss != null || info.questPoints != null} fonts={fonts} t={t} s={s} /> : null}
-        {info?.determined && info.determined.word !== BLANK_WORD ? <DeterminedMarkView rect={rect} word={info.determined.word} clear={badgeReach(info.effects, fonts, s, rect.h, stop, rect.w)} fonts={fonts} t={t} s={s} /> : null}
+        {info?.side?.current ? <CurrentQuestMark rect={rect} clear={badgeReach(info.effects, fonts, s, rect.h, stop, rect.w, covered)} fonts={fonts} t={t} s={s} /> : null}
+        {info?.determined && FOOT_WORDS.has(info.determined.word) ? <BlankMarkView rect={rect} word={info.determined.word} lifted={info.under != null || info.seat != null || info.engagement != null || info.combat != null || info.fire != null || info.loss != null || info.questPoints != null} fonts={fonts} t={t} s={s} /> : null}
+        {info?.determined && !FOOT_WORDS.has(info.determined.word) ? <DeterminedMarkView rect={rect} word={info.determined.word} clear={badgeReach(info.effects, fonts, s, rect.h, stop, rect.w, covered)} fonts={fonts} t={t} s={s} /> : null}
         {info?.seat ? <SeatChipView rect={rect} text={info.seat.chip} fonts={fonts} t={t} s={s} /> : null}
         {info?.loss ? <ShipLossView rect={rect} mark={info.loss} fonts={fonts} t={t} s={s} /> : null}
         {info?.place ? <PlaceMarkView rect={rect} mark={info.place} t={t} s={s} /> : null}

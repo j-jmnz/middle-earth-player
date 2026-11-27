@@ -130,7 +130,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   GainsDoomed: [{ verb: "GainsDoomed", amount: 1, pick: HERO }, { verb: "GainsDoomed", amount: { stat: "progress", of: "self" }, pick: HERO, byEncounterDeck: true }],
   ChangeControl: [{ verb: "ChangeControl", to: "eventSeat" }],
   EngageNextPlayer: [{ verb: "EngageNextPlayer" }, { verb: "EngageNextPlayer", announces: true, target: "subject" }],
-  DealShadowTo: [{ verb: "DealShadowTo", target: "picked" }, { verb: "DealShadowTo", target: "attacker", from: "encounter" }, { verb: "DealShadowTo", target: "attacker", from: "raven" }],
+  DealShadowTo: [{ verb: "DealShadowTo", target: "picked" }, { verb: "DealShadowTo", target: "attacker", from: "encounter" }, { verb: "DealShadowTo", target: "attacker", from: "raven" }, { verb: "DealShadowTo", target: "attacker", inPlay: true }],
   AttachSelfToPicked: [{ verb: "AttachSelfToPicked" }, { verb: "AttachSelfToPicked", unlimited: true }],
   RemoveAllQuestProgress: [{ verb: "RemoveAllQuestProgress", of: "stage" }],
   PutTopmostFromEncounterDiscard: [{ verb: "PutTopmostFromEncounterDiscard", type: "enemy", trait: "Warg", dealShadow: true }],

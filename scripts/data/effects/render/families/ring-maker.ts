@@ -3,7 +3,7 @@ import { amt, type Samples, type Templates } from "../family-kit.ts";
 import { str } from "../kit.ts";
 
 export const RING_MAKER_TEMPLATES: Templates = {
-  RemoveTimeFromQuest: (i, ctx) => ({ text: `up to ${amt(i.amount, ctx)} time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)`, read: ["amount"] }),
+  RemoveTimeFromQuest: (i, ctx) => ({ text: `up to ${amt(i.amount, ctx)} time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it is heard (a record that holds its events lets it resolve only after the whole effect has finished; a stage with none loses none)`, read: ["amount"] }),
   DrawSelfIntoHand: () => ({ text: "this card goes into the acting player's hand, which is no draw from a deck (no card hears a draw), and cannot leave that hand; the reveal does not discard it", read: [] }),
   EngageTopDiscarded: (i) => ({ text: `of the cards this effect discarded from the encounter deck, the ${str(i.trait)} enemy discarded last is put into play engaged with the acting player (as if it had engaged him; nothing when none was discarded)`, read: ["trait"] }),
   CreateOutOfPlayDecks: (i) => ({ text: `each player moves the top ${i.count} cards of his deck (all of it when fewer) into his out-of-play deck, a facedown stack of his own: out of play, owned by him, no draw and no discard`, read: ["count"] }),

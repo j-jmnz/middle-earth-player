@@ -5,12 +5,13 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
-import type { ScenarioState } from "../../rules/core/state.ts";
+import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
 import { dealAdditionalShadow } from "../../rules/interpret/interpret.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
 import { idOf, revealFromTop, send } from "../../../test/harness/scene-kit.ts";
 import { CODES, fight, opened, run, table } from "../../../test/scenarios/the-morgul-vale/table.ts";
 
+import { slotNumbers } from "../cards/card-effects.ts";
 import { cardKeywords } from "../cards/card-keywords.ts";
 import { ledgerLine } from "../cards/ledger.ts";
 import { previewCards, questTitle } from "../cards/table-preview.ts";
@@ -69,6 +70,12 @@ describe("the To the Tower dial (06147:A:3)", () => {
     expect(seven?.warn).toEqual({ level: "near", words: "3 more progress tokens on To the Tower lose the game." });
     expect(nine?.warn).toEqual({ level: "critical", words: "One more progress token on To the Tower loses the game." });
     expect(nine?.word).toBe("9/10");
+  });
+
+  it("the tap on the dial shows the card, and its preview says the dial's warning from 7 tokens", () => {
+    expect(detail(made, withTokens(made, 6), tower)).not.toContain("more progress token");
+    expect(detail(made, withTokens(made, 7), tower)).toContain("3 more progress tokens on To the Tower lose the game.");
+    expect(detail(made, withTokens(made, 9), tower)).toContain("One more progress token on To the Tower loses the game.");
   });
 
   it("says what places and removes tokens, for both seats, and The White Bridge's X", () => {
@@ -165,6 +172,20 @@ describe("the Captain's refusal on a card that would take him out of play (06144
   });
 });
 
+describe("the Bodyguard that takes a Captain's damage wears the Shield pill (06148:A:1)", () => {
+  it("only the Morgul Bodyguard with the most damage, and only while a Captain is in play", () => {
+    const made = table({ phase: "Planning", staging: [tower, bodyguard, bodyguard, murzag] });
+    const [first, second] = Object.values(made.state.cards).filter((card) => card.code === bodyguard).map((card) => card.id);
+    const hurt = updateCard(made.state, second ?? "", { damage: 2 });
+    const mark = (state: ScenarioState, id: string) => slotNumbers(state, made.ctx, id).determined?.word ?? null;
+    expect(mark(hurt, second ?? "")).toBe("Shield");
+    expect(mark(hurt, first ?? "")).toBeNull();
+    expect(mark(hurt, idOf(hurt, murzag))).toBeNull();
+    const lone = table({ phase: "Planning", staging: [tower, bodyguard] });
+    expect(mark(lone.state, idOf(lone.state, bodyguard))).toBeNull();
+  });
+});
+
 describe("the Bodyguard, the Nazgûl and the attack sheets (06148:A:1, 06153:A:2)", () => {
   const attackOn = (code: string, staging: string[], heroes: string[] = [BOROMIR]) => {
     const made = table({ phase: "PlayerAttacks", heroes, engaged: [code], staging: [tower, ...staging], ...(code === nazgul ? { stage: rider } : {}) }, undefined, heroes);
@@ -176,7 +197,7 @@ describe("the Bodyguard, the Nazgûl and the attack sheets (06148:A:1, 06153:A:2
 
   it("an attack on a shielded Captain says the damage goes to the Bodyguard and what it holds, in the sheet, the readout and the banner", () => {
     const { made, at, next, ids } = attackOn(murzag, [bodyguard]);
-    expect(next?.note).toBe("Defense 2. Damage to Murzag goes to Morgul Bodyguard, which holds 0 of 6 damage. Choose the characters that attack it.");
+    expect(next?.note).toBe("Damage to Murzag goes to Morgul Bodyguard, which holds 0 of 6 damage. Defense 2. Choose the characters that attack it.");
     expect(readoutFor(at.state, made.ctx, next ?? null, { key: next?.key ?? "", ids, shares: [] }, idName(made, at.state))?.result).toBe("1 damage on Morgul Bodyguard, not Murzag; 5 more destroys it");
     const attacked = send(at, { type: "DeclareAttackers", enemyId: idOf(at.state, murzag), attackerIds: ids }, made.ctx);
     const done = fight(made, attacked, (state) => state.mode !== "playerAttacks");
@@ -189,7 +210,7 @@ describe("the Bodyguard, the Nazgûl and the attack sheets (06148:A:1, 06153:A:2
     const plain = attackOn(murzag, []);
     expect(plain.next?.note).toBe("Defense 2. Choose the characters that attack it.");
     const { made, at, next, ids } = attackOn(nazgul, [], [BOROMIR, ARAGORN]);
-    expect(next?.note).toBe("Defense 4. He takes 1 damage at most from each attack. Choose the characters that attack it.");
+    expect(next?.note).toBe("He takes 1 damage at most from each attack. Defense 4. Choose the characters that attack it.");
     const attacked = send(at, { type: "DeclareAttackers", enemyId: idOf(at.state, nazgul), attackerIds: ids }, made.ctx);
     const done = fight(made, attacked, (state) => state.mode !== "playerAttacks");
     const { banner, log } = told(made, at.state, done.state, done.steps as never[]);
@@ -211,6 +232,17 @@ describe("the Bodyguard, the Nazgûl and the attack sheets (06148:A:1, 06153:A:2
     expect(detail(made, opened(made).state, bodyguard)).toBe("While it is in play, damage meant for a Captain goes whole to the Morgul Bodyguard with the most damage. The Bodyguard's own Defense does not reduce it. 2 Morgul Bodyguards in play. This one has 2 of 6 damage.");
   });
 
+  it("the Bodyguard that shields a Captain says so in its preview", () => {
+    const made = table({ engaged: [murzag], staging: [tower, { code: bodyguard, damage: 2 }, { code: bodyguard }] });
+    const guards = Object.values(made.state.cards).filter((card) => card.code === bodyguard);
+    const shielding = guards.find((card) => card.damage === 2)?.id ?? "";
+    const other = guards.find((card) => card.damage === 0)?.id ?? "";
+    const state = opened(made).state;
+    const text = (id: string) => previewCards(state, made.ctx, id, describe_(made), idName(made, state), [], ledgerLine).cards.find((card) => card.code === bodyguard)?.detail ?? "";
+    expect(text(shielding)).toContain("This one takes the damage meant for a Captain now.");
+    expect(text(other)).not.toContain("takes the damage meant for a Captain now");
+  });
+
   it("an enemy that goes back to the staging area by a shadow card, or by Morgul Vale at the end of the round, says so in the banner and the log", () => {
     const made = table({ phase: "Combat", staging: [tower], engaged: [murzag], deck: [road, bodyguard, bodyguard] });
     const id = made.state.seats[0]?.engaged[0] ?? "";
@@ -220,11 +252,11 @@ describe("the Bodyguard, the Nazgûl and the attack sheets (06148:A:1, 06153:A:2
     expect(answered.state.cards[id]?.zone).toBe("staging");
     expect(banner).toContain("Murzag returns to the staging area (Morgul Road's shadow effect)");
     expect(log).toContain("Murzag returns to the staging area (Morgul Road's shadow effect)");
-    // The end of the round: the stamp reads the move of an engaged enemy to the staging area when Morgul Vale is in play.
+    // The end of the round: the engine's step of the return, with Morgul Vale's Forced effect as its cause, is worded with the card that did it.
     const round = table({ phase: "Refresh", staging: [tower, vale], engaged: [murzag] });
-    const before = { ...opened(round).state, phase: "Beginning of round" as const };
+    const before = { ...opened(round).state, phase: "End of round" as const };
     const gone = { ...before, cards: { ...before.cards, [idOf(before, murzag)]: { ...before.cards[idOf(before, murzag)], zone: "staging" as const } } } as ScenarioState;
-    expect(told(round, before, gone, [{ kind: "draw", seat: 0, cardId: "x", cause: { rule: "rr.step-1-3" } }] as never[]).log).toContain("Murzag returns to the staging area (Morgul Vale's effect at the end of the round)");
+    expect(told(round, before, gone, [{ kind: "returnToStaging", enemyId: idOf(before, murzag), cause: { effect: "06155:forced:1", line: "06155:A:1" } }] as never[]).log).toContain("Murzag returns to the staging area (Morgul Vale's effect at the end of the round)");
   });
 
   it("the return names the shadow card whose record returns the attacker, also when it is not the first one, and cites that record's line", () => {

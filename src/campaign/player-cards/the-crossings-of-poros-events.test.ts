@@ -1,8 +1,7 @@
 // Rules: rr.action, rr.cost, rr.play-restrictions-and-permissions, rr.unique-cards, rr.traits, rr.ready, rr.attachment-cards,
 // rr.encounter-deck, rr.removed-from-game, rr.shadow-effects, rr.defending-player, rr.planning-phase, rr.triggered-ability
 // (data/rules/entries.json).
-// The Crossings of Poros events, written from their card text (data/cards/CoP.json; data/printed holds no ledger for this pack, so every
-// intent goes through sendUnledgered): Bulwark of the West 17137:A:1, Flight to the Sea 17140:A:1 and A:2, The Dam Bursts 17142:A:1 and
+// The Crossings of Poros events, written from their card text (data/cards/CoP.json; the ledger lines in data/printed are read from the scans): Bulwark of the West 17137:A:1, Flight to the Sea 17140:A:1 and A:2, The Dam Bursts 17142:A:1 and
 // A:2, Wind from the Sea 17144:A:1 and A:3.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -14,8 +13,8 @@ import { setAsideEncounterCards } from "../../rules/families/sidequests/encounte
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { canPlay, choices, combat, fillers, passAll, play, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
+import { type Scene, type Table, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { canPlay, choices, combat, fillers, passAll, play, playerTableFor } from "../../../test/harness/player-table.ts";
 
 const QUICKBEAM = "17135";
 const HALFAST = "17136";
@@ -69,12 +68,12 @@ describe("Bulwark of the West (17137:A:1)", () => {
     const { tab, allies: [first = "", second = "", theirs = ""], conditions: [mine = "", condition = ""], card } = bulwark(effects);
     let run = play(begin(tab.state), tab, card);
     expect(choices(run.state, tab).sort()).toEqual([first, second].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: first }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: first }, tab.ctx);
     expect(run.state.cards[first]?.zone).toBe("discard");
     expect(run.state.cards[second]?.zone).toBe("play");
     expect(run.state.cards[theirs]?.zone).toBe("play");
     expect(choices(run.state, tab).sort()).toEqual([mine, condition].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: condition }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: condition }, tab.ctx);
     expect(run.state.cards[condition]?.zone).toBe("discard");
     expect(run.state.cards[mine]?.zone).not.toBe("discard");
     expect(run.state.cards[idsOf(tab, PLAIN)]?.zone).not.toBe("discard");
@@ -182,9 +181,9 @@ describe("Wind from the Sea (17144:A:1, A:3)", () => {
     const shadowed = (tab.ids[WALL] ?? []).find((id) => run.state.cards[id]?.shadowId === wind) ?? "";
     expect(run.state.cards[shadowed]?.shadowId).toBe(wind);
     expect(run.state.window?.kind).toBe("chooseEnemy");
-    run = passAll(sendUnledgered(run, { type: "ChooseEnemy", enemyId: shadowed }, tab.ctx), tab.ctx);
+    run = passAll(send(run, { type: "ChooseEnemy", enemyId: shadowed }, tab.ctx), tab.ctx);
     expect(run.state.window).toMatchObject({ kind: "defense", enemyId: shadowed });
-    run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: aragorn }, tab.ctx), tab.ctx);
+    run = passAll(send(run, { type: "DeclareDefender", defenderId: aragorn }, tab.ctx), tab.ctx);
     expect(run.steps.some((step) => step.kind === "strike" && step.enemyId === shadowed && step.targetId === aragorn)).toBe(true);
     expect(run.state.window?.kind).toBe("defense");
     expect(run.state.cards[aragorn]?.exhausted).toBe(false);

@@ -1,7 +1,7 @@
 // How Settings is laid out (docs/design-system.md, Settings; user decision, 2026-11-21): the settings by id, the categories that hold
 // them, the rows the table's settings panel keeps, the search over names, details and the words players use, and the quick setups
 // that change several settings at once. Pure, so a test reads it; the rows themselves are drawn by setting-row.tsx.
-import { BANNER_CLOSES_LINE, EFFECTS_VOLUME_LINE, MUSIC_LINE, MUSIC_VOLUME_LINE, STOP_OTHER_AUDIO_LINE, SOUNDS_LINE, CONTRAST_LINE, CONFIRM_TIME_LINE, FOG_LINE, GUIDE_LINE, HAPTICS_LINE, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TABLE_LIST_LINE, TABLE_LIST_WORDS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, TITLE_FACE_LINE, TITLE_FACE_WORDS, ALWAYS_EMPTY_LINE, AWAKE_LINE, DEBUG_LABEL, DEBUG_LINE } from "./settings-words.ts";
+import { EFFECTS_VOLUME_LINE, MUSIC_LINE, MUSIC_VOLUME_LINE, STOP_OTHER_AUDIO_LINE, SOUNDS_LINE, CONTRAST_LINE, CONFIRM_TIME_LINE, FOG_LINE, GUIDE_LINE, HAPTICS_LINE, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TABLE_LIST_LINE, TABLE_LIST_WORDS, THEME_LINE, THEME_WORDS, TIMING_TIPS_LINE, TITLE_FACE_LINE, TITLE_FACE_WORDS, ALWAYS_EMPTY_LINE, AWAKE_LINE, DEBUG_LABEL, DEBUG_LINE } from "./settings-words.ts";
 import type { TableSettings } from "../../ui/table-settings.ts";
 import { CHECK_LABEL, CHECK_LINE } from "../../ui/update/offer.ts";
 import { volumeWords } from "../../ui/sound/volume.ts";
@@ -15,7 +15,6 @@ export type SettingId =
   | "fog"
   | "speed"
   | "reduceMotion"
-  | "bannerCloses"
   | "spotlight"
   | "haptics"
   | "sounds"
@@ -49,7 +48,6 @@ export const SETTING_TITLES: Readonly<Record<SettingId, string>> = {
   fog: "Moving fog",
   speed: "Animation speed",
   reduceMotion: "Reduce motion",
-  bannerCloses: "Banner closes",
   spotlight: "Combat spotlight",
   haptics: "Haptics",
   sounds: "Sound effects",
@@ -77,7 +75,6 @@ const SETTING_DETAILS: Readonly<Record<SettingId, string>> = {
   fog: FOG_LINE,
   speed: SPEED_LINE,
   reduceMotion: REDUCE_MOTION_LINE,
-  bannerCloses: BANNER_CLOSES_LINE,
   spotlight: SPOTLIGHT_LINE,
   haptics: HAPTICS_LINE,
   sounds: SOUNDS_LINE,
@@ -105,7 +102,6 @@ export const SETTING_KEYWORDS: Readonly<Record<SettingId, string>> = {
   fog: "background animation mist lag stutter",
   speed: "animation fast faster quick slow slower",
   reduceMotion: "animation motion sickness still",
-  bannerCloses: "message popup notice time wait",
   spotlight: "combat attack damage replay animation",
   haptics: "vibrate vibration buzz rumble feedback",
   sounds: "audio sfx click noise mute quiet",
@@ -141,7 +137,7 @@ export const CATEGORIES: readonly Category[] = [
   { id: "look", title: "Look", rows: ["theme", "scale", "titleFace", "contrast"], words: "display appearance" },
   { id: "motion", title: "Motion", rows: ["speed", "reduceMotion", "spotlight", "haptics"], words: "animation feel" },
   { id: "sound", title: "Sound", rows: ["sounds", "soundVolume", "music", "musicVolume", "stopOtherAudio"], words: "audio volume" },
-  { id: "playing", title: "Playing", rows: ["guide", "stops", "bannerCloses", "timingTips", "confirmTime", "awake", "always"], words: "game table play" },
+  { id: "playing", title: "Playing", rows: ["guide", "stops", "timingTips", "confirmTime", "awake", "always"], words: "game table play" },
   { id: "accessibility", title: "Accessibility", note: ACCESSIBILITY_LINE, rows: ["tableList", "scale", "contrast", "reduceMotion", "confirmTime"], words: "a11y access" },
   { id: "performance", title: "Performance", note: PERFORMANCE_LINE, rows: ["quality", "fog"], words: "battery speed slow lag stutter hot" },
   { id: "saves", title: "Saves", rows: [], words: "backup back up restore export import file" },
@@ -149,7 +145,7 @@ export const CATEGORIES: readonly Category[] = [
 ];
 
 // The rows the table's settings panel keeps: what a player changes during a game. The rest is one tap away in All settings.
-export const PANEL_ROWS: readonly SettingId[] = ["speed", "spotlight", "bannerCloses", "haptics", "sounds", "soundVolume", "music", "musicVolume", "timingTips", "always"];
+export const PANEL_ROWS: readonly SettingId[] = ["speed", "spotlight", "haptics", "sounds", "soundVolume", "music", "musicVolume", "timingTips", "always"];
 
 export function categoryOf(id: CategoryId): Category {
   const category = CATEGORIES.find((each) => each.id === id);
@@ -268,7 +264,7 @@ export function quickSetups(platform: SettingsPlatform): readonly QuickSetup[] {
     : { id: "light", title: "Save battery", line: "Card pictures Low, the fog still, and the screen may sleep during a game.", change: { cardQuality: "low", fogDrift: false, keepAwake: false } };
   return [
     { id: "read", title: "Easier to read", line: "UI scale Large, plain titles and strong outlines.", change: { uiScale: "large", titleFace: "plain", highContrast: "always" } },
-    { id: "calm", title: "Calm table", line: "Reduce motion, no combat spotlight, banners that wait for a tap and a long confirm time.", change: { reduceMotion: "always", spotlight: false, bannerCloses: "tap", confirmTime: "long" } },
+    { id: "calm", title: "Calm table", line: "Reduce motion, no combat spotlight and a long confirm time.", change: { reduceMotion: "always", spotlight: false, confirmTime: "long" } },
     light,
   ];
 }

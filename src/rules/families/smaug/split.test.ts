@@ -57,7 +57,7 @@ describe("progress on two active locations with Fisherman's Dock (50223:A:2)", (
   });
 });
 
-// A card in play that answers a location leaving play (Idraen's Response, 08025): it hears an explored location only when the split announces it.
+// A card in play that answers a location leaving play (Idraen's Response, 08025): it hears an explored location when the split announces it.
 const HEARS: Effect = { id: "a1:response:1", cardCode: "a1", lines: ["a1:A:1"], timing: "response", trigger: "leftPlay", subject: { type: "location", control: "any" }, instructions: [{ verb: "RaiseThreat", amount: 1 }] };
 
 function explore(second: string) {
@@ -70,8 +70,8 @@ function explore(second: string) {
 }
 
 describe("a location a split explores (rr.explored)", () => {
-  it("opens no Response window for a Fisherman's Dock split, as on main (The Battle of Lake-town plays as before)", () => {
-    expect(explore(DOCK).window?.kind).not.toBe("response");
+  it("opens the Response window of a card that hears it for a Fisherman's Dock split", () => {
+    expect(explore(DOCK).window?.kind).toBe("response");
   });
 
   it("opens the Response window of a card that hears it for a Ruined Tower split (06103:A:1; 06091:B:2 takes the explored location)", () => {

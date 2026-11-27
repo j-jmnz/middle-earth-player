@@ -78,6 +78,8 @@ export type CardSlot = Rect & {
   // A card of the back row of two stacked play rows: the screen y where the front row starts. Its tokens, effects and pops are drawn
   // in the band above it, so a hero's resources are not hidden under the row in front (user request, 2026-11-01; `shownBounds`).
   coveredFrom?: number;
+  // The width of a back-row card the next card in its row leaves visible (its own width on the last one): its effect pills stay inside it.
+  coveredStep?: number;
   // The victory display's pile: the pictures of the cards fanned behind its top (the oldest first) and the Victory points its cards score, on its gold coin.
   fan?: readonly string[];
   points?: number;

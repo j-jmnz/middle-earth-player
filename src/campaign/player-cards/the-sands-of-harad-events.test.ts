@@ -1,7 +1,6 @@
 // Rules: rr.action, rr.response, rr.cost, rr.unique-cards, rr.play-restrictions-and-permissions, rr.engaged, rr.triggered-ability
 // (data/rules/entries.json).
-// The Sands of Harad events, written from their card text (data/cards/TSoH.json; data/printed holds no ledger for this box, so every intent
-// goes through sendUnledgered): Unlikely Friendship 16007:A:1 and A:2, Well Warned 16008:A:1 and A:2. The heroes, allies and side quest
+// The Sands of Harad events, written from their card text (data/cards/TSoH.json; the ledger lines in data/printed are read from the scans): Unlikely Friendship 16007:A:1 and A:2, Well Warned 16008:A:1 and A:2. The heroes, allies and side quest
 // are in the-sands-of-harad.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -12,8 +11,8 @@ import { withThreat } from "../../rules/core/state.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { canPlay, choices, fillers, playCode, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { type Run, type Table, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { canPlay, choices, fillers, playCode, playerTableFor, triggers } from "../../../test/harness/player-table.ts";
 
 const GIMLI = "16001";
 const LEGOLAS = "16002";
@@ -78,7 +77,7 @@ describe("Unlikely Friendship (16007:A:1, A:2)", () => {
     const [drawn = ""] = tab.state.seats[0]?.deck ?? [];
     let run = playCode(tab, FRIENDSHIP);
     expect(choices(run.state, tab).sort()).toEqual([gimli, legolas].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: legolas }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: legolas }, tab.ctx);
     expect(run.state.seats[0]?.hand).toEqual([drawn]);
     expect(run.state.seats[0]?.deck).toHaveLength(1);
     expect(run.state.cards[legolas]?.resources).toBe(6 + 1);
@@ -92,9 +91,9 @@ describe("Well Warned (16008:A:1, A:2)", () => {
   function engaged(effects: readonly Effect[], other: string, enemy = WEAK): { tab: Table; run: Run } {
     const scene = table(effects, { seats: 2, start: "encounter", heroes: [{ code: LEGOLAS, seat: 0 }, { code: other, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: WARNED, seat: 0 }], staging: [enemy] });
     const tab = { ...scene, state: withThreat(scene.state, 1, 20) };
-    let run = sendUnledgered(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
     expect(run.state.activeSeat).toBe(1);
-    run = sendUnledgered(run, { type: "Engage", enemyId: idsOf(tab, enemy) }, tab.ctx);
+    run = send(run, { type: "Engage", enemyId: idsOf(tab, enemy) }, tab.ctx);
     expect(run.state.cards[idsOf(tab, enemy)]?.zone).toBe("engaged");
     return { tab, run };
   }
@@ -113,7 +112,7 @@ describe("Well Warned (16008:A:1, A:2)", () => {
   // the Weak, so his threat goes from 20 to 17; the first player's stays 8.
   lineSpec("16008:A:2", "Well Warned: after a player engages an enemy, reduce that player's threat by its printed Threat", (effects) => {
     const { tab, run: done } = engaged(effects, EOWYN);
-    const run = sendUnledgered(done, { type: "Trigger", cardId: idsOf(tab, WARNED), effectId: "16008:response:1" }, tab.ctx);
+    const run = send(done, { type: "Trigger", cardId: idsOf(tab, WARNED), effectId: "16008:response:1" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, WARNED)]?.zone).toBe("discard");
     expect(run.state.seats[1]?.threat).toBe(20 - 3);
     expect(run.state.seats[0]?.threat).toBe(8);

@@ -63,7 +63,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 10040:B:2 (back): The players cannot defeat this stage while Southern Gate is in play. If the players defeat this stage, they have escaped Mount Gram and win the game.
   10040:constant:2: Constant
     only if the card with code 10042 is in play
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 10041 Jailor Gornákh
 (the scenario deals it into the setAside pile; the piles place it, no record does)

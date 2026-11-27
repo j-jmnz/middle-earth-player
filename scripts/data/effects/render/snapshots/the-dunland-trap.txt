@@ -15,7 +15,7 @@ Scenario piles that place cards with no record (quest: 08011 The Road to Tharbad
     - Time 2: when this card is revealed, 2 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
 
 08011:B:2 (back): Forced: After the last time counter is removed from this stage, each player discards his hand and draws 2 cards. Place 2 time counters on this stage.
-  08011:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card) [also {"holdsEvents":true}]
+  08011:forced:1: Forced after the last time counter is removed from a card, at the end of the refresh phase or by a card effect (heard about this card; the Forced effects that hear what it does (a draw, the last time counter taken off the stage) resolve after the whole effect has finished, not between its steps or between two players' turns in it)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
@@ -37,7 +37,7 @@ Scenario piles that place cards with no record (quest: 08011 The Road to Tharbad
       - the acting player discards each ally (you control) other than the cards this effect already picked
 
 08012:B:1 (back): When Revealed: Each player searches the encounter deck and discard pile for a Boar Clan enemy and puts it into play engaged with him. Shuffle the encounter deck. Each player shuffles his discard pile into his draw deck and draws 1 card.
-  08012:whenRevealed:2: When revealed [also {"holdsEvents":true}]
+  08012:whenRevealed:2: When revealed (the Forced effects that hear what it does (a draw, the last time counter taken off the stage) resolve after the whole effect has finished, not between its steps or between two players' turns in it)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the acting player finds one Boar Clan enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
@@ -103,7 +103,7 @@ Scenario piles that place cards with no record (quest: 08011 The Road to Tharbad
 08014:A:3 (front): Forced: After an enemy engages a player, remove 1 time counter from the current quest.
   08014:forced:3: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about enemy (any player controls))
     who acts: the acting player is the player the enemy engaged
-    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it is heard (a record that holds its events lets it resolve only after the whole effect has finished; a stage with none loses none)
 
 ## 08015 Munuv Dûv Ravine
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -121,7 +121,7 @@ Scenario piles that place cards with no record (quest: 08011 The Road to Tharbad
   08016:forced:1: Forced at the end of the phase
     only if it is the Refresh phase
     who acts: the acting player is the first player (a phase has no player of its own)
-    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+    - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it is heard (a record that holds its events lets it resolve only after the whole effect has finished; a stage with none loses none)
 
 ## 08017 Boar Clan Stalker
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -182,7 +182,7 @@ Scenario piles that place cards with no record (quest: 08011 The Road to Tharbad
     - of the cards this effect discarded from the encounter deck, the Dunland enemy discarded last is put into play engaged with the acting player (as if it had engaged him; nothing when none was discarded)
 
 08020:A:2 (front): Travel: Each player draws a card to travel here.
-  08020:travel:1: Travel [also {"holdsEvents":true}]
+  08020:travel:1: Travel (the Forced effects that hear what it does (a draw, the last time counter taken off the stage) resolve after the whole effect has finished, not between its steps or between two players' turns in it)
     - for each player, first player first:
       - the acting player draws 1 card(s)
 
@@ -220,7 +220,7 @@ Scenario piles that place cards with no record (quest: 08011 The Road to Tharbad
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 08023:A:1 (front): When Revealed: Each player draws a card. Each player discards each ally from his hand. If no allies are discarded this way, Frenzied Attack gains surge.
-  08023:whenRevealed:1: When revealed [also {"holdsEvents":true}]
+  08023:whenRevealed:1: When revealed (the Forced effects that hear what it does (a draw, the last time counter taken off the stage) resolve after the whole effect has finished, not between its steps or between two players' turns in it)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the acting player draws 1 card(s)
@@ -252,4 +252,4 @@ Scenario piles that place cards with no record (quest: 08011 The Road to Tharbad
       - the acting player finds one Dunland enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
     - shuffle the encounter deck
 
-(rendered pieces: 127 by template, 4 as JSON)
+(rendered pieces: 131 by template, 0 as JSON)

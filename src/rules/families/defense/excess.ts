@@ -35,6 +35,13 @@ function noteLanded(state: ScenarioState, landed: number): ScenarioState {
   return landed > 0 ? { ...state, pendingAttack: { ...attack, defense: { ...attack.defense, landed: (attack.defense?.landed ?? 0) + landed } } } : state;
 }
 
+// The card the attack's combat damage landed on when it was redirected away from the card it was assigned to, kept for destroyedByAttack: the redirect is not the same at the attack's end (an unredirected target is read from the attack).
+function noteHit(state: ScenarioState, id: string, landed: number): ScenarioState {
+  const attack = state.pendingAttack;
+  if (!attack || landed <= 0 || attack.defense?.hit?.includes(id)) return state;
+  return { ...state, pendingAttack: { ...attack, defense: { ...attack.defense, hit: [...(attack.defense?.hit ?? []), id] } } };
+}
+
 // The excess damage of the attack in progress, kept for the effect it leaves for its end (excessToShip).
 function noteExcess(state: ScenarioState, excess: number): ScenarioState {
   const attack = state.pendingAttack;
@@ -84,7 +91,7 @@ export function combatDamage(
   const targetId = damageGoesTo(state, assigned, "combat");
   const damaged = placeDamage(state, assigned, raw, ctx.cards, steps, "combat", cause);
   const landed = steps.slice(logged).reduce((sum, step) => (step.kind === "damage" && step.targetId === targetId && step.amount > 0 ? sum + step.amount : sum), 0);
-  const placed = noteHurt(noteLanded(noteWillpower(damaged, state, targetId, ctx), landed), targetId, state.cards[targetId]?.damage ?? 0, landed, ctx);
+  const placed = noteHurt(noteHit(noteLanded(noteWillpower(damaged, state, targetId, ctx), landed), targetId, targetId === assigned ? 0 : landed), targetId, state.cards[targetId]?.damage ?? 0, landed, ctx);
   // "Each damage dealt by Wainriders raises the defending player's threat by 1" (00004:A:1): the damage that landed, whatever the character's hit points, raises the threat of the player the attack is against (rr.defending-player).
   const raised = landed > 0 && flagged(state, enemyId, "damageToThreat") ? damageRaisesThreat(placed, state, enemyId, landed, steps, ctx) : placed;
   const toThreat = flagged(state, enemyId, "excessToThreat");

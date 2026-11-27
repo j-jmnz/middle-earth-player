@@ -403,6 +403,16 @@ export function onTheTable(sheet: Sheet, onTable: (cardId: string) => boolean): 
   }
 }
 
+/** The note without the card's name when the title already says it ("Street Fighting: choose a hero" under the title "Street Fighting" reads "Choose a hero"): the dock keeps one line of the note, and a name in it twice cuts the useful part. */
+export function dockNote(title: string, note: string | null): string | null {
+  const prefix = `${title}: `;
+  const seat = /^Player \d+: /.exec(note ?? "")?.[0] ?? "";
+  const rest = (note ?? "").slice(seat.length);
+  if (note == null || title === "" || !rest.startsWith(prefix) || rest.length === prefix.length) return note;
+  const tail = rest.slice(prefix.length);
+  return `${seat}${tail.charAt(0).toUpperCase()}${tail.slice(1)}`;
+}
+
 /**
  * The words over a sheet, in the dock or on a panel: the step (with the timing of a Response or an Action, and the seat in
  * two-handed play), the moment, a sentence, and the engine's numbers for it.
@@ -414,16 +424,16 @@ export function headerOf(sheet: Sheet, game: ScenarioState): { step: string; lea
   switch (sheet.kind) {
     case "pick":
     case "multi":
-      return { step: `${seat}${sheet.step}`, lead: seat, title: sheet.title, note: sheet.note, stats: sheet.stats ?? [] };
+      return { step: `${seat}${sheet.step}`, lead: seat, title: sheet.title, note: dockNote(sheet.title, sheet.note), stats: sheet.stats ?? [] };
     case "distribute":
-      return { step: `${seat}${sheet.step}`, lead: seat, title: sheet.title, note: sheet.note, stats: [] };
+      return { step: `${seat}${sheet.step}`, lead: seat, title: sheet.title, note: dockNote(sheet.title, sheet.note), stats: [] };
     case "trigger": {
       // A title that already says the timing ("Response") is not led by it twice.
       const timing = sheet.title.startsWith(sheet.timing) ? "" : `${sheet.timing} · `;
-      return { step: `${seat}${sheet.timing} · ${sheet.step}`, lead: seat + timing, title: sheet.title, note: sheet.note, stats: [] };
+      return { step: `${seat}${sheet.timing} · ${sheet.step}`, lead: seat + timing, title: sheet.title, note: dockNote(sheet.title, sheet.note), stats: [] };
     }
     case "window":
-      return { step: `${seat}${sheet.step}`, lead: seat, title: sheet.title, note: sheet.note, stats: [] };
+      return { step: `${seat}${sheet.step}`, lead: seat, title: sheet.title, note: dockNote(sheet.title, sheet.note), stats: [] };
     case "outcome":
       return { step: sheet.step, lead: "", title: sheet.title, note: sheet.note, stats: [] };
   }

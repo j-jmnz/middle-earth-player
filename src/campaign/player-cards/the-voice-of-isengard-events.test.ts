@@ -1,7 +1,6 @@
 // Rules: rr.action, rr.event-cards, rr.doomed-x, rr.drawing-cards, rr.lasting-effects, rr.step-6-4a, rr.may, rr.search,
 // rr.in-player-order (data/rules/entries.json).
-// The Voice of Isengard events, each printed line tested from the words on the card (data/cards/VoI.json: data/printed holds no ledger
-// for this pack, so the lines are the text of data/cards and every intent goes through sendUnledgered): Legacy of Númenor 07011:A:2,
+// The Voice of Isengard events, each printed line tested from the words on the card (data/cards/VoI.json: the lines are the ledger lines in data/printed, read from the scans): Legacy of Númenor 07011:A:2,
 // Deep Knowledge 07012:A:2, The Wizards's Voice 07013:A:2, Power of Orthanc 07014:A:2, The Seeing-stone 07015:A:2.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -10,8 +9,8 @@ import { EFFECTS } from "../../effects/index.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf } from "../../../test/harness/scene.ts";
-import { atDefense, canPlay, choices, combat, fillers, passAll, play, playerTableFor, sendUnledgered } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { atDefense, canPlay, choices, combat, fillers, passAll, play, playerTableFor } from "../../../test/harness/player-table.ts";
 
 const LEGACY = "07011";
 const DEEP = "07012";
@@ -112,13 +111,13 @@ describe("Power of Orthanc (07014:A:2)", () => {
     const [favor, courage, item] = [idsOf(tab, FAVOR), idsOf(tab, COURAGE), idsOf(tab, STONE_ITEM)];
     let run = play(begin(tab.state), tab, idsOf(tab, POWER));
     expect(choices(run.state, tab).sort()).toEqual(["discard", "skip"]);
-    run = sendUnledgered(run, { type: "Choose", optionId: "discard" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "discard" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([favor, courage].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: courage }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: courage }, tab.ctx);
     expect(run.state.cards[courage]?.zone).toBe("discard");
     // The other player's turn to choose: the Favor is the lone Condition left; they skip.
     expect(choices(run.state, tab).sort()).toEqual(["discard", "skip"]);
-    run = sendUnledgered(run, { type: "Choose", optionId: "skip" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "skip" }, tab.ctx);
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[favor]?.zone).toBe("play");
     expect(run.state.cards[item]?.zone).toBe("play");
@@ -140,7 +139,7 @@ describe("The Seeing-stone (07015:A:2)", () => {
     const [deep, legacy] = [idsOf(tab, DEEP), idsOf(tab, LEGACY)];
     let run = play(begin(tab.state), tab, idsOf(tab, STONE));
     expect(choices(run.state, tab).sort()).toEqual([deep, legacy].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: legacy }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: legacy }, tab.ctx);
     expect(run.state.cards[legacy]?.zone).toBe("hand");
     expect(run.state.cards[deep]?.zone).toBe("deck");
     const unshuffled = (tab.state.seats[0]?.deck ?? []).filter((id) => id !== legacy);

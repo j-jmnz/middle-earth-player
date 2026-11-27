@@ -8,7 +8,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { applyResolution, openResolution, resolutionResult } from "../../../rules/setup/resolution.ts";
 import { attack, cardSpecs, damageOn, defend, endPhase, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
-import { lineSpec } from "../../../../test/harness/line-spec.ts";
+import { lineDefault, lineSpec } from "../../../../test/harness/line-spec.ts";
 import { idOf, legalTargets, send, start, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { payFor } from "../../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 
@@ -42,7 +42,7 @@ const hostsOf = (made: ReturnType<typeof blessingTable>): readonly string[] => l
 
 describe("Círdan's Blessing's hosts (11205:A:1 to 11208:A:1)", () => {
   for (const code of ["11205", "11206", "11207"]) {
-    lineSpec(`${code}:A:1`, "attaches to a character, a hero or an ally, and not to an enemy", (effects) => {
+    lineDefault(`${code}:A:1`, "attaches to a character, a hero or an ally, and not to an enemy", (effects) => {
       const made = blessingTable(code, effects, { seats: 2, play: ["ally"], staging: [SEA_SCORPION] });
       const hosts = hostsOf(made);
       expect(hosts).toContain(made.hero);

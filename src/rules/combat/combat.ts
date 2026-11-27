@@ -420,18 +420,44 @@ export function attackStrength(state: ScenarioState, attackerIds: readonly strin
   return attack;
 }
 
+// An assignment is dealt as one amount on its character (mec109.archery, hon.archery), in the order the player gave. The points not yet dealt are the player's to assign again, so the window opens again with them,
+// when a later assignment's character has left play or may no longer take archery damage (an ally destroyed by an earlier one, with `archeryToAllies` holding: 06043:B:1), and when an ally that must take
+// the damage first (`archeryToAllies`) would be destroyed with points over: those go to the next character that can take them.
 export function assignArchery(
   state: ScenarioState,
   assignments: readonly { cardId: string; amount: number }[],
   ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
+  const seat = state.window?.kind === "archery" ? state.window.seat : undefined;
+  const total = assignments.reduce((sum, assignment) => sum + Math.max(0, assignment.amount), 0);
+  const allies = state.modifiers.length > 0 && flagged(state, "table", "archeryToAllies");
   let next = state;
+  let dealt = 0;
+  let stopped = false;
   for (const assignment of assignments) {
     if (assignment.amount <= 0) continue;
-    next = placeDamage(next, assignment.cardId, assignment.amount, ctx.cards, steps, "framework", ruleCause("mec109.archery"));
+    if (stopped || (dealt > 0 && !canTakeArchery(next, ctx.cards, assignment.cardId, seat))) {
+      stopped = true;
+      continue;
+    }
+    const instance = next.cards[assignment.cardId];
+    const room = instance ? modifiedStat(next, instance, "hitPoints", ctx.cards) - instance.damage : assignment.amount;
+    const amount = allies && room > 0 ? Math.min(assignment.amount, room) : assignment.amount;
+    next = placeDamage(next, assignment.cardId, amount, ctx.cards, steps, "framework", ruleCause("mec109.archery"));
+    dealt += amount;
+    if (amount < assignment.amount) stopped = true;
   }
+  const left = total - dealt;
+  if (left > 0 && archeryRecipients(next, ctx.cards, seat).length > 0) return { ...next, window: { kind: "archery", total: left, ...(seat != null ? { seat } : {}) } };
   return { ...next, window: null };
+}
+
+// Whether archery damage may go on this character now (a seat's own archery window, or the one window of all seats): it is a recipient and its damage is short of its hit points (a lethal wound a Response may still cancel leaves it in play).
+function canTakeArchery(state: ScenarioState, cards: Cards, id: string, seat: number | undefined): boolean {
+  const instance = state.cards[id];
+  if (!instance || !archeryRecipients(state, cards, seat).includes(id)) return false;
+  return instance.damage < modifiedStat(state, instance, "hitPoints", cards);
 }
 
 export function heroIds(state: ScenarioState, seat: number): string[] {

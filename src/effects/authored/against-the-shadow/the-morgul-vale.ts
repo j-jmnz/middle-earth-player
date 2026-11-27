@@ -14,6 +14,7 @@ const PLACE = (amount: number, when?: Condition): Extract<Instruction, { verb: "
 const TOKENS = { stat: "progress", ofNamed: TOWER } as const;
 const TOWER_CARD: PickSpec = { type: "objective", control: "any", names: [TOWER], staging: true };
 const CAPTAIN = (name: string): PickSpec => ({ type: "enemy", control: "any", staging: true, names: [name] });
+const KEPT_UNLESS_DESTROYED = (name: string): Instruction => ({ verb: "ModifyStat", stat: "cannotLeaveUnlessDestroyed", amount: 1, until: "whileSourceInPlay", holders: CAPTAIN(name) });
 const KEEP_IN_PLAY = (name: string): Instruction => ({ verb: "ModifyStat", stat: "cannotLeavePlay", amount: 1, until: "whileSourceInPlay", holders: CAPTAIN(name) });
 const ADVANCE_WHEN_DESTROYED = (code: string, line: string, name: string): Effect => ({ id: `${code}:forced:1`, cardCode: code, lines: [line], timing: "forced", trigger: "enemyDestroyed", subject: CAPTAIN(name), instructions: [{ verb: "AdvanceStage" }] });
 const NO_TOKENS: Condition = { kind: "less", left: TOKENS, right: 1 };
@@ -34,18 +35,18 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     // 06144 The Rearguard (stage 1). A:1: the piles set Lord Alcaron, the Nazgûl and The White Bridge aside and add To the Tower, Murzag and a Morgul Vale to the staging area without revealing them; To the Tower is announced as added, so its own Forced effect hears it. B:1: Murzag cannot leave play unless destroyed; destroying him advances the quest (a Forced
     // effect, so the quest advances before any Response to his destruction). The stage prints no quest points: only his destruction advances it.
     { id: "06144:setup:1", cardCode: "06144", lines: ["06144:A:1"], timing: "setup", instructions: [{ verb: "Pick", pick: TOWER_CARD }, { verb: "AnnounceAddedToStaging", card: "picked" }] },
-    { id: "06144:constant:1", cardCode: "06144", lines: ["06144:B:1"], timing: "constant", instructions: [KEEP_IN_PLAY("Murzag")] },
+    { id: "06144:constant:1", cardCode: "06144", lines: ["06144:B:1"], timing: "constant", instructions: [KEEP_IN_PLAY("Murzag"), KEPT_UNLESS_DESTROYED("Murzag")] },
     ADVANCE_WHEN_DESTROYED("06144", "06144:B:1", "Murzag"),
 
     // 06145 The Betrayal (stage 2). A:1: Lord Alcaron, set aside, is added to the staging area (not revealed). B:1: as 06144:B:1 for Lord Alcaron.
     { id: "06145:whenRevealed:1", cardCode: "06145", lines: ["06145:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSetAsideToStaging", code: "06152" }] },
-    { id: "06145:constant:1", cardCode: "06145", lines: ["06145:B:1"], timing: "constant", instructions: [KEEP_IN_PLAY("Lord Alcaron")] },
+    { id: "06145:constant:1", cardCode: "06145", lines: ["06145:B:1"], timing: "constant", instructions: [KEEP_IN_PLAY("Lord Alcaron"), KEPT_UNLESS_DESTROYED("Lord Alcaron")] },
     ADVANCE_WHEN_DESTROYED("06145", "06145:B:1", "Lord Alcaron"),
 
     // 06146 The Morgul Rider (stage 3). A:1: the Nazgûl and The White Bridge, set aside, are added to the staging area. B:1: the first player reveals 1 card per player, one at a time, each added to the staging area. B:2: the Nazgûl cannot leave play unless destroyed. B:3: when he is destroyed the players win.
     { id: "06146:whenRevealed:1", cardCode: "06146", lines: ["06146:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSetAsideToStaging", code: "06153" }, { verb: "AddSetAsideToStaging", code: "06156" }] },
     { id: "06146:whenRevealed:2", cardCode: "06146", lines: ["06146:B:1"], timing: "whenRevealed", instructions: [{ verb: "RevealEncounter", who: "firstPlayer", times: { players: true } }] },
-    { id: "06146:constant:1", cardCode: "06146", lines: ["06146:B:2"], timing: "constant", instructions: [KEEP_IN_PLAY("Nazgûl of Minas Morgul")] },
+    { id: "06146:constant:1", cardCode: "06146", lines: ["06146:B:2"], timing: "constant", instructions: [KEEP_IN_PLAY("Nazgûl of Minas Morgul"), KEPT_UNLESS_DESTROYED("Nazgûl of Minas Morgul")] },
     { id: "06146:triggered:1", cardCode: "06146", lines: ["06146:B:3"], timing: "triggered", trigger: "enemyDestroyed", subject: CAPTAIN("Nazgûl of Minas Morgul"), instructions: [{ verb: "WinGame" }] },
 
     // 06147 To the Tower. A:1: it cannot leave the staging area. A:2: when it is added to the staging area at Setup, every Faramir the players own is removed from the game. A:3: once 10 or more progress tokens lie on it in the staging area (checked after each placement; the filter's zone scope is `inStaging`, as the engine's self test reads no zone) the players lose.

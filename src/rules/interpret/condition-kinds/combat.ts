@@ -3,6 +3,9 @@ import { engagedThisRound } from "../../families/attack/events.ts";
 import { attackingHolds } from "../../families/attack/strike.ts";
 import { defendingAgainst } from "../../families/angmar/combat.ts";
 import { inAreaOf } from "../../families/breaking/areas.ts";
+import { encounterUncancelable } from "../../families/encounter/cancel.ts";
+import { flagged } from "../../core/state.ts";
+import { hasShadowEffect } from "../../families/defense/shadow.ts";
 import { combatStepIs } from "../../families/defense/conditions.ts";
 import { engagedThisPhase } from "../../families/quest/conditions.ts";
 import { seatThreat } from "../../families/play/hooks.ts";
@@ -19,6 +22,15 @@ export const combatHandlers = {
     if (attack == null) return false;
     const undefended = attack.defenderId == null || attack.undefended === true;
     return undefended === (condition.is !== false);
+  },
+  // The shadow card dealt to the attacking enemy has an effect that is not resolved or canceled yet, whether it is dealt face down or face up (07009 shadowsFaceUp).
+  shadowPending: (state, _condition, _scope, ctx) => {
+    const attack = state.pendingAttack;
+    if (attack == null || attack.shadowResolved === true || attack.shadowCanceled === true) return false;
+    // No shadow effect of the Beast of Taur-nu-Fuin, of any enemy while Chieftain of the Pit is in play, or of an encounter card under The Eaves of Mirkwood can be canceled (rules/families/encounter/cancel.ts).
+    if (flagged(state, attack.enemyId, "shadowsUncancelable") || flagged(state, "table", "allShadowsUncancelable") || encounterUncancelable(state)) return false;
+    const shadowId = state.cards[attack.enemyId]?.shadowId;
+    return shadowId != null && hasShadowEffect(state, shadowId, ctx);
   },
   defendingAgainst: (state, condition, scope, ctx) => {
     const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];

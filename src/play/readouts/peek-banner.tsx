@@ -22,7 +22,7 @@ import { announce } from "../../ui/announce.ts";
 const PILL = 36;
 /** The gap between the top bar and the pill. */
 export const PEEK_TOP = 2;
-/** The room the banner takes under the top bar (its gap, the pill and a gap below): the table's own outcome banner hangs under it while it shows. */
+/** The room the banner takes under the top bar (its gap, the pill and a gap below). */
 export const PEEK_ROOM = PEEK_TOP + PILL + 4;
 // The one cap on the phone's text size that stays: the pill is a fixed 36 pt slot over the staging row (PEEK_ROOM), so its two words stop growing at 1.3 times.
 const SCALE = 1.3;

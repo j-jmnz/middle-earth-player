@@ -12,7 +12,7 @@ export const RECORDS: readonly Effect[] = [
   // 06065 Hobbit-sense. An event's lasting effect reaches the cards in play when it resolves (rr.event-cards): the enemies
   // engaged with you, and the characters you control, which cannot be declared as attackers.
   {"id":"06065:constant:1","cardCode":"06065","lines":["06065:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":{"kind":"heroesAll","trait":"Hobbit"}}]},
-  {"id":"06065:action:1","cardCode":"06065","lines":["06065:A:2"],"timing":"action","condition":{"kind":"phase","is":"Combat"},"instructions":[{"verb":"ModifyStat","stat":"cannotAttack","amount":1,"until":"endOfRound","holders":{"type":"enemy","control":"any","engaged":"you"}},{"verb":"ModifyStat","stat":"cannotAttack","amount":1,"until":"endOfRound","holders":{"type":"character","control":"you"}}]},
+  {"id":"06065:action:1","cardCode":"06065","lines":["06065:A:2"],"timing":"action","condition":{"kind":"phase","is":"Combat"},"instructions":[{"verb":"ModifyStat","stat":"cannotAttack","amount":1,"until":"endOfPhase","holders":{"type":"enemy","control":"any","engaged":"you"}},{"verb":"ModifyStat","stat":"cannotAttack","amount":1,"until":"endOfPhase","holders":{"type":"character","control":"you"}}]},
 ];
 
 export const REPLACES: readonly string[] = [];

@@ -7,7 +7,8 @@ import { legalIntents, reduce, type PlayerIntent, type ScenarioState } from "../
 import { enemy, hero, seaTable, shipEnemy } from "../../../rules/families/sea/table.ts";
 import { spawn } from "../../../rules/core/zones.ts";
 
-import { intentWords, momentOf } from "../../store/outcome.ts";
+import { intentWords } from "../../store/intent-words.ts";
+import { momentOf } from "../../store/outcome.ts";
 import { sailingTable } from "../../dream-chaser/sea-fixture.ts";
 import { pileSpeech } from "../../canvas/pile-speech.ts";
 import {
@@ -55,7 +56,8 @@ describe("Boarding's beat", () => {
     const lines = moment?.lines.map((line) => line.text) ?? [];
     expect(lines).toContain("Boarding 2 · Corsair Warship: 2 Corsairs engage Player 1");
     // The ship's line and the Boarding line: the Corsairs are not a beat of their own.
-    expect(lines.filter((text) => / engages? /.test(text))).toHaveLength(2);
+    expect(lines.filter((text) => / engages? /.test(text))).toHaveLength(1);
+    expect(lines).toContain("Engaged with Player 1");
     expect(moment?.lines.find((line) => line.text.startsWith("Boarding"))?.cards).toEqual([built.ids.galley]);
   });
 
@@ -65,7 +67,7 @@ describe("Boarding's beat", () => {
     const state = { ...built.state, corsairDeck: [], corsairDiscard: [] };
     // Only the engine's own mark (`boarding`, the ship whose keyword revealed it) joins an engagement to a ship's beat.
     const other = momentOf(state, state, [{ kind: "engage", seat: 0, enemyId: built.ids.galley! }, { kind: "engage", seat: 0, enemyId: built.ids.pirate! }], names);
-    expect(other?.lines.map((line) => line.text)).toEqual(["Galley engages you", "Pirate engages", "Pirate engages you"]);
+    expect(other?.lines.map((line) => line.text)).toEqual(["Galley engages you", "Pirate engages you"]);
     expect(other?.lines.some((line) => line.text.startsWith("Boarding"))).toBe(false);
     const boarded = momentOf(state, state, [{ kind: "engage", seat: 0, enemyId: built.ids.galley! }, { kind: "engage", seat: 0, enemyId: built.ids.pirate!, boarding: built.ids.galley! }], names);
     expect(boarded?.lines.map((line) => line.text)).toContain("Boarding 1 · Galley: 1 Corsair engages you");
@@ -74,7 +76,7 @@ describe("Boarding's beat", () => {
   it("tells an engagement with no ship before it as any other", () => {
     const built = seaTable({ cards: [hero("aragorn"), enemy("pirate")], effects: [], heroes: [{ code: "aragorn" }], enemies: [{ code: "pirate" }] });
     const moment = momentOf(built.state, built.state, [{ kind: "engage", seat: 0, enemyId: built.ids.pirate! }], { card: () => "Pirate" });
-    expect(moment?.lines.map((line) => line.text)).toEqual(["Pirate engages you"]);
+    expect(moment?.lines.map((line) => line.text)).toEqual(["Engaged with you"]);
   });
 });
 

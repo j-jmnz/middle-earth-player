@@ -155,5 +155,7 @@ export function crossBoundary(state: ScenarioState, ctx: ReduceContext, steps: E
     const event = { trigger: "endOfRound", seat: null, phase: ended } as const;
     next = fireForced(offerResponses(next, event, ctx, steps), event, ctx, steps);
   }
-  return fireForced(next, { trigger: "endOfPhase", seat: null, phase: ended }, ctx, steps);
+  const fired = fireForced(next, { trigger: "endOfPhase", seat: null, phase: ended }, ctx, steps);
+  // The effects of the end of the round resolve while the table is still in the End of round phase; the beginning of the round shows again once they are done (machine.ts, beginRound).
+  return ended === "End of round" && fired.stack.length > state.stack.length && state.mode === "beginRound" ? { ...fired, phase: "End of round", boundaryPhase: "End of round" } : fired;
 }

@@ -135,6 +135,11 @@ export function stagingStep(state: ScenarioState, ctx: ReduceContext, steps: Eng
   return startReveal(advanced, seat, ctx, steps);
 }
 
+// The seat that reveals the surge of a card `seat` revealed: the seat itself, or the first living seat when it was eliminated; null when nobody is left.
+function surgeRevealer(state: ScenarioState, seat: number): number | null {
+  return state.seats[seat]?.eliminated ? (livingSeats(state)[0] ?? null) : seat;
+}
+
 function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = frame.cardId;
   if (!id || frame.data.kind !== "reveal") throw new Error("Reveal frame lost its card");
@@ -152,7 +157,7 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       next = updateCard(next, id, { face: turnedUp(next, id), controller: seat });
       // A guard is attached to its objective as it is placed (rr.guarded); the objective may have left play since.
       if (frame.data.guards && next.cards[frame.data.guards] && inPlay(next.cards[frame.data.guards]?.zone ?? "removed")) next = updateCard(attachTo(next, id, frame.data.guards), id, { guard: true });
-      steps.push({ kind: "reveal", seat, cardId: id, cause: currentCause(steps, ruleCause("mec109.saga-staging-rules")) });
+      steps.push({ kind: "reveal", seat, cardId: id, cause: currentCause(steps, frame.data.cause ?? ruleCause("mec109.saga-staging-rules")) });
       if (printed.keywords.peril) next = { ...next, perilSeat: seat };
       // The families that note a reveal (the first treachery of the round, families/wilderland/rounds.ts) hear it before the card's own effects.
       next = familyRevealed(next, id, ctx);
@@ -221,13 +226,16 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       // Each separate instance of surge reveals 1 additional card (rr.surge): the printed keyword, each gain from a card in play and each grant made during this reveal.
       // The surge a card gives itself is read before a treachery leaves the staging area, while its constants still hold (Groping Horror, 50324:A:2).
       const surges = (printed.keywords.surge ? 1 : 0) + heldAmount(state, id, "gainsSurge") + (frame.data.kind === "reveal" ? (frame.data.surge ? 1 : 0) + (frame.data.extraSurge ?? 0) : 0);
-      if (surges <= 0 || !revealing || revealing.eliminated || frame.data.kind !== "reveal") return next;
+      // A seat the card eliminated (its Doomed raise, its effect) cannot reveal: the surge is revealed for the first player still in the game (rr.player-elimination, rr.surge).
+      const surgeSeat = surgeRevealer(next, seat);
+      if (surges <= 0 || !revealing || surgeSeat == null || frame.data.kind !== "reveal") return next;
       // The instances still to answer wait in the frame (step 6 reveals the next card when the one just revealed is done).
-      return startReveal(surges > 1 ? patchTop(next, { data: { ...frame.data, surgeLeft: surges - 1 } }) : next, seat, ctx, steps);
+      return startReveal(surges > 1 ? patchTop(next, { data: { ...frame.data, surgeLeft: surges - 1 } }) : next, surgeSeat, ctx, steps);
     }
     case 6:
-      if (frame.data.kind === "reveal" && (frame.data.surgeLeft ?? 0) > 0 && !state.seats[seat]?.eliminated) {
-        return startReveal(patchTop(state, { data: { ...frame.data, surgeLeft: (frame.data.surgeLeft ?? 0) - 1 } }), seat, ctx, steps);
+      const surgeSeat = surgeRevealer(state, seat);
+      if (frame.data.kind === "reveal" && (frame.data.surgeLeft ?? 0) > 0 && surgeSeat != null) {
+        return startReveal(patchTop(state, { data: { ...frame.data, surgeLeft: (frame.data.surgeLeft ?? 0) - 1 } }), surgeSeat, ctx, steps);
       }
       return finishReveal(state, frame, ctx, steps);
     default:

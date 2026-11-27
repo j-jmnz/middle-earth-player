@@ -351,7 +351,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 146077:B:3 (back): This stage cannot be defeated unless Mount Doom is the active location.
   146077:constant:2: Constant
     only if not (the active location is a location (any player controls) named "Mount Doom")
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 146078 The Crack of Doom
 (the scenario deals it into the quest pile; the piles place it, no record does)

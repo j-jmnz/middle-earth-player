@@ -252,6 +252,11 @@ export function hostOf(state: ScenarioState, code: string): string | null {
   return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id ?? null;
 }
 
+/** Whether a card lies in a player's play area (among the heroes, in play or attached) under that player's control. A revealed card carries its revealing seat as controller, so a set controller alone is not control. */
+export function inPlayerArea(card: Pick<CardInstance, "zone" | "controller">): boolean {
+  return card.controller != null && (card.zone === "play" || card.zone === "heroes" || card.zone === "attached");
+}
+
 export function inPlay(zone: ZoneName): boolean {
   return (
     zone === "heroes" ||

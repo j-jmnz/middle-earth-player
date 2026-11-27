@@ -8,6 +8,7 @@ import { chipText, moreText, MUST_COMMIT_WORD, type CardEffects, type CombatNumb
 import { DETERMINED_WORD } from "../words/scenarios/angmar/wastes-table.ts";
 import { BLANK_WORD } from "../words/card-bars.ts";
 import { CHAMPION_WORD } from "../words/scenarios/haradrim/umbar-table.ts";
+import { SHIELD_WORD } from "../words/scenarios/against-the-shadow/vale.ts";
 import { type IconName } from "../../ui/icon-map.ts";
 import { glyphCells, type PlaceMark } from "../store/island-place.ts";
 import { COLS, ROWS } from "../dream-chaser/island-table.ts";
@@ -15,7 +16,7 @@ import type { CombatMark, Rect } from "../layout/layout.ts";
 import { STAGE_APART_WORD, type StagePill } from "../words/scenarios/stormcaller.ts";
 import type { OptionMark } from "../choice/sheet-types.ts";
 import { currentMark } from "./current-mark.ts";
-import { BADGE_TOP, badgeRoom, hiddenBadges, lonePick, loneRow } from "./badge-room.ts";
+import { BADGE_TOP, badgeRoom, type CoveredBand, hiddenBadges, footPillSpan, lonePick, loneRow, pillFits } from "./badge-room.ts";
 import { TOKEN } from "./token-spots.ts";
 import { STRIP, underMarkBox } from "./under-mark.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
@@ -26,12 +27,13 @@ import { CanvasIcon, BADGE_H, type Fonts, type TokenImages } from "./pieces.nati
  * 2026-11-01): an enemy's attack on a threat-red pill, a character's defense on an accent pill, each with its icon. The value counts
  * every effect; the effect pills down the card's left edge still say what changed it.
  */
-export function CombatPill({ rect, combat, fonts, t, s }: { rect: Rect; combat: CombatNumber; fonts: Fonts; t: TableTokens; s: number }) {
-  const { x, y, w, h } = rect;
+export function CombatPill({ rect, combat, resources, visible, fonts, t, s }: { rect: Rect; combat: CombatNumber; resources: number; visible: number; fonts: Fonts; t: TableTokens; s: number }) {
+  const { x, y, h } = rect;
   const pill = BADGE_H * s;
   const text = String(combat.value);
-  const width = 18 * s + fonts.badge.getTextWidth(text) + 5 * s;
-  const left = x + (w - width) / 2;
+  const span = footPillSpan(visible, 18 * s + fonts.badge.getTextWidth(text) + 5 * s, resources, s);
+  const { width } = span;
+  const left = x + span.left;
   const top = y + h - pill - 3 * s;
   const attack = combat.stat === "attack";
   const ink = attack ? t.onThreatPill : t.onAccent;
@@ -41,6 +43,26 @@ export function CombatPill({ rect, combat, fonts, t, s }: { rect: Rect; combat: 
       <RoundedRect x={left} y={top} width={width} height={pill} r={pill / 2} color={attack ? t.danger : t.night} style="stroke" strokeWidth={1 * s} />
       <CanvasIcon name={combat.stat} x={left + 3 * s} y={top + 2 * s} size={11 * s} color={ink} />
       <Text x={left + 17 * s} y={top + 11.5 * s} text={text} font={fonts.badge} color={ink} />
+    </Group>
+  );
+}
+
+/**
+ * The count of effects a covered card has no room to list: its row gives way to the pill at its foot (a committed hero's Willpower pill, a defender's or attacker's combat pill; `footStop`), so the bare count stands over that pill's upper right corner and the player knows to tap.
+ * `end` is the pill's right end (x), `visible` the width the next card leaves.
+ */
+export function FootCount({ rect, count, end, visible, fonts, t, s }: { rect: Rect; count: number; end: number; visible: number; fonts: Fonts; t: TableTokens; s: number }) {
+  const { x, y, h } = rect;
+  const pill = BADGE_H * s;
+  const text = String(count);
+  const width = fonts.badge.getTextWidth(text) + 10 * s;
+  const left = Math.min(end - 4 * s, x + visible - width - 1 * s);
+  // Over the pill's upper right corner, so its number stays readable.
+  const top = y + h - pill - 3 * s - 9 * s;
+  return (
+    <Group>
+      <RoundedRect x={left} y={top} width={width} height={pill} r={pill / 2} color={t.night} />
+      <Text x={left + 5 * s} y={top + 11.5 * s} text={text} font={fonts.badge} color={t.bone} />
     </Group>
   );
 }
@@ -146,8 +168,8 @@ export function CurrentQuestMark({ rect, clear, fonts, t, s }: { rect: Rect; cle
   return <WordPill rect={rect} text="Current" clear={clear} fonts={fonts} t={t} s={s} />;
 }
 
-// The round glyph a word falls back to where it does not fit: "Determined" is a "D", the Champion of Escape from Umbar a "C", Desert Crossing's "Blank" a "B"; "Determination" has none (the plain dot).
-const SHORT_GLYPHS: ReadonlyMap<string, string> = new Map([[DETERMINED_WORD, "D"], [CHAMPION_WORD, "C"], [BLANK_WORD, "B"]]);
+// The round glyph a word falls back to where it does not fit: "Determined" is a "D", the Champion of Escape from Umbar a "C", the Morgul Bodyguard that shields a Captain an "S", Desert Crossing's "Blank" a "B"; "Determination" has none (the plain dot).
+const SHORT_GLYPHS: ReadonlyMap<string, string> = new Map([[DETERMINED_WORD, "D"], [CHAMPION_WORD, "C"], [SHIELD_WORD, "S"], [BLANK_WORD, "B"]]);
 const shortGlyph = (word: string): string | undefined => SHORT_GLYPHS.get(word);
 
 /** A hero or ally the Campaign Log marks determined ("Determined"), or that carries a Determination ("Determination"): the same pill as the current quest's, a character wearing neither of the other marks (mec108.campaign-log, ledger line 10172:A:1). */
@@ -157,14 +179,14 @@ export function DeterminedMarkView({ rect, word, clear, fonts, t, s }: { rect: R
 }
 
 /**
- * A card whose text box is blank (Desert Crossing, Cold from Angmar, the heroes The Long Arm of Mordor holds): the accent "Blank" pill stands in the pill column at the card's foot, as the "1 held" pill does, never on the name at the top; where the word does not fit, a round "B".
+ * A card marked with a word that must not stand on its name at the top: the accent "Blank" pill of a card whose text box is blank (Desert Crossing, Cold from Angmar, the heroes The Long Arm of Mordor holds), the "Shield" of the Morgul Bodyguard that takes a Captain's damage and the "Champion" of Escape from Umbar. It stands in the pill column at the card's foot, as the "1 held" pill does; where the word does not fit, a round glyph ("B", "S", "C").
  * `lifted`: another mark holds the foot row (the engagement cost, a combat number, the progress strip, a held pill), so this one stands a row above it.
  */
-export function BlankMarkView({ rect, lifted, fonts, t, s }: { rect: Rect; lifted: boolean; fonts: Fonts; t: TableTokens; s: number }) {
-  const words = fonts.badge.getTextWidth(BLANK_WORD);
+export function BlankMarkView({ rect, word, lifted, fonts, t, s }: { rect: Rect; word: string; lifted: boolean; fonts: Fonts; t: TableTokens; s: number }) {
+  const words = fonts.badge.getTextWidth(word);
   const box = underMarkBox(rect, words, 0, s, false, false, lifted);
   const fits = words + 10 * s <= rect.w - 4 * s;
-  const text = fits ? BLANK_WORD : "B";
+  const text = fits ? word : (shortGlyph(word) ?? word.slice(0, 1));
   const width = fits ? box.width : box.height;
   const x = box.x + (box.width - width) / 2;
   const shown = fonts.badge.getTextWidth(text);
@@ -198,23 +220,31 @@ export function SeatChipView({ rect, text, fonts, t, s }: { rect: Rect; text: st
 }
 
 /** How far the widest effect badge reaches from the card's left edge, so a word pill keeps clear of the badge column (the rows are drawn by `Badges`: a stat is the icon, the number and 5 pt, a flag the pill and 4 pt (the must-commit pill is a stat's width), the "more" pill its words and 12 pt, at least 24 pt). */
-export function badgeReach(effects: CardEffects, fonts: Fonts, s: number, height: number, stop: number | null, width: number): number {
+export function badgeReach(effects: CardEffects, fonts: Fonts, s: number, height: number, stop: number | null, width: number, covered: CoveredBand | null = null): number {
   const widths = [
     ...effects.stats.map((badge) => 15 * s + fonts.badge.getTextWidth(chipText(badge)) + 5 * s),
     ...effects.flags.map((flag) => (flag.flag === "mustCommit" ? 15 * s + fonts.badge.getTextWidth(MUST_COMMIT_WORD) + 5 * s : BADGE_H * s + 4 * s)),
   ];
   // The pill for the effects left out ("2 more") is as wide as its words and 12 pt, and is drawn when any are left out: the count is the one `Badges` draws, which depends on the room the card's height leaves.
-  const left = hiddenBadges(effects.stats.length + effects.flags.length, height, s, BADGE_H * s, stop);
-  const more = left > 0 ? fonts.badge.getTextWidth(moreText(left)) + 12 * s : 0;
+  const left = hiddenBadges(effects.stats.length + effects.flags.length, height, s, BADGE_H * s, stop, covered);
+  const shift = covered?.left ?? 0;
+  // A covered card's row ends at the next card in its row (`CoveredBand.width`); words and pills wider than that room give way to the round count, as `Badges` draws.
+  const avail = covered ? covered.width - shift : width;
+  const count = (n: number) => fonts.badge.getTextWidth(String(n)) + 10 * s;
+  const room = badgeRoom(height, s, BADGE_H * s, stop, covered);
   // A card with no room for a row draws no pill at all (badgeLayout).
-  if (widths.length === 0 || badgeRoom(height, s, BADGE_H * s, stop) < 1) return 0;
+  if (widths.length === 0 || room < 1) return 0;
+  const words = left > 0 ? fonts.badge.getTextWidth(moreText(left)) + 12 * s : 0;
+  const more = covered && left > 0 && !pillFits(words, s, avail) ? count(left) : words;
   // One row for several effects: the kept chip and "N more" stand side by side (Badges), so the pills reach as far as both; `loneRow` is the one answer for both.
-  if (badgeRoom(height, s, BADGE_H * s, stop) === 1 && widths.length > 1) {
+  if (room === 1 && widths.length > 1) {
     const keptStat = effects.stats[lonePick(effects.stats)];
-    const lone = loneRow(keptStat ? widths[lonePick(effects.stats)] ?? 0 : 0, fonts.badge.getTextWidth(String(widths.length - 1)) + 10 * s, fonts.badge.getTextWidth(moreText(widths.length - 1)) + 12 * s, s, width);
-    if (lone.mode != null) return 2 * s + Math.max(24 * s, lone.reach - 2 * s);
+    const lone = loneRow(keptStat ? widths[lonePick(effects.stats)] ?? 0 : 0, count(widths.length - 1), fonts.badge.getTextWidth(moreText(widths.length - 1)) + 12 * s, s, avail);
+    if (lone.mode != null) return shift + 2 * s + Math.max(24 * s, lone.reach - 2 * s);
   }
-  return 2 * s + Math.max(24 * s, more, ...widths);
+  // A lone pill that does not fit a covered card's visible width is the round count "1".
+  if (covered && room === 1 && widths.length === 1 && !pillFits(widths[0] ?? 0, s, avail)) return shift + 2 * s + Math.max(24 * s, count(1));
+  return shift + 2 * s + Math.max(24 * s, more, ...widths);
 }
 
 // An accent pill with a word inside the card's top edge, upright, clear of the effect badges' column; where the word does not fit, a short accent dot in its place (a round pill with `short` in it when the word has one).

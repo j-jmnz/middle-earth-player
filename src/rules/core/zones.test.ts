@@ -80,3 +80,16 @@ describe("a card that enters play again", () => {
     expect(back.cards[spawned.id]).toMatchObject({ zone: "play", committed: false, exhausted: false });
   });
 });
+
+describe("a card that goes back to a hand or a deck", () => {
+  // rr.in-play-and-out-of-play: it has left play, so it is not exhausted or committed and holds no tokens (Sneak Attack returns an exhausted Halfling Bounder to the hand).
+  it("is ready, uncommitted and clear of tokens in the hand and the deck", () => {
+    const start = blankScenario({ seatCount: 1, seed: 1, definition: fixtureDefinition(["stage"]) });
+    const spawned = spawn(start, "ally", { zone: "play", seat: 0 });
+    const worn = updateCard(spawned.state, spawned.id, { committed: true, exhausted: true, damage: 2, resources: 1, progress: 1 });
+    for (const zone of ["hand", "deck"] as const) {
+      const away = moveCard(worn, spawned.id, { zone, seat: 0 });
+      expect(away.cards[spawned.id]).toMatchObject({ zone, committed: false, exhausted: false, damage: 0, resources: 0, progress: 0 });
+    }
+  });
+});

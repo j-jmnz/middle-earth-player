@@ -3,8 +3,8 @@
 // 1. A Pick that feeds a verb taking the card out of play any way but destruction (a discard, a shuffle or a return to a deck or hand, the victory display, a removal from the game, a placing under another card) leaves the Captain out (`leavesPlayPicked`, read by interpret/pick.ts), so an ability with no other
 //    target is not offered. Returning it to the staging area, or engaging it, is not leaving play.
 // 2. The staging area shuffled into the encounter deck leaves it where it is, though it still counts (families/pelargir/staging.ts).
-// 3. An effect with no Pick that moves it out of play anyway (a discard of "the attacking enemy", a sweep of every enemy) is undone by the settle sweep below: the Captain returns to the staging area, unless it was destroyed in this intent (the sweep reads the `destroy` step), because the move helpers
-//    of core/zones.ts refuse only a card that cannot leave the staging area. What it lost on the way (its damage, its attachments, its shadow cards, the Forced and Response effects that heard it leave) is not restored.
+// 3. An effect with no Pick that moves it out of play anyway (a discard of "the attacking enemy", a sweep of every enemy) moves nothing: `moveCard` (core/zones.ts) keeps a card that holds `cannotLeaveUnlessDestroyed` (set beside `cannotLeavePlay` on the Captain) where it is, with its damage, tokens, attachments and shadow cards, unless the move is its destruction (`destroyed`).
+//    The settle sweep below is the backstop for a card that still lies out of play after an intent (a move that does not go through `moveCard`): it returns to the staging area, unless it was destroyed in this intent (the sweep reads the `destroy` step).
 import type { Instruction } from "../../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../../core/intents.ts";
@@ -76,6 +76,11 @@ export function leavesPlayPickedInEach(body: readonly (Instruction | undefined)[
 /** Whether a Pick that feeds such a verb may not choose this card: it holds `cannotLeavePlay`, or it lies in a hand and holds `cannotLeaveHand`. False in every game without the flags. */
 export function pickKeepsInPlay(state: ScenarioState, id: string): boolean {
   return state.modifiers.length > 0 && (flagged(state, id, "cannotLeavePlay") || heldInHand(state, id));
+}
+
+/** Whether the card holds `cannotLeaveUnlessDestroyed` (a Captain, 06144:B:1): any move out of play but its destruction leaves it where it is. The one reader behind `moveCard` and the encounter family's moves. False in every game without the flag. */
+export function keptInPlay(state: ScenarioState, id: string): boolean {
+  return state.modifiers.length > 0 && flagged(state, id, "cannotLeaveUnlessDestroyed");
 }
 
 // The title the current stage's records hold in play ("Murzag cannot leave play unless destroyed"): the holder named by its `cannotLeavePlay` constant.

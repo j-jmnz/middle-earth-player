@@ -10,15 +10,14 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import { attachBlocked } from "../../interpret/restrictions.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { livingSeats } from "../../core/state.ts";
+import { attachHeroHosts } from "../play/hooks.ts";
 import type { Focus } from "../index.ts";
 
 /** The heroes AttachToHighestThreatCost may use: of the heroes that carry no copy of the source and may have it, those with the highest printed threat cost. */
 export function highestThreatHosts(state: ScenarioState, sourceId: string, ctx: ReduceContext): string[] {
   const code = state.cards[sourceId]?.code;
   if (code == null) return [];
-  const free = livingSeats(state)
-    .flatMap((seat) => state.seats[seat]?.heroes ?? [])
+  const free = attachHeroHosts(state, { kind: "hero", control: "any" }, state.firstPlayer, ctx)
     .filter((id) => !(state.cards[id]?.attachments ?? []).some((other) => state.cards[other]?.code === code) && !attachBlocked(state, ctx, id, code));
   const cost = (id: string): number => printedOf(ctx.cards, state.cards[id]?.code ?? "").threat ?? 0;
   const top = Math.max(...free.map(cost));

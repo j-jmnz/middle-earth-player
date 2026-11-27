@@ -63,7 +63,7 @@ describe("engagement marks", () => {
     const table = buildTable(base, { start: "encounter", staging: [RIDER, "f0"] });
     const state = withThreat(table.state, 0, 40);
     const sheet = sheetFor(state, table.ctx, legalIntents(state, table.ctx), names);
-    expect(sheet?.kind === "pick" ? sheet.note : "").toBe(`You may engage one enemy in staging. Your threat is 40. The checks engage ${idsOf(table, RIDER)} (35) anyway. ${idsOf(table, "f0")} (50) stays in staging.`);
+    expect(sheet?.kind === "pick" ? sheet.note : "").toBe(`The checks engage ${idsOf(table, RIDER)} (35) anyway. ${idsOf(table, "f0")} (50) stays in staging. You may engage one enemy in staging. Your threat is 40.`);
   });
 });
 

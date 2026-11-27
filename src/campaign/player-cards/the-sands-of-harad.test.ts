@@ -1,7 +1,6 @@
 // Rules: rr.response, rr.triggered-ability, rr.cost, rr.limits, rr.ready, rr.lasting-effects, rr.modifiers, rr.enters-play,
 // rr.discard-pile-and-victory-display (data/rules/entries.json).
-// The Sands of Harad heroes, allies and side quest, written from their card text (data/cards/TSoH.json; data/printed holds no ledger for
-// this box, so every intent goes through sendUnledgered): Gimli 16001:A:2, Legolas 16002:A:2, Greenwood Archer 16003:A:2, Erebor Guard
+// The Sands of Harad heroes, allies and side quest, written from their card text (data/cards/TSoH.json; the ledger lines in data/printed are read from the scans): Gimli 16001:A:2, Legolas 16002:A:2, Greenwood Archer 16003:A:2, Erebor Guard
 // 16004:A:2, The Storm Comes 16013:A:1. The events are in the-sands-of-harad-events.test.ts, the attachments in
 // the-sands-of-harad-attachments.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -13,8 +12,8 @@ import { updateCard, withMode } from "../../rules/core/state.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, fillers, passAll, play, playCode, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { type Run, type Table, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { choices, combat, fillers, passAll, play, playCode, playerTableFor, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const GIMLI = "16001";
 const LEGOLAS = "16002";
@@ -48,13 +47,13 @@ describe("Gimli (16001:A:2)", () => {
     const scene = table(effects, { heroes: [{ code: GIMLI, seat: 0 }, { code: LEGOLAS, seat: 0 }, { code: ARAGORN, seat: 0 }], engaged: Array.from({ length: enemies }, () => ({ code: WEAK, seat: 0 })) });
     const tab = { ...scene, state: updateCard(updateCard(scene.state, idsOf(scene, LEGOLAS), { exhausted: true }), idsOf(scene, ARAGORN), { exhausted: true }) };
     const opened = passAll(combat(tab.state, tab), tab.ctx);
-    const run = enemies > 1 ? passAll(sendUnledgered(opened, { type: "ChooseEnemy", enemyId: tab.ids[WEAK]?.[0] ?? "" }, tab.ctx), tab.ctx) : opened;
+    const run = enemies > 1 ? passAll(send(opened, { type: "ChooseEnemy", enemyId: tab.ids[WEAK]?.[0] ?? "" }, tab.ctx), tab.ctx) : opened;
     expect(run.state.window?.kind).toBe("defense");
-    return { tab, run: sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, GIMLI) }, tab.ctx) };
+    return { tab, run: send(run, { type: "DeclareDefender", defenderId: idsOf(tab, GIMLI) }, tab.ctx) };
   }
 
   // The Response, paid with 1 resource from Gimli's pool.
-  const respond = (run: Run, tab: Table): Run => sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, GIMLI), effectId: "16001:response:1", payments: [{ heroId: idsOf(tab, GIMLI), amount: 1 }] }, tab.ctx);
+  const respond = (run: Run, tab: Table): Run => send(run, { type: "Trigger", cardId: idsOf(tab, GIMLI), effectId: "16001:response:1", payments: [{ heroId: idsOf(tab, GIMLI), amount: 1 }] }, tab.ctx);
 
   // "Response: After Gimli is declared as a defender, spend 1 resource from his pool to ready another hero. If that hero is Legolas, he
   // gets +1 Attack until the end of the phase.": Gimli pays 1 of his 6; Legolas and Aragorn are offered, not Gimli; Legolas readies and
@@ -66,7 +65,7 @@ describe("Gimli (16001:A:2)", () => {
     let run = respond(declared, tab);
     expect(run.state.cards[gimli]?.resources).toBe(6 - 1);
     expect(choices(run.state, tab).sort()).toEqual([legolas, aragorn].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: legolas }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: legolas }, tab.ctx);
     expect(run.state.cards[legolas]?.exhausted).toBe(false);
     expect(run.state.cards[aragorn]?.exhausted).toBe(true);
     expect(stat(run.state, tab, legolas, "attack")).toBe(3 + 1);
@@ -77,7 +76,7 @@ describe("Gimli (16001:A:2)", () => {
   it("16001:A:2 Gimli: a hero other than Legolas readies and gets no Attack", () => {
     const { tab, run: declared } = defended(EFFECTS);
     const aragorn = idsOf(tab, ARAGORN);
-    const run = sendUnledgered(respond(declared, tab), { type: "Choose", optionId: aragorn }, tab.ctx);
+    const run = send(respond(declared, tab), { type: "Choose", optionId: aragorn }, tab.ctx);
     expect(run.state.cards[aragorn]?.exhausted).toBe(false);
     expect(stat(run.state, tab, aragorn, "attack")).toBe(3);
     expect(stat(run.state, tab, idsOf(tab, LEGOLAS), "attack")).toBe(3);
@@ -94,17 +93,17 @@ describe("Gimli (16001:A:2)", () => {
     const scene = table(EFFECTS, { heroes: [{ code: GIMLI, seat: 0 }, { code: ARAGORN, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }] });
     const run = passAll(combat(scene.state, scene), scene.ctx);
     expect(run.state.window?.kind).toBe("defense");
-    expect(triggers(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(scene, ARAGORN) }, scene.ctx).state, scene)).not.toContain("16001:response:1");
+    expect(triggers(send(run, { type: "DeclareDefender", defenderId: idsOf(scene, ARAGORN) }, scene.ctx).state, scene)).not.toContain("16001:response:1");
   });
 
   // "(Limit once per phase.)": Gimli, readied again, defends the second attack of the phase and is not offered it again.
   it("16001:A:2 Gimli: limit once per phase", () => {
     const { tab, run: declared } = defended(EFFECTS, 2);
     const gimli = idsOf(tab, GIMLI);
-    let run = passAll(sendUnledgered(respond(declared, tab), { type: "Choose", optionId: idsOf(tab, LEGOLAS) }, tab.ctx), tab.ctx, { responses: true });
+    let run = passAll(send(respond(declared, tab), { type: "Choose", optionId: idsOf(tab, LEGOLAS) }, tab.ctx), tab.ctx, { responses: true });
     run = { ...run, state: updateCard(run.state, gimli, { exhausted: false }) };
     expect(run.state.window?.kind).toBe("defense");
-    run = sendUnledgered(run, { type: "DeclareDefender", defenderId: gimli }, tab.ctx);
+    run = send(run, { type: "DeclareDefender", defenderId: gimli }, tab.ctx);
     expect(triggers(run.state, tab)).not.toContain("16001:response:1");
   });
 });
@@ -114,7 +113,7 @@ describe("Legolas (16002:A:2)", () => {
   function committed(effects: readonly Effect[], hand: readonly string[]): { tab: Table; run: Run } {
     const scene = table(effects, { start: "quest", heroes: [{ code: LEGOLAS, seat: 0 }, { code: GIMLI, seat: 0 }, { code: ARAGORN, seat: 0 }], hand: hand.map((code) => ({ code, seat: 0 })), deck: ["f0", "f0"] });
     const tab = { ...scene, state: updateCard(updateCard(scene.state, idsOf(scene, GIMLI), { exhausted: true }), idsOf(scene, ARAGORN), { exhausted: true }) };
-    return { tab, run: sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, LEGOLAS)] }, tab.ctx) };
+    return { tab, run: send(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, LEGOLAS)] }, tab.ctx) };
   }
 
   // "Response: After Legolas commits to a quest, discard a card from your hand to ready another hero. If that hero is Gimli, he gets
@@ -124,11 +123,11 @@ describe("Legolas (16002:A:2)", () => {
     const { tab, run: done } = committed(effects, [CARD, SNOWBOURN]);
     const [legolas, gimli, aragorn, card, scout] = [idsOf(tab, LEGOLAS), idsOf(tab, GIMLI), idsOf(tab, ARAGORN), idsOf(tab, CARD), idsOf(tab, SNOWBOURN)];
     expect(triggers(done.state, tab)).toContain("16002:response:1");
-    let run = sendUnledgered(done, { type: "Trigger", cardId: legolas, effectId: "16002:response:1" }, tab.ctx);
+    let run = send(done, { type: "Trigger", cardId: legolas, effectId: "16002:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([card, scout].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: scout }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: scout }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([gimli, aragorn].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: gimli }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: gimli }, tab.ctx);
     expect(run.state.cards[scout]?.zone).toBe("discard");
     expect(run.state.cards[card]?.zone).toBe("hand");
     expect(run.state.cards[gimli]?.exhausted).toBe(false);
@@ -140,7 +139,7 @@ describe("Legolas (16002:A:2)", () => {
   it("16002:A:2 Legolas: a hero other than Gimli readies and gets no Willpower", () => {
     const { tab, run: done } = committed(EFFECTS, [CARD]);
     const aragorn = idsOf(tab, ARAGORN);
-    const run = sendUnledgered(sendUnledgered(done, { type: "Trigger", cardId: idsOf(tab, LEGOLAS), effectId: "16002:response:1" }, tab.ctx), { type: "Choose", optionId: aragorn }, tab.ctx);
+    const run = send(send(done, { type: "Trigger", cardId: idsOf(tab, LEGOLAS), effectId: "16002:response:1" }, tab.ctx), { type: "Choose", optionId: aragorn }, tab.ctx);
     expect(run.state.seats[0]?.hand).toEqual([]);
     expect(run.state.cards[aragorn]?.exhausted).toBe(false);
     expect(stat(run.state, tab, aragorn, "willpower")).toBe(2);
@@ -156,7 +155,7 @@ describe("Legolas (16002:A:2)", () => {
   // "After Legolas commits": another hero committing does not trigger it.
   it("16002:A:2 Legolas: not offered when only another character commits", () => {
     const scene = table(EFFECTS, { start: "quest", heroes: [{ code: LEGOLAS, seat: 0 }, { code: ARAGORN, seat: 0 }], hand: [{ code: CARD, seat: 0 }], deck: ["f0", "f0"] });
-    const run = sendUnledgered(begin(scene.state), { type: "Commit", cardIds: [idsOf(scene, ARAGORN)] }, scene.ctx);
+    const run = send(begin(scene.state), { type: "Commit", cardIds: [idsOf(scene, ARAGORN)] }, scene.ctx);
     expect(triggers(run.state, scene)).not.toContain("16002:response:1");
   });
 });
@@ -175,9 +174,9 @@ describe("Greenwood Archer (16003:A:2)", () => {
     const [gloin, aragorn] = [idsOf(tab, GLOIN), idsOf(tab, ARAGORN)];
     let run = playCode(tab, ARCHER);
     expect(triggers(run.state, tab)).toContain("16003:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, ARCHER), effectId: "16003:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, ARCHER), effectId: "16003:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([gloin, aragorn].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: aragorn }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: aragorn }, tab.ctx);
     expect(run.state.cards[aragorn]?.exhausted).toBe(false);
     expect(run.state.cards[gloin]?.exhausted).toBe(true);
   });
@@ -199,7 +198,7 @@ describe("Erebor Guard (16004:A:2)", () => {
     const tab = guard(effects, 3);
     const [eowyn, card] = [idsOf(tab, EOWYN), idsOf(tab, EREBOR)];
     const top = tab.state.seats[0]?.deck.slice(0, 2) ?? [];
-    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: card, payments: [{ heroId: eowyn, amount: 2 }] }, tab.ctx);
+    const run = send(begin(tab.state), { type: "PlayCard", cardId: card, payments: [{ heroId: eowyn, amount: 2 }] }, tab.ctx);
     expect(run.state.cards[card]?.zone).toBe("play");
     expect(run.state.cards[eowyn]?.resources).toBe(0);
     for (const id of top) expect(run.state.cards[id]?.zone).toBe("discard");
@@ -216,7 +215,7 @@ describe("Erebor Guard (16004:A:2)", () => {
   // Paid in full, the deck is not touched.
   it("16004:A:2 Erebor Guard: paid in full, nothing is discarded", () => {
     const tab = table(EFFECTS, { heroes: [{ code: EOWYN, seat: 0 }], hand: [{ code: EREBOR, seat: 0 }], playerDeck: fillers(CARD, 3) }, 4);
-    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, EREBOR), payments: [{ heroId: idsOf(tab, EOWYN), amount: 4 }] }, tab.ctx);
+    const run = send(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, EREBOR), payments: [{ heroId: idsOf(tab, EOWYN), amount: 4 }] }, tab.ctx);
     expect(run.state.cards[idsOf(tab, EREBOR)]?.zone).toBe("play");
     expect(run.state.seats[0]?.deck).toHaveLength(3);
     expect(run.state.seats[0]?.discard).toEqual([]);
@@ -231,11 +230,11 @@ describe("The Storm Comes (16013:A:1)", () => {
     const storm = tab.ids[STORM]?.find((id) => tab.state.cards[id]?.zone === "hand") ?? "";
     let run = play(begin(tab.state), tab, storm);
     expect(run.state.cards[storm]?.zone).toBe("staging");
-    run = passAll(sendUnledgered(run, { type: "Pass" }, tab.ctx), tab.ctx);
+    run = passAll(send(run, { type: "Pass" }, tab.ctx), tab.ctx);
     expect(choices(run.state, tab)).toContain(storm);
-    run = sendUnledgered(run, { type: "Choose", optionId: storm }, tab.ctx);
-    run = sendUnledgered(run, { type: "Commit", cardIds: [idsOf(tab, EOWYN), idsOf(tab, GLORFINDEL)] }, tab.ctx);
-    run = passAll(sendUnledgered(run, { type: "Pass" }, tab.ctx), tab.ctx, { responses: true });
+    run = send(run, { type: "Choose", optionId: storm }, tab.ctx);
+    run = send(run, { type: "Commit", cardIds: [idsOf(tab, EOWYN), idsOf(tab, GLORFINDEL)] }, tab.ctx);
+    run = passAll(send(run, { type: "Pass" }, tab.ctx), tab.ctx, { responses: true });
     expect(run.state.mode).toBe("travel");
     return { run, storm, others: (tab.ids[STORM] ?? []).filter((id) => id !== storm) };
   }

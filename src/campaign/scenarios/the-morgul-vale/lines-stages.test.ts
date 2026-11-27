@@ -34,15 +34,15 @@ lineSpec("06144:B:1", "Murzag cannot leave play unless destroyed: a shuffle into
   expect(where(swept.state, tracker)).toBe("encounterDiscard");
 });
 
-lineSpec("06144:B:1", "an effect with no pick that moves Murzag out of play is undone: he returns to the staging area face up and controlled by nobody, and what he carried is lost (his damage and his shadow cards)", (effects) => {
+lineSpec("06144:B:1", "an effect with no pick that moves Murzag out of play moves nothing: he stays engaged with his damage and his shadow cards", (effects) => {
   const t = table({ engaged: [{ code: murzag, damage: 3 }], staging: [tower], deck: [bodyguard, bodyguard] }, effects);
   const id = idOf(t.state, murzag);
   const shadowed = dealAdditionalShadow(t.state, id, [], t.ctx);
   const moved = run(t, shadowed, { verb: "MoveEncounterCard", card: "self", to: "discard" }, { sourceId: id });
-  expect(where(moved, murzag)).toBe("staging");
-  expect(moved.cards[id]).toMatchObject({ face: "up", controller: null, damage: 0 });
-  expect(engagedCodes(moved)).toEqual([]);
-  expect(moved.cards[id]?.shadowId ?? null).toBeNull();
+  expect(where(moved, murzag)).toBe("engaged");
+  expect(moved.cards[id]).toMatchObject({ damage: 3 });
+  expect(engagedCodes(moved)).toEqual([murzag]);
+  expect(moved.cards[id]?.shadowId ?? null).not.toBeNull();
 });
 
 lineSpec("06144:B:1", "the quest advances to The Betrayal when Murzag is destroyed, and not by progress: a successful quest puts progress on stage 1 and leaves it current", (effects) => {

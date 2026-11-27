@@ -1,4 +1,4 @@
-// Rules: rr.step-6-4-3, rr.damage, rr.step-7-3, rr.framework-steps (data/rules/entries.json). The banner resolves in beats
+// Rules: rr.step-6-4-3, rr.damage, rr.step-7-3, rr.framework-steps (data/rules/entries.json). The full telling of a move
 // (each line names the cards it touches), says when a destroyed defender left the attack undefended, reads a heal as a
 // heal, and sums the round when it ends; the store keeps the last moment worth showing; the first-game guide has a line
 // for each step.
@@ -40,6 +40,28 @@ describe("banner lines", () => {
       [`2 damage healed on ${sam}`, [sam]],
       [`${sam} is destroyed`, [sam]],
     ]);
+  });
+});
+
+describe("the engage banner", () => {
+  it("rr.engaged names the enemy once, in the title, and the line says who it engages", async () => {
+    const base = await sceneCards();
+    const table = buildTable(base, { engaged: [{ code: "f3", seat: 0 }] });
+    const enemy = idsOf(table, "f3");
+    const steps: EngineStep[] = [{ kind: "engage", enemyId: enemy, seat: 0 }];
+    const moment = momentOf(table.state, table.state, steps, { card: (id) => id });
+    expect(moment?.title).toBe(`${enemy} engages`);
+    expect(moment?.lines.map((line) => line.text)).toEqual(["Engaged with you"]);
+  });
+
+  it("two or more engagements are one beat with a line each, not a title and a line for every enemy", async () => {
+    const base = await sceneCards();
+    const table = buildTable(base, { seats: 2, engaged: [{ code: "f3", seat: 0 }, { code: "f3", seat: 1 }] });
+    const [first, second] = Object.values(table.state.cards).filter((card) => card.code === "f3").map((card) => card.id);
+    const steps: EngineStep[] = [{ kind: "engage", enemyId: first ?? "", seat: 0 }, { kind: "engage", enemyId: second ?? "", seat: 1 }];
+    const moment = momentOf(table.state, table.state, steps, { card: (id) => id });
+    expect(moment?.title).toBe("Enemies engage");
+    expect(moment?.lines.map((line) => line.text)).toEqual([`${first} engages Player 1`, `${second} engages Player 2`]);
   });
 });
 

@@ -167,8 +167,8 @@ lineSpec("06091:B:3", "wins at the end of the round when no Osgiliath location i
   const won = table({ phase: "Quest", active: { code: CODES.harbor, progress: 4 }, committed: ["dh1", "dh2"] }, effects);
   const cleared = drive(won, send(opened(won), { type: "Pass" }, won.ctx), (state) => state.stageCleared).state;
   expect(cleared.stageCleared).toBe(true);
-  // The check is the end of the round (06091:B:3): the quest explored the location in the round that began the game, the win waits for the refresh phase to end, and no new round has counted yet.
-  expect({ round: cleared.round, phase: cleared.phase }).toEqual({ round: won.state.round, phase: "Beginning of round" });
+  // The check is the end of the round (06091:B:3): the quest explored the location in the round that began the game, the win waits for the refresh phase to end, and no new round has counted yet, and the table is still in the End of round phase.
+  expect({ round: cleared.round, phase: cleared.phase }).toEqual({ round: won.state.round, phase: "End of round" });
   const going = table({ phase: "Quest", active: { code: CODES.harbor, progress: 4 }, committed: ["dh1", "dh2"], staging: [CODES.westQuarter] }, effects);
   const round = drive(going, send(opened(going), { type: "Pass" }, going.ctx), (state) => state.round > 1 || state.stageCleared);
   expect(controlled(round.state)).toEqual([CODES.harbor]);

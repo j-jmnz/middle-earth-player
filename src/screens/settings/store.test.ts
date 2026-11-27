@@ -117,18 +117,15 @@ describe("parseSettings table as a list and confirm time", () => {
   });
 });
 
-describe("parseSettings animation speed and banner closes", () => {
-  it("defaults a missing, wrong-typed or unknown value, and keeps every valid one", () => {
-    expect(parseSettings({}).bannerCloses).toBe("timer");
-    expect(parseSettings({ bannerCloses: "never" }).bannerCloses).toBe("timer");
-    expect(parseSettings({ bannerCloses: 3 }).bannerCloses).toBe("timer");
-    expect(parseSettings({ bannerCloses: "tap" }).bannerCloses).toBe("tap");
+describe("parseSettings animation speed", () => {
+  it("keeps every valid value, and drops the Banner closes value of an older save", () => {
+    expect(parseSettings({ bannerCloses: "tap" })).not.toHaveProperty("bannerCloses");
     for (const animationSpeed of ["normal", "quick", "slow"]) expect(parseSettings({ animationSpeed }).animationSpeed).toBe(animationSpeed);
   });
 
-  it("restores both to their defaults", () => {
-    const changed = { ...DEFAULT_SETTINGS, animationSpeed: "slow" as const, bannerCloses: "tap" as const };
-    expect(restoreDefaults(changed)).toMatchObject({ animationSpeed: "normal", bannerCloses: "timer" });
+  it("restores it to its default", () => {
+    const changed = { ...DEFAULT_SETTINGS, animationSpeed: "slow" as const };
+    expect(restoreDefaults(changed)).toMatchObject({ animationSpeed: "normal" });
   });
 });
 

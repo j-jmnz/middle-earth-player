@@ -234,7 +234,7 @@ export type FrameData =
   // effects of the card just revealed (Frodo Baggins). `discard`: and the card is discarded, not shuffled back (The Master Ring).
   // `chainMark`: the table as the reset of an empty deck last found it inside this reveal's surge chain (quest/surge-chain.ts `repeatsChain`).
   // `guards`: the card is revealed as the guard of this objective (rr.guarded): it is attached to it as it is placed in the staging area. `engage`: an enemy found by a search is put into play engaged with the revealing seat instead (SearchReveal `to: engaged`).
-  | { kind: "reveal"; hide: HideResult | null; surge: boolean; extraSurge?: number; extraDoomed?: number; surgeLeft?: number; fromDeck?: boolean; fromDiscard?: true; canceled?: boolean; discard?: boolean; guards?: string; engage?: true; chainMark?: string }
+  | { kind: "reveal"; hide: HideResult | null; surge: boolean; extraSurge?: number; extraDoomed?: number; surgeLeft?: number; fromDeck?: boolean; fromDiscard?: true; canceled?: boolean; discard?: boolean; guards?: string; engage?: true; chainMark?: string; cause?: Cause }
   | HideData
   | FortitudeData
   | EscapeData

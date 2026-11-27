@@ -198,7 +198,7 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
     // first, so the player sees the effect before choosing (rr.shadow-effects). The attack waits for the Responses, and
     // settle comes back here when they are done.
     const shadowId = next.cards[begun.enemyId]?.shadowId;
-    if (!begun.shadowOffered && shadowId && hasShadowEffect(next, begun.enemyId, ctx) && !flagged(next, begun.enemyId, "shadowsImmune")) {
+    if (!begun.shadowOffered && !begun.shadowCanceled && shadowId && hasShadowEffect(next, begun.enemyId, ctx) && !flagged(next, begun.enemyId, "shadowsImmune")) {
       const turned = updateCard(next, shadowId, { face: "up" });
       const offered = offerResponses({ ...turned, pendingAttack: { ...begun, shadowOffered: true } }, { trigger: "shadowPending", seat: begun.seat }, ctx, steps);
       // The defense window is over: the defender is declared. Settle runs the Responses, then the attack goes on.

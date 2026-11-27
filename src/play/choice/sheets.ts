@@ -2,8 +2,7 @@
 // rr.optional-engagement, rr.step-6-2 (data/rules/entries.json). The combat sheets are in combat-sheets.ts.
 //
 // What the choice sheet over the rail asks, for the window the engine has open. Every option is an intent legalIntents and
-// legalTargets list, or a number the engine computed (the Hide numbers, an attack and a defense). Nothing here writes a
-// number: a sheet names who does something, the reducer decides what happens.
+// legalTargets list, or a number the engine computed (the Hide numbers, an attack and a defense). Nothing here writes a number: a sheet names who does something, the reducer decides what happens.
 import type { Effect } from "../../catalog/boundary.ts";
 import { allHeroesDestroyed, defeatSentence } from "../../rules/core/elimination-words.ts";
 import { comparisonLossNote } from "../readouts/against-the-shadow/amon-din.ts";
@@ -325,6 +324,8 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const queue = (data?.queue ?? []).map((item) => item.instruction);
       const asked: AskedWords = wait?.kind === "target" ? askWords({ game, ctx, names: words, instruction: wait.item.instruction, queue, options: window.options, source, ...(wait.item.origin ? { origin: wait.item.origin, ...(wait.item.nth != null && wait.item.of != null ? { place: { nth: wait.item.nth, of: wait.item.of } } : {}) } : {}), picked: data?.kind === "effect" ? (data.picked?.at(-1) ?? null) : null, amountNow, ...(data?.effectId ? { effectId: data.effectId } : {}), ...(wait.item.cause ? { cause: wait.item.cause } : {}) }) : { verb: "Choose", prompt: "Choose one." };
       const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
+      // A search that spans the encounter deck and its discard pile (West Gate, 06096:A:1) names where each card lies, since two copies or two places read alike.
+      const zoned = wait?.kind === "target" && wait.item.instruction.verb === "SearchReveal" && new Set(window.options.map((id) => game.cards[id]?.zone)).size > 1;
       const collection = wait?.kind === "target" && asksCollection(wait.item.instruction);
       // The further defenders of Stand Together stop on the sheet's pass, not on a row (families/defense/defenders.ts).
       const stopsDefenders = defending && wait?.kind === "target";
@@ -359,7 +360,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const rowCaution = asked.cautions?.[id] ?? fire?.caution ?? ship?.caution ?? crown?.caution ?? kingsCaution;
           // A plain card row that shares its name with another row says what tells the copies apart (Mr. Underhill's two Black Riders).
           const plainLabel = card.label === names.card(id) ? (copyLabel(game, names, id, window.options) ?? card.label) : card.label;
-          const label = (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? crown?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? stagedAllyLabel(game, ctx, names, id, window.options) ?? seatedLabel(game, ctx, names, id, window.options) ?? orcsLabel(game, names, id, window.options) ?? tiedLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : plainLabel);
+          const label = (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? crown?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? stagedAllyLabel(game, ctx, names, id, window.options) ?? seatedLabel(game, ctx, names, id, window.options) ?? orcsLabel(game, names, id, window.options) ?? tiedLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay || zoned ? outOfPlayLabel(game, id, words) : plainLabel);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
           return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction) || isBoonCode(wait.item.instruction, id)) ? { code: id } : {}), ...(willpower.length > 0 || eyes.length > 0 || tied.length > 0 ? { stats: [...willpower, ...eyes, ...tied] } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };

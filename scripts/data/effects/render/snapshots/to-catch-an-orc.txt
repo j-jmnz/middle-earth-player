@@ -49,7 +49,7 @@ Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc
   07026:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it is heard (a record that holds its events lets it resolve only after the whole effect has finished; a stage with none loses none)
 
 ## 07027 Methedras
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -122,7 +122,7 @@ Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc
         - choose character (you control)
         - deal 3 damage to the picked card
       * option "time" (only if 0 is less than resources of the current quest stage):
-        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it is heard (a record that holds its events lets it resolve only after the whole effect has finished; a stage with none loses none)
 
 07038:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack.
   07038:shadow:1: Shadow
@@ -139,7 +139,7 @@ Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc
       * option "reveal":
         - the acting player reveals an encounter card
       * option "time" (only if 0 is less than resources of the current quest stage):
-        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it is heard (a record that holds its events lets it resolve only after the whole effect has finished; a stage with none loses none)
 
 07039:A:2 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
   07039:shadow:1: Shadow
@@ -212,7 +212,7 @@ Scenario piles that place cards with no record (quest: 07062 Orders from Orthanc
       * option "damage" (only if there is a exhausted character (any player controls) to choose):
         - deal 1 damage to each exhausted character (any player controls)
       * option "time" (only if 0 is less than resources of the current quest stage):
-        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it resolves (a stage with none loses none)
+        - up to 1 time counter(s) come off the current quest stage, one at a time; when the last one goes the stage's Forced effect for it is heard (a record that holds its events lets it resolve only after the whole effect has finished; a stage with none loses none)
 
 ## 07062 Orders from Orthanc
 (the scenario deals it into the quest pile; the piles place it, no record does)

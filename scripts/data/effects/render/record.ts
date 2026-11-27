@@ -111,12 +111,14 @@ export function renderCost(value: unknown, ctx: Ctx): string {
   return said ? done(ctx, said, value, ["kind", "amount", "sphere", "from", "code", "name", "each"]) : jsonOf(ctx, "cost", value);
 }
 
-function renderSubject(value: unknown, ctx: Ctx): string {
+function renderSubject(value: unknown, ctx: Ctx, trigger?: unknown): string {
   if (value === "self") return "this card";
   if (value === "host") return "the host";
   // A trigger's subject that is a player card hears an event card too: an event is not in play while it resolves, and the event it plays is still about it.
   const note = isObj(value) && value.playerCard === true ? " (an event card passes: it is heard while it resolves, though it is not in play)" : "";
-  return `${renderPick(value, ctx)}${note}`;
+  // The card the encounter deck discarded lies in the encounter discard pile when it is heard: no player controls it.
+  const lies = trigger === "discardedFromEncounterDeck" && isObj(value) && value.from === undefined ? { ...value, from: "encounterDiscard" } : value;
+  return `${renderPick(lies, ctx)}${note}`;
 }
 
 // The `played` event of a card another card hears: an event is heard when it is played, before its effects resolve (the heard effect resolves above the event's own, so it may cancel them); an ally is heard only when played from hand (a card played from the discard pile or the top of the deck counts as from hand; one put into play by an effect is not played).
@@ -132,7 +134,7 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   const timing = TIMING[str(effect.timing)] ?? str(effect.timing);
   const trigger = typeof effect.trigger === "string" ? ` ${triggerWords(effect)}` : "";
   const notes: string[] = [];
-  if (effect.subject !== undefined) notes.push(`heard about ${renderSubject(effect.subject, ctx)}`);
+  if (effect.subject !== undefined) notes.push(`heard about ${renderSubject(effect.subject, ctx, effect.trigger)}`);
   else if (typeof effect.trigger === "string" && ABOUT_ONE_CARD.has(effect.trigger)) notes.push("heard about this card only: with no subject, an event about one card is heard by that card alone");
   if (effect.eventSeat !== undefined) notes.push(`event happened to ${effect.eventSeat === "you" ? "the controller" : "another player"}`);
   if (typeof effect.limit === "string") notes.push(`limit ${LIMIT[effect.limit] ?? effect.limit}`);
@@ -147,9 +149,10 @@ export function renderRecord(effect: Obj, ctx: Ctx): string[] {
   if (effect.notFromDiscard === true) notes.push("not for a card found in the encounter discard pile");
   if (effect.byPlay === true) notes.push("only when a player played the attachment");
   if (effect.early === true) notes.push("resolves before the other Forced effects of the moment");
+  if (effect.holdsEvents === true) notes.push("the Forced effects that hear what it does (a draw, the last time counter taken off the stage) resolve after the whole effect has finished, not between its steps or between two players' turns in it");
   if (isObj(effect.cancel)) notes.push(`may be canceled by paying ${str(effect.cancel.cost)}`);
   if (isObj(effect.uncancelable)) notes.push(`cannot be canceled while ${renderCondition(effect.uncancelable, ctx)}`);
-  const head = done(ctx, `${timing}${trigger}${notes.length > 0 ? ` (${notes.join("; ")})` : ""}`, effect, ["id", "cardCode", "lines", "timing", "trigger", "subject", "eventSeat", "limit", "cost", "anyPlayer", "answeredBy", "whenFirst", "fromHand", "fromVictory", "byEncounterDeck", "notFromDiscard", "byPlay", "early", "cancel", "uncancelable", "condition", "instructions"]);
+  const head = done(ctx, `${timing}${trigger}${notes.length > 0 ? ` (${notes.join("; ")})` : ""}`, effect, ["id", "cardCode", "lines", "timing", "trigger", "subject", "eventSeat", "limit", "cost", "anyPlayer", "answeredBy", "whenFirst", "holdsEvents", "fromHand", "fromVictory", "byEncounterDeck", "notFromDiscard", "byPlay", "early", "cancel", "uncancelable", "condition", "instructions"]);
   const lines = [`${str(effect.id)}: ${head}`];
   if (effect.condition !== undefined) lines.push(`  only if ${renderCondition(effect.condition, ctx)}`);
   const instructions = Array.isArray(effect.instructions) ? effect.instructions : [];

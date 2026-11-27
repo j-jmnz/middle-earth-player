@@ -1,7 +1,7 @@
 // Rules: rr.in-play-and-out-of-play, rr.discard-pile-and-victory-display (data/rules/entries.json).
-import type { CardFace, CardInstance, ScenarioState, ZoneName } from "./state.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { leaveWith } from "../families/play/zones.ts";
+import { keptInPlay } from "../families/pelargir/vale/cannot-leave.ts";
 import { heldInHand } from "../families/ring-maker/hand.ts";
 import { endLastingOn } from "./lasting.ts";
 import { releaseOrcGuard } from "../families/dungeon/guard.ts";
@@ -17,7 +17,8 @@ import { joinOrcsArea } from "../families/haradrim/orcs-zone.ts";
 import { joinUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "../families/uncharted/zone.ts";
 import { deckRoute, isDeckZone, joinPile, leavePile, shufflePile, type PileZone } from "./piles.ts";
 import { isReanimatedCode, ORC_GUARD_CODE, reanimatedBase } from "./printed.ts";
-import { flagged, heldHero, hostsCaptives, inPlay, updateCard, updateCards, withSeat } from "./state.ts";
+import { flagged, heldHero, hostsCaptives, inPlay, updateCard, updateCards, withSeat, type CardFace, type CardInstance, type ScenarioState, type ZoneName } from "./state.ts";
+import { cannotLeaveStaging } from "./staging-bar.ts";
 
 export type Destination =
   | { zone: "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "seatStaging"; seat: number }
@@ -339,15 +340,11 @@ function stampEntry(state: ScenarioState, id: string, from: ZoneName): ScenarioS
   return updateCard({ ...state, clock }, id, { enteredPlay: clock, damage: keeps ? now.damage : 0, progress: 0, resources: from === "setAside" ? now.resources : 0, exhausted: false, committed: false, ...(keeps ? { keepsDamage: undefined } : {}) });
 }
 
-export type MoveOptions = { readonly released?: readonly string[]; readonly defeated?: boolean; readonly supersedes?: boolean };
-
-/** A card that "cannot leave the staging area" and has not lost that bar (a stage or an effect that removes it sets `losesCannotLeaveStaging`). `moveCard` and the optional engagement of the Harad family read it. */
-export function cannotLeaveStaging(state: ScenarioState, id: string): boolean {
-  return flagged(state, id, "cannotLeaveStaging") && !flagged(state, id, "losesCannotLeaveStaging");
-}
+export type MoveOptions = { readonly released?: readonly string[]; readonly defeated?: boolean; readonly supersedes?: boolean; readonly destroyed?: boolean };
 
 // `released` (option): the attachments destroyCard discarded just before the card itself (keywords.ts), named with its leaving.
 // `supersedes` (option): an effect that overrides "cannot leave the staging area" moves the card (Dark Pit's discard of Durin's Bane, FAQ 3.026, families/flame/bane.ts).
+// `destroyed` (option): the card is leaving because it was destroyed (destroyCard); a card that holds `cannotLeaveUnlessDestroyed` leaves play by no other move ("Murzag cannot leave play unless destroyed", 06144:B:1).
 // `defeated` (option): the card is leaving because damage destroyed it; a card that holds `leavesStagingWhenDefeated` then leaves the staging area although it cannot leave it any other way (Thaurdir on stage 2B, 10126:B:1, 10126:B:3).
 export function moveCard(state: ScenarioState, id: string, requested: Destination, options: MoveOptions = {}): ScenarioState {
   const dead = state.cards[id];
@@ -358,7 +355,7 @@ export function moveCard(state: ScenarioState, id: string, requested: Destinatio
 }
 
 function moveCardTo(state: ScenarioState, id: string, requested: Destination, options: MoveOptions): ScenarioState {
-  const { released = [], defeated = false, supersedes = false } = options;
+  const { released = [], defeated = false, supersedes = false, destroyed = false } = options;
   const current = state.cards[id];
   if (!current) return state;
   // A temporary card leaves the game when it leaves play, whether it is defeated, returned to a hand or a deck or discarded ("If those heroes leave play, they are removed from the game", 11212:A:2).
@@ -372,8 +369,9 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   if (dest.zone === "staging" && flagged(state, id, "cannotEnterStaging")) return state;
   // A card that cannot leave the staging area stays in it, whatever moves it (Uglúk, 143069:B:2).
   if (current.zone === "staging" && dest.zone !== "staging" && cannotLeaveStaging(state, id) && !supersedes && !(defeated && flagged(state, id, "leavesStagingWhenDefeated"))) return state;
-  // A card that cannot leave the hand stays in it, whatever moves it (Ill Tidings, 07023:A:1).
-  if (current.zone === "hand" && heldInHand(state, id)) return state;
+  // A card that cannot leave play unless destroyed stays where it is, with its damage, tokens, attachments and shadow cards, whatever else moves it out of play (families/pelargir/vale/cannot-leave.ts).
+  if (!destroyed && !defeated && inPlay(current.zone) && !inPlay(dest.zone) && keptInPlay(state, id)) return state;
+  if (current.zone === "hand" && heldInHand(state, id)) return state; // a card that cannot leave the hand stays in it, whatever moves it (Ill Tidings, 07023:A:1)
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";
   let next = detach(state, id);
   if ((leavingPlay || guardLeaves(current, dest)) && current.host) next = unhost(next, id);
@@ -400,6 +398,8 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   if (current.zone === "staging" && dest.zone !== "staging") moved = dest.zone === "activeLocation" || dest.zone === "secondActiveLocation" ? releaseGrappled(moved, id) : discardGrappled(moved, id);
   // The lasting modifiers it held end with its time in play (rr.in-play-and-out-of-play, core/lasting.ts).
   if (inPlay(current.zone) && !inPlay(dest.zone)) moved = endLastingOn(moved, id);
+  // A card that goes back to a hand or a deck has left play: it is no longer exhausted or committed and holds no tokens (rr.in-play-and-out-of-play: Sneak Attack returns an exhausted Halfling Bounder to the hand, and he is ready when played again).
+  if (inPlay(current.zone) && (dest.zone === "hand" || dest.zone === "deck" || dest.zone === "encounterDeck")) moved = updateCard(moved, id, { exhausted: false, committed: false, damage: 0, progress: 0, resources: 0 });
   // Its attachments leave play with it, however it left (rr.attachment-cards, families/play/zones.ts).
   if (inPlay(current.zone) && !inPlay(dest.zone)) moved = leaveWith(moved, current, released);
   // An Orc Guard that leaves play takes the deck card it is made of to its owner's discard pile and leaves the game (families/dungeon/guard.ts).

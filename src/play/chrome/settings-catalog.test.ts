@@ -61,7 +61,7 @@ describe("the categories", () => {
 
 describe("the table's panel", () => {
   it("keeps the settings a player changes during a game", () => {
-    expect(PANEL_ROWS).toEqual(["speed", "spotlight", "bannerCloses", "haptics", "sounds", "soundVolume", "music", "musicVolume", "timingTips", "always"]);
+    expect(PANEL_ROWS).toEqual(["speed", "spotlight", "haptics", "sounds", "soundVolume", "music", "musicVolume", "timingTips", "always"]);
   });
 });
 

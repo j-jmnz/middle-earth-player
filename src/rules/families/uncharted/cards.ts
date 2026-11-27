@@ -159,12 +159,16 @@ export function discardTopCards(state: ScenarioState, count: number, refill: Top
   return { state: next, ids };
 }
 
-/** DiscardEncounterTop: the top cards of the encounter deck go to its discard pile, face up; they are the cards the effect looked at. A deck that ran out during the effect is reset before the next card is discarded (10097:A:1). */
-export function discardEncounterTop(state: ScenarioState, instruction: Verb<"DiscardEncounterTop">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+/**
+ * DiscardEncounterTop: the top cards of the encounter deck go to its discard pile, face up; they are the cards the effect looked at. A deck that ran out during the effect is reset before the next card is discarded (10097:A:1).
+ * DiscardEncounterTopMore is the same discard, and the cards join the ones the effect discarded before, so the amount `discardedMatching` and StageDiscarded read them all (05024:A:1).
+ */
+export function discardEncounterTop(state: ScenarioState, instruction: Verb<"DiscardEncounterTop"> | Verb<"DiscardEncounterTopMore">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const count = resolveAmount(state, instruction.count, frameScope(state, focus.seat, focus.sourceId), ctx);
+  const before = instruction.verb === "DiscardEncounterTopMore" ? (effectData(state)?.looked ?? []) : [];
   const { state: next, ids } = discardTopCards(state, count, instruction.reset ? "reset" : "none", steps, ctx);
   const data = effectData(next);
-  return data ? patchTop(next, { data: { ...data, looked: ids } }) : next;
+  return data ? patchTop(next, { data: { ...data, looked: [...before, ...ids] } }) : next;
 }
 
 /**

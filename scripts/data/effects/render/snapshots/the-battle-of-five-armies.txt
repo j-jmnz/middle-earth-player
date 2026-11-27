@@ -251,7 +251,7 @@ Scenario piles that place cards with no record (quest: 132075 The Gathering of t
 132076:B:1 (back): Players cannot advance from this stage unless stage 3 and stage 4 are complete.
   132076:constant:1: Constant
     only if not every quest stage in play with the code 132077 and 132078 holds at least its quest points in progress
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 132076:B:2 (back): Forced: If there is no progress on this stage at the end of the round, each player must discard 1 random card from his hand.
   132076:forced:1: Forced at the end of the round
@@ -265,7 +265,7 @@ Scenario piles that place cards with no record (quest: 132075 The Gathering of t
 132077:B:1 (back): Players cannot advance from this stage unless stage 2 and stage 4 are complete.
   132077:constant:1: Constant
     only if not every quest stage in play with the code 132076 and 132078 holds at least its quest points in progress
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 132077:B:2 (back): Battle. (Characters use Attack instead of Willpower when questing here.)
   (the keyword part is owned by the card's keywords; the records cover: (Characters use Attack instead of Willpower when questing here.))
@@ -285,7 +285,7 @@ Scenario piles that place cards with no record (quest: 132075 The Gathering of t
 132078:B:1 (back): Players cannot advance from this stage unless stage 2 and stage 3 are complete.
   132078:constant:1: Constant
     only if not every quest stage in play with the code 132076 and 132077 holds at least its quest points in progress
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 132078:B:2 (back): Siege. (Characters use Defense instead of Willpower when questing here.)
   (the keyword part is owned by the card's keywords; the records cover: (Characters use Defense instead of Willpower when questing here.))

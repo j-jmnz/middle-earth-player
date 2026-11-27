@@ -1,7 +1,6 @@
 // Rules: rr.action, rr.event-cards, rr.encounter-phase, rr.engaged, rr.lasting-effects, rr.delayed-effects, rr.ownership-and-control,
 // rr.attachment-cards, rr.may (data/rules/entries.json).
-// The Blood of Gondor events, each printed line tested from the words on the card (data/cards/BoG.json: data/printed holds no ledger for
-// this pack, so the lines are the text of data/cards and every intent goes through sendUnledgered): The Hammer-stroke 06111:A:1, Children
+// The Blood of Gondor events, each printed line tested from the words on the card (data/cards/BoG.json: the lines are the ledger lines in data/printed, read from the scans): The Hammer-stroke 06111:A:1, Children
 // of the Sea 06113:A:1, Well-Equipped 06116:A:1.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -13,8 +12,8 @@ import { definePrinted } from "../../rules/core/printed.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene } from "../../../test/harness/scene.ts";
-import { canPlay, choices, enter, fillers, play, playerTableFor, printed, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
+import { type Scene, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { canPlay, choices, enter, fillers, play, playerTableFor, printed, stat } from "../../../test/harness/player-table.ts";
 
 const HAMMER = "06111";
 const CHILDREN = "06113";
@@ -63,8 +62,8 @@ describe("The Hammer-stroke (06111:A:1)", () => {
     const tab = scene(effects, "encounter");
     // Each player declines the optional engagement; the engagement checks engage nothing (engagement cost 50), and the window after
     // them opens.
-    let checked = sendUnledgered(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
-    checked = sendUnledgered(checked, { type: "DeclineEngage" }, tab.ctx);
+    let checked = send(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
+    checked = send(checked, { type: "DeclineEngage" }, tab.ctx);
     expect(checked.state.phase).toBe("Encounter");
     const run = play(checked, tab, idsOf(tab, HAMMER));
     expect(run.state.cards[idsOf(tab, HAMMER)]?.zone).toBe("discard");
@@ -81,8 +80,8 @@ describe("The Hammer-stroke (06111:A:1)", () => {
   // in the hand (the Pad) keeps the Encounter action window open, so the refusal is read in that window.
   it("06111:A:1 The Hammer-stroke: not played when every enemy is engaged with you", () => {
     const tab = table([...EFFECTS, padAction], { seats: 2, start: "encounter", heroes: [{ code: GIMLI, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: HAMMER, seat: 0 }, { code: PAD, seat: 0 }], engaged: [{ code: WEAK, seat: 0 }] });
-    let run = sendUnledgered(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
-    run = sendUnledgered(run, { type: "DeclineEngage" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
+    run = send(run, { type: "DeclineEngage" }, tab.ctx);
     expect(run.state.phase).toBe("Encounter");
     expect(canPlay(run.state, tab, idsOf(tab, PAD))).toBe(true);
     expect(canPlay(run.state, tab, idsOf(tab, HAMMER))).toBe(false);
@@ -103,7 +102,7 @@ describe("Children of the Sea (06113:A:1)", () => {
     const noldo = idsOf(tab, NOLDO);
     let run = play(begin(tab.state), tab, idsOf(tab, CHILDREN));
     expect(choices(run.state, tab).sort()).toEqual([guide, noldo].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: noldo }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: noldo }, tab.ctx);
     expect(stat(run.state, tab, noldo, "willpower")).toBe(printed(tab, NOLDO, "willpower") + 2);
     const ended = enter(run.state, tab, "questCommit").state;
     expect(ended.cards[noldo]?.zone).toBe("deck");
@@ -117,7 +116,7 @@ describe("Children of the Sea (06113:A:1)", () => {
     const tab = scene(EFFECTS);
     const [guide = ""] = tab.ids[GUIDE] ?? [];
     let run = play(begin(tab.state), tab, idsOf(tab, CHILDREN));
-    run = sendUnledgered(run, { type: "Choose", optionId: guide }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: guide }, tab.ctx);
     const destroyed = placeDamage(run.state, guide, 9, tab.ctx.cards, [], "framework", ruleCause("rr.damage"));
     expect(destroyed.cards[guide]?.zone).toBe("discard");
     const ended = enter(destroyed, tab, "questCommit").state;
@@ -148,10 +147,10 @@ describe("Well-Equipped (06116:A:1)", () => {
     let run = play(begin(tab.state), tab, idsOf(tab, WELL));
     expect(top.map((id) => run.state.cards[id]?.zone)).toEqual(["discard", "discard"]);
     expect(choices(run.state, tab).sort()).toEqual(["attach", "decline"]);
-    run = sendUnledgered(run, { type: "Choose", optionId: "attach" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "attach" }, tab.ctx);
     // The Axe is the lone attachment discarded, so the next question is its host.
     expect(choices(run.state, tab).sort()).toEqual([gimli, gloin].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: gloin }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: gloin }, tab.ctx);
     expect(run.state.cards[axe]).toMatchObject({ zone: "play", host: gloin });
     expect(run.state.seats[0]?.deck).toHaveLength(2);
   });
@@ -160,7 +159,7 @@ describe("Well-Equipped (06116:A:1)", () => {
   it("06116:A:1 Well-Equipped: declined, nothing is attached", () => {
     const tab = scene(EFFECTS, [AXE, "card"]);
     let run = play(begin(tab.state), tab, idsOf(tab, WELL));
-    run = sendUnledgered(run, { type: "Choose", optionId: "decline" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "decline" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, AXE)]?.zone).toBe("discard");
   });
 

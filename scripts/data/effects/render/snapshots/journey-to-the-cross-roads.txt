@@ -315,7 +315,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 144068:B:2 (back): The players cannot defeat this stage while The Cross-roads is in play. When The Cross-roads is explored, the players win the game.
   144068:constant:1: Constant
     only if the card with code 144030 is in play
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
   144068:forced:2: Forced on the event locationExplored (heard about location (any player controls) named "The Cross-roads")
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game

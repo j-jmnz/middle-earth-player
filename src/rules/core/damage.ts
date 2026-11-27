@@ -6,7 +6,7 @@ import { queueEvent } from "../windows/queue.ts";
 import type { ScenarioState } from "./state.ts";
 import { flagged, heldAmount, updateCard } from "./state.ts";
 import { inPlay } from "./zones.ts";
-import { damageBarred, damageGoesTo } from "../families/defense/damage.ts";
+import { damageBarred, damageGoesTo, queueBeforeDestruction } from "../families/defense/damage.ts";
 import { resourceCancel, resourceShield } from "../families/aflame/attack.ts";
 import { cancelAllDamage, damageShield } from "../families/wilderland/shield.ts";
 import { reduceLife, takesLifeInstead } from "../families/burden/life.ts";
@@ -83,6 +83,8 @@ function placeDamageHere(state: ScenarioState, assigned: string, amount: number,
   }
   if (lethal) {
     next = destroyAndAnnounce(next, instance, printed, cards, steps);
+    // A character that damage destroyed took that damage all the same (rr.damage): the cards still in play hear it before its destruction. An attack's combat damage is heard as `damagedByAttack` (noteAttackDamage).
+    if (hurt && source !== "combat" && isCharacterType(printed) && !inPlay(next.cards[id]?.zone ?? "removed")) next = queueBeforeDestruction(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id, amount: dealt });
   } else if (hurt) {
     // A card that took damage and is still in play hears about it ("After Boromir takes any amount of damage").
     next = queueEvent(next, { trigger: "damaged", seat: instance.controller, cardId: id, subject: id, amount: dealt });

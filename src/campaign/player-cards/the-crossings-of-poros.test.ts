@@ -1,7 +1,6 @@
 // Rules: rr.attachment-cards, rr.restricted, rr.action, rr.limits, rr.cost, rr.response, rr.enters-play, rr.resources, rr.victory,
 // rr.engaged, rr.staging-area, rr.lasting-effects, rr.destroy, rr.ready, rr.triggered-ability, rr.deckbuilding (data/rules/entries.json).
-// The Crossings of Poros characters and attachments, written from their card text (data/cards/CoP.json; data/printed holds no ledger for
-// this pack, so every intent goes through sendUnledgered): Quickbeam 17135:A:1 and A:2, Halfast Gamgee 17136:A:1 and A:2, Beorning
+// The Crossings of Poros characters and attachments, written from their card text (data/cards/CoP.json; the ledger lines in data/printed are read from the scans): Quickbeam 17135:A:1 and A:2, Halfast Gamgee 17136:A:1 and A:2, Beorning
 // Guardian 17138:A:1, Followed 17139:A:1 to A:3, Emyn Arnen Ranger 17141:A:1, Magic Ring 17143:A:1 and A:2. The events are in
 // the-crossings-of-poros-events.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -16,8 +15,8 @@ import { stagingThreat } from "../../rules/quest/quest.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { attach, attacking, choices, deckSaveFacts, enter, fillers, hosts, packRow, play, playerTableFor, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { type Table, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { attach, attacking, choices, deckSaveFacts, enter, fillers, hosts, packRow, play, playerTableFor, questing, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const QUICKBEAM = "17135";
 const HALFAST = "17136";
@@ -80,7 +79,7 @@ describe("Quickbeam (17135:A:1, A:2)", () => {
   lineSpec("17135:A:2", "Quickbeam: deal 2 damage to him to ready him, once per phase", (effects) => {
     const { tab, quickbeam } = exhausted(effects);
     expect(triggers(tab.state, tab)).toContain("17135:action:1");
-    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: quickbeam, effectId: "17135:action:1" }, tab.ctx);
+    const run = send(begin(tab.state), { type: "Trigger", cardId: quickbeam, effectId: "17135:action:1" }, tab.ctx);
     expect(run.state.cards[quickbeam]).toMatchObject({ damage: 2, exhausted: false });
     const again = updateCard(run.state, quickbeam, { exhausted: true });
     expect(triggers(again, tab)).not.toContain("17135:action:1");
@@ -106,7 +105,7 @@ describe("Halfast Gamgee (17136:A:1, A:2)", () => {
     expect(playCost(two.state, idsOf(two, HALFAST), 0, two.ctx)).toBe(1);
     const none = halfast(effects, [LOC]);
     expect(playCost(none.state, idsOf(none, HALFAST), 0, none.ctx)).toBe(3);
-    const run = sendUnledgered(begin(two.state), { type: "PlayCard", cardId: idsOf(two, HALFAST), payments: [{ heroId: idsOf(two, PAL), amount: 1 }] }, two.ctx);
+    const run = send(begin(two.state), { type: "PlayCard", cardId: idsOf(two, HALFAST), payments: [{ heroId: idsOf(two, PAL), amount: 1 }] }, two.ctx);
     expect(run.state.cards[idsOf(two, HALFAST)]?.zone).toBe("play");
   });
 
@@ -117,9 +116,9 @@ describe("Halfast Gamgee (17136:A:1, A:2)", () => {
     const [card, aragorn] = [idsOf(tab, HALFAST), idsOf(tab, ARAGORN)];
     let run = play(begin(tab.state), tab, card);
     expect(triggers(run.state, tab)).toContain("17136:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: card, effectId: "17136:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: card, effectId: "17136:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([aragorn, idsOf(tab, PAL)].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: aragorn }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: aragorn }, tab.ctx);
     expect(run.state.cards[aragorn]?.resources).toBe(6 + 1);
   });
 });
@@ -130,7 +129,7 @@ describe("Beorning Guardian (17138:A:1)", () => {
   function guardian(effects: readonly Effect[], enemy: string, attackers: "guardian" | "legolas") {
     const tab = table(effects, { heroes: [{ code: LEGOLAS, seat: 0 }], allies: [{ code: GUARDIAN, seat: 0 }], engaged: [{ code: enemy, seat: 0 }], active: LOC, staging: [LOC2] });
     const [card, legolas] = [idsOf(tab, GUARDIAN), idsOf(tab, LEGOLAS)];
-    const run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, enemy), attackerIds: [attackers === "guardian" ? card : legolas] }, tab.ctx);
+    const run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, enemy), attackerIds: [attackers === "guardian" ? card : legolas] }, tab.ctx);
     return { tab, run, card, enemy: idsOf(tab, enemy) };
   }
 
@@ -141,10 +140,10 @@ describe("Beorning Guardian (17138:A:1)", () => {
     const { tab, run: attack, card, enemy } = guardian(effects, PREY, "guardian");
     expect(attack.state.cards[enemy]?.zone).not.toBe("engaged");
     expect(triggers(attack.state, tab)).toContain("17138:response:1");
-    let run = sendUnledgered(attack, { type: "Trigger", cardId: card, effectId: "17138:response:1" }, tab.ctx);
+    let run = send(attack, { type: "Trigger", cardId: card, effectId: "17138:response:1" }, tab.ctx);
     expect(run.state.cards[card]?.zone).toBe("discard");
     expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, LOC), idsOf(tab, LOC2)].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, LOC2) }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: idsOf(tab, LOC2) }, tab.ctx);
     expect(run.state.cards[idsOf(tab, LOC2)]?.progress).toBe(2);
     expect(run.state.cards[idsOf(tab, LOC)]?.progress).toBe(0);
   });
@@ -173,7 +172,7 @@ describe("Followed (17139:A:1, A:2, A:3)", () => {
   // The optional engagement of the encounter phase: `seat` engages the enemy.
   const engage = (tab: Table, state: Table["state"], enemy: string, seat = 0) => {
     const run = enter(state, tab, "optionalEngage");
-    return sendUnledgered({ ...run, state: { ...run.state, activeSeat: seat } }, { type: "Engage", enemyId: enemy }, tab.ctx);
+    return send({ ...run, state: { ...run.state, activeSeat: seat } }, { type: "Engage", enemyId: enemy }, tab.ctx);
   };
 
   // "Play into your play area unattached.": the only place offered is the player's play area (no hero), and the card lies there, attached
@@ -219,7 +218,7 @@ describe("Emyn Arnen Ranger (17141:A:1)", () => {
     const [first = "", second = ""] = scene.ids[SNARE] ?? [];
     const tab = traps ? attach(scene, [[first, staged], [second, engaged]]) : scene;
     const card = idsOf(tab, RANGER);
-    return { tab, card, staged, engaged, run: sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [card] }, tab.ctx) };
+    return { tab, card, staged, engaged, run: send(begin(tab.state), { type: "Commit", cardIds: [card] }, tab.ctx) };
   }
 
   // "Response: After Emyn Arnen Ranger commits to the quest, choose an enemy with a Trap attachment. Until the end of the phase, Emyn Arnen
@@ -228,9 +227,9 @@ describe("Emyn Arnen Ranger (17141:A:1)", () => {
   lineSpec("17141:A:1", "Emyn Arnen Ranger: after he commits, +X Willpower until the end of the phase, X a trapped enemy's printed Threat", (effects) => {
     const { tab, card, staged, engaged, run: committed } = ranger(effects);
     expect(triggers(committed.state, tab)).toContain("17141:response:1");
-    let run = sendUnledgered(committed, { type: "Trigger", cardId: card, effectId: "17141:response:1" }, tab.ctx);
+    let run = send(committed, { type: "Trigger", cardId: card, effectId: "17141:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([engaged, staged].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: engaged }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: engaged }, tab.ctx);
     expect(stat(run.state, tab, card, "willpower")).toBe(2);
     expect(stat(withMode(run.state, "travel"), tab, card, "willpower")).toBe(0);
   });
@@ -268,7 +267,7 @@ describe("Magic Ring (17143:A:1, A:2)", () => {
     const scene = table(effects, { heroes: [{ code: ARAGORN, seat: 0 }], attached: [{ code: RING, host: ARAGORN }] });
     const aragorn = idsOf(scene, ARAGORN);
     const tab = { ...scene, state: updateCard(scene.state, aragorn, { damage, exhausted }) };
-    return { tab, aragorn, card: idsOf(tab, RING), run: sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, RING), effectId: "17143:action:1" }, tab.ctx) };
+    return { tab, aragorn, card: idsOf(tab, RING), run: send(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, RING), effectId: "17143:action:1" }, tab.ctx) };
   }
 
   // "Action: Exhaust Magic Ring and raise your threat by 1 to (choose 1): heal 1 damage from attached hero, add 1 resource to attached
@@ -278,7 +277,7 @@ describe("Magic Ring (17143:A:1, A:2)", () => {
     for (const [option, expected] of [["heal", { damage: 1, resources: 6, exhausted: true }], ["resource", { damage: 2, resources: 7, exhausted: true }], ["ready", { damage: 2, resources: 6, exhausted: false }]] as const) {
       const { tab, aragorn, card, run: triggered } = ring(effects, 2, true);
       expect(choices(triggered.state, tab).sort()).toEqual(["heal", "ready", "resource"]);
-      const run = sendUnledgered(triggered, { type: "Choose", optionId: option }, tab.ctx);
+      const run = send(triggered, { type: "Choose", optionId: option }, tab.ctx);
       expect(run.state.cards[aragorn]).toMatchObject(expected);
       expect(run.state.cards[card]?.exhausted).toBe(true);
       expect(run.state.seats[0]?.threat).toBe(9);

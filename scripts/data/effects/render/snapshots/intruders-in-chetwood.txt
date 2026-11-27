@@ -38,7 +38,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09017:A:3 (front): The players cannot win the game while Orc War Party is in play.
   09017:constant:3: Constant
-    - the players cannot defeat the main quest stage while this holds
+    - the players cannot defeat the main quest stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 09018 Chetwood Forest
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -313,7 +313,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     only if not (the actor controls the card with code 09016)
     who acts: the acting player is the first player (a quest stage belongs to no player; while the stages are split between the players, the player whose stage it is)
     note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
-    - the players cannot defeat this stage while this holds
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
 
 ## 10156 Intruders in Chetwood
 

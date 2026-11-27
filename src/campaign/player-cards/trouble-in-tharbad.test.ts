@@ -3,8 +3,7 @@
 // (data/rules/entries.json).
 // The Trouble in Tharbad player cards, each printed line tested from the words on the card (lineSpec, test/harness/line-spec.ts): O Lórien!
 // 08058:A:1, Gwaihir 08059:A:1 and A:2, Courage Awakened 08061:A:1, Galadhrim Minstrel 08063:A:1, Lembas 08064:A:1 to A:3, Defender of
-// the Naith 08065:A:2. The lines are the text of data/cards/TiT.json (data/printed holds no ledger for this pack), so every intent goes
-// through sendUnledgered.
+// the Naith 08065:A:2. The lines are the text of data/cards/TiT.json (the ledger lines in data/printed are read from the scans).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
@@ -14,8 +13,8 @@ import { updateCard, withThreat } from "../../rules/core/state.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { canPlay, choices, destroyed, discarded, endRound, enter, hosts, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { type Run, type Table, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { canPlay, choices, destroyed, discarded, endRound, enter, hosts, play, playerTableFor, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const LORIEN = "08058";
 const GWAIHIR = "08059";
@@ -93,9 +92,9 @@ describe("Gwaihir (08059:A:1, A:2)", () => {
     const gwaihir = idsOf(tab, GWAIHIR);
     let run = play(begin(tab.state), tab, gwaihir);
     expect(triggers(run.state, tab)).toContain("08059:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: gwaihir, effectId: "08059:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: gwaihir, effectId: "08059:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([...mine].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: eagle }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: eagle }, tab.ctx);
     expect(run.state.cards[eagle]).toMatchObject({ zone: "play", controller: 0 });
     for (const id of [plain, event, theirs, mine[1] ?? ""]) expect(run.state.cards[id]?.zone).toBe("discard");
     expect(run.state.cards[gwaihir]?.zone).toBe("play");
@@ -110,8 +109,8 @@ describe("Gwaihir (08059:A:1, A:2)", () => {
     const { tab, mine: [eagle = ""] } = scene(EFFECTS);
     const gwaihir = idsOf(tab, GWAIHIR);
     let run = play(begin(tab.state), tab, gwaihir);
-    run = sendUnledgered(run, { type: "Trigger", cardId: gwaihir, effectId: "08059:response:1" }, tab.ctx);
-    run = sendUnledgered(run, { type: "Choose", optionId: eagle }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: gwaihir, effectId: "08059:response:1" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: eagle }, tab.ctx);
     run = destroyed(run.state, tab, eagle);
     expect(run.state.cards[eagle]?.zone).toBe("discard");
     expect(endRound(run.state, tab).state.cards[eagle]?.zone).toBe("discard");
@@ -122,9 +121,9 @@ describe("Courage Awakened (08061:A:1)", () => {
   // The Spirit hero pays; two copies are in hand.
   const scene = (effects: readonly Effect[]) => table(effects, { heroes: [{ code: SPIRIT, seat: 0 }, { code: PAL, seat: 0 }], hand: [{ code: COURAGE, seat: 0 }, { code: COURAGE, seat: 0 }] });
   const cast = (run: Run, tab: Table, id: string, hero: string): Run => {
-    const played = sendUnledgered(run, { type: "PlayCard", cardId: id, payments: [{ heroId: idsOf(tab, SPIRIT), amount: 1 }] }, tab.ctx);
+    const played = send(run, { type: "PlayCard", cardId: id, payments: [{ heroId: idsOf(tab, SPIRIT), amount: 1 }] }, tab.ctx);
     expect(choices(played.state, tab).sort()).toEqual([idsOf(tab, SPIRIT), idsOf(tab, PAL)].sort());
-    return sendUnledgered(played, { type: "Choose", optionId: hero }, tab.ctx);
+    return send(played, { type: "Choose", optionId: hero }, tab.ctx);
   };
 
   // "Action: Choose a hero. That hero gets +2 Willpower until the end of the phase. Then, if your threat is 20 or less and this is the
@@ -168,9 +167,9 @@ describe("Galadhrim Minstrel (08063:A:1)", () => {
     expect([order[0], order[2], order[5]]).toEqual([first, second, deep]);
     let run = play(begin(tab.state), tab, minstrel);
     expect(triggers(run.state, tab)).toContain("08063:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: minstrel, effectId: "08063:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: minstrel, effectId: "08063:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([first, second].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: second }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: second }, tab.ctx);
     expect(run.state.cards[second]?.zone).toBe("hand");
     const left = run.state.seats[0]?.deck ?? [];
     expect([...left].sort()).toEqual(order.filter((id) => id !== second).sort());
@@ -206,7 +205,7 @@ describe("Lembas (08064:A:1 to A:3)", () => {
   lineSpec("08064:A:3", "discards itself to ready the hero and heal 3 damage from it", (effects) => {
     const tab = scene(effects, true, 4);
     const glorfindel = idsOf(tab, GLORFINDEL);
-    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, LEMBAS), effectId: "08064:action:1" }, tab.ctx);
+    const run = send(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, LEMBAS), effectId: "08064:action:1" }, tab.ctx);
     expect(run.state.cards[glorfindel]).toMatchObject({ exhausted: false, damage: 1 });
     expect(run.state.cards[idsOf(tab, LEMBAS)]?.zone).toBe("discard");
   });
@@ -214,7 +213,7 @@ describe("Lembas (08064:A:1 to A:3)", () => {
   // A ready hero with damage is still healed.
   it("08064:A:3 heals a ready hero", () => {
     const tab = scene(EFFECTS, false, 2);
-    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, LEMBAS), effectId: "08064:action:1" }, tab.ctx);
+    const run = send(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, LEMBAS), effectId: "08064:action:1" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, GLORFINDEL)]?.damage).toBe(0);
   });
 
@@ -239,7 +238,7 @@ describe("Defender of the Naith (08065:A:2)", () => {
     let run = destroyed(tab.state, tab, guide);
     expect(run.state.cards[guide]?.zone).toBe("discard");
     expect(triggers(run.state, tab)).toContain("08065:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, NAITH), effectId: "08065:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, NAITH), effectId: "08065:response:1" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, NAITH)]?.exhausted).toBe(false);
   });
 
