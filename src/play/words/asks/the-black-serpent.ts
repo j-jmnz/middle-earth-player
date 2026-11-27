@@ -13,8 +13,8 @@ const ELIMINATED_BY_THREAT = {
   text: [
     { when: { kind: "all", conditions: [{ kind: "not", condition: { kind: "otherPlayer" } }, REACHES(0)] } as Condition, text: "Tap again: this takes your threat to 50 and eliminates you. If you are the last player, the game is lost" },
     { when: { kind: "all", conditions: [REACHES(0), REACHES(1)] } as Condition, text: "Tap again: this takes Player 1's and Player 2's threat to 50 and eliminates both. The game is lost" },
-    { when: REACHES(0), text: "Tap again: this takes Player 1's threat to 50 and eliminates Player 1. If Player 2 is eliminated too, the game is lost" },
-    { text: "Tap again: this takes Player 2's threat to 50 and eliminates Player 2. If Player 1 is eliminated too, the game is lost" },
+    { when: REACHES(0), text: "Tap again: this takes Player 1's threat to 50 and eliminates Player 1. The game is lost when no other player is left" },
+    { text: "Tap again: this takes Player 2's threat to 50 and eliminates Player 2. The game is lost when no other player is left" },
   ],
 } as const;
 

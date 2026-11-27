@@ -341,6 +341,11 @@ function stampEntry(state: ScenarioState, id: string, from: ZoneName): ScenarioS
 
 export type MoveOptions = { readonly released?: readonly string[]; readonly defeated?: boolean; readonly supersedes?: boolean };
 
+/** A card that "cannot leave the staging area" and has not lost that bar (a stage or an effect that removes it sets `losesCannotLeaveStaging`). `moveCard` and the optional engagement of the Harad family read it. */
+export function cannotLeaveStaging(state: ScenarioState, id: string): boolean {
+  return flagged(state, id, "cannotLeaveStaging") && !flagged(state, id, "losesCannotLeaveStaging");
+}
+
 // `released` (option): the attachments destroyCard discarded just before the card itself (keywords.ts), named with its leaving.
 // `supersedes` (option): an effect that overrides "cannot leave the staging area" moves the card (Dark Pit's discard of Durin's Bane, FAQ 3.026, families/flame/bane.ts).
 // `defeated` (option): the card is leaving because damage destroyed it; a card that holds `leavesStagingWhenDefeated` then leaves the staging area although it cannot leave it any other way (Thaurdir on stage 2B, 10126:B:1, 10126:B:3).
@@ -366,7 +371,7 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   // A card that cannot enter the staging area stays where it is ("Shrine to Morgoth ... cannot enter the staging area", 12094:A:1).
   if (dest.zone === "staging" && flagged(state, id, "cannotEnterStaging")) return state;
   // A card that cannot leave the staging area stays in it, whatever moves it (Uglúk, 143069:B:2).
-  if (current.zone === "staging" && dest.zone !== "staging" && flagged(state, id, "cannotLeaveStaging") && !flagged(state, id, "losesCannotLeaveStaging") && !supersedes && !(defeated && flagged(state, id, "leavesStagingWhenDefeated"))) return state;
+  if (current.zone === "staging" && dest.zone !== "staging" && cannotLeaveStaging(state, id) && !supersedes && !(defeated && flagged(state, id, "leavesStagingWhenDefeated"))) return state;
   // A card that cannot leave the hand stays in it, whatever moves it (Ill Tidings, 07023:A:1).
   if (current.zone === "hand" && heldInHand(state, id)) return state;
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";

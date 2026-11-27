@@ -91,7 +91,7 @@ export function stateText(state: ScenarioState, ctx: ReduceContext, options: Sta
   if (state.failure) lines.push(`failure: ${state.failure}`);
   lines.push(`quest: ${state.questStage ? cardLine(state, ctx, state.questStage) : "none"}; ${stagesLeft(state, ctx)} stages left`);
   for (const id of [state.activeLocation, state.secondActiveLocation]) if (id) lines.push(`active location: ${cardLine(state, ctx, id)}`);
-  // The total the quest resolves against: a card that adds no Threat (an enemy considered engaged) is left out, as the engine sums it.
+  // The total the quest resolves against, as the engine sums it (stagingThreatSources): the staged cards, the engaged enemies that contribute, an active location that contributes, a location of another area, and the held adjustment; a card that adds no Threat (an enemy considered engaged) is left out.
   const threat = stagingThreat(state, ctx.cards);
   lines.push(`staging (${threat} threat):`, ...state.staging.map((id) => `  ${cardLine(state, ctx, id)}`));
   lines.push(

@@ -1,11 +1,25 @@
 // Rules: docs/design-system-table.md (Tokens and effects). The count of effect pills hidden behind the "N more" pill, which badgeReach keeps a word pill clear of.
 import { describe, expect, it } from "vitest";
 
-import { BADGE_TOP, BADGE_TOP_SHORT, badgeLayout, badgeRoom, badgeShown, footStop, hiddenBadges, type FootMarks } from "./badge-room.ts";
+import { BADGE_TOP, BADGE_TOP_SHORT, badgeLayout, badgeRoom, badgeShown, footStop, hiddenBadges, loneRow, type FootMarks } from "./badge-room.ts";
 import { TOKEN } from "./token-spots.ts";
 import { underMarkBox } from "./under-mark.ts";
 
 const PILL = 15;
+
+describe("loneRow", () => {
+  // A 40 pt chip, a 14 pt count pill, a 52 pt "2 more" pill.
+  it("puts the words beside the chip on a wide card, the bare count on a narrower one and a round pill over the chip's end on a narrow one", () => {
+    expect(loneRow(40, 14, 52, 1, 120)).toEqual({ mode: "beside", compact: false, reach: 4 + 40 + 52 });
+    expect(loneRow(40, 14, 52, 1, 70)).toEqual({ mode: "beside", compact: true, reach: 4 + 40 + 14 });
+    expect(loneRow(40, 14, 52, 1, 56)).toEqual({ mode: "overlap", compact: true, reach: 40 - 4 + 14 });
+  });
+
+  it("is no lone row for a flag (no chip width) or a card too narrow for the round pill", () => {
+    expect(loneRow(0, 14, 52, 1, 200).mode).toBeNull();
+    expect(loneRow(40, 14, 52, 1, 40).mode).toBeNull();
+  });
+});
 
 describe("hiddenBadges", () => {
   it("two pills on a card with room for one row hide both: the \"2 more\" pill is drawn alone, so the clear space counts it", () => {

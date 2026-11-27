@@ -13,7 +13,7 @@ import { PEEK, type CardSlot, type Rect } from "../layout/layout.ts";
 import { medallionAt } from "../layout/look-strip.ts";
 import { medallionCount } from "../words/scenarios/sea.ts";
 import { progressInStrip as progressInStripOf, stripCenterX, stripText } from "./table-canvas-views.ts";
-import { badgeLayout, badgeShown, lonePick } from "./badge-room.ts";
+import { badgeLayout, badgeShown, lonePick, loneRow } from "./badge-room.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 import { wrapName } from "./wrap.ts";
@@ -237,7 +237,7 @@ export function BandName({ slot, name, fonts, t, s }: { slot: CardSlot; name: st
   const x = slot.x;
   const y = slot.y + slot.h - band;
   const width = slot.w - (slot.stack != null ? 22 * s : 0);
-  const text = fitName(name, (width - 6 * s) / BAND_NAME, (line) => fonts.names.getTextWidth(line));
+  const text = wrapName(name, (width - 6 * s) / BAND_NAME, (line) => fonts.names.getTextWidth(line), 1)[0] ?? "";
   return (
     <Group clip={{ x, y, width, height: band }}>
       <Group transform={[{ translateX: x + 3 * s }, { translateY: y + band - 2 * s }, { scale: BAND_NAME }]}>
@@ -245,14 +245,6 @@ export function BandName({ slot, name, fonts, t, s }: { slot: CardSlot; name: st
       </Group>
     </Group>
   );
-}
-
-// The name cut to the width with an ellipsis (the whole name when it fits).
-function fitName(name: string, width: number, measure: (text: string) => number): string {
-  if (measure(name) <= width) return name;
-  let cut = name;
-  while (cut.length > 1 && measure(`${cut}…`) > width) cut = cut.slice(0, -1);
-  return `${cut.trimEnd()}…`;
 }
 
 /**
@@ -339,11 +331,11 @@ export function Badges({
   const fullMore = fonts.badge.getTextWidth(moreText(items.length - 1)) + 12 * s;
   // The words "N more" when they fit beside the chip; on a narrower card the bare count in a round pill ("3": a count with no sign, never read as a change).
   const countOnly = fonts.badge.getTextWidth(String(items.length - 1)) + 10 * s;
-  // On a card too narrow for even that, the count is a small round pill over the chip's right end.
-  const beside = keptItem != null && keptWidth > 0 && 2 * s + keptWidth + 2 * s + countOnly <= w - 2 * s;
-  const overlap = keptItem != null && keptWidth > 0 && !beside && 2 * s + keptWidth + 6 * s <= w - 2 * s;
-  const lone = beside || overlap;
-  const compact = lone && 2 * s + keptWidth + 2 * s + fullMore > w - 2 * s;
+  // On a card too narrow for even that, the count is a small round pill over the chip's right end (loneRow).
+  const row = loneRow(keptWidth, countOnly, fullMore, s, w);
+  const overlap = row.mode === "overlap";
+  const lone = row.mode != null;
+  const compact = row.compact;
   const hidden = lone ? items.length - 1 : split.hidden;
   // When some pills are left out, the Attack chip (the first when there is none) leads, so it is the one that stays.
   const lead = split.hidden > 0 ? lonePick(effects.stats) : 0;

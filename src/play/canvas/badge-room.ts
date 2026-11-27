@@ -57,3 +57,17 @@ export function hiddenBadges(total: number, height: number, s: number, pill: num
 export function lonePick(stats: readonly { stat: string }[]): number {
   return Math.max(0, stats.findIndex((badge) => badge.stat === "attack"));
 }
+
+/**
+ * How the kept chip and the "N more" pill share the one row of a card (`Badges`; `badgeReach` reads the same answer): `beside` when the pill's count fits at the chip's right, `overlap` when only a small round pill fits over the chip's end,
+ * null when the chip is no stat (`keptWidth` 0) or even that does not fit. `compact`: the pill holds the bare count, as the full words do not fit. `reach` is how far the pills stand from the card's left edge.
+ * `keptWidth` is the chip's width, `countWidth` the bare count's pill and `moreWidth` the full "N more" pill (both with their padding), `cardWidth` the card's.
+ */
+export function loneRow(keptWidth: number, countWidth: number, moreWidth: number, s: number, cardWidth: number): { mode: "beside" | "overlap" | null; compact: boolean; reach: number } {
+  if (keptWidth <= 0) return { mode: null, compact: false, reach: 0 };
+  const beside = 2 * s + keptWidth + 2 * s + countWidth <= cardWidth - 2 * s;
+  const overlap = !beside && 2 * s + keptWidth + 6 * s <= cardWidth - 2 * s;
+  if (!beside && !overlap) return { mode: null, compact: false, reach: 0 };
+  const compact = 2 * s + keptWidth + 2 * s + moreWidth > cardWidth - 2 * s;
+  return { mode: beside ? "beside" : "overlap", compact, reach: beside ? 4 * s + keptWidth + (compact ? countWidth : moreWidth) : keptWidth - 4 * s + countWidth };
+}

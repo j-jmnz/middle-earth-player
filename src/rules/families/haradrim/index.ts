@@ -10,6 +10,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
+import { cannotLeaveStaging } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { addWithHostToVictory, attachRandomSetAside } from "./capture.ts";
 import { exploredCondition } from "./explored.ts";
@@ -92,7 +93,8 @@ export const manifest: RulesFamily = {
   amount: (state, found, scope, ctx) => (found.willpowerGap ? willpowerGap(state, scope.sourceId ?? null, ctx.cards) : temperatureAmount(state, found)),
   pick: haradrimPickMatches,
   // An enemy that cannot leave the staging area and is only considered engaged (The Black Serpent, 17094:A:1) is never optionally engaged: it would not leave (rr.optional-engagement, rr.cannot).
-  optionalEngage: (state, enemyId) => flagged(state, enemyId, "neverEngaged") && flagged(state, enemyId, "cannotLeaveStaging") && !flagged(state, enemyId, "losesCannotLeaveStaging"),
+  // `cannotBeOptionallyEngaged` cannot serve for `neverEngaged`: the bar must end with `losesCannotLeaveStaging` (the enemy can be engaged again once it can leave), which that stat never does.
+  optionalEngage: (state, enemyId) => flagged(state, enemyId, "neverEngaged") && cannotLeaveStaging(state, enemyId),
   combat: {
     defense: (state, defender, cards, defenderId) => allyBelowThreat(state, defender, cards, defenderId),
     undefended: (state) => {

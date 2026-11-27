@@ -31,7 +31,7 @@ function foldSlot(zone: "staging" | "engaged", stack: { x: number; w: number; ca
 export function placeRow(placed: readonly ZoneEntry[], zone: ZoneId, area: Rect, size: { w: number; h: number }, out: CardSlot[], m: Metrics, folding?: RowFolding, reach: RowReach | null = null): boolean {
   // The selector orders a guard right after the objective it guards (selectors.ts, stagingOrder). A guard lies over the objective it guards, shifted by PAIR_STEP of its width, and the pair keeps a wider gap from its neighbours (rr.guarded).
   const groups: ZoneEntry[][] = [];
-  // The guard's step over its objective: PAIR_STEP of a card, and never less than a 44 pt target of the objective left bare, so the objective's name and Guarded chip are not cut to a few letters on a small card (as the Stormcaller's area steps, stormcaller-layout.ts).
+  // The guard's step over its objective: PAIR_STEP of a card (as the Stormcaller's area steps, stormcaller-layout.ts), so the objective's name and Guarded chip show beside the guard.
   const step = size.w * PAIR_STEP;
   for (const entry of placed) {
     const last = groups[groups.length - 1];

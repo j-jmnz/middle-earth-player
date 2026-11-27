@@ -83,7 +83,7 @@ export type Layout = {
   // The scenario's mode card lies beside the quest deck on its back, as a finished Setup leaves it (The Siege of Annúminas' Standard Game Mode, 50801:B:1).
   // `"easy"`: the scenario's Easy Mode card instead (The Hunt for the Dreadnaught, 40001:B:1).
   modeCard?: true | "easy";
-  // Cards attached to the first card of `to`, wherever it lies (an attachment is spawned in play and attached).
+  // Cards attached to the first card of `to`, wherever it lies (an attachment is spawned in play and attached). An objective on a character is a plain attachment in play here, controlled and marked claimed; `claimed` builds the one ClaimObjective leaves (zone attached, `claimedBy`).
   // `encounter`: an encounter card attached the way its own effect attaches it (zone attached, controlled by no one, not claimed): the Sack cards, the Troll Key and the Troll Purse; an enemy lies as an attachment (Mugash, 07024:A:2).
   attached?: readonly { code: string; to: string; encounter?: true; guard?: true }[];
   // Objectives a hero holds, as ClaimObjective leaves them: `code` lies attached to the first card of `by` (zone attached, faceup, claimed, controlled by that hero's player).
