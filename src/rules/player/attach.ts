@@ -36,7 +36,7 @@ export function attachRule(ctx: ReduceContext, code: string): AttachRule | undef
 }
 
 // The cards an attachment with this code may be attached to. A card with an "Attach to" record may go on a card of any
-// seat; one without goes on a character of the seat that plays it, or of any seat when `options.anySeat` says the asking effect names no player. `options.byEffect`: an effect attaches a card already in play or set aside
+// seat; one without goes on a character of any seat, or only of the playing seat when `options.anySeat` is false (the asking effect says `control: "you"`). `options.byEffect`: an effect attaches a card already in play or set aside
 // (Reattach, an "attach to" pick), which a bar on playing attachment cards does not reach.
 export function attachmentHostIds(state: ScenarioState, seat: number, code: string, ctx: ReduceContext, options: { byEffect?: boolean; anySeat?: boolean } = {}): string[] {
   // A card played unattached or onto a threat dial goes on no card (families/attachments/play.ts).
@@ -48,8 +48,8 @@ export function attachmentHostIds(state: ScenarioState, seat: number, code: stri
     // Any of the filters, from the playing seat's side; a filter that says `control: "you"` keeps the seat's own cards.
     for (const filter of rule.hosts) candidates.push(...pickCandidates(state, filter, seat, [], null, ctx).filter((id) => !candidates.includes(id)));
   } else if (!rule) {
-    // `options.anySeat`: the effect that asks names no player (`control: "any"`), so a character of any seat may take the card (rr.attachment-cards, the option to attach to another player's character); a card played from the hand goes on the playing seat's characters.
-    for (const index of options.anySeat === true ? livingSeats(state) : [seat]) candidates.push(...characters(state, index, ctx.cards));
+    // A character of any seat may take the card: "A player has the option to play attachments by attaching them to another player's character" (rr.attachment-cards). `options.anySeat` false is an effect whose own filter keeps the host with the actor (`control: "you"`).
+    for (const index of options.anySeat === false ? [seat] : livingSeats(state)) candidates.push(...characters(state, index, ctx.cards));
   } else if (named.kind === "activeLocation") {
     // The playing seat's own active location once stages are separate (families/breaking/areas.ts).
     const active = activeOf(state, seat);

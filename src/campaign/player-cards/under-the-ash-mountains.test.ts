@@ -17,7 +17,7 @@ import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starte
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
 import { begin, idsOf } from "../../../test/harness/scene.ts";
-import { canPlay, choices, deckSaveFacts, endRound, fillers, packRow, play, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { canPlay, choices, deckSaveFacts, endRound, fillers, hosts, packRow, play, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
 
 const GILDOR = "22081";
 const EXILE = "22082";
@@ -278,6 +278,14 @@ describe("Helm of Secrecy leaves a Permanent attachment behind (22090:A:2)", () 
     expect(run.state.cards[boon]?.zone).toBe("removed");
     expect(run.state.cards[eowyn]?.attachments).not.toContain(boon);
     expect(run.state.cards[steward]).toMatchObject({ host: eowyn, zone: "play" });
+  });
+});
+
+describe("An attachment with no printed host played from a hand (rr.attachment-cards)", () => {
+  // "A player has the option to play attachments by attaching them to another player's character": Spyglass prints no "Attach to" line, so every hero of both players is offered.
+  it("Spyglass (11180) played from the hand may go on the other player's hero", () => {
+    const tab = table(EFFECTS, { seats: 2, heroes: [{ code: ARAGORN, seat: 0 }, { code: LEGOLAS, seat: 1 }], hand: [{ code: SPYGLASS, seat: 0 }] });
+    expect(hosts(tab, idsOf(tab, SPYGLASS))).toEqual([idsOf(tab, ARAGORN), idsOf(tab, LEGOLAS)].sort());
   });
 });
 
