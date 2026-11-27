@@ -113,7 +113,7 @@ describe("The Crossings of Poros golden", () => {
         expect([...stage3].sort()).toEqual(STAGE_3);
       });
 
-      // The set and the stage 2 that stage 2A removes never come back: from the first state that holds them removed, they stay so (a removed set is out of the game, a removed stage never becomes the quest).
+      // The cards of the set that stage 2A removes, as they lay set aside when it resolved, and the stage 2 it removes never come back: from the first state that holds them removed, they stay so (a removed card is out of the game, a removed stage never becomes the quest).
       it("the encounter set and the stage 2 that stage 2A removes never come back", () => {
         let removedSets = 0;
         for (const golden of POROS_GOLDENS) {
@@ -126,14 +126,18 @@ describe("The Crossings of Poros golden", () => {
           const sets = STAGE_2_SETS[chosen];
           const inSet = (state: ScenarioState, set: string) => Object.values(state.cards).filter((card) => printedOf(ctx.cards, card.code).encounterSet === set && printedOf(ctx.cards, card.code).campaignKind == null);
           const otherStage = STAGE_2.find((code) => code !== chosen) ?? "";
+          // The cards of the removed set that lay set aside when stage 2A resolved: the last state before the stage 2 came up. The ones the stage 1 Setup dealt into the deck stay in the game (setAsideOnly).
+          const before = trail.findLast((state) => stageCode(state) === STAGE_1) as ScenarioState;
+          const asideOut = new Set(inSet(before, sets?.out ?? "").filter((card) => card.zone === "setAside").map((card) => card.id));
+          expect(asideOut.size, golden.name).toBeGreaterThan(0);
           let seenRemoved = false;
           let seenStageRemoved = false;
           for (const state of trail) {
-            const out = inSet(state, sets?.out ?? "");
-            if (out.length > 0 && out.every((card) => card.zone === "removed")) seenRemoved = true;
+            const out = [...asideOut].map((id) => state.cards[id]);
+            if (out.every((card) => card?.zone === "removed")) seenRemoved = true;
             if (seenRemoved) {
               removedSets += 1;
-              expect(out.every((card) => card.zone === "removed"), golden.name).toBe(true);
+              expect(out.every((card) => card?.zone === "removed"), golden.name).toBe(true);
             }
             const [other] = cardsOf(state, [otherStage]);
             if (other?.removedStage === true) seenStageRemoved = true;
@@ -143,13 +147,13 @@ describe("The Crossings of Poros golden", () => {
               expect(state.questStage, golden.name).not.toBe(other?.id);
             }
           }
-          // Stage 2A ran: the chosen set was shuffled in (none of it set aside), the other set and stage left.
+          // Stage 2A ran: the chosen set was shuffled in (none of it set aside), the other set's set-aside cards and the other stage left.
           const last = trail[trail.length - 1] as ScenarioState;
           if (pathOf(trail).length >= 2) {
             expect(seenRemoved, golden.name).toBe(true);
             expect(seenStageRemoved, golden.name).toBe(true);
             expect(inSet(last, sets?.in ?? "").some((card) => card.zone === "setAside"), golden.name).toBe(false);
-            expect(inSet(last, sets?.out ?? "").every((card) => card.zone === "removed"), golden.name).toBe(true);
+            expect([...asideOut].every((id) => last.cards[id]?.zone === "removed"), golden.name).toBe(true);
           }
         }
         expect(removedSets).toBeGreaterThan(0);

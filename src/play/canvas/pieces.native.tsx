@@ -16,7 +16,7 @@ import { progressInStrip as progressInStripOf, stripCenterX, stripText } from ".
 import { badgeLayout, badgeShown, lonePick, loneRow } from "./badge-room.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
-import { fit, wrapName } from "./wrap.ts";
+import { fit, nameScale, wrapName } from "./wrap.ts";
 
 // Medium's sizes in points. Every piece draws them times `s`, the UI scale (ui-scale.ts, user request, 2026-10-28), which the canvas root
 // hands down as a prop beside the tokens `t`: a piece does not read the scale itself. A card's corner is the card screen's share of its
@@ -168,6 +168,9 @@ export function CardBody({
   const { x, y, w, h } = slot;
   const radius = cardCorner(w, h);
   const bare = slot.shown != null && slot.shown < w ? 0.7 : 1;
+  const room = bare === 1 ? w - 10 * s : ((slot.shown ?? w) - 8 * s) / bare;
+  // A name whose widest part does not fit takes a smaller type, down to a minimum, before it is cut (wrap.ts, nameScale).
+  const shrink = nameScale(name, room, (text) => fonts.names.getTextWidth(text), nameLines);
   return (
     <Group>
       <RoundedRect x={x + 1 * s} y={y + 2 * s} width={w} height={h} r={radius} color={shadowOf(t)} />
@@ -182,8 +185,8 @@ export function CardBody({
           <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={t.raised} />
           <Group clip={{ x: x + 3 * s, y: y + 3 * s, width: bare === 1 ? w - 6 * s : (slot.shown ?? w) - 4 * s, height: h - 6 * s }}>
             {/* A card its guard lies over (`shown`) names itself smaller, in the part the guard leaves bare. */}
-            <Group transform={[{ translateX: x + 5 * s }, { translateY: y + 15 * s }, { scale: bare }]}>
-              {wrapName(name, bare === 1 ? w - 10 * s : ((slot.shown ?? w) - 8 * s) / bare, (text) => fonts.names.getTextWidth(text), nameLines).map((line, index) => (
+            <Group transform={[{ translateX: x + 5 * s }, { translateY: y + 15 * s }, { scale: bare * shrink }]}>
+              {wrapName(name, room / shrink, (text) => fonts.names.getTextWidth(text), nameLines).map((line, index) => (
                 <Text key={index} x={0} y={index * LINE * s} text={line} font={fonts.names} color={t.bone} />
               ))}
             </Group>
@@ -237,10 +240,13 @@ export function BandName({ slot, name, fonts, t, s }: { slot: CardSlot; name: st
   const x = slot.x;
   const y = slot.y + slot.h - band;
   const width = slot.w - (slot.stack != null ? 22 * s : 0);
-  const text = fit(name, (width - 6 * s) / BAND_NAME, (line) => fonts.names.getTextWidth(line));
+  const room = (width - 6 * s) / BAND_NAME;
+  // The name on its one line takes a smaller type, down to a minimum, before it is cut with an ellipsis (wrap.ts, nameScale).
+  const shrink = nameScale(name, room, (line) => fonts.names.getTextWidth(line), 1);
+  const text = fit(name, room / shrink, (line) => fonts.names.getTextWidth(line));
   return (
     <Group clip={{ x, y, width, height: band }}>
-      <Group transform={[{ translateX: x + 3 * s }, { translateY: y + band - 2 * s }, { scale: BAND_NAME }]}>
+      <Group transform={[{ translateX: x + 3 * s }, { translateY: y + band - 2 * s }, { scale: BAND_NAME * shrink }]}>
         <Text x={0} y={0} text={text} font={fonts.names} color={t.bone} />
       </Group>
     </Group>

@@ -53,15 +53,15 @@ const stageTwoA = (code: string, shuffled: string, removed: string, otherStage: 
   cardCode: code,
   lines: [`${code}:A:1`],
   timing: "whenRevealed",
-  instructions: [{ verb: "ShuffleSetAsideSet", set: shuffled }, { verb: "ShuffleEncounterDeck" }, { verb: "RemoveEncounterSet", set: removed, setAsideOnly: true }, { verb: "RemoveStage", code: otherStage }],
+  instructions: [{ verb: "ShuffleSetAsideSet", set: shuffled }, { verb: "ShuffleEncounterDeck" }, { verb: "RemoveEncounterSet", set: removed, setAsideOnly: true }, { verb: "RemoveStage", code: otherStage, announce: true }],
 });
 // "Forced: When this stage is defeated, advance to a random stage 3." (17158:B:2, 17159:B:2)
-const stageTwoB = (code: string): Effect => ({ id: `${code}:forced:2`, cardCode: code, lines: [`${code}:B:2`], timing: "forced", trigger: "questCardDefeated", subject: "self", instructions: [{ verb: "AdvanceToRandomStage", codes: STAGE_THREES, stageSet: true }] });
+const stageTwoB = (code: string): Effect => ({ id: `${code}:forced:2`, cardCode: code, lines: [`${code}:B:2`], timing: "forced", trigger: "questCardDefeated", subject: "self", instructions: [{ verb: "AdvanceToRandomStage", codes: STAGE_THREES, stageSet: true, announce: true }] });
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   [
     // 17145 Poros Garrison. A:1: the first player controls it, and control passes with the first player token (Calphon's ControlledBy). A:3: the controller may engage one more enemy in the optional engagement step. A:2 and A:4 are the templates'.
-    { id: "17145:constant:1", cardCode: "17145", lines: ["17145:A:1"], timing: "constant", instructions: [{ verb: "ControlledBy", who: "firstPlayer", card: "self" }] },
+    { id: "17145:constant:1", cardCode: "17145", lines: ["17145:A:1"], timing: "constant", instructions: [{ verb: "ControlledBy", who: "firstPlayer", card: "self", announce: true }] },
     { id: "17145:constant:2", cardCode: "17145", lines: ["17145:A:3"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "extraOptionalEngage", amount: 1, until: "whileSourceInPlay", target: "actorSeat" }] },
 
     // 17146 The Black Serpent: the printed text of 17094 (the same X, the same Forced choice).
@@ -170,7 +170,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "forced",
       trigger: "endOfPhase",
       condition: PHASE_PLANNING,
-      instructions: [{ verb: "AdvanceToRandomStage", codes: ["17158", "17159"], stageSet: true }],
+      instructions: [{ verb: "AdvanceToRandomStage", codes: ["17158", "17159"], stageSet: true, announce: true }],
     },
 
     // 17158 The Desert Path (stage 2). Desert Sands joins the deck, Mountains of Shadow and the other stage 2A are removed. Side B: a player who plays an ally exhausts it or deals 1 damage to it; when defeated, a random stage 3.

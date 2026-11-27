@@ -14,6 +14,8 @@ import { qualifyingEnemies } from "../../../rules/quest/quest.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
+import { moveCard } from "../../../rules/core/zones.ts";
+import { enterPlay } from "../../../rules/families/play/enter.ts";
 
 const table = (layout: Layout = {}) => tableFromLayout("the-crossings-of-poros", { seats: 1, stage: "17157", ...layout });
 
@@ -59,9 +61,21 @@ describe("17147:A:1 RandomSetAside `pick`: the option that places an enemy is of
     expect(modifiedStat(run.state, run.state.cards[run.id]!, "attack", made.ctx.cards)).toBe(3 + 3);
   });
 
-  it("17147:A:1 offers only +3 Attack for a set removed from the game, and so for a set shuffled in", () => {
-    const made = table({ staging: ["17147"] });
-    const run = resolveRecords(made.state, made.ctx, "17147", "forced", idOf(made.state, "17147"));
+  it("17147:A:1 offers only +3 Attack once its set was shuffled in by stage 3A (17161:A:1): none of it is set aside any more", () => {
+    const first = table({ stage: "17161", side: "A", setAside: HARAD_SOLDIERS });
+    expect(first.state.setAside.filter((id) => HARAD_SOLDIERS.includes(codeOf(first.state, id) ?? ""))).toHaveLength(HARAD_SOLDIERS.length);
+    const shuffled = resolveRecords(first.state, first.ctx, "17161", "whenRevealed", idOf(first.state, "17161")).state;
+    expect(shuffled.setAside.map((id) => codeOf(shuffled, id)).filter((code) => HARAD_SOLDIERS.includes(code ?? ""))).toEqual([]);
+    const run = resolveRecords({ ...shuffled, encounterDeck: [], encounterDiscard: [] }, first.ctx, "17147", "forced");
+    expect(run.state.encounterDiscard).toEqual([]);
+    expect(modifiedStat(run.state, run.state.cards[run.id]!, "attack", first.ctx.cards)).toBe(3 + 3);
+  });
+
+  it("17147:A:1 offers only +3 Attack once its set was removed from the game: a removed set has no card set aside", () => {
+    const made = table({ staging: ["17147"], setAside: HARAD_SOLDIERS });
+    const gone = made.state.setAside.reduce((state, id) => moveCard(state, id, { zone: "removed" }), made.state);
+    const run = resolveRecords(gone, made.ctx, "17147", "forced", idOf(gone, "17147"));
+    expect(run.state.encounterDiscard).toEqual([]);
     expect(modifiedStat(run.state, run.state.cards[run.id]!, "attack", made.ctx.cards)).toBe(3 + 3);
   });
 });
@@ -270,6 +284,30 @@ describe("17157:B:1 allies enter play exhausted", () => {
   it("17157:B:1 does not exhaust one while another stage is the main quest", () => {
     expect(played({ stage: "17158" })).toMatchObject({ zone: "play", exhausted: false });
   });
+
+  // The ally put into play by an effect (families/play/enter.ts) and the one played free from the top of the deck (Vilya, families/encounter/items.ts) enter exhausted too: "Allies enter play exhausted".
+  it("17157:B:1 exhausts an ally an effect puts into play, and not on another stage", () => {
+    const entered = (layout: Layout) => {
+      const made = table({ hand: ["ally"], ...layout });
+      const ally = made.state.seats[0]!.hand[0]!;
+      return enterPlay(made.state, ally, 0, {}, { seat: 0 } as never, made.ctx, []).cards[ally];
+    };
+    expect(entered({})).toMatchObject({ zone: "play", exhausted: true });
+    expect(entered({ stage: "17158" })).toMatchObject({ zone: "play", exhausted: false });
+  });
+
+  it("17157:B:1 exhausts the ally Vilya plays free from the top of the deck, and not on another stage", () => {
+    const freed = (layout: Layout) => {
+      const made = tableFromLayout("the-crossings-of-poros", { seats: 1, stage: "17157", deckOf: ["ally"], attached: [{ code: "04137", to: "dh1" }], phase: "Planning", ...layout }, { extra: ["04137"] });
+      const top = made.state.seats[0]!.deck[0]!;
+      const ring = idOf(made.state, "04137");
+      const looking = send(opened(made), { type: "Trigger", cardId: ring, effectId: "04137:action:1" }, made.ctx);
+      const done = send(send(looking, { type: "Pass" }, made.ctx), { type: "Choose", optionId: "play" }, made.ctx);
+      return done.state.cards[top];
+    };
+    expect(freed({})).toMatchObject({ zone: "play", exhausted: true });
+    expect(freed({ stage: "17158" })).toMatchObject({ zone: "play", exhausted: false });
+  });
 });
 
 describe("17163:B:2 the stage is defeated only at the end of the combat phase", () => {
@@ -295,5 +333,43 @@ describe("17146:A:1 an enemy that cannot leave the staging area is passed over b
     const made = table({ staging: ["17146", "17147"], threat: [50, 20] });
     const state = opened(made).state;
     expect(qualifyingEnemies(state, 0, made.ctx.cards).map((id) => codeOf(state, id))).toEqual(["17147"]);
+  });
+});
+
+describe("the steps that tell a random stage, a stage that left and a pass of control", () => {
+  it("17157:B:2 tells the stages the random advance chose among, with the stage's own line as its cause", () => {
+    const made = table({ stage: "17157", side: "B", phase: "Planning" });
+    const run = resolveRecords(made.state, made.ctx, "17157", "forced", idOf(made.state, "17157"));
+    const advance = run.steps.find((step) => step.kind === "advance");
+    expect(advance).toMatchObject({ random: { cause: { effect: "17157:forced:1", line: "17157:B:2" } } });
+    const from = advance?.kind === "advance" ? (advance.random?.from ?? []).map((id) => codeOf(run.state, id)).sort() : [];
+    expect(from).toEqual(["17158", "17159"]);
+    expect(advance?.kind === "advance" ? from.includes(codeOf(run.state, advance.cardId)) : false).toBe(true);
+  });
+
+  it("17158:A:1 tells the other stage 2A as removed from the game, caused by the stage's line", () => {
+    const made = table({ stage: "17158", side: "A", setAside: ["16049"] });
+    const run = resolveRecords(made.state, made.ctx, "17158", "whenRevealed", idOf(made.state, "17158"));
+    const left = run.steps.filter((step) => step.kind === "stageLeaves");
+    expect(left).toEqual([{ kind: "stageLeaves", cardId: idOf(run.state, "17159"), how: "removed", cause: { effect: "17158:whenRevealed:1", line: "17158:A:1" } }]);
+  });
+
+  it("17160:A:1 tells each other stage 3A as set aside", () => {
+    const made = table({ stage: "17160", side: "A", setAside: DESERT_CREATURES });
+    const run = resolveRecords(made.state, made.ctx, "17160", "whenRevealed", idOf(made.state, "17160"));
+    const left = run.steps.flatMap((step) => (step.kind === "stageLeaves" ? [[codeOf(run.state, step.cardId), step.how]] : []));
+    expect(left.sort()).toEqual([["17161", "setAside"], ["17162", "setAside"]]);
+  });
+
+  it("17145:A:1 tells Poros Garrison passing to the new first player, and says nothing while the first player stays", () => {
+    const made = table({ seats: 2, play: [{ code: "17145", seat: 0 }], firstPlayer: 1 });
+    const garrison = idOf(made.state, "17145");
+    const steps: EngineStep[] = [];
+    const passed = playSweep(syncConstants(updateCard(made.state, garrison, { controller: 0 }), made.ctx), made.ctx, steps);
+    expect(passed.cards[garrison]?.controller).toBe(1);
+    expect(steps).toEqual([{ kind: "controlPasses", cardId: garrison, seat: 1, cause: { effect: "17145:constant:1", line: "17145:A:1" } }]);
+    const quiet: EngineStep[] = [];
+    playSweep(passed, made.ctx, quiet);
+    expect(quiet).toEqual([]);
   });
 });

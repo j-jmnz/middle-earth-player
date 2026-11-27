@@ -322,7 +322,7 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     next = updateCard(next, nextId, { face: arrivalFace(next, nextCode) });
     if (next.stageChoice) next = withoutStageChoice(next);
     if (nextCode) next = reachedStage(next, nextCode);
-    steps.push({ kind: "advance", cardId: nextId });
+    steps.push({ kind: "advance", cardId: nextId, ...(rolled?.from && rolled.cause ? { random: { from: rolled.from, cause: rolled.cause } } : {}) });
     const arrived = next.cards[nextId];
     const points = arrived ? questPointsOf(next, arrived, cards) : null;
     // A stage that arrives with 0 quest points (Surprise Attack, 41005:B:2, or Return to Rhosgobel, 02062:B:1) is not met at once: its When Revealed effects have not resolved yet (advanceReady, placeQuestProgress).

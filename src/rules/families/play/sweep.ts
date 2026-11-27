@@ -8,6 +8,7 @@ import type { Effect, Instruction } from "../../../catalog/boundary.ts";
 
 import { constantInstructions } from "../../interpret/constant-records.ts";
 import { syncConstants } from "../../interpret/constants.ts";
+import { effectCause } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { destroyCard, modifiedStat } from "../../core/keywords.ts";
@@ -117,11 +118,11 @@ export function playSweep(state: ScenarioState, ctx: ReduceContext, steps: Engin
   // A stat is read with the constants as they are now ("-1 Willpower for each damaged hero you control").
   const synced = syncConstants(next, ctx);
   if (synced !== next) return synced;
-  const rules: { sourceId: string; instruction: Instruction }[] = [];
-  for (const { source, instruction } of constantInstructions(next, ctx)) {
-    if (instruction.verb === "ControlledBy" || instruction.verb === "DiscardWhen") rules.push({ sourceId: source.id, instruction });
+  const rules: { sourceId: string; instruction: Instruction; effect: Effect }[] = [];
+  for (const { source, instruction, effect } of constantInstructions(next, ctx)) {
+    if (instruction.verb === "ControlledBy" || instruction.verb === "DiscardWhen") rules.push({ sourceId: source.id, instruction, effect });
   }
-  for (const { sourceId, instruction } of rules) {
+  for (const { sourceId, instruction, effect } of rules) {
     const source = next.cards[sourceId];
     if (!source || !inPlay(source.zone)) continue;
     if (instruction.verb === "ControlledBy") {
@@ -137,6 +138,8 @@ export function playSweep(state: ScenarioState, ctx: ReduceContext, steps: Engin
       // control, not a rule that follows the token (Grimbeorn the Old, 02037:A:2; docs/scenarios/shadows-of-mirkwood/conflict-at-the-carrock.md, Conflict at the Carrock).
       } else if (id && held?.zone === "staging" && instruction.intoPlay === true) next = updateCard(moveCard(next, id, { zone: "play", seat: holder }), id, { face: "up", exhausted: false });
       else if (id && (instruction.intoPlay !== true || instruction.follows === true) && held?.controller !== holder) {
+        // A pass that follows the first player token is told when the record announces it ("Poros Garrison passes to Player 2 with the first player token").
+        if (instruction.announce === true && held?.controller != null) steps.push({ kind: "controlPasses", cardId: id, seat: holder, cause: effectCause(effect) });
         next = giveControl(next, id, holder, ctx.cards);
         // "If Bilbo Baggins is the last hero under a player's control, and he then leaves that player's control, that player is immediately eliminated" (hob.bilbo-multiplayer-ohauh, hob.bilbo-multiplayer-otd); the same words for Aragorn (mec113.multiplayer-aragorn; in The Two Towers, mec112.aragorn with rr.player-elimination: a player with no heroes is eliminated).
         if (held?.zone === "heroes") next = eliminateEmpties(next, steps);

@@ -13,7 +13,7 @@ const URUK_PROWLER = "17148";
 export const screens: ScreenMoment[] = [
   {
     name: "aside-and-path-dials",
-    note: "17157:A:1 and 17157:B:2: after the Setup, the top bar's \"Aside\" dial counts the cards the five set aside sets still hold (the set with the most is marked, ties are named and the first player chooses), the \"Path\" dial shows stage 1 of 4 with the stage 2 and 3 cards not chosen yet, and The Black Serpent lies in the staging area. Poros Garrison is set aside, so no \"Garrison\" dial.",
+    note: "17157:A:1 and 17157:B:2: after the Setup, the top bar's \"Aside\" dial counts the cards the five set aside sets still hold (the set with the most is marked, ties are named and the first player chooses), the \"Path\" dial shows stage 1 of 4 with the stage 2 and 3 cards not chosen yet, and The Black Serpent lies in the staging area. Poros Garrison is set aside, so no \"Garrison\" dial. The \"Path\" dial lists stage 2 and stage 3 (tap it: `--tap poros-path`).",
     layout: { stage: "17157", side: "B", phase: "Planning", seats: 2, staging: [SERPENT], setAside: [GARRISON, ...ASIDE] },
   },
   {
@@ -23,13 +23,18 @@ export const screens: ScreenMoment[] = [
   },
   {
     name: "garrison-in-play",
-    note: "17145:A:1, 17145:A:3, 17145:A:4 and 17163:A:1: stage 4B, Poros Garrison in the first player's play area with 4 damage. The \"Garrison\" dial shows the damage against its hit points and warms near them, the first player's seat wears the mark \"P1 · Garrison\", and its note says the players lose when it leaves play.",
+    note: "17145:A:1, 17145:A:3, 17145:A:4 and 17163:A:1: stage 4B, Poros Garrison in the first player's play area with 4 damage. The \"Garrison\" dial, the first of the dials, shows the damage against its hit points and warms near them, and it stays whole where the top bar scrolls (a warned dial is kept in view). The first player's ring wears the held mark, and the dial's note says the players lose when it leaves play and that control passes with the first player token.",
     layout: { stage: "17163", side: "B", phase: "Combat", seats: 2, play: [{ code: GARRISON, seat: 0, damage: 4 }], staging: [SERPENT, URUK_PROWLER, SOUTHRON_ARCHER], setAside: ASIDE },
   },
   {
     name: "garrison-near-leaving-play",
-    note: "17145:A:4: Poros Garrison holds all but one of its hit points, so the \"Garrison\" dial is in its critical state and says that one more damage makes the players lose the game. True solo, so its mark is \"Garrison\" with no seat.",
+    note: "17145:A:4: Poros Garrison holds all but one of its hit points, so the \"Garrison\" dial is in its critical state and says that one more damage makes the players lose the game. True solo, so no seat wears the held mark and the threat dial is named \"Threat\".",
     layout: { stage: "17163", side: "B", phase: "Combat", seats: 1, play: [{ code: GARRISON, seat: 0, damage: 5 }], staging: [SERPENT, URUK_PROWLER] },
+  },
+  {
+    name: "aside-tie",
+    note: "17150:A:2: the Mountains of Shadow and Desert Sands sets each hold 2 cards, so the \"Aside\" dial's panel (`--tap poros-aside`) names the tie on its foot (\"Tie for the most cards left: Mountains of Shadow and Desert Sands. The first player chooses which one a draw reads.\"), not only in the voice. True solo.",
+    layout: { stage: "17157", side: "B", phase: "Planning", seats: 1, staging: [SERPENT], setAside: [GARRISON, "17153", "17154", "16049", "16050"] },
   },
   {
     name: "black-serpent-staged",

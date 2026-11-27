@@ -14,6 +14,7 @@ import { guardianLocked, guardianSeat } from "../../rules/families/guardian/seat
 import { captiveDialWords } from "../words/scenarios/ungol.ts";
 import { guardianHeldWords } from "../words/scenarios/guardian.ts";
 import { gollumHeld } from "./marshes.ts";
+import { porosHeld } from "./haradrim/poros.ts";
 
 export type WidgetReadouts = {
   // The Ring-bearer's life (mec109.ringbearers-life), or null when the scenario has no life tracker.
@@ -92,7 +93,7 @@ export function heldDials(game: ScenarioState, nameOf: (code: string) => string,
     const before = dials.get(card.owner);
     dials.set(card.owner, { seat: card.owner, words: before ? `${before.words}. ${words}` : words, mark: before?.mark ?? "hero" });
   }
-  for (const gollum of [...gollumHeld(game), ...guardianHeld(game)]) {
+  for (const gollum of [...gollumHeld(game), ...guardianHeld(game), ...porosHeld(game)]) {
     const before = dials.get(gollum.seat);
     dials.set(gollum.seat, { seat: gollum.seat, words: before ? `${before.words}. ${gollum.words}` : gollum.words, mark: before?.mark ?? gollum.mark });
   }

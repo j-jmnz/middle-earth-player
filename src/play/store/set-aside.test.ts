@@ -24,13 +24,13 @@ describe("the Set aside list", () => {
     expect(setAsideList(made.state, made.ctx)).toBe(setAsideList({ ...made.state }, made.ctx));
   });
 
-  it("names the cards the Setup set aside, by name and not in the order they were set aside, and keeps Durin's Bane's dial", () => {
+  it("names the cards the Setup set aside, by encounter set (when there are several) then by name and not in the order they were set aside, and keeps Durin's Bane's dial", () => {
     const made = tableFromLayout("escape-from-khazad-dum", { setAside: ["51311"] });
     const list = setAsideList(made.state, made.ctx);
     expect(list).toMatchObject({ cards: [idOf(made.state, "51311")], facedown: 0 });
     expect(khazadDials(made.state, made.ctx, nameOfIn(made)).find((dial) => dial.id === "bane")?.cardId).toBe(list.cards[0]);
     const heath = tableFromLayout("the-withered-heath", { setAside: ["19012", "19011", "12176"] });
-    expect(namesOf(heath, setAsideList(heath.state, heath.ctx).cards)).toEqual(["Cold-Drake", "Dragon Sign", "Master of the Hunt"]);
+    expect(namesOf(heath, setAsideList(heath.state, heath.ctx).cards)).toEqual(["Master of the Hunt", "Cold-Drake", "Dragon Sign"]);
   });
 
   it("returns its earlier result for the same game, and an equal key for a game that changes nothing the panel draws", () => {
@@ -42,7 +42,7 @@ describe("the Set aside list", () => {
     expect(setAsideKey(other, made.ctx)).toBe(setAsideKey(made.state, made.ctx));
     // 19024:A:1: the damage Cold-Drake keeps is on its row, and changes the key.
     const hurt = updateCard(made.state, idOf(made.state, "19011"), { damage: 3, keepsDamage: true });
-    expect(setAsideList(hurt, made.ctx).rows).toEqual([{ id: idOf(hurt, "19011"), code: "19011", picture: "19011", kept: 3, count: 1 }]);
+    expect(setAsideList(hurt, made.ctx).rows).toEqual([{ id: idOf(hurt, "19011"), code: "19011", picture: "19011", kept: 3, count: 1, set: expect.any(String) }]);
     expect(setAsideKey(hurt, made.ctx)).not.toBe(setAsideKey(made.state, made.ctx));
     expect(setAsideFromKey(setAsideKey(hurt, made.ctx))).toEqual({ rows: setAsideList(hurt, made.ctx).rows, facedown: 0, total: 1 });
   });
@@ -166,5 +166,15 @@ describe("the verbs that hide a set-aside card", () => {
     expect(sort(made.cards.get("01096"), "01096")).toBe("open");
     // A card the table has no printing of is counted: it could not be named.
     expect(sort(undefined, "nope")).toBe("facedown");
+  });
+});
+
+describe("the Set aside list of The Crossings of Poros", () => {
+  it("orders the rows by encounter set, then name, and every row names its set, so the panel can group them as the Aside dial does", () => {
+    const made = tableFromLayout("the-crossings-of-poros", { stage: "17157", setAside: ["16040", "16049", "17153", "16050", "16044"] });
+    const rows = setAsideList(made.state, made.ctx).rows;
+    expect(rows.map((row) => row.set)).toEqual(["Desert Sands", "Desert Sands", "Harad Soldiers", "Harad Soldiers", "Mountains of Shadow"]);
+    expect(rows.every((row, at) => at === 0 || rows[at - 1]!.set < row.set || rows[at - 1]!.set === row.set)).toBe(true);
+    expect(setAsideFromKey(setAsideKey(made.state, made.ctx)).rows.map((row) => row.set)).toEqual(rows.map((row) => row.set));
   });
 });

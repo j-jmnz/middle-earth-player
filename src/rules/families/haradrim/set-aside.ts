@@ -4,9 +4,10 @@
 // in the set-aside zone are what these verbs count and draw from; a set removed from the game has none left there, so it can no longer be named (hrd.removed-from-the-game).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
+import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { printedOf } from "../../core/printed.ts";
-import { nextUint } from "../../core/seed.ts";
+import { drawRandomSetAside } from "../../core/set-aside-draw.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -55,8 +56,8 @@ export function randomSetAside(state: ScenarioState, instruction: Verb<"RandomSe
   // With no card left a `discard` is not resolved in full, so the text after "Then" is not attempted (thenResolves, rr.then).
   const none = (at: ScenarioState): ScenarioState => (instruction.to === "pick" ? pushPicked(at, undefined) : instruction.to === "discard" ? markShort(at, ctx) : at);
   if (typeof set !== "string") return set ?? none(state);
-  const ids = asideOf(state, set, ctx).filter((id) => instruction.cardType == null || printedOf(ctx.cards, state.cards[id]?.code ?? "").type === instruction.cardType);
-  const drawn = ids[nextUint(state.seed, state.seedCursor) % Math.max(ids.length, 1)];
+  const of = new Set(asideOf(state, set, ctx).filter((id) => instruction.cardType == null || printedOf(ctx.cards, state.cards[id]?.code ?? "").type === instruction.cardType));
+  const drawn = drawRandomSetAside(state, (id) => of.has(id));
   if (!drawn) return none(state);
   const next = { ...state, seedCursor: state.seedCursor + 1 };
   if (instruction.to === "pick") return pushPicked(next, drawn);
@@ -64,12 +65,15 @@ export function randomSetAside(state: ScenarioState, instruction: Verb<"RandomSe
   return startReveal(next, focus.seat, ctx, steps, drawn);
 }
 
-/** SetStagesAside: each stage with one of these codes that is still in the quest deck is set aside, out of play, never played (`removedStage`, as RemoveStage marks it); the quest no longer reaches it. The stages are never listed as set-aside cards. */
-export function setStagesAside(state: ScenarioState, instruction: Verb<"SetStagesAside">): ScenarioState {
+/** SetStagesAside: each stage with one of these codes that is still in the quest deck leaves the quest deck for the set-aside zone (`state.setAside`) and is marked `removedStage` (never played, as RemoveStage marks it), so the quest no longer reaches it and SearchAsideStageSets can tell it from the stage 3 the players played. Each is told in the log. */
+export function setStagesAside(state: ScenarioState, instruction: Verb<"SetStagesAside">, steps: EngineStep[]): ScenarioState {
   let next = state;
+  const cause = currentCause(steps, UNATTRIBUTED);
   for (const code of instruction.codes) {
     const id = next.questDeck.find((candidate) => next.cards[candidate]?.code === code);
-    if (id) next = moveCard(updateCard(next, id, { removedStage: true }), id, { zone: "setAside" });
+    if (!id) continue;
+    steps.push({ kind: "stageLeaves", cardId: id, how: "setAside", cause });
+    next = moveCard(updateCard(next, id, { removedStage: true }), id, { zone: "setAside" });
   }
   return next;
 }

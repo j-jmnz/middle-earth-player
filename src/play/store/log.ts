@@ -14,6 +14,7 @@ import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape
 import { attachedWords } from "../words/scenarios/haradrim/capture.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
 import { trackLogLine } from "../words/scenarios/haradrim/track.ts";
+import { listAnd, porosStepLine } from "../words/scenarios/haradrim/poros-table.ts";
 import { discoverLogLine, setAsideLine } from "../words/scenarios/wilderland.ts";
 import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poison.ts";
 import type { Cause } from "../../rules/core/cause.ts";
@@ -147,7 +148,10 @@ function words(step: EngineStep, names: LogNames, questStat: string | null): str
     case "strike":
       return step.undefended ? `Attack ${step.attack}, undefended, on ${names.card(step.targetId)}` : `Attack ${step.attack} against defense ${step.defense} on ${names.card(step.targetId)}`;
     case "advance":
-      return step.stormcaller === true ? `The Stormcaller advances to ${names.card(step.cardId)}` : `The quest advances to ${names.card(step.cardId)}`;
+      return step.stormcaller === true ? `The Stormcaller advances to ${names.card(step.cardId)}` : `The quest advances to ${names.card(step.cardId)}${step.random ? `, chosen at random from ${listAnd(step.random.from.map((id) => names.card(id)))}` : ""}`;
+    case "stageLeaves":
+    case "controlPasses":
+      return porosStepLine(step, names.card);
     case "attack":
       return step.side === "enemy" ? `${names.card(step.enemyId)} attacks ${player(step.seat)}` : `${player(step.seat)} attacks ${names.card(step.enemyId)}`;
     case "cancel":
@@ -194,7 +198,7 @@ export function logLines(steps: readonly EngineStep[], names: LogNames): LogLine
     // A location a player took control of is explored, not destroyed: the intent's last step says who took it (osgiliath-steps.ts).
     const explored = step.kind === "destroy" && steps.some((other) => controlOf(other)?.changes.some((change) => change.kind === "took" && change.id === step.targetId));
     const text = explored && step.kind === "destroy" ? `${names.card(step.targetId)} is explored` : words(step, names, stat);
-    if (text) lines.push({ key: `${index}`, text, cause: "cause" in step ? causeText(step.cause, names) : null, mark: markOf(step, stat) });
+    if (text) lines.push({ key: `${index}`, text, cause: "cause" in step ? causeText(step.cause, names) : step.kind === "advance" && step.random ? causeText(step.random.cause, names) : null, mark: markOf(step, stat) });
     // The villager tokens of Encounter at Amon Dîn that moved in the intent this step ended: no engine step tells them (villager-steps.ts).
     villagersOf(step).forEach((change, at) => lines.push({ key: `${index}-v${at}`, text: changedWords(names.card(change.id), change.was, change.now), cause: null, mark: "resource" }));
     // The control of Osgiliath locations taken or lost in the intent this step ended (Assault on Osgiliath): no engine step tells it (readouts/against-the-shadow/osgiliath-steps.ts).

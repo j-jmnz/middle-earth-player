@@ -51,7 +51,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "RandomSetAside":
       return randomSetAside(state, instruction, focus, ctx, steps);
     case "SetStagesAside":
-      return setStagesAside(state, instruction);
+      return setStagesAside(state, instruction, steps);
     case "SearchAsideStageSets":
       return searchAsideStageSets(state, instruction, focus, ctx, steps);
     case "AddWithHostToVictory":

@@ -86,7 +86,7 @@ export function playCard(
   const elsewhere = playsOntoHost(printed) ? playElsewhere(next, intent.cardId, intent.hostId, seat, ctx, steps) : null;
   if (elsewhere) return elsewhere;
   next = moveCard(next, intent.cardId, { zone: "play", seat });
-  next = updateCard(next, intent.cardId, { exhausted: entersExhausted(next, ctx, instance.code) });
+  next = updateCard(next, intent.cardId, { exhausted: entersExhausted(state, ctx, instance.code) });
   if (playsOntoHost(printed) && intent.hostId) {
     // Played on another player's character, it is that player's to control (rr.attachment-cards).
     next = hostTakesControl(attachTo(next, intent.cardId, intent.hostId), intent.cardId, ctx);
@@ -173,7 +173,7 @@ function playRules(ctx: ReduceContext, code: string) {
     .flatMap((effect) => effect.instructions);
 }
 
-// "Enters play exhausted" (a constant on the card itself), or "Allies enter play exhausted" (a stage's constant, the table flag `alliesEnterExhausted`, 17157:B:1).
+// "Enters play exhausted" (a constant on the card itself), or "Allies enter play exhausted" (a stage's constant, the table flag `alliesEnterExhausted`, 17157:B:1). Every caller passes the state the card enters from, before it moves.
 export function entersExhausted(state: ScenarioState, ctx: ReduceContext, code: string): boolean {
   return playRules(ctx, code).some((instruction) => instruction.verb === "EntersPlayExhausted") || (flagged(state, "table", "alliesEnterExhausted") && printedOf(ctx.cards, code).type === "ally");
 }

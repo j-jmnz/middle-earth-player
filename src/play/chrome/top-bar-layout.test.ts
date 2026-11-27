@@ -32,10 +32,12 @@ import {
   RAIL_MAX,
   RAIL_WIDE,
   railWide,
+  scrollCue,
   SEAT_DIAL,
   TICK,
   TICK_GAP,
   TOP_BAR,
+  warnedDialId,
 } from "./top-bar-layout.ts";
 
 // The rail names a phase over its ticks and nothing longer, so it never needs more than this.
@@ -376,5 +378,20 @@ describe("keepWidest", () => {
   });
   it("takes the new width for a new key, even a narrower one: a dial whose label got shorter under the same id is measured again", () => {
     expect(keepWidest(was, "a|Time left", 200)).toEqual({ key: "a|Time left", width: 200 });
+  });
+});
+
+describe("the dial the scrolling row keeps whole", () => {
+  it("keeps a critical dial before a near one, and none when no dial warns", () => {
+    expect(warnedDialId([{ id: "aside" }, { id: "garrison", warn: { level: "near" } }, { id: "gate", warn: { level: "critical" } }])).toBe("gate");
+    expect(warnedDialId([{ id: "aside" }, { id: "garrison", warn: { level: "near" } }])).toBe("garrison");
+    expect(warnedDialId([{ id: "aside" }, { id: "path" }])).toBeNull();
+  });
+
+  it("shows the scroll cue while the zone scrolls and its view has not reached the row's end", () => {
+    expect(scrollCue({ scroll: false }, 0, 200, 400)).toBe(false);
+    expect(scrollCue({ scroll: true }, 0, 200, 400)).toBe(true);
+    expect(scrollCue({ scroll: true }, 200, 200, 400)).toBe(false);
+    expect(scrollCue({ scroll: true }, 199, 200, 400)).toBe(false);
   });
 });

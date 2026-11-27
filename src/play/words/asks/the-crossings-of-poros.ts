@@ -1,5 +1,5 @@
 import type { Ask } from "../asks.ts";
-import { ELIMINATED } from "../asks-conditions.ts";
+import { DESTROYED_BY, ELIMINATED } from "../asks-conditions.ts";
 import { ELIMINATION_LEVEL } from "../../../rules/core/eliminate.ts";
 import { URUK_CHIEFTAIN_ASKS } from "../haradrim-asks.ts";
 
@@ -35,7 +35,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 17158:B:1 (Pelargir Defences stage 2, forced): the player who played the ally chooses.
   "17158:forced:1 @0 Choose": { owned: true, note: "You played {subject}: exhaust it, or deal 1 damage to it." },
   "17158:forced:1 @0 exhaust": { label: "Exhaust {subject}" },
-  "17158:forced:1 @0 damage": { label: "Deal 1 damage to {subject}" },
+  "17158:forced:1 @0 damage": { label: "Deal 1 damage to {subject}", caution: { when: DESTROYED_BY(1, "subject"), text: "Tap again: this destroys {subject}" } },
 
   // 17159:B:1 (stage 2, forced): exhaust the ally, or raise the threat of the player who played it by 1.
   "17159:forced:1 @0 Choose": { owned: true, note: "You played {subject}: exhaust it, or raise your threat by 1." },

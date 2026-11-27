@@ -12,6 +12,7 @@ import { plural } from "../words/list.ts";
 import { reshuffleWords } from "./pile-ids.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
 import { attachedWords } from "../words/scenarios/haradrim/capture.ts";
+import { randomStageDetail } from "../words/scenarios/haradrim/poros-table.ts";
 import { boardingWords } from "../words/scenarios/sea.ts";
 import type { FateNames } from "../words/scenarios/fate-beats.ts";
 import { ignoredRevealNote } from "../readouts/ettenmoors.ts";
@@ -180,7 +181,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         }
         // A stage 2 of Roam Across Rhovanion (19047:B:2, 19048:B:2): the three are played in a random order, each once, so the banner says the seed chose this one and what it asks.
         if (code != null && after.stages.some((stage) => stage.randomNext?.codes.includes(code))) {
-          line("The stage was chosen at random");
+          line(step.random ? randomStageDetail(steps.slice(index + 1), names.card) : "The stage was chosen at random");
           const text = names.stage?.(step.cardId);
           if (text) line(text, null, [step.cardId]);
         }

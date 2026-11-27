@@ -6,7 +6,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
 import { engagedSeat } from "../../core/engaged.ts";
-import { nextUint } from "../../core/seed.ts";
+import { drawRandomSetAside } from "../../core/set-aside-draw.ts";
 import { printedOf } from "../../core/printed.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { attachTo, inPlay, moveCard } from "../../core/zones.ts";
@@ -18,17 +18,11 @@ import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
-/** The id of one set-aside card with the trait, drawn by the game seed (the ids in order, one step of the seed), or undefined when none is set aside. The caller advances `seedCursor` when it uses the card. */
-export function drawRandomSetAside(state: ScenarioState, trait: string, ctx: ReduceContext): string | undefined {
-  const ids = state.setAside.filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").traits.includes(trait)).sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
-  return ids[nextUint(state.seed, state.seedCursor) % Math.max(ids.length, 1)];
-}
-
 /** AttachRandomSetAside: one set-aside card with the trait, drawn by the game seed (the ids in order, one step of the seed), is attached faceup to the last picked card in play and controlled by nobody. */
 export function attachRandomSetAside(state: ScenarioState, instruction: Verb<"AttachRandomSetAside">, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const host = state.cards[lastPicked(state)];
   if (!host || !inPlay(host.zone)) return state;
-  const drawn = drawRandomSetAside(state, instruction.trait, ctx);
+  const drawn = drawRandomSetAside(state, (id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").traits.includes(instruction.trait));
   if (!drawn) return state;
   const lying = updateCard(attachTo(moveCard({ ...state, seedCursor: state.seedCursor + 1 }, drawn, { zone: "attached" }), drawn, host.id), drawn, { face: "up", exhausted: false });
   steps.push({ kind: "attachDrawn", cardId: drawn, hostId: host.id, seat: engagedSeat(state, host.id) });

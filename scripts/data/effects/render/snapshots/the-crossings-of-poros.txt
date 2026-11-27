@@ -5,7 +5,7 @@ Scenario piles that place cards with no record (quest: 17157 Flight to Gondor; q
 
 17145:A:1 (front): The first player gains control of Poros Garrison.
   17145:constant:1: Constant
-    - this card is controlled by the first player while this holds
+    - this card is controlled by the first player while this holds (each pass of control is told in the log)
 
 17145:A:2: Immune to player card effects.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
@@ -224,7 +224,7 @@ Scenario piles that place cards with no record (quest: 17157 Flight to Gondor; q
   17157:forced:1: Forced at the end of the phase
     only if it is the Planning phase
     who acts: the acting player is the first player (a phase has no player of its own)
-    - the quest proceeds to one of the stages with codes 17158 and 17159, each played once in a random order (the game's seed): one still in the quest deck (the scenario definition copies it onto the stage and the quest takes it when the stage is defeated; run on the stage the quest is at, it advances the quest at once)
+    - the quest proceeds to one of the stages with codes 17158 and 17159, each played once in a random order (the game's seed): one still in the quest deck (the scenario definition copies it onto the stage and the quest takes it when the stage is defeated; run on the stage the quest is at, it advances the quest at once); the log tells the advance with the stages it chose among and this line as its cause
 
 ## 17158 The Desert Path
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -235,7 +235,7 @@ Scenario piles that place cards with no record (quest: 17157 Flight to Gondor; q
     - every set-aside card of the encounter set "Desert Sands" joins the encounter deck (the deck is shuffled by the step after)
     - shuffle the encounter deck
     - every card of the encounter set "Mountains of Shadow" that is still set aside leaves the game (a card of the set already in the deck, the discard pile or play stays)
-    - the stage with code 17159 is set aside and no longer part of the quest deck: the stage that is defeated before it goes to the next stage still in the quest deck; if it is the current stage, the quest advances at once to the next stage still in the quest deck and that stage is revealed; a stage already gone is not an error
+    - the stage with code 17159 is set aside and no longer part of the quest deck: the stage that is defeated before it goes to the next stage still in the quest deck; if it is the current stage, the quest advances at once to the next stage still in the quest deck and that stage is revealed; a stage already gone is not an error; a stage removed while the quest is at another stage is told in the log
 
 17158:B:1 (back): Forced: After a player plays an ally, he must either exhaust that ally or deal 1 damage to it.
   17158:forced:1: Forced after an ally is played from hand (not one put into play by an effect) (heard about card (any player controls) or in the staging area or the active location, of card type ally)
@@ -249,7 +249,7 @@ Scenario piles that place cards with no record (quest: 17157 Flight to Gondor; q
 17158:B:2 (back): Forced: When this stage is defeated, advance to a random stage 3.
   17158:forced:2: Forced on the event questCardDefeated (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the quest proceeds to one of the stages with codes 17160, 17161 and 17162, each played once in a random order (the game's seed): one still in the quest deck (the scenario definition copies it onto the stage and the quest takes it when the stage is defeated; run on the stage the quest is at, it advances the quest at once)
+    - the quest proceeds to one of the stages with codes 17160, 17161 and 17162, each played once in a random order (the game's seed): one still in the quest deck (the scenario definition copies it onto the stage and the quest takes it when the stage is defeated; run on the stage the quest is at, it advances the quest at once); the log tells the advance with the stages it chose among and this line as its cause
 
 ## 17159 The Ephel Dúath
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -260,7 +260,7 @@ Scenario piles that place cards with no record (quest: 17157 Flight to Gondor; q
     - every set-aside card of the encounter set "Mountains of Shadow" joins the encounter deck (the deck is shuffled by the step after)
     - shuffle the encounter deck
     - every card of the encounter set "Desert Sands" that is still set aside leaves the game (a card of the set already in the deck, the discard pile or play stays)
-    - the stage with code 17158 is set aside and no longer part of the quest deck: the stage that is defeated before it goes to the next stage still in the quest deck; if it is the current stage, the quest advances at once to the next stage still in the quest deck and that stage is revealed; a stage already gone is not an error
+    - the stage with code 17158 is set aside and no longer part of the quest deck: the stage that is defeated before it goes to the next stage still in the quest deck; if it is the current stage, the quest advances at once to the next stage still in the quest deck and that stage is revealed; a stage already gone is not an error; a stage removed while the quest is at another stage is told in the log
 
 17159:B:1 (back): Forced: After a player plays an ally, he must either exhaust that ally or raise his threat by 1.
   17159:forced:1: Forced after an ally is played from hand (not one put into play by an effect) (heard about card (any player controls) or in the staging area or the active location, of card type ally)
@@ -274,7 +274,7 @@ Scenario piles that place cards with no record (quest: 17157 Flight to Gondor; q
 17159:B:2 (back): Forced: When this stage is defeated, advance to a random stage 3.
   17159:forced:2: Forced on the event questCardDefeated (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the quest proceeds to one of the stages with codes 17160, 17161 and 17162, each played once in a random order (the game's seed): one still in the quest deck (the scenario definition copies it onto the stage and the quest takes it when the stage is defeated; run on the stage the quest is at, it advances the quest at once)
+    - the quest proceeds to one of the stages with codes 17160, 17161 and 17162, each played once in a random order (the game's seed): one still in the quest deck (the scenario definition copies it onto the stage and the quest takes it when the stage is defeated; run on the stage the quest is at, it advances the quest at once); the log tells the advance with the stages it chose among and this line as its cause
 
 ## 17160 Deadly Creatures
 (the scenario deals it into the quest pile; the piles place it, no record does)

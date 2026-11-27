@@ -55,12 +55,11 @@ export type PorosGame = PlayedGame;
 // The goldens (src/campaign/scenarios/the-crossings-of-poros/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type PorosGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: PorosDecks; outcome: "won" | "lost"; policy?: Partial<PorosPolicy>; lossReason?: string };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Nightmare) and a few losses (each way the scenario can be lost), each on a fixed seed.
+// The games pinned (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost): the wins play each stage 2 and each stage 3 once between them (solo: 17158 then 17162, 17159 then 17160; two-handed: 17159 then 17161), and a loss for each way to lose, each on a fixed seed.
 export const POROS_GOLDENS: readonly PorosGolden[] = [
   { name: "true solo, won, Normal, Desert Path then Orc Patrols", seatCount: 1, seed: 3, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, won, Normal, Ephel Duath then Deadly Creatures", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed, won, Normal, Ephel Duath then Southron Pursuit", seatCount: 2, seed: 8, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "two-handed, won, Normal, Desert Path then Deadly Creatures", seatCount: 2, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "true solo, lost, every hero destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
   { name: "true solo, lost, Poros Garrison leaves play", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "Poros Garrison left play" },

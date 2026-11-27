@@ -32,3 +32,15 @@ export function fit(line: string, width: number, measure: (text: string) => numb
   while (text.length > 1 && measure(`${text}…`) > width) text = text.slice(0, -1);
   return `${text.trimEnd()}…`;
 }
+
+/** The smallest share of its size a name shrinks to before it is cut with an ellipsis. */
+export const MIN_NAME_SCALE = 0.75;
+
+/**
+ * The share of its size a name is drawn at so its long part fits `width`, never under `min`: the whole name when it takes one line, else its widest word (a word does not wrap). 1 when it fits. What still does not fit at the minimum is cut with an ellipsis (wrapName, fit),
+ * called with the width divided by this scale.
+ */
+export function nameScale(name: string, width: number, measure: (text: string) => number, maxLines = 3, min = MIN_NAME_SCALE): number {
+  const widest = maxLines === 1 ? measure(name) : Math.max(0, ...name.split(/\s+/).map((word) => measure(word)));
+  return widest <= width || widest <= 0 ? 1 : Math.max(min, width / widest);
+}
