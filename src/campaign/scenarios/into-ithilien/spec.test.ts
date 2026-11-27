@@ -68,6 +68,7 @@ const ROWS: readonly Row[] = [
   { line: "05053:A:2", name: "Shadow: the enemy attacks again, with a new shadow card (the shadow and a second one leave the deck)", layout: { stage: BATTLE }, act: attack("f3", { shadow: ELITE, undefended: true }), expect: deckCount(2) },
 
   { line: "05055:A:2", name: "When Revealed: each player searches the encounter deck for a Harad enemy and adds it to the staging area", layout: { stage: BATTLE, deck: [COMPANY, "f0", "f0"] }, act: reveal(SUPPORT), expect: zone(COMPANY, "staging") },
+  { line: "05055:A:2", name: "A Haradrim Elite it adds to the staging area attacks the first player at once", layout: { stage: BATTLE, deck: [ELITE, "f0", "f0"] }, act: reveal(SUPPORT), expect: window("defense") },
   { line: "05055:A:2", name: "The discard pile is searched too", layout: { stage: BATTLE, deck: ["f0", "f0"], discard: [COMPANY] }, act: reveal(SUPPORT), expect: zone(COMPANY, "staging") },
 
 

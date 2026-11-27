@@ -5,7 +5,9 @@ import { describe, expect, it } from "vitest";
 import { legalIntents } from "../../../rules/engine/legal.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { attachBlocked, restricted } from "../../../rules/interpret/restrictions.ts";
-import { moveCard } from "../../../rules/core/zones.ts";
+import { moveCard, shadowCards } from "../../../rules/core/zones.ts";
+import { playedLayout } from "../../../../test/harness/card-spec-play.ts";
+import { attack } from "../../../../test/harness/card-spec.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { addModifier } from "../../../rules/core/keywords.ts";
 import { healDamage } from "../../../rules/families/dreamchaser/heal-cap.ts";
@@ -122,5 +124,16 @@ describe("Befouled Equipment", () => {
     const second = finish({ state: revealFromTop(first, made.ctx, "51036", []).state, steps: [] }, made.ctx).state;
     const copies = Object.values(second.cards).filter((card) => card.code === "51036");
     expect(copies.map((card) => card.host).sort()).toEqual([ally, idOf(second, "dh1")].sort());
+  });
+});
+
+describe("additional shadow cards", () => {
+  it("51049:A:2 the additional shadow card goes to the attacking enemy and is resolved with it, not held by the shadow card", () => {
+    const { run } = playedLayout("the-wizards-quest", { engaged: ["f3"], deck: ["f0", "f0", "f0", "f0", "f0", "f0"] }, attack("f3", { shadow: "51049", undefended: true }));
+    const state = run.state;
+    const enemy = state.cards[idOf(state, "f3")];
+    expect(shadowCards(enemy).map((id) => state.cards[id]?.code).sort()).toEqual(["51049", "f0"]);
+    expect(shadowCards(state.cards[idOf(state, "51049")])).toEqual([]);
+    expect(shadowCards(enemy).every((id) => state.cards[id]?.face === "up")).toBe(true);
   });
 });
