@@ -66,7 +66,7 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
 
 17122:A:2 (front): While Prison Guard is not guarding an objective, it gains: "Forced: After Prison Guard attacks and damages an ally, attach that ally to Prison Guard."
   17122:forced:1: Forced on the event attackDamagedCharacter (heard about this card)
-    only if all of: (this card is a enemy (any player controls) that holds no captive) and (the event's other card is a ally (any player controls))
+    only if all of: (this card is a enemy (any player controls) that holds no captive) and (the event's other card is a ally (any player controls) that is in play now)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the event's other card is attached to this card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
 
@@ -100,11 +100,11 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
     - if the encounter deck holds no card: shuffle the encounter discard pile into the encounter deck
     - the top card of the encounter deck goes to the encounter discard pile
     - the first player chooses one of:
-      * option "discard" (only if all of: (the picked card is a card (any player controls) or in the staging area or the active location that is out of play now) and (there is a card (you control) in hand, with a printed cost greater than the printed Threat (0 with none) of the card last discarded from the encounter deck to choose)):
-        - choose card (you control) in hand, with a printed cost greater than the printed Threat (0 with none) of the card last discarded from the encounter deck
-        - discard the picked card
-      * option "threat" (only if the picked card is a card (any player controls) or in the staging area or the active location that is out of play now):
-        - raise threat by 3 (each player)
+      * option "discard" (only if there is a card (you control) in hand, with a printed cost greater than the printed Threat (0 with none) of the card last discarded from the encounter deck to choose):
+        - if the picked card is a card (any player controls) or in the staging area or the active location that is out of play now: choose card (you control) in hand, with a printed cost greater than the printed Threat (0 with none) of the card last discarded from the encounter deck
+        - then, if the picked card is a card (any player controls) or in the staging area or the active location that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+      * option "threat":
+        - if the picked card is a card (any player controls) or in the staging area or the active location that is out of play now: raise threat by 3 (each player)
 
 ## 17125 Dungeon Cell
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -311,4 +311,4 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
     note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 232 by template, 2 as JSON)
+(rendered pieces: 233 by template, 2 as JSON)

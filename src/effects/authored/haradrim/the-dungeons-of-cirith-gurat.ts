@@ -25,7 +25,7 @@ const UNATTACHED_ENEMY: PickSpec = { type: "enemy", control: "any", stagingOnly:
 const UNATTACHED_ENEMY_OR_LOCATION: PickSpec = { type: "card", control: "any", stagingOnly: true, enemyOrLocation: true, unattached: true };
 // "If this attack destroys an ally": the attack's X is the characters it destroyed, and the one it destroyed is an ally.
 const DESTROYED_AN_ALLY: Condition = { kind: "all", conditions: [{ kind: "x", min: 1 }, { kind: "matches", card: "other", pick: { type: "card", control: "any", cardType: "ally" }, inPlay: false }] };
-// "Then, ...": the text after it resolves only when the encounter deck gave a card to discard (rr.then).
+// "Then, ...": the text after it resolves only when the encounter deck gave a card to discard (rr.then). It is tested inside the options: the Travel cost reads an option's `requires` before anything is discarded.
 const DISCARDED_A_CARD: Condition = { kind: "matches", card: "picked", pick: { type: "card", control: "any" }, inPlay: false };
 const ORC_FOUND: Condition = { kind: "matches", card: "picked", pick: { type: "enemy", control: "any", trait: "Orc" }, inPlay: false };
 const ATTACH_PICKED_TO_PREVIOUS: Instruction = { verb: "AttachCaptive", card: "previous", to: "picked" };
@@ -76,7 +76,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "forced",
     trigger: "attackDamagedCharacter",
     subject: "self",
-    condition: { kind: "all", conditions: [{ kind: "matches", card: "self", pick: { ...GUARDING, type: "enemy", guardsCaptive: false } }, { kind: "matches", card: "other", pick: { type: "ally", control: "any" } }] },
+    condition: { kind: "all", conditions: [{ kind: "matches", card: "self", pick: { ...GUARDING, type: "enemy", guardsCaptive: false } }, { kind: "matches", card: "other", pick: { type: "ally", control: "any" }, inPlay: true }] },
     instructions: [{ verb: "AttachCaptive", card: "other", to: "self" }],
   },
 
@@ -97,8 +97,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
         verb: "Choose",
         who: "firstPlayer",
         options: [
-          { id: "discard", requires: { kind: "all", conditions: [DISCARDED_A_CARD, { kind: "canPick", pick: { type: "card", control: "you", from: "hand", costAboveDiscardedThreat: true } }] }, instructions: [{ verb: "Pick", pick: { type: "card", control: "you", from: "hand", costAboveDiscardedThreat: true } }, { verb: "DiscardPicked" }] },
-          { id: "threat", requires: DISCARDED_A_CARD, instructions: [{ verb: "RaiseThreat", amount: 3, who: "eachSeat" }] },
+          { id: "discard", requires: { kind: "canPick", pick: { type: "card", control: "you", from: "hand", costAboveDiscardedThreat: true } }, instructions: [{ verb: "Pick", pick: { type: "card", control: "you", from: "hand", costAboveDiscardedThreat: true }, when: DISCARDED_A_CARD }, { verb: "DiscardPicked", when: DISCARDED_A_CARD }] },
+          { id: "threat", instructions: [{ verb: "RaiseThreat", amount: 3, who: "eachSeat", when: DISCARDED_A_CARD }] },
         ],
       },
     ],
