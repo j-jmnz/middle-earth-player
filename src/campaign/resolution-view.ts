@@ -10,7 +10,7 @@ import type { Instruction } from "../catalog/boundary.ts";
 import type { CampaignEnd } from "../catalog/campaign-record.ts";
 import { andList, carryVerb, carryWords } from "./carry-words.ts";
 import { endedInDefeat } from "../rules/core/eliminate.ts";
-import { allHeroesDestroyed, lossWithCauses } from "../rules/core/elimination-words.ts";
+import { lossReasonOf } from "./report.ts";
 import { legalIntents, type ScenarioState } from "../rules/engine/reduce.ts";
 import { answeredSeats, asksPlayers, resolutionResult, SKIP } from "../rules/setup/resolution.ts";
 import { isEncounterOption, LOG_LINE, poolTally, removalCode, removalSeat } from "../rules/families/wilderland/pool.ts";
@@ -143,7 +143,7 @@ function removalTile(world: World, optionId: string, tally: Readonly<Record<stri
 // `logged`: the boxes beside Beldis the campaign log holds before this game (the save's log), so the view names only the marks this game adds.
 // `destroyed`: the heroes the table saw destroyed, so a loss by "No seats remain" names the cause of each elimination as the table and the outcome screen do (rules/core/elimination-words.ts).
 export function resolutionView(state: ScenarioState, world: World, logged: readonly number[] = [], destroyed?: ReadonlySet<string>): ResolutionView {
-  if (state.lost) return { kind: "lost", reason: lossWithCauses(state, destroyed && allHeroesDestroyed(state, destroyed, (id) => world.cards.get(state.cards[id]?.code ?? "")?.type === "hero")) };
+  if (state.lost) return { kind: "lost", reason: lossReasonOf(state, world.cards, destroyed) };
   const settled = resolutionResult(state);
   if (settled) {
     // The tally the log will hold: the copies are capped at what one collection holds (applyResolution).

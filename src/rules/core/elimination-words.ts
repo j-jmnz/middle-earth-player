@@ -14,10 +14,10 @@ export function lastHeroesDestroyed(before: ScenarioState, steps: readonly Engin
   return standing.length > 0 && standing.every((id) => steps.some((step) => step.kind === "destroy" && step.targetId === id));
 }
 
-/** Every hero card of the seat is in `destroyed` (the ids a destroy step named over the game), and the seat has one: its last hero was destroyed. `isHero` reads a card id's printed type. */
+/** Every hero card of the seat is in `destroyed` (the ids a destroy step named over the game), and the seat has one: its last hero was destroyed. `isHero` reads a card id's printed type. A card belongs to the seat that controls it (`owner` is set only for a captured card). */
 export function allHeroesDestroyed(state: ScenarioState, destroyed: ReadonlySet<string>, isHero: (cardId: string) => boolean): HeroCause {
   return (seat) => {
-    const owned = Object.values(state.cards).filter((card) => card.owner === seat && isHero(card.id));
+    const owned = Object.values(state.cards).filter((card) => (card.owner ?? card.controller) === seat && isHero(card.id));
     return owned.length > 0 && owned.every((card) => destroyed.has(card.id));
   };
 }
