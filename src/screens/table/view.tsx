@@ -379,7 +379,7 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
           {/* The command column lies over the canvas's right edge, its empty top passing taps to the canvas. It stands on a fade to the night at its foot and right edge, clear (0 alpha) at its left edge and at its top so no straight edge shows (one radial gradient of the column's own width and height from the bottom-right corner), drawn under the canvas (above) so a row that runs on under the column stays clear; the dock has no panel of its own. */}
           <View testID="command" pointerEvents="box-none" className="justify-between px-2" onLayout={(event) => setColumnHeight(Math.round(event.nativeEvent.layout.height))} style={{ position: "absolute", top: 0, right: 0, bottom: 0, width: commandWidth, paddingBottom: footPad }}>
             {/* Above the dock, from the column's top to the dock's top; it never pushes the dock (command-head.ts). */}
-            <CommandHead scale={scale} room={room} bare={bare} bottom={footPad + dockHeight + HEAD_GAP * s} move={choice.move} moveKey={choice.moveKey} onMeter={() => setReading({ kind: "stagingThreat" })} onMove={() => setReading({ kind: "log" })} />
+            <CommandHead scale={scale} room={room} bare={bare} bottom={footPad + dockHeight + HEAD_GAP * s} move={choice.move} moveKey={choice.moveKey} onMeter={() => setReading({ kind: "stagingThreat" })} onMove={() => setReading({ kind: "log", latest: true })} />
             <TableDock
               step={choice.header.step}
               lead={choice.header.lead}

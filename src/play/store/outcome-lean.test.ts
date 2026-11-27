@@ -65,10 +65,12 @@ describe("the lean telling", () => {
     // No spotlight (the setting off, reduced motion, a reader): the attack's numbers stay, the tokens' do not.
     const plain = momentsOf(before, table.state, steps, names).lean;
     expect(plain?.title).toBe(`${enemy} attacks`);
-    expect(texts(plain)).toEqual([`With ${sam} gone, the attack is undefended`, "Attack 3 on hero, undefended", `${sam} is destroyed`]);
+    // The card that left play leads: the line has two rows.
+    expect(plain?.tone).toBe("bad");
+    expect(texts(plain)).toEqual([`${sam} is destroyed`, `With ${sam} gone, the attack is undefended`, "Attack 3 on hero, undefended"]);
     // The spotlight played the attack on that target: only what it did not show is left.
     const spotlit = momentsOf(before, table.state, steps, { ...names, spotlit: (targetId) => targetId === "hero" }).lean;
-    expect(texts(spotlit)).toEqual([`With ${sam} gone, the attack is undefended`, `${sam} is destroyed`]);
+    expect(texts(spotlit)).toEqual([`${sam} is destroyed`, `With ${sam} gone, the attack is undefended`]);
     // The full telling is the same either way.
     expect(momentsOf(before, table.state, steps, names).full?.lines).toHaveLength(5);
   });

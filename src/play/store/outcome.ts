@@ -63,7 +63,7 @@ function seatWord(state: ScenarioState, seat: number): string {
 // `whole`: the group's lines are kept together, uncut, and come last (Discover's, whose last line lays the look strip). `firm`: the group's lines are never cut, the cut falls on the other lines (a location taken or lost in Assault on Osgiliath).
 // `early`: the group is told right after the lead, ahead of the other groups (the villager tokens of Encounter at Amon Dîn, which the quest result moved).
 // `seen` on a line or a group: the table shows that fact once the intent is resolved (the card in its row, the tokens, the dial, the spotlight), so the last-move line leaves it out; a reader still hears it.
-type Told = MomentLine & { seen?: boolean };
+type Told = MomentLine & { seen?: boolean; lead?: boolean };
 type Group = { rank: number; title: string; tone: MomentTone; lines: Told[]; whole?: boolean; early?: true; firm?: true; seen?: true };
 
 /**
@@ -212,7 +212,7 @@ export function momentsOf(before: ScenarioState, after: ScenarioState, steps: re
         // The spotlight played this attack: its numbers and its damage were on screen.
         const spot = names.spotlit?.(step.side === "enemy" ? step.targetId : step.enemyId) === true;
         if (step.side === "enemy") {
-          open(2, `${enemy} attacks`, "plain");
+          open(2, `${enemy} attacks`, "bad");
           // A defender the shadow card destroyed leaves the attack undefended (rr.step-6-4-3): say why it is.
           const declared = before.pendingAttack?.enemyId === step.enemyId ? before.pendingAttack.defenderId : undefined;
           if (step.undefended && declared && declared !== step.targetId && steps.slice(0, index).some((earlier) => earlier.kind === "destroy" && earlier.targetId === declared)) {
@@ -259,6 +259,9 @@ export function momentsOf(before: ScenarioState, after: ScenarioState, steps: re
         const was = before.cards[step.targetId]?.zone;
         const verb = was === "activeLocation" || was === "secondActiveLocation" ? "explored" : was === "engaged" || was === "staging" ? "defeated" : "destroyed";
         line(`${names.card(step.targetId)} is ${verb}`, null, [step.targetId]);
+        // The line has two rows: a card that left play is told before the numbers that did it.
+        const last = current?.lines[current.lines.length - 1];
+        if (last) last.lead = true;
         return;
       }
       case "reveal":
@@ -440,7 +443,9 @@ function compose(groups: readonly Group[], most: number | null): Moment | null {
   // A firm group's lines stay whole, so the cut takes the others' (the line that says who took control of the location a quest just explored is never behind "more in the log").
   const firm = ordered.filter((group) => group.firm).flatMap(told);
   const loose = ordered.filter((group) => !group.firm).flatMap(told);
-  const kept = most == null ? [...loose] : loose.slice(0, Math.max(most - firm.length, 1));
+  // The lean telling, never cut, leads with the lines marked `lead`; a title that became a line keeps its place among the rest.
+  const flowLines: Told[] = ordered.filter((group) => !group.firm).flatMap((group) => (group === lead || !group.title ? group.lines : [{ text: group.title, mark: null }, ...group.lines]));
+  const kept = most == null ? [...flowLines.filter((told) => told.lead), ...flowLines.filter((told) => !told.lead)].map(plainLine) : loose.slice(0, Math.max(most - firm.length, 1));
   kept.push(...firm);
   const cut = loose.length - (kept.length - firm.length);
   if (cut > 0) kept.push({ text: `And ${cut} more in the log`, mark: null });
