@@ -73,7 +73,9 @@ export type EngineStep =
   // A character was given poison (hob.venom-poison): `count` is the poison it has now, `of` its printed hit points; one more at `of` makes it unconscious.
   | { kind: "poison"; targetId: string; count: number; of: number; cause: Cause }
   // A character was made unconscious (hob.unconscious-characters), or, with `ready`, readied from it.
-  | { kind: "unconscious"; targetId: string; ready?: true; cause: Cause };
+  | { kind: "unconscious"; targetId: string; ready?: true; cause: Cause }
+  // A card discarded at random from a hand whose effect says so (`announce` on DiscardRandomFromHand: Biting Insects, 17024:A:1), so the banner names it. Only that effect pushes it: no other step log changes.
+  | { kind: "discardedRandom"; seat: number; cardId: string; cause: Cause };
 
 export type Payment = { heroId: string; amount: number };
 

@@ -14,6 +14,7 @@ import { CONTROL_RADIUS, SHEET_RADIUS } from "../../ui/radius.ts";
 import { chipOnSurface, parchmentSurface } from "../../ui/surfaces.ts";
 import { layoutAnim, useMotionScale } from "../../ui/motion-run.ts";
 import { MOTION } from "../../ui/motion-tokens.ts";
+import { DENSE_BELOW } from "./dock/budget.ts";
 import type { SheetStat } from "./sheet-types.ts";
 import { withAlphaHex } from "../../ui/tokens.ts";
 import { capLines, touch, useUiScale } from "../../ui/ui-scale.ts";
@@ -143,7 +144,10 @@ export function Tile({
   const night = surface === "night";
   const ring = useFocusRing(!night);
   // A row's name keeps two lines at the phone's default text size and grows with larger text (capLines, ui/ui-scale.ts).
-  const labelCap = capLines(2, useWindowDimensions().fontScale);
+  const screen = useWindowDimensions();
+  const labelCap = capLines(2, screen.fontScale);
+  // On a short phone the dock's rows have room for about six lines of a row's printed line: a longer one ends in an ellipsis on a whole line, never cut mid-line at the foot of the rows (the dock's Read opens the whole card).
+  const detailCap = night && screen.height / s < DENSE_BELOW ? capLines(6, screen.fontScale) : undefined;
   // A screen reader's actions on the row: a share row's increment and decrement, and the long press's "Show card" (docs/design-system.md, Screen reader).
   const onStep = reader?.onStep;
   const actions = mergeA11yActions(
@@ -188,7 +192,11 @@ export function Tile({
               </Text>
               {night || dense ? null : numbers}
             </View>
-            {detail ? <Text className={`mt-0.5 text-label ${night ? "text-muted" : "text-inkMuted"}`}>{detail}</Text> : null}
+            {detail ? (
+              <Text numberOfLines={detailCap} className={`mt-0.5 text-label ${night ? "text-muted" : "text-inkMuted"}`}>
+                {detail}
+              </Text>
+            ) : null}
             {night || dense ? <View className={dense ? "" : "mt-0.5"}>{numbers}</View> : null}
           </View>
           {selected && night ? (

@@ -336,6 +336,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         return;
       // Poison and unconscious (hob.venom-poison, hob.unconscious-characters): the character's table pill and its turn follow each line.
       case "poison": return void line(poisonLine(names.card(step.targetId), step.count, step.of), null, [step.targetId]);
+      case "discardedRandom": return void line(`Player ${step.seat + 1} discards ${names.card(step.cardId)} at random`, null, [step.cardId]);
       case "unconscious": return void line(unconsciousLine(names.card(step.targetId), step.ready === true), null, [step.targetId]);
       case "resetEncounterDeck":
         line("The encounter discard pile is shuffled into the encounter deck");

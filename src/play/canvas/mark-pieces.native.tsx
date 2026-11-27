@@ -314,16 +314,15 @@ export function StageMarks({ rect, pill, apart, fonts, t, s }: { rect: Rect; pil
   const plateW = Math.min(room, plate + 8 * s);
   const pillX = rect.x + 3 * s;
   const pillY = rect.y + rect.h - STRIP * s - height - 2 * s;
-  // The plate stands under the picture's title band, clear of the pill when the card is tall enough for both; when it is not, the pill keeps only its number and the plate stands beside it.
+  // The plate stands under the picture's title band, clear of the pill, when the card is tall enough for both; when it is not it hangs above the card's top edge, so the pill keeps its whole words ("Orcs 1") and the plate reads in full.
   const below = rect.y + BADGE_TOP * s + 1 * s;
   const roomBelow = below + height + 1 * s <= pillY;
-  const beside = apart && !roomBelow;
   // The pill says whose stage it is when it fits the uncovered width, and only its number when it does not.
-  const text = !beside && fonts.small.getTextWidth(pill.text) + 8 * s <= room ? pill.text : pill.short;
+  const text = fonts.small.getTextWidth(pill.text) + 8 * s <= room ? pill.text : pill.short;
   const words = fonts.small.getTextWidth(text);
   const pillW = Math.min(room, words + 8 * s);
-  const plateX = roomBelow ? rect.x + (rect.w - plateW) / 2 : Math.min(pillX + pillW + 2 * s, rect.x + rect.w - plateW - 1 * s);
-  const plateY = roomBelow ? below : pillY;
+  const plateX = rect.x + (rect.w - plateW) / 2;
+  const plateY = roomBelow ? below : rect.y - height - 1 * s;
   return (
     <Group>
       <RoundedRect x={pillX} y={pillY} width={pillW} height={height} r={height / 2} color={pill.danger ? t.threat : withAlphaHex(t.night, 0.9)} />

@@ -23,6 +23,8 @@ import { fit, wrapName } from "./wrap.ts";
 // shorter side (`cardCorner`, user request, 2026-10-29); `RADIUS` is left for the shapes that are not cards (a drop zone's outline).
 export const RADIUS = 6;
 export const LINE = 14;
+// How far a one-line placeholder name shrinks to fit before it is cut with an ellipsis.
+const NAME_FLOOR = 0.7;
 export const BADGE_H = 15;
 // A card picture is drawn at sizes other than its copy's (a hand card at rest is smaller than the scrub's lifted copy; a card moving
 // grows and shrinks): linear filtering between mipmap levels, so it neither aliases when smaller nor blocks when larger.
@@ -168,6 +170,11 @@ export function CardBody({
   const { x, y, w, h } = slot;
   const radius = cardCorner(w, h);
   const bare = slot.shown != null && slot.shown < w ? 0.7 : 1;
+  // The name's line: across the card, unscaled. A name that must stay on one line (effect pills stand under it) shrinks to fit, down to a floor, before it is cut; the damage token at the top right keeps the first line clear.
+  const across = bare === 1 ? w - 10 * s : ((slot.shown ?? w) - 8 * s) / bare;
+  const full = fonts.names.getTextWidth(name);
+  const squeeze = nameLines === 1 && full > across ? Math.max(NAME_FLOOR, across / full) : 1;
+  const first = slot.damage > 0 && bare === 1 ? (w - 10 * s - (TOKEN + 2) * s + 5 * s) / squeeze : undefined;
   return (
     <Group>
       <RoundedRect x={x + 1 * s} y={y + 2 * s} width={w} height={h} r={radius} color={shadowOf(t)} />
@@ -182,8 +189,8 @@ export function CardBody({
           <RoundedRect x={x} y={y} width={w} height={h} r={radius} color={t.raised} />
           <Group clip={{ x: x + 3 * s, y: y + 3 * s, width: bare === 1 ? w - 6 * s : (slot.shown ?? w) - 4 * s, height: h - 6 * s }}>
             {/* A card its guard lies over (`shown`) names itself smaller, in the part the guard leaves bare. */}
-            <Group transform={[{ translateX: x + 5 * s }, { translateY: y + 15 * s }, { scale: bare }]}>
-              {wrapName(name, bare === 1 ? w - 10 * s : ((slot.shown ?? w) - 8 * s) / bare, (text) => fonts.names.getTextWidth(text), nameLines).map((line, index) => (
+            <Group transform={[{ translateX: x + 5 * s }, { translateY: y + 15 * s }, { scale: bare * squeeze }]}>
+              {wrapName(name, across / squeeze, (text) => fonts.names.getTextWidth(text), nameLines, first).map((line, index) => (
                 <Text key={index} x={0} y={index * LINE * s} text={line} font={fonts.names} color={t.bone} />
               ))}
             </Group>
