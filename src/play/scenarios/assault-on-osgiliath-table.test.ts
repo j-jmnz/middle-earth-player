@@ -309,4 +309,12 @@ describe("the words of the control records and the choice sheets (06093:A:1, 061
     expect(choose.note).toBe("Street Fighting: the discarded Osgiliath location is the last card discarded. Exhaust a hero to take control of it, or add it to the staging area.");
     expect(choose.options.map((option) => option.label)).toEqual(["Exhaust a hero: you control the discarded location, with no progress", "Do not exhaust: add the discarded location to the staging area"]);
   });
+  it("06096:A:1 West Gate's search names the place each Osgiliath location lies in: the encounter deck or its discard pile", () => {
+    const made = table({ phase: "Planning", staging: [CODES.westGate], deck: ["f0", harbor], discard: [library] });
+    const action = legalIntents(made.state, made.ctx).find((intent) => intent.type === "Trigger" && intent.effectId === "06096:action:1");
+    expect(action).toBeDefined();
+    const at = send(opened(made), action as never, made.ctx).state;
+    const search = sheetFor(at, made.ctx, legalIntents(at, made.ctx), namesOf(made, at)) as PickSheet;
+    expect(search.options.map((option) => option.label).sort()).toEqual(["Ancient Harbor from the encounter deck", "The King's Library from the encounter discard pile"]);
+  });
 });
