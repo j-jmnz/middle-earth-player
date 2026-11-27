@@ -49,7 +49,7 @@ export const HARADRIM_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => M
     const sets = (Array.isArray(i.sets) ? i.sets : []).map(str);
     const from = sets.length === 1 ? `the set aside ${sets[0]} set` : `the set aside encounter set with the most cards remaining (among ${sets.join(", ")}; the first player chooses among tied sets; a set removed from the game has none left)`;
     const card = `1 random card${i.cardType === "enemy" ? " that is an enemy" : ""} of ${from}, drawn by the game seed (nothing when none is left)`;
-    const to = i.to === "pick" ? "it becomes the last picked card and stays set aside (an option that reads it is offered only while there is one)" : i.to === "discard" ? "it is placed into the encounter discard pile and is part of the encounter deck from then on" : "the acting player reveals it as if it were the top card of the encounter deck (Surge, Doomed and When Revealed apply) and it is part of the encounter deck from then on";
+    const to = i.to === "pick" ? "it becomes the last picked card and stays set aside (an option that reads it is offered only while there is one)" : i.to === "discard" ? "it is placed into the encounter discard pile and is part of the encounter deck from then on" : i.to !== "reveal" ? "it stays set aside" : "the acting player reveals it as if it were the top card of the encounter deck (Surge, Doomed and When Revealed apply) and it is part of the encounter deck from then on";
     return { text: `choose ${card}: ${to}`, read: ["sets", "cardType", "to"] };
   },
   SetStagesAside: (i) => ({ text: `each stage with code ${(Array.isArray(i.codes) ? i.codes : []).map(str).join(", ")} still in the quest deck is set aside, out of play (the quest no longer reaches it)`, read: ["codes"] }),

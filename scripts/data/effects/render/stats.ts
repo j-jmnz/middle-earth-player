@@ -45,10 +45,10 @@ const TARGET_STAT: Readonly<Record<string, string>> = {
   table: "the table",
   currentQuest: "the main quest card (also while a side quest is the current quest)",
   eachSeat: "each player",
-  actorSeat: "the player who controls this card (the first player when none does)",
   questingCharacters: "every character committed to the quest, now and committing later while the effect lasts",
 };
-const targetStat = (value: string): string => TARGET_STAT[value] ?? cardRef(value);
+// A constant record reads the player who controls the card (the first player when none does; constants.ts); any other record reads the acting player (attack-verbs.ts).
+const targetStat = (value: string, ctx: Ctx): string => (value === "actorSeat" ? (ctx.timing === "constant" ? "the player who controls this card (the first player when none does)" : "the acting player") : (TARGET_STAT[value] ?? cardRef(value)));
 // What a stat flag means where the bare name would not say it.
 const STAT_NOTE: Readonly<Record<string, string>> = {
   ...ESCAPE_STAT_NOTES,
@@ -99,7 +99,7 @@ function attachBar(i: Obj): string {
 export const STAT_TEMPLATES: Readonly<Record<string, Template>> = {
   ModifyStat: (i, ctx) => {
     const lasting = i.until === "endOfPhase" || i.until === "endOfRound" || i.until === "endOfAttack";
-    const holders = isObj(i.holders) ? `each ${pick(i.holders, ctx)}${lasting ? " (only the cards that match now: one that arrives later does not get it)" : ""}` : typeof i.target === "string" ? targetStat(i.target) : "this card";
+    const holders = isObj(i.holders) ? `each ${pick(i.holders, ctx)}${lasting ? " (only the cards that match now: one that arrives later does not get it)" : ""}` : typeof i.target === "string" ? targetStat(i.target, ctx) : "this card";
     const per = typeof i.per === "string" ? ` for each ${i.per}` : "";
     const trait = typeof i.trait === "string" ? (i.target === "stagingCards" ? ` (${i.trait} only: an enemy or a location that holds the Trait)` : ` (${i.trait} only)`) : "";
     const sign = i.subtract === true ? "minus " : "";

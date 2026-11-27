@@ -302,7 +302,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
         * option "threat":
           - raise threat by 1 (the acting player)
         * option "noPlay":
-          - the player who controls this card (the first player when none does): stat cannotPlayCards 1, until the end of the phase
+          - the acting player: stat cannotPlayCards 1, until the end of the phase
 
 ## 145065 The Dead are Following
 (the scenario deals it into the quest pile; the piles place it, no record does)

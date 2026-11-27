@@ -18,7 +18,7 @@ Scenario piles that place cards with no record (quest: 08066 Double Dealings; qu
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the player who controls this card (the first player when none does): stat eliminationReduction 10, until the end of the game
+      - the acting player: stat eliminationReduction 10, until the end of the game
     - each player whose threat is at or above his threat elimination level now (50, less what the effects before this one took off) is eliminated at once
     - place 4 resource tokens on this card
 

@@ -279,7 +279,7 @@ Scenario piles that place cards with no record (activeLocation: 143027 Eastemnet
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player searches the encounter deck and discard pile for a Uruk-hai enemy, reveals it and puts it into play engaged with them
     - shuffle the encounter deck
-    - the player who controls this card (the first player when none does): stat engagedThreatSeat (each enemy engaged with that player adds its Threat to the staging area's total, counted live: an enemy that engages later counts too) 1, until the end of the round
+    - the acting player: stat engagedThreatSeat (each enemy engaged with that player adds its Threat to the staging area's total, counted live: an enemy that engages later counts too) 1, until the end of the round
 
 ## 143066 Snaga
 (the scenario deals it into the encounter pile; the piles place it, no record does)
