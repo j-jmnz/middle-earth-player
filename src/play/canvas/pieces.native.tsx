@@ -170,10 +170,10 @@ export function CardBody({
   const { x, y, w, h } = slot;
   const radius = cardCorner(w, h);
   const bare = slot.shown != null && slot.shown < w ? 0.7 : 1;
-  // The name's line: across the card, unscaled. A name that must stay on one line (effect pills stand under it) shrinks to fit, down to a floor, before it is cut; the damage token at the top right keeps the first line clear.
+  // The name's line: across the card, unscaled. A name that must stay on one line (effect pills stand under it) shrinks to fit, when it fits at the floor or more, before it is cut; the damage token at the top right keeps the first line clear.
   const across = bare === 1 ? w - 10 * s : ((slot.shown ?? w) - 8 * s) / bare;
   const full = fonts.names.getTextWidth(name);
-  const squeeze = nameLines === 1 && full > across ? Math.max(NAME_FLOOR, across / full) : 1;
+  const squeeze = nameLines === 1 && full > across && across / full >= NAME_FLOOR ? across / full : 1;
   const first = slot.damage > 0 && bare === 1 ? (w - 10 * s - (TOKEN + 2) * s + 5 * s) / squeeze : undefined;
   return (
     <Group>
