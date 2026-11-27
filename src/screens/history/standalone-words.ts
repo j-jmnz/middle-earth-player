@@ -1,6 +1,6 @@
 // The words the standalone screens show for a game: its status on the list and the lines of its outcome. Pure.
 import { causeWords } from "../../campaign/runs";
-import { standaloneStatus, type ListedStandalone, type StandaloneResult } from "../../campaign/standalone";
+import { standaloneStatus, unsettledOutcome, type ListedStandalone, type StandaloneResult } from "../../campaign/standalone";
 import { seatWord } from "../data/seats";
 
 
@@ -11,7 +11,7 @@ export function gameCaption(game: ListedStandalone): string {
 }
 
 export function statusWord(game: ListedStandalone): string {
-  switch (standaloneStatus(game)) {
+  switch (unsettledOutcome(game) ?? standaloneStatus(game)) {
     case "playing":
       return "In progress";
     case "needsChoice":

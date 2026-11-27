@@ -7,6 +7,7 @@ import { bookletOf, scenarioName } from "../../../data/campaign-data";
 import { useDatabases } from "../../../data/databases";
 import { goBack } from "../../../nav/go-back";
 import { routeCode } from "../../../nav/route-code";
+import { landingFor } from "../../../session/undo-landing";
 import { continueStandaloneGame, restartStandaloneGame, standaloneStore, useStandaloneSessionAfterPaint } from "../../../session/standalone-session";
 import { DROPPED_GAME, MISSING_GAME, STALE_CLOSED } from "../../../session/stale-words";
 import { useStaleChoice } from "../../../session/use-stale-choice";
@@ -28,7 +29,8 @@ export default function StandaloneTableScreen() {
   // Opened once per game, after the first paint (null until then): the store holds the game from here on, and each accepted intent is
   // written to user.db.
   const session = useStandaloneSessionAfterPaint(gameId, choice.attempt);
-  const table = useMemo(() => (session?.ok ? standaloneStore(session, user) : null), [session, user]);
+  // An Undo made on the outcome screen just before opens the table on the moment it took back (undo-landing.ts).
+  const table = useMemo(() => (session?.ok ? standaloneStore(session, user, landingFor(session.stored.id, session.stored.active?.intents.length ?? 0)) : null), [session, user]);
 
   if (gameId && (!session || choice.running)) {
     // The replay has not run yet (a miss in the session cache): the table's own frame, so the table replaces it without a jump.

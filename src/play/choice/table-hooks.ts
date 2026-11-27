@@ -110,13 +110,21 @@ export function useLastMove(store: TableStore, ctx: ReduceContext, names: SheetN
   // Every moment worth telling since the last one told, oldest first: the table answers the windows after a send in the same tap (stops.ts,
   // followAnswers), so more than one can arrive before the next render, and each has its say.
   const waiting = useRef<TableMoment[]>([]);
-  useEffect(
-    () =>
-      store.subscribe((state, before) => {
-        if (state.shown && state.shown !== before.shown) waiting.current.push(state.shown);
-      }),
-    [store],
-  );
+  // The moment the table opened on (an Undo a result screen made, store.ts `landing`) is told like any other, once: `queued` is the last moment's seq put on the list.
+  const queued = useRef(0);
+  useEffect(() => {
+    const opening = store.getState().shown;
+    if (opening && opening.seq > queued.current) {
+      queued.current = opening.seq;
+      waiting.current.push(opening);
+    }
+    return store.subscribe((state, before) => {
+      if (state.shown && state.shown !== before.shown) {
+        queued.current = state.shown.seq;
+        waiting.current.push(state.shown);
+      }
+    });
+  }, [store]);
   const told = shown != null && !playing;
   const seq = shown?.seq ?? 0;
   // As the moments are told: the line (last-move-time.ts, heldLine), the notice sound of a result (the quest, a test, an elimination), once, and the

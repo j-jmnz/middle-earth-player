@@ -88,6 +88,7 @@ export const activeScenarioSchema = z.strictObject({
   continued: z.literal(true).optional(),
   startedAt: z.number().optional(),
   activeMs: z.number().optional(),
+  ended: z.strictObject({ at: z.number(), outcome: z.enum(["won", "lost"]) }).optional(),
 });
 
 // What the briefing chose, kept with the open scenario so a relaunch rebuilds the same start: the heroes and the cards

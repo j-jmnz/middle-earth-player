@@ -3,8 +3,8 @@
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { staleChanges } from "../../campaign/changes";
-import { needsChoiceBeforeOpen } from "../../campaign/replay";
-import { continueStandalone, restartStandalone, resumeStandalone, type StandaloneGame } from "../../campaign/standalone";
+import { isContinued, needsChoiceBeforeOpen } from "../../campaign/replay";
+import { continueStandalone, finishStandalone, restartStandalone, resumeStandalone, type StandaloneGame } from "../../campaign/standalone";
 import { dealtCodes, loadWorld, type World } from "../../campaign/world";
 import { CATALOG_VERSION } from "../../catalog/version";
 import { EFFECTS } from "../../effects";
@@ -13,12 +13,13 @@ import { campaignOf, scenarioOf } from "../data/campaign-data";
 import { replayForTable, type ReplayedGame } from "./open-game";
 import type { PlayClock } from "./play-clock";
 import { fingerprintOf, sessionCacheOf } from "./cache";
-import { readStandalone, readStandaloneCheckpoint, writeStandaloneActive, writeStandaloneCheckpoint, writeStandaloneReplaced, writeStandaloneUndone } from "../data/standalone-store";
+import { readStandalone, readStandaloneCheckpoint, writeStandalone, writeStandaloneActive, writeStandaloneCheckpoint, writeStandaloneReplaced, writeStandaloneUndone } from "../data/standalone-store";
+import { recordStandaloneRun } from "../data/run-writers";
 import { dealSeed } from "../nav/e2e";
 import { gameStore } from "./game-store";
 import { continueChoice, gameWorld, restartChoice, staleFields } from "./stale-game";
 import type { StaleChoice } from "./stale-words";
-import type { TableStore } from "../../play/store/store";
+import type { TableMoment, TableStore } from "../../play/store/store";
 
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
@@ -92,9 +93,10 @@ export type StandaloneTable = { store: TableStore; game: () => StandaloneGame; c
  * The table store for an opened game (game-store.ts). Each intent the reducer accepts is appended and written at once; Undo takes it off. `game` is the game as last written. `clock`
  * counts the foreground time as the session store's does (table-open.ts): folded into each write, and written once on a pause.
  */
-export function standaloneStore<TRun>(session: Opened, user: Db<TRun>): StandaloneTable {
+export function standaloneStore<TRun>(session: Opened, user: Db<TRun>, landing?: Extract<TableMoment, { kind: "undone" }>): StandaloneTable {
   const { store, saved, clock } = gameStore<StandaloneGame, Opened>({
     session,
+    landing,
     initial: session.stored,
     cache: sessionCacheOf<Opened>(user, "standalone"),
     // The open's stamp is written already (table-open.ts, sessionStore).
@@ -102,4 +104,34 @@ export function standaloneStore<TRun>(session: Opened, user: Db<TRun>): Standalo
     writers: { active: (game) => writeStandaloneActive(user, game), undone: (game) => writeStandaloneUndone(user, game), checkpoint: (id, checkpoint) => writeStandaloneCheckpoint(user, id, checkpoint) },
   });
   return { store, game: saved, clock };
+}
+
+/**
+ * Leaving the outcome of a finished game makes it final (Done, Play again, Back, or any other way off the screen): the game's result is written (the open game goes) and its one run (History). The run ends
+ * when the move that ended the game was accepted (`active.ended`), not when the player leaves. A game still on writes nothing and returns null. A second call writes nothing more: the row holds the same result
+ * and the run's id is fixed.
+ */
+export function settleStandalone<TRun>(user: Db<TRun>, session: Opened, now: number = Date.now()): StandaloneGame | null {
+  const finished = finishStandalone(session.stored, session.world, session.game);
+  if (finished.result == null) return null;
+  writeStandalone(user, finished);
+  recordUnsettledRun(user, session, finished, now);
+  return finished;
+}
+
+/** The run of a finished game that was never left (settleStandalone), written alone: a game deleted from History first records it. */
+export function recordUnsettledRun<TRun>(user: Db<TRun>, session: Opened, finished: StandaloneGame = finishStandalone(session.stored, session.world, session.game), now: number = Date.now()): void {
+  if (finished.result == null) return;
+  const { active } = session.stored;
+  recordStandaloneRun(user, finished, session.world, session.game, active?.ended?.at ?? now, active?.activeMs ?? null, active != null && isContinued(active), active?.startedAt ?? null);
+}
+
+/** Delete from History on a game that is over and was never left: its run is recorded before the row goes. A game that will not replay, or is still on, writes nothing and never stops the delete. */
+export function recordUnsettledGame<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, gameId: string): void {
+  try {
+    const session = openStandalone(catalog, user, gameId);
+    if (session.ok) recordUnsettledRun(user, session);
+  } catch {
+    // The run is a record, not a step: a game that will not replay must not stop the delete.
+  }
 }

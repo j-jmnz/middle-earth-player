@@ -31,6 +31,9 @@ export type ActiveScenario = {
   startedAt?: number;
   // The ms the table was on screen with the app in the foreground (the run's playtime). A scenario played before it has none.
   activeMs?: number;
+  // Set when the move just sent ended the game: when it was accepted (ms since the epoch) and how it ended. The result is final only when the player leaves
+  // the result screen, so a game over and not yet left keeps this for its run's end time and for History; Undo takes it off with the move.
+  ended?: { at: number; outcome: "won" | "lost" };
 };
 
 // The table a rebased game replays from, in place of the opening state its seed deals: a checkpoint the player chose to continue from after an update
@@ -67,7 +70,7 @@ export function addActive(active: ActiveScenario, ms: number): ActiveScenario {
 // Takes the last intent back (the table's Undo): replaying the rest gives the state before it.
 // The last digest goes with it; checks that did not match the intents one for one are dropped.
 export function dropLastIntent(active: ActiveScenario): ActiveScenario {
-  const { checks, ...rest } = active;
+  const { checks, ended: _ended, ...rest } = active;
   const intents = active.intents.slice(0, -1);
   if (!checks) return { ...rest, intents };
   return fullChecks(active) ? { ...rest, intents, checks: checks.slice(0, -1) } : { ...rest, intents };

@@ -41,9 +41,10 @@ const listed = {
   world: sql<number | null>`json_extract(${standaloneGames.activeScenario}, '$.world')`,
   intents: sql<number | null>`json_array_length(${standaloneGames.activeScenario}, '$.intents')`,
   checks: sql<number | null>`json_array_length(${standaloneGames.activeScenario}, '$.checks')`,
+  ended: sql<string | null>`json_extract(${standaloneGames.activeScenario}, '$.ended.outcome')`,
 };
 
-function listedRow(row: { id: string; campaignId: string; scenarioId: string; seatCount: number; loadout: unknown; result: unknown; engineVersion: number | null; dataHash: number | null; world: number | null; intents: number | null; checks: number | null }): ListedStandalone {
+function listedRow(row: { id: string; campaignId: string; scenarioId: string; seatCount: number; loadout: unknown; result: unknown; engineVersion: number | null; dataHash: number | null; world: number | null; intents: number | null; checks: number | null; ended: string | null }): ListedStandalone {
   const loadout = parseStandaloneLoadout(row.loadout);
   const open = loadout && typeof row.engineVersion === "number" && typeof row.dataHash === "number";
   const active = open ? { engineVersion: row.engineVersion as number, dataHash: row.dataHash as number, world: typeof row.world === "number" ? row.world : null } : null;
@@ -55,6 +56,7 @@ function listedRow(row: { id: string; campaignId: string; scenarioId: string; se
     loadout,
     active,
     result: parseStandaloneResult(row.result),
+    ...(active && (row.ended === "won" || row.ended === "lost") ? { ended: row.ended } : {}),
     ...(active && needsChoiceBeforeOpen(active, row.intents ?? 0, row.checks) ? { needsChoice: true as const } : {}),
   };
 }

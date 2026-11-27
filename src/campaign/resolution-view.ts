@@ -288,6 +288,14 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
   };
 }
 
+/**
+ * Whether the game is on again: no loss, no win to settle, no choice to make. The result screens ask it after an Undo, to leave for the
+ * table (the Resolution, the standalone outcome); one answer for both.
+ */
+export function gameIsOn(state: ScenarioState, world: World, logged: readonly number[] = [], destroyed?: ReadonlySet<string>): boolean {
+  return resolutionView(state, world, logged, destroyed).kind === "playing";
+}
+
 // The choosing view of one of The Two Towers' own choices (resolution-two-towers.ts words them).
 function twoTowersView(state: ScenarioState, world: World, instruction: Extract<Instruction, { verb: "ChooseOption" | "ReviveFallenHero" | "TrimHeroes" }>, window: { step: number; seat: number }): ResolutionView {
   const optionIds = legalIntents(state, contextOf(world)).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));

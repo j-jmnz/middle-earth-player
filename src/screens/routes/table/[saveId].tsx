@@ -14,6 +14,7 @@ import { continueTable, restartTable, sessionStore, useTableSessionAfterPaint } 
 import { DROPPED_SAVE, MISSING_GAME, STALE_CLOSED } from "../../session/stale-words";
 import { useStaleChoice } from "../../session/use-stale-choice";
 import { StaleSheet } from "../../table/stale-sheet";
+import { landingFor } from "../../session/undo-landing";
 
 // What a choice answers when the route has no save id: nothing to continue.
 const MISSING = { ok: false, message: MISSING_GAME } as const;
@@ -28,7 +29,8 @@ export default function TableScreen() {
   // Opened once per save, after the first paint (null until then): the store holds the game from here on, and each accepted intent is
   // written to user.db.
   const session = useTableSessionAfterPaint(saveId, choice.attempt);
-  const table = useMemo(() => (session?.ok ? sessionStore(session, user) : null), [session, user]);
+  // An Undo made on the Resolution just before opens the table on the moment it took back (undo-landing.ts).
+  const table = useMemo(() => (session?.ok ? sessionStore(session, user, landingFor(session.save.id, session.save.active?.intents.length ?? 0)) : null), [session, user]);
 
   if (saveId && (!session || choice.running)) {
     // The replay has not run yet (a miss in the session cache): the table's own frame, so the table replaces it without a jump.

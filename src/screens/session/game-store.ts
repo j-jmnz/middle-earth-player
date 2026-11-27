@@ -6,7 +6,7 @@ import { atPhaseBoundary, checkpointOf, type Checkpoint } from "../../campaign/c
 import { addActive, type ActiveScenario } from "../../campaign/replay";
 import { isWon, record, unrecord } from "../../campaign/session";
 import { CATALOG_VERSION } from "../../catalog/version";
-import type { ScenarioState, TableStore } from "../../play/store/store";
+import type { ScenarioState, TableMoment, TableStore } from "../../play/store/store";
 
 import { fingerprintOf, type SessionCache } from "./cache";
 import { committingStore, type ReplayedGame } from "./open-game";
@@ -16,6 +16,8 @@ import { createPlayClock, type PlayClock } from "./play-clock";
 export type Held = { id: string; active: ActiveScenario | null };
 
 export type GameStoreParts<H extends Held, O> = {
+  /** The Undo a result screen made just before the table opened (undo-landing.ts). */
+  landing?: Extract<TableMoment, { kind: "undone" }> | undefined;
   session: ReplayedGame;
   initial: H;
   cache: SessionCache<O>;
@@ -31,7 +33,7 @@ export type GameStoreParts<H extends Held, O> = {
 
 export type GameStore<H> = { store: TableStore; saved: () => H; clock: PlayClock };
 
-export function gameStore<H extends Held, O>({ session, initial, cache, reopened, writers, onLost, onLostUndone }: GameStoreParts<H, O>): GameStore<H> {
+export function gameStore<H extends Held, O>({ session, landing, initial, cache, reopened, writers, onLost, onLostUndone }: GameStoreParts<H, O>): GameStore<H> {
   let saved: H = initial;
   const base = createPlayClock();
   // How many intents the checkpoint this session last wrote counted, or null when it has written none (the row may still hold an earlier one).
@@ -53,10 +55,15 @@ export function gameStore<H extends Held, O>({ session, initial, cache, reopened
     const { game, roundSteps, history, destroyedHeroes } = store.getState();
     cache.follow(saved.id, () => ({ fingerprint: fingerprintOf(saved, CATALOG_VERSION), session: reopened(saved, { game, roundSteps, history, destroyedHeroes }) }));
   };
+  // The move that ends the game is stamped with its time and outcome, written with it: the run of a game left later is dated to this move, and History says how it ended (replay.ts, ActiveScenario.ended).
+  const ended = (held: H, game: ScenarioState): H => {
+    const over = game.lost || isWon(game);
+    return over && held.active ? { ...held, active: { ...held.active, ended: { at: Date.now(), outcome: game.lost ? ("lost" as const) : ("won" as const) } } } : held;
+  };
   const store = committingStore(
     session,
     (intent, game) => {
-      saved = fold(record(saved, intent, game));
+      saved = ended(fold(record(saved, intent, game)), game);
       writers.active(saved);
       if (atPhaseBoundary(game) && !game.lost && !isWon(game)) checkpoint(game);
       if (game.lost) onLost?.(saved, game);
@@ -70,6 +77,7 @@ export function gameStore<H extends Held, O>({ session, initial, cache, reopened
       if (saved.active && checkpointed != null && checkpointed > saved.active.intents.length) checkpointed = null;
       follow();
     },
+    landing,
   );
   // A pause (the table left, the app in the background) writes the time since the last write, once, and the checkpoint when the game moved since it; a game that is over, won or lost, writes nothing
   // (its last intent folded the time already, and a pause must never write a finished scenario back).
