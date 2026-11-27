@@ -1,7 +1,7 @@
 // The web app's test controls (src/ui/web/render-scale.ts): which drawing scale and whether the frame meter, from the address and the stored choice.
 import { describe, expect, it } from "vitest";
 
-import { chosenScale, errorLine, logText, meterChosen, meterLine, secondLine, secondOf, summaryLine, type Second } from "./render-scale.ts";
+import { blendsOff, chosenScale, errorLine, logText, meterChosen, meterLine, picturesHidden, picturesLine, secondLine, secondOf, summaryLine, type Second } from "./render-scale.ts";
 
 describe("the web app's drawing scale", () => {
   it("takes the address's scale before the stored one", () => {
@@ -60,5 +60,27 @@ describe("the web app's drawing scale", () => {
       " 2  24 fps  worst 90 ms  late 610  raf 30/24  tap 0/1  shader 400/3",
       " 3  48 fps  worst 40 ms  late 200",
     ]);
+  });
+});
+
+describe("the pictures control", () => {
+  it("leaves the pictures out for pics=0, and keeps the stored choice when the address has none", () => {
+    expect(picturesHidden("?pics=0", null)).toBe(true);
+    expect(picturesHidden("?pics=1", "1")).toBe(false);
+    expect(picturesHidden("", "1")).toBe(true);
+    expect(picturesHidden("", null)).toBe(false);
+  });
+  it("counts the loaded pictures and their megapixels", () => {
+    expect(picturesLine([{ naturalWidth: 879, naturalHeight: 1200 }, { naturalWidth: 1542, naturalHeight: 473 }, { naturalWidth: 0, naturalHeight: 0 }])).toBe("pics 2 2 MP");
+    expect(picturesLine([])).toBe("pics 0 0 MP");
+  });
+});
+
+describe("the blends control", () => {
+  it("turns the blends off for blend=0, and keeps the stored choice when the address has none", () => {
+    expect(blendsOff("?blend=0", null)).toBe(true);
+    expect(blendsOff("?blend=1", "1")).toBe(false);
+    expect(blendsOff("", "1")).toBe(true);
+    expect(blendsOff("", null)).toBe(false);
   });
 });

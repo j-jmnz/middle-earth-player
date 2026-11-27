@@ -1,11 +1,14 @@
-// The web app's drawing scale and frame meter (docs/plans/pwa-iphone-ipad.md, Risks only a device can answer): two test controls a player turns on from the address,
+// The web app's drawing scale and frame meter (docs/plans/pwa-iphone-ipad.md, Risks only a device can answer): test controls a player turns on from the address,
 // so a device says what a headless browser cannot. `?scale=1` (or 1.5) makes the table's canvases draw at that many pixels for each CSS pixel in place of the device's
-// (an iPad's 2 is four times the pixels of 1), `?fps=1` shows the frame rate, a log of the last minute (a tap on the meter stops it and copies the log) and the first error the page reports, with where it was thrown, and sends the log to the site (`/_meter`, webapp/meter.ts) when the site keeps one; `?scale=0` and `?fps=0` turn each off. Both are kept in localStorage, since they are read
+// (an iPad's 2 is four times the pixels of 1), `?fps=1` shows the frame rate, a log of the last minute (a tap on the meter stops it and copies the log) and the first error the page reports, with where it was thrown, and sends the log to the site (`/_meter`, webapp/meter.ts) when the site keeps one; `?scale=0` and `?fps=0` turn each off, and `?pics=0` leaves out every picture element of the screens (`?pics=1` brings them back), so a run says what the pictures cost, and `?blend=0` turns off every blend of the screens (`?blend=1` brings them back); the log's head counts the loaded ones and their megapixels. All are kept in localStorage, since they are read
 // before any database opens. Skia's web views read window.devicePixelRatio when they are made, so the scale is set before CanvasKit loads (skia-web-load.ts).
 import { described, onSpan, type SpanName } from "./meter-span.ts";
+import { startSlowProbe } from "./slow-probe.ts";
 
 const SCALE_KEY = "middle-earth-player.render-scale";
 const FPS_KEY = "middle-earth-player.frame-meter";
+const PICS_KEY = "middle-earth-player.no-pictures";
+const BLEND_KEY = "middle-earth-player.no-blend";
 
 /**
  * The scale to draw at: the address's `scale` when it has one, else the stored one; null for the device's own. A scale under 1, at or over the device's,
@@ -21,6 +24,30 @@ export function chosenScale(search: string, stored: string | null, device: numbe
 export function meterChosen(search: string, stored: string | null): boolean {
   const asked = new URLSearchParams(search).get("fps");
   return (asked ?? stored ?? "0") !== "0";
+}
+
+/** Whether the screens' pictures are left out: the address's `pics` when it has one (`0` leaves them out), else the stored choice. */
+export function picturesHidden(search: string, stored: string | null): boolean {
+  const asked = new URLSearchParams(search).get("pics");
+  return asked === null ? stored === "1" : asked === "0";
+}
+
+/** Whether the screens' blends are off: the address's `blend` when it has one (`0` turns them off), else the stored choice. */
+export function blendsOff(search: string, stored: string | null): boolean {
+  const asked = new URLSearchParams(search).get("blend");
+  return asked === null ? stored === "1" : asked === "0";
+}
+
+/** The pictures the page holds, for the log's head: how many image elements have loaded, and the megapixels the browser decodes to draw them all. */
+export function picturesLine(images: Iterable<{ naturalWidth: number; naturalHeight: number }>): string {
+  let count = 0;
+  let pixels = 0;
+  for (const image of images) {
+    if (image.naturalWidth === 0) continue;
+    count += 1;
+    pixels += image.naturalWidth * image.naturalHeight;
+  }
+  return `pics ${count} ${Math.round(pixels / 1e6)} MP`;
 }
 
 function read(key: string): string | null {
@@ -303,7 +330,7 @@ function sender(): (log: readonly Second[], fault: string) => void {
     if (!sending || log.length === 0) return;
     part += 1;
     const build = (window as { __early?: { build?: string } }).__early?.build ?? "no early script";
-    const head = `session ${session} part ${part}  ${new Date().toISOString()}  ${window.location.pathname}  ${window.innerWidth}x${window.innerHeight}  saves ${(savedBytes / 1048576).toFixed(1)} MB\n${navigator.userAgent}\nbuild ${build}`;
+    const head = `session ${session} part ${part}  ${new Date().toISOString()}  ${window.location.pathname}  ${window.innerWidth}x${window.innerHeight}  saves ${(savedBytes / 1048576).toFixed(1)} MB  ${picturesLine(document.images)}\n${navigator.userAgent}\nbuild ${build}`;
     const body = [head, logText(log, window.devicePixelRatio), fault].filter((text) => text !== "").join("\n");
     void fetch("/_meter", { method: "POST", body, headers: { "content-type": "text/plain" }, keepalive: true }).then(
       (response) => {
@@ -398,7 +425,7 @@ let applied = false;
 // Whether the meter shows, once the controls are applied.
 let metering = false;
 
-/** Reads the two controls from the address and storage and applies them, once. Only the web app's build calls it. */
+/** Reads the controls from the address and storage and applies them, once. Only the web app's build calls it. */
 export function applyRenderControls(): void {
   if (applied || typeof window === "undefined") return;
   applied = true;
@@ -411,4 +438,15 @@ export function applyRenderControls(): void {
   if (params.has("fps")) write(FPS_KEY, meter ? "1" : null);
   metering = meter;
   if (meter) startMeter();
+  // The slow-state probe (slow-probe.ts) runs with the meter, for this page only: it is not stored, since it makes the screen flicker.
+  if (meter && params.get("probe") === "1") startSlowProbe();
+  // No picture element is drawn or decoded (the table's canvases load theirs another way): a device run with and without them says what the pictures cost.
+  const noPictures = picturesHidden(search, read(PICS_KEY));
+  if (params.has("pics")) write(PICS_KEY, noPictures ? "1" : null);
+  if (noPictures) document.head.appendChild(document.createElement("style")).textContent = "img{display:none!important}";
+  // No element blends with what is under it (the backdrop's grit, wash and light, the hero art's veil): the slow-state probe (slow-probe.ts) found the page fast
+  // on Safari's engine while the blends were off, and a whole run without them confirms or clears them.
+  const noBlend = blendsOff(search, read(BLEND_KEY));
+  if (params.has("blend")) write(BLEND_KEY, noBlend ? "1" : null);
+  if (noBlend) document.head.appendChild(document.createElement("style")).textContent = "*{mix-blend-mode:normal!important}";
 }
