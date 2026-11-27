@@ -19,7 +19,6 @@ export const phaseNameSchema = z.enum([
   "End of round",
 ]);
 
-
 // The conditions that hold no other condition. `not`, `all` and `any` (below) combine these, one level deep.
 const atomSchema = z.discriminatedUnion("kind", [
   // The actor failed a Hide test in the current phase or round.
@@ -309,8 +308,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("combatStep"), is: z.enum(["beforeEnemyAttacks", "beforeAttacksResolve", "afterEnemyAttacks"]) }),
   // The source is attached to the active location ("While attached location is the active location").
   z.strictObject({ kind: z.literal("hostActive") }),
-  // The source enemy was dealt a shadow card and one of them has no shadow effect ("If Wargs is dealt a shadow card with no effect",
-  // 01085:A:1). A card that was dealt none is not blank.
+  // The source enemy was dealt a shadow card and one of them has no shadow effect ("If Wargs is dealt a shadow card with no effect", 01085:A:1). A card that was dealt none is not blank.
   z.strictObject({ kind: z.literal("shadowBlank") }),
   // The attack in progress was dealt a facedown shadow card with a shadow effect that has not resolved or been canceled: an Action taken after the defender is declared can still cancel it ("cancel a shadow effect dealt to the attacking enemy", 12060:A:2).
   z.strictObject({ kind: z.literal("shadowPending") }),

@@ -2,8 +2,7 @@
 // rr.optional-engagement, rr.step-6-2 (data/rules/entries.json). The combat sheets are in combat-sheets.ts.
 //
 // What the choice sheet over the rail asks, for the window the engine has open. Every option is an intent legalIntents and
-// legalTargets list, or a number the engine computed (the Hide numbers, an attack and a defense). Nothing here writes a
-// number: a sheet names who does something, the reducer decides what happens.
+// legalTargets list, or a number the engine computed (the Hide numbers, an attack and a defense). Nothing here writes a number: a sheet names who does something, the reducer decides what happens.
 import type { Effect } from "../../catalog/boundary.ts";
 import { allHeroesDestroyed, defeatSentence } from "../../rules/core/elimination-words.ts";
 import { comparisonLossNote } from "../readouts/against-the-shadow/amon-din.ts";

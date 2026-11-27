@@ -133,8 +133,8 @@ describe("The Defeat note", () => {
     const names = { card: (id: string) => id, line: () => null };
     const without = sheetFor(lost, t.ctx, [], names);
     const kept = sheetFor(lost, t.ctx, [], names, new Set(heroes));
-    expect(without).toMatchObject({ kind: "outcome", note: "No seats remain." });
-    expect(kept).toMatchObject({ kind: "outcome", note: "No seats remain. Player 1's last hero was destroyed." });
+    expect(without).toMatchObject({ kind: "outcome", note: "Every player is eliminated." });
+    expect(kept).toMatchObject({ kind: "outcome", note: "Every player is eliminated. Player 1's last hero was destroyed." });
   });
 });
 
