@@ -6,7 +6,7 @@ import { EFFECTS } from "../../../effects/index.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { addModifier } from "../../../rules/core/modified-stat.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
-import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { expireModifiers, flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { attachTo, moveCard } from "../../../rules/core/zones.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { guardWith } from "../../../rules/families/objectives/guard.ts";
@@ -250,5 +250,29 @@ describe("17096:A:2 Travel: the first player searches, whoever travels", () => {
       return state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "";
     }, true, 1);
     expect(askedOf).toEqual([0]);
+  });
+});
+
+describe("17091:A:3 17092:A:3 the Action's change lasts until the end of the phase", () => {
+  const used = (made: ReturnType<typeof table>, code: string) => {
+    const state = opened(made, held(made.state, code, made.hero)).state;
+    const [intent] = triggersOf(state, made.ctx, code);
+    return finish(send(opened(made, state), { ...intent!, payments: [] } as never, made.ctx), made.ctx).state;
+  };
+
+  it("17091:A:3 the -1 Attack ends at the end of the phase", () => {
+    const made = table({ staging: [BANNER], engaged: [GUARD] });
+    const state = used(made, BANNER);
+    const attack = (current: ScenarioState) => modifiedStat(current, current.cards[idOf(current, GUARD)]!, "attack", made.ctx.cards);
+    expect(attack(state)).toBe(2);
+    expect(attack(expireModifiers(state, ["endOfPhase"]))).toBe(3);
+  });
+
+  it("17092:A:3 the -2 Threat ends at the end of the phase", () => {
+    const made = table({ staging: [GARB, GUARD] });
+    const state = used(made, GARB);
+    const threat = (current: ScenarioState) => modifiedStat(current, current.cards[idOf(current, GUARD)]!, "threat", made.ctx.cards);
+    expect(threat(state)).toBe(0);
+    expect(threat(expireModifiers(state, ["endOfPhase"]))).toBe(2);
   });
 });
