@@ -2,12 +2,12 @@
 // elimination as the table did: the heroes destroyed are told from the whole intent log (screens/session/open-game.ts, replayForTable).
 import { describe, expect, it } from "vitest";
 
-import { CATALOG_VERSION } from "../catalog/version.ts";
-import { worldFor } from "../../test/harness/fixture-world.ts";
-import { keepIntent, type Kept } from "../play/store/store.ts";
-import { fixtureSave } from "./fixtures.ts";
-import { lossReasonOf } from "./report.ts";
-import { contextOf, resume } from "./session.ts";
+import { CATALOG_VERSION } from "../../catalog/version.ts";
+import { worldFor } from "../../../test/harness/fixture-world.ts";
+import { keepIntent, type Kept } from "../../play/store/store.ts";
+import { fixtureSave } from "../../campaign/fixtures.ts";
+import { lossReasonOf } from "../../campaign/report.ts";
+import { contextOf, resume } from "../../campaign/session.ts";
 
 describe("a reopened lost game", () => {
   it("lair-lost: the reopened game names the heroes destroyed over all its intents", () => {
