@@ -8,6 +8,8 @@ import { useStore } from "zustand";
 
 import type { ScenarioState } from "../../rules/core/state.ts";
 
+import type { Clash } from "../store/clash.ts";
+
 import { tickImpact } from "../../ui/haptics.ts";
 import { playStrike } from "./strike-play.ts";
 import { strikeSounds } from "./strike-sounds.ts";
@@ -42,6 +44,16 @@ export function useSpotlightScale(): number {
 export function useSpotlightHold(store: TableStore): boolean {
   const gate = useStore(store, (state) => state.spotlight);
   return spotlightHolds(gate, useSpotlightScale(), CANVAS);
+}
+
+const NO_CLASHES: readonly Clash[] = [];
+
+/** The attacks the spotlight plays, or played, for the moment `seq`: none when it is another moment's gate, or when no spotlight is drawn (reduced motion, the setting off). The last-move line leaves these attacks to the spotlight. */
+export function useSpotlitClashes(store: TableStore, seq: number): readonly Clash[] {
+  const gate = useStore(store, (state) => state.spotlight);
+  const scale = useSpotlightScale();
+  const drawn = CANVAS && scale > 0;
+  return drawn && gate.seq === seq ? gate.clashes : NO_CLASHES;
 }
 
 /** Whether the skip catcher over the top bar and the dock takes touches: while the spotlight is held at all. */

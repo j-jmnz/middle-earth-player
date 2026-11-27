@@ -1,4 +1,4 @@
-// What a screen reader hears of the outcome banner (docs/design-system-table.md, Banner). The banner's label reads as one sentence; under a
+// What a screen reader hears of the last move (docs/design-system-table.md, Last move): its full telling, which the code calls the banner. Its label reads as one sentence; under a
 // phone reader, which never sees the combat spotlight, the same words are announced as the banner's title and then each line on its own, in
 // the order the engine resolved them (who attacks whom, the shadow and its effect, the damage, a destroyed card), so the announcer's queue
 // (src/ui/announce.ts) gives each its time and a long attack is not cut off. Pure.

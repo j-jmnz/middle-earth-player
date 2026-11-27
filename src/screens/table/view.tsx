@@ -23,7 +23,6 @@ import { effectById, type ReduceContext, type TableStore } from "../../play/stor
 import { createHandoff } from "../../play/spotlight/handoff";
 import { PicturedCanvas, PicturedSpotlight } from "./pictured";
 import type { TableCanvasProps } from "../../play/canvas/table-canvas-types";
-import { MomentBanner } from "../../play/readouts/moment-banner";
 import { TableDock } from "../../play/choice/dock/table-dock";
 import { TableLayers } from "../../play/chrome/table-layers";
 import { openReading, type Reading } from "../../play/chrome/reading";
@@ -40,7 +39,6 @@ import { advanceButton, advanceFace, advanceWords } from "../../play/readouts/qu
 import { QuestAdvanceView } from "../../play/readouts/quest-advance-view";
 import { seatDialLimit } from "../../play/readouts/threat-level";
 import { useQuestAdvance } from "../../play/readouts/use-quest-advance";
-import { PEEK_ROOM } from "../../play/readouts/peek-banner";
 import { usePeek } from "../../play/store/use-peek";
 import { AreaSummary } from "../../play/canvas/area-summary";
 import { useTableChoice } from "../../play/choice/use-table-choice";
@@ -62,7 +60,7 @@ import { ruleTip, scenarioRuleDoc } from "../rules/glossary";
 import { notApplied } from "../../play/cards/not-applied";
 import { BodyText, NavBar, Screen } from "../kit/chrome";
 import { useTableBack } from "./use-table-back";
-import { TableTopBar, TOP_BAR } from "./top-bar";
+import { TableTopBar } from "./top-bar";
 import { useTableLayout } from "./use-table-layout";
 import { goBack } from "../nav/go-back";
 import { useTablePictures } from "./use-table-pictures";
@@ -111,7 +109,7 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
   const threatOf = useMemo(() => threatSelector(), []);
   const threats = useStore(store, (state) => threatOf(state.game));
   const peek = usePeek(store);
-  // The banner's beat rings cards on the canvas, which reads it from here (beat-store.ts).
+  // The last move's line rings the cards it names on the canvas, which reads them from here (beat-store.ts).
   const [beats] = useState(createBeats);
   const ctx = session.ctx;
 
@@ -237,8 +235,6 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
       overlay: choice.closeOverlay,
       panel: choice.fold,
     },
-    banner: choice.banner != null,
-    dismissBanner: choice.dismissBanner,
     undo: choice.undo,
     leave: () => goBack(router, nav.back),
   });
@@ -268,7 +264,7 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
   const nightmareId = useMemo(() => nightmareCardId(game), [game]);
   const questNumbers = choice.readout?.kind === "quest" && choice.readout.stats.length > 0;
   // The plan of the command column's room, the reach of the top rows and the spotlight's screen (use-table-layout.ts).
-  const { commandWidth, footPad, peekRoom, reach, room, meterShown, barTop, barBottom, stageArea, narrow, columnClear } = useTableLayout({
+  const { commandWidth, footPad, peekRoom, reach, room, bare, meterShown, barTop, barBottom, stageArea, narrow, columnClear } = useTableLayout({
     screen, insets, s, canvasX: size?.x ?? 0, columnHeight, dockHeight, numbersRow, dockHasNumbers, feet, peekWords: peek.words != null, separate: game.separate === true, questNumbers, scaleLive: scale.live,
   });
   // How a card code is shown large, by picture key (src/play/canvas/picture-key.ts): the preview's cards and the advanced stage.
@@ -383,7 +379,7 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
           {/* The command column lies over the canvas's right edge, its empty top passing taps to the canvas. It stands on a fade to the night at its foot and right edge, clear (0 alpha) at its left edge and at its top so no straight edge shows (one radial gradient of the column's own width and height from the bottom-right corner), drawn under the canvas (above) so a row that runs on under the column stays clear; the dock has no panel of its own. */}
           <View testID="command" pointerEvents="box-none" className="justify-between px-2" onLayout={(event) => setColumnHeight(Math.round(event.nativeEvent.layout.height))} style={{ position: "absolute", top: 0, right: 0, bottom: 0, width: commandWidth, paddingBottom: footPad }}>
             {/* Above the dock, from the column's top to the dock's top; it never pushes the dock (command-head.ts). */}
-            <CommandHead scale={scale} room={room} bottom={footPad + dockHeight + HEAD_GAP * s} onMeter={() => setReading({ kind: "stagingThreat" })} />
+            <CommandHead scale={scale} room={room} bare={bare} bottom={footPad + dockHeight + HEAD_GAP * s} move={choice.move} moveKey={choice.moveKey} onMeter={() => setReading({ kind: "stagingThreat" })} onMove={() => setReading({ kind: "log" })} />
             <TableDock
               step={choice.header.step}
               lead={choice.header.lead}
@@ -438,20 +434,8 @@ export function TableView({ session, store, clock, nav, intents }: { session: Op
         }}
       />
       {/* The combat spotlight: a full-screen canvas over the table, the bar and the dock, mounted only while it plays and deaf to touches
-          (the table canvas and the scrim in TableLayers catch the skip). The banner, the preview and the menu stay above it. */}
+          (the table canvas and the scrim in TableLayers catch the skip). The preview and the menu stay above it. */}
       <PicturedSpotlight handoff={handoff} picture={pictureOf} nameOf={nameOf} sphereOf={sphereOf} />
-      {/* Over the table and any open panel, centered, 4 pt under the top bar so the phase rail stays in view (user instruction, 2026-11-27, issue #305), and narrowed so it never covers the command column's tray (banner-span.ts). While the table peeks it hangs under the peek pill, so Back to Player 1 stays in reach. */}
-      {choice.banner ? (
-        <MomentBanner
-          key={choice.bannerKey}
-          moment={choice.banner}
-          top={barTop + (peek.words ? TOP_BAR + PEEK_ROOM : TOP_BAR + 4) * s}
-          leftClear={insets.left}
-          rightClear={insets.right + commandWidth}
-          onBeat={choice.onBeat}
-          onDismiss={choice.dismissBanner}
-        />
-      ) : null}
       {advance.shown && advancedCard ? (
         <QuestAdvanceView
           key={advance.shown.seq}

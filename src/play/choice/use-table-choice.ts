@@ -1,7 +1,6 @@
 // The table's gesture-to-intent state (docs/architecture.md, Modules: src/play owns it): the open sheet (the window's own, or
 // one the player opened from the table: a payment, a host, an Action), what is picked for it, whether it is answered on the
-// table or on a paper panel, the dock's buttons, the engine's numbers beside them, and the outcome banner of the last
-// intent. Taps, drops and tiles pick; only a dock button sends an intent, through the store (table-choice.ts).
+// table or on a paper panel, the dock's buttons, the engine's numbers beside them, and the last move's line. Taps, drops and tiles pick; only a dock button sends an intent, through the store (table-choice.ts).
 import { useCallback, useMemo, useState } from "react";
 import { useStore } from "zustand";
 
@@ -13,7 +12,7 @@ import { playSound, playUndo } from "../../ui/sound/sound.ts";
 import { pointTitle } from "../phases/rail.ts";
 import { questStatNow } from "../phases/quest-stat.ts";
 import { isFreeResponse, nextStopTitle, passableWindow } from "../phases/stops.ts";
-import { useAutoAnswer, useBanner, useGuide, useSettle } from "./table-hooks.ts";
+import { useAutoAnswer, useLastMove, useGuide, useSettle } from "./table-hooks.ts";
 import { tableSettings, toggleAlways } from "../../ui/table-settings.ts";
 import type { Moment } from "../store/outcome.ts";
 import { readoutFor, type Readout } from "../readouts/readout.ts";
@@ -67,13 +66,9 @@ export type TableChoice = {
   extras: readonly DockExtra[];
   // Changes with the moment and the pick, so an armed button goes back to unarmed.
   resetKey: string;
-  banner: Moment | null;
-  // The moment's number and whether the banner shows it or the round summary: a new one enters the banner afresh.
-  bannerKey: string;
-  // The banner reached a line: the cards it names are ringed on the table.
-  onBeat: (cards: readonly string[]) => void;
-  // The player swiped the banner away.
-  dismissBanner: () => void;
+  move: Moment | null;
+  // The moment's number: a new one enters the line afresh.
+  moveKey: string;
   // The first-game guide's line for this moment, and turning the guide off.
   guide: string | null;
   // A screen reader's focus stays where it is when the moment changes: it is on a card the new moment still asks about (use-reader-choice.ts).
@@ -107,7 +102,7 @@ export function useTableChoice({
   store: TableStore;
   ctx: ReduceContext;
   names: SheetNames;
-  // Where the banner rings the cards its current line names (beat-store.ts); only the canvas reads them.
+  // Where the last move's line rings the cards it names (beat-store.ts); only the canvas reads them.
   beats: BeatStore;
   // A tap on a card the moment does not ask about shows it large; `extra` are cards to list with it (the Look window's).
   onPreview: (cardId: string, extra?: readonly string[]) => void;
@@ -142,8 +137,8 @@ export function useTableChoice({
   const guideOn = useStore(tableSettings, (state) => state.settings.guide);
   const guideSeen = useStore(tableSettings, (state) => state.settings.guideSeen);
   const settings = useMemo(() => ({ stopsOn, stops, alwaysUse, guide: guideOn, guideSeen }), [stopsOn, stops, alwaysUse, guideOn, guideSeen]);
-  // The outcome banner of the last moment worth showing, and the round's summary after it (table-hooks.ts).
-  const { banner, bannerKey, onBeat, dismiss: dismissBanner } = useBanner(store, ctx, names, beats);
+  // The last move's line, lean: what the table does not show of the last moment worth one (table-hooks.ts).
+  const { move, moveKey, close: closeMove } = useLastMove(store, ctx, names, beats);
 
   const base = useMemo(() => sheetFor(game, ctx, legal, names, destroyed) ?? windowSheet(game, ctx, legal, names), [game, ctx, legal, names, destroyed]);
   const live = overlay && overlay.game === game ? overlay : null;
@@ -214,7 +209,10 @@ export function useTableChoice({
     (intent: PlayerIntent, confirm = false) => {
       // The Sent tick plays the moment the reducer accepts the intent, before the next state is built and the save written; a refused intent
       // gets the Refused tick, never both. The moments the table answers after it are answered in the same tap (table-hooks.ts, follow).
+      const told = store.getState().shown?.seq ?? 0;
       if (store.getState().dispatch(intent, tickSent)) {
+        // The player's own send ends the last move's line; the moment this send makes brings its own.
+        closeMove(told);
         if (confirm) playSound("ui.confirm");
         reset();
         // An accepted send keeps the card the reader last activated, so focus can stay on it in the next moment.
@@ -225,7 +223,7 @@ export function useTableChoice({
         if (readerMode) announce(store.getState().refusal ?? "");
       }
     },
-    [store, reset, follow, readerMode, resetReader],
+    [store, reset, follow, readerMode, resetReader, closeMove],
   );
 
   // A pick being made is put back first; otherwise the last intent is taken back.
@@ -416,10 +414,8 @@ export function useTableChoice({
     overlayOpen: live != null,
     extras,
     resetKey,
-    banner,
-    bannerKey,
-    onBeat,
-    dismissBanner,
+    move,
+    moveKey,
     guide,
     stayFocus: stayFocus,
     undo: undoButton,

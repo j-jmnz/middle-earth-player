@@ -2,7 +2,7 @@
 // so the two say the same thing (user request, 2026-10-28). Pure, so a test reads them.
 import { Platform } from "react-native";
 
-import type { BannerClosesOption, CardQualityOption, ConfirmTimeOption, ReduceMotionOption, StrongOutlinesOption, TableListOption, ThemeOption, TitleFaceOption, UiScaleOption } from "../../ui/table-settings.ts";
+import type { CardQualityOption, ConfirmTimeOption, ReduceMotionOption, StrongOutlinesOption, TableListOption, ThemeOption, TitleFaceOption, UiScaleOption } from "../../ui/table-settings.ts";
 import type { Speed } from "../../ui/motion-tokens.ts";
 
 // The themes go by Middle-earth names: Ringwraith is the dark theme, Rivendell the light. A screen reader hears which is which (THEME_LABELS).
@@ -10,7 +10,6 @@ export const THEME_WORDS: Readonly<Record<ThemeOption, string>> = { dark: "Ringw
 export const THEME_LABELS: Readonly<Record<ThemeOption, string>> = { dark: "Ringwraith, dark", light: "Rivendell, light", system: "System" };
 export const REDUCE_MOTION_WORDS: Readonly<Record<ReduceMotionOption, string>> = { system: "Follow system", always: "Always" };
 export const SPEED_WORDS: Readonly<Record<Speed, string>> = { normal: "Normal", quick: "Quick", slow: "Slow" };
-export const BANNER_CLOSES_WORDS: Readonly<Record<BannerClosesOption, string>> = { timer: "After a few seconds", tap: "When tapped" };
 export const SCALE_WORDS: Readonly<Record<UiScaleOption, string>> = { small: "Small", medium: "Medium", large: "Large", xlarge: "Extra large" };
 export const TABLE_LIST_WORDS: Readonly<Record<TableListOption, string>> = { system: "Follow screen reader", always: "Always" };
 export const CONFIRM_TIME_WORDS: Readonly<Record<ConfirmTimeOption, string>> = { standard: "Standard", long: "Long", none: "No limit" };
@@ -36,7 +35,6 @@ export const FOG_LINE = "Animated fog behind every screen. Off saves battery.";
 export const FOG_LIGHT_LINE = "Animated fog behind the table. Off saves battery.";
 export const FOG_REDUCED_LINE = "No effect: Reduce motion already stops the fog.";
 export const SPEED_LINE = "Quick shortens animations and skips the phase title. Slow makes animations and the banner's pauses one and a half times as long.";
-export const BANNER_CLOSES_LINE = "After a few seconds closes the banner on its own. When tapped keeps it until you tap or swipe it, or the next one replaces it.";
 export const REDUCE_MOTION_LINE = "Always turns off most animation, the fog and the combat replay, which lowers the load on the device. Follow system uses the device's setting.";
 export const SPOTLIGHT_LINE = "A replay of each attack that deals or blocks damage. Tap to skip.";
 export const HAPTICS_LINE = "Vibration at key moments.";
