@@ -459,7 +459,7 @@ export function assignArchery(
   return { ...next, window: null };
 }
 
-// Whether archery damage may go on this character now: it is a recipient and its damage is short of its hit points (a lethal wound a Response may still cancel leaves it in play).
+// Whether archery damage may go on this character now (a seat's own archery window, or the one window of all seats): it is a recipient and its damage is short of its hit points (a lethal wound a Response may still cancel leaves it in play).
 function canTakeArchery(state: ScenarioState, cards: Cards, id: string, seat: number | undefined): boolean {
   const instance = state.cards[id];
   if (!instance || !archeryRecipients(state, cards, seat).includes(id)) return false;
