@@ -14,7 +14,7 @@ import { effectsOf } from "../../../rules/windows/listen.ts";
 import { topFrame } from "../../../rules/windows/windows.ts";
 
 import type { ChoiceNames, PickWords } from "../choice.ts";
-import { plural } from "../list.ts";
+import { listAnd, plural } from "../list.ts";
 import { seatSays } from "../seat.ts";
 
 type Choose = Extract<Instruction, { verb: "Choose" }>;
@@ -22,7 +22,6 @@ type Facts = { game: ScenarioState; ctx: ReduceContext; options: readonly string
 type Kind = "discoverValue" | "searching" | "shadowStalker";
 
 const THREAT_ELIMINATION = 50;
-const list = (items: readonly string[]): string => (items.length <= 2 ? items.join(" and ") : `${items.slice(0, -1).join(", ")} and ${items.at(-1)}`);
 
 // Which of the scenario's Choose windows this is, from the instructions of its options; null for another Choose.
 function kindOf(choose: Choose): Kind | null {
@@ -109,9 +108,9 @@ export function framsburgAsk(instruction: Instruction, source: string | null, na
     const engaged = facts.options.map((option) => {
       const seat = Number(option.replace("seat:", ""));
       const uniques = Number.isInteger(seat) ? uniquesOf(facts.game, facts.ctx, names, seat) : [];
-      return uniques.length > 0 ? `${facts.game.seatCount > 1 ? `Player ${seat + 1}` : "you"} with ${list(uniques)}` : null;
+      return uniques.length > 0 ? `${facts.game.seatCount > 1 ? `Player ${seat + 1}` : "you"} with ${listAnd(uniques)}` : null;
     }).filter((part): part is string => part != null);
-    return group("Choose", `${card}: choose a player engaged with a unique enemy${engaged.length > 0 ? ` (${list(engaged)})` : ""}. ${card} makes an immediate attack against that player from the staging area.`);
+    return group("Choose", `${card}: choose a player engaged with a unique enemy${engaged.length > 0 ? ` (${listAnd(engaged)})` : ""}. ${card} makes an immediate attack against that player from the staging area.`);
   }
   // A When Revealed effect that has each player in turn exhaust a ready character they control (19108:A:2); a cost or an effect of any other card keeps its own words.
   const eachExhausts = facts != null && source != null && effectsOf(facts.ctx, facts.game.cards[source]?.code ?? "").some((effect) => effect.timing === "whenRevealed" && effect.instructions.some((step) => step.verb === "ForEachPlayer" && step.instructions.some((inner) => inner.verb === "Pick" && JSON.stringify(inner.pick) === JSON.stringify(pick))));
@@ -143,7 +142,7 @@ export function framsburgChooseNote(choose: Choose, game: ScenarioState, ctx: Re
   if (kind === "searching") {
     const raise = raiseOf(choose, "threat");
     const threats = livingSeats(game).map((index) => (game.seatCount > 1 ? `Player ${index + 1} ${game.seats[index]?.threat ?? 0}` : `${game.seats[index]?.threat ?? 0}`));
-    return `${card}: raise each player's threat by ${raise} (now ${list(threats)})? Or discard cards from the encounter deck until a location is discarded, and add it to the staging area?`;
+    return `${card}: raise each player's threat by ${raise} (now ${listAnd(threats)})? Or discard cards from the encounter deck until a location is discarded, and add it to the staging area?`;
   }
   const raise = raiseOf(choose, "threat");
   const attacker = game.pendingAttack?.enemyId;
@@ -177,7 +176,7 @@ export function framsburgBranchWords(choose: Choose, optionId: string, rows?: Re
 function lossCaution(game: ScenarioState, reached: readonly number[]): string | null {
   if (reached.length === 0) return null;
   if (reached.length === livingSeats(game).length) return `Tap again: ${game.seatCount > 1 ? "every player reaches" : "you reach"} ${THREAT_ELIMINATION} threat and the game is lost`;
-  return `Tap again: ${list(reached.map((index) => `Player ${index + 1}`))} ${reached.length === 1 ? "reaches" : "reach"} ${THREAT_ELIMINATION} threat and ${reached.length === 1 ? "is" : "are"} eliminated`;
+  return `Tap again: ${listAnd(reached.map((index) => `Player ${index + 1}`))} ${reached.length === 1 ? "reaches" : "reach"} ${THREAT_ELIMINATION} threat and ${reached.length === 1 ? "is" : "are"} eliminated`;
 }
 
 /** The caution of the branch that raises threat: armed when it eliminates a player. Null for another branch. */
@@ -236,7 +235,7 @@ export function framsburgActionNote(game: ScenarioState, ctx: ReduceContext, eff
     const pile = game.encounterDiscard.length;
     const out = eliminated(game, livingSeats(game), amount);
     const solo = game.seatCount === 1;
-    const warning = out.length === 0 ? "" : out.length === livingSeats(game).length ? ` ${solo ? "Your threat would reach 50 and the game would be lost." : "Every player would reach 50 threat and the game would be lost."}` : ` ${list(out.map((seat) => `Player ${seat + 1}`))} would reach 50 threat and be eliminated.`;
+    const warning = out.length === 0 ? "" : out.length === livingSeats(game).length ? ` ${solo ? "Your threat would reach 50 and the game would be lost." : "Every player would reach 50 threat and the game would be lost."}` : ` ${listAnd(out.map((seat) => `Player ${seat + 1}`))} would reach 50 threat and be eliminated.`;
     return `Each player raises their threat by ${amount}, then the encounter discard pile (${plural(pile, "card")}) is shuffled into the encounter deck. Any player may use it.${warning}`;
   }
   const lowers = effect.instructions.some((step) => step.verb === "LowerThreat");
@@ -250,7 +249,7 @@ export function framsburgActionNote(game: ScenarioState, ctx: ReduceContext, eff
   const picks = effect.instructions.some((step) => step.verb === "LowerThreat" && step.who === "picked") && livingSeats(game).length > 1;
   if (picks) {
     const rooms = livingSeats(game).map((index) => `Player ${index + 1} has ${framsburgThreatCap(game, index, names)?.left ?? 0} left`);
-    return say(`${own.holder} is in the staging area. Player card effects reduce a player's threat by ${own.cap} at most each round. ${list(rooms)} this round.`);
+    return say(`${own.holder} is in the staging area. Player card effects reduce a player's threat by ${own.cap} at most each round. ${listAnd(rooms)} this round.`);
   }
   const room = own.left === 0 ? `Your ${own.cap} for this round is used, so ${source} reduces it by 0.` : `${own.left === own.cap ? "You have not lowered it yet this round" : `You have ${own.left} left this round`}, so ${source} reduces it by ${own.left} at most.`;
   return say(`${own.holder} is in the staging area. Player card effects reduce your threat by ${own.cap} at most each round. ${room}`);
@@ -261,8 +260,8 @@ export function framsburgEngageNote(game: ScenarioState, ctx: ReduceContext, nam
   const barred = game.staging.filter((id) => game.cards[id] && flagged(game, id, "optionalEngageUnique"));
   if (barred.length === 0) return null;
   const uniques = uniquesOf(game, ctx, names, seat);
-  const name = list([...new Set(barred.map((id) => names.card(id)))]);
+  const name = listAnd([...new Set(barred.map((id) => names.card(id)))]);
   const many = barred.length > 1;
   const rule = `${name} may be engaged only by a player engaged with a unique enemy`;
-  return uniques.length > 0 ? `${rule}. You are engaged with ${list(uniques)}, so you may choose ${many ? "them" : "it"}.` : `${rule}. You are not engaged with one, so you cannot choose ${many ? "them" : "it"} here.`;
+  return uniques.length > 0 ? `${rule}. You are engaged with ${listAnd(uniques)}, so you may choose ${many ? "them" : "it"}.` : `${rule}. You are not engaged with one, so you cannot choose ${many ? "them" : "it"} here.`;
 }

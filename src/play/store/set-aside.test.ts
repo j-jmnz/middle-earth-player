@@ -177,4 +177,13 @@ describe("the Set aside list of The Crossings of Poros", () => {
     expect(rows.every((row, at) => at === 0 || rows[at - 1]!.set < row.set || rows[at - 1]!.set === row.set)).toBe(true);
     expect(setAsideFromKey(setAsideKey(made.state, made.ctx)).rows.map((row) => row.set)).toEqual(rows.map((row) => row.set));
   });
+
+  it("says once, in the list and through its key, whether the rows are grouped by set (more than one set), so the panel reads it and does not decide it again", () => {
+    const several = tableFromLayout("the-crossings-of-poros", { stage: "17157", setAside: ["16040", "17153"] });
+    expect(setAsideList(several.state, several.ctx).grouped).toBe(true);
+    expect(setAsideFromKey(setAsideKey(several.state, several.ctx)).grouped).toBe(true);
+    const one = tableFromLayout("the-crossings-of-poros", { stage: "17157", setAside: ["16040", "16040"] });
+    expect(setAsideList(one.state, one.ctx).grouped).toBeUndefined();
+    expect(setAsideFromKey(setAsideKey(one.state, one.ctx)).grouped).toBeUndefined();
+  });
 });

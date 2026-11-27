@@ -1,5 +1,6 @@
 // Rules: hrd.multiple-encounter-sets, hrd.removed-from-the-game, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 17145:A:4, 17150:A:2, 17151:A:1, 17157:A:1, 17158:A:1, 17159:A:1, 17160:A:1 to 17162:A:1 (docs/scenarios/haradrim/the-crossings-of-poros.md, Table).
 import type { EngineStep } from "../../../../rules/core/intents.ts";
+import { listAnd } from "../../list.ts";
 
 // What the table says of The Crossings of Poros' pieces (src/play/readouts/haradrim/poros.ts): the encounter sets set aside with the cards each still holds, the stages played and removed, and Poros Garrison with its loss line. The engine decided every number; these only say it.
 
@@ -41,14 +42,6 @@ export const garrisonNearWords = (left: number): string => (left === 1 ? "1 more
 
 /** The held mark on the seat that controls it (spoken). */
 export const GARRISON_HELD_WORDS = "Controls Poros Garrison: if it leaves play the players lose the game. Control passes with the first player token.";
-
-/** "A", "A and B", "A, B and C". */
-export const listAnd = (parts: readonly string[]): string => (parts.length <= 1 ? (parts[0] ?? "") : `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`);
-
-/** The log line of a stage that left the quest, or of Poros Garrison passing with the first player token; `name` gives a card's name. */
-export function porosStepLine(step: Extract<EngineStep, { kind: "stageLeaves" | "controlPasses" }>, name: (cardId: string) => string): string {
-  return step.kind === "stageLeaves" ? `${name(step.cardId)} ${step.how === "removed" ? "leaves the game" : "is set aside"}` : `${name(step.cardId)} passes to Player ${step.seat + 1} with the first player token`;
-}
 
 /**
  * The banner's detail for a stage chosen at random: what the stage's own Setup of sets and stages did in the same intent (the steps after the advance): "Chosen at random. Mountains of Shadow is shuffled in; Desert Sands and The Desert Path leave the game."

@@ -2,7 +2,7 @@
 // The words of Assault on Osgiliath's table pieces: who controls a location and what control gives, the win line of the stage, the bar on progress in the staging area, the locations an undefended attack returns, and the verbs of the control records in a sentence. Pure.
 import type { Instruction } from "../../../../catalog/boundary.ts";
 
-import { plural } from "../../list.ts";
+import { listAnd, plural } from "../../list.ts";
 import { ownerWords } from "../../owner.ts";
 
 const SOLO = 1;
@@ -26,7 +26,6 @@ export const undefendedReturnWords = (seatCount: number, seat: number | null): s
     : `If ${whoInside(seatCount, seat)} leave${seatCount > SOLO ? "s" : ""} an attack undefended, it returns to the staging area with its progress removed.`;
 
 /** The names of the Osgiliath locations that stop the win, as a list: "West Gate, The Old Bridge". */
-const listOf = (names: readonly string[]): string => (names.length <= 2 ? names.join(" and ") : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`);
 
 /** A location a player controls, by name and seat. */
 export type HeldLocation = { name: string; seat: number };
@@ -34,14 +33,14 @@ export type HeldLocation = { name: string; seat: number };
 /** The controlled locations as the dial counts them: "West Gate and Ruined Tower (Player 1)", alone solo ("West Gate and Ruined Tower"), one group a seat. */
 const heldList = (held: readonly HeldLocation[], seatCount: number): string => {
   const seats = [...new Set(held.map((entry) => entry.seat))].sort((one, other) => one - other);
-  return seats.map((seat) => `${listOf(held.filter((entry) => entry.seat === seat).map((entry) => entry.name))}${seatCount > SOLO ? ` (Player ${seat + 1})` : ""}`).join("; ");
+  return seats.map((seat) => `${listAnd(held.filter((entry) => entry.seat === seat).map((entry) => entry.name))}${seatCount > SOLO ? ` (Player ${seat + 1})` : ""}`).join("; ");
 };
 
 /** Stage 1B's win line with the table as it stands: what blocks the win and what the players control, or that the end of the round wins. During Setup nothing is in play yet, so no win is announced. No final period: the preview's join ends the line. */
 export function winWords(left: readonly string[], held: readonly HeldLocation[], seatCount: number, setup: boolean): string {
   const head = "To win: at the end of the round, no Osgiliath location is in the staging area or active";
   const controlled = held.length === 0 ? "Controlled: none" : `Controlled: ${heldList(held, seatCount)}`;
-  if (left.length > 0) return `${head}. Left: ${listOf(left)}. ${controlled}`;
+  if (left.length > 0) return `${head}. Left: ${listAnd(left)}. ${controlled}`;
   if (setup) return `${head}. ${controlled}`;
   return held.length === 0 ? `${head}. None is in play, so the players win at the end of this round` : `${head}. None is left, so the players win at the end of this round. ${controlled}`;
 }
@@ -68,7 +67,7 @@ export const lostWords = (name: string, seatCount: number, seat: number, progres
 /** The attack sheet's line when leaving an attack undefended returns controlled locations: the hero still takes the damage (the sheet's own default line is replaced, so this one says it). `towers`: Ruined Tower, which the defending player controls, returns too when it hears the loss of another location (06103:A:2). */
 export function undefendedLocationsWords(names: readonly string[], seatCount: number, seat: number, towers = 0): string {
   const plural_ = names.length > 1;
-  const first = `Undefended: a hero takes all of it. ${listOf(names)}, which ${seatCount > SOLO ? `Player ${seat + 1} controls` : "you control"}, ${plural_ ? "return" : "returns"} to the staging area afterwards with ${plural_ ? "their" : "its"} progress removed.`;
+  const first = `Undefended: a hero takes all of it. ${listAnd(names)}, which ${seatCount > SOLO ? `Player ${seat + 1} controls` : "you control"}, ${plural_ ? "return" : "returns"} to the staging area afterwards with ${plural_ ? "their" : "its"} progress removed.`;
   return towers > 0 ? `${first} ${towers > 1 ? "Each Ruined Tower" : "Ruined Tower"} returns as well, as control of another location is lost.` : first;
 }
 
@@ -80,7 +79,7 @@ export const pinnedWords = (controlled: number): string => `X is the number of l
 
 /** Southron Commander: who it attacks when revealed. */
 export const commanderWords = (targets: readonly string[]): string =>
-  targets.length === 0 ? "When revealed it attacks each player who controls a location, first player first. No player controls one now, so it attacks no one." : `When revealed it attacks each player who controls a location, first player first. Now it attacks ${listOf(targets)}.`;
+  targets.length === 0 ? "When revealed it attacks each player who controls a location, first player first. No player controls one now, so it attacks no one." : `When revealed it attacks each player who controls a location, first player first. Now it attacks ${listAnd(targets)}.`;
 
 /** Ruined Tower in the staging area: how many locations are active decides how it is traveled to (06103:A:1). */
 export const towerStagedWords = (active: number): string =>

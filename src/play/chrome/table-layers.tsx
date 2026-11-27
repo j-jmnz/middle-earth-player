@@ -125,11 +125,9 @@ function RowReading({ store, ctx, row, names, picture, onRead, onClose }: { stor
 function SetAsideReading({ store, ctx, names, picture, onRead, onClose }: { store: TableStore; ctx: ReduceContext; names: SheetNames; picture: Pictures; onRead: (cardId: string) => void; onClose: () => void }) {
   const key = useStore(store, (state) => setAsideKey(state.game, ctx));
   const list = setAsideFromKey(key);
-  // The rows are grouped under their encounter set's name when the cards come from more than one set (store/set-aside.ts orders them so).
-  const grouped = new Set(list.rows.map((row) => row.set)).size > 1;
   const cards = list.rows.map((row) => {
     const made = listCard(row.id, row.code, row.picture, names, picture, ctx.cards, setAsideWords(kindWords(ctx.cards.get(row.code)), keptWords(row.kept)));
-    return { ...made, label: copiesLabel(made.label, row.count), spoken: copiesSaid(made.label, row.count), ...(grouped ? { group: row.set === "" ? "Other cards" : row.set } : {}) };
+    return { ...made, label: copiesLabel(made.label, row.count), spoken: copiesSaid(made.label, row.count), ...(list.grouped === true ? { group: row.set === "" ? "Other cards" : row.set } : {}) };
   });
   return <SetAsideList title={SET_ASIDE_TITLE} head={setAsideHead(list.total)} cards={cards} facedown={list.facedown === 0 ? null : list.deck ? facedownSplitWords(list.facedown, list.deck) : facedownWords(list.facedown)} onRead={onRead} onClose={onClose} />;
 }

@@ -7,7 +7,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { printedOf } from "../../core/printed.ts";
-import { drawRandomSetAside } from "../../core/set-aside-draw.ts";
+import { byId, drawRandomSetAside } from "../../core/set-aside-draw.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -18,8 +18,6 @@ import { markShort } from "../../interpret/effect-verbs.ts";
 import { ask, chosenOf } from "./staged.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
-
-const byId = (left: string, right: string): number => left.localeCompare(right, undefined, { numeric: true });
 
 /** The ids set aside that belong to the encounter set, in id order (a boon or burden of the campaign is no card of the set). */
 export function asideOf(state: ScenarioState, set: string, ctx: ReduceContext): string[] {

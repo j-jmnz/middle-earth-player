@@ -29,8 +29,8 @@ import { underworldCount } from "../readouts/against-the-shadow/stewards-fear.ts
 export type SetAsideRow = { readonly id: string; readonly code: string; readonly picture: string; readonly kept: number; readonly count: number; readonly set: string };
 
 /** The public set-aside cards by id, in a stable order that says nothing of when each was set aside (by name, then id); the same cards as rows; and the number of facedown ones. */
-/** `deck`: how many of the facedown cards lie in The Steward's Fear's underworld deck (absent in any other game); the rest are the cards the Setup hides. */
-export type SetAsideList = { readonly cards: readonly string[]; readonly rows: readonly SetAsideRow[]; readonly facedown: number; readonly deck?: number };
+/** `deck`: how many of the facedown cards lie in The Steward's Fear's underworld deck (absent in any other game); the rest are the cards the Setup hides. `grouped` (absent when not): the open cards come from more than one encounter set, so the rows are ordered by set and the panel lists each set under its name (decided here, once). */
+export type SetAsideList = { readonly cards: readonly string[]; readonly rows: readonly SetAsideRow[]; readonly facedown: number; readonly deck?: number; readonly grouped?: true };
 
 const EMPTY: SetAsideList = { cards: [], rows: [], facedown: 0 };
 
@@ -159,7 +159,7 @@ export function setAsideList(game: ScenarioState, ctx: ReduceContext): SetAsideL
       rows.set(key, row ? { ...row, count: row.count + 1 } : { id: entry.id, code: entry.code, picture: entry.picture, kept: entry.kept, count: 1, set: entry.set });
     }
     const deck = Math.min(facedown, underworldCount(game));
-    return { cards: open.map((entry) => entry.id), rows: [...rows.values()], facedown, ...(deck > 0 ? { deck } : {}) };
+    return { cards: open.map((entry) => entry.id), rows: [...rows.values()], facedown, ...(grouped ? { grouped: true as const } : {}), ...(deck > 0 ? { deck } : {}) };
   });
 }
 
@@ -171,21 +171,21 @@ export function setAsideCount(game: ScenarioState, ctx: ReduceContext): number {
 
 /**
  * The list as one string, for a subscription: a state that changes nothing the panel draws gives an equal string, so the panel does not render (.claude/rules/code-standards.md,
- * Rendering the table and screens). The first line is the facedown count, then a line for each row. `setAsideFromKey` reads it back.
+ * Rendering the table and screens). The first line is the facedown count, the cards of the underworld deck among them (when there are any) and whether the rows are grouped by set, then a line for each row. `setAsideFromKey` reads it back.
  */
 export function setAsideKey(game: ScenarioState, ctx: ReduceContext): string {
   const list = setAsideList(game, ctx);
-  return [list.deck ? `${list.facedown}\t${list.deck}` : String(list.facedown), ...list.rows.map((row) => [row.id, row.code, row.picture, row.kept, row.count, row.set].join("\t"))].join("\n");
+  return [[list.facedown, ...(list.deck || list.grouped ? [list.deck ?? 0] : []), ...(list.grouped ? [1] : [])].join("\t"), ...list.rows.map((row) => [row.id, row.code, row.picture, row.kept, row.count, row.set].join("\t"))].join("\n");
 }
 
-export function setAsideFromKey(key: string): { rows: readonly SetAsideRow[]; facedown: number; deck?: number; total: number } {
+export function setAsideFromKey(key: string): { rows: readonly SetAsideRow[]; facedown: number; deck?: number; grouped?: true; total: number } {
   const [first = "0", ...lines] = key.split("\n");
   const rows = lines.map((line): SetAsideRow => {
     const [id = "", code = "", picture = "", kept = "0", count = "1", set = ""] = line.split("\t");
     return { id, code, picture, kept: Number(kept), count: Number(count), set };
   });
-  const [count = "0", inDeck = "0"] = first.split("\t");
+  const [count = "0", inDeck = "0", groupedFlag = "0"] = first.split("\t");
   const facedown = Number(count);
   const deck = Number(inDeck);
-  return { rows, facedown, ...(deck > 0 ? { deck } : {}), total: facedown + rows.reduce((sum, row) => sum + row.count, 0) };
+  return { rows, facedown, ...(groupedFlag === "1" ? { grouped: true as const } : {}), ...(deck > 0 ? { deck } : {}), total: facedown + rows.reduce((sum, row) => sum + row.count, 0) };
 }

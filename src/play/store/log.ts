@@ -1,6 +1,6 @@
 // The table's log: this round's engine steps in words, each with its cause from phase 8d (the rule title, or the card and
 // its printed line), so a player can check a number against its source. It is text, not a control.
-import { plural } from "../words/list.ts";
+import { listAnd, plural } from "../words/list.ts";
 import { countedOf } from "./counted.ts";
 import { villagersOf } from "./villager-steps.ts";
 import { controlOf } from "../readouts/against-the-shadow/osgiliath-steps.ts";
@@ -14,7 +14,7 @@ import { escapeCountedWords, escapeResultTitle } from "../words/scenarios/escape
 import { attachedWords } from "../words/scenarios/haradrim/capture.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
 import { trackLogLine } from "../words/scenarios/haradrim/track.ts";
-import { listAnd, porosStepLine } from "../words/scenarios/haradrim/poros-table.ts";
+import { stageStepLine } from "../words/stage-steps.ts";
 import { discoverLogLine, setAsideLine } from "../words/scenarios/wilderland.ts";
 import { poisonLine, unconsciousLine } from "../words/scenarios/the-hobbit/poison.ts";
 import type { Cause } from "../../rules/core/cause.ts";
@@ -151,7 +151,7 @@ function words(step: EngineStep, names: LogNames, questStat: string | null): str
       return step.stormcaller === true ? `The Stormcaller advances to ${names.card(step.cardId)}` : `The quest advances to ${names.card(step.cardId)}${step.random ? `, chosen at random from ${listAnd(step.random.from.map((id) => names.card(id)))}` : ""}`;
     case "stageLeaves":
     case "controlPasses":
-      return porosStepLine(step, names.card);
+      return stageStepLine(step, names.card);
     case "attack":
       return step.side === "enemy" ? `${names.card(step.enemyId)} attacks ${player(step.seat)}` : `${player(step.seat)} attacks ${names.card(step.enemyId)}`;
     case "cancel":
