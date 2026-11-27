@@ -8,6 +8,7 @@ import { chipText, moreText, MUST_COMMIT_WORD, type CardEffects, type CombatNumb
 import { DETERMINED_WORD } from "../words/scenarios/angmar/wastes-table.ts";
 import { BLANK_WORD } from "../words/card-bars.ts";
 import { CHAMPION_WORD } from "../words/scenarios/haradrim/umbar-table.ts";
+import { SHIELD_WORD } from "../words/scenarios/against-the-shadow/vale.ts";
 import { type IconName } from "../../ui/icon-map.ts";
 import { glyphCells, type PlaceMark } from "../store/island-place.ts";
 import { COLS, ROWS } from "../dream-chaser/island-table.ts";
@@ -146,8 +147,8 @@ export function CurrentQuestMark({ rect, clear, fonts, t, s }: { rect: Rect; cle
   return <WordPill rect={rect} text="Current" clear={clear} fonts={fonts} t={t} s={s} />;
 }
 
-// The round glyph a word falls back to where it does not fit: "Determined" is a "D", the Champion of Escape from Umbar a "C", Desert Crossing's "Blank" a "B"; "Determination" has none (the plain dot).
-const SHORT_GLYPHS: ReadonlyMap<string, string> = new Map([[DETERMINED_WORD, "D"], [CHAMPION_WORD, "C"], [BLANK_WORD, "B"]]);
+// The round glyph a word falls back to where it does not fit: "Determined" is a "D", the Champion of Escape from Umbar a "C", the Morgul Bodyguard that shields a Captain an "S", Desert Crossing's "Blank" a "B"; "Determination" has none (the plain dot).
+const SHORT_GLYPHS: ReadonlyMap<string, string> = new Map([[DETERMINED_WORD, "D"], [CHAMPION_WORD, "C"], [SHIELD_WORD, "S"], [BLANK_WORD, "B"]]);
 const shortGlyph = (word: string): string | undefined => SHORT_GLYPHS.get(word);
 
 /** A hero or ally the Campaign Log marks determined ("Determined"), or that carries a Determination ("Determination"): the same pill as the current quest's, a character wearing neither of the other marks (mec108.campaign-log, ledger line 10172:A:1). */

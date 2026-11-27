@@ -5,12 +5,13 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
 import { EFFECTS } from "../../effects/index.ts";
-import type { ScenarioState } from "../../rules/core/state.ts";
+import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
 import { dealAdditionalShadow } from "../../rules/interpret/interpret.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
 import { idOf, revealFromTop, send } from "../../../test/harness/scene-kit.ts";
 import { CODES, fight, opened, run, table } from "../../../test/scenarios/the-morgul-vale/table.ts";
 
+import { slotNumbers } from "../cards/card-effects.ts";
 import { cardKeywords } from "../cards/card-keywords.ts";
 import { ledgerLine } from "../cards/ledger.ts";
 import { previewCards, questTitle } from "../cards/table-preview.ts";
@@ -162,6 +163,20 @@ describe("the Captain's refusal on a card that would take him out of play (06144
     const both = opened(other).state;
     // The sentence belongs to a card with no target: with the Tracker to take it, the card has one and no refusal is said.
     expect(whyNotPlayable(both, other.ctx, idOf(both, INFIGHTING), idName(other, both)) ?? "").not.toContain("Captain");
+  });
+});
+
+describe("the Bodyguard that takes a Captain's damage wears the Shield pill (06148:A:1)", () => {
+  it("only the Morgul Bodyguard with the most damage, and only while a Captain is in play", () => {
+    const made = table({ phase: "Planning", staging: [tower, bodyguard, bodyguard, murzag] });
+    const [first, second] = Object.values(made.state.cards).filter((card) => card.code === bodyguard).map((card) => card.id);
+    const hurt = updateCard(made.state, second ?? "", { damage: 2 });
+    const mark = (state: ScenarioState, id: string) => slotNumbers(state, made.ctx, id).determined?.word ?? null;
+    expect(mark(hurt, second ?? "")).toBe("Shield");
+    expect(mark(hurt, first ?? "")).toBeNull();
+    expect(mark(hurt, idOf(hurt, murzag))).toBeNull();
+    const lone = table({ phase: "Planning", staging: [tower, bodyguard] });
+    expect(mark(lone.state, idOf(lone.state, bodyguard))).toBeNull();
   });
 });
 

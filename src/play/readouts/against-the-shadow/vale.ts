@@ -25,6 +25,8 @@ import {
   NAZGUL_REFUSAL,
   NAZGUL_SHEET,
   nazgulWords,
+  SHIELD_WORD,
+  shieldMarkWords,
   shieldReadout,
   shieldWords,
   stageLines,
@@ -146,6 +148,14 @@ const shielder = (game: ScenarioState, id: string): CardInstance | null => {
   const target = live(game) ? bodyguardTarget(game, id) : null;
   return target ? (game.cards[target] ?? null) : null;
 };
+
+/** The pill on the Morgul Bodyguard that takes the damage meant for a Captain in play (the engine's own pick, `shielder`), so the table shows which one it is. Null for any other card and in any other scenario. */
+export function valeShieldMark(game: ScenarioState, cardId: string): { word: string; speech: string } | null {
+  const card = game.cards[cardId];
+  if (!card || !live(game) || card.code !== BODYGUARD || !(card.zone === "staging" || card.zone === "engaged")) return null;
+  const shields = Object.values(game.cards).some((other) => CAPTAINS.has(other.code) && PLAY.includes(other.zone as (typeof PLAY)[number]) && shielder(game, other.id)?.id === cardId);
+  return shields ? { word: SHIELD_WORD, speech: shieldMarkWords } : null;
+}
 
 /** The player-attack sheet's line for an attack on a Captain: where his damage goes while a Bodyguard is in play, or the Nazgûl's cut. Empty for any other enemy. */
 export function valeAttackNote(game: ScenarioState, ctx: ReduceContext, enemyId: string): string {
