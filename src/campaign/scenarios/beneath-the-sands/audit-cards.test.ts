@@ -319,12 +319,12 @@ describe("17074 Grabbed by Spiders", () => {
 
 describe("17068:A:1 Immune to player card effects", () => {
   // A keyword of the card: no record names the line, so the test has no run without records.
-  // FAULT: the card prints "Immune to player card effects", but data/cards holds no immune keyword for it, so a player card (Ride to Ruin) is offered Spider Burrow as a target.
-  it.fails("17068:A:1 a player card effect cannot choose Spider Burrow as its target", () => {
-    const made = tableFromLayout(SID, { phase: "Quest", hand: [RIDE_TO_RUIN], play: [SCOUT], heroes: [{ code: EOWYN, resources: 2 }], staging: [OFF, BURROW, CAVERN] }, { effects: EFFECTS, extra: [RIDE_TO_RUIN, SCOUT, EOWYN] });
+  it("17068:A:1 a player card effect cannot choose Spider Burrow as its target", () => {
+    const made = tableFromLayout(SID, { phase: "Quest", hand: [RIDE_TO_RUIN], play: [SCOUT], heroes: [{ code: EOWYN, resources: 2 }], staging: [OFF, BURROW, CAVERN, PLACE] }, { effects: EFFECTS, extra: [RIDE_TO_RUIN, SCOUT, EOWYN] });
     const played = sendUnledgered(start(made.state), { type: "PlayCard", cardId: idOf(made.state, RIDE_TO_RUIN), payments: [{ heroId: idOf(made.state, EOWYN), amount: 1 }] }, made.ctx);
     const offered = played.state.window?.kind === "choose" ? played.state.window.options.map((id) => played.state.cards[id]?.code) : [];
     expect(offered).toContain(CAVERN);
+    expect(offered).toContain(PLACE);
     expect(offered).not.toContain(BURROW);
   });
 });

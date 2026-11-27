@@ -258,7 +258,7 @@ Scenario piles that place cards with no record (quest: 16068 The Desert of Harad
 16055:A:2 (shadow): Shadow: If this attack deals damage, the defending character cannot ready until the end of the round.
   16055:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - when the attack in progress ends:
+    - if not (the attack has no defender): when the attack in progress ends:
       - if the attack that left this effect for its end, or the damage the answered event placed, dealt at least 1 damage: the event's other card: stat cannotReady 1, until the end of the round
 
 ## 16068 The Desert of Harad
@@ -342,4 +342,4 @@ Scenario piles that place cards with no record (quest: 16068 The Desert of Harad
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - if the temperature is at least 60 (false while no heat tracker is set): the players lose the game (The temperature reached 60)
 
-(rendered pieces: 208 by template, 0 as JSON)
+(rendered pieces: 210 by template, 0 as JSON)
