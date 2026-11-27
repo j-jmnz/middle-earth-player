@@ -40,5 +40,5 @@ export function openScene(dump: SceneDump, factsOf: (codes: Iterable<string>) =>
   if (!campaign || !scenario) return null;
   const world: World = { campaign, scenario, effects: [...EFFECTS, ...dump.extraEffects], cards: new Map(dump.cards), sets: new Map() };
   const stored: StandaloneGame = { id: SCENE_GAME, campaignId: campaign.id, scenarioId: dump.scenarioId, seatCount: dump.state.seatCount, loadout: null, active: null, result: null };
-  return { ok: true, stored, stamp: null, world, ctx: contextOf(world), game: dump.state, roundSteps: [], history: [], destroyedHeroes: new Set(), facts: factsOf(world.cards.keys()) };
+  return { ok: true, stored, stamp: null, world, ctx: contextOf(world), game: dump.state, roundSteps: [], history: [], facts: factsOf(world.cards.keys()) };
 }

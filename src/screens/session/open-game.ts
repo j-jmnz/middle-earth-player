@@ -25,7 +25,7 @@ export function factsOf<TRun>(catalog: Db<TRun>, codes: Iterable<string>): Map<s
   return new Map(rows.map((row) => [row.code, { imagesrc: row.imagesrc, backImagesrc: row.backImagesrc, text: row.text, pack: row.pack }]));
 }
 
-export type ReplayedGame = { world: World; ctx: ReduceContext; game: ScenarioState; roundSteps: readonly EngineStep[]; history: readonly Undoable[]; facts: ReadonlyMap<string, CardFacts>; destroyedHeroes: ReadonlySet<string> };
+export type ReplayedGame = { world: World; ctx: ReduceContext; game: ScenarioState; roundSteps: readonly EngineStep[]; history: readonly Undoable[]; facts: ReadonlyMap<string, CardFacts>; destroyedHeroes?: ReadonlySet<string> };
 
 /** A replay for the table: the game and the open scenario to write once (`stamp`, session.ts Resumed), or the index of the first intent a checked replay refused or did not match (`at`, null when there was nothing to check). */
 export type ReplayedOpen = { ok: true; game: ReplayedGame; stamp: ActiveScenario | null } | { ok: false; at: number | null };
