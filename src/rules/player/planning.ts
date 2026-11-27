@@ -1,5 +1,6 @@
 // Rules: rr.planning-phase, rr.step-2-2, rr.step-2-3, rr.resource-match, ltp.planning-order, rr.triggered-ability, ltp.paying-costs-multiple,
 // ltp.unique-cards, ltp.neutral-cards (data/rules/entries.json).
+import { withPlayed } from "../core/played.ts";
 import type { Effect } from "../../catalog/boundary.ts";
 
 import { attachmentHostIds, enforceRestricted, hostTakesControl, playCost } from "./attach.ts";
@@ -68,7 +69,7 @@ export function playCard(
   }
   // The discount it used is spent, and the card joins this round's plays.
   next = spendDiscount(next, intent.cardId, seat, ctx);
-  next = { ...next, played: [...(next.played ?? []).filter((entry) => entry.round === next.round), { id: intent.cardId, code: instance.code, seat, round: next.round, ...(next.phase === "Planning" ? {} : { phase: next.phase }) }] };
+  next = withPlayed(next, intent.cardId, instance.code, seat);
   // Doomed X: each player raises their threat by X when the card is played (rr.doomed-x), less a reduction the seat holds for
   // its next Doomed event (families/deck/rules.ts).
   const doomed = doomedRaise(next, seat, printed, gainedDoomed(next, intent.cardId, seat, ctx));

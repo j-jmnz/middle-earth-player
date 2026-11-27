@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../catalog/boundary.ts";
 import { expectOk } from "../core/test-fixture.ts";
 import { definePrinted, type PrintedCard } from "../core/printed.ts";
-import { reduce } from "../engine/reduce.ts";
+import { legalIntents, reduce } from "../engine/reduce.ts";
 import { withThreat, type ScenarioState } from "../core/state.ts";
 import { attachTo } from "../core/zones.ts";
 import { RECORDS as ENCOUNTER_RECORDS } from "../../effects/authored/families/encounter.ts";
@@ -88,7 +88,7 @@ describe("After an event is played, on every exit of the event", () => {
     const reply = kit.hand("evresp");
     const first = expectOk(reduce(kit.state, { type: "PlayCard", cardId: played, payments: [] }, ctx()));
     const answered = expectOk(reduce(first.state, { type: "Trigger", cardId: reply, effectId: "evresp:response:1" }, ctx()));
-    // Every seat passes the Responses still offered (the Response event hears itself played too).
+    // Every seat passes the Responses still offered.
     let done = answered;
     const steps = [...first.steps, ...answered.steps];
     for (let guard = 0; guard < 6 && done.state.window?.kind === "response"; guard += 1) {
@@ -98,6 +98,17 @@ describe("After an event is played, on every exit of the event", () => {
     // Both events are announced: the Action event and the Response event.
     expect(threats(steps).filter((amount) => amount === 2)).toHaveLength(2);
     expect(done.state.cards[reply]?.zone).toBe("discard");
+  });
+
+  it("rr.response: a Response event does not answer its own play, and joins the cards played this round", () => {
+    const kit = table();
+    const played = kit.hand("ev");
+    const reply = kit.hand("evresp");
+    const first = expectOk(reduce(kit.state, { type: "PlayCard", cardId: played, payments: [] }, ctx()));
+    const answered = expectOk(reduce(first.state, { type: "Trigger", cardId: reply, effectId: "evresp:response:1" }, ctx()));
+    expect(answered.state.played?.map((entry) => entry.id)).toEqual([played, reply]);
+    const offered = legalIntents(answered.state, ctx()).filter((intent) => intent.type === "Trigger" && intent.cardId === reply);
+    expect(offered).toEqual([]);
   });
 
   it("rr.event-cards: an event that goes on into an attack is announced once it has left the hand", () => {
