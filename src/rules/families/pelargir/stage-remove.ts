@@ -4,7 +4,7 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
-import type { ScenarioState } from "../../core/state.ts";
+import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { advanceNow } from "./advance.ts";
@@ -12,7 +12,8 @@ import { advanceNow } from "./advance.ts";
 /** RemoveStage: the stage with this code leaves the quest deck. Nothing happens when it is already gone. */
 export function removeStage(state: ScenarioState, instruction: Extract<Instruction, { verb: "RemoveStage" }>, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const current = state.questStage ? state.cards[state.questStage] : undefined;
-  if (current?.code === instruction.code) return advanceNow(state, ctx, steps);
+  // The removal is recorded on the card, so the stage list names a removed stage as removed, not as an earlier stage.
+  if (current?.code === instruction.code) return advanceNow(updateCard(state, current.id, { removedStage: true }), ctx, steps);
   const id = state.questDeck.find((candidate) => state.cards[candidate]?.code === instruction.code);
-  return id ? moveCard(state, id, { zone: "setAside" }) : state;
+  return id ? moveCard(updateCard(state, id, { removedStage: true }), id, { zone: "setAside" }) : state;
 }

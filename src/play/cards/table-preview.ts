@@ -13,6 +13,7 @@ import { BLIZZARD_LIMIT } from "../../rules/families/quest/blizzard.ts";
 import { dungeonDetail } from "./dungeon-preview.ts";
 import { deadPreview } from "./realm-preview.ts";
 import { earlierStages, heldStage } from "./earlier-stages.ts";
+import { EARLIER_STAGE, REMOVED_STAGE } from "./preview-words.ts";
 import { grappleDetail, shipLoss } from "../words/scenarios/grapple.ts";
 import { oathDetail } from "./oath-preview.ts";
 import { blankMark, delayedLines, effectLines, noReadyLine } from "./card-effects.ts";
@@ -108,10 +109,13 @@ export function tokenLines(card: Pick<CardInstance, "damage" | "progress" | "res
 
 // An earlier stage as the quest stage's preview lists it: "Stage 1B" over its name, on its B side, the side it was played on. Its number
 // is the stage number it holds (earlier-stages.ts heldStage).
-function earlierStage(game: ScenarioState, ctx: ReduceContext, code: string, describe: Describe): PreviewCard {
+// A stage a Response removed from the quest deck was never played: it is "Stage 3", not 3B, and its role says it was removed (`removedStage`, stage-remove.ts).
+function earlierStage(game: ScenarioState, ctx: ReduceContext, id: string, describe: Describe): PreviewCard {
+  const code = game.cards[id]?.code ?? id;
+  const removed = game.cards[id]?.removedStage === true;
   const place = heldStage(game, ctx, code);
   const described = describe(code, pictureKey({ code, face: "B" }));
-  return { code, ...described, ...(place ? { title: `Stage ${place.at}B`, detail: described.name } : {}), effects: [], role: "Earlier stage" };
+  return { code, ...described, ...(place ? { title: `Stage ${place.at}${removed ? "" : "B"}`, detail: described.name } : {}), effects: [], role: removed ? REMOVED_STAGE : EARLIER_STAGE };
 }
 
 /**
@@ -141,7 +145,7 @@ export function previewCards(
   const groups = ids.map((id, index): PreviewCard[] => {
     const card = game.cards[id];
     if (!card) return [];
-    if (earlier.includes(id)) return [earlierStage(game, ctx, card.code, describe)];
+    if (earlier.includes(id)) return [earlierStage(game, ctx, id, describe)];
     // The loot a location guards is under it, out of play, and still its player's (22024:B:2).
     const loot = game.lootDecks != null && card.zone === "under" && card.controller != null;
     const role = index === 0 ? null : card.zone === "shadow" ? "Shadow card" : loot ? LOOT_ROLE : (underAlleywayRole(game, id) ?? guardedRole(game, id) ?? (card.host ? hostedRole(printedOf(ctx.cards, card.code)) : null));

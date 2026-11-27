@@ -40,8 +40,8 @@ import { adjustWords, threatSourcesOf } from "../readouts/threat-sources.ts";
 type Made = ReturnType<typeof table>;
 const nameOf = (made: Made) => (code: string) => made.cards.get(code)?.name ?? code;
 const say = (made: Made, state: ScenarioState, code: string) => dungeonDetail(state, made.ctx, idOf(state, code), (id) => made.cards.get(state.cards[id]?.code ?? id)?.name ?? id);
-// A stage that was defeated keeps the progress that filled it, where the layout sets the earlier stages aside with none: `played` gives them what play would, but for the codes named (stages the Responses removed).
-const played = (state: ScenarioState, ...removed: string[]): ScenarioState => state.setAside.reduce((now, id) => (removed.includes(now.cards[id]?.code ?? "") ? now : updateCard(now, id, { progress: 99 })), state);
+// A stage that was defeated keeps the progress that filled it, where the layout sets the earlier stages aside with none: `played` gives them what play would, and marks the codes named as the stages the Responses removed (`removedStage`, which RemoveStage sets).
+const played = (state: ScenarioState, ...removed: string[]): ScenarioState => state.setAside.reduce((now, id) => updateCard(now, id, removed.includes(now.cards[id]?.code ?? "") ? { removedStage: true } : { progress: 99 }), state);
 const stage = (made: Made, state: ScenarioState) => questTitle(played(state), made.ctx, state.questStage ?? "", "Stage", () => null);
 const dialsOf = (made: Made, state: ScenarioState) => scenarioDials(state, made.ctx, nameOf(made)).filter((dial) => dial.id.startsWith("battleground-"));
 
@@ -131,6 +131,18 @@ describe("the stages the Responses removed (05033:A:2, 05034:A:2, 05035:A:2)", (
     expect(questTitle(played(removed, "05075"), made.ctx, removed.questStage ?? "", "Stage", () => null)?.detail).toContain("Stage 4 was removed from the quest deck");
     expect(stage(made, made.state)?.detail).not.toContain("removed from the quest deck");
     expect(removed.questDeck.map((id) => removed.cards[id]?.code)).toEqual(["05073", "05074", "05076"]);
+    // The engine records the removal on the card, and the stage list says "Removed stage", not "Earlier stage".
+    expect(removed.cards[idOf(removed, "05075")]).toMatchObject({ zone: "setAside", removedStage: true });
+  });
+
+  it("the stage list calls a removed stage removed, never played, and a defeated one earlier", () => {
+    const made = table({ stage: "05076" });
+    const state = played(made.state, "05074", "05075");
+    const shown = previewCards(state, made.ctx, state.questStage ?? "", (code) => ({ name: nameOf(made)(code), source: null }), (id) => id);
+    const roles = shown.cards.slice(1).map((card) => [card.code, card.title, card.role]);
+    expect(roles).toContainEqual(["05075", "Stage 4", "Removed stage"]);
+    expect(roles).toContainEqual(["05074", "Stage 3", "Removed stage"]);
+    expect(roles.filter(([, , role]) => role === "Earlier stage").map(([code]) => code)).toEqual(["05073", "05072"]);
   });
 
   it("the advance screen names every stage that was removed, and no stage that was defeated", () => {

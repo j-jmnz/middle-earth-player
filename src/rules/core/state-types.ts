@@ -118,11 +118,11 @@ export type CardInstance = {
   temporary?: true;
   // On an attachment: the id of the hero card from the collection attached to it, whose game text and resource icon its host has.
   lends?: string;
-  // A double-sided card whose two sides are two catalog cards (the Grotto and Underwater locations, dcce.grotto-deck): the code of the side it does not show. `code` is the side it shows,
-  // so every read of the card (traits, Threat, records) sees the side faceup; a flip swaps the two (families/uncharted/grotto.ts).
+  // A double-sided card whose two sides are two catalog cards (the Grotto and Underwater locations, dcce.grotto-deck): the code of the side it does not show. `code` is the side it shows, so every read of the card (traits, Threat, records) sees the side faceup; a flip swaps the two (families/uncharted/grotto.ts).
   other?: string;
-  // A card held facedown as part of a prisoner (the hero, the cards attached to it, Mendor captured with it): it is blank and unusable
-  // until it is rescued (families/prisoner.ts, 01123:B:1).
+  // A quest stage a Response took out of the quest deck (RemoveStage, The Siege of Cair Andros, ats.cair-andros-remove-stage): it lies set aside, never played, and the stage list says so.
+  removedStage?: true;
+  // A card held facedown as part of a prisoner (the hero, the cards attached to it, Mendor captured with it): it is blank and unusable until it is rescued (families/prisoner.ts, 01123:B:1).
   prisoner?: true;
   // The place the prisoner hero had among its seat's heroes, so a rescued (or swapped back) hero returns where it was (families/prisoner.ts).
   heroSlot?: number;
