@@ -54,33 +54,43 @@ export function measureText(body: string): string | undefined {
   return text.filter(Boolean).join(" ").replace(/ ?\n ?/g, "\n").trim();
 }
 
-// The labels a measure line names; "Review findings" is the Review task's sentence, "Second fix" belongs to Fix and "Focused review" to Review.
-const LABEL = /(?<![\w-])(Read|Research|Build|Judge|Tests|Words|Games|Review findings|Focused review|Review|Second fix|Third fix|Fix):/g;
+// The labels a measure line names; "Review findings" (also "Review findings by class.") is the Review task's sentence, "Second fix" belongs to Fix and "Focused review" to Review.
+const LABEL = /(?<![\w-])(?:(Review findings)(?: by class)?[:.]|(Read|Research|Build|Judge|Tests|Words|Games|Focused review|Review|Second fix|Third fix|Fix):)/g;
 const OWNER: Record<string, MeasureTask> = { "Review findings": "Review", "Focused review": "Review", Review: "Review", "Second fix": "Fix", "Third fix": "Fix", Fix: "Fix" };
+// The older form of a "Times" item, which has no colon after the task: "Fix 8 wait minutes, 21 writing minutes, plus about 12 writing minutes".
+const TIMES = /(?<![\w-])(Read|Research|Build|Judge|Tests|Words|Games|Review|Fix)\s+(?:about\s+)?(\d+)\s+wait minutes,\s*(?:about\s+)?(\d+)\s+writing minutes(?:,?\s*plus about (\d+) writing minutes)?/g;
 
 const sum = (text: string, pattern: RegExp): number | undefined => {
   const found = [...text.matchAll(pattern)].map((match) => Number(match[1]));
   return found.length === 0 ? undefined : found.reduce((a, b) => a + b, 0);
 };
 
-/** The wait and writing minutes of each task in a measure's text, and its `Review findings:` sentence. A task with no such numbers has none (a "Judge: 2 minutes" is not a wait or writing time); the runs of Fix, and of Review after the findings, add up. */
+const add = (into: Minutes, wait: number | undefined, writing: number | undefined): void => {
+  if (wait !== undefined) into.wait = (into.wait ?? 0) + wait;
+  if (writing !== undefined) into.writing = (into.writing ?? 0) + writing;
+};
+
+/**
+ * The wait and writing minutes of each task in a measure's text, and its `Review findings:` sentence. A label's part ends at the next label or at the end of its list item (a line of the text),
+ * so one item's numbers never reach the next. A task with no such numbers has none (a "Judge: 2 minutes" is not a wait or writing time); the runs of Fix, and of Review after the findings, add up.
+ * The older "Times" item (`<Task> N wait minutes, M writing minutes`, with "plus about N writing minutes" for follow-up fixes) adds its numbers to that task.
+ */
 export function parseMeasure(text: string): Measure {
   const tasks = Object.fromEntries(MEASURE_TASKS.map((task) => [task, {} as Minutes])) as Record<MeasureTask, Minutes>;
   const marks = [...text.matchAll(LABEL)];
   let findings: string | undefined;
   marks.forEach((mark, at) => {
-    const label = mark[1] ?? "";
-    const end = marks[at + 1]?.index ?? text.length;
-    const part = text.slice(mark.index + mark[0].length, end);
+    const label = mark[1] ?? mark[2] ?? "";
+    const after = mark.index + mark[0].length;
+    const lineEnd = text.indexOf("\n", after);
+    const end = Math.min(marks[at + 1]?.index ?? text.length, lineEnd < 0 ? text.length : lineEnd);
+    const part = text.slice(after, end);
     const task = (MEASURE_TASKS as readonly string[]).includes(label) ? (label as MeasureTask) : OWNER[label];
     if (!task) return;
-    if (label === "Review findings") findings = (text.slice(mark.index, end).trim().split("\n")[0] ?? "").trim();
-    const wait = sum(part, /(?:about )?(\d+)\s+wait minutes/g);
-    const writing = sum(part, /(?:about )?(\d+)\s+writing minutes/g);
-    const into = tasks[task];
-    if (wait !== undefined) into.wait = (into.wait ?? 0) + wait;
-    if (writing !== undefined) into.writing = (into.writing ?? 0) + writing;
+    if (label === "Review findings") findings = text.slice(mark.index, end).trim();
+    add(tasks[task], sum(part, /(?:about )?(\d+)\s+wait minutes/g), sum(part, /(?:about )?(\d+)\s+writing minutes/g));
   });
+  for (const times of text.matchAll(TIMES)) add(tasks[times[1] as MeasureTask], Number(times[2]), Number(times[3]) + Number(times[4] ?? 0));
   return findings === undefined ? { tasks } : { tasks, findings };
 }
 
