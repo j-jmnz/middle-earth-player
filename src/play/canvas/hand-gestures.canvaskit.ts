@@ -193,6 +193,8 @@ function useMouse({ layout, canvas, k, live, onTap, onPreview }: Args, scrub: Sc
       const slot = layout.slots[hitSlot(layout.slots, at.x, at.y)];
       if (!slot) return;
       if (slot.kind === "pile") onTap(slot.id);
+      // A facedown card of The Steward's Fear's underworld stack opens the location it lies under, as its tap does.
+      else if (slot.opens !== undefined) onPreview(slot.opens);
       else if (!slot.faceDown || slot.held || slot.dead) onPreview(slot.id);
     };
     window.addEventListener("pointermove", move, true);

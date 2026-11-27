@@ -351,7 +351,7 @@ describe("the play area wraps (user request, 2026-10-29)", () => {
         const cards = playCards(layout);
         const target = touch(scale, MIN_TARGET);
         const where = `${scale} ${play}`;
-        const rows = [...new Set(cards.filter((slot) => !slot.committed).map((slot) => slot.y))].sort((a, b) => a - b);
+        const at = (slot: CardSlot) => slot.y + (slot.exhausted && slot.coveredFrom != null ? (slot.h - slot.w) / 2 : 0); /* placePlay lifts a back row's exhausted card by its turn: `at` is its row's line */ const rows = [...new Set(cards.filter((slot) => !slot.committed).map(at))].sort((a, b) => a - b);
         // One row where it squeezes no step under a target; else the back row shows a 44 pt band above the front row.
         expect(rows.length, where).toBeLessThanOrEqual(2);
         if (rows.length === 2) expect((rows[1] ?? 0) - (rows[0] ?? 0), where).toBeCloseTo(target, 9);
@@ -359,14 +359,14 @@ describe("the play area wraps (user request, 2026-10-29)", () => {
         if (rows.length === 2) {
           for (const slot of cards) {
             const shown = shownBounds(slot);
-            if (slot.y === rows[0] || slot.y === (rows[0] ?? 0) - 5 * scale) expect(shown.y + shown.h, where).toBeCloseTo(rows[1] ?? 0, 9);
+            if (at(slot) === rows[0] || at(slot) === (rows[0] ?? 0) - 5 * scale) { expect(shown.y + shown.h, where).toBeCloseTo(rows[1] ?? 0, 9); if (slot.exhausted) expect(shown.h, where).toBeCloseTo(target, 9); }
             else expect(shown, where).toEqual(slotBounds(slot));
           }
         }
         if (scale === 1 && play === 12) expect(rows, where).toHaveLength(2);
         expect(cards[0]?.w ?? 0, where).toBeGreaterThanOrEqual(target);
         for (const y of rows) {
-          const row = cards.filter((slot) => slot.y === y || slot.y === y - 5 * scale).sort((a, b) => a.x - b.x);
+          const row = cards.filter((slot) => at(slot) === y || at(slot) === y - 5 * scale).sort((a, b) => a.x - b.x);
           for (let at = 1; at < row.length; at += 1) {
             const step = slotBounds(row[at] as CardSlot).x - slotBounds(row[at - 1] as CardSlot).x;
             expect(step, `${where} row ${y}`).toBeGreaterThanOrEqual(target - 1e-6);

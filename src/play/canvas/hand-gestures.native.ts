@@ -259,6 +259,8 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
         const slot = slots.get()[hitSlot(slots.get(), event.x, event.y)];
         if (!slot || swallow.get()) return;
         if (slot.kind === "pile") scheduleOnRN(onTap, slot.id);
+        // A facedown card of The Steward's Fear's underworld stack opens the location it lies under, as its tap does.
+        else if (slot.opens !== undefined) scheduleOnRN(onPreview, slot.opens);
         else if (!slot.faceDown || slot.held || slot.dead) scheduleOnRN(onPreview, slot.id);
       });
 

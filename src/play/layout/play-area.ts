@@ -5,6 +5,7 @@ import { ASPECT, cardRect, deepestUnder, footprint, MIN_TARGET, placeUnder, rowX
 import type { ZoneEntry } from "../store/selectors.ts";
 import { wrapRows } from "./table-spacing.ts";
 import { touch } from "../../ui/ui-scale.ts";
+import { isExhausted } from "../../rules/core/state.ts";
 
 // After a seat's last ship the row keeps one more gap, so the ships read as a group without a box (dcce.ship-objectives; `SHIP_GAP` is one `GAP`).
 export const SHIP_GAP = 1;
@@ -120,7 +121,9 @@ export function placePlay(plan: PlayPlan, area: Rect, out: CardSlot[], m: Metric
       placeUnder(entry, "play", rect, out, [], m.peek);
       // A committed character stands a step higher, sent toward the quest.
       const lift = entry.card.committed ? -m.peek / 2 : 0;
-      out.push({ ...slotOf(entry.card, "play", "card", { ...rect, y: rect.y + lift }), ...covered });
+      // An exhausted card is turned about its center, which leaves its top lower than its row's: in a back row it rises by the difference, so the band that shows above the front row is the 44 pt the row keeps, with room for its tokens.
+      const turned = covered.coveredFrom != null && isExhausted(entry.card) ? -(plan.size.h - plan.size.w) / 2 : 0;
+      out.push({ ...slotOf(entry.card, "play", "card", { ...rect, y: rect.y + lift + turned }), ...covered });
     });
     y = next;
   });
