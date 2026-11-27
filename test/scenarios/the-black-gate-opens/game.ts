@@ -109,7 +109,7 @@ export const OPENS_GOLDENS: readonly OpensGolden[] = [
   { name: "true solo, ended, Normal, after the earlier parts, every hero destroyed", seatCount: 1, seed: 5, difficulty: "Normal", decks: "brittle", outcome: "won", after: true },
   { name: "true solo, ended, Normal, with no earlier log, threat 99 in the first round", seatCount: 1, seed: 8, difficulty: "Normal", decks: "weak", outcome: "won" },
   { name: "two-handed, ended, Normal, after the earlier parts, the first player out first", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
-  { name: "two-handed, ended, Normal, after the earlier parts, Gwaihir held by the first player", seatCount: 2, seed: 13, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
+  { name: "two-handed, ended, Normal, after the earlier parts, Gwaihir held by the first player", seatCount: 2, seed: 37, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
   { name: "two-handed, ended, Easy, after the earlier parts, the Embassy played", seatCount: 2, seed: 7, difficulty: "Easy", decks: "strong", outcome: "won", after: true, policy: { choose: "last" } },
   { name: "two-handed, ended, Normal, after the earlier parts, every hero destroyed", seatCount: 2, seed: 7, difficulty: "Normal", decks: "brittle", outcome: "won", after: true },
   { name: "true solo, lost, Aragorn leaves play", seatCount: 1, seed: 3, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "Aragorn left play" },
