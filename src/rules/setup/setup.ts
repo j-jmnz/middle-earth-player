@@ -24,6 +24,10 @@ import { blankScenario, livingSeats, updateCard, withMode, withSeat, withThreat,
 import type { CampaignFacts } from "../core/campaign-state.ts";
 import { placeCampaignCard } from "../families/burden/campaign.ts";
 import { snapshotOf } from "../engine/undo.ts";
+import { settle } from "../engine/machine.ts";
+import { syncConstants } from "../interpret/constants.ts";
+import { registerHostListeners } from "../families/attachments/hold.ts";
+import { pushDue } from "../windows/delayed.ts";
 import { attachTo, moveCard, spawn } from "../core/zones.ts";
 import { corsairTrait, stampRoutes } from "../families/sea/routes.ts";
 import { markSideQuests } from "../families/wilderland/night-quest.ts";
@@ -198,16 +202,25 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   const quiet: EngineStep[] = [];
   state = searchSetup(state, "player", ctx, quiet);
   state = handSetup(state, ctx, quiet);
-  for (const seat of livingSeats(state)) state = drawOpeningHand(state, seat, quiet, ctx);
-  state = {
-    ...withMode(state, "mulligan"),
-    window: { kind: "mulligan" },
-    activeSeat: state.firstPlayer,
-  };
+  // A player Setup that fires right after the heroes are placed and may ask (The One Ring, vom.the-one-ring) resolves before the hands are drawn.
+  const waiting = pushDue(withMode(state, "openingHands"), "Setup", "beforeOpeningHand", quiet);
+  if (waiting.stack.length > 0) {
+    registerHostListeners(ctx);
+    const settled = syncConstants(settle(waiting, ctx, quiet), ctx);
+    return { ...settled, undo: snapshotOf(settled) };
+  }
+  state = openMulligan(state, ctx, quiet);
   return {
     ...state,
     undo: snapshotOf(state),
   };
+}
+
+// The opening hands are drawn, and the mulligan opens for the first player (rr.setup, rr.mulligan).
+export function openMulligan(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  let next = state;
+  for (const seat of livingSeats(next)) next = drawOpeningHand(next, seat, steps, ctx);
+  return { ...withMode(next, "mulligan"), window: { kind: "mulligan" }, activeSeat: next.firstPlayer };
 }
 
 export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {

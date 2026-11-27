@@ -43,23 +43,28 @@ function started(deck: readonly string[], heroes: readonly string[] = ["dwarf", 
 }
 
 describe("The One Ring (21001)", () => {
-  it("is attached to a hero the player chooses after the opening hand, with a Master card fetched into the hand (21001:A:2)", () => {
+  it("is attached to a hero the player chooses right after the heroes are placed, before the opening hand, with a Master card fetched into the hand (21001:A:2)", () => {
     const { state, world } = started(["21001", "master", ...filler]);
-    // The Ring left the deck for its Setup, which waits for the opening hand and the mulligan.
+    // The Setup asks first: the Ring is out of the deck and nothing is drawn yet, so there is no mulligan window.
     expect(Object.values(state.cards).find((card) => card.code === "21001")?.zone).toBe("setAside");
-    let next = expectOk(reduce(state, { type: "Keep" }, world)).state;
+    expect(state.window).toMatchObject({ kind: "choose" });
+    expect(state.mode).toBe("openingHands");
+    expect(state.seats[0]?.hand).toHaveLength(0);
     // Two heroes: the player chooses.
-    expect(next.window).toMatchObject({ kind: "choose" });
-    const options = choices(next);
+    const options = choices(state);
     expect(options).toHaveLength(2);
     const [chosen] = options;
-    next = expectOk(reduce(next, { type: "Choose", optionId: chosen ?? "" }, world)).state;
+    const next = expectOk(reduce(state, { type: "Choose", optionId: chosen ?? "" }, world)).state;
     const ring = Object.values(next.cards).find((card) => card.code === "21001");
     expect(ring?.host).toBe(chosen);
     expect(ring?.zone).toBe("play");
-    // The Master card is in the hand (it may already have been in the opening hand).
+    // The Master card was fetched before the draw, so it is in the hand and the opening hand is 6 more cards.
     const master = Object.values(next.cards).find((card) => card.code === "master");
     expect(master?.zone).toBe("hand");
+    expect(next.seats[0]?.hand).toHaveLength(7);
+    // The mulligan opens only now.
+    expect(next.mode).toBe("mulligan");
+    expect(next.window).toMatchObject({ kind: "mulligan" });
     void legalIntents;
   });
 

@@ -24,6 +24,7 @@ export function phaseOf(mode: ModeName): Phase {
   switch (mode) {
     case "mulligan":
       return "Mulligan";
+    case "openingHands":
     case "afterOpening":
       return "Setup";
     case "beginRound":

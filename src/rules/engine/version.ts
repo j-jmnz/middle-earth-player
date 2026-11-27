@@ -210,9 +210,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 62, scenarios: "all", note: "A lasting effect that lasts until the end of the phase or round holds while the Forced effects at that end are collected, so after Lost Underground is defeated On Track does not flip back to Off Track at the end of the quest phase. The Responses offered at the end of the round hear it too." },
   { version: 63, scenarios: "all", note: "A card that prints Immune to player card effects as the first words of a line is immune in every box, not only in the ones whose source lists the keyword: Spider Burrow, Poros Garrison, Smaug, the Siege of Annúminas cards and others can no longer be chosen by a player card." },
   { version: 64, scenarios: "all", note: "When two or more Forced effects of different cards trigger at the same moment, the first player chooses the order they initiate in, whoever controls the cards; each resolves completely before the next. A window asks for the order only when the effects differ, and never offers an order a card forbids (Attack on Dol Guldur's stage 3 and Dol Guldur go before the mode card's)." },
+  { version: 65, scenarios: "all", note: "The One Ring is attached to a hero, and its Master card searched, right after the starting heroes are placed, before the opening hand is drawn and the mulligan is offered." },
 ];
 
-export const ENGINE_VERSION = 64;
+export const ENGINE_VERSION = 65;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

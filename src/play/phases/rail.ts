@@ -50,6 +50,7 @@ const ROUND: readonly ModeName[] = [
 ];
 
 export const STEP_WORDS: Readonly<Record<ModeName, string>> = {
+  openingHands: "Setup",
   afterOpening: "Setup",
   mulligan: "Mulligan",
   beginRound: "Beginning of round",
@@ -90,7 +91,7 @@ export function railFor(game: ScenarioState): Rail {
   };
   if (game.lost) return { ...base, previous: STEP_WORDS[game.mode], current: "Defeat", next: "" };
   if (game.stageCleared) return { ...base, previous: STEP_WORDS[game.mode], current: endedInDefeat(game) ? "The end" : "Victory", next: "Resolution" };
-  if (game.mode === "afterOpening" || game.mode === "mulligan") {
+  if (game.mode === "openingHands" || game.mode === "afterOpening" || game.mode === "mulligan") {
     return { ...base, previous: game.mode === "mulligan" ? "Setup" : "", current: STEP_WORDS[game.mode], next: STEP_WORDS.beginRound };
   }
   const at = ROUND.indexOf(game.mode === "stopped" ? "resolution" : game.mode);

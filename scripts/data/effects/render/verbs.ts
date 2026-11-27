@@ -69,7 +69,7 @@ const DELAY_UNTIL: Readonly<Record<string, string>> = {
   questSucceeded: "if the players quest successfully this phase (never, if they do not)",
   questFailed: "if the players quest unsuccessfully this phase (never, if they do not)",
   endOfAttack: "when the attack ends",
-  startOfGame: "once the opening hands are done, before the first round",
+  beforeOpeningHand: "right after the heroes are placed, before the opening hand is drawn",
   beginningOfTravel: "when the next travel phase begins",
 };
 const CHOOSE_CARDS_WHO: Readonly<Record<string, string>> = { eachSeat: "each player in turn", firstPlayer: "the first player", onePlayer: "each player in turn (the offer ends once one has taken it)" };

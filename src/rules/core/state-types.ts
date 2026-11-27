@@ -216,6 +216,7 @@ export type Phase =
 
 export type ModeName =
   | "mulligan"
+  | "openingHands"
   | "afterOpening"
   | "beginRound"
   | "resourceGrant"
