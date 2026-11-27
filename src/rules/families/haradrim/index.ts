@@ -22,7 +22,7 @@ import { revealRandomSetAside } from "./random-aside.ts";
 import { haradrimPickMatches } from "./pick.ts";
 import { allyBelowThreat, threatAboveWillpower, willpowerGap } from "./combat.ts";
 import { attackSeatWithMost, engageSeatWithMost } from "./engage.ts";
-import { attachCaptive, discardUntilAlly, heldPrintedAmount, rescueCaptured, stripCaptive } from "./captured.ts";
+import { attachCaptive, discardUntilAlly, heldPrintedAmount, rescueCaptured, seatsWithoutCaptives, stripCaptive } from "./captured.ts";
 import { announceOverLimit } from "./hand.ts";
 import { runHeat, temperatureAmount, temperatureCondition } from "./heat.ts";
 import { guardStagedHeroes, markStagedHeroes, moveHeroesToStaging, releaseStagedHero, takeObjectiveHero, undefendedStaged } from "./staged.ts";
@@ -101,7 +101,7 @@ export const manifest: RulesFamily = {
         return haradrimCondition(state, condition) ?? orcsCondition(state, condition) ?? exploredCondition(state, condition) ?? temperatureCondition(state, condition);
     }
   },
-  amount: (state, found, scope, ctx) => (found.heldPrinted ? heldPrintedAmount(state, found.heldPrinted, scope, ctx) : found.willpowerGap ? willpowerGap(state, scope.sourceId ?? null, ctx.cards) : temperatureAmount(state, found)),
+  amount: (state, found, scope, ctx) => (found.seatsWithoutCaptives ? seatsWithoutCaptives(state) : found.heldPrinted ? heldPrintedAmount(state, found.heldPrinted, scope, ctx) : found.willpowerGap ? willpowerGap(state, scope.sourceId ?? null, ctx.cards) : temperatureAmount(state, found)),
   pick: haradrimPickMatches,
   // An enemy that cannot leave the staging area and is only considered engaged (The Black Serpent, 17094:A:1) is never optionally engaged: it would not leave (rr.optional-engagement, rr.cannot).
   // `cannotBeOptionallyEngaged` cannot serve for `neverEngaged`: the bar must end with `losesCannotLeaveStaging` (the enemy can be engaged again once it can leave), which that stat never does.

@@ -139,6 +139,8 @@ export const amountExprSchema = z.strictObject({
   willpowerGap: z.literal(true).optional(),
   // The printed Willpower or cost of the captive the source holds, 0 with none (17125:A:2); `ownedByActor`: of the one the acting seat owns (17131:A:2). Read by the haradrim family (families/haradrim/captured.ts).
   heldPrinted: z.strictObject({ stat: z.enum(["willpower", "cost"]), ownedByActor: z.literal(true).optional() }).optional(),
+  // How many living players own no captive ("if any player does not own a guarded objective", 17130:A:1). Read by the haradrim family (families/haradrim/captured.ts).
+  seatsWithoutCaptives: z.literal(true).optional(),
   // The highest threat among the living players ("X is the threat of the player with the highest threat", 145064:B:1), and the number of living players whose threat is at least this ("+1 Threat for each player with a threat of 35 or higher",
   // 145021:A:1). Read by the grey-company family (src/rules/families/grey-company/amounts.ts).
   highestThreat: z.literal(true).optional(),

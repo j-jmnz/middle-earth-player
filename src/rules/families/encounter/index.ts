@@ -5,6 +5,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
+import { markShort } from "../../interpret/effect-verbs.ts";
 import { startReveal } from "../../windows/frames.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -67,7 +68,9 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       if (times <= 0) return state;
       const rest: Instruction = { verb: "RevealEncounter", ...(instruction.who ? { who: instruction.who } : {}), times: times - 1 };
       const queued = times > 1 && effectData(state) ? queueFront(state, [{ instruction: rest, seat: focus.seat, chosen: null }]) : state;
-      return startReveal(queued, seat, ctx, steps);
+      const started = startReveal(queued, seat, ctx, steps);
+      // No card to reveal: the text after "then" is not attempted (the `thenResolves` condition, rr.then).
+      return started.stack.length === queued.stack.length ? markShort(started, ctx) : started;
     }
     case "RevealTopEnemies":
       return revealTopEnemies(state, resolveAmount(state, instruction.count, frameScope(state, focus.seat, focus.sourceId), ctx), focus.seat, ctx, steps);

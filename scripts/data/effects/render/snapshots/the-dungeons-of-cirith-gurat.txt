@@ -5,7 +5,9 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
 
 17119:A:1 (front): While a character is attached to an encounter card, it is considered to be a guarded objective with a blank text box.
   17119:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - each card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
+    - each card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free): stat guardedObjective (the character is a guarded objective: while it is attached it loses its card type and its player card status, and it gets both back when it is rescued; it lies in the captive zone) 1, while this card is in play
 
 17119:A:2 (front): Forced: When a character is attached to an encounter card, discard each token and attachment on that character.
   17119:forced:1: Forced on the event attached (heard about card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free))
@@ -95,12 +97,13 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
   17124:travel:1: Travel
     note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no option can be taken
     (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the encounter deck holds no card: shuffle the encounter discard pile into the encounter deck
     - the top card of the encounter deck goes to the encounter discard pile
     - the first player chooses one of:
-      * option "discard" (only if there is a card (you control) in hand, with a printed cost greater than the printed Threat (0 with none) of the card last discarded from the encounter deck to choose):
+      * option "discard" (only if all of: (the picked card is a card (any player controls) or in the staging area or the active location that is out of play now) and (there is a card (you control) in hand, with a printed cost greater than the printed Threat (0 with none) of the card last discarded from the encounter deck to choose)):
         - choose card (you control) in hand, with a printed cost greater than the printed Threat (0 with none) of the card last discarded from the encounter deck
         - discard the picked card
-      * option "threat":
+      * option "threat" (only if the picked card is a card (any player controls) or in the staging area or the active location that is out of play now):
         - raise threat by 3 (each player)
 
 ## 17125 Dungeon Cell
@@ -140,7 +143,7 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
 17127:A:1 (front): While Mines of Cirith Gurat is in the staging area, it gains: "Forced: When a player card would reduce a player's threat by any amount, reduce that amount to 1."
   17127:constant:1: Constant
     only if this card is in the staging area
-    - each player: stat threatReductionToOne 1, while this card is in play
+    - each player: stat threatReductionToOne (a player card effect lowers this player's threat by at most 1; an encounter card's reduction is not capped) 1, while this card is in play
 
 17127:A:2 (front): Travel: Each player discards the top 3 cards of his deck and raises his threat by 1 for each ally he discards this way.
   17127:travel:1: Travel
@@ -184,16 +187,17 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
-      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the event's other card is a card (any player controls) or in the staging area or the active location, of card type ally that is out of play now): the acting player reveals an encounter card
+      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the character the attack destroyed (the event's other card) is a card (any player controls) or in the staging area or the active location, of card type ally that is out of play now): the acting player reveals an encounter card
 
 ## 17130 Tormented by Orcs
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 17130:A:1 (front): When Revealed: Each player raises his threat by 1 for each guarded objective he owns. If any player does not own a guarded objective, Tormented by Orcs gains surge.
   17130:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - raise threat by the number of card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free), that the acting player owns (the acting player)
-      - then, if the number of Captives in play that belong to the acting seat is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if 0 is less than [json amount {"seatsWithoutCaptives":true}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 17130:A:2 (shadow): Shadow: Until the end of the phase, attacking enemy gets +1 Defense (+2 Defense instead if it is guarding an objective).
   17130:shadow:1: Shadow
@@ -240,7 +244,7 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
 
 17132:B:1 (back): Each enemy and location in the staging area that is guarding an objective is immune to player card effects.
   17132:constant:1: Constant
-    - each card (any player controls) in the staging area only, that holds a captive (a character or objective attached to it: it is guarding an objective): stat immuneToPlayerCards 1, while this card is in play
+    - each card (any player controls) in the staging area only, that is an enemy or a location, that holds a captive (a character or objective attached to it: it is guarding an objective): stat immuneToPlayerCards 1, while this card is in play
 
 17132:B:2 (back): Forced: After any number of characters are rescued, reveal an encounter card.
   17132:forced:1: Forced after any number of captives are rescued (once for everything one effect rescued; heard by the main quest stage) (heard about this card)
@@ -272,7 +276,7 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player reveals an encounter card
-    - then, if no player has engaged an enemy this round (at any moment of the round) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on this card
+    - then, if all of: (every draw, every discard from a deck, every discard of resources and every ready this effect ran so far resolved in full: a draw or a discard that found fewer cards or tokens than it named, and a ready that did not happen (the card was ready already, or cannot ready), did not (what follows "then" is attempted only when they all did)) and (no player has engaged an enemy this round (at any moment of the round)) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on this card
 
 17133:B:3 (back): The players cannot defeat this stage unless there are at least 2 resources here.
   17133:constant:2: Constant
@@ -288,10 +292,10 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
     - one set-aside card with code 16061 joins the staging area (it is not revealed)
     - for each player, first player first:
       - choose hero (you control)
+      - the picked card loses its damage, resource and progress tokens, and each attachment on it is discarded
       - choose enemy (any player controls) in the staging area only, with nothing attached to it, no attachment of any kind and no captive
       - the card picked before is attached to the picked card as a captive: it lies in play, faceup, under no player's control and still its owner's (a hero keeps its place among its owner's heroes); the Captives of Cirith Gurat hear it (nothing with no such card or no host)
-    - the table: stat engagementCostZeroUnguarded (each enemy that holds no captive has engagement cost 0 until the end of the phase) 1, until the end of the phase
-    - the players make engagement checks against each enemy in the staging area, outside the encounter phase: in player order each engages the enemy of the highest engagement cost at or below their threat, pass after pass until a pass engages none
+    - then, if not (the number of hero (in play, controlled by no player) that is a Captive (held by an enemy or lying free) is less than the number of players) (checked when this step runs, after the steps above; not tied to whether they did anything): the players make engagement checks against each enemy in the staging area, outside the encounter phase: in player order each engages the enemy of the highest engagement cost at or below their threat, pass after pass until a pass engages none [also {"unguardedZero":true}]
 
 17134:B:1 (back): Forced: At the beginning of the quest phase, discard cards from the encounter deck until an enemy is discarded and add that enemy to the staging area.
   17134:forced:1: Forced when a phase begins
@@ -307,4 +311,4 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
     note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 217 by template, 0 as JSON)
+(rendered pieces: 232 by template, 2 as JSON)

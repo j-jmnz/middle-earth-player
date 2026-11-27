@@ -9,7 +9,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import { destroyCard, releaseAttachments } from "../../core/destroy.ts";
 import { uniqueBlocked } from "../../core/keywords.ts";
 import { printedOf } from "../../core/printed.ts";
-import { inPlay, updateCard, type CardInstance, type ScenarioState } from "../../core/state.ts";
+import { inPlay, livingSeats, updateCard, type CardInstance, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { frameScope, refCard, type AmountScope } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -132,4 +132,9 @@ export function heldPrintedAmount(state: ScenarioState, found: { stat: "willpowe
   const held = scope.sourceId ? captivesHeldBy(state, scope.sourceId).filter((card) => !found.ownedByActor || card.owner === scope.actor) : [];
   const first = held[0];
   return first ? (printedOf(ctx.cards, first.code)[found.stat] ?? 0) : 0;
+}
+
+/** The amount `seatsWithoutCaptives`: the living players that own no captive. */
+export function seatsWithoutCaptives(state: ScenarioState): number {
+  return livingSeats(state).filter((seat) => !captivesOf(state).some((card) => card.owner === seat)).length;
 }

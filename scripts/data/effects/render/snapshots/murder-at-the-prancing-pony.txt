@@ -270,7 +270,7 @@ Scenario piles that place cards with no record (staging: 50716 Ramshackle Manor;
 
 50716:A:2 (front): When a player card effect reduces a player's threat by any amount, reduce that amount to 1.
   50716:constant:2: Constant
-    - each player: stat threatReductionToOne 1, while this card is in play
+    - each player: stat threatReductionToOne (a player card effect lowers this player's threat by at most 1; an encounter card's reduction is not capped) 1, while this card is in play
 
 50716:A:3 (front): Travel: Raise each player's threat by 1 to travel here.
   50716:travel:1: Travel

@@ -25,6 +25,8 @@ const UNATTACHED_ENEMY: PickSpec = { type: "enemy", control: "any", stagingOnly:
 const UNATTACHED_ENEMY_OR_LOCATION: PickSpec = { type: "card", control: "any", stagingOnly: true, enemyOrLocation: true, unattached: true };
 // "If this attack destroys an ally": the attack's X is the characters it destroyed, and the one it destroyed is an ally.
 const DESTROYED_AN_ALLY: Condition = { kind: "all", conditions: [{ kind: "x", min: 1 }, { kind: "matches", card: "other", pick: { type: "card", control: "any", cardType: "ally" }, inPlay: false }] };
+// "Then, ...": the text after it resolves only when the encounter deck gave a card to discard (rr.then).
+const DISCARDED_A_CARD: Condition = { kind: "matches", card: "picked", pick: { type: "card", control: "any" }, inPlay: false };
 const ORC_FOUND: Condition = { kind: "matches", card: "picked", pick: { type: "enemy", control: "any", trait: "Orc" }, inPlay: false };
 const ATTACH_PICKED_TO_PREVIOUS: Instruction = { verb: "AttachCaptive", card: "previous", to: "picked" };
 
@@ -34,7 +36,7 @@ const THREAT_BEATS_ALLY: Condition = { kind: "all", conditions: [{ kind: "threat
 export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 17119 The Captives of Cirith Gurat (objective). A character attached to an encounter card is a guarded objective with a blank text box (the captive zone, blankText); when it is attached its tokens and attachments are discarded
   // (Forced on `attached`); when the encounter card that holds it leaves play it is free of encounters and its owner takes control of it, exhausted (Forced on `leftPlay`, RescueCaptured; a side quest that holds one rescues them itself when it is defeated, 17131:A:2).
-  { id: `${CAPTIVES}:constant:1`, cardCode: CAPTIVES, lines: [`${CAPTIVES}:A:1`], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "blankText", amount: 1, until: "whileSourceInPlay", holders: CAPTIVE }] },
+  { id: `${CAPTIVES}:constant:1`, cardCode: CAPTIVES, lines: [`${CAPTIVES}:A:1`], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "blankText", amount: 1, until: "whileSourceInPlay", holders: CAPTIVE }, { verb: "ModifyStat", stat: "guardedObjective", amount: 1, until: "whileSourceInPlay", holders: CAPTIVE }] },
   { id: `${CAPTIVES}:forced:1`, cardCode: CAPTIVES, lines: [`${CAPTIVES}:A:2`], timing: "forced", trigger: "attached", subject: CAPTIVE, instructions: [{ verb: "StripCaptive" }] },
   { id: `${CAPTIVES}:forced:2`, cardCode: CAPTIVES, lines: [`${CAPTIVES}:A:3`], timing: "forced", trigger: "leftPlay", subject: { ...GUARDING, enemyOrLocation: true }, instructions: [{ verb: "RescueCaptured" }] },
 
@@ -89,13 +91,14 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["17124:A:2"],
     timing: "travel",
     instructions: [
+      { verb: "ShuffleEncounterDiscard", when: { kind: "encounterDeckEmpty" } },
       { verb: "MoveEncounterCard", card: "deckTop", to: "discard" },
       {
         verb: "Choose",
         who: "firstPlayer",
         options: [
-          { id: "discard", requires: { kind: "canPick", pick: { type: "card", control: "you", from: "hand", costAboveDiscardedThreat: true } }, instructions: [{ verb: "Pick", pick: { type: "card", control: "you", from: "hand", costAboveDiscardedThreat: true } }, { verb: "DiscardPicked" }] },
-          { id: "threat", instructions: [{ verb: "RaiseThreat", amount: 3, who: "eachSeat" }] },
+          { id: "discard", requires: { kind: "all", conditions: [DISCARDED_A_CARD, { kind: "canPick", pick: { type: "card", control: "you", from: "hand", costAboveDiscardedThreat: true } }] }, instructions: [{ verb: "Pick", pick: { type: "card", control: "you", from: "hand", costAboveDiscardedThreat: true } }, { verb: "DiscardPicked" }] },
+          { id: "threat", requires: DISCARDED_A_CARD, instructions: [{ verb: "RaiseThreat", amount: 3, who: "eachSeat" }] },
         ],
       },
     ],
@@ -172,7 +175,11 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "17130",
     lines: ["17130:A:1"],
     timing: "whenRevealed",
-    instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "RaiseThreat", amount: { count: MY_CAPTIVE }, who: "actor" }, { verb: "GainSurge", when: { kind: "captives", max: 0, of: "actor" } }] }],
+    instructions: [
+      { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "RaiseThreat", amount: { count: MY_CAPTIVE }, who: "actor" }] },
+      // One surge in all, as printed, when any player owns none.
+      { verb: "GainSurge", when: { kind: "less", left: 0, right: { seatsWithoutCaptives: true } } },
+    ],
   },
   {
     id: "17130:shadow:1",
@@ -224,7 +231,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "DiscardUntilAlly", notInPlay: true }, { verb: "Pick", pick: UNATTACHED_ENEMY }, ATTACH_PICKED_TO_PREVIOUS] },
     ],
   },
-  { id: `${STAGE_1}:constant:1`, cardCode: STAGE_1, lines: [`${STAGE_1}:B:1`], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "immuneToPlayerCards", amount: 1, until: "whileSourceInPlay", holders: { ...GUARDING, stagingOnly: true } }] },
+  { id: `${STAGE_1}:constant:1`, cardCode: STAGE_1, lines: [`${STAGE_1}:B:1`], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "immuneToPlayerCards", amount: 1, until: "whileSourceInPlay", holders: { ...GUARDING, enemyOrLocation: true, stagingOnly: true } }] },
   { id: `${STAGE_1}:forced:1`, cardCode: STAGE_1, lines: [`${STAGE_1}:B:2`], timing: "forced", trigger: "charactersRescued", subject: "self", instructions: [{ verb: "RevealEncounter" }] },
   { id: `${STAGE_1}:constant:2`, cardCode: STAGE_1, lines: [`${STAGE_1}:B:3`], timing: "constant", condition: { kind: "canPick", pick: CAPTIVE }, instructions: [{ verb: "Restrict", what: "advance" }] },
 
@@ -247,7 +254,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: [`${STAGE_2}:B:2`],
     timing: "forced",
     trigger: "endOfRound",
-    instructions: [{ verb: "RevealEncounter" }, { verb: "PlaceResourceTokens", amount: 1, on: "self", when: { kind: "engagedThisRound", is: false, anySeat: true } }],
+    instructions: [{ verb: "RevealEncounter" }, { verb: "PlaceResourceTokens", amount: 1, on: "self", when: { kind: "all", conditions: [{ kind: "thenResolves" }, { kind: "engagedThisRound", is: false, anySeat: true }] } }],
   },
   { id: `${STAGE_2}:constant:2`, cardCode: STAGE_2, lines: [`${STAGE_2}:B:3`], timing: "constant", condition: { kind: "less", left: { stat: "resources", of: "self" }, right: 2 }, instructions: [{ verb: "Restrict", what: "advance" }] },
 
@@ -260,9 +267,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "whenRevealed",
     instructions: [
       { verb: "AddSetAsideToStaging", code: "16061" },
-      { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Pick", pick: { type: "hero", control: "you" } }, { verb: "Pick", pick: UNATTACHED_ENEMY }, ATTACH_PICKED_TO_PREVIOUS] },
-      { verb: "ModifyStat", stat: "engagementCostZeroUnguarded", amount: 1, until: "endOfPhase", target: "table" },
-      { verb: "MakeEngagementChecks" },
+      { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Pick", pick: { type: "hero", control: "you" } }, { verb: "StripCaptive", target: "picked" }, { verb: "Pick", pick: UNATTACHED_ENEMY }, ATTACH_PICKED_TO_PREVIOUS] },
+      // "Then": the checks happen only when each player attached a hero (rr.then).
+      { verb: "MakeEngagementChecks", unguardedZero: true, when: { kind: "not", condition: { kind: "less", left: { count: { ...CAPTIVE, type: "hero" } }, right: { players: true } } } },
     ],
   },
   {
