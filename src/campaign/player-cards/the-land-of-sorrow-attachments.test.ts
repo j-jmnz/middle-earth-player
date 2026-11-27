@@ -2,7 +2,7 @@
 // rr.quest-phase, rr.step-3-4, rr.search (data/rules/entries.json).
 // The Land of Sorrow attachments, each printed line tested from the words on the card (lineSpec, test/harness/line-spec.ts): Red Book of
 // Westmarch 22110:A:1, A:2 and A:3, Song of Healing 22112:A:1 and A:2, Spare Pipe 22115:A:1, A:2 and A:3. The lines are the text of
-// data/cards/TLoS.json (data/printed holds no ledger for this pack), so every intent goes through sendUnledgered. The other cards are in
+// data/cards/TLoS.json (data/printed holds the pack's ledger), so every line is checked against it. The other cards are in
 // the-land-of-sorrow.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -14,8 +14,8 @@ import { syncConstants } from "../../rules/interpret/constants.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { choices, hosts, play, playerTableFor, printed, questUntil, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { choices, hosts, play, playerTableFor, printed, questUntil, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const BOOK = "22110";
 const HEALING = "22112";
@@ -66,7 +66,7 @@ describe("Red Book of Westmarch (22110:A:1, A:2, A:3)", () => {
     let run = play(begin(tab.state), tab, book, pal);
     expect(run.state.window?.kind).toBe("choose");
     expect(choices(run.state, tab).sort()).toEqual([book, first, second].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: first }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: first }, tab.ctx);
     expect(run.state.cards[first]?.zone).toBe("discard");
     expect(run.state.cards[pal]?.attachments.slice().sort()).toEqual([book, second].sort());
   });
@@ -82,7 +82,7 @@ describe("Red Book of Westmarch (22110:A:1, A:2, A:3)", () => {
     const [pal, took, aragorn] = [idsOf(tab, PAL), idsOf(tab, TOOK), idsOf(tab, ARAGORN)];
     expect(stat(tab.state, tab, pal, "willpower")).toBe(1);
     expect(stat(tab.state, tab, took, "willpower")).toBe(1);
-    const run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [pal] }, tab.ctx);
+    const run = send(begin(tab.state), { type: "Commit", cardIds: [pal] }, tab.ctx);
     expect(run.state.cards[pal]?.committed).toBe(true);
     expect(stat(run.state, tab, pal, "willpower")).toBe(1 + 1);
     expect(stat(run.state, tab, took, "willpower")).toBe(1 + 1);
@@ -97,7 +97,7 @@ describe("Red Book of Westmarch (22110:A:1, A:2, A:3)", () => {
     let run = questUntil(tab, [pal], (next) => triggers(next.state, tab).includes("22110:response:1"));
     expect(triggers(run.state, tab)).toContain("22110:response:1");
     const before = run.state.cards[pal]?.resources ?? 0;
-    run = sendUnledgered(run, { type: "Trigger", cardId: book, effectId: "22110:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: book, effectId: "22110:response:1" }, tab.ctx);
     expect(run.state.cards[book]?.exhausted).toBe(true);
     expect(run.state.cards[pal]?.resources).toBe(before + 1);
   });
@@ -134,10 +134,10 @@ describe("Song of Healing (22112:A:1, A:2)", () => {
     const tab = song(effects, 2, [[EV1, EV2]]);
     const [denethor, ev1, ev2] = [idsOf(tab, DENETHOR), idsOf(tab, EV1), idsOf(tab, EV2)];
     expect(triggers(tab.state, tab)).toContain("22112:action:1");
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, HEALING), effectId: "22112:action:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, HEALING), effectId: "22112:action:1" }, tab.ctx);
     expect(run.state.window?.kind).toBe("choose");
     expect(choices(run.state, tab).sort()).toEqual([ev1, ev2].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: ev1 }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: ev1 }, tab.ctx);
     expect(run.state.cards[ev1]?.zone).toBe("discard");
     expect(run.state.seats[0]?.hand).toEqual([ev2]);
     expect(run.state.cards[denethor]?.damage).toBe(1);
@@ -146,10 +146,10 @@ describe("Song of Healing (22112:A:1, A:2)", () => {
   // "Any player may trigger this effect.": the first player passes; the second player triggers it and discards from his own hand.
   lineSpec("22112:A:2", "another player may trigger it, discarding from his own hand", (effects) => {
     const tab = song(effects, 2, [[], [EV1]], 2);
-    let run = sendUnledgered(begin(tab.state), { type: "Pass" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Pass" }, tab.ctx);
     expect(run.state.activeSeat).toBe(1);
     expect(triggers(run.state, tab)).toContain("22112:action:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, HEALING), effectId: "22112:action:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, HEALING), effectId: "22112:action:1" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, EV1)]?.zone).toBe("discard");
     expect(run.state.seats[1]?.hand).toEqual([]);
     expect(run.state.cards[idsOf(tab, DENETHOR)]?.damage).toBe(1);
@@ -194,10 +194,10 @@ describe("Spare Pipe (22115:A:1, A:2, A:3)", () => {
     let run = play(begin(tab.state), tab, pipe, idsOf(tab, EOWYN));
     expect(triggers(run.state, tab)).toContain("22115:response:1");
     const cursor = run.state.seedCursor;
-    run = sendUnledgered(run, { type: "Trigger", cardId: pipe, effectId: "22115:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: pipe, effectId: "22115:response:1" }, tab.ctx);
     expect(run.state.window?.kind).toBe("choose");
     expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, EV1), idsOf(tab, EV2)].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, EV2) }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: idsOf(tab, EV2) }, tab.ctx);
     expect(run.state.seats[0]?.hand).toEqual([idsOf(tab, EV2)]);
     const left = run.state.seats[0]?.deck ?? [];
     expect(left).toHaveLength(6);

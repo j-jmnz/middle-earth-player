@@ -2,8 +2,7 @@
 // rr.discard-pile-and-victory-display, rr.encounter-deck, rr.ownership-and-control, rr.staging, rr.step-3-3 (data/rules/entries.json).
 // The Wrath and Ruin heroes, events and ally, each line tested from the words on the card: Thorin Stonehelm 22001:A:1, Pillars of the Kings
 // 22003:A:1 and A:2, Tom Bombadillo! 22005:A:1, Charge into Battle 22007:A:1, Tom Bombadil 22010:A:1. The attachments are in
-// wrath-and-ruin-attachments.test.ts. The lines are the text of data/cards/WaR.json (data/printed holds no entry for this pack), so every
-// intent goes through sendUnledgered.
+// wrath-and-ruin-attachments.test.ts. The lines are the text of data/cards/WaR.json (data/printed holds the pack's ledger), so every line is checked against it.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
@@ -15,8 +14,8 @@ import { playCost } from "../../rules/player/attach.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { attacking, canPlay, choices, fillers, playCode, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, type Run, type Table } from "../../../test/harness/scene.ts";
+import { attacking, canPlay, choices, fillers, playCode, playerTableFor, triggers } from "../../../test/harness/player-table.ts";
 
 const THORIN = "22001";
 const PILLARS = "22003";
@@ -49,7 +48,7 @@ describe("Thorin Stonehelm (22001:A:1)", () => {
   // Two seats: two Walls are engaged with the player, the Dear with the other player. Thorin's deck holds `deck` cards.
   const scene = (effects: readonly Effect[], deck: number) =>
     table(effects, { seats: 2, heroes: [{ code: THORIN, seat: 0 }, { code: PAL, seat: 1 }], engaged: [{ code: WALL, seat: 0 }, { code: WALL, seat: 0 }, { code: "dear", seat: 1 }], playerDeck: fillers("card", deck) });
-  const declared = (tab: Table): Run => sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: tab.ids[WALL]?.[0] ?? "", attackerIds: [idsOf(tab, THORIN)] }, tab.ctx);
+  const declared = (tab: Table): Run => send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: tab.ids[WALL]?.[0] ?? "", attackerIds: [idsOf(tab, THORIN)] }, tab.ctx);
 
   // "Response: After Thorin Stonehelm is declared as an attacker, discard the top card of your deck to deal 1 damage to an enemy engaged
   // with you.": the top card of the deck goes to the discard pile; both Walls engaged with the player may be chosen, the Dear (engaged with
@@ -60,11 +59,11 @@ describe("Thorin Stonehelm (22001:A:1)", () => {
     const top = tab.state.seats[0]?.deck[0] ?? "";
     let run = declared(tab);
     expect(triggers(run.state, tab)).toContain("22001:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, THORIN), effectId: "22001:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, THORIN), effectId: "22001:response:1" }, tab.ctx);
     expect(run.state.cards[top]?.zone).toBe("discard");
     expect(run.state.seats[0]?.deck).toHaveLength(2);
     expect(choices(run.state, tab).sort()).toEqual([first, second].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: second }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: second }, tab.ctx);
     expect(run.state.cards[second]?.damage).toBe(1);
     expect(run.state.cards[idsOf(tab, "dear")]?.damage).toBe(0);
   });
@@ -89,7 +88,7 @@ describe("Pillars of the Kings (22003:A:1, A:2)", () => {
     const low = pillars(effects, 39);
     const card = idsOf(low, PILLARS);
     expect(playCost(low.state, card, 0, low.ctx)).toBe(0);
-    const run = sendUnledgered(begin(low.state), { type: "PlayCard", cardId: card, payments: [] }, low.ctx);
+    const run = send(begin(low.state), { type: "PlayCard", cardId: card, payments: [] }, low.ctx);
     expect(run.state.cards[card]?.zone).toBe("discard");
     expect(run.state.cards[idsOf(low, PAL)]?.resources).toBe(6);
     const high = pillars(effects, 40);
@@ -164,9 +163,9 @@ describe("Charge into Battle (22007:A:1)", () => {
     const tab = scene(effects);
     const charge = idsOf(tab, CHARGE);
     expect(canPlay(tab.state, tab, charge)).toBe(false);
-    let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, PAL)] }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, PAL)] }, tab.ctx);
     expect(canPlay(run.state, tab, charge)).toBe(false);
-    run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = send(run, { type: "Pass" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, "f0")]?.zone).toBe("staging");
     expect(canPlay(run.state, tab, charge)).toBe(true);
   });

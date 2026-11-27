@@ -16,7 +16,7 @@ export const RECORDS: readonly Effect[] = [
     {"verb":"DamageCard","amount":4,"target":"picked","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any","hasAttachment":{}}}}]},
   // 21008 Put Off Pursuit
   {"id":"21008:constant:1","cardCode":"21008","lines":["21008:A:1","21008:A:2"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"activeLocation"},"limitPerHost":true},{"verb":"ModifyStat","stat":"questPoints","amount":2,"until":"whileSourceInPlay","target":"host"}]},
-  // 21072 Sméagol, side A (side B is open: its enemy stats are in no source, src/effects/open-lines.ts)
+  // 21072 Sméagol, side A (the enemy side is Gollum, 21073)
   {"id":"21072:response:1","cardCode":"21072","lines":["21072:A:3"],"timing":"response","trigger":"traveled","subject":{"type":"location","control":"any"},"cost":{"kind":"raiseThreat","amount":1},"instructions":[{"verb":"Draw","amount":1}]},
 ];
 

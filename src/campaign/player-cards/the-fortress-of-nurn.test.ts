@@ -1,7 +1,7 @@
 // Rules: rr.attachment-cards, rr.restricted, rr.modifiers, rr.ranged, rr.sentinel, rr.action, rr.response, rr.play-restrictions-and-permissions,
 // rr.planning-phase, rr.step-3-4, rr.ready, rr.deckbuilding, rr.triggered-ability (data/rules/entries.json).
-// The Fortress of Nurn player cards, written from their card text (data/cards/TFoN.json; data/printed holds no ledger for this pack, so
-// the lines are the text of data/cards and every intent goes through sendUnledgered): Shining Shield 22138:A:1 and A:3, Knowledge of the
+// The Fortress of Nurn player cards, written from their card text (data/cards/TFoN.json; data/printed holds the pack's ledger, so
+// every line is checked against it): Shining Shield 22138:A:1 and A:3, Knowledge of the
 // Enemy 22139:A:1, Haleth 22140:A:1 (its failed quest; the rest is in the-fate-of-numenor.test.ts), Woodman Lore 22141:A:1, Westfold
 // Lancer 22142:A:1, Tireless Thoroughbred 22143:A:1 and A:3, Misty Mountain Journeyman 22144:A:1, Thorongil 22146:A:1, Bond of Friendship
 // 22147:A:1 and A:2.
@@ -19,8 +19,8 @@ import { syncConstants } from "../../rules/interpret/constants.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { attach, choices, enter, hosts, packRow, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, type Table } from "../../../test/harness/scene.ts";
+import { attach, choices, enter, hosts, packRow, play, playerTableFor, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const SHIELD = "22138";
 const KNOWLEDGE = "22139";
@@ -124,7 +124,7 @@ describe("Knowledge of the Enemy (22139:A:1)", () => {
     const [first = "", second = ""] = tab.ids[KNOWLEDGE] ?? [];
     let run = play(begin(tab.state), tab, first);
     expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, LEAD), idsOf(tab, TAC)].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, TAC) }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: idsOf(tab, TAC) }, tab.ctx);
     expect(run.state.cards[idsOf(tab, TAC)]?.resources).toBe(6 + 2);
     expect(run.state.cards[idsOf(tab, LEAD)]?.resources).toBe(6);
     expect(playable(tab, run.state, second)).toBe(false);
@@ -146,9 +146,9 @@ describe("Knowledge of the Enemy (22139:A:1)", () => {
 
 // The kit lacks this: commits `cardIds` and passes every window (Pass) until `effectId` is offered or the quest phase is over.
 function quest(tab: Table, cardIds: readonly string[], effectId: string) {
-  let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds }, tab.ctx);
+  let run = send(begin(tab.state), { type: "Commit", cardIds }, tab.ctx);
   for (let guard = 0; guard < 20 && run.state.phase === "Quest" && !triggers(run.state, tab).includes(effectId) && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"); guard += 1) {
-    run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    run = send(run, { type: "Pass" }, tab.ctx);
   }
   return run;
 }
@@ -180,11 +180,11 @@ describe("Woodman Lore (22141:A:1)", () => {
     for (const id of [woodHero, woodAlly, woodScout, plain, theirs]) state = updateCard(state, id, { exhausted: true });
     let run = play(begin(state), tab, idsOf(tab, WOODMAN_LORE));
     expect(choices(run.state, tab).sort()).toEqual(["ready", "stop"]);
-    run = sendUnledgered(run, { type: "Choose", optionId: "ready" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "ready" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([woodHero, woodAlly, woodScout].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: woodAlly }, tab.ctx);
-    run = sendUnledgered(run, { type: "Choose", optionId: "ready" }, tab.ctx);
-    run = sendUnledgered(run, { type: "Choose", optionId: woodHero }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: woodAlly }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "ready" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: woodHero }, tab.ctx);
     expect(run.state.window?.kind).not.toBe("choose");
     expect([woodHero, woodAlly, woodScout, plain, theirs].map((id) => run.state.cards[id]?.exhausted)).toEqual([false, false, true, true, true]);
     expect(run.state.cards[fen]?.attachments ?? []).toEqual([]);
@@ -207,10 +207,10 @@ describe("Westfold Lancer (22142:A:1)", () => {
     const [staged = "", engaged = ""] = tab.ids[GRUNT] ?? [];
     expect(run.state.window?.kind).toBe("response");
     expect(triggers(run.state, tab)).toContain("22142:response:1");
-    let next = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, LANCER), effectId: "22142:response:1" }, tab.ctx);
+    let next = send(run, { type: "Trigger", cardId: idsOf(tab, LANCER), effectId: "22142:response:1" }, tab.ctx);
     expect(next.state.cards[idsOf(tab, LANCER)]?.zone).toBe("discard");
     expect(choices(next.state, tab).sort()).toEqual([staged, idsOf(tab, BRUTE)].sort());
-    next = sendUnledgered(next, { type: "Choose", optionId: idsOf(tab, BRUTE) }, tab.ctx);
+    next = send(next, { type: "Choose", optionId: idsOf(tab, BRUTE) }, tab.ctx);
     expect([idsOf(tab, BRUTE), staged, idsOf(tab, BOSS), engaged].map((id) => next.state.cards[id]?.damage)).toEqual([2, 0, 0, 0]);
   });
 

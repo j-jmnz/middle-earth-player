@@ -1,6 +1,6 @@
 // Rules: rr.attachment-cards, rr.restricted, rr.modifiers, rr.action, rr.doomed-x, rr.search, rr.lasting-effects (data/rules/entries.json).
-// The Challenge of the Wainriders attachments, written from their card text (data/cards/CotW.json; data/printed holds no ledger for this
-// pack, so the lines are the text of data/cards and every intent goes through sendUnledgered): Power of Command 22055:A:1 and A:2, Golden
+// The Challenge of the Wainriders attachments, written from their card text (data/cards/CotW.json; data/printed holds the
+// pack's ledger, so every line is checked against it): Power of Command 22055:A:1 and A:2, Golden
 // Belt 22060:A:1 and A:2, Saruman's Staff 22063:A:1 and A:2. The heroes, allies, events and contract are in
 // challenge-of-the-wainriders.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -11,8 +11,8 @@ import { updateCard } from "../../rules/core/state.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { choices, enter, hosts, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, type Run, type Table } from "../../../test/harness/scene.ts";
+import { choices, enter, hosts, play, playerTableFor, printed, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const SARUMAN = "22054";
 const COMMAND = "22055";
@@ -106,7 +106,7 @@ describe("Golden Belt (22060:A:1, A:2)", () => {
     const axe = tab.ids[AXE]?.find((id) => tab.state.cards[id]?.zone === "hand") ?? "";
     let run = play(begin(tab.state), tab, axe, legolas);
     expect(choices(run.state, tab).sort()).toEqual([...(tab.ids[AXE] ?? []), idsOf(tab, PLATE)].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, PLATE) }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: idsOf(tab, PLATE) }, tab.ctx);
     expect(run.state.cards[idsOf(tab, PLATE)]?.zone).toBe("discard");
     expect(run.state.cards[legolas]?.attachments).toHaveLength(2);
   });
@@ -122,7 +122,7 @@ describe("Golden Belt (22060:A:1, A:2)", () => {
     expect(run.state.window?.kind).not.toBe("choose");
     run = play(run, tab, held, legolas);
     expect(choices(run.state, tab).sort()).toEqual([...(tab.ids[AXE] ?? []), worn, held].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: worn }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: worn }, tab.ctx);
     expect(run.state.cards[worn]?.zone).toBe("discard");
     expect(run.state.cards[legolas]?.attachments).toHaveLength(4);
   });
@@ -147,10 +147,10 @@ describe("Saruman's Staff (22063:A:1, A:2)", () => {
 
   // The Staff's Action, answered with `option`.
   function used(tab: Table, option: string): Run {
-    const run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, STAFF), effectId: "22063:action:1" }, tab.ctx);
+    const run = send(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, STAFF), effectId: "22063:action:1" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, STAFF)]?.exhausted).toBe(true);
     expect(choices(run.state, tab).sort()).toEqual(["doomed", "search"]);
-    return sendUnledgered(run, { type: "Choose", optionId: option }, tab.ctx);
+    return send(run, { type: "Choose", optionId: option }, tab.ctx);
   }
 
   // "Action: Exhaust Saruman's Staff to (choose one): Reduce the X value of the next Doomed X event you play this phase by 2": the first

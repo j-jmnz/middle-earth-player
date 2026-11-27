@@ -15,7 +15,7 @@ export function readVengeanceOfMordor(sentence: string, names: NameIndex, before
     return codes.every(own) ? codes : [];
   };
   const step = stepWith([]);
-  // The cards of one trait and type among the scenario's own: "each Plot objective", "each Cultist enemy", "each Camp location".
+  // The cards of one trait and type of the whole cycle (not only the scenario's encounter sets; a scenario that shares a trait across boxes reads the same set): "each Plot objective", "each Cultist enemy", "each Camp location".
   const ofTrait = (trait: string, type: string): string[] => names.cards.filter((card) => own(card.code) && card.type === type && card.traits.includes(trait)).map((card) => card.code);
   const last = before[before.length - 1];
   let match: RegExpExecArray | null;
@@ -27,8 +27,6 @@ export function readVengeanceOfMordor(sentence: string, names: NameIndex, before
     const codes = [...ofTrait(match[1] ?? "", "objective"), ...ofTrait(match[2] ?? "", "enemy")];
     return codes.length === 0 ? null : [{ kind: "aside", codes, allCopies: false }];
   }
-  // Danger in Dorwinion: "Each player searches the encounter deck for a different location and adds it to the staging area."
-  if (/^Each player searches the encounter deck for (?:1|an?|one) different location and adds it to the staging area$/i.test(sentence)) return [{ kind: "eachPlayerAddsLocation", count: 1 }];
   // Danger in Dorwinion: "One of those locations must be Side Street."
   if ((match = /^One of those locations must be (.+)$/i.exec(sentence))) {
     const codes = named(match[1]);
@@ -56,7 +54,7 @@ export function readVengeanceOfMordor(sentence: string, names: NameIndex, before
     return codes.length === 0 ? null : [{ kind: "stage", codes, perPlayer: null, count: 1 }];
   }
   // Challenge of the Wainriders, Under the Ash Mountains: "Each other player adds 1 different location to the staging area."
-  if ((match = /^Each other player adds (?:1|an?|one) different location to the staging area$/i.exec(sentence))) return [{ kind: "eachPlayerAddsLocation", count: 1, exceptFirst: true }];
+  if ((match = /^Each other player adds (?:1|an?|one) different location to the staging area$/i.exec(sentence))) return [{ kind: "eachPlayerAddsLocation", count: 1 }];
   // Under the Ash Mountains: "Each player with more than 40 cards in his deck discards cards from the top of his deck until he has 40 cards left."
   if ((match = /^Each player with more than (\d+) cards in his deck discards cards from the top of his deck until he has \d+ cards left$/i.exec(sentence))) return [step("trimDecks", { count: Number(match[1]) })];
   // Under the Ash Mountains: "Shuffle the encounter deck and discard cards from the top until a side quest is discarded." and "Reveal that side quest."
@@ -79,8 +77,6 @@ export function readVengeanceOfMordor(sentence: string, names: NameIndex, before
     const codes = ofTrait(match[1] ?? "", "enemy");
     return codes.length === 0 ? null : [stepWith(codes)("placeWardensUnderCamps")];
   }
-  // The Land of Sorrow: "Add each discarded this way to the staging area." (after the discard step read with Ered Mithrin's pattern)
-  if (/^Add each discarded this way to the staging area$/i.test(sentence)) return last?.kind === "discardToStaging" ? [] : null;
   // The Fortress of Nurn: "Player decks cannot exceed 50 cards."
   if ((match = /^Player decks cannot exceed (\d+) cards$/i.exec(sentence))) return [step("limitDeckSize", { count: Number(match[1]) })];
   // The Fortress of Nurn: "Each player puts 1 copy of Ulchor's Guard into play engaged with him."

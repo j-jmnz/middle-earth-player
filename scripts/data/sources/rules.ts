@@ -107,7 +107,7 @@ export const RULE_PDFS = [
     ["cop", "mec61_web_the_crossing_of_poros-rules.pdf"],
   ].map(([doc, file]) => ({ doc: doc as string, file: file as string, url: `${FFG}/${file as string}` })),
   // The Vengeance of Mordor cycle's rules insert (A Shadow in the East, MEC77, three scenarios) and the Adventure Pack rulesheets (MEC78 to MEC83): the scenario's encounter sets, its setup paragraph and the keywords it introduces.
-  // The FFG host has no copy under a name we know; Hall of Beorn's S3 host serves the PDFs (as it does `rr`). The Adventure Packs' pages 1 to 3 are text (MEC78 to MEC80) or outlines (MEC81 to MEC83: `handRead` in data/rules/columns.json).
+  // The FFG host has no copy under a name we know; Hall of Beorn's S3 host serves the PDFs (as it does `rr`). All seven are scans, so each is hand-read (`handRead` in data/rules/columns.json): MEC77 to MEC80 carry an OCR text layer with wrong words, MEC81 to MEC83 only outlines.
   ...[
     ["asite", "MEC77.pdf"],
     ["war", "MEC78.pdf"],

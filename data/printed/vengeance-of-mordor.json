@@ -3406,6 +3406,10 @@
       "inert": [],
       "misprints": [
         {
+          "line": 1,
+          "printed": "When Revealed: Wainrider Champion makes an attack against each engaged player. If no attacks were made, place damage on the Wainrider's stage equal to the Wainrider Champion's Threat."
+        },
+        {
           "line": 2,
           "printed": "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place 2 damage on the The Wainriders' stage."
         }

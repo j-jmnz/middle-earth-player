@@ -3,7 +3,7 @@
 // rr.cannot (data/rules/entries.json).
 // The A Shadow in the East player cards, each printed line tested from the words on the card: Frodo Baggins 21002:A:1, Merry 21003:A:1,
 // Pippin 21004:A:1 and A:2, Faramir 21005:A:1, Put Off Pursuit 21008:A:1, Sméagol 21072:A:1 and A:3, The Ring of Power 21011:A:1. The lines are the text of
-// data/cards (data/printed holds no ledger for this pack), so every intent goes through sendUnledgered.
+// data/cards (data/printed holds the pack's ledger), so every line is checked against it.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
@@ -13,8 +13,8 @@ import { updateCard } from "../../rules/core/state.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { attach, attacking, choices, endRound, hosts, passAll, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, type Run, type Table } from "../../../test/harness/scene.ts";
+import { attach, attacking, choices, endRound, hosts, passAll, play, playerTableFor, printed, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const FRODO_HERO = "21002";
 const MERRY_ALLY = "21003";
@@ -71,11 +71,11 @@ describe("Frodo Baggins (21002:A:1)", () => {
   function committed(effects: readonly Effect[], staging: readonly string[]): { tab: Table; run: Run } {
     const tab = table(effects, { start: "quest", heroes: [{ code: FRODO_HERO, seat: 0 }, { code: SAGE, seat: 0 }], allies: [{ code: UNIQUE, seat: 0 }, { code: ALLY, seat: 0 }], staging, deck: ["f0", "f0"] });
     const ids = [FRODO_HERO, SAGE, UNIQUE, ALLY].map((code) => idsOf(tab, code));
-    return { tab, run: sendUnledgered(begin(tab.state), { type: "Commit", cardIds: ids }, tab.ctx) };
+    return { tab, run: send(begin(tab.state), { type: "Commit", cardIds: ids }, tab.ctx) };
   }
   const respond = (tab: Table, run: Run): Run => {
     const frodo = idsOf(tab, FRODO_HERO);
-    return sendUnledgered(run, { type: "Trigger", cardId: frodo, effectId: "21002:response:1", payments: [{ heroId: frodo, amount: 1 }] }, tab.ctx);
+    return send(run, { type: "Trigger", cardId: frodo, effectId: "21002:response:1", payments: [{ heroId: frodo, amount: 1 }] }, tab.ctx);
   };
 
   // "Response: After Frodo Baggins commits to the quest, spend 1 resource from his resource pool to ready another unique character
@@ -87,10 +87,10 @@ describe("Frodo Baggins (21002:A:1)", () => {
     expect(triggers(start.state, tab)).toContain("21002:response:1");
     let run = respond(tab, start);
     expect(choices(run.state, tab).sort()).toEqual([sage, unique].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: unique }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: unique }, tab.ctx);
     expect(run.state.cards[unique]).toMatchObject({ exhausted: false, committed: true });
     expect(run.state.cards[frodo]?.resources).toBe(6 - 1);
-    run = passAll(sendUnledgered(run, { type: "Pass" }, tab.ctx), tab.ctx, { responses: true });
+    run = passAll(send(run, { type: "Pass" }, tab.ctx), tab.ctx, { responses: true });
     expect(run.state.phase).not.toBe("Quest");
     expect(run.state.seats[0]?.threat).toBe(8 - 1);
   });
@@ -99,8 +99,8 @@ describe("Frodo Baggins (21002:A:1)", () => {
   it("21002:A:1 Frodo Baggins: no threat reduction when the quest fails", () => {
     const { tab, run: start } = committed(EFFECTS, ["f3", "f3"]);
     let run = respond(tab, start);
-    run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, UNIQUE) }, tab.ctx);
-    run = passAll(sendUnledgered(run, { type: "Pass" }, tab.ctx), tab.ctx, { responses: true });
+    run = send(run, { type: "Choose", optionId: idsOf(tab, UNIQUE) }, tab.ctx);
+    run = passAll(send(run, { type: "Pass" }, tab.ctx), tab.ctx, { responses: true });
     expect(run.state.phase).not.toBe("Quest");
     expect(run.state.seats[0]?.threat).toBe(8 + 1);
   });
@@ -119,7 +119,7 @@ describe("Merry (21003:A:1)", () => {
     const [merry, unique = "", theirs = "", plain] = [idsOf(tab, MERRY_ALLY), ...(tab.ids[UNIQUE] ?? []), idsOf(tab, ALLY)];
     let run = play(begin(tab.state), tab, merry);
     expect(triggers(run.state, tab)).toContain("21003:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: merry, effectId: "21003:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: merry, effectId: "21003:response:1" }, tab.ctx);
     expect(stat(run.state, tab, merry, "willpower")).toBe(2 + 1);
     expect(stat(run.state, tab, unique, "willpower")).toBe(1 + 1);
     expect(stat(run.state, tab, plain, "willpower")).toBe(1);
@@ -145,10 +145,10 @@ describe("Pippin (21004:A:1, A:2)", () => {
   lineSpec("21004:A:1", "Pippin: +2 Attack while attacking an enemy with an engagement cost higher than your threat", (effects) => {
     const tab = scene(effects, "engaged");
     const pippin = idsOf(tab, PIPPIN);
-    const dear = passAll(sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, DEAR), attackerIds: [pippin] }, tab.ctx), tab.ctx, { responses: true });
+    const dear = passAll(send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, DEAR), attackerIds: [pippin] }, tab.ctx), tab.ctx, { responses: true });
     expect(strikeAttack(dear)).toEqual([0 + 2]);
     expect(stat(dear.state, tab, pippin, "attack")).toBe(0);
-    const cheap = passAll(sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, CHEAP), attackerIds: [pippin] }, tab.ctx), tab.ctx, { responses: true });
+    const cheap = passAll(send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, CHEAP), attackerIds: [pippin] }, tab.ctx), tab.ctx, { responses: true });
     expect(strikeAttack(cheap)).toEqual([0]);
   });
 
@@ -158,11 +158,11 @@ describe("Pippin (21004:A:1, A:2)", () => {
     const scene0 = scene(effects, "staging");
     const tab = { ...scene0, state: updateCard(scene0.state, idsOf(scene0, PIPPIN), { exhausted: true }) };
     const pippin = idsOf(tab, PIPPIN);
-    const cheap = sendUnledgered(begin(tab.state), { type: "Engage", enemyId: idsOf(tab, CHEAP) }, tab.ctx);
+    const cheap = send(begin(tab.state), { type: "Engage", enemyId: idsOf(tab, CHEAP) }, tab.ctx);
     expect(triggers(cheap.state, tab)).not.toContain("21004:response:1");
-    let run = sendUnledgered(begin(tab.state), { type: "Engage", enemyId: idsOf(tab, DEAR) }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Engage", enemyId: idsOf(tab, DEAR) }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("21004:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: pippin, effectId: "21004:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: pippin, effectId: "21004:response:1" }, tab.ctx);
     expect(run.state.cards[pippin]?.exhausted).toBe(false);
   });
 });
@@ -178,9 +178,9 @@ describe("Faramir (21005:A:1)", () => {
     const faramir = idsOf(tab, FARAMIR);
     let run = play(begin(tab.state), tab, faramir);
     expect(triggers(run.state, tab)).toContain("21005:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: faramir, effectId: "21005:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: faramir, effectId: "21005:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, WALL), idsOf(tab, MOAT)].sort());
-    return sendUnledgered(run, { type: "Choose", optionId: choice }, tab.ctx);
+    return send(run, { type: "Choose", optionId: choice }, tab.ctx);
   };
 
   // "Response: After Faramir enters play, choose a non-unique enemy in the staging area. Engage that enemy and deal 2 damage to it (4 damage
@@ -234,11 +234,11 @@ describe("Sméagol (21072:A:1, A:3)", () => {
   // by 1 and draws the card. (The round then runs on to the refresh phase, whose own raise of 1 is a step of rr.step-7-3.)
   lineSpec("21072:A:3", "Sméagol: after you travel, raise your threat by 1 to draw 1 card", (effects) => {
     const tab = scene(effects, 2);
-    let run = sendUnledgered(begin(tab.state), { type: "Travel", locationId: idsOf(tab, ROAD) }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Travel", locationId: idsOf(tab, ROAD) }, tab.ctx);
     expect(run.state.cards[idsOf(tab, ROAD)]?.zone).toBe("activeLocation");
     expect(triggers(run.state, tab)).toContain("21072:response:1");
     const before = run.steps.length;
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, SMEAGOL), effectId: "21072:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, SMEAGOL), effectId: "21072:response:1" }, tab.ctx);
     const raised = run.steps.slice(before).flatMap((step) => (step.kind === "threat" && !("rule" in step.cause) ? [step.amount] : []));
     expect(raised).toEqual([1]);
     const drawn = run.steps.slice(before).filter((step) => step.kind === "draw" && "effect" in step.cause && step.cause.effect === "21072:response:1");
@@ -248,7 +248,7 @@ describe("Sméagol (21072:A:1, A:3)", () => {
   // With an empty deck nothing would be drawn: the Response is not offered, so no threat is raised for nothing.
   it("21072:A:3 Sméagol: not offered with an empty deck", () => {
     const tab = scene(EFFECTS, 0);
-    const run = sendUnledgered(begin(tab.state), { type: "Travel", locationId: idsOf(tab, ROAD) }, tab.ctx);
+    const run = send(begin(tab.state), { type: "Travel", locationId: idsOf(tab, ROAD) }, tab.ctx);
     expect(triggers(run.state, tab)).not.toContain("21072:response:1");
   });
 });

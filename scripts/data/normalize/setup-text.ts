@@ -20,8 +20,7 @@ export type SetupClause =
   | { kind: "shuffleInto"; codes: string[]; into: "encounter deck" | "burden deck" | "Corsair deck" | "Caves deck"; set: string | null; ifTreasures?: number }
   | { kind: "lifeSet"; amount: number }
   | { kind: "damageOn"; codes: string[]; amount: number }
-  // `exceptFirst`: "Each other player adds 1 different location to the staging area" (the first player adds a card of his own).
-  | { kind: "eachPlayerAddsLocation"; count: number; exceptFirst?: boolean }
+  | { kind: "eachPlayerAddsLocation"; count: number }
   | { kind: "shuffleEncounterDeck" }
   | { kind: "choose"; codes: string[]; who: string; attach: boolean }
   | { kind: "earned"; codes: string[] }

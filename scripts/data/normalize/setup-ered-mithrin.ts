@@ -40,7 +40,7 @@ export function readEredMithrin(sentence: string, names: NameIndex, before: read
   if (/^Each player discards cards from the top of the encounter deck until he discards an enemy or location and adds that card to the staging area$/i.test(sentence)) {
     return [{ kind: "discardToStaging", types: ["enemy", "location"], amount: "players", eachPlayer: true, shuffleFirst: false }];
   }
-  if (/^Add (?:each discarded|those) (?:locations?|enem(?:y|ies))(?: discarded)? to the staging area$/i.test(sentence)) return last?.kind === "discardToStaging" ? [] : null;
+  if (/^Add (?:(?:each discarded|those) (?:locations?|enem(?:y|ies))(?: discarded)?|each discarded this way) to the staging area$/i.test(sentence)) return last?.kind === "discardToStaging" ? [] : null;
 
   // Who takes control of a boon ally or objective.
   if ((match = /^The first player (?:takes|gains) control of (.+?) and adds (.+?) to the staging area$/i.exec(sentence))) {

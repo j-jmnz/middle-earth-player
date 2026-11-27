@@ -2,8 +2,8 @@
 // rr.attack-strength, rr.card-types (data/rules/entries.json).
 // The Land of Sorrow heroes, allies, event and contract, each printed line tested from the words on the card (lineSpec,
 // test/harness/line-spec.ts): Gwaihir 22108:A:2, Hobbit Archer 22109:A:2, Eagle Emissary 22113:A:1 and A:2, Smoke and Think 22116:A:1,
-// Wilyador 22117:A:2, Messenger of the King 22134:B:1. The lines are the text of data/cards/TLoS.json (data/printed holds no ledger for
-// this pack), so every intent goes through sendUnledgered. The attachments are in the-land-of-sorrow-attachments.test.ts.
+// Wilyador 22117:A:2, Messenger of the King 22134:B:1. The lines are the text of data/cards/TLoS.json (data/printed holds the
+// pack's ledger), so every line is checked against it. The attachments are in the-land-of-sorrow-attachments.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
@@ -16,8 +16,8 @@ import { playCost } from "../../rules/player/attach.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { attach, attacking, choices, enter, hosts, passAll, playCode, playerTableFor, printed, questUntil, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, type Run, type Table } from "../../../test/harness/scene.ts";
+import { attach, attacking, choices, enter, hosts, passAll, playCode, playerTableFor, printed, questUntil, stat } from "../../../test/harness/player-table.ts";
 
 const GWAIHIR = "22108";
 const ARCHER = "22109";
@@ -75,7 +75,7 @@ describe("Hobbit Archer (22109:A:2)", () => {
   // The Archer alone attacks an enemy engaged with its player; the attack strength of the strike.
   function struck(effects: readonly Effect[], enemy: string): { tab: Table; attack: number[] } {
     const tab = table(effects, { heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: ARCHER, seat: 0 }], engaged: [{ code: enemy, seat: 0 }] });
-    const run = passAll(sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, enemy), attackerIds: [idsOf(tab, ARCHER)] }, tab.ctx), tab.ctx);
+    const run = passAll(send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, enemy), attackerIds: [idsOf(tab, ARCHER)] }, tab.ctx), tab.ctx);
     return { tab, attack: run.steps.flatMap((step) => (step.kind === "strike" && step.side === "player" ? [step.attack] : [])) };
   }
 
@@ -120,7 +120,7 @@ describe("Eagle Emissary (22113:A:2)", () => {
     const { tab, run: asked } = emissary(effects, LEGOLAS);
     expect(asked.state.window?.kind).toBe("choose");
     expect(choices(asked.state, tab).sort()).toEqual(["discard", "pay"]);
-    const run = sendUnledgered(asked, { type: "Choose", optionId: "pay" }, tab.ctx);
+    const run = send(asked, { type: "Choose", optionId: "pay" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, LEGOLAS)]?.resources).toBe(2 - 1);
     expect(run.state.cards[idsOf(tab, EMISSARY)]?.zone).toBe("play");
   });
@@ -128,7 +128,7 @@ describe("Eagle Emissary (22113:A:2)", () => {
   lineSpec("22113:A:2", "after it quests successfully, the player may discard it instead", (effects) => {
     const { tab, run: asked } = emissary(effects, LEGOLAS);
     expect(asked.state.window?.kind).toBe("choose");
-    const run = sendUnledgered(asked, { type: "Choose", optionId: "discard" }, tab.ctx);
+    const run = send(asked, { type: "Choose", optionId: "discard" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, LEGOLAS)]?.resources).toBe(2);
     expect(run.state.cards[idsOf(tab, EMISSARY)]?.zone).toBe("discard");
   });
@@ -173,7 +173,7 @@ describe("Smoke and Think (22116:A:1)", () => {
     const [first = "", second = ""] = costlies(tab);
     let run = playCode(tab, SMOKE);
     expect(playCost(run.state, first, 0, tab.ctx)).toBe(3 - 2);
-    run = sendUnledgered(run, { type: "PlayCard", cardId: first, payments: [{ heroId: idsOf(tab, EOWYN), amount: 1 }] }, tab.ctx);
+    run = send(run, { type: "PlayCard", cardId: first, payments: [{ heroId: idsOf(tab, EOWYN), amount: 1 }] }, tab.ctx);
     expect(run.state.cards[first]?.zone).toBe("play");
     expect(run.state.cards[idsOf(tab, EOWYN)]?.resources).toBe(6 - 1);
     expect(playCost(run.state, second, 0, tab.ctx)).toBe(3);

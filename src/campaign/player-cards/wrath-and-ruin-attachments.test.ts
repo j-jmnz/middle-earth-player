@@ -1,8 +1,7 @@
 // Rules: rr.attachment-cards, rr.restricted, rr.modifiers, rr.response, rr.cancel, rr.cost, rr.shadow-effects, rr.guarded, wor.guarded-x,
 // rr.triggered-ability (data/rules/entries.json).
 // The Wrath and Ruin attachments, each line tested from the words on the card: Durin's Axe 22006:A:1, A:2 and A:3, Silver Circlet 22008:A:1 and A:3,
-// Inner Strength 22009:A:1, A:2 and A:3. The lines are the text of data/cards/WaR.json (data/printed holds no entry for this pack), so every
-// intent goes through sendUnledgered. The shadow effect Inner Strength cancels is a fixture record (line fixture:A:1).
+// Inner Strength 22009:A:1, A:2 and A:3. The lines are the text of data/cards/WaR.json (data/printed holds the pack's ledger), so every line is checked against it. The shadow effect Inner Strength cancels is a fixture record (line fixture:A:1).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
@@ -14,8 +13,8 @@ import { updateCard } from "../../rules/core/state.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { atDefense, attacking, choices, combat, hosts, passAll, play, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
+import { atDefense, attacking, choices, combat, hosts, passAll, play, playerTable, printed, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const AXE = "22006";
 const CIRCLET = "22008";
@@ -63,7 +62,7 @@ describe("Durin's Axe (22006:A:1, A:2, A:3)", () => {
     const tab = table(effects, { heroes: [{ code: LEGOLAS, seat: 0 }, { code: BERAVOR, seat: 0 }], allies: [{ code: ALLY, seat: 0 }], hand: [{ code: AXE, seat: 0 }], deck: [TRAGIC, "f3"] });
     const axe = idsOf(tab, AXE);
     const [hostId] = hosts(tab, axe);
-    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: axe, hostId, payments: payFor(tab.state, tab.ctx, axe) }, tab.ctx);
+    const run = send(begin(tab.state), { type: "PlayCard", cardId: axe, hostId, payments: payFor(tab.state, tab.ctx, axe) }, tab.ctx);
     return { tab, run };
   }
 
@@ -82,9 +81,9 @@ describe("Durin's Axe (22006:A:1, A:2, A:3)", () => {
   lineSpec("22006:A:2", "Durin's Axe: once free of encounters, goes on a hero of the player's choice", (effects) => {
     const { tab, run: played } = guarded(effects);
     const axe = idsOf(tab, AXE);
-    let run = sendUnledgered(begin(placeDamage(played.state, idsOf(tab, "f3"), 9, tab.ctx.cards, [], "framework", ruleCause("rr.damage"))), { type: "Pass" }, tab.ctx);
+    let run = send(begin(placeDamage(played.state, idsOf(tab, "f3"), 9, tab.ctx.cards, [], "framework", ruleCause("rr.damage"))), { type: "Pass" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, LEGOLAS), idsOf(tab, BERAVOR)].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, BERAVOR) }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: idsOf(tab, BERAVOR) }, tab.ctx);
     expect(run.state.cards[axe]).toMatchObject({ host: idsOf(tab, BERAVOR), zone: "play", controller: 0 });
   });
 
@@ -103,10 +102,10 @@ describe("Durin's Axe (22006:A:1, A:2, A:3)", () => {
   // the Wall (the only other enemy engaged with the player) takes 1 damage, the Dear (engaged with the other player) none.
   lineSpec("22006:A:3", "Durin's Axe: after the hero attacks and destroys an enemy, 1 damage to an enemy engaged with you", (effects) => {
     const tab = axed(effects);
-    let run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WEAK), attackerIds: [idsOf(tab, BERAVOR)] }, tab.ctx);
+    let run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WEAK), attackerIds: [idsOf(tab, BERAVOR)] }, tab.ctx);
     expect(run.state.cards[idsOf(tab, WEAK)]?.zone).not.toBe("engaged");
     expect(triggers(run.state, tab)).toContain("22006:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, AXE), effectId: "22006:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, AXE), effectId: "22006:response:1" }, tab.ctx);
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[idsOf(tab, WALL)]?.damage).toBe(1);
     expect(run.state.cards[idsOf(tab, "dear")]?.damage).toBe(0);
@@ -115,11 +114,11 @@ describe("Durin's Axe (22006:A:1, A:2, A:3)", () => {
   // The Wall survives Beravor's attack, and Legolas (not the attached hero) destroys the Weak: no Response either time.
   it("22006:A:3 Durin's Axe: not offered when the enemy survives or another hero destroys it", () => {
     const tab = axed(EFFECTS);
-    const survived = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WALL), attackerIds: [idsOf(tab, BERAVOR)] }, tab.ctx);
+    const survived = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WALL), attackerIds: [idsOf(tab, BERAVOR)] }, tab.ctx);
     expect(survived.state.cards[idsOf(tab, WALL)]).toMatchObject({ zone: "engaged", damage: printed(tab, BERAVOR, "attack") + 2 });
     expect(triggers(survived.state, tab)).not.toContain("22006:response:1");
     // An action window opens before the attack resolves (the other player may act); it is passed.
-    const other = passAll(sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WEAK), attackerIds: [idsOf(tab, LEGOLAS)] }, tab.ctx), tab.ctx);
+    const other = passAll(send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WEAK), attackerIds: [idsOf(tab, LEGOLAS)] }, tab.ctx), tab.ctx);
     expect(other.state.cards[idsOf(tab, WEAK)]?.zone).not.toBe("engaged");
     expect(triggers(other.state, tab)).not.toContain("22006:response:1");
   });
@@ -127,7 +126,7 @@ describe("Durin's Axe (22006:A:1, A:2, A:3)", () => {
   // The Weak was the only enemy engaged with the player: no enemy engaged with you is left, so no Response.
   it("22006:A:3 Durin's Axe: not offered when no other enemy is engaged with you", () => {
     const tab = table(EFFECTS, { seats: 2, heroes: [{ code: BERAVOR, seat: 0 }, { code: "pal", seat: 1 }], attached: [{ code: AXE, host: BERAVOR }], engaged: [{ code: WEAK, seat: 0 }, { code: "dear", seat: 1 }] });
-    const run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WEAK), attackerIds: [idsOf(tab, BERAVOR)] }, tab.ctx);
+    const run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WEAK), attackerIds: [idsOf(tab, BERAVOR)] }, tab.ctx);
     expect(run.state.cards[idsOf(tab, WEAK)]?.zone).not.toBe("engaged");
     expect(triggers(run.state, tab)).not.toContain("22006:response:1");
   });
@@ -191,7 +190,7 @@ describe("Inner Strength (22009:A:1 to A:3)", () => {
   function defended(effects: readonly Effect[], defender: string): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: [{ code: BEARER, seat: 0 }, { code: EOWYN, seat: 0 }], attached: [{ code: ONE_RING, host: BEARER }, { code: INNER, host: BEARER }], engaged: [{ code: BRUTE, seat: 0 }], deck: [BOOST] });
     let run = atDefense(tab);
-    run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx), tab.ctx);
+    run = passAll(send(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx), tab.ctx);
     return { tab, run };
   }
 
@@ -201,7 +200,7 @@ describe("Inner Strength (22009:A:1 to A:3)", () => {
     const { tab, run: asked } = defended(effects, BEARER);
     const bearer = idsOf(tab, BEARER);
     expect(triggers(asked.state, tab)).toContain("22009:response:1");
-    const run = passAll(sendUnledgered(asked, { type: "Trigger", cardId: idsOf(tab, INNER), effectId: "22009:response:1" }, tab.ctx), tab.ctx, { responses: true });
+    const run = passAll(send(asked, { type: "Trigger", cardId: idsOf(tab, INNER), effectId: "22009:response:1" }, tab.ctx), tab.ctx, { responses: true });
     expect(run.state.cards[idsOf(tab, ONE_RING)]?.exhausted).toBe(true);
     expect(run.state.seats[0]?.threat).toBe(8 + 1);
     expect(run.state.cards[bearer]?.damage).toBe(0);
@@ -210,7 +209,7 @@ describe("Inner Strength (22009:A:1 to A:3)", () => {
   // The shadow effect not canceled: the attack is 2 + 3 against Defense 3, and the Bearer takes 2.
   it("22009:A:3 Inner Strength: the shadow effect resolves when it is not used", () => {
     const { tab, run: asked } = defended(EFFECTS, BEARER);
-    const run = passAll(sendUnledgered(asked, { type: "Pass" }, tab.ctx), tab.ctx, { responses: true });
+    const run = passAll(send(asked, { type: "Pass" }, tab.ctx), tab.ctx, { responses: true });
     expect(run.state.cards[idsOf(tab, BEARER)]?.damage).toBe(2);
   });
 
@@ -220,7 +219,7 @@ describe("Inner Strength (22009:A:1 to A:3)", () => {
     const ring = idsOf(tab, ONE_RING);
     let run = passAll(combat(updateCard(tab.state, ring, { exhausted: true }), tab), tab.ctx);
     expect(run.state.window?.kind).toBe("defense");
-    run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, BEARER) }, tab.ctx), tab.ctx);
+    run = passAll(send(run, { type: "DeclareDefender", defenderId: idsOf(tab, BEARER) }, tab.ctx), tab.ctx);
     expect(run.state.cards[ring]?.exhausted).toBe(true);
     expect(triggers(run.state, tab)).not.toContain("22009:response:1");
   });

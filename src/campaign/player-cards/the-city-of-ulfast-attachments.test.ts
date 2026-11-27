@@ -1,7 +1,6 @@
 // Rules: rr.attachment-cards, rr.restricted, rr.ranged, rr.response, rr.damage, rr.modifiers, rr.printed, rr.cost, rr.lasting-effects
 // (data/rules/entries.json).
-// The City of Ulfast attachments, written from their card text (data/cards/TCoU.json; data/printed holds no ledger for this pack, so every
-// intent goes through sendUnledgered): Keen Longbow 22031:A:1, A:2 and A:3, War Axe 22032:A:1 and A:3, Strength and Courage 22033:A:1, A:2
+// The City of Ulfast attachments, written from their card text (data/cards/TCoU.json; data/printed holds the pack's ledger): Keen Longbow 22031:A:1, A:2 and A:3, War Axe 22032:A:1 and A:3, Strength and Courage 22033:A:1, A:2
 // and A:3, Horn of the Mark 22035:A:1.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -13,8 +12,8 @@ import { updateCard } from "../../rules/core/state.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { attach, attacking, choices, hosts, passAll, play, playerTableFor, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, type Run, type Table } from "../../../test/harness/scene.ts";
+import { attach, attacking, choices, hosts, passAll, play, playerTableFor, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const LONGBOW = "22031";
 const AXE = "22032";
@@ -82,7 +81,7 @@ describe("Keen Longbow (22031:A:1, A:2, A:3)", () => {
 
   // "Restricted. Attached hero gains ranged.": Beravor with the Longbow may attack the enemy engaged with the other player (rr.ranged),
   // Erestor may not. The Longbow has the restricted keyword.
-  lineSpec("22031:A:2", "Keen Longbow: the attached hero gains ranged", (effects) => {
+  lineSpec("22031:A:3", "Keen Longbow: the attached hero gains ranged", (effects) => {
     const tab = bow(effects);
     const declaring = attacking(tab.state);
     const wall = idsOf(tab, WALL);
@@ -97,13 +96,13 @@ describe("Keen Longbow (22031:A:1, A:2, A:3)", () => {
   lineSpec("22031:A:3", "Keen Longbow: after the hero attacks, discard up to 3 cards to deal 1 damage each to that enemy", (effects) => {
     const tab = bow(effects, [ONE, TWO, THREE]);
     const wall = idsOf(tab, WALL);
-    let run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: wall, attackerIds: [idsOf(tab, BERAVOR)] }, tab.ctx);
+    let run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: wall, attackerIds: [idsOf(tab, BERAVOR)] }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("22031:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, LONGBOW), effectId: "22031:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, LONGBOW), effectId: "22031:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual(["discard1", "discard2", "discard3"]);
-    run = sendUnledgered(run, { type: "Choose", optionId: "discard2" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "discard2" }, tab.ctx);
     // The player picks the two cards.
-    for (const code of [ONE, TWO]) run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, code) }, tab.ctx);
+    for (const code of [ONE, TWO]) run = send(run, { type: "Choose", optionId: idsOf(tab, code) }, tab.ctx);
     expect(run.state.cards[idsOf(tab, ONE)]?.zone).toBe("discard");
     expect(run.state.cards[idsOf(tab, TWO)]?.zone).toBe("discard");
     expect(run.state.cards[idsOf(tab, THREE)]?.zone).toBe("hand");
@@ -114,8 +113,8 @@ describe("Keen Longbow (22031:A:1, A:2, A:3)", () => {
   it("22031:A:3 Keen Longbow: with 1 card in hand only 1 can be discarded", () => {
     const tab = bow(EFFECTS, [ONE]);
     const wall = idsOf(tab, WALL);
-    let run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: wall, attackerIds: [idsOf(tab, BERAVOR)] }, tab.ctx);
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, LONGBOW), effectId: "22031:response:1" }, tab.ctx);
+    let run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: wall, attackerIds: [idsOf(tab, BERAVOR)] }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, LONGBOW), effectId: "22031:response:1" }, tab.ctx);
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[idsOf(tab, ONE)]?.zone).toBe("discard");
     expect(run.state.cards[wall]?.damage).toBe(1);
@@ -124,7 +123,7 @@ describe("Keen Longbow (22031:A:1, A:2, A:3)", () => {
   // An empty hand: nothing to discard, so no damage can be dealt and it is not offered.
   it("22031:A:3 Keen Longbow: not offered with an empty hand", () => {
     const tab = bow(EFFECTS);
-    const run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WALL), attackerIds: [idsOf(tab, BERAVOR)] }, tab.ctx);
+    const run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WALL), attackerIds: [idsOf(tab, BERAVOR)] }, tab.ctx);
     expect(triggers(run.state, tab)).not.toContain("22031:response:1");
   });
 });
@@ -197,10 +196,10 @@ describe("Strength and Courage (22033:A:1, A:2, A:3)", () => {
     const tab = courage(effects, true);
     const [legolas, ring, wall] = [idsOf(tab, LEGOLAS), idsOf(tab, ONE_RING), idsOf(tab, WALL)];
     const worn = (tab.ids[COURAGE] ?? []).find((id) => tab.state.cards[id]?.host === legolas) ?? "";
-    let run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: wall, attackerIds: [legolas] }, tab.ctx);
+    let run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: wall, attackerIds: [legolas] }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("22033:response:1");
     const before = run.steps.length;
-    run = passAll(sendUnledgered(run, { type: "Trigger", cardId: worn, effectId: "22033:response:1" }, tab.ctx), tab.ctx, { responses: true });
+    run = passAll(send(run, { type: "Trigger", cardId: worn, effectId: "22033:response:1" }, tab.ctx), tab.ctx, { responses: true });
     expect(run.state.cards[ring]?.exhausted).toBe(true);
     expect(run.state.seats[0]?.threat).toBe(9);
     expect(strikes(run, before)).toEqual([[wall, 3 + 1 + 3]]);
@@ -211,7 +210,7 @@ describe("Strength and Courage (22033:A:1, A:2, A:3)", () => {
   it("22033:A:3 Strength and Courage: not offered while The One Ring is exhausted", () => {
     const scene = courage(EFFECTS, true);
     const tab = { ...scene, state: updateCard(scene.state, idsOf(scene, ONE_RING), { exhausted: true }) };
-    const run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WALL), attackerIds: [idsOf(tab, LEGOLAS)] }, tab.ctx);
+    const run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WALL), attackerIds: [idsOf(tab, LEGOLAS)] }, tab.ctx);
     expect(triggers(run.state, tab)).not.toContain("22033:response:1");
   });
 });
