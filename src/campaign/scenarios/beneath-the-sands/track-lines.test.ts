@@ -2,12 +2,16 @@
 import { describe, expect, it } from "vitest";
 
 import { sandsStart, sandsWorld } from "../../../../test/scenarios/beneath-the-sands/game.ts";
-import { expireModifiers, flagged } from "../../../rules/core/state.ts";
+import { expireModifiers, flagged, updateCard, type GameEvent, type ScenarioState } from "../../../rules/core/state.ts";
+import type { EngineStep } from "../../../rules/core/intents.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import { fireForced } from "../../../rules/windows/triggers.ts";
+import { moveCard } from "../../../rules/core/zones.ts";
 import { reduce, startScenario } from "../../../rules/engine/reduce.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { announce, answer, attack, cardSpecs, count, damageOn, deckCount, flag, quest, resourcesOn, respond, reveal, rowProblems, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
-import { codesIn, idOf, opened, resolveRecords, run, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
+import { codesIn, finish, idOf, opened, resolveRecords, run, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 import { sideQuestCurrent } from "../../../rules/families/haradrim/race-kit.ts";
 import { EFFECTS } from "../../../effects/index.ts";
 
@@ -73,6 +77,17 @@ lineSpec("17079:A:2", "Progress cannot be placed on the main quest, but the side
   expect(toMain.cards[state.questStage ?? ""]?.progress).toBe(0);
 });
 
+lineSpec("17075:A:1", "the block is a constant of the card: a cancelled When Revealed keeps it, and Track still does not resolve", (effects) => {
+  // The card is in play with no When Revealed run (it was cancelled, as A Test of Will does).
+  const made = tableFromLayout("beneath-the-sands", { stage: "17076", side: "B", staging: [OFF, "17075", "17070"], deck: ["17066", "f0", "f3"] }, { effects });
+  const state = opened(made).state;
+  expect(flagged(state, "table", "cannotFlipSearch")).toBe(true);
+  expect(run(made, state, { verb: "FlipSearchObjective", to: "onTrack" }).cards[idOf(state, OFF)]?.code).toBe(OFF);
+  const tracked = run(made, state, { verb: "ResolveTrack", amount: 1, marked: ["17066"] });
+  expect(tracked.encounterDeck).toHaveLength(3);
+  expect(tracked.cards[idOf(state, OFF)]?.code).toBe(OFF);
+});
+
 lineSpec("17075:A:2", "the flip is the card's own text: it happens while Lost Underground still stops other flips", (effects) => {
   const made = tableFromLayout("beneath-the-sands", { stage: "17076", side: "B", staging: [OFF, { code: "17075", progress: 5 }] }, { effects });
   const state = opened(made).state;
@@ -83,11 +98,26 @@ lineSpec("17075:A:2", "the flip is the card's own text: it happens while Lost Un
 });
 
 describe("Limit and duration lines of the Search cards", () => {
-  const read = (row: Row) => expect(rowProblems("beneath-the-sands", row, EFFECTS)).toEqual([]);
-  it("17074:A:2 Limit 1 per quest: a second copy stays unattached, and the first fires again at each flip to Off Track while a player has no ally", () => {
-    const attached = { stage: "17076", side: "B", staging: [OFF], attached: [{ code: "17074", to: "17076", encounter: true as const }] } as const;
-    read({ line: "17074:A:2", layout: { ...attached, seats: 2, play: ["ally"] }, act: [announce("searchFlippedOff", OFF), announce("searchFlippedOff", OFF)], expect: [zone("ally", "discard"), zone("17074", "attached")] });
-    read({ line: "17074:A:2", layout: { stage: "17076", side: "B", staging: [OFF] }, act: [reveal("17074"), reveal("17074")], expect: count("17074", "attached", 1) });
+  // Grabbed by Spiders' Forced effect fires at each flip to Off Track while it is attached: it goes only when every player has an ally to discard, and a player with none keeps it attached for the next flip. The second copy that Limit 1 turns away is the spec row of 17074:A:2.
+  it("17074:A:2 a player with no ally keeps it attached at the first flip, and it fires again and is discarded at the next flip once that player has an ally", () => {
+    const made = tableFromLayout("beneath-the-sands", { seats: 2, stage: "17076", side: "B", staging: [OFF], play: ["ally", "ally"], hand: [{ code: "ally", seat: 1 }], attached: [{ code: "17074", to: "17076", encounter: true }] });
+    const flip = (state: ScenarioState): ScenarioState => {
+      const steps: EngineStep[] = [];
+      const event = { trigger: "searchFlippedOff", seat: 0, cardId: idOf(state, OFF) } as GameEvent;
+      return finish({ state: settle(fireForced({ ...state, window: null }, event, made.ctx, steps), made.ctx, steps), steps }, made.ctx).state;
+    };
+    const start = opened(made).state;
+    const seatOneAlly = start.seats[1]?.hand[0] ?? "";
+    expect(start.cards[seatOneAlly]?.code).toBe("ally");
+    const first = flip(start);
+    expect(first.cards[idOf(start, "17074")]?.zone).toBe("attached");
+    expect(first.seats[0]?.play.filter((id) => first.cards[id]?.code === "ally")).toHaveLength(1);
+    // The second player puts an ally into play.
+    const armed = updateCard(moveCard(first, seatOneAlly, { zone: "play", seat: 1 }), seatOneAlly, { controller: 1 });
+    const second = flip(armed);
+    expect(second.cards[seatOneAlly]?.zone).toBe("discard");
+    expect(second.seats[0]?.play.filter((id) => second.cards[id]?.code === "ally")).toHaveLength(0);
+    expect(second.cards[idOf(start, "17074")]?.zone).toBe("encounterDiscard");
   });
   it("17075:A:2 the ignored Forced effects of On Track come back at the end of the phase", () => {
     const made = tableFromLayout("beneath-the-sands", { stage: "17076", side: "B", staging: [OFF, { code: "17075", progress: 5 }] });

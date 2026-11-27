@@ -28,9 +28,12 @@ function plural(count: number, word: string): string {
   return `${count} ${word}${count === 1 ? "" : "s"}`;
 }
 
-/** The lines under Victory or Defeat. A win shows the score and what made it (ltp.scoring); lower is better. */
-export function outcomeLines(result: StandaloneResult): string[] {
-  if (result.outcome === "lost") return [...(result.reason ? [`${result.reason}.`] : []), `${plural(result.rounds, "round")} completed.`];
+/** The lines under Victory or Defeat. A win shows the score and what made it (ltp.scoring); lower is better. A loss gives the engine's reason, or `reason` when the final game is at hand to say the cause of each elimination (rules/core/elimination-words.ts). */
+export function outcomeLines(result: StandaloneResult, reason?: string | null): string[] {
+  if (result.outcome === "lost") {
+    const why = reason ?? result.reason;
+    return [...(why ? [why.endsWith(".") ? why : `${why}.`] : []), `${plural(result.rounds, "round")} completed.`];
+  }
   const { score, rounds, victoryPoints } = result.score;
   return [`Score ${score}. Lower is better.`, `${plural(rounds, "completed round")} · ${plural(victoryPoints, "victory point")}`];
 }

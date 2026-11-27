@@ -252,7 +252,7 @@ export function putOnStage(from: ScenarioState, stageId: string, wanted: number,
   const { counted, reduced = true } = options;
   // "Progress cannot be placed here" (148003:B:1, while a Great Barrow is in play): the stage takes none, whatever places it.
   if (flagged(from, stageId, "noProgressPlaced")) return from;
-  // "The players cannot place progress on the main quest" (17079:A:2): no main quest card takes any, whatever places it; a side quest that is the current quest still does.
+  // "Progress cannot be placed on the main quest." (17079:A:2): no main quest card takes any, whatever places it; a side quest that is the current quest still does.
   if (mainQuestBlocked(from)) return from;
   // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1).
   const { state, remaining: absorbed } = absorbFirst(from, stageId, wanted, cards, steps);

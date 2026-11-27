@@ -32,11 +32,11 @@ export const HARADRIM_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => M
   TakeObjectiveAlly: (i) => ({ text: `the acting player takes control of one of the set-aside objective allies (${(Array.isArray(i.codes) ? i.codes : []).map(str).join(", ")}) into their play area, ready (asked only when different cards are left, copies of one card are one choice); it is an ally in play`, read: ["codes"] }),
   EliminateAfterAttack: () => ({ text: "the acting player is eliminated from the game by a card effect; while an enemy attack on that player is in progress the elimination waits until that attack has resolved (its end-of-attack effects and the Forced effects it announces resolve first)", read: [] }),
   FlipSearchObjective: (i) => ({
-    text: `the Search objective in play flips to ${i.to === "onTrack" ? "On Track (each resource on it is discarded)" : i.to === "offTrack" ? "Off Track" : "no side"}${i.despiteBlock === true ? ", even while Lost Underground stops flips (this card's own flip)" : " (nothing while Lost Underground is in play)"}; nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not`,
+    text: `the Search objective in play flips to ${i.to === "onTrack" ? "On Track (each resource on it is discarded)" : i.to === "offTrack" ? "Off Track" : "no side"}${i.despiteBlock === true ? ", even while Lost Underground stops flips (this card's own flip)" : " (nothing while Lost Underground is in play; its constant also stops Track from resolving)"}; nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not`,
     read: ["to", "despiteBlock"],
   }),
   ResolveTrack: (i) => ({
-    text: `Track ${str(i.amount)}: discard ${str(i.amount)} cards from the top of the encounter deck, shuffling the encounter discard pile into the deck each time the deck runs out and going on; if any discarded card is one that prints On Track in the lower right corner (codes ${(Array.isArray(i.marked) ? i.marked : []).map(str).join(", ")}), flip the Search objective to On Track (nothing while Lost Underground is in play)`,
+    text: `Track ${str(i.amount)}: discard ${str(i.amount)} cards from the top of the encounter deck, shuffling the encounter discard pile into the deck each time the deck runs out and going on; if any discarded card is one that prints On Track in the lower right corner (codes ${(Array.isArray(i.marked) ? i.marked : []).map(str).join(", ")}), flip the Search objective to On Track; Track does not resolve at all while Lost Underground is in play (no card is discarded)`,
     read: ["amount", "marked"],
   }),
   StageMarkedFromTop: (i) => ({
@@ -44,7 +44,7 @@ export const HARADRIM_TEMPLATES: Readonly<Record<string, (i: Obj, ctx: Ctx) => M
     read: ["count", "marked"],
   }),
   AddTopmostFromDiscard: (i) => ({ text: `the ${str(i.cardType)} put on the encounter discard pile last is added to the staging area (nothing with none there)`, read: ["cardType"] }),
-  SetAsideCode: (i) => ({ text: `the card with code ${str(i.code)} in play, in the staging area or engaged, is set aside, out of play, with no damage (nothing when none is in play)`, read: ["code"] }),
+  SetAsideCode: (i) => ({ text: `the card with code ${str(i.code)} in play, wherever it lies, is set aside, out of play, with no damage (nothing when none is in play)`, read: ["code"] }),
   EngageSeatWithMost: (i, ctx) => ({ text: `this enemy engages the player engaged with the most ${pck(i.pick, ctx)} (the first player chooses among players that tie, all players at 0; nothing changes when it is already engaged with that player, else it moves to that player)`, read: ["pick"] }),
 };
 

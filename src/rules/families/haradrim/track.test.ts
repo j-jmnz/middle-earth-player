@@ -2,6 +2,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
+import type { EngineStep } from "../../core/intents.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
 import { codesIn, idOf, opened, run, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
@@ -18,11 +19,12 @@ const side = (state: ScenarioState, id: string): string | undefined => state.car
 const flippedEvents = (state: ScenarioState): number => (state.pendingEvents ?? []).filter((event) => event.trigger === "searchFlippedOff").length;
 
 describe("FlipSearchObjective: the Search objective shows its other side", () => {
-  it("Off Track flips to On Track, discarding each resource on it, and the flip is announced", () => {
+  it("Off Track flips to On Track, discarding each resource on it, and queues no event", () => {
     const made = table({ staging: [{ code: OFF, resources: 3 }] });
     const id = idOf(made.state, OFF);
     const done = run(made, opened(made).state, flip("onTrack"));
     expect(done.cards[id]).toMatchObject({ code: ON, other: OFF, resources: 0, zone: "staging" });
+    expect(flippedEvents(done)).toBe(flippedEvents(opened(made).state));
   });
 
   it("On Track flips to Off Track and keeps its place", () => {
@@ -171,5 +173,50 @@ describe("17068:A:3 SetAsideCode: the card in play with the code goes out of pla
     const made = table({ setAside: ["17065"] });
     const state = opened(made).state;
     expect(run(made, state, { verb: "SetAsideCode", code: "17065" }).setAside).toEqual(state.setAside);
+  });
+});
+
+describe("hrd.track the steps that tell Track and the flips", () => {
+  it("17069:A:1 ResolveTrack pushes one track step: the discarded cards, those that print On Track, and whether the objective flipped", () => {
+    const made = table({ staging: ["17070", OFF], deck: ["16047", "17067", "16046"] });
+    const steps: EngineStep[] = [];
+    const state = opened(made).state;
+    const done = run(made, state, { verb: "ResolveTrack", amount: 2, marked: MARKED }, { steps, sourceId: idOf(state, "17070") });
+    const step = steps.find((item) => item.kind === "track");
+    expect(step).toMatchObject({ kind: "track", locationId: idOf(state, "17070"), amount: 2, discarded: [expect.any(String), expect.any(String)], flipped: true });
+    expect(step?.kind === "track" ? step.marked.map((id) => done.cards[id]?.code) : []).toEqual(["17067"]);
+    // The flip to On Track is told by the track step, not by a second step.
+    expect(steps.filter((item) => item.kind === "searchFlip")).toHaveLength(0);
+  });
+
+  it("17069:A:1 a Track with no marked card says it flipped nothing, and a blocked Track pushes no step", () => {
+    const made = table({ staging: [OFF], deck: ["16047", "16046"] });
+    const steps: EngineStep[] = [];
+    run(made, opened(made).state, { verb: "ResolveTrack", amount: 2, marked: MARKED }, { steps });
+    expect(steps.find((item) => item.kind === "track")).toMatchObject({ marked: [], flipped: false });
+    const blocked: EngineStep[] = [];
+    run(made, withBlock(opened(made).state), { verb: "ResolveTrack", amount: 2, marked: MARKED }, { steps: blocked });
+    expect(blocked.filter((item) => item.kind === "track")).toHaveLength(0);
+  });
+
+  it("17073:A:1 each flip that happens is a searchFlip step, and a flip that changes nothing is none", () => {
+    const made = table({ staging: [ON] });
+    const state = opened(made).state;
+    const steps: EngineStep[] = [];
+    run(made, state, flip("offTrack"), { steps });
+    expect(steps.filter((item) => item.kind === "searchFlip")).toEqual([expect.objectContaining({ kind: "searchFlip", to: "offTrack", cardId: idOf(state, ON) })]);
+    const quiet: EngineStep[] = [];
+    run(made, state, flip("onTrack"), { steps: quiet });
+    expect(quiet.filter((item) => item.kind === "searchFlip")).toHaveLength(0);
+    const blocked: EngineStep[] = [];
+    run(made, withBlock(state), flip("offTrack"), { steps: blocked });
+    expect(blocked.filter((item) => item.kind === "searchFlip")).toHaveLength(0);
+  });
+
+  it("17080:A:1 StageMarkedFromTop with no marked card flips the objective to Off Track and says so", () => {
+    const made = table({ staging: [ON], deck: ["16047", "16046", "16046"] });
+    const steps: EngineStep[] = [];
+    run(made, opened(made).state, { verb: "StageMarkedFromTop", count: 3, marked: MARKED }, { steps });
+    expect(steps.filter((item) => item.kind === "searchFlip")).toHaveLength(1);
   });
 });

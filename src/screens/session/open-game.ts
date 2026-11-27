@@ -25,7 +25,7 @@ export function factsOf<TRun>(catalog: Db<TRun>, codes: Iterable<string>): Map<s
   return new Map(rows.map((row) => [row.code, { imagesrc: row.imagesrc, backImagesrc: row.backImagesrc, text: row.text, pack: row.pack }]));
 }
 
-export type ReplayedGame = { world: World; ctx: ReduceContext; game: ScenarioState; roundSteps: readonly EngineStep[]; history: readonly Undoable[]; facts: ReadonlyMap<string, CardFacts> };
+export type ReplayedGame = { world: World; ctx: ReduceContext; game: ScenarioState; roundSteps: readonly EngineStep[]; history: readonly Undoable[]; facts: ReadonlyMap<string, CardFacts>; destroyedHeroes?: ReadonlySet<string> };
 
 /** A replay for the table: the game and the open scenario to write once (`stamp`, session.ts Resumed), or the index of the first intent a checked replay refused or did not match (`at`, null when there was nothing to check). */
 export type ReplayedOpen = { ok: true; game: ReplayedGame; stamp: ActiveScenario | null } | { ok: false; at: number | null };
@@ -35,11 +35,14 @@ export function replayForTable<TRun>(catalog: Db<TRun>, world: World, resume: (o
   // The same fold the store runs on each intent it sends (keepIntent), so a reopened game can be undone as far as before.
   const ctx = contextOf(world);
   let kept: Kept = { roundSteps: [], history: [] };
+  // The heroes a destroy step named, over the whole game: the outcome tells them apart from the heroes that left play with an eliminated player (campaign/report.ts).
+  const destroyed = new Set<string>();
   const resumed = resume((before, after, steps, intent) => {
     kept = keepIntent(kept, before, after, steps, intent, ctx);
+    for (const step of steps) if (step.kind === "destroy" && before.cards[step.targetId]?.zone === "heroes") destroyed.add(step.targetId);
   });
   if (!resumed.ok) return { ok: false, at: resumed.at ?? null };
-  return { ok: true, game: { world, ctx, game: resumed.state, ...kept, facts: factsOf(catalog, world.cards.keys()) }, stamp: resumed.stamp };
+  return { ok: true, game: { world, ctx, game: resumed.state, ...kept, destroyedHeroes: destroyed, facts: factsOf(catalog, world.cards.keys()) }, stamp: resumed.stamp };
 }
 
 /**

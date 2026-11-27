@@ -175,17 +175,16 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     ],
   },
 
-  // 17075 Lost Underground (side quest). When Revealed: the objective flips to Off Track (Track is not resolved). While it is in play (the When Revealed record holds the flag `cannotFlipSearch` for as long as the card is in play) the objective cannot flip, except by its own two flips. Response: when it is defeated the objective flips to On Track and ignores its Forced effects until the end of the phase.
+  // 17075 Lost Underground (side quest). When Revealed: the objective flips to Off Track (Track is not resolved). While it is in play (a constant record holds the flag `cannotFlipSearch`) the objective cannot flip and Track does not resolve, except by its own two flips. Response: when it is defeated the objective flips to On Track and ignores its Forced effects until the end of the phase.
   {
     id: "17075:whenRevealed:1",
     cardCode: LOST_UNDERGROUND,
     lines: ["17075:A:1"],
     timing: "whenRevealed",
-    instructions: [
-      { verb: "FlipSearchObjective", to: "offTrack", despiteBlock: true },
-      { verb: "ModifyStat", stat: "cannotFlipSearch", amount: 1, until: "whileSourceInPlay", target: "table" },
-    ],
+    instructions: [{ verb: "FlipSearchObjective", to: "offTrack", despiteBlock: true }],
   },
+  // "While Lost Underground is in play, the Search objective cannot flip" is a constant of the same line, so a cancelled When Revealed keeps the block (and Track stays unresolved).
+  { id: "17075:constant:1", cardCode: LOST_UNDERGROUND, lines: ["17075:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotFlipSearch", amount: 1, until: "whileSourceInPlay", target: "table" }] },
   {
     id: "17075:response:1",
     cardCode: LOST_UNDERGROUND,

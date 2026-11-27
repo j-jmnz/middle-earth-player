@@ -7,6 +7,7 @@ import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 import { reanimatedHeroes } from "../rules/families/angmar/reanimate/standing.ts";
 
+import { lossWithCauses } from "../rules/core/elimination-words.ts";
 import { scoreParts, scoreTotal } from "./score.ts";
 
 export type ReportHero = { name: string; words: string; destroyed: boolean };
@@ -22,6 +23,8 @@ export type GameReport = {
   victory: readonly string[];
   // A win: what the score adds up, ending with the total.
   score: readonly ReportLine[] | null;
+  // A loss: the engine's reason with the cause of each elimination after "No seats remain" (rules/core/elimination-words.ts), else null.
+  lossReason: string | null;
 };
 
 const PHASE_WORDS: Readonly<Record<string, string>> = {
@@ -56,7 +59,7 @@ function heroWords(cards: ReadonlyMap<string, PrintedCard>, code: string, damage
   return health != null ? `${damage} damage of ${health} hit points` : plural(damage, "damage");
 }
 
-function seatLines(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ReportSeat[] {
+function seatLines(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, destroyed?: ReadonlySet<string>): ReportSeat[] {
   return state.seats.slice(0, state.seatCount).map((seat, index) => {
     const label = state.seatCount > 1 ? `Player ${index + 1}` : "Your heroes";
     const standing = seat.heroes.flatMap((id) => {
@@ -68,7 +71,9 @@ function seatLines(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>
     const fallen = seat.discard.flatMap((id) => {
       const card = state.cards[id];
       if (!card || printedOf(cards, card.code).type !== "hero") return [];
-      return [{ name: printedOf(cards, card.code).name, words: "Destroyed", destroyed: true }];
+      // A hero that left play with its eliminated player was not destroyed: only a hero a destroy step named is (the steps are known when the game was replayed).
+      const withPlayer = seat.eliminated && destroyed != null && !destroyed.has(id);
+      return [{ name: printedOf(cards, card.code).name, words: withPlayer ? "Defeated with the player" : "Destroyed", destroyed: true }];
     });
     // A destroyed hero lying reanimated (mec108.reanimated-dead) is in no discard pile but is still destroyed.
     const reanimated = reanimatedHeroes(state, cards).filter((hero) => hero.seat === index).map((hero) => ({ name: printedOf(cards, hero.code).name, words: "Destroyed", destroyed: true }));
@@ -89,8 +94,8 @@ function scoreLines(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard
   ];
 }
 
-/** The report of a finished scenario: a win when the game is not lost. */
-export function gameReport(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): GameReport {
+/** The report of a finished scenario: a win when the game is not lost. `destroyed` holds the heroes a destroy step named; with it, a hero of an eliminated player that is in no such step is told as defeated with the player. */
+export function gameReport(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, destroyed?: ReadonlySet<string>): GameReport {
   const phase = PHASE_WORDS[state.phase];
   const ended = state.lost ? `Lost in round ${state.round}${phase ? `, in ${phase}` : ""}.` : `Won in round ${state.round}.`;
   const victory = state.victory.flatMap((id) => {
@@ -99,5 +104,5 @@ export function gameReport(state: ScenarioState, cards: ReadonlyMap<string, Prin
     const printed = printedOf(cards, card.code);
     return [printed.victory ? `${printed.name} (${printed.victory})` : printed.name];
   });
-  return { ended, stage: stageLine(state, cards), seats: seatLines(state, cards), victory, score: state.lost ? null : scoreLines(state, cards) };
+  return { ended, stage: stageLine(state, cards), seats: seatLines(state, cards, destroyed), victory, score: state.lost ? null : scoreLines(state, cards), lossReason: state.lost ? lossWithCauses(state) : null };
 }

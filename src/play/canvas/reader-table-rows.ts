@@ -37,6 +37,8 @@ export type ReaderRowsDeps = {
   playable: ReadonlySet<string>;
   // How many cards the banner's beat lays in the Discover look strip (0 when none).
   discover: number;
+  // The keyword whose look strip it is, when it is not Discover's (Track).
+  lookWord?: string;
   // Whether the seat shown plays with the top card of its deck faceup (Gandalf, 142002:A:1): the deck then names that card.
   deckFaceUp?: boolean;
 };
@@ -51,7 +53,7 @@ function seaNotes(game: ScenarioState, seat: number, deps: ReaderRowsDeps): Read
   if (ships.length > 0) notes.push(shipsLine(ships.map((card) => ({ name: deps.nameOf(card?.code ?? ""), damage: card?.damage ?? 0 }))));
   const looked = lookedIds(game).length;
   if (looked > 0) notes.push(`Sailing test: ${looked} ${looked === 1 ? "card" : "cards"} looked at`);
-  if (deps.discover > 0) notes.push(lookStripWords(deps.discover));
+  if (deps.discover > 0) notes.push(lookStripWords(deps.discover, deps.lookWord));
   return notes.map((text) => ({ kind: "text", text }));
 }
 

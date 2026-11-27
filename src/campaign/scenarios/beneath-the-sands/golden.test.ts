@@ -54,17 +54,27 @@ describe("Beneath the Sands golden", () => {
           const played = game(golden);
           const trail = played.trail ?? [];
           expect(trail.length, golden.name).toBe(played.intents.length);
-          const reveals = played.steps.filter((step) => step.kind === "reveal" && played.state.cards[step.cardId]?.code === "17074").length;
-          if (reveals >= 2) doubleReveals += 1;
           trail.forEach((state, at) => {
+            // A reveal while a copy is attached: a copy comes to the discard pile in this intent and the attached one is still attached.
+            const before = trail[at - 1];
+            const attachedBefore = before ? cardsOf(before, "17074").filter((card) => card.zone === "attached").map((card) => card.id) : [];
+            const newlyDiscarded = cardsOf(state, "17074").filter((card) => card.zone === "encounterDiscard" && !attachedBefore.includes(card.id) && before?.cards[card.id]?.zone !== "encounterDiscard");
+            if (attachedBefore.length > 0 && newlyDiscarded.length > 0 && attachedBefore.every((id) => state.cards[id]?.zone === "attached")) doubleReveals += 1;
             if (state.lost && at === trail.length - 1) return;
             const copies = cardsOf(state, "17074");
             expect(copies.filter((card) => card.zone === "attached").length, `${golden.name} after intent ${at}`).toBeLessThanOrEqual(1);
             expect(copies.filter((card) => card.zone === "staging").length, `${golden.name} after intent ${at}`).toBe(0);
           });
         }
-        // The goldens reveal a second copy: the check sees the Limit work.
+        // The goldens reveal a second copy while one is attached: the check sees the Limit work.
         expect(doubleReveals).toBeGreaterThan(0);
+      });
+      // The one loss only a two-handed game reaches: one seat is out (its heroes destroyed) while the other plays on, and the game is lost when the last seat falls.
+      it("a two-handed loss has one seat eliminated while the other plays on", () => {
+        const golden = SANDS_GOLDENS.find((item) => item.name.includes("while the other plays on"));
+        expect(golden).toBeDefined();
+        const trail = game(golden as SandsGolden).trail ?? [];
+        expect(trail.some((state) => !state.lost && state.seats.slice(0, 2).filter((seat) => seat.eliminated).length === 1)).toBe(true);
       });
     },
   });

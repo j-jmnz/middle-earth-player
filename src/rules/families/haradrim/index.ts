@@ -57,9 +57,9 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "EliminateAfterAttack":
       return eliminateAfterAttack(state, focus, ctx, steps);
     case "FlipSearchObjective":
-      return flipSearchObjective(state, instruction);
+      return flipSearchObjective(state, instruction, steps);
     case "ResolveTrack":
-      return resolveTrack(state, instruction, steps);
+      return resolveTrack(state, instruction, focus, ctx, steps);
     case "StageMarkedFromTop":
       return stageMarkedFromTop(state, instruction, focus, ctx, steps);
     case "AddTopmostFromDiscard":
@@ -75,7 +75,16 @@ export const manifest: RulesFamily = {
   name: "haradrim",
   verbs: ["PlaceUnderSelfFaceup", "SetTemperature", "RaiseTemperature", "LowerTemperature", "MoveHeroesToStaging", "TakeObjectiveHero", "ReleaseStagedHero", "GuardStagedHeroes", "EngageSeatWithMost", "AttachRandomSetAside", "AddWithHostToVictory", "PrepareOrcsArea", "MoveToOrcsArea", "OrcsProgress", "AddOrcsProgress", "TakeObjectiveAlly", "EliminateAfterAttack", "FlipSearchObjective", "ResolveTrack", "StageMarkedFromTop", "AddTopmostFromDiscard", "SetAsideCode"],
   run,
-  condition: (state, condition, _scope, ctx) => (condition.kind === "threatAboveWillpower" ? threatAboveWillpower(state, ctx.cards) : condition.kind === "everySeatHasAlly" ? everySeatHasAlly(state, ctx.cards) : (haradrimCondition(state, condition) ?? orcsCondition(state, condition) ?? exploredCondition(state, condition) ?? temperatureCondition(state, condition))),
+  condition: (state, condition, scope, ctx) => {
+    switch (condition.kind) {
+      case "threatAboveWillpower":
+        return threatAboveWillpower(state, ctx.cards);
+      case "everySeatHasAlly":
+        return everySeatHasAlly(state, scope.sourceId ?? null, ctx);
+      default:
+        return haradrimCondition(state, condition) ?? orcsCondition(state, condition) ?? exploredCondition(state, condition) ?? temperatureCondition(state, condition);
+    }
+  },
   amount: (state, found, scope, ctx) => (found.willpowerGap ? willpowerGap(state, scope.sourceId ?? null, ctx.cards) : temperatureAmount(state, found)),
   pick: haradrimPickMatches,
   combat: {

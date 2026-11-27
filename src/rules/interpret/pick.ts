@@ -129,7 +129,11 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   if (from === "hand") for (const index of seats) raw.push(...(state.seats[index]?.hand ?? []));
   else if (from === "victory") raw.push(...state.victory);
   // The encounter discard pile, the most recently discarded card first ("the opposing team chooses a card in the encounter discard pile", 51116:A:1).
-  else if (from === "encounterDiscard") raw.push(...[...state.encounterDiscard].reverse());
+  // With `topmost`, only the card of the pick's type nearest the top: "the topmost location in the encounter discard pile" (17079:A:1).
+  else if (from === "encounterDiscard") {
+    const pile = [...state.encounterDiscard].reverse();
+    raw.push(...(spec.topmost ? pile.filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === spec.type).slice(0, 1) : pile));
+  }
   // The Raven deck of The Antlered Crown, top first (rm.raven-deck).
   else if (from === "ravenDeck") raw.push(...pileOf(state, "ravenDeck"));
   else if (from === "loot") raw.push(...Object.values(state.cards).filter((card) => card.zone === "under" && card.controller != null && seats.includes(card.controller)).map((card) => card.id));

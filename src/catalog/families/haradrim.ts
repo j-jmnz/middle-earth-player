@@ -56,14 +56,14 @@ const VERBS = [
   // when it already shows that side, or while the table holds `cannotFlipSearch` (Lost Underground), unless `despiteBlock` (the side quest's own flips). A flip to Off Track queues `searchFlippedOff` about the objective.
   z.strictObject({ verb: z.literal("FlipSearchObjective"), to: z.enum(["onTrack", "offTrack"]), despiteBlock: z.literal(true).optional(), ...when }),
   // "Track X" (17069:A:1 to 17072:A:1; hrd.track): discards `amount` cards from the top of the encounter deck, the discard pile shuffled back into an empty deck at once (any phase); when one of them has a code in `marked` (the cards that print "On Track" in the lower right
-  // corner, read from the scans) and the objective is Off Track, it flips to On Track (blocked as FlipSearchObjective says).
+  // corner, read from the scans), it flips the objective to On Track. While the table holds `cannotFlipSearch` Track does not resolve at all: no card is discarded (17075:A:1, "Do not resolve the Track keyword").
   z.strictObject({ verb: z.literal("ResolveTrack"), amount: z.number().int().positive(), marked: z.array(z.string().min(1)).min(1), ...when }),
   // "Search the top 3 cards of the encounter deck for a card with 'On Track' in the lower right corner, add it to the staging area and discard the rest. If no card enters play from this effect, flip this objective" (17080:A:1): the first card of the top `count` with a code in
   // `marked` is added to the staging area, not revealed, the others are discarded, and with none found the objective flips to Off Track. A deck with fewer cards is looked at in full.
   z.strictObject({ verb: z.literal("StageMarkedFromTop"), count: z.number().int().positive(), marked: z.array(z.string().min(1)).min(1), ...when }),
   // "Return the topmost location in the encounter discard pile to the staging area" (17079:A:1): the card of this type put on the discard pile last is added to the staging area. Nothing happens with none.
   z.strictObject({ verb: z.literal("AddTopmostFromDiscard"), cardType: z.literal("location"), ...when }),
-  // "Set Brood Mother aside, out of play" (17068:A:3): the card in play with this code, in the staging area or engaged, goes to the set-aside pile with no damage and no controller. Nothing happens with none in play.
+  // "Set Brood Mother aside, out of play" (17068:A:3): the card in play with this code, from play, wherever it lies, goes to the set-aside pile with no damage and no controller. Nothing happens with none in play.
   z.strictObject({ verb: z.literal("SetAsideCode"), code: z.string().min(1), ...when }),
 ] as const;
 
@@ -101,9 +101,9 @@ const FLAGS = [
   "undefendedToMumak",
   // On the table, until the end of the phase: the total Threat in the Orcs' area is added to the total Threat in the staging area, read live (17046:A:1; families/haradrim/orcs-values.ts orcsStagingRaise).
   "orcsInStagingThreat",
-  // On the table, while Lost Underground is in play: the Search objective does not flip (families/haradrim/track.ts; 17075:A:1).
+  // On the table, while Lost Underground is in play (17075:A:1, a constant): the Search objective does not flip, except by the side quest's own two flips (`despiteBlock`), and Track does not resolve at all. The flag means both (families/haradrim/track.ts).
   "cannotFlipSearch",
-  // On the table, while Off Track is in play: no progress is placed on the main quest card, though a side quest that is the current quest takes it (17079:A:2; mainQuestBlocked in families/haradrim/track.ts, read by quest.ts).
+  // On the table, while Off Track is in play: "Progress cannot be placed on the main quest." (17079:A:2): no progress is placed on the main quest card, though a side quest that is the current quest takes it (17079:A:2; mainQuestBlocked in families/haradrim/track.ts, read by quest.ts).
   "noMainQuestProgress",
 ] as const;
 

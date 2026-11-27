@@ -54,15 +54,14 @@ export type SandsGame = PlayedGame;
 // The goldens (src/campaign/scenarios/beneath-the-sands/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type SandsGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: SandsDecks; outcome: "won" | "lost"; policy?: Partial<SandsPolicy>; lossReason?: string };
 
-// The games to pin (.claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and true solo on Easy, and the two ways to lose (the scenario prints no loss of its own: every hero destroyed or every player at a threat of 50, both the engine's "No seats remain"), each true solo and two-handed.
+// The games to pin (.claude/rules/code-standards.md, Test cost): wins true solo and two-handed on Normal and true solo on Easy, and the two ways to lose (the scenario prints no loss of its own: every hero destroyed or every player at a threat of 50, both the engine's "No seats remain"), true solo, and two-handed once, where one seat's heroes are destroyed while the other seat plays on (a path no solo game reaches).
 export const SANDS_GOLDENS: readonly SandsGolden[] = [
   { name: "true solo, won, Normal", seatCount: 1, seed: 6, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed, won, Normal", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, won, Easy", seatCount: 1, seed: 5, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "tense", outcome: "lost", lossReason: "No seats remain" },
-  { name: "two-handed, lost, threat reaches 50 after a long game", seatCount: 2, seed: 3, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "No seats remain" },
   { name: "true solo, lost, every hero destroyed", seatCount: 1, seed: 5, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
-  { name: "two-handed, lost, every hero destroyed", seatCount: 2, seed: 5, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+  { name: "two-handed, lost, one seat out while the other plays on", seatCount: 2, seed: 5, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
 ];
 
 const game = standaloneGame<SandsDecks, SandsPolicy>({

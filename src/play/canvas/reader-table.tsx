@@ -10,7 +10,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 
 import type { CardSpeechDeps } from "../words/card-speech.ts";
 import { cardSpeech } from "../words/card-speech.ts";
-import { lookIdsOf } from "../words/scenarios/wilderland.ts";
+import { lookIdsOf, lookWordOf } from "../words/scenarios/wilderland.ts";
 import { beatIds } from "../store/beat-store.ts";
 import { NO_HIGHLIGHT } from "../store/peek.ts";
 import { useReaderGateEnd } from "../spotlight/reader-gate.ts";
@@ -145,12 +145,13 @@ export function ReaderTable({ store, width, height, bottomInset, nameOf, inactiv
   // The cards the banner's Discover beat lays in the look strip.
   const beatKey = useStore(beats, (state) => state.key);
   const discover = peeking ? 0 : lookIdsOf(beatIds(beatKey)).length;
+  const lookWord = lookWordOf(beatIds(beatKey));
   // No row of this table is folded away: every card is a button, so the pick reaches all of them (row-fold.ts).
   useLayoutEffect(() => {
     store.getState().setRowFolds({ staging: [], engaged: [] });
   }, [store]);
   const deckFaceUp = useStore(store, (state) => state.faceUpDecks.includes(seat));
-  const rows = readerRows(game, seat, { facts, cards: readerSeed.cards, nameOf, playable: highlight.tappable, discover, deckFaceUp });
+  const rows = readerRows(game, seat, { facts, cards: readerSeed.cards, nameOf, playable: highlight.tappable, discover, lookWord, deckFaceUp });
   const deps: CardSpeechDeps = { nameOf, inactive, facts, info, highlight, cards: readerSeed.cards, sheet: readerSeed.sheet, peeking };
   return (
     <ScrollView testID="reader-table" importantForAccessibility={tableVisibility(Platform.OS, panelOpen)} style={{ width, height }} contentContainerStyle={{ padding: 12 * s, paddingTop: 12 * s + banner, paddingBottom: 12 * s + bottomInset }}>

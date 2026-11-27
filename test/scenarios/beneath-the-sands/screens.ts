@@ -6,7 +6,7 @@ import type { ScreenMoment } from "../../harness/screens.ts";
 export const screens: ScreenMoment[] = [
   {
     name: "off-track",
-    note: "The Search objective Off Track (17079) in the staging area with 2 resources on it, as its Forced effect places them; Grabbed by Spiders (17074) is attached to the main quest.",
+    note: "The Search objective Off Track (17079) in the staging area with 2 resources on it, as its Forced effect places them; Grabbed by Spiders (17074) is attached to the main quest and shows as one peek below the stage card.",
     layout: { stage: "17076", staging: [{ code: "17079", resources: 2 }], attached: [{ code: "17074", to: "17076", encounter: true }] },
   },
   {

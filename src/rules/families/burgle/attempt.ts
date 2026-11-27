@@ -6,7 +6,6 @@ import { ruleCause } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
-import { reshuffleDiscard } from "../../interpret/verbs.ts";
 import type { BurgleData, Frame, ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
@@ -15,6 +14,7 @@ import { openFrameActions } from "../../windows/pass.ts";
 import { fireForced } from "../../windows/triggers.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "../../windows/windows.ts";
 import { shuffleSeatDeck } from "../deck/moves.ts";
+import { discardTopCards } from "../uncharted/cards.ts";
 import type { Focus } from "../index.ts";
 import { burgleEffectOf, matchingHand, nearestBurgle } from "./match.ts";
 import { noteEffectBurgle } from "./results.ts";
@@ -63,10 +63,10 @@ function dealStep(state: ScenarioState, data: BurgleData, ctx: ReduceContext, st
   const dealt: string[] = [];
   if (![...state.encounterDeck, ...state.encounterDiscard].some((id) => hasBurgle(state, id, ctx))) return patchTop(next, { step: STEP_RESULT, data: { ...data, result: false } });
   for (let guard = 0; guard < 2000; guard += 1) {
-    if (next.encounterDeck.length === 0) next = reshuffleDiscard(next, steps, "rr.running-out-of-cards");
-    const id = next.encounterDeck[0];
-    if (!id || !next.cards[id]) break;
-    next = updateCard(moveCard(next, id, { zone: "encounterDiscard" }), id, { face: "up" });
+    const top = discardTopCards(next, 1, "shuffle", steps, ctx);
+    next = top.state;
+    const id = top.ids[0];
+    if (!id) break;
     dealt.push(id);
     if (hasBurgle(next, id, ctx)) return patchTop(next, { step: STEP_REVEAL, data: { ...data, effectCardId: id, dealtIds: dealt } });
   }

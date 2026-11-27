@@ -63,14 +63,14 @@ Scenario piles that place cards with no record (quest: 17076 Searching the Caves
   17068:forced:1: Forced after this location becomes the active location (heard about this card)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the Search objective in play flips to On Track (each resource on it is discarded) (nothing while Lost Underground is in play); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
+    - the Search objective in play flips to On Track (each resource on it is discarded) (nothing while Lost Underground is in play; its constant also stops Track from resolving); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
     - one set-aside card with code 17065 joins the staging area (it is not revealed)
 
 17068:A:3 (front): Forced: When Spider Burrow leaves play as an explored location, set Brood Mother aside, out of play (unless the players are at stage 3B).
   17068:forced:2: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - if not (the players are on stage 3): the card with code 17065 in play, in the staging area or engaged, is set aside, out of play, with no damage (nothing when none is in play)
+    - if not (the players are on stage 3): the card with code 17065 in play, wherever it lies, is set aside, out of play, with no damage (nothing when none is in play)
 
 ## 17069 Pitch Black Tunnel
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -79,7 +79,7 @@ Scenario piles that place cards with no record (quest: 17076 Searching the Caves
   17069:forced:1: Forced after the players travel (heard about this card)
     only if the card with code 17079 is in play
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - Track 4: discard 4 cards from the top of the encounter deck, shuffling the encounter discard pile into the deck each time the deck runs out and going on; if any discarded card is one that prints On Track in the lower right corner (codes 17066, 17067, 17069, 17070, 17072), flip the Search objective to On Track (nothing while Lost Underground is in play)
+    - Track 4: discard 4 cards from the top of the encounter deck, shuffling the encounter discard pile into the deck each time the deck runs out and going on; if any discarded card is one that prints On Track in the lower right corner (codes 17066, 17067, 17069, 17070, 17072), flip the Search objective to On Track; Track does not resolve at all while Lost Underground is in play (no card is discarded)
 
 17069:A:2 (front): X is the number of characters controlled by the first player.
   17069:constant:1: Constant
@@ -96,7 +96,7 @@ Scenario piles that place cards with no record (quest: 17076 Searching the Caves
   17070:forced:1: Forced after the players travel (heard about this card)
     only if the card with code 17079 is in play
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - Track 3: discard 3 cards from the top of the encounter deck, shuffling the encounter discard pile into the deck each time the deck runs out and going on; if any discarded card is one that prints On Track in the lower right corner (codes 17066, 17067, 17069, 17070, 17072), flip the Search objective to On Track (nothing while Lost Underground is in play)
+    - Track 3: discard 3 cards from the top of the encounter deck, shuffling the encounter discard pile into the deck each time the deck runs out and going on; if any discarded card is one that prints On Track in the lower right corner (codes 17066, 17067, 17069, 17070, 17072), flip the Search objective to On Track; Track does not resolve at all while Lost Underground is in play (no card is discarded)
 
 17070:A:2 (front): Travel: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until a Creature enemy is discarded. Add the discarded enemy to the staging area.
   17070:travel:1: Travel
@@ -112,7 +112,7 @@ Scenario piles that place cards with no record (quest: 17076 Searching the Caves
   17071:forced:1: Forced after the players travel (heard about this card)
     only if the card with code 17079 is in play
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - Track 2: discard 2 cards from the top of the encounter deck, shuffling the encounter discard pile into the deck each time the deck runs out and going on; if any discarded card is one that prints On Track in the lower right corner (codes 17066, 17067, 17069, 17070, 17072), flip the Search objective to On Track (nothing while Lost Underground is in play)
+    - Track 2: discard 2 cards from the top of the encounter deck, shuffling the encounter discard pile into the deck each time the deck runs out and going on; if any discarded card is one that prints On Track in the lower right corner (codes 17066, 17067, 17069, 17070, 17072), flip the Search objective to On Track; Track does not resolve at all while Lost Underground is in play (no card is discarded)
 
 17071:A:2 (front): While On Track is in play, Cobwebbed Cavern gets +2 Threat.
   17071:constant:1: Constant
@@ -133,7 +133,7 @@ Scenario piles that place cards with no record (quest: 17076 Searching the Caves
   17072:forced:1: Forced after the players travel (heard about this card)
     only if the card with code 17079 is in play
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - Track 2: discard 2 cards from the top of the encounter deck, shuffling the encounter discard pile into the deck each time the deck runs out and going on; if any discarded card is one that prints On Track in the lower right corner (codes 17066, 17067, 17069, 17070, 17072), flip the Search objective to On Track (nothing while Lost Underground is in play)
+    - Track 2: discard 2 cards from the top of the encounter deck, shuffling the encounter discard pile into the deck each time the deck runs out and going on; if any discarded card is one that prints On Track in the lower right corner (codes 17066, 17067, 17069, 17070, 17072), flip the Search objective to On Track; Track does not resolve at all while Lost Underground is in play (no card is discarded)
 
 17072:A:2 (front): While On Track is in play, progress cannot be placed on locations in the staging area.
   17072:constant:1: Constant
@@ -155,7 +155,7 @@ Scenario piles that place cards with no record (quest: 17076 Searching the Caves
     who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     - the first player chooses one of:
       * option "flip":
-        - the Search objective in play flips to Off Track (nothing while Lost Underground is in play); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
+        - the Search objective in play flips to Off Track (nothing while Lost Underground is in play; its constant also stops Track from resolving); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
       * option "damage":
         - deal 1 damage to each character (any player controls) committed to the quest
 
@@ -190,8 +190,8 @@ Scenario piles that place cards with no record (quest: 17076 Searching the Caves
 
 17075:A:1 (front): When Revealed: Flip the Search objective to Off Track. While Lost Underground is in play, the Search objective cannot flip. (Do not resolve the Track keyword.)
   17075:whenRevealed:1: When revealed
-    (steps run in order; a step depends on an earlier one only through its own condition)
     - the Search objective in play flips to Off Track, even while Lost Underground stops flips (this card's own flip); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
+  17075:constant:1: Constant
     - the table: stat cannotFlipSearch 1, while this card is in play
 
 17075:A:2 (front): Response: When this stage is defeated, flip the Search objective to On Track and ignore its Forced effects until the end of the phase.
@@ -217,7 +217,7 @@ Scenario piles that place cards with no record (quest: 17076 Searching the Caves
 17077:A:1 (front): When Revealed: Flip the Search objective to Off Track. Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X enemies are discarded, where X is the number of players. Add each enemy discarded by this effect to the staging area.
   17077:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the Search objective in play flips to Off Track (nothing while Lost Underground is in play); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
+    - the Search objective in play flips to Off Track (nothing while Lost Underground is in play; its constant also stops Track from resolving); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
     - shuffle the encounter discard pile into the encounter deck
     - discard from the top of the encounter deck until 1 enemy for each player is discarded; add those enemies to the staging area
 
@@ -235,7 +235,7 @@ Scenario piles that place cards with no record (quest: 17076 Searching the Caves
     - one set-aside card with code 17065 joins the staging area (it is not revealed)
     - for each player, first player first:
       - if not (the actor holds the first player token): the acting player reveals an encounter card
-    - the Search objective in play flips to Off Track (nothing while Lost Underground is in play); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
+    - the Search objective in play flips to Off Track (nothing while Lost Underground is in play; its constant also stops Track from resolving); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
 
 17078:B:1 (back): While there are at least 5 progress tokens on this stage, Brood Mother loses the text: 'Cannot take damage.'
   17078:constant:1: Constant
@@ -285,6 +285,6 @@ Scenario piles that place cards with no record (quest: 17076 Searching the Caves
 17080:A:2 (front): Forced: After the players quest unsuccessfully, flip this objective.
   17080:forced:2: Forced after the players quest unsuccessfully
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
-    - the Search objective in play flips to Off Track (nothing while Lost Underground is in play); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
+    - the Search objective in play flips to Off Track (nothing while Lost Underground is in play; its constant also stops Track from resolving); nothing changes when it already shows that side; a flip to Off Track is announced (the event searchFlippedOff), a flip to On Track is not
 
-(rendered pieces: 159 by template, 0 as JSON)
+(rendered pieces: 160 by template, 0 as JSON)
