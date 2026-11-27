@@ -174,7 +174,7 @@ Scenario piles that place cards with no record (quest: 06091 Retake the City)
 
 06100:A:1 (front): While West Quarter is the active location, the current quest gains siege. (Characters quest using Defense instead of Willpower.)
   06100:constant:1: Constant
-    - currentQuest: stat siege 1, while this card is active
+    - the main quest card (also while a side quest is the current quest): stat siege 1, while this card is active
 
 06100:A:2 (shadow): Shadow: If this attack destroys a character, that character's controller must return a location he controls with the highest Threat to the staging area.
   06100:shadow:1: Shadow
@@ -189,7 +189,7 @@ Scenario piles that place cards with no record (quest: 06091 Retake the City)
 
 06101:A:1 (front): While East Quarter is the active location, the current quest gains battle. (Characters quest using Attack instead of Willpower.)
   06101:constant:1: Constant
-    - currentQuest: stat battle 1, while this card is active
+    - the main quest card (also while a side quest is the current quest): stat battle 1, while this card is active
 
 06101:A:2 (shadow): Shadow: If this attack destroys a character, that character's controller must return a location he controls with the highest Threat to the staging area.
   06101:shadow:1: Shadow

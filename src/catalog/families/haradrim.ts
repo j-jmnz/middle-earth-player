@@ -84,6 +84,8 @@ const TRIGGERS = [
 const FLAGS = [
   // On a stage: it takes no progress beyond its quest points even while it cannot advance ("This stage cannot have more than 15 progress tokens on it", 16066:B:1, 16067:B:1). Read by putOnStage (src/rules/quest/quest.ts).
   "stageCapped",
+  // On a stage: as `stageCapped`, but the cap is the quest points printed on the stage, not a value an effect gave it ("beyond its printed quest points value", 17100:A:2). Read by putOnStage (src/rules/quest/quest.ts).
+  "stageCappedPrinted",
   // On the table: no player holds more cards in hand than the amount (5, 16045:A:2); a seat over it raises `handOverLimit` at the next settle. The tightest amount holds.
   "handLimit",
   // On the table, noted by the family's settle hook: the round the current main quest card was first seen in play, as the amount, with the stage as the source (condition `stageInPlayWholeRound`, 16014:A:2). A stage in play from Setup notes round 0.

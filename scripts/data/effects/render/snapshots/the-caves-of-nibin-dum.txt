@@ -85,9 +85,9 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41027:A:1 (front): X is the stage number of the quest.
   41027:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat threat the stage number of the quest, while this card is in play
-    - this card: stat attack the stage number of the quest, while this card is in play
-    - this card: stat defense the stage number of the quest, while this card is in play
+    - this card: stat threat the stage number of the main quest (also while a side quest is the current quest), while this card is in play
+    - this card: stat attack the stage number of the main quest (also while a side quest is the current quest), while this card is in play
+    - this card: stat defense the stage number of the main quest (also while a side quest is the current quest), while this card is in play
 
 41027:A:2 (front): Cannot take damage. Cannot have attachments.
   41027:constant:2: Constant
@@ -100,7 +100,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     who acts: the acting player is the defending player (the player the attack is against)
     - the first player chooses one of:
       * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 1 progress):
-        - remove the stage number of the quest progress from the main quest (all of it when it holds less)
+        - remove the stage number of the main quest (also while a side quest is the current quest) progress from the main quest (all of it when it holds less)
       * option "staging":
         - return this card to the staging area
 

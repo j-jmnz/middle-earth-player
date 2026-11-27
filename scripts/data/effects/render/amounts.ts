@@ -72,7 +72,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (expr.guardedCost === true) return { text: "the printed cost of the card this card guards (one under it, or the host it guards as a guard; 0 for a card with no printed cost)", read: ["guardedCost"] };
   if (expr.discoverValue === true) return { text: "the Discover value of the active location (its Discover X, with the adjustment a Response made; 0 when it has none)", read: ["discoverValue"] };
   if (expr.x === true) return { text: "X", read: ["x"] };
-  if (expr.stage === true) return { text: "the stage number of the quest", read: ["stage"] };
+  if (expr.stage === true) return { text: "the stage number of the main quest (also while a side quest is the current quest)", read: ["stage"] };
   if (typeof expr.threat === "string") return { text: expr.threat === "tens" ? "the tens digit of your threat" : "your threat", read: ["threat"] };
   if (expr.hand === true) return { text: "the cards in your hand", read: ["hand"] };
   if (expr.attackDamage === true) return { text: "the damage the player attack this effect answers would deal this enemy: the attackers' total Attack less this enemy's Defense (0 at the least)", read: ["attackDamage"] };

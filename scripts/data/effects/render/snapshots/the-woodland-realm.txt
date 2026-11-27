@@ -203,14 +203,14 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51113:A:1 (front): X is 1 more than the stage number of the main quest.
   51113:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat threat the stage number of the quest + 1, while this card is in play
-    - this card: stat questPoints the stage number of the quest + 1, while this card is in play
+    - this card: stat threat the stage number of the main quest (also while a side quest is the current quest) + 1, while this card is in play
+    - this card: stat questPoints the stage number of the main quest (also while a side quest is the current quest) + 1, while this card is in play
 
 51113:A:2 (front): Travel: Each player deals X damage to a character he controls.
   51113:travel:1: Travel
     - for each player, first player first:
       - choose character (you control)
-      - deal the stage number of the quest + 1 damage to the picked card
+      - deal the stage number of the main quest (also while a side quest is the current quest) + 1 damage to the picked card
 
 ## 51114 Despair
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -258,7 +258,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51117:A:1 (front): When Revealed: Each player raises his threat by X, where X is 1 more than the stage number of the main quest.
   51117:whenRevealed:1: When revealed
     - for each player, first player first:
-      - raise threat by the stage number of the quest + 1 (the acting player)
+      - raise threat by the stage number of the main quest (also while a side quest is the current quest) + 1 (the acting player)
 
 51117:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if your threat is 35 or higher).
   51117:shadow:1: Shadow
@@ -488,7 +488,7 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51132:A:3 (shadow): Shadow: Attacking enemy gets +X Attack, where X is the stage number of the current quest.
   51132:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - the attacking enemy: stat attack the stage number of the quest, until the end of the attack
+    - the attacking enemy: stat attack the stage number of the main quest (also while a side quest is the current quest), until the end of the attack
 
 ## 51133 Mirkwood Patrol
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -546,13 +546,13 @@ Scenario piles that place cards with no record (quest: 51101 Captured by Spiders
 51136:A:1 (front): X is 1 more than the stage number of the main quest.
   51136:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat threat the stage number of the quest + 1, while this card is in play
-    - this card: stat defense the stage number of the quest + 1, while this card is in play
+    - this card: stat threat the stage number of the main quest (also while a side quest is the current quest) + 1, while this card is in play
+    - this card: stat defense the stage number of the main quest (also while a side quest is the current quest) + 1, while this card is in play
 
 51136:A:2 (shadow): Shadow: Attacking enemy gets +X Defense until the end of the phase, where X is the stage number of the main quest.
   51136:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - the attacking enemy: stat defense the stage number of the quest, until the end of the phase
+    - the attacking enemy: stat defense the stage number of the main quest (also while a side quest is the current quest), until the end of the phase
 
 ## 51137 Labyrinthine Woods
 (the scenario deals it into the encounter pile; the piles place it, no record does)

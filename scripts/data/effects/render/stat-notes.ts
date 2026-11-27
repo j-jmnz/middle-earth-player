@@ -12,6 +12,7 @@ export const FLAG_NOTES: Readonly<Record<string, string>> = {
   noMainQuestProgress: " (no progress can be placed on the main quest card while it lasts; a side quest that is the current quest still takes progress)",
   noQuestProgress: " (no progress can be placed on the current quest while it lasts; the active location still takes its share first)",
   stageCapped: " (the stage takes no more progress than its quest points even while it cannot advance; the rest is not placed)",
+  stageCappedPrinted: " (the stage takes no more progress than the quest points printed on it, even while it cannot advance and whatever an effect gave it; the rest is not placed)",
   handLimit: " (no player holds more cards in hand than this; a hand over it discards down to it at the next settle, the player choosing which cards)",
   temperature: " (the heat tracker: the temperature, one modifier of the table for the rest of the game, set at Setup and replaced by each verb)",
   undefendedToStaged: " (the damage of undefended attacks goes to a hero in the staging area, the attacked player naming which, while one can take it; with none it goes to the player's own heroes)",

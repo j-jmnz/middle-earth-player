@@ -11,12 +11,12 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
 
 17091:A:2 (front): While Banner of the Serpent is attached to an encounter card, each Harad enemy gets +1 Attack.
   17091:constant:2: Constant
-    only if this card is a objective (any player controls) that is attached to an encounter card (an encounter card guards it, or it hangs on an enemy or a location)
+    only if this card is a objective (any player controls) that is attached to an encounter card (an encounter card guards it, or it hangs on an enemy or a location), wherever it lies in play: in the staging area or held by a player's card
     - each Harad enemy (any player controls) or in the staging area: stat attack 1, while this card is in play
 
 17091:A:3 (front): Action: Exhaust Banner of the Serpent and raise your threat by 1 to give each Harad enemy engaged with you -1 Attack until the end of the phase.
   17091:action:1: Action (cost: exhaust this card and raise your threat by 1)
-    only if the card with code 17091 is attached to a hero, any player's
+    only if all of: (the card with code 17091 is attached to a hero, any player's) and (the card this one is attached to is controlled by the acting player) and (there is a Harad enemy (any player controls) engaged with you to choose)
     who acts: any player may trigger it; the acting player is the one who does
     - each Harad enemy (any player controls) engaged with you (only the cards that match now: one that arrives later does not get it): stat attack -1, until the end of the phase
 
@@ -39,7 +39,7 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
 
 17092:A:3 (front): Action: Exhaust The Serpent's Garb and raise your threat by 1 to give a Harad enemy in the staging area -2 Threat until the end of the phase.
   17092:action:1: Action (cost: exhaust this card and raise your threat by 1)
-    only if the card with code 17092 is attached to a hero, any player's
+    only if all of: (the card with code 17092 is attached to a hero, any player's) and (the card this one is attached to is controlled by the acting player) and (there is a Harad enemy (any player controls) or in the staging area, in the staging area only to choose)
     who acts: any player may trigger it; the acting player is the one who does
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose Harad enemy (any player controls) or in the staging area, in the staging area only
@@ -56,12 +56,12 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
 
 17093:A:2 (front): While Summons from Mordor is attached to an encounter card, each player's threat cannot be reduced.
   17093:constant:2: Constant
-    only if this card is a objective (any player controls) that is attached to an encounter card (an encounter card guards it, or it hangs on an enemy or a location)
+    only if this card is a objective (any player controls) that is attached to an encounter card (an encounter card guards it, or it hangs on an enemy or a location), wherever it lies in play: in the staging area or held by a player's card
     - each player: stat threatReductionBarred 1, while this card is in play
 
 17093:A:3 (front): Action: Exhaust Summons from Mordor and raise your threat by 1 to add 1 resource to attached hero's pool.
   17093:action:1: Action (cost: exhaust this card and raise your threat by 1)
-    only if the card with code 17093 is attached to a hero, any player's
+    only if all of: (the card with code 17093 is attached to a hero, any player's) and (the card this one is attached to is controlled by the acting player)
     who acts: any player may trigger it; the acting player is the one who does
     - add 1 resources to its host
 
@@ -77,9 +77,9 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
 17094:A:2 (front): The Black Serpent gets +X Threat, +X Attack and +X Defense.
   17094:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat threat the stage number of the quest, while this card is in play
-    - this card: stat attack the stage number of the quest, while this card is in play
-    - this card: stat defense the stage number of the quest, while this card is in play
+    - this card: stat threat the stage number of the main quest (also while a side quest is the current quest), while this card is in play
+    - this card: stat attack the stage number of the main quest (also while a side quest is the current quest), while this card is in play
+    - this card: stat defense the stage number of the main quest (also while a side quest is the current quest), while this card is in play
 
 17094:A:3 (front): Forced: At the end of the encounter phase, either remove X progress from the main quest, or The Black Serpent makes an attack against the first player.
   17094:forced:1: Forced at the end of the phase
@@ -87,7 +87,7 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
     who acts: the acting player is the first player (a phase has no player of its own)
     - the first player chooses one of:
       * option "progress" (only if the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 1 progress):
-        - remove the stage number of the quest progress from the main quest (all of it when it holds less)
+        - remove the stage number of the main quest (also while a side quest is the current quest) progress from the main quest (all of it when it holds less)
       * option "attack":
         - this card attacks the first player now, from the staging area, dealt a shadow card
 
@@ -116,7 +116,7 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 17096:A:1 (front): While The Serpent's Redoubt is in the staging area, it gains: "Forced: After a player plays an ally from his hand, either remove 1 progress from the main quest, or exhaust that ally."
-  17096:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type ally)
+  17096:forced:1: Forced after an ally is played from a hand (not one put into play by an effect) (heard about card (any player controls) or in the staging area or the active location, of card type ally)
     only if this card is in the staging area
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player chooses one of:
@@ -128,6 +128,7 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
 17096:A:2 (front): Travel: The first player searches the encounter deck and discard pile for an enemy and puts it into play engaged with him. Shuffle the encounter deck.
   17096:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
+    - the rest of the effect is carried out by the first player
     - the acting player finds one enemy in the encounter deck or its discard pile and puts it into play engaged with the first player (it is not revealed)
     - shuffle the encounter deck
 
@@ -135,7 +136,7 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 17097:A:1 (front): While Roofless Tower is in the staging area, it gains: "Forced: When a player plays an event, either remove 1 progress from the main quest, or cancel the effects of that event."
-  17097:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
+  17097:forced:1: Forced when an event is played, before its effects resolve (heard about card (any player controls) or in the staging area or the active location, of card type event)
     only if this card is in the staging area
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the acting player chooses one of:
@@ -170,7 +171,7 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
   17099:forced:1: Forced at the end of the round
     only if this card is in the staging area
     who acts: the acting player is the first player (a phase has no player of its own)
-    - remove all the progress from each location (any player controls)
+    - remove all the progress from each location (any player controls) or in the staging area
 
 17099:A:2 (front): Travel: Raise each player's threat by 1 to travel here.
   17099:travel:1: Travel
@@ -185,7 +186,7 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
 17100:A:2 (front): While Broken Courtyard is in the staging area, the main quest cannot have progress tokens beyond its printed quest points value.
   17100:constant:1: Constant
     only if this card is in the staging area
-    - currentQuest: stat stageCapped (the stage takes no more progress than its quest points even while it cannot advance; the rest is not placed) 1, while this card is in play
+    - the main quest card (also while a side quest is the current quest): stat stageCappedPrinted (the stage takes no more progress than the quest points printed on it, even while it cannot advance and whatever an effect gave it; the rest is not placed) 1, while this card is in play
 
 17100:A:3 (shadow): Shadow: Either remove 2 progress from the main quest, or return attacking enemy to the staging area after this attack.
   17100:shadow:1: Shadow
@@ -234,9 +235,9 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
   17102:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     - when the attack in progress ends:
-      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (there is a Harad objective (you control) that is claimed (attached to a character a player controls) to choose) and (there is a non-unique card (any player controls) in the staging area only, that is not an objective to choose): choose Harad objective (you control) that is claimed (attached to a character a player controls)
-      - then, if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (there is a Harad objective (you control) that is claimed (attached to a character a player controls) to choose) and (there is a non-unique card (any player controls) in the staging area only, that is not an objective to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): choose non-unique card (any player controls) in the staging area only, that is not an objective
-      - then, if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (there is a Harad objective (you control) that is claimed (attached to a character a player controls) to choose) and (there is a non-unique card (any player controls) in the staging area only, that is not an objective to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card becomes the guard of the card picked before, attached to it in the staging area (an objective a character holds is detached first, into the staging area faceup and unclaimed)
+      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (there is a Harad objective (you control) that is claimed (attached to a character a player controls) to choose) and (there is a non-unique card (any player controls) that is an encounter card, in the staging area only, that is not an objective to choose): choose Harad objective (you control) that is claimed (attached to a character a player controls)
+      - then, if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (there is a Harad objective (you control) that is claimed (attached to a character a player controls) to choose) and (there is a non-unique card (any player controls) that is an encounter card, in the staging area only, that is not an objective to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): choose non-unique card (any player controls) that is an encounter card, in the staging area only, that is not an objective
+      - then, if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (there is a Harad objective (you control) that is claimed (attached to a character a player controls) to choose) and (there is a non-unique card (any player controls) that is an encounter card, in the staging area only, that is not an objective to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card becomes the guard of the card picked before, attached to it in the staging area (an objective a character holds is detached first, into the staging area faceup and unclaimed)
 
 ## 17103 Chaos in the Night
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -249,6 +250,7 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
         - raise threat by 3 (each player)
       * option "noProgress":
         - the table: stat noQuestProgress (no progress can be placed on the current quest while it lasts; the active location still takes its share first) 1, until the end of the round
+        - the table: stat noMainQuestProgress (no progress can be placed on the main quest card while it lasts; a side quest that is the current quest still takes progress) 1, until the end of the round
 
 17103:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, remove all progress from the main quest.
   17103:shadow:1: Shadow
@@ -263,7 +265,6 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
 
 17104:A:1 (front): Forced: At the end of the round, discard all progress from the main quest.
   17104:forced:1: Forced at the end of the round
-    only if this card is the current quest
     who acts: the acting player is the first player (a phase has no player of its own)
     - all progress on this stage (the main quest card) is discarded
 
@@ -287,7 +288,7 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
 
 17106:B:2 (back): This stage cannot be defeated unless each Harad objective in play is attached to a hero.
   17106:constant:2: Constant
-    only if any of: (there is a Harad objective (any player controls) that is attached to an encounter card (an encounter card guards it, or it hangs on an enemy or a location) to choose) or (there is a Harad objective (any player controls) in the staging area only, that is attached to no encounter card to choose)
+    only if any of: (there is a Harad objective (any player controls) that is attached to an encounter card (an encounter card guards it, or it hangs on an enemy or a location), wherever it lies in play: in the staging area or held by a player's card to choose) or (there is a Harad objective (any player controls) in the staging area only, that is attached to no encounter card to choose)
     - the players cannot defeat this stage while this holds
 
 ## 17107 Battle in the Camp
@@ -313,7 +314,7 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
 
 17107:B:3 (back): This stage cannot be defeated unless each Harad objective in play is attached to a hero.
   17107:constant:3: Constant
-    only if any of: (there is a Harad objective (any player controls) that is attached to an encounter card (an encounter card guards it, or it hangs on an enemy or a location) to choose) or (there is a Harad objective (any player controls) in the staging area only, that is attached to no encounter card to choose)
+    only if any of: (there is a Harad objective (any player controls) that is attached to an encounter card (an encounter card guards it, or it hangs on an enemy or a location), wherever it lies in play: in the staging area or held by a player's card to choose) or (there is a Harad objective (any player controls) in the staging area only, that is attached to no encounter card to choose)
     - the players cannot defeat this stage while this holds
 
 ## 17108 Defeat the Serpent
@@ -341,8 +342,8 @@ Scenario piles that place cards with no record (quest: 17106 The Crossroads Fort
 
 17108:B:3 (back): This stage cannot be defeated unless each Harad objective in play is attached to a hero. If the players defeat this stage, they win the game.
   17108:constant:3: Constant
-    only if any of: (there is a Harad objective (any player controls) that is attached to an encounter card (an encounter card guards it, or it hangs on an enemy or a location) to choose) or (there is a Harad objective (any player controls) in the staging area only, that is attached to no encounter card to choose)
+    only if any of: (there is a Harad objective (any player controls) that is attached to an encounter card (an encounter card guards it, or it hangs on an enemy or a location), wherever it lies in play: in the staging area or held by a player's card to choose) or (there is a Harad objective (any player controls) in the staging area only, that is attached to no encounter card to choose)
     note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 255 by template, 0 as JSON)
+(rendered pieces: 266 by template, 0 as JSON)

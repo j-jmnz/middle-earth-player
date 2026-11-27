@@ -1,4 +1,4 @@
-import type { Effect, PickSpec } from "../../../catalog/boundary.ts";
+import type { Condition, Effect, PickSpec } from "../../../catalog/boundary.ts";
 
 // Records for The Black Serpent (haradrim cycle part 7, no campaign card). Every line is read from the scan ledger (data/printed/haradrim.json). See docs/scenarios/haradrim/the-black-serpent.md, Readings, for each reading.
 // The three Harad objectives are set aside by the piles; the Setup, stage 2A and stage 3A reveal or attach one at random (RevealRandomSetAside, AttachRandomSetAside). Guarded (X) is GuardObjective with `types` (hrd.guarded-x). An objective is "attached to an encounter card"
@@ -19,10 +19,12 @@ const MY_HARAD_OBJECTIVE: PickSpec = { type: "objective", control: "you", trait:
 const HARAD_ON_ENCOUNTER: PickSpec = { type: "objective", control: "any", trait: "Harad", onEncounter: true };
 const HARAD_STAGED_FREE: PickSpec = { type: "objective", control: "any", trait: "Harad", stagingOnly: true, onEncounter: false };
 const HARAD_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true, trait: "Harad" };
+const HARAD_ENEMY_IN_STAGING: PickSpec = { ...HARAD_ENEMY, stagingOnly: true };
 const HARAD_ENEMY_ENGAGED_WITH_YOU: PickSpec = { type: "enemy", control: "any", trait: "Harad", engaged: "you" };
 const HERO_WITH_OBJECTIVE: PickSpec = { type: "hero", control: "any", holdsObjective: true };
-const STAGED_LOCATION: PickSpec = { type: "location", control: "any" };
-const STAGED_NON_UNIQUE_ENCOUNTER_CARD: PickSpec = { type: "card", control: "any", stagingOnly: true, nonUnique: true, nonObjective: true };
+// "Each location in play": the staging area and the active location (`staging` makes the staging area explicit).
+const STAGED_LOCATION: PickSpec = { type: "location", control: "any", staging: true };
+const STAGED_NON_UNIQUE_ENCOUNTER_CARD: PickSpec = { type: "card", control: "any", stagingOnly: true, nonUnique: true, nonObjective: true, playerCard: false };
 
 // "While <the objective> is attached to an encounter card".
 const ATTACHED_TO_ENCOUNTER: Cond = { kind: "matches", card: "self", pick: { type: "objective", control: "any", onEncounter: true } };
@@ -62,13 +64,13 @@ const guarded = (code: string, types: ("enemy" | "location")[]): Effect[] => [
 const HARAD_COUNT = { count: HARAD_CONTROLLED };
 
 // The same Action on three objectives: exhaust it and raise your threat by 1 to ... (the player who controls it, a hero holds it).
-const objectiveAction = (code: string, line: string, instructions: Instruction[]): Effect => ({
+const objectiveAction = (code: string, line: string, instructions: Instruction[], needs?: Extract<Condition, { kind: "canPick" }>): Effect => ({
   id: `${code}:action:1`,
   cardCode: code,
   lines: [line],
   timing: "action",
-  // Only the player who controls the objective may use it: a hero holds it, not the staging area or an encounter card (rr.guarded, rr.objective-cards).
-  condition: { kind: "attachedToHero", code, is: true },
+  // Only the player who controls the objective may use it (an objective's Action is any player's, rr.action, so the hero's controller is named): a hero holds it, not the staging area or an encounter card (rr.guarded, rr.objective-cards).
+  condition: { kind: "all", conditions: needs ? [{ kind: "attachedToHero", code, is: true }, { kind: "hostControlledByActor" }, needs] : [{ kind: "attachedToHero", code, is: true }, { kind: "hostControlledByActor" }] },
   cost: [{ kind: "exhaustSelf" }, { kind: "raiseThreat", amount: 1 }],
   instructions,
 });
@@ -91,7 +93,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     condition: ATTACHED_TO_ENCOUNTER,
     instructions: [{ verb: "ModifyStat", stat: "attack", amount: 1, until: "whileSourceInPlay", holders: HARAD_ENEMY }],
   },
-  objectiveAction("17091", "17091:A:3", [{ verb: "ModifyStat", stat: "attack", amount: -1, until: "endOfPhase", holders: HARAD_ENEMY_ENGAGED_WITH_YOU }]),
+  objectiveAction("17091", "17091:A:3", [{ verb: "ModifyStat", stat: "attack", amount: -1, until: "endOfPhase", holders: HARAD_ENEMY_ENGAGED_WITH_YOU }], { kind: "canPick", pick: HARAD_ENEMY_ENGAGED_WITH_YOU }),
 
   // 17092 The Serpent's Garb. Guarded (enemy). The attached encounter card gets +2 Threat and is immune to player card effects. Action: a Harad enemy in the staging area gets -2 Threat until the end of the phase.
   ...guarded("17092", ["enemy"]),
@@ -105,10 +107,15 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       { verb: "ModifyStat", stat: "immuneToPlayerCards", amount: 1, until: "whileSourceInPlay", holders: ATTACHED_ENCOUNTER_CARD(type) },
     ]),
   },
-  objectiveAction("17092", "17092:A:3", [
-    { verb: "Pick", pick: { ...HARAD_ENEMY, stagingOnly: true } },
-    { verb: "ModifyStat", stat: "threat", amount: -2, until: "endOfPhase", target: "picked" },
-  ]),
+  objectiveAction(
+    "17092",
+    "17092:A:3",
+    [
+      { verb: "Pick", pick: HARAD_ENEMY_IN_STAGING },
+      { verb: "ModifyStat", stat: "threat", amount: -2, until: "endOfPhase", target: "picked" },
+    ],
+    { kind: "canPick", pick: HARAD_ENEMY_IN_STAGING },
+  ),
 
   // 17093 Summons from Mordor. Guarded (location). While attached to an encounter card no player's threat can be reduced. Action: add 1 resource to the pool of the hero it is attached to.
   ...guarded("17093", ["location"]),
@@ -174,7 +181,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     condition: IN_STAGING,
     instructions: [{ verb: "Choose", who: "actor", options: [progressOption(1), { id: "exhaust", instructions: [{ verb: "Exhaust", target: { kind: "ref", ref: "subject" } }] }] }],
   },
-  { id: "17096:travel:1", cardCode: "17096", lines: ["17096:A:2"], timing: "travel", instructions: [{ verb: "SearchMove", type: "enemy", to: "engagedFirstPlayer" }, { verb: "ShuffleEncounterDeck" }] },
+  { id: "17096:travel:1", cardCode: "17096", lines: ["17096:A:2"], timing: "travel", instructions: [{ verb: "ActAs", who: "firstPlayer" }, { verb: "SearchMove", type: "enemy", to: "engagedFirstPlayer" }, { verb: "ShuffleEncounterDeck" }] },
 
   // 17097 Roofless Tower. While in the staging area: when a player plays an event, that player either removes 1 progress from the main quest or the event's effects are canceled (the event is still played). Travel: exhaust a hero.
   {
@@ -218,7 +225,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     lines: ["17100:A:2"],
     timing: "constant",
     condition: IN_STAGING,
-    instructions: [{ verb: "ModifyStat", stat: "stageCapped", amount: 1, until: "whileSourceInPlay", target: "currentQuest" }],
+    instructions: [{ verb: "ModifyStat", stat: "stageCappedPrinted", amount: 1, until: "whileSourceInPlay", target: "currentQuest" }],
   },
   {
     id: "17100:shadow:1",
@@ -298,7 +305,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
         who: "firstPlayer",
         options: [
           { id: "threat", instructions: [{ verb: "RaiseThreat", amount: 3, who: "eachSeat" }] },
-          { id: "noProgress", instructions: [{ verb: "ModifyStat", stat: "noQuestProgress", amount: 1, until: "endOfRound", target: "table" }] },
+          // Every quest card: the current quest (the main quest, or the side quest that is current) and the main quest while a side quest is current.
+          { id: "noProgress", instructions: (["noQuestProgress", "noMainQuestProgress"] as const).map((stat): Option["instructions"][number] => ({ verb: "ModifyStat", stat, amount: 1, until: "endOfRound", target: "table" })) },
         ],
       },
     ],
@@ -314,14 +322,13 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     ],
   },
 
-  // 17104 Don't Let Them Escape! (encounter side quest). A:1: while it is the current quest, all progress comes off the main quest at the end of the round. A:2: each time it becomes the current quest, 1 encounter card is revealed.
+  // 17104 Don't Let Them Escape! (encounter side quest). A:1: while it is in play (in the staging area, current quest or not), all progress comes off the main quest at the end of the round. A:2: each time it becomes the current quest, 1 encounter card is revealed.
   {
     id: "17104:forced:1",
     cardCode: "17104",
     lines: ["17104:A:1"],
     timing: "forced",
     trigger: "endOfRound",
-    condition: { kind: "currentQuest", is: "self" },
     instructions: [{ verb: "RemoveAllQuestProgress", of: "stage" }],
   },
   { id: "17104:forced:2", cardCode: "17104", lines: ["17104:A:2"], timing: "forced", trigger: "becameCurrentQuest", subject: "self", instructions: [{ verb: "RevealEncounter" }] },

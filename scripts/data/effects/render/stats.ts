@@ -43,6 +43,7 @@ const TARGET_STAT: Readonly<Record<string, string>> = {
   characters: "every character in play, now and entering later",
   attacker: "the attacking enemy",
   table: "the table",
+  currentQuest: "the main quest card (also while a side quest is the current quest)",
   eachSeat: "each player",
   questingCharacters: "every character committed to the quest, now and committing later while the effect lasts",
 };
