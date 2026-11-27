@@ -19,6 +19,7 @@ import { deepestUnder, HELD_STRIP, placeUnder } from "../layout/slots.ts";
 import type { CardSlot } from "../layout/layout.ts";
 import { zoneSelector } from "../store/selectors.ts";
 import { discardValues, pickedValues, whoseWords } from "../words/asks-held.ts";
+import { attachedWords } from "../words/scenarios/haradrim/capture.ts";
 
 const ABAAN = "17120";
 const CELL = "17125";
@@ -197,5 +198,20 @@ describe("the Setup's search for an Orc enemy", () => {
       const printed = t.ctx.cards.get(run.state.cards[option.id]?.code ?? "");
       expect(option.stats, option.label).toEqual([{ icon: "threat", value: printed?.threat, word: "Threat" }, { icon: "engagementCost", value: printed?.engagementCost, word: "Engagement cost" }]);
     }
+  });
+});
+
+describe("the banner and the log of a capture, a rescue and the freeing of Abaan", () => {
+  const say = (event: "captured" | "rescued" | "free", seat: number | null, seats: number) => attachedWords({ kind: "captive", event, cardId: "ally", hostId: "host", seat }, (id) => (id === "ally" ? "Guard of the Citadel" : "Jailer of Cirith Gurat"), seats);
+
+  it("17121:A:1 names the character and its holder when it is captured", () => {
+    expect(say("captured", null, 2)).toBe("Guard of the Citadel is captured by Jailer of Cirith Gurat.");
+  });
+
+  it("17119:A:3 names who takes control of a rescued character, exhausted, and says Abaan is free", () => {
+    expect(say("rescued", 0, 2)).toBe("Guard of the Citadel is rescued: Player 1 takes control of it, exhausted.");
+    expect(say("rescued", 0, 1)).toBe("Guard of the Citadel is rescued: You take control of it, exhausted.");
+    expect(say("rescued", null, 2)).toBe("Guard of the Citadel is rescued: its owner has left the game, so it goes to the discard pile.");
+    expect(say("free", 0, 2)).toBe("Guard of the Citadel is free: Player 1 takes control of him.");
   });
 });
