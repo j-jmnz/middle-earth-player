@@ -22,7 +22,7 @@
 "end":{"round":5,"lost":false,"cleared":true,"hash":"3b1191dffa4e07b1dde56445"}
 },
 {
-"name":"true solo, lost, temperature reaches 60",
+"name":"true solo, lost, temperature reaches 60, the last option of every Choose window",
 "seatCount":1,
 "seed":9,
 "difficulty":"Normal",
