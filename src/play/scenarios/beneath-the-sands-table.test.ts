@@ -87,9 +87,9 @@ describe("the choice words", () => {
   });
 
   it("17079:A:1 asks for a second tap when the raise takes a player to 50, and names each player it takes", () => {
-    const threat = (resources: number, threats: number[], seats = threats.length) => asked({ seats, staging: [{ code: "17079", resources }], threat: threats }, "17079:forced:1", 1)("threat")?.caution;
-    expect(threat(2, [48])).toBe("Tap again: this takes your threat to 50 and eliminates you. If you are the last player, the game is lost");
-    expect(threat(2, [47])).toBeUndefined();
+    const threat = (resources: number, threats: [number, number], seats: 1 | 2 = 2) => asked({ seats, staging: [{ code: "17079", resources }], threat: threats }, "17079:forced:1", 1)("threat")?.caution;
+    expect(threat(2, [48, 28], 1)).toBe("Tap again: this takes your threat to 50 and eliminates you. If you are the last player, the game is lost");
+    expect(threat(2, [47, 28], 1)).toBeUndefined();
     expect(threat(2, [48, 28])).toBe("Tap again: this takes Player 1's threat to 50 and eliminates Player 1. The game is lost when no other player is left");
     expect(threat(2, [28, 48])).toBe("Tap again: this takes Player 2's threat to 50 and eliminates Player 2. The game is lost when no other player is left");
     expect(threat(2, [48, 49])).toBe("Tap again: this takes Player 1's and Player 2's threat to 50 and eliminates both. The game is lost");

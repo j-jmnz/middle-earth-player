@@ -17,6 +17,8 @@ import { buildStart } from "../../start.ts";
 import { checklist } from "../../checklist.ts";
 import { applyResolution, emptyLog, poolCard, type CampaignLog } from "../../log.ts";
 import { newSave } from "../../save.ts";
+import { resolutionView } from "../../resolution-view.ts";
+import type { World } from "../../world.ts";
 import { campaignPath } from "../../path.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { NO_COPY_LIMITS } from "../../wilderland.ts";
@@ -117,6 +119,9 @@ describe("Voyage Across Belegaer in the Dream-chaser campaign", () => {
     const lostGame = playGolden(lost, (await voyageWorld(lost.decks)).ctx);
     const untouched = emptyLog(1);
     expect(applyResolution(untouched, lostGame.state.scenarioId, lostGame.state, cards, NO_COPY_LIMITS)).toBe(untouched);
+    // The Resolution screen gives the elimination cause the table and the outcome screen give, not the engine's "No seats remain".
+    const screen: World = { campaign, scenario: campaignScenario(voyage), effects: EFFECTS, cards, sets: new Map() };
+    expect(resolutionView(lostGame.state, screen)).toEqual({ kind: "lost", reason: "Every player is eliminated. Player 1's threat reached 50." });
   });
 
   it("carries the previous part's pool into the encounter deck and the player decks through the checklist (Ominous Fate and a pool card)", () => {
