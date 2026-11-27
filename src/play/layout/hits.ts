@@ -1,5 +1,6 @@
 import { unturn } from "../canvas/frame.ts";
 import type { CardSlot, Rect } from "./layout.ts";
+import { PEEK } from "./layout.ts";
 import { MIN_TARGET } from "./slots.ts";
 
 // Where a tap or a drag lands on the table: the rectangle a slot is drawn in (turned when exhausted, narrowed where the
@@ -37,7 +38,29 @@ export function contains(rect: Rect, x: number, y: number): boolean {
   return x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h;
 }
 
-/** The topmost card slot under a point, or -1. Later slots are drawn on top. A tilted card is hit where it is drawn. */
+/**
+ * The rectangle a tap finds an attachment in: the band of it that shows under its host (the bottom peek of its card), grown to 44 pt tall about its middle, and moved up
+ * where it would reach the hand (`slot.bandFloor`, the hand zone's top). Only a point no card holds reaches it (`hitSlot`).
+ */
+export function bandBounds(slot: CardSlot): Rect {
+  "worklet";
+  const peek = slot.bandPeek ?? PEEK;
+  const middle = slot.y + slot.h - peek / 2;
+  const top = middle - MIN_TARGET / 2;
+  return { x: slot.x, y: slot.bandFloor != null ? Math.min(top, slot.bandFloor - MIN_TARGET) : top, w: slot.w, h: MIN_TARGET };
+}
+
+// The attachment whose 44 pt band holds the point, topmost first, or -1: a held or hung objective is a strip 10 pt tall, too thin to hit on its own.
+function hitBand(slots: readonly CardSlot[], x: number, y: number): number {
+  "worklet";
+  for (let index = slots.length - 1; index >= 0; index -= 1) {
+    const slot = slots[index];
+    if (slot && slot.kind === "attachment" && !slot.faceDown && contains(bandBounds(slot), x, y)) return index;
+  }
+  return -1;
+}
+
+/** The topmost card slot under a point, or -1. Later slots are drawn on top. A tilted card is hit where it is drawn. A point no card holds finds the attachment whose band is near it. */
 export function hitSlot(slots: readonly CardSlot[], x: number, y: number): number {
   "worklet";
   for (let index = slots.length - 1; index >= 0; index -= 1) {
@@ -47,7 +70,7 @@ export function hitSlot(slots: readonly CardSlot[], x: number, y: number): numbe
     const point = unturn(slot, x, y);
     if (contains(hitBounds(slot), point.x, point.y)) return index;
   }
-  return -1;
+  return hitBand(slots, x, y);
 }
 
 // A drop target with the rectangle it occupies, so the worklet can test it without the layout.

@@ -2,12 +2,14 @@
 // The one line a card of Escape from Dol Guldur says about itself in the card preview (table-preview.ts) when it has more to say than its text:
 // an objective's guard, the prisoner, an Orc Guard's card, Iron Shackles on a deck; and of A Storm on Cobas Haven, a tower the players control and the Ship enemy a location holds out of play. The engine decided each; nothing here changes one.
 import { mumakDetail } from "../readouts/haradrim/orcs.ts";
+import { serpentDetail } from "../readouts/haradrim/serpent.ts";
+import { carriesWords } from "../words/scenarios/haradrim/serpent-table.ts";
 import { poisonDetail } from "./poison-preview.ts";
 import { freeOfEncounters } from "../../rules/families/objectives/index.ts";
 import { captivesUnder } from "../../rules/families/captives/values.ts";
 import { heroGuardedBy } from "../../rules/families/wilderland/carried.ts";
 import { cardsUnder } from "../../rules/core/zones.ts";
-import { flagged, heldAmount } from "../../rules/core/state.ts";
+import { flagged, heldAmount, inPlay } from "../../rules/core/state.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
 import { committedInStaging } from "../../rules/families/pelargir/committed.ts";
 import { questStatOf } from "../../rules/quest/quest.ts";
@@ -67,9 +69,29 @@ function ithilienDetail(game: ScenarioState, ctx: ReduceContext, cardId: string)
 
 /** The muted line under a card's name in its preview, or null: what only the table knows about it. A stat read from the stage number is told after any other line the card has. */
 export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name: (id: string) => string): string | null {
-  const own = ownDetail(game, ctx, cardId, name);
+  const own = ownDetail(game, ctx, cardId, name) ?? carriedDetail(game, ctx, cardId, name);
   const stage = stageXDetail(game, ctx, cardId);
   return own != null && stage != null ? `${own} ${stage}` : own ?? stage;
+}
+
+/**
+ * The preview line of a card that carries objectives, told after every other line of a card (`ownDetail`): the claimed ones a hero holds, and the unclaimed ones hanging on an enemy or a location (attached, controlled by no one).
+ * A guarded objective lies in the staging area with its guard attached to it, so it never reads as hanging. Null for a card that carries none.
+ */
+export function carriedDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name: (id: string) => string): string | null {
+  const card = game.cards[cardId];
+  if (!card || !inPlay(card.zone)) return null;
+  const objectives = card.attachments.filter((id) => game.cards[id]?.guard !== true && game.cards[id]?.zone === "attached" && printedOf(ctx.cards, game.cards[id]?.code ?? "").type === "objective");
+  const held = objectives.filter((id) => game.cards[id]?.claimed === true).map(name);
+  const hung = objectives.filter((id) => game.cards[id]?.claimed !== true && game.cards[id]?.controller == null).map(name);
+  return held.length + hung.length > 0 ? `${carriesWords(held, hung)}.` : null;
+}
+
+// The Black Serpent's line, with the objective hanging on it: the one card whose own line is not the whole of what it says.
+function serpentLine(game: ScenarioState, ctx: ReduceContext, cardId: string, name: (id: string) => string): string | null {
+  const serpent = serpentDetail(game, ctx, cardId);
+  const carried = serpent != null ? carriedDetail(game, ctx, cardId, name) : null;
+  return serpent != null && carried != null ? `${serpent} ${carried}` : serpent;
 }
 
 function ownDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name: (id: string) => string): string | null {
@@ -93,7 +115,7 @@ function ownDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name
   const kept = keptDetail(game, cardId, name);
   if (kept) return kept;
   // The heroes in the staging area, the heroes an Orc guards and the objective-heroes (The Long Arm of Mordor) are told before the Captives' words, which would call them Captives of The Uruk-hai.
-  const staged = stagedDetail(game, cardId, name) ?? objectiveDetail(game, ctx, cardId) ?? mumakDetail(game, ctx, cardId);
+  const staged = stagedDetail(game, cardId, name) ?? objectiveDetail(game, ctx, cardId) ?? mumakDetail(game, ctx, cardId) ?? serpentLine(game, ctx, cardId, name);
   if (staged) return staged;
   const captive = captiveDetail(game, ctx, card, name);
   if (captive) return captive;

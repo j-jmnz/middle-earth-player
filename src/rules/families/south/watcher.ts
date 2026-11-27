@@ -23,12 +23,12 @@ import { patchTop } from "../../windows/windows.ts";
 import type { Focus } from "../index.ts";
 import { effectData } from "../encounter/moves.ts";
 import { activeLocations } from "./locations.ts";
-import { engagedWithThreatening } from "../../core/engaged.ts";
+import { engagedWithBySeatRule, hasSeatRuleEngagement } from "../../core/engaged.ts";
 
 // An enemy in the staging area that is considered engaged with each player (the Watcher in the Water), with the first player only (the
 // Balrog, `engagedWithFirst`, 142044:A:2) or with each player whose threat is 1 or greater (Durin's Bane, `engagedWithThreatening`, 04150:A:2): it stays in the staging area and attacks from there.
 export function engagedWithAll(state: ScenarioState, id: string): boolean {
-  return state.cards[id]?.zone === "staging" && (flagged(state, id, "engagedWithAll") || flagged(state, id, "engagedWithFirst") || flagged(state, id, "engagedWithThreatening"));
+  return state.cards[id]?.zone === "staging" && (flagged(state, id, "engagedWithAll") || hasSeatRuleEngagement(state, id));
 }
 
 
@@ -71,7 +71,7 @@ export function countsEachAttack(state: ScenarioState, id: string): boolean {
 // Whether the enemy in the staging area is considered engaged with this seat: every seat for the Watcher, the first player for the Balrog, the seats with a relaying enemy engaged for the Thing.
 function engagedWithSeat(state: ScenarioState, id: string, seat: number): boolean {
   if (state.cards[id]?.zone !== "staging") return false;
-  return flagged(state, id, "engagedWithAll") || (flagged(state, id, "engagedWithFirst") && seat === state.firstPlayer) || engagedWithThreatening(state, id, seat) || (viaRelay(state, id) && relayedTo(state, seat));
+  return flagged(state, id, "engagedWithAll") || engagedWithBySeatRule(state, id, seat) || (viaRelay(state, id) && relayedTo(state, seat));
 }
 
 // The enemy is where it can attack from: engaged, in the staging area but considered engaged with every player, or in the staging area

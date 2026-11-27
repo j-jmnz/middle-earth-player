@@ -25,9 +25,10 @@ export function wrapName(name: string, width: number, measure: (text: string) =>
   return kept;
 }
 
-function fit(line: string, width: number, measure: (text: string) => number, ellipsis = false): string {
+/** The line cut to `width` with an ellipsis: the whole line when it fits (a band name is one line, cut by letter, not by word). */
+export function fit(line: string, width: number, measure: (text: string) => number, ellipsis = false): string {
   if (measure(line) <= width) return line;
   let text = ellipsis ? line.replace(/…$/, "") : line;
   while (text.length > 1 && measure(`${text}…`) > width) text = text.slice(0, -1);
-  return `${text}…`;
+  return `${text.trimEnd()}…`;
 }

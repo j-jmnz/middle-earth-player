@@ -18,7 +18,7 @@ import { lastPicked } from "../../interpret/player-verbs.ts";
 import { printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { updateCard } from "../../core/state.ts";
+import { flagged, updateCard } from "../../core/state.ts";
 import { resetEncounterDeck } from "../../interpret/verbs.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import { discardUntilType } from "../encounter/discard-until.ts";
@@ -28,6 +28,7 @@ import { effectsOf } from "../../windows/listen.ts";
 import type { Focus } from "../index.ts";
 import { controlSweep } from "./control.ts";
 import { freeOfEncounters } from "./free.ts";
+import { claimUnattached, revealDetached } from "./stage-claim.ts";
 import { attachGuard, guardWith } from "./guard.ts";
 import { objectivesPickMatches } from "./pick.ts";
 
@@ -43,7 +44,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return attachGuard(state, instruction, focus, ctx);
     // A constant kept by the settle sweep (control.ts): it does nothing when run.
     case "ControlWhenFree":
+    case "ClaimUnattached":
       return state;
+    case "RevealDetached":
+      return revealDetached(state, focus, ctx, steps);
     default:
       return null;
   }
@@ -94,13 +98,14 @@ function claimObjective(state: ScenarioState, instruction: Extract<Instruction, 
   if (!id || !objective || !claimable || !freeOfEncounters(state, id) || !hero || (hero.zone !== "heroes" && hero.zone !== "play") || hero.controller == null) return state;
   const attached = attachTo(moveCard(state, id, { zone: "attached" }), id, heroId);
   const claimed = updateCard(attached, id, { face: "up", controller: hero.controller, claimed: true });
+  if (flagged(state, id, "announcesClaim")) steps.push({ kind: "claim", cardId: id, heroId, seat: hero.controller });
   return queueEvent(enforceRestricted(claimed, heroId, ctx, steps), { trigger: "claimed", seat: hero.controller, cardId: id });
 }
 
 export const manifest: RulesFamily = {
   name: "objectives",
-  settle: { sweep: (state, ctx) => controlSweep(state, ctx) },
-  pick: (state, id, spec, _at, ctx) => objectivesPickMatches(state, id, spec, ctx),
-  verbs: ["GuardObjective", "ClaimObjective", "AttachGuard", "ControlWhenFree"],
+  settle: { sweep: (state, ctx, steps) => claimUnattached(controlSweep(state, ctx), ctx, steps) },
+  pick: (state, id, spec, at, ctx) => objectivesPickMatches(state, id, spec, ctx, at),
+  verbs: ["GuardObjective", "ClaimObjective", "AttachGuard", "ControlWhenFree", "ClaimUnattached", "RevealDetached"],
   run,
 };

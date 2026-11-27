@@ -74,21 +74,21 @@ Scenario piles that place cards with no record (quest: 16071 Surprise Attack; qu
 16035:A:1 (front): X is the stage number on the main quest.
   16035:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat threat the stage number of the quest, while this card is in play
-    - this card: stat attack the stage number of the quest, while this card is in play
-    - this card: stat defense the stage number of the quest, while this card is in play
+    - this card: stat threat the stage number of the main quest (also while a side quest is the current quest), while this card is in play
+    - this card: stat attack the stage number of the main quest (also while a side quest is the current quest), while this card is in play
+    - this card: stat defense the stage number of the main quest (also while a side quest is the current quest), while this card is in play
 
 16035:A:2 (front): Forced: At the end of the round, assign X damage among characters in play.
   16035:forced:1: Forced at the end of the round
     who acts: the acting player is the first player (a phase has no player of its own)
-    - the acting player assigns the stage number of the quest damage among the character (any player controls) (Captives included), chosen by the first player, one at a time
+    - the acting player assigns the stage number of the main quest (also while a side quest is the current quest) damage among the character (any player controls) (Captives included), chosen by the first player, one at a time
 
 ## 16036 Southron Boma
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 16036:A:1 (front): X is the stage number of the main quest.
   16036:constant:1: Constant
-    - this card: stat threat the stage number of the quest, while this card is in play
+    - this card: stat threat the stage number of the main quest (also while a side quest is the current quest), while this card is in play
 
 16036:A:2 (front): Travel: Each player spends 1 resource to travel here.
   16036:travel:1: Travel
@@ -146,12 +146,12 @@ Scenario piles that place cards with no record (quest: 16071 Surprise Attack; qu
 
 16039:A:1 (front): When Revealed: Until the end of the phase, increase the total Threat in the staging area by X, where X is twice the stage number of the main quest.
   16039:whenRevealed:1: When revealed
-    - the total Threat in the staging area is the stage number of the quest x 2 higher until the end of the phase
+    - the total Threat in the staging area is the stage number of the main quest (also while a side quest is the current quest) x 2 higher until the end of the phase
 
 16039:A:2 (shadow): Shadow: Assign X damage among characters you control, where X is the stage number of the main quest.
   16039:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - the acting player assigns the stage number of the quest damage among the character (you control), one at a time
+    - the acting player assigns the stage number of the main quest (also while a side quest is the current quest) damage among the character (you control), one at a time
 
 ## 16056 Jungle Trail
 (the scenario deals it into the encounter pile; the piles place it, no record does)

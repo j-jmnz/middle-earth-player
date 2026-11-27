@@ -117,8 +117,8 @@ Scenario piles that place cards with no record (quest: 06117 The Ambush; quest: 
 06123:A:1 (front): The current quest card gains siege (and loses battle).
   06123:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - currentQuest: stat siege 1, while this card is in play
-    - currentQuest: stat losesBattle (held by the current quest stage: it does not have the Battle keyword it prints) 1, while this card is in play
+    - the main quest card (also while a side quest is the current quest): stat siege 1, while this card is in play
+    - the main quest card (also while a side quest is the current quest): stat losesBattle (held by the current quest stage: it does not have the Battle keyword it prints) 1, while this card is in play
 
 06123:A:2 (front): X is equal to the number of players in the game.
   06123:constant:2: Constant

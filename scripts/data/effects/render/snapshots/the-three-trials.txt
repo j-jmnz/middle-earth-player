@@ -85,7 +85,7 @@ Scenario piles that place cards with no record (quest: 08035 The Trials Begin; q
   08038:constant:1: Constant
     - [json EngageSeat {"verb":"EngageSeat","who":"firstPlayer","trait":"Guardian"}]
   08038:constant:2: Constant
-    - currentQuest: stat progressDiscards 1, while this card is in play
+    - the main quest card (also while a side quest is the current quest): stat progressDiscards 1, while this card is in play
 
 08038:B:2 (back): When the players control the current trial's Key objective, add all Guardian enemies and Barrow locations in play to the victory display and immediately advance to a stage 2A of the players' choice. If all stage 2 quests have been defeated, advance to stage 3A, instead.
   08038:triggered:1: Triggered (mandatory, not printed as Forced) on the event trialKeyControlled

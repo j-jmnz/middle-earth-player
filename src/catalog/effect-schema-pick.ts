@@ -250,6 +250,13 @@ export const pickSchema = z.strictObject({
   // "each unguarded objective in the staging area", 12121:A:1). `isGuard`: an enemy attached to an objective as its guard (`false`: "an enemy that is not currently guarding an objective", 12133:A:1).
   hasGuard: z.boolean().optional(),
   isGuard: z.boolean().optional(),
+  // An objective attached to an encounter card (`onEncounter`; `false`: not): an encounter card guards it, or it hangs on one (AttachRandomSetAside on The Black Serpent). `true` lists the hanging objectives as candidates too, which no player holds and the staging area does not list ("each Harad objective in play",
+  // 17106:B:2; "While Banner of the Serpent is attached to an encounter card", 17091:A:2).
+  onEncounter: z.boolean().optional(),
+  // An encounter card attached to the source objective (its guard) or the card the source objective hangs on ("Attached encounter card gets +2 Threat", 17092:A:2).
+  linkedToSource: z.literal(true).optional(),
+  // A character with an objective card attached ("each hero with an objective attached", 17101:A:2).
+  holdsObjective: z.literal(true).optional(),
   // An objective guarded by an enemy attached to it with this trait (`guardedByTrait`), or by none (`notGuardedByTrait`): "a Clue card not attached to a Mordor enemy" (900401:A:2), "Clue cards attached to Mordor enemies" (900401:A:3).
   guardedByTrait: z.string().min(1).optional(),
   notGuardedByTrait: z.string().min(1).optional(),

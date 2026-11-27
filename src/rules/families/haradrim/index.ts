@@ -9,6 +9,8 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { flagged } from "../../core/state.ts";
+import { cannotLeaveStaging } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { addWithHostToVictory, attachRandomSetAside } from "./capture.ts";
 import { exploredCondition } from "./explored.ts";
@@ -16,6 +18,7 @@ import { eliminateAfterAttack, takeObjectiveAlly, undefendedMumak } from "./muma
 import { moveToOrcsArea, prepareOrcsArea, syncOrcsArea } from "./orcs-area.ts";
 import { addOrcsProgress, orcsProgress } from "./orcs-stage.ts";
 import { orcsCondition } from "./orcs-values.ts";
+import { revealRandomSetAside } from "./random-aside.ts";
 import { haradrimPickMatches } from "./pick.ts";
 import { allyBelowThreat, threatAboveWillpower, willpowerGap } from "./combat.ts";
 import { engageSeatWithMost } from "./engage.ts";
@@ -42,6 +45,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return engageSeatWithMost(state, instruction, focus, ctx, steps);
     case "AttachRandomSetAside":
       return attachRandomSetAside(state, instruction, ctx, steps);
+    case "RevealRandomSetAside":
+      return revealRandomSetAside(state, instruction, focus, ctx, steps);
     case "AddWithHostToVictory":
       return addWithHostToVictory(state, focus, ctx);
     case "PrepareOrcsArea":
@@ -73,7 +78,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "haradrim",
-  verbs: ["PlaceUnderSelfFaceup", "SetTemperature", "RaiseTemperature", "LowerTemperature", "MoveHeroesToStaging", "TakeObjectiveHero", "ReleaseStagedHero", "GuardStagedHeroes", "EngageSeatWithMost", "AttachRandomSetAside", "AddWithHostToVictory", "PrepareOrcsArea", "MoveToOrcsArea", "OrcsProgress", "AddOrcsProgress", "TakeObjectiveAlly", "EliminateAfterAttack", "FlipSearchObjective", "ResolveTrack", "StageMarkedFromTop", "AddTopmostFromDiscard", "SetAsideCode"],
+  verbs: ["PlaceUnderSelfFaceup", "SetTemperature", "RaiseTemperature", "LowerTemperature", "MoveHeroesToStaging", "TakeObjectiveHero", "ReleaseStagedHero", "GuardStagedHeroes", "EngageSeatWithMost", "AttachRandomSetAside", "RevealRandomSetAside", "AddWithHostToVictory", "PrepareOrcsArea", "MoveToOrcsArea", "OrcsProgress", "AddOrcsProgress", "TakeObjectiveAlly", "EliminateAfterAttack", "FlipSearchObjective", "ResolveTrack", "StageMarkedFromTop", "AddTopmostFromDiscard", "SetAsideCode"],
   run,
   condition: (state, condition, scope, ctx) => {
     switch (condition.kind) {
@@ -87,6 +92,9 @@ export const manifest: RulesFamily = {
   },
   amount: (state, found, scope, ctx) => (found.willpowerGap ? willpowerGap(state, scope.sourceId ?? null, ctx.cards) : temperatureAmount(state, found)),
   pick: haradrimPickMatches,
+  // An enemy that cannot leave the staging area and is only considered engaged (The Black Serpent, 17094:A:1) is never optionally engaged: it would not leave (rr.optional-engagement, rr.cannot).
+  // `cannotBeOptionallyEngaged` cannot serve for `neverEngaged`: the bar must end with `losesCannotLeaveStaging` (the enemy can be engaged again once it can leave), which that stat never does.
+  optionalEngage: (state, enemyId) => flagged(state, enemyId, "neverEngaged") && cannotLeaveStaging(state, enemyId),
   combat: {
     defense: (state, defender, cards, defenderId) => allyBelowThreat(state, defender, cards, defenderId),
     undefended: (state) => {

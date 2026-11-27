@@ -24,6 +24,7 @@ import { lootDeckWords, lootGuardWords } from "../words/loot.ts";
 import { lootUnder } from "../../rules/families/sidequests/loot.ts";
 import { alleywayMark, championMark, seizeMark } from "../readouts/haradrim/umbar.ts";
 import { stagedSeatChip } from "../readouts/haradrim/staged.ts";
+import { consideredChip, guardedChip } from "../readouts/haradrim/serpent.ts";
 import { stackMark } from "../readouts/against-the-shadow/stewards-fear.ts";
 import { capturedPill } from "../words/scenarios/angmar/gram-table.ts";
 import { capturedOwners } from "../readouts/gram.ts";
@@ -367,7 +368,7 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     determined: determinedMark(game, ctx, cardId) ?? championMark(game, ctx, cardId) ?? blankMark(game, ctx, cardId),
     dead: deadSpeech(game, ctx.cards, cardId),
     combat: card != null ? combatNumber(game, ctx, card) : null,
-    seat: stagedSeatChip(game, cardId),
+    seat: stagedSeatChip(game, cardId) ?? consideredChip(game, cardId) ?? guardedChip(game, ctx, cardId, (id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name),
   };
 }
 

@@ -103,7 +103,7 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
     - attach this card to an enemy in play with the trait Balrog
   04145:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
-  04145:forced:1: Forced after this card is played (heard about card (any player controls) or in the staging area or the active location, of card type event)
+  04145:forced:1: Forced when an event is played, before its effects resolve (heard about card (any player controls) or in the staging area or the active location, of card type event)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard 1 card(s) from the top of the encounter deck

@@ -122,6 +122,11 @@ export function failures(done: Done, wanted: readonly Expect[]): string[] {
           if (held?.zone !== "captive" || held.host !== host) problems.push(`${item.code} is ${held?.zone === "captive" ? `held by ${state.cards[held.host ?? ""]?.code ?? "nothing"}` : `in ${held?.zone ?? "no zone"}`}, not held by ${item.host}`);
           break;
         }
+        case "attachedTo": {
+          const got = state.cards[idOf(state, item.code)]?.host;
+          if (got !== idOf(state, item.host)) problems.push(`${item.code} is attached to ${got ? (state.cards[got]?.code ?? got) : "nothing"}, not to ${item.host}`);
+          break;
+        }
         case "window": {
           const got = state.window?.kind === item.kind;
           if (got !== item.value) problems.push(`the open window is ${state.window?.kind ?? "none"}, ${item.value ? "not" : "which is"} ${item.kind}`);

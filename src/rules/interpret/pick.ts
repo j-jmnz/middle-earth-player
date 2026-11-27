@@ -9,6 +9,7 @@ import { attachmentHostIds } from "../player/attach.ts";
 import { canAttack, characters, legalAttackEnemies } from "../combat/combat.ts";
 import { hostOf } from "./amounts.ts";
 import { countsAsAttachment, hasTrait } from "./conditions.ts";
+import { hungOnEncounter } from "../families/objectives/pick.ts";
 import { attachmentsPickMatches } from "../families/attachments/pick.ts";
 import { costsPickMatches, highestCost } from "../families/costs/pick.ts";
 import { spheresOf } from "../families/costs/pay.ts";
@@ -192,6 +193,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     if (spec.safe && !spec.stagingOnly) raw.push(...activeFor(state, asking, spec.stagingArea === "any"));
     // `controlled` also counts a tower the players control as a group: freed of encounters, in the staging area, claimed with no controller (ControlWhenFree, families/objectives/control.ts).
     if (spec.controlled && spec.control !== "you") raw.push(...stagingFor(state, spec, asking).filter((id) => state.cards[id]?.claimed === true));
+    // `onEncounter`: the objectives hanging on an encounter card are candidates too (families/objectives/pick.ts).
+    if (spec.onEncounter === true) raw.push(...hungOnEncounter(state, ctx));
   } else if ((spec.type === "ally" || spec.type === "card") && spec.stagingOnly) {
     // The cards lying in the staging area; for allies, those under nobody's control (families/pelennor/allies.ts, 145074:B:2).
     raw.push(...stagingFor(state, spec, asking));

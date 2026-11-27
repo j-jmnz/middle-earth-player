@@ -7,6 +7,7 @@
 // with you"). combat.ts and legal.ts ask these.
 import { attackerLimitReason } from "../aflame/attack.ts";
 import { attackersAtOnceReason } from "../pelennor/combat.ts";
+import { hasSeatRuleEngagement } from "../../core/engaged.ts";
 import type { PlayerIntent } from "../../core/intents.ts";
 import { hasKeyword } from "../../core/keywords.ts";
 import { printedOf, type PrintedCard } from "../../core/printed.ts";
@@ -52,6 +53,6 @@ export function attackRuleReason(state: ScenarioState, intent: Extract<PlayerInt
   if (offered) return offered.includes(intent.enemyId) ? null : "That enemy cannot be attacked";
   if (state.cards[intent.enemyId]?.zone !== "staging" || intent.attackerIds.length < 2) return null;
   // Any character may choose an attackableByAny enemy there as its target, together with others (06064).
-  if (flagged(state, intent.enemyId, "attackableByAny") || flagged(state, intent.enemyId, "attackableAsEngaged") || flagged(state, intent.enemyId, "attackableByRanged") || flagged(state, intent.enemyId, "engagedWithFirst") || flagged(state, intent.enemyId, "attackableEngagedWithAll") || flagged(state, intent.enemyId, "engagedWithThreatening")) return null;
+  if (flagged(state, intent.enemyId, "attackableByAny") || flagged(state, intent.enemyId, "attackableAsEngaged") || flagged(state, intent.enemyId, "attackableByRanged") || hasSeatRuleEngagement(state, intent.enemyId) || flagged(state, intent.enemyId, "attackableEngagedWithAll")) return null;
   return intent.attackerIds.every((id) => flagged(state, id, "attacksStaging")) ? null : "That character attacks the staging area only alone";
 }
