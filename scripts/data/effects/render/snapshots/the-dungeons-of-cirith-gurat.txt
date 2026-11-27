@@ -7,7 +7,7 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
   17119:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, while this card is in play
-    - each card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free): stat guardedObjective (the character is a guarded objective: while it is attached it loses its card type and its player card status, and it gets both back when it is rescued; it lies in the captive zone) 1, while this card is in play
+    - the table: stat announcesCaptives (held by the table: a capture, a rescue and the freeing of Abaan are announced, so the banner and the log say them) 1, while this card is in play
 
 17119:A:2 (front): Forced: When a character is attached to an encounter card, discard each token and attachment on that character.
   17119:forced:1: Forced on the event attached (heard about card (in play, controlled by no player) or in the staging area or the active location, that is a Captive (held by an enemy or lying free))
@@ -225,6 +225,10 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
     - for each player, first player first:
       - lower threat by the printed cost of the captive this card holds that the acting player owns (0 when it holds none) (the acting player)
     - each captive this card holds is rescued: a hero returns among its owner's heroes and an ally to its owner's play area, both exhausted and with no enters-play event, an objective with no owner (Abaan) to the staging area, and a captive whose owner left the game goes to that owner's discard pile; once for all of them the main quest stage hears that characters were rescued
+  17131:forced:2: Forced after a card leaves play (heard about this card)
+    only if not (this card is in the victory display)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - each captive this card holds is rescued: a hero returns among its owner's heroes and an ally to its owner's play area, both exhausted and with no enters-play event, an objective with no owner (Abaan) to the staging area, and a captive whose owner left the game goes to that owner's discard pile; once for all of them the main quest stage hears that characters were rescued
 
 ## 17132 Rescue the Prisoners
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -311,4 +315,4 @@ Scenario piles that place cards with no record (staging: 17125 Dungeon Cell; que
     note: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 233 by template, 2 as JSON)
+(rendered pieces: 236 by template, 2 as JSON)

@@ -9,8 +9,9 @@ import { eliminateEmpties } from "../../../rules/core/eliminate.ts";
 import { ruleCause } from "../../../rules/core/cause.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import { printedOf, type PrintedCard } from "../../../rules/core/printed.ts";
-import { expireModifiers, flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { expireModifiers, flagged, inPlay, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { moveCard } from "../../../rules/core/zones.ts";
+import { engagementCheck } from "../../../rules/quest/quest.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { releaseHeldOnDefeat } from "../../../rules/families/angmar/hold.ts";
 import { lowerThreatByEffect } from "../../../rules/families/quest/threat.ts";
@@ -41,13 +42,13 @@ const table = (layout: Layout, effects: readonly Effect[] = EFFECTS) => tableFro
 describe("17119:A:1 a captive is a guarded objective until it is rescued", () => {
   lineSpec("17119:A:1", "a character attached to an encounter card is a guarded objective with a blank text box, and is neither once it is rescued", (effects) => {
     const made = table({ play: [AXEHAND], staging: [CAPTIVES, GUARD] }, effects);
-    const taken = settle(runInstruction(made, opened(made).state, { verb: "AttachCaptive", card: "picked", to: "self" }, { sourceId: idOf(made.state, GUARD) }), made.ctx, none);
-    const ally = idOf(taken, AXEHAND);
-    expect(taken.cards[ally]?.zone).toBe("play");
     const state = settle(resolveRecords(opened(made).state, made.ctx, "17129", "whenRevealed").state, made.ctx, none);
     const held = idOf(state, AXEHAND);
+    expect(state.cards[held]).toMatchObject({ zone: "captive", captive: true, controller: null });
     expect(flagged(state, held, "blankText")).toBe(true);
-    const freed = settle(destroyCard(state, idOf(state, GUARD) in state.cards && state.cards[held]?.host ? (state.cards[held]?.host ?? "") : "", made.ctx.cards, none), made.ctx, none);
+    const host = state.cards[held]?.host ?? "";
+    const freed = settle(destroyCard(state, host, made.ctx.cards, none), made.ctx, none);
+    expect(freed.cards[held]).toMatchObject({ zone: "play", controller: 0 });
     expect(flagged(freed, held, "blankText")).toBe(false);
   });
 });
@@ -215,11 +216,13 @@ describe("17134:A:1 Fight Your Way Out", () => {
     expect(state.seats[0]?.engaged.length).toBeGreaterThan(0);
   });
 
-  it("17134:A:1 the engagement cost 0 lasts for the checks only: a later check reads the printed engagement cost", () => {
+  it("17134:A:1 the engagement cost 0 lasts for the checks only: a loose enemy put back in the staging area does not engage at a later check at the same threat", () => {
     const { made, state } = reveal({});
-    const loose = Object.values(state.cards).find((card) => card.zone === "staging" && ["16062", "16063", "16061"].includes(card.code) && !captivesHeldBy(state, card.id).length);
-    if (loose) expect(made.ctx.cards.get(loose.code)?.engagementCost ?? 0).toBeGreaterThan(0);
-    expect(state.modifiers.filter((modifier) => modifier.stat === "engagementCost")).toEqual([]);
+    const engaged = state.seats[0]?.engaged ?? [];
+    expect(engaged.length).toBeGreaterThan(0);
+    const back = engaged.reduce((current, id) => updateCard(moveCard(current, id, { zone: "staging" }), id, { face: "up" }), state);
+    expect(back.modifiers.filter((modifier) => modifier.stat === "engagementCost")).toEqual([]);
+    expect(engagementCheck(back, 0, made.ctx.cards).kind).toBe("none");
   });
 
   it("17134:A:1 with a player who cannot attach a hero no engagement check is made", () => {
@@ -279,13 +282,12 @@ const pickFirst = (state: ScenarioState): string => first(state);
 describe("the captives and the cards that take them", () => {
   lineSpec("17119:A:2", "Forced: when a character is attached to an encounter card its tokens and attachments are discarded", (effects) => {
     const made = table({ play: [AXEHAND], staging: [CAPTIVES, GUARD], attached: [{ code: "attachment", to: AXEHAND }] }, effects);
-    const ally = idOf(made.state, AXEHAND);
+    const [ally, attachment] = [idOf(made.state, AXEHAND), idOf(made.state, "attachment")];
     const hurt = updateCard(opened(made).state, ally, { damage: 1, resources: 1 });
-    const state = settle(runInstruction(made, hurt, { verb: "AttachCaptive", card: "picked", to: "self" }, { sourceId: idOf(made.state, GUARD) }), made.ctx, none);
+    expect(hurt.cards[ally]?.attachments).toEqual([attachment]);
     const held = settle(resolveRecords(hurt, made.ctx, "17129", "whenRevealed").state, made.ctx, none);
-    expect(state.cards[ally]).toBeDefined();
-    expect(held.cards[ally]).toMatchObject({ zone: "captive", damage: 0, resources: 0 });
-    expect(held.cards[ally]?.attachments).toEqual([]);
+    expect(held.cards[ally]).toMatchObject({ zone: "captive", damage: 0, resources: 0, attachments: [] });
+    expect(inPlay(held.cards[attachment]?.zone ?? "discard")).toBe(false);
   });
 
   lineSpec("17120:A:1", "While Abaan is free of encounters the first player gains control of him", (effects) => {
@@ -293,8 +295,10 @@ describe("the captives and the cards that take them", () => {
     const cell = idOf(made.state, CELL);
     const held = settle(runInstruction(made, opened(made).state, { verb: "AttachCaptive", code: "17120", to: "self" }, { sourceId: cell }), made.ctx, none);
     expect(held.cards[idOf(held, "17120")]?.zone).toBe("captive");
-    const freed = settle(destroyCard(held, cell, made.ctx.cards, none), made.ctx, none);
+    const steps: EngineStep[] = [];
+    const freed = settle(destroyCard(held, cell, made.ctx.cards, steps), made.ctx, steps);
     expect(freed.cards[idOf(freed, "17120")]).toMatchObject({ zone: "play", controller: 0 });
+    expect(steps).toContainEqual({ kind: "captive", event: "free", cardId: idOf(freed, "17120"), hostId: cell, seat: 0 });
   });
 
   lineSpec("17123:A:2", "When Revealed: it makes an immediate attack against the player who controls the most allies", (effects) => {
@@ -340,12 +344,28 @@ describe("the captives and the cards that take them", () => {
     expect(defeated.cards[idOf(defeated, ARCHER)]).toMatchObject({ zone: "play", controller: 0, exhausted: true });
   });
 
+  it("17131:A:2 Captured! that leaves play in any other way frees its allies too, with no reward, and none is left in the captive zone", () => {
+    const made = table({ seats: 2, play: [ARCHER, { code: AXEHAND, seat: 1 }], staging: [CAPTIVES], threat: [35, 30], deck: ["f3", "f3"] });
+    const revealed = settle(resolveRecords(opened(made).state, made.ctx, "17131", "whenRevealed").state, made.ctx, none);
+    const quest = idOf(revealed, "17131");
+    const steps: EngineStep[] = [];
+    const gone = settle(destroyCard(revealed, quest, made.ctx.cards, steps), made.ctx, steps);
+    expect(captivesOf(gone)).toEqual([]);
+    expect(gone.cards[idOf(gone, ARCHER)]).toMatchObject({ zone: "play", controller: 0, exhausted: true });
+    expect(gone.cards[idOf(gone, AXEHAND)]).toMatchObject({ zone: "play", controller: 1, exhausted: true });
+    expect(gone.seats.map((seat) => seat.threat)).toEqual([35, 30]);
+    expect(steps.filter((step) => step.kind === "captive" && step.event === "rescued")).toHaveLength(2);
+  });
+
   lineSpec("17132:A:1", "Setup: Abaan is attached to Dungeon Cell and each player attaches an ally from the top of his deck to an Orc enemy found in the encounter deck", (effects) => {
     const made = table({ stage: "17132", side: "A", staging: [CAPTIVES, CELL], setAside: ["17120", "16061"], deck: ["16062", "16063", "f0"], deckOf: [AXEHAND, "f0"] }, effects);
     const done = resolveRecords(opened(made).state, made.ctx, "17132", "setup", idOf(made.state, "17132"), first);
     const state = settle(done.state, made.ctx, none);
     expect(captivesHeldBy(state, idOf(state, CELL)).map((card) => card.code)).toEqual(["17120"]);
-    expect(captivesOf(state).some((card) => card.code === AXEHAND)).toBe(true);
+    const ally = captivesOf(state).find((card) => card.code === AXEHAND);
+    expect(ally).toMatchObject({ zone: "captive", owner: 0 });
+    expect(state.cards[ally?.host ?? ""]?.code).toMatch(/^1606[23]$/);
+    expect(done.steps.filter((step) => step.kind === "captive" && step.event === "captured")).toHaveLength(2);
   });
 
   lineSpec("17132:B:2", "Forced: after characters are rescued an encounter card is revealed", (effects) => {

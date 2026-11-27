@@ -16,8 +16,8 @@ const ASKING = new Set<string>([...ASKING_VERBS, "PickEncounter", "ChooseX", "Re
 // scripts/checks/engine-asks.test.ts fails on a family verb whose handler reaches a window and is not here; the type keeps a name that is no verb out.
 const ENGINE_ASKING = [
   "ActivateFromCaves", "AddEventsToHand", "AddSourceToHandOfMost", "ArrangeCaves", "ArrangeEncounter", "ArrangeLookedDeck", "ArrangeTop", "AssignFaceup",
-  "AttachCollectionHero", "AttackSeatWithMost", "AttachLootFromDiscard", "AttachRandomTreasure", "AttachSacked", "AttachSearched", "AttachToActiveLocation", "AttachToHighestThreatCost",
-  "AttackHighestWillpower", "ChooseAttackers", "ChooseBoon", "ChooseBoonToHand", "ChooseCurrentQuest", "ChooseQuestStage", "ChooseStageToFlip", "ClaimRandomTreasure",
+  "AttachCollectionHero", "AttachLootFromDiscard", "AttachRandomTreasure", "AttachSacked", "AttachSearched", "AttachToActiveLocation", "AttachToHighestThreatCost",
+  "AttackHighestWillpower", "AttackSeatWithMost", "ChooseAttackers", "ChooseBoon", "ChooseBoonToHand", "ChooseCurrentQuest", "ChooseQuestStage", "ChooseStageToFlip", "ClaimRandomTreasure",
   "DestroyHighestCostAlly", "DiscardAlliesToCost", "DiscardFromAnyDeck", "Discover", "EachExhaustsOne", "EngageFromVictory", "EngageLowestThreat", "EngageOrGrapple",
   "EngageSeatWith", "EngageSeatWithMost", "FitShips", "GainChosenTrait", "GuardStagedHeroes", "HealAmong", "HealLakeTownByProgress", "HealLocations", "LocateTest",
   "LookAtStages", "MakeEngagementChecks", "MayDiscardShadow", "MoveProgress", "MoveToHero", "NameCard", "NameEncounterType", "NameInvestigation", "PayResources",

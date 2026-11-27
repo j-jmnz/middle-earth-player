@@ -9,7 +9,6 @@ import { idOf, opened, resolveRecords, run as runInstruction, tableFromLayout, t
 import { settle } from "../../engine/machine.ts";
 import { matchesPick, pickCandidates } from "../../interpret/pick.ts";
 import { resolveAmount, frameScope } from "../../interpret/amounts.ts";
-import { defeatSideQuest } from "../sidequests/quest.ts";
 import { captivesHeldBy, captivesOf } from "../captives/values.ts";
 
 const table = (layout: Layout = {}) => tableFromLayout("the-dungeons-of-cirith-gurat", { seats: 1, stage: "17132", ...layout }, { extra: ["01017", "01028"] });
@@ -29,6 +28,16 @@ describe("17129:A:1 AttachCaptive: an ally is attached to an unattached enemy in
     expect(captivesHeldBy(state, idOf(state, JAILER)).map((card) => card.code)).toEqual([ARCHER]);
   });
 
+  it("the capture is announced as a step only while the Captives objective (the table's announcesCaptives) is in play", () => {
+    const withObjective = table({ play: [ARCHER], staging: [CAPTIVES, JAILER] });
+    const told = resolveRecords(opened(withObjective).state, withObjective.ctx, "17129", "whenRevealed");
+    expect(told.steps).toContainEqual({ kind: "captive", event: "captured", cardId: idOf(told.state, ARCHER), hostId: idOf(told.state, JAILER), seat: null });
+    const without = table({ play: [ARCHER], staging: [JAILER] });
+    const silent = resolveRecords(opened(without).state, without.ctx, "17129", "whenRevealed");
+    expect(captivesOf(silent.state)).toHaveLength(1);
+    expect(silent.steps.filter((step) => step.kind === "captive")).toEqual([]);
+  });
+
   it("with no ally to attach it gains doomed 2 and nothing is attached", () => {
     const made = table({ staging: [CAPTIVES, JAILER] });
     const before = made.state.seats[0]?.threat ?? 0;
@@ -37,28 +46,21 @@ describe("17129:A:1 AttachCaptive: an ally is attached to an unattached enemy in
     expect(state.seats[0]?.threat).toBe(before + 2);
   });
 
-  it("an enemy that already holds a captive is not a target", () => {
-    const made = table({ play: [ARCHER], staging: [CAPTIVES, JAILER, "17122"] });
-    const first = runInstruction(made, opened(made).state, { verb: "AttachCaptive", card: "picked", to: "self" }, { sourceId: idOf(made.state, JAILER) });
-    expect(captivesOf(first)).toEqual([]);
-    const spawned = resolveRecords(opened(made).state, made.ctx, "17129", "whenRevealed", undefined, (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "")).state;
-    const guard = idOf(spawned, JAILER);
-    expect(captivesHeldBy(spawned, guard).length + captivesHeldBy(spawned, idOf(spawned, "17122")).length).toBe(1);
+  it("an enemy that already holds a captive is not a target: the next ally goes to the one that holds none", () => {
+    const made = table({ play: [ARCHER, AXEHAND], staging: [CAPTIVES, JAILER, "17122"], captive: [{ hero: AXEHAND, under: JAILER }] });
+    const state = resolveRecords(opened(made).state, made.ctx, "17129", "whenRevealed", undefined, (current) => (current.window?.kind === "choose" ? (current.window.options[0] ?? "") : "")).state;
+    expect(captivesHeldBy(state, idOf(state, JAILER)).map((card) => card.code)).toEqual([AXEHAND]);
+    expect(captivesHeldBy(state, idOf(state, "17122")).map((card) => card.code)).toEqual([ARCHER]);
   });
 });
 
 describe("17119:A:2 and 17119:A:3 the Captives: strip on attach, rescue when the guard leaves play", () => {
-  it("a hero attached as a captive loses its tokens and attachments, is not out of heroes, and returns exhausted to its owner's heroes when the enemy leaves play", () => {
-    const made = table({ staging: [CAPTIVES, JAILER, "17134"], heroes: [], attached: [{ code: "attachment", to: "dh1" }] });
+  it("a hero attached as a captive is not out of heroes, and returns exhausted to its owner's heroes when the enemy leaves play", () => {
+    const made = table({ staging: [CAPTIVES, JAILER, "17134"], heroes: [] });
     const hero = made.hero;
-    const damaged = { ...made.state, cards: { ...made.state.cards, [hero]: { ...made.state.cards[hero]!, damage: 1, resources: 2 } } };
-    const enemy = idOf(damaged, JAILER);
-    const attached = settle(runInstruction(made, opened(made, damaged).state, { verb: "AttachCaptive", card: "picked", to: "self" }, { sourceId: enemy }), made.ctx, none);
-    expect(attached.cards[hero]?.zone).toBe("heroes");
-    const picked = resolveRecords(opened(made, damaged).state, made.ctx, "17134", "whenRevealed", idOf(damaged, "17134"), (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : ""));
+    const picked = resolveRecords(opened(made).state, made.ctx, "17134", "whenRevealed", idOf(made.state, "17134"), (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : ""));
     const held = captivesOf(picked.state).find((card) => card.id === hero);
-    expect(held).toMatchObject({ zone: "captive", guardedHero: true, damage: 0, resources: 0, owner: 0 });
-    expect(held?.attachments).toEqual([]);
+    expect(held).toMatchObject({ zone: "captive", guardedHero: true, owner: 0 });
     expect(settle(picked.state, made.ctx, none).seats[0]?.eliminated).toBeFalsy();
     const guard = held?.host ?? "";
     const freed = settle(destroyCard(picked.state, guard, made.ctx.cards, none), made.ctx, none);
@@ -81,8 +83,6 @@ describe("17119:A:2 and 17119:A:3 the Captives: strip on attach, rescue when the
 
   it("a captive whose owner left the game goes to that owner's discard pile", () => {
     const made = table({ seats: 2, play: [{ code: ARCHER, seat: 1 }], staging: [CAPTIVES, JAILER] });
-    const taken = runInstruction(made, opened(made).state, { verb: "AttachCaptive", card: "picked", to: "self" }, { sourceId: idOf(made.state, JAILER) });
-    expect(captivesOf(taken)).toEqual([]);
     const archer = idOf(made.state, ARCHER);
     const state = opened(made, { ...made.state, cards: { ...made.state.cards, [archer]: { ...made.state.cards[archer]!, zone: "captive", host: idOf(made.state, JAILER), captive: true, owner: 1, controller: null } } }).state;
     const eliminated = { ...state, seats: [state.seats[0]!, { ...state.seats[1]!, eliminated: true }] as typeof state.seats };
@@ -95,8 +95,7 @@ describe("17125:A:2 the pick filters and the amount that read the captives", () 
   it("guardsCaptive, unattached and heldBySource tell the holder from the free enemy; heldPrinted reads the printed Willpower", () => {
     const made = table({ play: [ARCHER], staging: [CAPTIVES, JAILER, "17122", "17125"] });
     const cell = idOf(made.state, "17125");
-    const state = settle(runInstruction(made, opened(made).state, { verb: "AttachCaptive", card: "picked", to: "self" }, { sourceId: cell }), made.ctx, none);
-    expect(state.cards[idOf(state, ARCHER)]?.zone).toBe("play");
+    const state = opened(made).state;
     const archer = idOf(made.state, ARCHER);
     const withArcher = { ...state, cards: { ...state.cards, [archer]: { ...state.cards[archer]!, zone: "captive" as const, host: cell, captive: true as const, owner: 0, controller: null } } };
     const enemy = (spec: object) => matchesPick(withArcher, idOf(withArcher, JAILER), { type: "enemy", control: "any", ...spec } as never, { seat: 0, sourceId: null }, made.ctx);
@@ -129,59 +128,5 @@ describe("17123:A:2 AttackSeatWithMost: the seat with the most allies is attacke
     const state = runInstruction(made, opened(made).state, { verb: "AttackSeatWithMost", pick: { type: "ally", control: "you" } }, { sourceId: warg });
     expect(state.pendingAttack).toMatchObject({ enemyId: warg, seat: 1 });
     expect(state.cards[warg]?.zone).toBe("staging");
-  });
-});
-
-describe("17132:A:1 the Setup and 17132:B:2 the rescue", () => {
-  it("Abaan is attached to Dungeon Cell, each player attaches an ally from the deck to an Orc enemy found in the encounter deck, and the stage hears the rescue of Abaan", () => {
-    const made = table({ stage: "17132", side: "A", staging: ["17119", "17125"], setAside: ["17120", "16061"], deck: ["16062", "16063", "f0"], deckOf: [AXEHAND, "f0"] });
-    const done = resolveRecords(opened(made).state, made.ctx, "17132", "setup", idOf(made.state, "17132"), (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : ""));
-    const state = settle(done.state, made.ctx, none);
-    const cell = idOf(state, "17125");
-    expect(captivesHeldBy(state, cell).map((card) => card.code)).toEqual(["17120"]);
-    const ally = captivesOf(state).find((card) => card.code === AXEHAND);
-    expect(ally).toMatchObject({ zone: "captive", owner: 0 });
-    expect(printedHost(state, ally?.host ?? "")).toMatch(/^1606[23]$/);
-    // The cell leaves play: Abaan returns to the staging area and the first player gains control of him.
-    const side = { ...state, cards: { ...state.cards } };
-    const freed = settle(destroyCard(side, cell, made.ctx.cards, none), made.ctx, none);
-    expect(freed.cards[idOf(freed, "17120")]).toMatchObject({ zone: "play", controller: 0 });
-  });
-});
-
-const printedHost = (state: { cards: Record<string, { code: string }> }, id: string): string => state.cards[id]?.code ?? "";
-
-describe("17131:A:1 and 17131:A:2 Captured!", () => {
-  it("each player's ally is attached to the side quest, and defeating it frees each ally to its own player and lowers that player's threat by its printed cost", () => {
-    const made = table({ seats: 2, stage: "17132", play: [ARCHER, { code: AXEHAND, seat: 1 }], staging: [CAPTIVES], threat: [35, 30] });
-    const revealed = settle(resolveRecords(opened(made).state, made.ctx, "17131", "whenRevealed").state, made.ctx, none);
-    const quest = idOf(revealed, "17131");
-    const [archer, axehand] = [idOf(revealed, ARCHER), idOf(revealed, AXEHAND)];
-    expect(revealed.cards[archer]).toMatchObject({ zone: "captive", host: quest, captive: true, owner: 0 });
-    expect(revealed.cards[axehand]).toMatchObject({ zone: "captive", host: quest, captive: true, owner: 1 });
-    const defeated = settle(defeatSideQuest(revealed, quest, made.ctx, none), made.ctx, none);
-    expect(defeated.cards[archer]).toMatchObject({ zone: "play", controller: 0, exhausted: true });
-    expect(defeated.cards[axehand]).toMatchObject({ zone: "play", controller: 1, exhausted: true });
-    expect(defeated.seats.map((seat) => seat.threat)).toEqual([32, 28]);
-  });
-
-  it("with no ally to attach it is discarded and an additional encounter card is revealed", () => {
-    const made = table({ stage: "17132", staging: [CAPTIVES], deck: ["16062", "f0"] });
-    const state = settle(resolveRecords(opened(made).state, made.ctx, "17131", "whenRevealed").state, made.ctx, none);
-    expect(state.cards[idOf(state, "17131")]?.zone).not.toBe("staging");
-    expect(state.encounterDeck.length).toBeLessThan(2);
-  });
-});
-
-describe("17134:A:1 Fight Your Way Out: heroes attached, engagement checks at cost 0 for enemies that guard nothing", () => {
-  it("a hero is attached to an unattached enemy and the free enemies engage the player", () => {
-    const made = table({ stage: "17134", side: "A", staging: [CAPTIVES, "16062", "16063"], setAside: ["16061"], threat: [30, 30] });
-    const state = settle(resolveRecords(opened(made).state, made.ctx, "17134", "whenRevealed", idOf(made.state, "17134"), (current) => (current.window?.kind === "choose" ? (current.window.options[0] ?? "") : "")).state, made.ctx, none);
-    expect(captivesOf(state)).toHaveLength(1);
-    const holder = captivesOf(state)[0]?.host ?? "";
-    expect(state.cards[holder]?.zone).toBe("staging");
-    expect(state.seats[0]?.engaged.length).toBeGreaterThan(0);
-    expect(state.seats[0]?.engaged).not.toContain(holder);
-    expect(state.seats[0]?.engaged.map((id) => state.cards[id]?.code)).not.toContain("16061" === state.cards[holder]?.code ? "" : "none");
   });
 });
