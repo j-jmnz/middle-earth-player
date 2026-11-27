@@ -1,7 +1,6 @@
 // Rules: rr.attachment-cards, rr.restricted, rr.modifiers, rr.response, rr.action, rr.cancel, rr.cost, rr.triggered-ability, rr.optional-engagement,
 // rr.enters-play, rr.resource-match, rr.lasting-effects, rr.shadow-effects (data/rules/entries.json).
-// The Antlered Crown heroes, allies and attachments, written from their card text (data/cards/TAC.json; data/printed holds no ledger for
-// this pack, so the lines are the text of data/cards and every intent goes through sendUnledgered): Erkenbrand 08137:A:2, The Day's Rising
+// The Antlered Crown heroes, allies and attachments, written from their card text (data/cards/TAC.json; the lines are the ledger lines in data/printed, read from the scans): Erkenbrand 08137:A:2, The Day's Rising
 // 08139:A:1, Captain of Gondor 08140:A:1 and A:2, Booming Ent 08141:A:1 and A:2, Treebeard 08146:A:1 and A:2. The events are in
 // the-antlered-crown-events.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -14,8 +13,8 @@ import { syncConstants } from "../../rules/interpret/constants.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { atDefense, choices, endRound, enter, hosts, passAll, play, playCode, playerTable, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { type Run, type Scene, type Table, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { atDefense, choices, endRound, enter, hosts, passAll, play, playCode, playerTable, printed, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const ERKENBRAND = "08137";
 const DAYS = "08139";
@@ -65,7 +64,7 @@ describe("Erkenbrand (08137:A:2)", () => {
     const tab = table(effects, { heroes: [{ code: ERKENBRAND, seat: 0 }, { code: BERAVOR, seat: 0 }], engaged: [{ code: BRUTE, seat: 0 }], deck: [BOOST] });
     let run = atDefense(tab);
     // An action window opens after the defender is declared, before the shadow card is turned.
-    run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx), tab.ctx);
+    run = passAll(send(run, { type: "DeclareDefender", defenderId: idsOf(tab, defender) }, tab.ctx), tab.ctx);
     return { tab, run };
   }
 
@@ -75,7 +74,7 @@ describe("Erkenbrand (08137:A:2)", () => {
     const { tab, run: asked } = defended(effects, ERKENBRAND);
     const erkenbrand = idsOf(tab, ERKENBRAND);
     expect(triggers(asked.state, tab)).toContain("08137:response:1");
-    const run = passAll(sendUnledgered(asked, { type: "Trigger", cardId: erkenbrand, effectId: "08137:response:1" }, tab.ctx), tab.ctx, { responses: true });
+    const run = passAll(send(asked, { type: "Trigger", cardId: erkenbrand, effectId: "08137:response:1" }, tab.ctx), tab.ctx, { responses: true });
     expect(run.state.cards[erkenbrand]?.damage).toBe(1);
     expect(run.steps.filter((step) => step.kind === "damage" && step.targetId === erkenbrand && step.amount > 0).map((step) => (step.kind === "damage" ? step.amount : 0))).toEqual([1]);
   });
@@ -83,7 +82,7 @@ describe("Erkenbrand (08137:A:2)", () => {
   // The shadow effect not canceled: the attack is 2 + 3 against Defense 3, and he takes 2.
   it("08137:A:2 the shadow effect resolves when he does not cancel it", () => {
     const { tab, run: asked } = defended(EFFECTS, ERKENBRAND);
-    const run = passAll(sendUnledgered(asked, { type: "Pass" }, tab.ctx), tab.ctx, { responses: true });
+    const run = passAll(send(asked, { type: "Pass" }, tab.ctx), tab.ctx, { responses: true });
     expect(run.state.cards[idsOf(tab, ERKENBRAND)]?.damage).toBe(2);
   });
 
@@ -124,10 +123,10 @@ describe("Captain of Gondor (08140:A:1, A:2)", () => {
   lineSpec("08140:A:2", "Captain of Gondor: after you optionally engage, exhaust it for +1 Attack and +1 Defense until the end of the round", (effects) => {
     const tab = engaging(effects);
     const [legolas, captain] = [idsOf(tab, LEGOLAS), idsOf(tab, CAPTAIN)];
-    let run = sendUnledgered(begin(tab.state), { type: "Engage", enemyId: idsOf(tab, RAM) }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Engage", enemyId: idsOf(tab, RAM) }, tab.ctx);
     expect(run.state.cards[idsOf(tab, RAM)]?.zone).toBe("engaged");
     expect(triggers(run.state, tab)).toContain("08140:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: captain, effectId: "08140:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: captain, effectId: "08140:response:1" }, tab.ctx);
     expect(run.state.cards[captain]?.exhausted).toBe(true);
     expect(stat(run.state, tab, legolas, "attack")).toBe(printed(tab, LEGOLAS, "attack") + 1);
     expect(stat(run.state, tab, legolas, "defense")).toBe(printed(tab, LEGOLAS, "defense") + 1);
@@ -141,7 +140,7 @@ describe("Captain of Gondor (08140:A:1, A:2)", () => {
   // An enemy that engages through the engagement check is not optionally engaged: no Response.
   it("08140:A:2 Captain of Gondor: not offered when an enemy engages by the engagement check", () => {
     const tab = engaging(EFFECTS, true);
-    const run = sendUnledgered(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
+    const run = send(begin(tab.state), { type: "DeclineEngage" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, "cheap")]?.zone).toBe("engaged");
     expect(triggers(run.state, tab)).not.toContain("08140:response:1");
     expect(run.state.cards[idsOf(tab, CAPTAIN)]?.exhausted).toBe(false);
@@ -211,7 +210,7 @@ describe("Treebeard (08146:A:1, A:2)", () => {
     const treebeard = idsOf(start, TREEBEARD);
     const tab = { ...start, state: updateCard(start.state, treebeard, { resources: 2 }) };
     expect(refusal(tab.state, { type: "PlayCard", cardId: idsOf(tab, STONE), payments: [{ heroId: treebeard, amount: 2 }] }, tab.ctx)).not.toBeNull();
-    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, ENT), payments: [{ heroId: treebeard, amount: 2 }] }, tab.ctx);
+    const run = send(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, ENT), payments: [{ heroId: treebeard, amount: 2 }] }, tab.ctx);
     expect(run.state.cards[idsOf(tab, ENT)]?.zone).toBe("play");
     expect(run.state.cards[treebeard]?.resources).toBe(0);
   });
@@ -229,10 +228,10 @@ describe("Treebeard (08146:A:1, A:2)", () => {
   lineSpec("08146:A:2", "Treebeard: pay 2 from his pool to ready an Ent character", (effects) => {
     const tab = grove(effects, 3, true);
     const treebeard = idsOf(tab, TREEBEARD);
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: treebeard, effectId: "08146:action:1", payments: [{ heroId: treebeard, amount: 2 }] }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: treebeard, effectId: "08146:action:1", payments: [{ heroId: treebeard, amount: 2 }] }, tab.ctx);
     expect(run.state.cards[treebeard]?.resources).toBe(1);
     expect(choices(run.state, tab).sort()).toEqual([treebeard, idsOf(tab, ENT)].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, ENT) }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: idsOf(tab, ENT) }, tab.ctx);
     expect(run.state.cards[idsOf(tab, ENT)]?.exhausted).toBe(false);
     expect(run.state.cards[treebeard]?.exhausted).toBe(true);
     expect(run.state.cards[idsOf(tab, BERAVOR)]?.exhausted).toBe(true);

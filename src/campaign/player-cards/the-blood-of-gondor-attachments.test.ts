@@ -1,7 +1,6 @@
 // Rules: rr.attachment-cards, rr.cost, rr.printed, rr.action, rr.then, rr.play-restrictions-and-permissions, rr.staging-area,
 // rr.staging, rr.step-7-4, rr.damage, rr.triggered-ability (data/rules/entries.json).
-// The Blood of Gondor attachments, each printed line tested from the words on the card (data/cards/BoG.json: data/printed holds no ledger
-// for this pack, so the lines are the text of data/cards and every intent goes through sendUnledgered): Tome of Atanatar 06109:A:1, A:2
+// The Blood of Gondor attachments, each printed line tested from the words on the card (data/cards/BoG.json: the lines are the ledger lines in data/printed, read from the scans): Tome of Atanatar 06109:A:1, A:2
 // and A:3, Poisoned Stakes 06115:A:1, A:2 and A:3.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -13,8 +12,8 @@ import { playCost } from "../../rules/player/attach.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf } from "../../../test/harness/scene.ts";
-import { attach, discarded, endRound, fillers, hosts, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { attach, discarded, endRound, fillers, hosts, play, playerTableFor, printed, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const TOME = "06109";
 const STAKES = "06115";
@@ -79,7 +78,7 @@ describe("Tome of Atanatar (06109:A:1, A:2, A:3)", () => {
     const { tab, ids: [gondor = "", mastery = ""] } = scene(effects, [FOR_GONDOR, BLADE_MASTERY]);
     const [aragorn, gimli, tome] = [idsOf(tab, ARAGORN), idsOf(tab, GIMLI), idsOf(tab, TOME)];
     expect(triggers(tab.state, tab)).toContain("06109:action:1");
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: tome, effectId: "06109:action:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: tome, effectId: "06109:action:1" }, tab.ctx);
     expect(run.state.cards[tome]?.zone).toBe("discard");
     // For Gondor! is the lone Leadership event: it is played at once, paid by Aragorn, with no question.
     expect(run.state.window?.kind).not.toBe("choose");
@@ -125,8 +124,8 @@ describe("Poisoned Stakes (06115:A:1, A:2, A:3)", () => {
     const stakes = idsOf(tab, STAKES);
     const placed = play(begin(tab.state), tab, stakes, "staging");
     const questTab = { ...tab, state: { ...placed.state, phase: "Quest" as const, boundaryPhase: "Quest" as const, mode: "questCommit" as const, window: { kind: "pass" as const }, activeSeat: 0 } };
-    let run = sendUnledgered(begin(questTab.state), { type: "Commit", cardIds: [idsOf(tab, DENETHOR)] }, tab.ctx);
-    run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    let run = send(begin(questTab.state), { type: "Commit", cardIds: [idsOf(tab, DENETHOR)] }, tab.ctx);
+    run = send(run, { type: "Pass" }, tab.ctx);
     return { tab, stakes, run };
   }
 

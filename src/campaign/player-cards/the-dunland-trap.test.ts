@@ -1,7 +1,6 @@
 // Rules: rr.attachment-cards, rr.restricted, rr.modifiers, rr.lasting-effects, rr.response, rr.action, rr.enters-play, rr.search,
 // rr.deckbuilding, rr.the-letter-x, rr.step-3-2, rr.limits (data/rules/entries.json).
-// The Dunland Trap player cards, written from their card text (data/cards/TDT.json; data/printed holds no ledger for this pack, so every
-// intent goes through sendUnledgered): Celeborn 08001:A:1, Naith Guide 08002:A:1, Firefoot 08004:A:1 and A:2, The Fall of Gil-Galad
+// The Dunland Trap player cards, written from their card text (data/cards/TDT.json; the ledger lines in data/printed are read from the scans): Celeborn 08001:A:1, Naith Guide 08002:A:1, Firefoot 08004:A:1 and A:2, The Fall of Gil-Galad
 // 08007:A:1, The Tree People 08009:A:1, The White Council 08010:A:2.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -13,8 +12,8 @@ import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { attach, choices, deckSaveFacts, discarded, endRound, fillers, hosts, packRow, play, playerTableFor, printed, questing, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { type Table, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { attach, choices, deckSaveFacts, discarded, endRound, fillers, hosts, packRow, play, playerTableFor, printed, questing, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const CELEBORN = "08001";
 const NAITH = "08002";
@@ -61,7 +60,7 @@ describe("Celeborn (08001:A:1)", () => {
     const guide = idsOf(tab, GUIDE);
     let run = play(begin(tab.state), tab, guide);
     expect(triggers(run.state, tab)).toContain("08001:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, CELEBORN), effectId: "08001:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, CELEBORN), effectId: "08001:response:1" }, tab.ctx);
     for (const which of ["willpower", "attack", "defense"] as const) expect(stat(run.state, tab, guide, which)).toBe(printed(tab, GUIDE, which) + 1);
     const ended = endRound(run.state, tab).state;
     for (const which of ["willpower", "attack", "defense"] as const) expect(stat(ended, tab, guide, which)).toBe(printed(tab, GUIDE, which));
@@ -80,12 +79,12 @@ describe("Naith Guide (08002:A:1)", () => {
   lineSpec("08002:A:1", "Naith Guide: the chosen hero does not exhaust to quest this round", (effects) => {
     const tab = table(effects, { seats: 2, heroes: [{ code: CELEBORN, seat: 0 }, { code: DENETHOR, seat: 0 }, { code: PAL, seat: 1 }], hand: [{ code: NAITH, seat: 0 }], deck: ["f0", "f0"] });
     const [celeborn, denethor] = [idsOf(tab, CELEBORN), idsOf(tab, DENETHOR)];
-    let run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, NAITH), payments: [{ heroId: celeborn, amount: 2 }] }, tab.ctx);
+    let run = send(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, NAITH), payments: [{ heroId: celeborn, amount: 2 }] }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("08002:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, NAITH), effectId: "08002:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, NAITH), effectId: "08002:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([celeborn, denethor, idsOf(tab, PAL)].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: denethor }, tab.ctx);
-    const quest = sendUnledgered(begin(questing(run.state)), { type: "Commit", cardIds: [celeborn, denethor] }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: denethor }, tab.ctx);
+    const quest = send(begin(questing(run.state)), { type: "Commit", cardIds: [celeborn, denethor] }, tab.ctx);
     expect(quest.state.cards[denethor]).toMatchObject({ committed: true, exhausted: false });
     expect(quest.state.cards[celeborn]).toMatchObject({ committed: true, exhausted: true });
   });
@@ -148,7 +147,7 @@ describe("The Tree People (08009:A:1)", () => {
     expect(run.state.cards[guide]?.zone).toBe("hand");
     expect(choices(run.state, tab).sort()).toEqual([archer, daughter].sort());
     const cursor = run.state.seedCursor;
-    run = sendUnledgered(run, { type: "Choose", optionId: archer }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: archer }, tab.ctx);
     expect(run.state.cards[archer]?.zone).toBe("play");
     expect(run.state.seats[0]?.deck).toHaveLength(5);
     expect(run.state.cards[idsOf(tab, HENAMARTH)]?.zone).toBe("deck");
@@ -159,7 +158,7 @@ describe("The Tree People (08009:A:1)", () => {
   it("08009:A:1 The Tree People: one copy each phase", () => {
     const tab = scene(EFFECTS, 2);
     const [first = "", second = ""] = tab.ids[TREE_PEOPLE] ?? [];
-    const run = sendUnledgered(play(begin(tab.state), tab, first), { type: "Choose", optionId: idsOf(tab, ARCHER) }, tab.ctx);
+    const run = send(play(begin(tab.state), tab, first), { type: "Choose", optionId: idsOf(tab, ARCHER) }, tab.ctx);
     expect(run.state.cards[idsOf(tab, ARCHER)]?.zone).toBe("play");
     expect(legalIntents(run.state, tab.ctx).some((intent) => intent.type === "PlayCard" && intent.cardId === second)).toBe(false);
   });
@@ -181,13 +180,13 @@ describe("The White Council (08010:A:2)", () => {
     const tab = { ...listed, state: updateCard(listed.state, idsOf(listed, PAL), { exhausted: true }) };
     const [eowyn, pal] = [idsOf(tab, EOWYN), idsOf(tab, PAL)];
     const hands = tab.state.seats.map((seat) => seat.hand.length);
-    let run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, COUNCIL), payments: [{ heroId: eowyn, amount: 2 }] }, tab.ctx);
+    let run = send(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, COUNCIL), payments: [{ heroId: eowyn, amount: 2 }] }, tab.ctx);
     expect(run.state.cards[eowyn]?.resources).toBe(6 - 2);
     expect(choices(run.state, tab)).toContain("draw");
-    run = sendUnledgered(run, { type: "Choose", optionId: "draw" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "draw" }, tab.ctx);
     expect(choices(run.state, tab)).not.toContain("draw");
     expect(choices(run.state, tab)).toContain("resource");
-    run = sendUnledgered(run, { type: "Choose", optionId: "resource" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "resource" }, tab.ctx);
     expect(run.state.cards[pal]?.resources).toBe(6 + 1);
     expect(run.state.seats[1]?.hand.length).toBe(hands[1]);
     // The first player's hand: the event left it, the drawn card came in.

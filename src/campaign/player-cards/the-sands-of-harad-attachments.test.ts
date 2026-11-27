@@ -1,6 +1,5 @@
 // Rules: rr.attachment-cards, rr.restricted, rr.modifiers (data/rules/entries.json).
-// The Sands of Harad attachments, written from their card text (data/cards/TSoH.json; data/printed holds no ledger for this box, so every
-// intent goes through sendUnledgered): Dwarven Shield 16010:A:1 and A:2, Mirkwood Long-knife 16011:A:1 and A:2, The Road Goes Ever On
+// The Sands of Harad attachments, written from their card text (data/cards/TSoH.json; the ledger lines in data/printed are read from the scans): Dwarven Shield 16010:A:1 and A:2, Mirkwood Long-knife 16011:A:1 and A:2, The Road Goes Ever On
 // 16012:A:1. The heroes, allies, events and side quest are in the-sands-of-harad.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -9,8 +8,8 @@ import { EFFECTS } from "../../effects/index.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { choices, hosts, play, playerTableFor, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
+import { type Table, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { choices, hosts, play, playerTableFor, stat } from "../../../test/harness/player-table.ts";
 
 const GIMLI = "16001";
 const LEGOLAS = "16002";
@@ -58,7 +57,7 @@ describe("Dwarven Shield (16010:A:1, A:2)", () => {
     const [first = "", second = ""] = scene.ids[PLATE] ?? [];
     let run = play(begin(scene.state), scene, idsOf(scene, SHIELD), thalin);
     expect(choices(run.state, scene).sort()).toEqual([first, second, idsOf(scene, SHIELD)].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: first }, scene.ctx);
+    run = send(run, { type: "Choose", optionId: first }, scene.ctx);
     expect(run.state.cards[thalin]?.attachments.slice().sort()).toEqual([second, idsOf(scene, SHIELD)].sort());
     expect(run.state.seats[0]?.discard).toEqual([first]);
   });

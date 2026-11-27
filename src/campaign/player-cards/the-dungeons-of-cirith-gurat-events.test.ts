@@ -1,7 +1,6 @@
 // Rules: bts.valour, rr.action, rr.triggered-ability, rr.unique-cards, rr.engaged, rr.play-restrictions-and-permissions, rr.search
 // (data/rules/entries.json).
-// The Dungeons of Cirith Gurat events, written from their card text (data/cards/DoCG.json; data/printed holds no ledger for this pack, so
-// every intent goes through sendUnledgered): Fierce Defense 17113:A:1 and A:2, Heirs of Earendil 17115:A:1, Open the Armory 17118:A:1 and
+// The Dungeons of Cirith Gurat events, written from their card text (data/cards/DoCG.json; the ledger lines in data/printed are read from the scans): Fierce Defense 17113:A:1 and A:2, Heirs of Earendil 17115:A:1, Open the Armory 17118:A:1 and
 // A:2. The hero, allies and attachments are in the-dungeons-of-cirith-gurat.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -11,8 +10,8 @@ import { definePrinted } from "../../rules/core/printed.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { canPlay, choices, combat, playCode, playerTableFor, sendUnledgered, threatened } from "../../../test/harness/player-table.ts";
+import { type Table, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { canPlay, choices, combat, playCode, playerTableFor, threatened } from "../../../test/harness/player-table.ts";
 
 const FIERCE = "17113";
 const HEIRS = "17115";
@@ -68,7 +67,7 @@ describe("Fierce Defense (17113:A:1, A:2)", () => {
     const grunt = idsOf(tab, GRUNT);
     let run = playCode(tab, FIERCE, combat(tab.state, tab));
     expect(choices(run.state, tab).sort()).toEqual(mine(tab));
-    run = sendUnledgered(run, { type: "Choose", optionId: grunt }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: grunt }, tab.ctx);
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[grunt]?.damage).toBe(3);
     expect(run.state.cards[grunt]?.zone).toBe("engaged");
@@ -101,9 +100,9 @@ describe("Fierce Defense (17113:A:1, A:2)", () => {
     const [weak, grunt] = [tab.ids[WEAK]?.[0] ?? "", idsOf(tab, GRUNT)];
     let run = playCode(tab, FIERCE, combat(tab.state, tab));
     expect(choices(run.state, tab).sort()).toEqual(mine(tab));
-    run = sendUnledgered(run, { type: "Choose", optionId: weak }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: weak }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual(["damage", "valour"]);
-    run = sendUnledgered(run, { type: "Choose", optionId: "valour" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "valour" }, tab.ctx);
     expect(run.state.cards[weak]?.zone).toBe("encounterDiscard");
     expect(run.state.cards[grunt]?.damage).toBe(0);
   });
@@ -140,7 +139,7 @@ describe("Open the Armory (17118:A:1, A:2)", () => {
     const cursor = tab.state.seedCursor;
     let run = playCode(tab, ARMORY);
     expect(choices(run.state, tab).sort()).toEqual([plate, blade].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: blade }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: blade }, tab.ctx);
     expect(run.state.cards[blade]?.zone).toBe("hand");
     expect(run.state.seats[0]?.deck).toHaveLength(11);
     expect(run.state.seedCursor).toBeGreaterThan(cursor);
@@ -155,9 +154,9 @@ describe("Open the Armory (17118:A:1, A:2)", () => {
     const cursor = tab.state.seedCursor;
     let run = playCode(tab, ARMORY);
     expect(choices(run.state, tab)).toEqual(["search", "valour"]);
-    run = sendUnledgered(run, { type: "Choose", optionId: "valour" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "valour" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([aragorn, legolas].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: legolas }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: legolas }, tab.ctx);
     expect(run.state.cards[plate]).toMatchObject({ zone: "play", host: legolas });
     expect(run.state.cards[legolas]?.resources).toBe(6);
     expect(run.state.cards[aragorn]?.resources).toBe(6 - 1);

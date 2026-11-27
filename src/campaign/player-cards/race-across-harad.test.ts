@@ -4,7 +4,7 @@
 // The Race Across Harad player cards, each printed line tested from the words on the card (lineSpec, test/harness/line-spec.ts): Thurindir
 // 17028:A:1, Kahliel's Tribesman 17029:A:1, Steed of the North 17030:A:1 and A:2, Mighty Warrior 17031:A:1 to A:3, Proud Hunters 17032:A:1
 // and A:2, Backtrack 17034:A:1, Explore Secret Ways 17036:A:1 and A:2, Steward of Orthanc 17037:A:1. The lines are the text of
-// data/cards/RAH.json (data/printed holds no ledger for this pack), so every intent goes through sendUnledgered.
+// data/cards/RAH.json (the ledger lines in data/printed are read from the scans).
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
@@ -16,8 +16,8 @@ import { stagingThreat } from "../../rules/quest/quest.ts";
 import { payFor, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { attacking, canPlay, choices, endRound, fillers, hosts, passAll, play, playCode, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { type Run, type Scene, type Table, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { attacking, canPlay, choices, endRound, fillers, hosts, passAll, play, playCode, playerTableFor, printed, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const THURINDIR = "17028";
 const TRIBESMAN = "17029";
@@ -108,11 +108,11 @@ describe("Kahliel's Tribesman (17029:A:1)", () => {
     const tab = tribe(effects);
     const [tribesman, harad] = [idsOf(tab, TRIBESMAN), idsOf(tab, HARAD)];
     expect(triggers(tab.state, tab)).toContain("17029:action:1");
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: tribesman, effectId: "17029:action:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: tribesman, effectId: "17029:action:1" }, tab.ctx);
     expect(run.state.cards[tribesman]?.exhausted).toBe(true);
     expect(run.state.window?.kind).toBe("choose");
     expect(choices(run.state, tab).sort()).toEqual([harad, idsOf(tab, HARAD_ALLY)].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: harad }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: harad }, tab.ctx);
     for (const which of ["willpower", "attack", "defense"] as const) {
       expect(stat(run.state, tab, harad, which)).toBe(printed(tab, HARAD, which) + 1);
       expect(stat(withMode(run.state, "questCommit"), tab, harad, which)).toBe(printed(tab, HARAD, which));
@@ -140,7 +140,7 @@ describe("Steed of the North (17030:A:1, A:2)", () => {
   function engaged(effects: readonly Effect[], tired: boolean): { tab: Table; run: Run } {
     const scene = table(effects, { start: "encounter", heroes: [{ code: BERAVOR, seat: 0 }], attached: [{ code: STEED, host: BERAVOR }], staging: [FAR] });
     const tab = { ...scene, state: updateCard(scene.state, idsOf(scene, BERAVOR), { exhausted: tired }) };
-    return { tab, run: sendUnledgered(begin(tab.state), { type: "Engage", enemyId: idsOf(tab, FAR) }, tab.ctx) };
+    return { tab, run: send(begin(tab.state), { type: "Engage", enemyId: idsOf(tab, FAR) }, tab.ctx) };
   }
 
   // "Response: After you engage an enemy, exhaust Steed of the North to ready attached hero.": Beravor is readied, the Steed exhausted.
@@ -148,7 +148,7 @@ describe("Steed of the North (17030:A:1, A:2)", () => {
     const { tab, run: engagedRun } = engaged(effects, true);
     expect(engagedRun.state.cards[idsOf(tab, FAR)]?.zone).toBe("engaged");
     expect(triggers(engagedRun.state, tab)).toContain("17030:response:1");
-    const run = sendUnledgered(engagedRun, { type: "Trigger", cardId: idsOf(tab, STEED), effectId: "17030:response:1" }, tab.ctx);
+    const run = send(engagedRun, { type: "Trigger", cardId: idsOf(tab, STEED), effectId: "17030:response:1" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, BERAVOR)]?.exhausted).toBe(false);
     expect(run.state.cards[idsOf(tab, STEED)]?.exhausted).toBe(true);
   });
@@ -194,7 +194,7 @@ describe("Mighty Warrior (17031:A:1, A:2, A:3)", () => {
     let run = play(begin(tab.state), tab, idsOf(tab, MIGHTY), idsOf(tab, BERAVOR));
     const hand = run.state.seats[0]?.hand.length ?? 0;
     expect(triggers(run.state, tab)).toContain("17031:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, MIGHTY), effectId: "17031:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, MIGHTY), effectId: "17031:response:1" }, tab.ctx);
     expect(run.state.seats[0]?.hand).toHaveLength(hand + 1);
     expect(run.state.seats[0]?.deck).toHaveLength(2);
   });
@@ -204,7 +204,7 @@ describe("Proud Hunters (17032:A:1, A:2)", () => {
   // `heroes` for the first player; the Frail (printed threat 3) is engaged with him and `attacker` destroys it. Proud Hunters is in hand.
   function destroyed(effects: readonly Effect[], heroes: readonly string[], attacker: string, allies: readonly string[] = []): { tab: Table; run: Run } {
     const tab = table(effects, { heroes: heroes.map((code) => ({ code, seat: 0 })), allies: allies.map((code) => ({ code, seat: 0 })), hand: [{ code: HUNTERS, seat: 0 }], engaged: [{ code: FRAIL, seat: 0 }] }, 0);
-    const run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, FRAIL), attackerIds: [idsOf(tab, attacker)] }, tab.ctx);
+    const run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, FRAIL), attackerIds: [idsOf(tab, attacker)] }, tab.ctx);
     expect(run.state.cards[idsOf(tab, FRAIL)]?.zone).not.toBe("engaged");
     return { tab, run };
   }
@@ -227,7 +227,7 @@ describe("Proud Hunters (17032:A:1, A:2)", () => {
     const { tab, run: killed } = destroyed(effects, [GIMLI, BERAVOR], GIMLI);
     const [gimli, hunters] = [idsOf(tab, GIMLI), idsOf(tab, HUNTERS)];
     expect(triggers(killed.state, tab)).toContain("17032:response:1");
-    const run = sendUnledgered(killed, { type: "Trigger", cardId: hunters, effectId: "17032:response:1", payments: payFor(killed.state, tab.ctx, hunters) }, tab.ctx);
+    const run = send(killed, { type: "Trigger", cardId: hunters, effectId: "17032:response:1", payments: payFor(killed.state, tab.ctx, hunters) }, tab.ctx);
     expect(run.state.cards[hunters]?.zone).toBe("discard");
     expect(run.state.cards[gimli]?.resources).toBe(3);
     expect(run.state.cards[idsOf(tab, BERAVOR)]?.resources).toBe(0);
@@ -273,7 +273,7 @@ describe("Explore Secret Ways (17036:A:1, A:2)", () => {
     expect(tab.state.cards[first]?.zone).toBe("victory");
     const played = playCode(tab, SECRET);
     expect(played.state.cards[second]?.zone).toBe("staging");
-    const run = sendUnledgered(begin(updateCard(played.state, second, { progress: 6 })), { type: "Pass" }, tab.ctx);
+    const run = send(begin(updateCard(played.state, second, { progress: 6 })), { type: "Pass" }, tab.ctx);
     expect(run.state.victory).toEqual([first]);
     expect(run.state.cards[second]?.zone).toBe("discard");
   });
@@ -308,7 +308,7 @@ describe("Steward of Orthanc (17037:A:1)", () => {
     const offered = (run: Run): string[] => legalIntents(run.state, tab.ctx).flatMap((intent) => (intent.type === "Trigger" && intent.effectId === "17037:response:1" ? [intent.cardId] : []));
     let run = play(begin(tab.state), tab, one);
     expect(offered(run).sort()).toEqual([first, other].sort());
-    run = sendUnledgered(run, { type: "Trigger", cardId: first, effectId: "17037:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: first, effectId: "17037:response:1" }, tab.ctx);
     // The event then resolves: the ally is readied.
     expect(run.state.cards[idsOf(tab, ALLY)]?.exhausted).toBe(false);
     expect(run.state.seats[0]?.threat).toBe(8 + 1);
@@ -330,10 +330,10 @@ describe("Steward of Orthanc (17037:A:1)", () => {
     const [guard, ally] = [idsOf(scene, ORTHANC_GUARD), idsOf(scene, ALLY)];
     const tab = { ...scene, state: updateCard(updateCard(scene.state, guard, { exhausted: true }), ally, { exhausted: true }) };
     let run = play(begin(tab.state), tab, idsOf(tab, VIGILANT));
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, STEWARD), effectId: "17037:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, STEWARD), effectId: "17037:response:1" }, tab.ctx);
     expect(run.state.seats[0]?.threat).toBe(8 + 1);
     expect(triggers(run.state, tab)).toContain("07004:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: guard, effectId: "07004:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: guard, effectId: "07004:response:1" }, tab.ctx);
     expect(run.state.cards[guard]?.exhausted).toBe(false);
   });
 

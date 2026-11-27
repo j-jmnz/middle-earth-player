@@ -1,7 +1,6 @@
 // Rules: rr.modifiers, rr.initial-threat-level, rr.printed, rr.resource-match, rr.attachment-cards, rr.response, rr.forced, rr.lasting-effects,
 // rr.ready, rr.traits, rr.triggered-ability, ltp.undefended-attack, rr.step-6-4-3 (data/rules/entries.json).
-// The Drúadan Forest heroes, allies and attachment, written from their card text (data/cards/TDF.json; data/printed holds no ledger for
-// this pack, so the lines are the text of data/cards and every intent goes through sendUnledgered): Mirlonde 06032:A:1, Forlong 06033:A:1,
+// The Drúadan Forest heroes, allies and attachment, written from their card text (data/cards/TDF.json; the lines are the ledger lines in data/printed, read from the scans): Mirlonde 06032:A:1, Forlong 06033:A:1,
 // Mighty Prowess 06035:A:1 and A:2, Silvan Refugee 06037:A:1, Harbor Master 06039:A:1, White Tower Watchman 06041:A:1. The events are in
 // the-druadan-forest-events.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -15,8 +14,8 @@ import { legalIntents } from "../../rules/engine/reduce.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Scene, type Table } from "../../../test/harness/scene.ts";
-import { atDefense, attacking, choices, endRound, enter, hosts, passAll, passWhile, play, playerTableFor, printed, sendUnledgered, stat, triggers } from "../../../test/harness/player-table.ts";
+import { type Run, type Scene, type Table, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { atDefense, attacking, choices, endRound, enter, hosts, passAll, passWhile, play, playerTableFor, printed, stat, triggers } from "../../../test/harness/player-table.ts";
 
 const MIRLONDE = "06032";
 const FORLONG = "06033";
@@ -129,7 +128,7 @@ describe("Mighty Prowess (06035:A:1, A:2)", () => {
   // The Slayer holds Prowess; Legolas is beside him. The Orc is engaged, with the Troll (Orc, Troll) and the Wolf (Creature).
   const prowess = (effects: readonly Effect[], scene: Partial<Scene> = {}) =>
     table(effects, { heroes: [{ code: SLAYER, seat: 0 }, { code: LEGOLAS, seat: 0 }], attached: [{ code: PROWESS, host: SLAYER }], engaged: [{ code: ORC, seat: 0 }, { code: WOLF, seat: 0 }], staging: [TROLL], ...scene });
-  const attack = (tab: Table, attacker: string): Run => sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, ORC), attackerIds: [idsOf(tab, attacker)] }, tab.ctx);
+  const attack = (tab: Table, attacker: string): Run => send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, ORC), attackerIds: [idsOf(tab, attacker)] }, tab.ctx);
 
   // "Response: After attached hero attacks and destroys an enemy, deal 1 damage to another enemy that shares a Trait with the enemy just
   // destroyed.": the Slayer destroys the Orc; the Troll in the staging area (an Orc) takes 1 damage; the Wolf (Creature) cannot be picked.
@@ -138,7 +137,7 @@ describe("Mighty Prowess (06035:A:1, A:2)", () => {
     let run = attack(tab, SLAYER);
     expect(run.state.cards[idsOf(tab, ORC)]?.zone).toBe("encounterDiscard");
     expect(triggers(run.state, tab)).toContain("06035:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, PROWESS), effectId: "06035:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, PROWESS), effectId: "06035:response:1" }, tab.ctx);
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[idsOf(tab, TROLL)]?.damage).toBe(1);
     expect(run.state.cards[idsOf(tab, WOLF)]?.damage).toBe(0);
@@ -149,9 +148,9 @@ describe("Mighty Prowess (06035:A:1, A:2)", () => {
     const tab = prowess(EFFECTS, { engaged: [{ code: ORC, seat: 0 }, { code: ORC, seat: 0 }, { code: WOLF, seat: 0 }] });
     const [, other = ""] = tab.ids[ORC] ?? [];
     let run = attack(tab, SLAYER);
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, PROWESS), effectId: "06035:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, PROWESS), effectId: "06035:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([other, idsOf(tab, TROLL)].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, TROLL) }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: idsOf(tab, TROLL) }, tab.ctx);
     expect(run.state.cards[idsOf(tab, TROLL)]?.damage).toBe(1);
     expect(run.state.cards[other]?.damage).toBe(0);
   });
@@ -176,7 +175,7 @@ describe("Silvan Refugee (06037:A:1)", () => {
   lineSpec("06037:A:1", "Silvan Refugee: discarded after a character leaves play", (effects) => {
     const tab = table(effects, { heroes: [{ code: EOWYN, seat: 0 }], allies: [{ code: ALLY, seat: 0 }, { code: REFUGEE, seat: 0 }], engaged: [{ code: BRUTE, seat: 0 }] });
     let run = atDefense(tab);
-    run = passAll(sendUnledgered(run, { type: "DeclareDefender", defenderId: idsOf(tab, ALLY) }, tab.ctx), tab.ctx, { responses: true });
+    run = passAll(send(run, { type: "DeclareDefender", defenderId: idsOf(tab, ALLY) }, tab.ctx), tab.ctx, { responses: true });
     expect(run.state.cards[idsOf(tab, ALLY)]?.zone).toBe("discard");
     expect(run.state.cards[idsOf(tab, REFUGEE)]?.zone).toBe("discard");
   });
@@ -184,7 +183,7 @@ describe("Silvan Refugee (06037:A:1)", () => {
   // An enemy is not a character: the Slayer destroys the Orc and the Refugee stays.
   it("06037:A:1 Silvan Refugee: stays when an enemy leaves play", () => {
     const tab = table(EFFECTS, { heroes: [{ code: SLAYER, seat: 0 }], allies: [{ code: REFUGEE, seat: 0 }], engaged: [{ code: ORC, seat: 0 }] });
-    const run = passAll(sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, ORC), attackerIds: [idsOf(tab, SLAYER)] }, tab.ctx), tab.ctx, { responses: true });
+    const run = passAll(send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, ORC), attackerIds: [idsOf(tab, SLAYER)] }, tab.ctx), tab.ctx, { responses: true });
     expect(run.state.cards[idsOf(tab, ORC)]?.zone).toBe("encounterDiscard");
     expect(run.state.cards[idsOf(tab, REFUGEE)]?.zone).toBe("play");
   });
@@ -197,10 +196,10 @@ describe("Harbor Master (06039:A:1)", () => {
   lineSpec("06039:A:1", "Harbor Master: +1 Defense until the end of the round after a card effect adds resources to your hero", (effects) => {
     const tab = table(effects, { heroes: [{ code: ARAGORN, seat: 0 }], allies: [{ code: HARBOR, seat: 0 }], attached: [{ code: STEWARD, host: ARAGORN }], playerDeck: [{ code: "card", seat: 0 }] });
     const harbor = idsOf(tab, HARBOR);
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, STEWARD), effectId: "01026:action:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: idsOf(tab, STEWARD), effectId: "01026:action:1" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, ARAGORN)]?.resources).toBe(6 + 2);
     expect(triggers(run.state, tab)).toContain("06039:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: harbor, effectId: "06039:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: harbor, effectId: "06039:response:1" }, tab.ctx);
     expect(stat(run.state, tab, harbor, "defense")).toBe(printed(tab, HARBOR, "defense") + 1);
     expect(stat(enter(run.state, tab, "combatStart").state, tab, harbor, "defense")).toBe(printed(tab, HARBOR, "defense") + 1);
     expect(stat(endRound(run.state, tab).state, tab, harbor, "defense")).toBe(printed(tab, HARBOR, "defense"));
@@ -214,8 +213,8 @@ describe("Harbor Master (06039:A:1)", () => {
     let run = begin(tab.state);
     run = passWhile(run, tab, (run) => !legalIntents(run.state, tab.ctx).some((intent) => intent.type === "PlayCard"), 3);
     expect(run.state.activeSeat).toBe(1);
-    run = sendUnledgered(run, { type: "PlayCard", cardId: idsOf(tab, STEWARD), hostId: idsOf(tab, PAL), payments: [{ heroId: idsOf(tab, PAL), amount: 2 }] }, tab.ctx);
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, STEWARD), effectId: "01026:action:1" }, tab.ctx);
+    run = send(run, { type: "PlayCard", cardId: idsOf(tab, STEWARD), hostId: idsOf(tab, PAL), payments: [{ heroId: idsOf(tab, PAL), amount: 2 }] }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, STEWARD), effectId: "01026:action:1" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, PAL)]?.resources).toBe(6 - 2 + 2);
     expect(triggers(run.state, tab)).not.toContain("06039:response:1");
   });
@@ -242,7 +241,7 @@ describe("White Tower Watchman (06041:A:1)", () => {
   lineSpec("06041:A:1", "White Tower Watchman: takes an undefended attack's damage while your heroes share a sphere", (effects) => {
     const { tab, run } = undefended(effects, [LEGOLAS, GIMLI]);
     const watchman = idsOf(tab, WATCHMAN);
-    const after = sendUnledgered(run, { type: "Undefended", heroId: watchman }, tab.ctx);
+    const after = send(run, { type: "Undefended", heroId: watchman }, tab.ctx);
     expect(after.state.cards[watchman]?.zone).toBe("discard");
     expect(after.state.cards[idsOf(tab, LEGOLAS)]?.damage).toBe(0);
     expect(after.state.cards[idsOf(tab, GIMLI)]?.damage).toBe(0);

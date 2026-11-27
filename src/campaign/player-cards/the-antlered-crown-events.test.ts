@@ -1,7 +1,6 @@
 // Rules: rr.response, rr.action, rr.cost, rr.triggered-ability, rr.resource-match, rr.shadow-effects, rr.doomed-x, rr.step-3-4, rr.active-location
 // (data/rules/entries.json).
-// The Antlered Crown events, written from their card text (data/cards/TAC.json; data/printed holds no ledger for this pack, so the lines are
-// the text of data/cards and every intent goes through sendUnledgered): Ride Them Down 08142:A:1, Shadows Give Way 08143:A:1 and A:2, Don't
+// The Antlered Crown events, written from their card text (data/cards/TAC.json; the lines are the ledger lines in data/printed, read from the scans): Ride Them Down 08142:A:1, Shadows Give Way 08143:A:1 and A:2, Don't
 // Be Hasty! 08144:A:1, Waters of Nimrodel 08145:A:2 (its Doomed 3, 08145:A:1, is a keyword the engine reads from the card).
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -13,8 +12,8 @@ import { spawn } from "../../rules/core/zones.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Run, type Table } from "../../../test/harness/scene.ts";
-import { choices, play, playableCards, playCode, playerTableFor, printed, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { type Run, type Table, begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { choices, play, playableCards, playCode, playerTableFor, printed, triggers } from "../../../test/harness/player-table.ts";
 
 const RIDE = "08142";
 const SHADOWS = "08143";
@@ -61,7 +60,7 @@ describe("Ride Them Down (08142:A:1)", () => {
   function quested(effects: readonly Effect[]): { tab: Table; run: Run } {
     const tab = table(effects, { start: "quest", heroes: [{ code: EOWYN, seat: 0 }], hand: [{ code: RIDE, seat: 0 }], staging: [RAM, CHIEF], deck: [RAM], active: LOC });
     const revealed = tab.ids[RAM]?.find((id) => tab.state.cards[id]?.zone === "encounterDeck") ?? "";
-    const run = sendUnledgered(sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, EOWYN)] }, tab.ctx), { type: "Pass" }, tab.ctx);
+    const run = send(send(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, EOWYN)] }, tab.ctx), { type: "Pass" }, tab.ctx);
     expect(run.state.cards[revealed]?.zone).toBe("staging");
     expect(run.state.window?.kind).toBe("frameAction");
     return { tab, run };
@@ -74,7 +73,7 @@ describe("Ride Them Down (08142:A:1)", () => {
     let run = play(asked, tab, idsOf(tab, RIDE));
     expect(run.state.window?.kind).toBe("choose");
     expect(choices(run.state, tab).sort()).toEqual([ram, other].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: ram }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: ram }, tab.ctx);
     expect(run.state.window?.kind).toBe("frameAction");
     return { tab, run, ram, other };
   }
@@ -86,7 +85,7 @@ describe("Ride Them Down (08142:A:1)", () => {
   lineSpec("08142:A:1", "Ride Them Down: questing progress past the active location is damage on the chosen non-unique enemy", (effects) => {
     const { tab, run, ram, other } = ridden(effects);
     const stage = tab.state.questStage ?? "";
-    const done = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    const done = send(run, { type: "Pass" }, tab.ctx);
     expect(done.state.mode).toBe("travel");
     expect(done.state.cards[idsOf(tab, LOC)]?.zone).toBe("encounterDiscard");
     expect(done.state.cards[ram]?.damage).toBe(2);
@@ -96,7 +95,7 @@ describe("Ride Them Down (08142:A:1)", () => {
 
   lineSpec("08142:A:1", "Ride Them Down: the damage on the chosen enemy names its cause", (effects) => {
     const { tab, run, ram } = ridden(effects);
-    const done = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+    const done = send(run, { type: "Pass" }, tab.ctx);
     expect(done.state.cards[ram]?.damage).toBe(2);
   });
 
@@ -139,7 +138,7 @@ describe("Shadows Give Way (08143:A:1, A:2)", () => {
   lineSpec("08143:A:2", "Shadows Give Way: discards each shadow card from each enemy in play", (effects) => {
     const { tab, dealt } = shadowed(effects);
     const pay = [idsOf(tab, EOWYN), idsOf(tab, DUNHERE), idsOf(tab, SPRITE)].map((heroId) => ({ heroId, amount: 1 }));
-    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, SHADOWS), payments: pay }, tab.ctx);
+    const run = send(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, SHADOWS), payments: pay }, tab.ctx);
     for (const enemy of tab.ids[BRUTE] ?? []) expect(run.state.cards[enemy]?.shadowId ?? null).toBeNull();
     for (const id of dealt) expect(run.state.cards[id]?.zone).toBe("encounterDiscard");
     expect(run.state.cards[idsOf(tab, SHADOWS)]?.zone).toBe("discard");
@@ -156,9 +155,9 @@ describe("Don't Be Hasty! (08144:A:1)", () => {
   // Beravor (Lore, pays 0) and Éowyn commit, Legolas does not; the encounter deck reveals the Ram.
   function revealed(effects: readonly Effect[]): { tab: Table; run: Run } {
     const tab = table(effects, { start: "quest", heroes: [{ code: BERAVOR, seat: 0 }, { code: EOWYN, seat: 0 }, { code: LEGOLAS, seat: 0 }], hand: [{ code: HASTY, seat: 0 }], deck: [RAM] });
-    const run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, BERAVOR), idsOf(tab, EOWYN)] }, tab.ctx);
+    const run = send(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, BERAVOR), idsOf(tab, EOWYN)] }, tab.ctx);
     // The commit pass ends; the staging step reveals the Ram.
-    return { tab, run: sendUnledgered(run, { type: "Pass" }, tab.ctx) };
+    return { tab, run: send(run, { type: "Pass" }, tab.ctx) };
   }
 
   // "Response: When an encounter card is revealed but before resolving any of that card's keywords or "when revealed" effects, choose a
@@ -168,10 +167,10 @@ describe("Don't Be Hasty! (08144:A:1)", () => {
     const { tab, run: asked } = revealed(effects);
     const [beravor, eowyn] = [idsOf(tab, BERAVOR), idsOf(tab, EOWYN)];
     expect(triggers(asked.state, tab)).toContain("08144:response:1");
-    let run = sendUnledgered(asked, { type: "Trigger", cardId: idsOf(tab, HASTY), effectId: "08144:response:1", payments: [{ heroId: beravor, amount: 0 }] }, tab.ctx);
+    let run = send(asked, { type: "Trigger", cardId: idsOf(tab, HASTY), effectId: "08144:response:1", payments: [{ heroId: beravor, amount: 0 }] }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([beravor, eowyn].sort());
     const stage = tab.state.questStage ?? "";
-    run = sendUnledgered(run, { type: "Choose", optionId: eowyn }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: eowyn }, tab.ctx);
     expect(run.state.cards[eowyn]?.exhausted).toBe(false);
     expect(run.state.cards[beravor]?.exhausted).toBe(true);
     expect(run.state.cards[idsOf(tab, HASTY)]?.zone).toBe("discard");
@@ -183,7 +182,7 @@ describe("Don't Be Hasty! (08144:A:1)", () => {
   // "choose a character committed to the quest": with no character committed, the Response is not offered when the Ram is revealed.
   it("08144:A:1 Don't Be Hasty!: not offered when no character is committed", () => {
     const tab = table(EFFECTS, { start: "quest", heroes: [{ code: BERAVOR, seat: 0 }], hand: [{ code: HASTY, seat: 0 }], deck: [RAM] });
-    const run = sendUnledgered(begin(tab.state), { type: "Pass" }, tab.ctx);
+    const run = send(begin(tab.state), { type: "Pass" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, RAM)]?.zone).toBe("staging");
     expect(triggers(run.state, tab)).not.toContain("08144:response:1");
   });
