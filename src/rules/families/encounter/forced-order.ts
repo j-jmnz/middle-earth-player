@@ -1,15 +1,23 @@
 // Rules: rr.forced (data/rules/entries.json). OrderForced (engine use, windows/triggers.ts): the Forced effects of one event that differ are initiated in the order the first player chooses. The first player picks
-// the card whose effects initiate next; they resolve completely before the rest are offered again, so a choice is asked once for each card but the last. What the cards print holds some back (`early`, `afterForcedOn`: orderOptions).
+// the card whose effects initiate next; they resolve completely before the rest are offered again, so a choice is asked once for each card but the last. What the cards print holds some back (`afterForcedOn`: orderOptions).
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { nextInOrder } from "../../windows/in-order.ts";
+import { topFrame } from "../../windows/windows.ts";
 import { foundOf, orderOptions, pushCounted } from "../../windows/triggers.ts";
 import type { Focus } from "../index.ts";
 import { effectData } from "./moves.ts";
 
 type OrderForced = Extract<Instruction, { verb: "OrderForced" }>;
+
+/** Whether the open choice is the first player's order of the Forced effects (the words and the tests read it). */
+export function asksForcedOrder(state: ScenarioState): boolean {
+  const data = topFrame(state)?.data;
+  const wait = data?.kind === "effect" ? data.wait : null;
+  return state.window?.kind === "choose" && wait?.kind === "target" && wait.item.instruction.verb === "OrderForced";
+}
 
 export function orderForced(state: ScenarioState, instruction: OrderForced, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const event = effectData(state)?.orderEvent;

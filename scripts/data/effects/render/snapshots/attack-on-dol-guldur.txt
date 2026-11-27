@@ -220,7 +220,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
   50907:forced:2: Forced on the event locationExplored (heard about location (any player controls))
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - add the Siege value printed on the card the event is about (a destroyed enemy, an explored location; 0 when it prints none) to this round's Siege tally
-  50907:forced:3: Forced at the end of the round (resolves after the Forced effects on The Siege of Dol Guldur or The Tower of Sorcery or Battle Under the Trees or Dungeons of the Necromancer)
+  50907:forced:3: Forced at the end of the round (resolves after the Forced effects on each of The Siege of Dol Guldur, The Tower of Sorcery, Battle Under the Trees, Dungeons of the Necromancer in play)
     only if 2 is less than the stage number of the main quest (also while a side quest is the current quest)
     who acts: the acting player is the first player (a phase has no player of its own)
     - up to the Siege values added up this round: each enemy destroyed and each location explored adds its printed Siege value resource token(s) come off the card with code 50907 in play
@@ -618,7 +618,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
     - each Lieutenant enemy (any player controls) or in the staging area: stat losesIndestructible 1, while this card is in play
 
 50931:B:2 (back): While the players are at stage 3, this card gains: 'Forced: After resolving the Forced effect on Dol Guldur, randomly select a stage 3 that was not in play this round and resolve its Forced effect. Then, discard all progress from the current stage 3 and advance to a new stage 3 of your choice.'
-  50931:forced:2: Forced at the end of the round (resolves after the Forced effects on Dol Guldur)
+  50931:forced:2: Forced at the end of the round (resolves after the Forced effects on each of Dol Guldur in play)
     only if 2 is less than the stage number of the main quest (also while a side quest is the current quest)
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
@@ -645,7 +645,7 @@ Scenario piles that place cards with no record (quest: 50901 Assault on the Gold
         - the acting player's stage leaves the quest (its attachments are released and it is set aside) and the quest deck's card with code 50906 becomes the stage, side B up with no progress, its When Revealed effects resolving; when the deck has no such card, a copy the quest left earlier and set aside comes back, with no tokens on it (nothing when no such card is there)
 
 50931:B:3 (back): At the end of the round, if Dol Guldur's city strength is 0 and there are no Lieutenant enemies in play, Dol Guldur is captured and the players win the game.
-  50931:forced:1: Forced at the end of the round (resolves after the Forced effects on Dol Guldur)
+  50931:forced:1: Forced at the end of the round (resolves after the Forced effects on each of Dol Guldur in play)
     who acts: the acting player is the first player (a phase has no player of its own)
     - if all of: (the resource tokens on objective (any player controls) named "Dol Guldur" is less than 1) and (the number of Lieutenant enemy (any player controls) or in the staging area is at most 0): the players win the game
 

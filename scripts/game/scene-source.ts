@@ -27,10 +27,11 @@ function codesOf(value: unknown, out: Set<string>): Set<string> {
   return out;
 }
 
-/** The table of a layout, with the cards of data/cards that the layout names and the scenario does not deal. */
+/** The table of a layout, with the cards of data/cards that the layout names and the scenario does not deal. The test kit leaves the round at 0, which the phase rail reads as the Setup; a scene is shown at round 1, as a game in play is. */
 export function sceneTable(scenarioId: string, layout: Layout): LayoutTable {
   const extra = [...codesOf(layout, new Set())].filter((code) => printedIn(scenarioId, code) === undefined);
-  return tableFromLayout(scenarioId, layout, { extra });
+  const table = tableFromLayout(scenarioId, layout, { extra });
+  return table.state.round === 0 ? { ...table, state: { ...table.state, round: 1 } } : table;
 }
 
 export function sceneSource(scenarioId: string, layout: Layout): GameSource {

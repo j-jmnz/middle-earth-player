@@ -4,12 +4,13 @@
 import type { Instruction } from "../../catalog/boundary.ts";
 import type { GameEvent, ScenarioState } from "../../rules/core/state.ts";
 import { reduce, type ReduceContext } from "../../rules/engine/reduce.ts";
+import { asksForcedOrder } from "../../rules/families/encounter/forced-order.ts";
 import { showedHidden } from "../../rules/engine/undo.ts";
 import { effectById } from "../../rules/windows/listen.ts";
 import { copiesInOrder } from "../../rules/windows/triggers.ts";
 import { topFrame } from "../../rules/windows/windows.ts";
 
-import { decidedBy, reachOf, type Reach } from "./table-changes.ts";
+import { decidedBy, reachOf, said, type Reach } from "./table-changes.ts";
 import type { AskedWords } from "./asks.ts";
 import type { ChoiceNames } from "./choice.ts";
 
@@ -46,11 +47,24 @@ function momentWords(event: GameEvent | undefined): string {
   return (event ? MOMENTS[event.trigger] : undefined) ?? "at the same moment";
 }
 
-// The order the card's effects initiate in is its own; the copy is read once the effects of that card are done (up to the next question). An order that shows something hidden (a reveal, a shuffle, a random pick) gives no result: the
-// copy would show the card the player may not see yet. Each option costs one reduce (about 1 ms in Desert Crossing, measured with a scratch script: 2 ms for the two-option sheet), and the sheet is built when the window opens, so it keeps no cache (the words hold no module state).
-function reachFor(game: ScenarioState, ctx: ReduceContext, names: ChoiceNames, id: string): Reach | null {
+// The order the card's effects initiate in is its own; the copy is read once the effects of that card are done: the Forced effects ask the order again, or the frame has ended. A copy that stops on a question of the card's own gives no result, and
+// an order that shows something hidden (a reveal, a shuffle, a random pick) is "hidden": the copy would show the card the player may not see yet. Each option costs one reduce (about 1 ms in Desert Crossing, measured with a scratch script:
+// 2 ms for the two-option sheet), and the sheet is built when the window opens, so it keeps no cache (the words hold no module state).
+type Read = Reach | "hidden" | null;
+
+function reachFor(game: ScenarioState, ctx: ReduceContext, names: ChoiceNames, id: string): Read {
   const sent = reduce(game, { type: "Choose", optionId: id }, ctx);
-  return sent.ok && !showedHidden(game, sent.state) ? reachOf(game, sent.state, names.card) : null;
+  if (!sent.ok) return null;
+  if (showedHidden(game, sent.state)) return "hidden";
+  const settled = asksForcedOrder(sent.state) || sent.state.stack.length < game.stack.length;
+  return settled ? reachOf(game, sent.state, names.card) : null;
+}
+
+/** The Result of one row: what its order decides when every order was read, all it changes when another is hidden, and why there is none when its own is hidden. Null when the copy stopped on a question of the card's own. */
+function resultOf(read: Read, known: readonly Reach[], whole: boolean): string | null {
+  if (read === "hidden") return "Result: shown after it resolves (a hidden card turns up).";
+  if (read == null) return null;
+  return `Result: ${whole ? decidedBy(read, known) : said(read.parts)}.`;
 }
 
 /** The sheet's words: the title, the question and one row for each card that may resolve next. */
@@ -60,7 +74,7 @@ export function orderForcedWords(game: ScenarioState, ctx: ReduceContext, names:
   const total = instruction.total ?? left;
   const first = left === total;
   const reaches = options.map((id) => reachFor(game, ctx, names, id));
-  const known = reaches.flatMap((reach) => (reach ? [reach] : []));
+  const known = reaches.flatMap((reach) => (reach && reach !== "hidden" ? [reach] : []));
   // The orders reach the same table: every copy was read and they left it alike.
   const same = reaches.length > 1 && known.length === reaches.length && known.every((reach) => reach.table === known[0]?.table);
   const ask = first ? "Choose the one that resolves first." : `Choose the one that resolves next (${left} of ${total} left).`;
@@ -76,9 +90,9 @@ export function orderForcedWords(game: ScenarioState, ctx: ReduceContext, names:
         const text = effect.lines[0] ? names.line?.(effect.lines[0]) : null;
         return text ? [text] : [];
       }).join(" ");
-      const reach = reaches[at];
-      const result = same || reach == null ? null : `Result: ${decidedBy(reach, known)}.`;
-      return [id, { label: copies > 1 ? `${names.card(id)} (${copies} copies)` : names.card(id), detail: [line, result].filter((part) => part).join(" ") || null }];
+      const result = same ? null : resultOf(reaches[at] ?? null, known, known.length === reaches.length);
+      // The Result comes first: on a short phone the row's detail is cut at its foot, and the printed line is the part a long press shows.
+      return [id, { label: copies > 1 ? `${names.card(id)} (${copies} copies)` : names.card(id), detail: [result, line].filter((part) => part).join(" ") || null }];
     }),
   );
   return {

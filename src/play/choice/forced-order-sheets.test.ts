@@ -53,10 +53,10 @@ describe("the order of simultaneous Forced effects on the sheet", () => {
     const shade = rows.find((row) => row.label === "Seek Shade");
     const stage = rows.find((row) => row.label === "The Desert of Harad");
     // Seek Shade removes 4 progress at 40 and 3 at 36 (the stage's +4 comes first or after).
-    expect(stage?.detail).toContain("The Desert of Harad progress 6 to 2");
-    expect(shade?.detail).toContain("The Desert of Harad progress 6 to 3");
+    expect(stage?.detail).toContain("Progress on The Desert of Harad 6 to 2");
+    expect(shade?.detail).toContain("Progress on The Desert of Harad 6 to 3");
     // The temperature rises either way: it is not what the order decides.
-    expect(stage?.detail?.split("Result:")[1]).not.toContain("temperature");
+    expect(stage?.detail?.split("Forced:")[0]).not.toContain("emperature");
   });
 
   it("two-handed the title names the first player and the note still starts with the question", () => {
@@ -87,16 +87,6 @@ describe("three cards or more", () => {
 });
 
 describe("what the words claim of an order", () => {
-  it("gives no result for an order that reveals a card, so the sheet shows nothing hidden (50820:A:2 with 50812:A:1)", () => {
-    // City Wall at 2 resource tokens reveals an encounter card at the end of the round; Annúminas takes damage for each enemy.
-    const { sheet } = asked({ seats: 1, phase: "Combat", deck: ["50821", "50822"], staging: [{ code: "50820", resources: 2 }, { code: "50812", resources: 10 }] }, "the-siege-of-annuminas");
-    const rows = trayTiles(sheet);
-    const wall = rows.find((row) => row.label === "City Wall");
-    expect(wall, JSON.stringify(rows.map((row) => row.label))).toBeDefined();
-    expect(wall?.detail).not.toContain("Result:");
-    expect(sheet.note).not.toContain("Same result");
-  });
-
   it("keeps the sentence of when the effects trigger in the first question when what a card prints narrows the options", () => {
     const { state, ctx, names } = asked(SOLO);
     const shade = Object.values(state.cards).find((card) => card.code === "16023");
@@ -108,5 +98,35 @@ describe("what the words claim of an order", () => {
     ];
     const words = orderForcedWords(state, ctx, names, { verb: "OrderForced", entries, total: 2 }, [shade.id]);
     expect(words.prompt).toContain("2 Forced effects trigger at the end of the round.");
+  });
+});
+
+describe("what a sheet says when an order cannot be read", () => {
+  // Annúminas, a Battering Ram and a City Wall at 2 tokens: the Wall's order reveals a hidden card, the other two stop at the next order question.
+  const THREE: Layout = { seats: 1, phase: "Combat", deck: ["50821", "50822"], staging: [{ code: "50820", resources: 2 }, "50814", { code: "50812", resources: 10 }] };
+
+  it("names its whole change on the row it can read and says why the other has none (50820:A:2, 50814:A:2)", () => {
+    const { sheet } = asked(THREE, "the-siege-of-annuminas");
+    const rows = trayTiles(sheet);
+    expect(rows.find((row) => row.label === "City Wall")?.detail).toContain("Result: shown after it resolves (a hidden card turns up).");
+    expect(rows.find((row) => row.label === "Battering Ram")?.detail).toContain("Result: Resource tokens on Battering Ram 0 to 1,");
+    expect(sheet.note).not.toContain("Same result");
+  });
+
+  it("puts the Result before the printed line, so a cut detail keeps the Result", () => {
+    const { sheet } = asked(THREE, "the-siege-of-annuminas");
+    for (const row of trayTiles(sheet)) expect(row.detail?.startsWith("Result:"), row.label).toBe(true);
+  });
+
+  it("gives no Result and no equal-result claim for a copy that stops on a question of its own card (50813:A:3: the attack on the first player)", () => {
+    const { sheet } = asked({ seats: 1, phase: "Combat", deck: ["50821", "50822"], staging: ["50813", { code: "50812", resources: 10 }] }, "the-siege-of-annuminas");
+    for (const row of trayTiles(sheet)) expect(row.detail, row.label).not.toContain("Result:");
+    expect(sheet.note).not.toContain("Same result");
+  });
+
+  it("says Same result in either order when the two orders leave equal tables (50820:A:2 at 0 tokens, 50812:A:1)", () => {
+    const { sheet } = asked({ seats: 1, phase: "Combat", deck: ["50821", "50822"], staging: [{ code: "50820", resources: 0 }, { code: "50812", resources: 10 }] }, "the-siege-of-annuminas");
+    expect(sheet.note).toContain("Same result in either order.");
+    for (const row of trayTiles(sheet)) expect(row.detail, row.label).not.toContain("Result:");
   });
 });
