@@ -5,10 +5,11 @@ import { describe, expect, it } from "vitest";
 import { legalIntents } from "../../rules/engine/legal.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import type { PlayerIntent } from "../../rules/engine/reduce.ts";
-import { asksForcedOrder } from "../../../test/harness/forced-order.ts";
+import { asksForcedOrder } from "../../rules/families/encounter/forced-order.ts";
 import { start, send, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
 import { spawn } from "../../rules/core/zones.ts";
-import { orderForcedWords } from "../words/forced-order.ts";
+import { orderForcedWords, sameResult, settledAt, type Read } from "../words/forced-order.ts";
+import { reachOf } from "../words/table-changes.ts";
 import { ledgerLine } from "../cards/ledger.ts";
 
 import { sheetFor } from "./sheets.ts";
@@ -128,5 +129,41 @@ describe("what a sheet says when an order cannot be read", () => {
     const { sheet } = asked({ seats: 1, phase: "Combat", deck: ["50821", "50822"], staging: [{ code: "50820", resources: 0 }, { code: "50812", resources: 10 }] }, "the-siege-of-annuminas");
     expect(sheet.note).toContain("Same result in either order.");
     for (const row of trayTiles(sheet)) expect(row.detail, row.label).not.toContain("Result:");
+  });
+});
+
+describe("when a copy of the order has settled", () => {
+  const { state } = asked(SOLO);
+  const top = state.stack[state.stack.length - 1];
+  if (!top) throw new Error("no frame");
+
+  it("is ended when the frame of the order is gone, and asking when the same order asks again at the same depth", () => {
+    expect(settledAt(state, { ...state, stack: state.stack.slice(0, -1) })).toBe("ended");
+    expect(settledAt(state, state)).toBe("asking");
+  });
+
+  it("has not settled on another order deeper in the stack (a Forced effect of the chosen card that asks its own order), or on a question that is not an order", () => {
+    expect(settledAt(state, { ...state, stack: [...state.stack, top] })).toBeNull();
+    expect(settledAt(state, { ...state, window: null })).toBeNull();
+  });
+});
+
+describe("when the sheet says the result is the same", () => {
+  const { state, names } = asked(SOLO);
+  const reach = reachOf(state, state, names.card);
+  const other = reachOf(state, { ...state, round: state.round + 1 }, names.card);
+  const ended = (one: typeof reach): Read => ({ reach: one, ended: true });
+
+  it("says it when every order was read to its end and they left equal tables", () => {
+    expect(sameResult([ended(reach), ended(reach)])).toBe(true);
+    expect(sameResult([ended(reach), ended(reach), ended(reach)])).toBe(true);
+  });
+
+  it("does not say it with a card left after the first pick (a third card would still differ), for tables that differ, a hidden order or a copy that did not settle", () => {
+    expect(sameResult([{ reach, ended: false }, ended(reach), ended(reach)])).toBe(false);
+    expect(sameResult([ended(reach), ended(other)])).toBe(false);
+    expect(sameResult([ended(reach), "hidden"])).toBe(false);
+    expect(sameResult([ended(reach), null])).toBe(false);
+    expect(sameResult([ended(reach)])).toBe(false);
   });
 });

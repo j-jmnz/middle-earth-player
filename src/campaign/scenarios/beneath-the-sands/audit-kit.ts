@@ -4,7 +4,6 @@ import { type ScenarioState } from "../../../rules/core/state.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { PASSING, codesIn, fightEnemy, finish, idOf, idsOf, legalIntents, legalTargets, opened, revealFromTop, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
 import { pick } from "../../../../test/harness/pick.ts";
-export { pick };
 
 export const SID = "beneath-the-sands";
 export const BROOD = "17065";

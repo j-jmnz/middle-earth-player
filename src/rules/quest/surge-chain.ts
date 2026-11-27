@@ -1,7 +1,7 @@
 // Rules: rr.surge, rr.running-out-of-cards, faq.last-encounter-card (data/rules/entries.json).
 // The check a surge chain shares with the families that hold one (pelargir/surge-chain.ts, ring-maker/surge-chain.ts). A game can drain its encounter deck into the staging area, the engaged rows and the hidden cards until a surging card is the only card it has left. The core's reset would
 // shuffle that card back and reveal it inside its own surge for ever. The core cuts a repeating chain in every game (repeatsChain: a reset that finds the table an earlier reset of the chain found); a family adds its own hold for the chains it names (inSurgeChain with a filter on the cards).
-import type { ScenarioState } from "../core/state.ts";
+import type { CardInstance, ScenarioState } from "../core/state.ts";
 
 /** The deck is empty and every card of the discard pile is a card whose reveal is past its staging and still open (a surge chain, rr.surge) and that `counts` accepts: the surge finds no card and the chain ends; the reset that follows the last reveal (faq.last-encounter-card) runs as usual. */
 export function inSurgeChain(state: ScenarioState, counts: (code: string) => boolean = () => true): boolean {
@@ -10,10 +10,17 @@ export function inSurgeChain(state: ScenarioState, counts: (code: string) => boo
   return state.encounterDiscard.every((id) => open.has(id) && counts(state.cards[id]?.code ?? ""));
 }
 
-// The table without what only counts passes or records history: the stack, the seed and its cursor, the id counters, the clock, the undo log (every accepted intent changes it) and the order in which cards entered play, and without the scenario's constant data. Two resets of one chain that find the same table are one lap of a loop that changes nothing. The mark is the length of the table's text and a 32-bit FNV-1a hash of it, kept on the reveal frame.
+/**
+ * The table as facts: the state without what only counts passes or records history, and without the scenario's constant data. Two states that return the same facts hold the same game. It leaves out: the stack and the window (the running frames and the open question), the seed (it never changes) and its cursor, the id counters (`nextId`, `frameSeq`), the clock, the undo log (every accepted intent changes it), `setup`, `stages`, `widgets` and `resolution` (the scenario's constant data), and the order in which cards entered play (`enteredPlay`, a count). It keeps `revealCursor` (the seats still to reveal: a game fact) and every modifier, in the state's order; a caller that compares orders sorts them. Used by the surge chain's mark (below) and by the words that compare the orders of a Forced window (play/words/table-changes.ts).
+ */
+export function tableFacts(state: ScenarioState): Omit<ScenarioState, "cards" | "stack" | "window" | "seed" | "seedCursor" | "nextId" | "frameSeq" | "clock" | "undo" | "setup" | "stages" | "widgets" | "resolution"> & { readonly cards: readonly Omit<CardInstance, "enteredPlay">[] } {
+  const { stack: _stack, window: _window, seed: _seed, seedCursor: _cursor, nextId: _next, frameSeq: _seq, clock: _clock, undo: _undo, setup: _setup, stages: _stages, widgets: _widgets, resolution: _resolution, cards, ...table } = state;
+  return { ...table, cards: Object.values(cards).map(({ enteredPlay: _entered, ...card }) => card) };
+}
+
+// The mark of a table is the length of its facts' text and a 32-bit FNV-1a hash of it, kept on the reveal frame. Two resets of one chain that find the same table are one lap of a loop that changes nothing.
 function tableMark(state: ScenarioState): string {
-  const { stack: _stack, seed: _seed, seedCursor: _cursor, nextId: _next, frameSeq: _seq, clock: _clock, undo: _undo, setup: _setup, stages: _stages, widgets: _widgets, resolution: _resolution, cards, ...table } = state;
-  const text = JSON.stringify({ ...table, cards: Object.values(cards).map(({ enteredPlay: _entered, ...card }) => card) });
+  const text = JSON.stringify(tableFacts(state));
   let hash = 0x811c9dc5;
   for (let i = 0; i < text.length; i += 1) hash = Math.imul(hash ^ text.charCodeAt(i), 0x01000193) >>> 0;
   return `${text.length}:${hash.toString(16)}`;

@@ -6,8 +6,6 @@ import type { ReduceContext } from "../../src/rules/interpret/interpret.ts";
 import { applyChoice } from "../../src/rules/windows/choices.ts";
 import { asksForcedOrder } from "../../src/rules/families/encounter/forced-order.ts";
 
-export { asksForcedOrder };
-
 /** The order questions of a settled state answered with their first option (the order the engine took before the first player chose), while one is open. */
 export function inForcedOrder(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;

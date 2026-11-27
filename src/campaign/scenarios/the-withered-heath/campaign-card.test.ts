@@ -15,7 +15,7 @@ import { reduce, startScenario, type PlayerIntent, type ReduceContext } from "..
 import { openResolution, resolutionResult } from "../../../rules/setup/resolution.ts";
 import { heathLoadout, heathPlan, heathStart, heathWorld } from "../../../../test/scenarios/the-withered-heath/game.ts";
 import { CODES, campaign, heath, heathTable, idOf, loadHeathWorld, send, start, finish, legalIntents, legalTargets, type HeathWorld } from "../../../../test/scenarios/the-withered-heath/scene.ts";
-import { asksForcedOrder } from "../../../../test/harness/forced-order.ts";
+import { asksForcedOrder } from "../../../rules/families/encounter/forced-order.ts";
 
 let ctx: ReduceContext;
 let table: HeathWorld;

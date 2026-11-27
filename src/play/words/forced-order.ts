@@ -47,24 +47,36 @@ function momentWords(event: GameEvent | undefined): string {
   return (event ? MOMENTS[event.trigger] : undefined) ?? "at the same moment";
 }
 
-// The order the card's effects initiate in is its own; the copy is read once the effects of that card are done: the Forced effects ask the order again, or the frame has ended. A copy that stops on a question of the card's own gives no result, and
-// an order that shows something hidden (a reveal, a shuffle, a random pick) is "hidden": the copy would show the card the player may not see yet. Each option costs one reduce (about 1 ms in Desert Crossing, measured with a scratch script:
-// 2 ms for the two-option sheet), and the sheet is built when the window opens, so it keeps no cache (the words hold no module state).
-type Read = Reach | "hidden" | null;
+// The order the card's effects initiate in is its own; the copy is read once the effects of that card are done: the frame of the order has ended (`ended`, the stack is shorter than in the game), or the same order asks again at the same depth (a
+// third card or more is left). An order deeper in the stack is another card's own order, so the copy has not settled. A copy that stops on a question of the card's own gives no result, and an order that shows something hidden (a reveal, a shuffle, a random pick) is "hidden": the copy would
+// show the card the player may not see yet. Each option costs one reduce (about 1 ms in Desert Crossing, measured with a scratch script: 2 ms for the two-option sheet), and the sheet is built when the window opens, so it keeps no cache (the words hold no module state).
+export type Read = { readonly reach: Reach; readonly ended: boolean } | "hidden" | null;
 
 function reachFor(game: ScenarioState, ctx: ReduceContext, names: ChoiceNames, id: string): Read {
   const sent = reduce(game, { type: "Choose", optionId: id }, ctx);
   if (!sent.ok) return null;
   if (showedHidden(game, sent.state)) return "hidden";
-  const settled = asksForcedOrder(sent.state) || sent.state.stack.length < game.stack.length;
-  return settled ? reachOf(game, sent.state, names.card) : null;
+  const where = settledAt(game, sent.state);
+  return where ? { reach: reachOf(game, sent.state, names.card), ended: where === "ended" } : null;
 }
 
-/** The Result of one row: what its order decides when every order was read, all it changes when another is hidden, and why there is none when its own is hidden. Null when the copy stopped on a question of the card's own. */
+/** Where a copy of the game stands after one order was sent: "ended" (the frame of the order is gone), "asking" (the same order asks again at the same depth, a card is left) or null (the card's own question, or another order deeper in the stack: it has not settled). */
+export function settledAt(game: ScenarioState, sent: ScenarioState): "ended" | "asking" | null {
+  if (sent.stack.length < game.stack.length) return "ended";
+  return asksForcedOrder(sent) && sent.stack.length === game.stack.length ? "asking" : null;
+}
+
+/** Whether the orders leave the same table: every copy was read to the end of the order (a card left after the first pick would still differ) and they left it alike. */
+export function sameResult(reads: readonly Read[]): boolean {
+  const known = reads.flatMap((read) => (read && read !== "hidden" ? [read] : []));
+  return known.length > 1 && known.length === reads.length && known.every((read) => read.ended && read.reach.table === known[0]?.reach.table);
+}
+
+/** The Result of one row: what its order decides when every order was read to its end, all it changes when another is hidden, and why there is none when its own is hidden. Null when the copy stopped on a question of the card's own. */
 function resultOf(read: Read, known: readonly Reach[], whole: boolean): string | null {
   if (read === "hidden") return "Result: shown after it resolves (a hidden card turns up).";
   if (read == null) return null;
-  return `Result: ${whole ? decidedBy(read, known) : said(read.parts)}.`;
+  return `Result: ${whole ? decidedBy(read.reach, known) : said(read.reach.parts)}.`;
 }
 
 /** The sheet's words: the title, the question and one row for each card that may resolve next. */
@@ -74,9 +86,10 @@ export function orderForcedWords(game: ScenarioState, ctx: ReduceContext, names:
   const total = instruction.total ?? left;
   const first = left === total;
   const reaches = options.map((id) => reachFor(game, ctx, names, id));
-  const known = reaches.flatMap((reach) => (reach && reach !== "hidden" ? [reach] : []));
-  // The orders reach the same table: every copy was read and they left it alike.
-  const same = reaches.length > 1 && known.length === reaches.length && known.every((reach) => reach.table === known[0]?.table);
+  const known = reaches.flatMap((read) => (read && read !== "hidden" ? [read.reach] : []));
+  const same = sameResult(reaches);
+  // What one order decides is what the others do not do, so it is said only when every order was read to its end; with a card left after the first pick, or a hidden order, each row names all its parts.
+  const whole = reaches.every((read) => read != null && read !== "hidden" && read.ended);
   const ask = first ? "Choose the one that resolves first." : `Choose the one that resolves next (${left} of ${total} left).`;
   const when = first ? ` ${left} Forced effects trigger ${momentWords(data?.kind === "effect" ? data.orderEvent : undefined)}. ${left === 2 ? "The other resolves after it." : "The rest resolve after it."}` : "";
   const rows = Object.fromEntries(
@@ -90,7 +103,7 @@ export function orderForcedWords(game: ScenarioState, ctx: ReduceContext, names:
         const text = effect.lines[0] ? names.line?.(effect.lines[0]) : null;
         return text ? [text] : [];
       }).join(" ");
-      const result = same ? null : resultOf(reaches[at] ?? null, known, known.length === reaches.length);
+      const result = same ? null : resultOf(reaches[at] ?? null, known, whole);
       // The Result comes first: on a short phone the row's detail is cut at its foot, and the printed line is the part a long press shows.
       return [id, { label: copies > 1 ? `${names.card(id)} (${copies} copies)` : names.card(id), detail: [result, line].filter((part) => part).join(" ") || null }];
     }),

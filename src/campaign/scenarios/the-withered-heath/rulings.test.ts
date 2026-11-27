@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { settle } from "../../../rules/engine/machine.ts";
 import type { ScenarioState } from "../../../rules/engine/reduce.ts";
 import { CODES, codesIn, finish, heathTable, idOf, legalIntents, loadHeathWorld, resolveRecords, send, start, type HeathWorld, type PlayerIntent, type Run } from "../../../../test/scenarios/the-withered-heath/scene.ts";
-import { asksForcedOrder } from "../../../../test/harness/forced-order.ts";
+import { asksForcedOrder } from "../../../rules/families/encounter/forced-order.ts";
 
 let world: HeathWorld;
 beforeAll(async () => {

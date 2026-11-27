@@ -8,7 +8,7 @@ import type { EngineStep } from "../../src/rules/core/intents.ts";
 import type { PlayerIntent } from "../../src/rules/engine/reduce.ts";
 
 import type { Act, Done, Row } from "./card-spec-types.ts";
-import { asksForcedOrder } from "./forced-order.ts";
+import { asksForcedOrder } from "../../src/rules/families/encounter/forced-order.ts";
 import { fightEnemy, finish, first, idOf, legalIntents, opening, resolveRecords, revealFromTop, secondSeatHero, send, start as begin, tableFromLayout, type Layout, type LayoutTable, type Run, type ScenePhase } from "./scene-kit.ts";
 
 // Test helper. Plays the actions of a card-spec row (card-spec-types.ts, Act) on a table built from its layout: each action is the scene kit's helper for it (`resolveRecords`, `revealFromTop`, `fightEnemy`, `send` of an

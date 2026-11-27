@@ -12,7 +12,7 @@ import { settle } from "../../../rules/engine/machine.ts";
 import { first, opening, revealFromTop, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { applyChoice } from "../../../rules/windows/choices.ts";
-import { asksForcedOrder } from "../../../../test/harness/forced-order.ts";
+import { asksForcedOrder } from "../../../rules/families/encounter/forced-order.ts";
 import { guldurStart, guldurWorld } from "../../../../test/scenarios/attack-on-dol-guldur/game.ts";
 
 const table = (layout: Layout) => tableFromLayout("attack-on-dol-guldur", layout);

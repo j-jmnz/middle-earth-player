@@ -1,4 +1,4 @@
-// Rules: rr.forced (data/rules/entries.json). What a move changes on the table, said in its words (table-changes.ts): the stats beyond a card's progress, the numbers of the table, bookkeeping that is not named, and what an order decides.
+// Rules: rr.forced (data/rules/entries.json). What a move changes on the table, said in its words (table-changes.ts): the stats beyond a card's progress, the numbers of the table, the modifiers that have no words (compared, not named), the engine's notes that are left out, and what an order decides.
 import { describe, expect, it } from "vitest";
 
 import type { ScenarioState } from "../../rules/core/state.ts";
@@ -28,11 +28,26 @@ describe("reachOf", () => {
     expect(reach.parts[0]).toMatch(/^Temperature \d+ to \d+$/);
   });
 
-  it("names no bookkeeping stat, and a bookkeeping difference alone leaves the tables equal", () => {
-    const noted = withTable("moreStagingThreat", 2);
-    const reach = reachOf(before, noted, name);
-    expect(reach.parts).toEqual([]);
-    expect(reach.table).toBe(reachOf(before, before, name).table);
+  it("compares a modifier that has no words (moreStagingThreat, skipQuestPhase) and names none of them", () => {
+    for (const stat of ["moreStagingThreat", "skipQuestPhase", "doesNotReady"]) {
+      const reach = reachOf(before, withTable(stat, 2), name);
+      expect(reach.parts, stat).toEqual([]);
+      expect(reach.table, stat).not.toBe(reachOf(before, before, name).table);
+    }
+  });
+
+  it("leaves the tables equal for a note of the engine that the table already shows (engagedThisPhase, enemyRevealed, locationRevealed, questTotalAnnounced)", () => {
+    for (const stat of ["engagedThisPhase", "enemyRevealed", "ambushEnemyRevealed", "locationRevealed", "questTotalAnnounced"]) expect(reachOf(before, withTable(stat, 1), name).table, stat).toBe(reachOf(before, before, name).table);
+  });
+
+  it("names a stat with words that expired (the temperature that is gone)", () => {
+    const gone: ScenarioState = { ...before, modifiers: before.modifiers.filter((modifier) => modifier.stat !== "temperature") };
+    expect(reachOf(before, gone, name).parts).toEqual(["Temperature 36 to 0"]);
+  });
+
+  it("tells two tables apart when the seats still to reveal differ (revealCursor is a game fact)", () => {
+    const revealing: ScenarioState = { ...before, revealCursor: { seats: [0], index: 0 } };
+    expect(reachOf(before, revealing, name).table).not.toBe(reachOf(before, before, name).table);
   });
 
   it("leaves the tables equal for a difference that holds no game fact (the order cards entered play in, the frame counter)", () => {

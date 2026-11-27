@@ -34,7 +34,6 @@ const tableOf = (effects: readonly Effect[]) => (layout: Layout): Made => tableF
 const UNDER_TWO: Layout["under"] = [{ code: TOWER, to: SEARCH }, { code: PLAZA, to: SEARCH }];
 const HOST_MOULD = (to: string) => ({ code: MOULD, to, encounter: true as const });
 
-
 /** The options that the keys name, one key for each choice the effects open in turn (the last key again when the choices outnumber them). */
 const inOrder = (...keys: string[]) => {
   let turn = 0;

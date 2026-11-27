@@ -1,15 +1,17 @@
 // Rules: rr.forced (data/rules/entries.json). What one move changes on the table, read from the two states and said in the table's own words: a card's progress, damage and resources, where a card went, whether it is exhausted, a seat's
 // threat and a number the table holds that has words for players (WORDS: the temperature of Desert Crossing, held as a modifier of the table). The reducer decided each number; this only compares.
 import type { CardInstance, ScenarioState } from "../../rules/core/state.ts";
+import { tableFacts } from "../../rules/quest/surge-chain.ts";
 
 const zoneWords = (zone: string): string => zone.replace(/([A-Z])/g, " $1").toLowerCase();
 
-// The numbers the table holds as modifiers of "table" that a player reads, by their stat and in the words that name them. Every other table stat is bookkeeping of the engine (what was explored, how much staging threat was added):
-// it is neither named nor compared.
+// The numbers the table holds as modifiers of "table" that a player reads, by their stat and in the words that name them. Only this list is named in a row; every modifier, these included, is compared.
 const WORDS: Readonly<Record<string, string>> = { temperature: "Temperature" };
 
-// The fields of the state that hold no game fact: the running frames and window, the counters, the undo log, and the order cards entered play in.
-const NO_FACT: ReadonlySet<string> = new Set(["stack", "window", "frameSeq", "undo", "nextId", "seedCursor", "revealCursor", "clock"]);
+// The modifiers left out of the comparison: notes the engine keeps that hold no game fact of their own, each set as a side effect of a change the table shows anyway (a card that moved or turned up), so two orders that reach the same cards never differ by them. `engagedThisPhase` (an enemy engaged: its card moved), `enemyRevealed` and
+// `ambushEnemyRevealed` (the first enemy revealed this round: its card is in the staging area), `locationRevealed` (a location revealed this round) and `questTotalAnnounced` (the quest total was counted: once each phase, whatever the order). Every other modifier (moreStagingThreat, skipQuestPhase, doesNotReady, temperature, a flag on a card) is a game fact. The fields of the state that
+// hold none are left out by `tableFacts` (src/rules/quest/surge-chain.ts), which the surge chain's check shares.
+const BOOKKEEPING: ReadonlySet<string> = new Set(["engagedThisPhase", "enemyRevealed", "ambushEnemyRevealed", "locationRevealed", "questTotalAnnounced"]);
 
 function cardChanges(was: CardInstance, now: CardInstance, name: string): string[] {
   const parts: string[] = [];
@@ -30,14 +32,11 @@ function tableNumbers(game: ScenarioState): Map<string, number> {
   return held;
 }
 
-// The whole reached state as a string, less what holds no game fact: so two moves that leave the same table compare equal.
+// The reached table as a string: the facts of the state (`tableFacts`) and its modifiers but the bookkeeping ones, in a fixed order, so two moves that leave the same table compare equal.
 function tableOf(state: ScenarioState): string {
-  const { cards, modifiers, ...rest } = state;
-  const kept = Object.fromEntries(Object.entries(rest).filter(([key]) => !NO_FACT.has(key)));
-  const held = [...tableNumbers(state)].sort(([a], [b]) => a.localeCompare(b));
-  const own = modifiers.filter((modifier) => modifier.instanceId !== "table").map((modifier) => JSON.stringify(modifier)).sort();
-  const all = Object.values(cards).map(({ enteredPlay: _entered, ...card }) => card).sort((a, b) => a.id.localeCompare(b.id));
-  return JSON.stringify({ kept, cards: all, own, held });
+  const facts = tableFacts(state);
+  const modifiers = facts.modifiers.filter((modifier) => !BOOKKEEPING.has(modifier.stat)).map((modifier) => JSON.stringify(modifier)).sort();
+  return JSON.stringify({ ...facts, modifiers, cards: [...facts.cards].sort((a, b) => a.id.localeCompare(b.id)) });
 }
 
 /** What a move from `before` to `after` reaches: its changes as sentences, and the table it leaves as a string, so two moves that leave the same table compare equal. */
@@ -53,7 +52,8 @@ export function reachOf(before: ScenarioState, after: ScenarioState, nameOf: (ca
     if (from !== seat.threat) parts.push(`${before.seatCount > 1 ? `Player ${at + 1} threat` : "Threat"} ${from} to ${seat.threat}`);
   });
   const was = tableNumbers(before);
-  for (const [stat, amount] of tableNumbers(after)) if ((was.get(stat) ?? 0) !== amount) parts.push(`${WORDS[stat]} ${was.get(stat) ?? 0} to ${amount}`);
+  const now = tableNumbers(after);
+  for (const stat of new Set([...was.keys(), ...now.keys()])) if ((was.get(stat) ?? 0) !== (now.get(stat) ?? 0)) parts.push(`${WORDS[stat]} ${was.get(stat) ?? 0} to ${now.get(stat) ?? 0}`);
   return { parts, table: tableOf(after) };
 }
 

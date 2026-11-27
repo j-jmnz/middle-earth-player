@@ -13,7 +13,8 @@ import { stagingThreat } from "../../../rules/quest/quest.ts";
 import { codesIn, engagedCodes, finish, idOf, idsOf, opened, revealFromTop, send, start, statOf, tableFromLayout, zoneOf, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
 import { sendUnledgered } from "../../../../test/harness/player-table.ts";
-import { SID, BROOD, GUARDIAN, BROODLING, BURROW, TUNNEL, NEST, CAVERN, PASSAGE, FORCED, GRABBED, LOST, CAVES, HIVE, OFF, ON, VIPER, SCORPION, PLACE, RIDE_TO_RUIN, SCOUT, EOWYN, INJURED, tableOf, inDiscard, inDeck, has, resourcesOf, damageOf, pick, inZone, travelTo, heroOfSeat, undefendedOn, fought, revealed, questedTo, hitFor, progressOf, threatsOf, surviving } from "./audit-kit.ts";
+import { SID, BROOD, GUARDIAN, BROODLING, BURROW, TUNNEL, NEST, CAVERN, PASSAGE, FORCED, GRABBED, LOST, CAVES, HIVE, OFF, ON, VIPER, SCORPION, PLACE, RIDE_TO_RUIN, SCOUT, EOWYN, INJURED, tableOf, inDiscard, inDeck, has, resourcesOf, damageOf, inZone, travelTo, heroOfSeat, undefendedOn, fought, revealed, questedTo, hitFor, progressOf, threatsOf, surviving } from "./audit-kit.ts";
+import { pick } from "../../../../test/harness/pick.ts";
 
 describe("17065 Brood Mother", () => {
   lineSpec("17065:A:1", "Brood Mother takes no damage from an attack that would damage another enemy, and no attachment can be attached to her", (effects) => {
