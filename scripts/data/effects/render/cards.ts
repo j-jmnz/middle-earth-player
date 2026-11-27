@@ -11,14 +11,14 @@ import { renderRecord } from "./record.ts";
 export type CardRender = { text: string; tally: Tally };
 
 // `rawLines`: every printed ledger line of the card in order (the ones generate.ts drops as keyword-only included). `pile`: where the scenario deals the card (encounter, quest, staging...), which places it with no record. `perPlayer`: the pile places that many copies for each player (the other copies stay in the encounter deck).
-export type CardExtras = { rawLines?: readonly { lineId: string; line: string }[]; pile?: string; perPlayer?: number; finalStage?: boolean; checks?: boolean };
+export type CardExtras = { rawLines?: readonly { lineId: string; line: string }[]; pile?: string; perPlayer?: number; finalStage?: boolean; checks?: boolean; nameOf?: (code: string) => string | undefined };
 
 // `checks`: print under each line the checks that apply to it (checks.ts), which the reading judge answers.
 // `inert`: the ledger line ids marked inert (a reminder or keyword the engine applies by rule), which need no record.
 export function renderCard(card: Card, segments: readonly Segment[], effects: readonly Effect[], inert: ReadonlySet<string>, extras: CardExtras = {}): CardRender {
   const own = effects.filter((effect) => effect.cardCode === card.code);
   const rows = extras.rawLines ?? segments.map((segment) => ({ lineId: segment.lineId, line: segment.line }));
-  const ctx = newCtx({ effects: effects as unknown as readonly Obj[], cardName: card.name, cardType: card.type, lineTexts: new Map(rows.map((row) => [row.lineId, row.line])), ...(extras.finalStage ? { finalStage: true } : {}) });
+  const ctx = newCtx({ effects: effects as unknown as readonly Obj[], cardName: card.name, cardType: card.type, lineTexts: new Map(rows.map((row) => [row.lineId, row.line])), ...(extras.nameOf ? { nameOf: extras.nameOf } : {}), ...(extras.finalStage ? { finalStage: true } : {}) });
   const known = new Set(segments.map((segment) => segment.lineId));
   const bySegment = new Map(segments.map((segment) => [segment.lineId, segment]));
   const out: string[] = [`## ${card.code} ${card.name}`];

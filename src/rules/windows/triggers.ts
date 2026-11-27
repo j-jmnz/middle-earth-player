@@ -57,21 +57,18 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, tim
       found.push({ effect, instance });
     }
   }
-  // An `early` effect first, then the oldest card first.
-  return found.sort(
-    (left, right) =>
-      Number(right.effect.early === true) - Number(left.effect.early === true) ||
-      left.instance.enteredPlay - right.instance.enteredPlay ||
-      left.instance.id.localeCompare(right.instance.id, undefined, { numeric: true }),
-  );
+  // The oldest card first.
+  return found.sort((left, right) => left.instance.enteredPlay - right.instance.enteredPlay || left.instance.id.localeCompare(right.instance.id, undefined, { numeric: true }));
 }
 
 // The Forced effects of one event are initiated in the order the first player chooses (rr.forced: "the first player determines the order in which the abilities initiate, regardless of who controls the cards bearing those
 // abilities"; "each forced ability must resolve as completely as possible before the next ... may initiate"). With effects that differ on two or more cards a frame asks the first player (OrderForced); otherwise the
-// default order stands: an `early` effect first, then the oldest card first.
+// default order stands: the oldest card first.
 function pushForced(state: ScenarioState, found: readonly Found[], event: GameEvent, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const first = found[0];
-  if (!first || !forcedOrderDiffers(found)) return pushFound(state, found, event, ctx, steps);
+  if (found.length === 0 || !forcedOrderDiffers(found)) return pushFound(state, found, event, ctx, steps);
+  // The frame is named for the effect that may initiate first (what the cards print holds the others back).
+  const first = found.find((one) => one.instance.id === orderOptions(found)[0]) ?? found[0];
+  if (!first) return state;
   // An effect with a limit spends its use as it triggers, so an effect that waits for the order cannot fire a second time meanwhile ("Limit once per round").
   const spent = found.reduce((current, one) => noteForcedUse(current, one.effect, one.instance.id, forcedActor(state, one.instance, event, ctx)), state);
   return pushEffectFrame(
@@ -92,30 +89,41 @@ function pushForced(state: ScenarioState, found: readonly Found[], event: GameEv
   );
 }
 
-// Two or more cards bear effects, and not all of them the same effects (two copies of one card change nothing by their order).
-/** Whether the cards bearing these effects differ: the first player has a choice of order. */
-export function forcedOrderDiffers(found: readonly Found[]): boolean {
-  return new Set(found.map(signature)).size >= 2;
+// The effects the card `sourceId` bears among `entries`, as one string: two cards with the same string change nothing by their order.
+function bornEffects(entries: readonly { effectId: string; sourceId: string }[], sourceId: string): string {
+  return entries.filter((entry) => entry.sourceId === sourceId).map((entry) => entry.effectId).join(",");
 }
 
-// The effects the card of `one` bears among `found`, as one string.
-function signature(one: Found, _at: number, found: readonly Found[]): string {
-  return found.filter((other) => other.instance.id === one.instance.id).map((other) => other.effect.id).join(",");
+const entriesOf = (found: readonly Found[]): { effectId: string; sourceId: string }[] => found.map((one) => ({ effectId: one.effect.id, sourceId: one.instance.id }));
+
+// Two or more cards bear effects, and not all of them the same effects (two copies of one card change nothing by their order).
+function forcedOrderDiffers(found: readonly Found[]): boolean {
+  const entries = entriesOf(found);
+  return new Set(found.map((one) => bornEffects(entries, one.instance.id))).size >= 2;
+}
+
+/** How many cards among the `entries` print the same card as `sourceId` and bear the same effects: the copies a row of the order window stands for. */
+export function copiesInOrder(entries: readonly { effectId: string; sourceId: string }[], codeOf: (sourceId: string) => string | undefined, sourceId: string): number {
+  const sign = bornEffects(entries, sourceId);
+  return new Set(entries.filter((entry) => codeOf(entry.sourceId) === codeOf(sourceId) && bornEffects(entries, entry.sourceId) === sign).map((entry) => entry.sourceId)).size;
 }
 
 /**
- * The cards whose effects may initiate next, one card for each set of effects, in the default order. What the cards print holds back some: an `early` effect initiates before the rest, and an effect printed "After resolving the Forced
+ * The cards whose effects may initiate next, one card for each set of effects, in the default order. What the cards print holds back some: an effect printed "After resolving the Forced
  * effect on X" (`afterForcedOn`) waits while a card with that code still has effects to initiate (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 5).
  */
 export function orderOptions(found: readonly Found[]): string[] {
-  const waiting = (one: Found): boolean => one.effect.afterForcedOn != null && found.some((other) => other.instance.id !== one.instance.id && other.instance.code === one.effect.afterForcedOn);
+  const waiting = (one: Found): boolean => {
+    const codes = [one.effect.afterForcedOn ?? []].flat();
+    return found.some((other) => other.instance.id !== one.instance.id && codes.includes(other.instance.code));
+  };
   const free = found.filter((one) => !waiting(one));
   const ready = free.length > 0 ? free : found;
-  const early = ready.filter((one) => one.effect.early === true);
+  const entries = entriesOf(found);
   const seen = new Set<string>();
   const options: string[] = [];
-  for (const one of early.length > 0 ? early : ready) {
-    const sign = signature(one, 0, found);
+  for (const one of ready) {
+    const sign = bornEffects(entries, one.instance.id);
     if (seen.has(sign) || options.includes(one.instance.id)) continue;
     seen.add(sign);
     options.push(one.instance.id);

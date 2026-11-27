@@ -85,7 +85,11 @@ describe("Shadow effects", () => {
 
   it("Ungoliant's Swarm put into play engaged by its shadow is eligible to attack in that combat phase (01136:A:2, rr.step-6-4a)", () => {
     const { run } = fight(world, "01136", "grunt");
-    expect(run.state.resolvedAttacks).not.toContain(first(run.state, "01136"));
+    const swarm = first(run.state, "01136");
+    // The grunt's attack is over; the combat phase goes on to the Swarm's attack, which has not been made: a defense window with the Swarm as the attacker.
+    expect(run.state.resolvedAttacks).not.toContain(swarm);
+    expect(run.state.pendingAttack?.enemyId).toBe(swarm);
+    expect(run.state.window?.kind).toBe("defense");
   });
 
   it("Lingering Venom exhausts each damaged character the defending player controls (01137:A:3)", () => {

@@ -1,5 +1,5 @@
 // Rules: rr.forced, rr.limits, rr.response (data/rules/entries.json). The first player's choice of the order the Forced effects of one moment initiate in (OrderForced, families/encounter/forced-order.ts): when a window opens and when it does not,
-// what the cards print holds back (`early`, `afterForcedOn`), a limit spent as the effect triggers, and the lasting effects that lapse as a phase or round ends holding for the Forced effects and the Responses at that end.
+// what the cards print holds back (`afterForcedOn`), a limit spent as the effect triggers, and the lasting effects that lapse as a phase or round ends holding for the Forced effects and the Responses at that end.
 import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../catalog/boundary.ts";
@@ -65,14 +65,13 @@ describe("the order window opens only when the Forced effects differ", () => {
 });
 
 describe("what the cards print holds an order back", () => {
-  it("an early effect initiates before the rest and is never an option", () => {
-    const { ctx, state } = table(["b", "c", "a"], [forced("a:forced:1", "a", 1, { early: true }), forced("b:forced:1", "b", 2), forced("c:forced:1", "c", 3)]);
+  it("an effect that waits for any of several codes (50907:A:1, each stage 3) initiates after the one in play", () => {
+    const { ctx, state } = table(["a", "b", "c"], [forced("a:forced:1", "a", 1, { afterForcedOn: ["b", "x"] }), forced("b:forced:1", "b", 2), forced("c:forced:1", "c", 3)]);
     const steps: EngineStep[] = [];
     const question = settle(fireForced(state, EVENT, ctx, steps), ctx, steps);
-    expect(threats(steps)).toEqual([1]);
     expect(codesOf(question, asked(question))).toEqual(["b", "c"]);
     settle(applyChoice(question, asked(question)[1] ?? ""), ctx, steps);
-    expect(threats(steps)).toEqual([1, 3, 2]);
+    expect(threats(steps)).toEqual([3, 2, 1]);
   });
 
   it("an effect printed \"after resolving the Forced effect on\" a card waits for that card's effects", () => {

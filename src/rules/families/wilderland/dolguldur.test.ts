@@ -1,5 +1,5 @@
 // Rules: rr.destroy, rr.explored, rr.the-word-choose, rr.forced, mec109.indestructible (data/rules/entries.json); ledger lines 50907:A:1, 50931:B:1, 50931:B:2, 50930:A:2, 50903:B:2 (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, readings 4, 5, 6, 8 and 18).
-// The pieces Attack on Dol Guldur adds, on fixture cards: TallySiege and the amount siegeTally, SelectRandomStage with the condition optionTaken, the flag losesIndestructible, an `early` Forced effect and AdvanceToStage `again`.
+// The pieces Attack on Dol Guldur adds, on fixture cards: TallySiege and the amount siegeTally, SelectRandomStage with the condition optionTaken, the flag losesIndestructible and AdvanceToStage `again`.
 import { describe, expect, it } from "vitest";
 
 import { indestructible, modifiedStat } from "../../core/keywords.ts";
@@ -10,7 +10,6 @@ import { holds } from "../../interpret/conditions.ts";
 import { resolveAmount } from "../../interpret/amounts.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
-import { fireForced } from "../../windows/triggers.ts";
 import { topFrame } from "../../windows/windows.ts";
 import { cancelBarred } from "../encounter/cancel.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
@@ -77,21 +76,6 @@ describe("the flag losesIndestructible (50931:B:1)", () => {
     const flagged: ScenarioState = { ...urdug.state, modifiers: [...urdug.state.modifiers, { instanceId: urdug.id, sourceId: urdug.id, stat: "losesIndestructible", amount: 1, until: "whileSourceInPlay" }] };
     expect(indestructible(flagged, urdug.id, printed)).toBe(false);
     expect(printed.keywords.indestructible).toBe(true);
-  });
-});
-
-describe("`early` Forced effects (50907:A:1, reading 5)", () => {
-  const forcedAtEnd = (cardCode: string, extra: Partial<Parameters<typeof record>[4]> = {}) => record(`${cardCode}:forced:1`, cardCode, "forced", [{ verb: "ShuffleEncounterDeck" }], { trigger: "endOfRound", ...extra });
-
-  it("resolves before the older card's Forced effect, which otherwise comes first", () => {
-    const older = spawn(table(), "siegePlace", { zone: "staging" });
-    const newer = spawn(older.state, "siegeEnemy", { zone: "staging" });
-    const bumped = updateCard(newer.state, newer.id, { enteredPlay: (newer.state.cards[older.id]?.enteredPlay ?? 0) + 5 });
-    const event = { trigger: "endOfRound", seat: null, phase: "End of round" } as const;
-    const plain = fireForced(bumped, event, ctxOf([forcedAtEnd("siegePlace"), forcedAtEnd("siegeEnemy")]), []);
-    expect(topFrame(plain)?.data).toMatchObject({ kind: "effect", effectId: "siegePlace:forced:1" });
-    const early = fireForced(bumped, event, ctxOf([forcedAtEnd("siegePlace"), forcedAtEnd("siegeEnemy", { early: true })]), []);
-    expect(topFrame(early)?.data).toMatchObject({ kind: "effect", effectId: "siegeEnemy:forced:1" });
   });
 });
 

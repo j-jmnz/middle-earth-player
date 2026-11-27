@@ -2,12 +2,14 @@
 // comes from the engine, not from a record, so its words are written here. Each row is a card with its Forced line in its printed words and what that order does, found by sending the Choose on a copy of the game, as the fire rows and
 // branchNow read a pick's outcome (the reducer decides, nothing here writes a number).
 import type { Instruction } from "../../catalog/boundary.ts";
-import { temperatureOf } from "../../rules/families/haradrim/heat.ts";
 import type { GameEvent, ScenarioState } from "../../rules/core/state.ts";
 import { reduce, type ReduceContext } from "../../rules/engine/reduce.ts";
+import { showedHidden } from "../../rules/engine/undo.ts";
 import { effectById } from "../../rules/windows/listen.ts";
+import { copiesInOrder } from "../../rules/windows/triggers.ts";
 import { topFrame } from "../../rules/windows/windows.ts";
 
+import { decidedBy, reachOf, type Reach } from "./table-changes.ts";
 import type { AskedWords } from "./asks.ts";
 import type { ChoiceNames } from "./choice.ts";
 
@@ -44,41 +46,11 @@ function momentWords(event: GameEvent | undefined): string {
   return (event ? MOMENTS[event.trigger] : undefined) ?? "at the same moment";
 }
 
-// What the table holds that an order can change: the quest stages' progress, the temperature, each seat's threat and the damage on the heroes.
-function readings(game: ScenarioState): Readonly<Record<string, number>> {
-  const cards = Object.values(game.cards);
-  const read: Record<string, number> = {
-    progress: cards.filter((card) => card.zone === "questStage").reduce((sum, card) => sum + card.progress, 0),
-    damage: cards.filter((card) => card.zone === "heroes").reduce((sum, card) => sum + card.damage, 0),
-  };
-  const temperature = temperatureOf(game);
-  if (temperature != null) read.temperature = temperature;
-  game.seats.forEach((seat, at) => {
-    read[`threat${at}`] = seat.threat;
-  });
-  return read;
-}
-
-const NAMES: Readonly<Record<string, string>> = { progress: "quest progress", damage: "damage on the heroes", temperature: "temperature" };
-
-/** What the order changes, in the table's own words: "quest progress 6 to 2, temperature 36 to 40". */
-function changes(before: ScenarioState, after: ScenarioState): string {
-  const was = readings(before);
-  const now = readings(after);
-  const parts = Object.keys(now).flatMap((key) => {
-    const from = was[key] ?? 0;
-    if (from === now[key]) return [];
-    const seat = /^threat(\d)$/.exec(key);
-    const name = seat ? (before.seatCount > 1 ? `Player ${Number(seat[1]) + 1} threat` : "threat") : (NAMES[key] ?? key);
-    return [`${name} ${from} to ${now[key]}`];
-  });
-  return parts.length > 0 ? parts.join(", ") : "nothing else changes";
-}
-
-// The order the card's effects initiate in is its own; the result of sending the Choose is read once the effects of that card are done (up to the next question).
-function resultOf(game: ScenarioState, ctx: ReduceContext, id: string): string | null {
+// The order the card's effects initiate in is its own; the copy is read once the effects of that card are done (up to the next question). An order that shows something hidden (a reveal, a shuffle, a random pick) gives no result: the
+// copy would show the card the player may not see yet. Each option costs one reduce (about 1 ms in Desert Crossing, measured with a scratch script: 2 ms for the two-option sheet), and the sheet is built when the window opens, so it keeps no cache (the words hold no module state).
+function reachFor(game: ScenarioState, ctx: ReduceContext, names: ChoiceNames, id: string): Reach | null {
   const sent = reduce(game, { type: "Choose", optionId: id }, ctx);
-  return sent.ok ? changes(game, sent.state) : null;
+  return sent.ok && !showedHidden(game, sent.state) ? reachOf(game, sent.state, names.card) : null;
 }
 
 /** The sheet's words: the title, the question and one row for each card that may resolve next. */
@@ -87,8 +59,10 @@ export function orderForcedWords(game: ScenarioState, ctx: ReduceContext, names:
   const left = instruction.entries.length;
   const total = instruction.total ?? left;
   const first = left === total;
-  const results = options.map((id) => resultOf(game, ctx, id));
-  const same = results.length > 1 && results.every((result) => result != null && result === results[0]);
+  const reaches = options.map((id) => reachFor(game, ctx, names, id));
+  const known = reaches.flatMap((reach) => (reach ? [reach] : []));
+  // The orders reach the same table: every copy was read and they left it alike.
+  const same = reaches.length > 1 && known.length === reaches.length && known.every((reach) => reach.table === known[0]?.table);
   const ask = first ? "Choose the one that resolves first." : `Choose the one that resolves next (${left} of ${total} left).`;
   const when = first ? ` ${left} Forced effects trigger ${momentWords(data?.kind === "effect" ? data.orderEvent : undefined)}. ${left === 2 ? "The other resolves after it." : "The rest resolve after it."}` : "";
   const rows = Object.fromEntries(
@@ -97,13 +71,13 @@ export function orderForcedWords(game: ScenarioState, ctx: ReduceContext, names:
         const effect = effectById(ctx, entry.effectId);
         return effect ? [effect] : [];
       });
-      const sign = effects.map((effect) => effect.id).join(",");
-      const copies = new Set(instruction.entries.filter((entry) => game.cards[entry.sourceId]?.code === game.cards[id]?.code && instruction.entries.filter((other) => other.sourceId === entry.sourceId).map((other) => other.effectId).join(",") === sign).map((entry) => entry.sourceId)).size;
+      const copies = copiesInOrder(instruction.entries, (sourceId) => game.cards[sourceId]?.code, id);
       const line = effects.flatMap((effect) => {
         const text = effect.lines[0] ? names.line?.(effect.lines[0]) : null;
         return text ? [text] : [];
       }).join(" ");
-      const result = same || results[at] == null ? null : `Result: ${results[at]}.`;
+      const reach = reaches[at];
+      const result = same || reach == null ? null : `Result: ${decidedBy(reach, known)}.`;
       return [id, { label: copies > 1 ? `${names.card(id)} (${copies} copies)` : names.card(id), detail: [line, result].filter((part) => part).join(" ") || null }];
     }),
   );

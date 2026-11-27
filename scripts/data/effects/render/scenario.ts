@@ -77,7 +77,7 @@ export function renderCodes(env: RenderEnv, codes: readonly string[], piles: Rea
     const card = env.byCode.get(code);
     if (!card) continue;
     const rawLines = (["A", "B"] as const).flatMap((side) => (env.ledger.byKey.get(keyOf(code, side))?.lines ?? []).map((line, at) => ({ lineId: lineId(code, side, at + 1), line })));
-    const rendered = renderCard(card, segmentsOf(card, env.ledger), EFFECTS, env.inertIds, { ...(rawLines.length > 0 ? { rawLines } : {}), ...(piles.has(code) ? { pile: piles.get(code) } : {}), ...(perPlayer.has(code) ? { perPlayer: perPlayer.get(code) } : {}), ...(finalStageCodes().has(code) ? { finalStage: true } : {}), ...(checks ? { checks: true } : {}) });
+    const rendered = renderCard(card, segmentsOf(card, env.ledger), EFFECTS, env.inertIds, { nameOf: (named: string) => env.byCode.get(named)?.name, ...(rawLines.length > 0 ? { rawLines } : {}), ...(piles.has(code) ? { pile: piles.get(code) } : {}), ...(perPlayer.has(code) ? { perPlayer: perPlayer.get(code) } : {}), ...(finalStageCodes().has(code) ? { finalStage: true } : {}), ...(checks ? { checks: true } : {}) });
     total.template += rendered.tally.template;
     total.json += rendered.tally.json;
     sections.push(rendered.text);

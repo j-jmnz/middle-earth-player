@@ -346,7 +346,7 @@ export type ScenarioState = {
   // Which instance of a phase is running: enterMode counts up when an additional instance begins, and the end-of-phase machinery (triggers.ts crossBoundary) compares it with `boundarySeq`, the count it last saw, so an instance of the phase in progress ends like any other phase. Absent in every game with no additional instance.
   phaseSeq?: number;
   boundarySeq?: number;
-  // The lasting effects that expired as a phase or round ended, kept while crossBoundary (triggers.ts) collects the Forced effects of that end (docs/scenarios/haradrim/beneath-the-sands.md, Readings); absent in every settled state.
+  // The lasting effects that expired as a phase or round ended, kept while crossBoundary (triggers.ts) collects the Forced effects and the Responses offered at that end (docs/scenarios/haradrim/beneath-the-sands.md, Readings); absent in every settled state. A game that ends on a loss before crossBoundary finishes keeps them.
   lapsedModifiers?: readonly Modifier[];
   // The seats that have had their travel opportunity this round while stages are separate: each seat in player order may travel to a location of its own
   // staging area (machine.ts, travel.ts).

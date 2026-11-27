@@ -139,7 +139,7 @@ describe("the bars of the locations reach that location only", () => {
 });
 
 describe("the Forced effects at the end of the round at stage 3 keep the order their cards print (rr.forced, reading 5)", () => {
-  // 50907:A:1 "after resolving the Forced effect on each stage 3" (the stage's `early` effect first) and 50931:B:2 "After resolving the Forced effect on Dol Guldur": the first player is offered no order that breaks either.
+  // 50907:A:1 "after resolving the Forced effect on each stage 3" (`afterForcedOn` the stage codes) and 50931:B:2 "After resolving the Forced effect on Dol Guldur": the first player is offered no order that breaks either.
   it("the stage's Forced effect, Dol Guldur's reduction, the win check and the random stage resolve in that order, and the first player is never asked for an order", () => {
     const made = table({ threat: [0, 0], modeCard: true, stage: "50903", progress: 3, staging: [DG(10)], deck: PLACES });
     const steps: Parameters<typeof settle>[2] = [];

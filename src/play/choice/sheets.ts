@@ -331,7 +331,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       return {
         ...base,
         ...(asked.title ? { title: asked.title } : {}),
-        ...immuneRefusals(game, ctx, names, wait?.kind === "target" ? wait.item.instruction : null, window.options, source),
+        ...immuneRefusals(game, ctx, names, wait?.kind === "target" ? wait.item.instruction : null, window.options, source, window.seat),
         ...(stopsDefenders ? { alternative: { label: "No more defenders", intent: { type: "Choose" as const, optionId: DONE } } } : {}),
         note: [`${asked.prompt}${asked.owned ? "" : who}`, committedNote(game, ctx, effect, window.seat), asked.bare ? null : line].filter((part) => part != null).join(" "),
         printed: asked.bare ? null : line,

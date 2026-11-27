@@ -5,7 +5,7 @@ type AmountOfCity = Exclude<Amount, number>;
 // Records for Attack on Dol Guldur (standalone-scenarios cycle part 9, no campaign card). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) or another card prints
 // word for word needs no record here. Played in the Standard Game Mode only (docs/scenarios/standalone-scenarios/attack-on-dol-guldur.md, Attack on Dol Guldur, reading 1): "each stage", "each team" and "at this stage" read as the one table. The mode card 50931 is the scenario's
 // `modeCard`: its front Setup runs with the quest card's, then it is flipped and its back works all game. City strength is the resource tokens on Dol Guldur (reading 3); the Siege values of the enemies destroyed and the locations
-// explored are added to a round tally as they happen (reading 4) and Dol Guldur's Forced effect takes the tally off at the end of the round. At the end of the round at stage 3 the stage's Forced effect (`early`) resolves first, then Dol Guldur's,
+// explored are added to a round tally as they happen (reading 4) and Dol Guldur's Forced effect takes the tally off at the end of the round. At the end of the round at stage 3 the stage's Forced effect resolves first, then Dol Guldur's (`afterForcedOn`),
 // then the mode card's win check and last its random stage (reading 5).
 // Rules: rr.forced, rr.response, rr.then, rr.travel, rr.first-player, rr.victory, rr.the-word-choose, rr.engaged, rr.destroy, rr.explored, rr.in-play-and-out-of-play, rr.cancel, rr.damage, faq.additional-attacks, faq.lasting-effects (data/rules/entries.json).
 const MODE = "50931";
@@ -141,7 +141,6 @@ const stageForced = (stage: (typeof STAGES_3)[number]): Effect => {
     lines: [`${stage}:B:2`],
     timing: "forced",
     trigger: "endOfRound",
-    early: true,
     instructions: [
       {
         verb: "Choose",
@@ -277,7 +276,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // stage's own (reading 5).
   { id: "50907:forced:1", cardCode: DOL_GULDUR, lines: ["50907:A:1"], timing: "forced", trigger: "enemyDestroyed", subject: { type: "enemy", control: "any", staging: true }, instructions: [{ verb: "TallySiege" }] },
   { id: "50907:forced:2", cardCode: DOL_GULDUR, lines: ["50907:A:1"], timing: "forced", trigger: "locationExplored", subject: { type: "location", control: "any" }, instructions: [{ verb: "TallySiege" }] },
-  { id: "50907:forced:3", cardCode: DOL_GULDUR, lines: ["50907:A:1"], timing: "forced", trigger: "endOfRound", condition: AT_STAGE_3, instructions: [{ verb: "RemoveResourceTokens", amount: { siegeTally: true }, code: DOL_GULDUR }] },
+  { id: "50907:forced:3", cardCode: DOL_GULDUR, lines: ["50907:A:1"], timing: "forced", trigger: "endOfRound", afterForcedOn: [...STAGES_3], condition: AT_STAGE_3, instructions: [{ verb: "RemoveResourceTokens", amount: { siegeTally: true }, code: DOL_GULDUR }] },
 
   // 50908 Power of Lórien: while a player controls it, a Response adds it to the victory display to cancel and discard the encounter card just revealed from the encounter deck (reading 19).
   {

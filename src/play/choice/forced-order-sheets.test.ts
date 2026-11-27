@@ -17,8 +17,8 @@ import { trayTiles } from "./tray-logic.ts";
 const SOLO: Layout = { seats: 1, stage: "16068", progress: 6, temperature: 36, staging: ["16023"], phase: "Combat" };
 
 // The table passes until the engine opens the order window at the end of the round.
-function asked(layout: Layout) {
-  const made = tableFromLayout("desert-crossing", layout);
+function asked(layout: Layout, scenario = "desert-crossing") {
+  const made = tableFromLayout(scenario, layout);
   let run = start(made.state);
   for (let pass = 0; pass < 60 && !asksForcedOrder(run.state); pass += 1) {
     const intent = legalIntents(run.state, made.ctx).find((one) => ["Pass", "DeclineAttack", "DeclineEngage", "DeclineTravel", "Keep"].includes(one.type));
@@ -53,9 +53,10 @@ describe("the order of simultaneous Forced effects on the sheet", () => {
     const shade = rows.find((row) => row.label === "Seek Shade");
     const stage = rows.find((row) => row.label === "The Desert of Harad");
     // Seek Shade removes 4 progress at 40 and 3 at 36 (the stage's +4 comes first or after).
-    expect(stage?.detail).toContain("quest progress 6 to 2");
-    expect(shade?.detail).toContain("quest progress 6 to 3");
-    expect(stage?.detail).toContain("temperature 36 to 40");
+    expect(stage?.detail).toContain("The Desert of Harad progress 6 to 2");
+    expect(shade?.detail).toContain("The Desert of Harad progress 6 to 3");
+    // The temperature rises either way: it is not what the order decides.
+    expect(stage?.detail?.split("Result:")[1]).not.toContain("temperature");
   });
 
   it("two-handed the title names the first player and the note still starts with the question", () => {
@@ -82,5 +83,30 @@ describe("three cards or more", () => {
     expect(next.verb).toBe("Resolve next");
     expect(next.rows?.[shade.id]?.label).toBe("Seek Shade (2 copies)");
     expect(next.rows?.[stage.id]?.label).toBe("The Desert of Harad");
+  });
+});
+
+describe("what the words claim of an order", () => {
+  it("gives no result for an order that reveals a card, so the sheet shows nothing hidden (50820:A:2 with 50812:A:1)", () => {
+    // City Wall at 2 resource tokens reveals an encounter card at the end of the round; Annúminas takes damage for each enemy.
+    const { sheet } = asked({ seats: 1, phase: "Combat", deck: ["50821", "50822"], staging: [{ code: "50820", resources: 2 }, { code: "50812", resources: 10 }] }, "the-siege-of-annuminas");
+    const rows = trayTiles(sheet);
+    const wall = rows.find((row) => row.label === "City Wall");
+    expect(wall, JSON.stringify(rows.map((row) => row.label))).toBeDefined();
+    expect(wall?.detail).not.toContain("Result:");
+    expect(sheet.note).not.toContain("Same result");
+  });
+
+  it("keeps the sentence of when the effects trigger in the first question when what a card prints narrows the options", () => {
+    const { state, ctx, names } = asked(SOLO);
+    const shade = Object.values(state.cards).find((card) => card.code === "16023");
+    const stage = Object.values(state.cards).find((card) => card.code === "16068");
+    if (!shade || !stage) throw new Error("no Seek Shade or stage");
+    const entries = [
+      { effectId: "16023:forced:1", sourceId: shade.id },
+      { effectId: "16068:forced:1", sourceId: stage.id },
+    ];
+    const words = orderForcedWords(state, ctx, names, { verb: "OrderForced", entries, total: 2 }, [shade.id]);
+    expect(words.prompt).toContain("2 Forced effects trigger at the end of the round.");
   });
 });
