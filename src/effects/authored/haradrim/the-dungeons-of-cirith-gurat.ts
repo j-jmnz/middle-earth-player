@@ -33,10 +33,10 @@ const THREAT_BEATS_ALLY: Condition = { kind: "all", conditions: [{ kind: "threat
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 17119 The Captives of Cirith Gurat (objective). A character attached to an encounter card is a guarded objective with a blank text box (the captive zone, blankText); when it is attached its tokens and attachments are discarded
-  // (Forced on `attached`); when the encounter card that holds it leaves play it is free of encounters and its owner takes control of it, exhausted (Forced on `leftPlay`, RescueCaptured).
+  // (Forced on `attached`); when the encounter card that holds it leaves play it is free of encounters and its owner takes control of it, exhausted (Forced on `leftPlay`, RescueCaptured; a side quest that holds one rescues them itself when it is defeated, 17131:A:2).
   { id: `${CAPTIVES}:constant:1`, cardCode: CAPTIVES, lines: [`${CAPTIVES}:A:1`], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "blankText", amount: 1, until: "whileSourceInPlay", holders: CAPTIVE }] },
   { id: `${CAPTIVES}:forced:1`, cardCode: CAPTIVES, lines: [`${CAPTIVES}:A:2`], timing: "forced", trigger: "attached", subject: CAPTIVE, instructions: [{ verb: "StripCaptive" }] },
-  { id: `${CAPTIVES}:forced:2`, cardCode: CAPTIVES, lines: [`${CAPTIVES}:A:3`], timing: "forced", trigger: "leftPlay", subject: GUARDING, instructions: [{ verb: "RescueCaptured" }] },
+  { id: `${CAPTIVES}:forced:2`, cardCode: CAPTIVES, lines: [`${CAPTIVES}:A:3`], timing: "forced", trigger: "leftPlay", subject: { ...GUARDING, enemyOrLocation: true }, instructions: [{ verb: "RescueCaptured" }] },
 
   // 17120 Abaan (objective ally; A:3, the loss, is a template). While free of encounters the first player gains control of him; Response: after he exhausts, a Harad character gets +1 Willpower, Attack and Defense for the round.
   { id: `${ABAAN}:constant:1`, cardCode: ABAAN, lines: [`${ABAAN}:A:1`], timing: "constant", instructions: [{ verb: "GainControlWhenFree", who: "firstPlayer" }] },

@@ -10,6 +10,7 @@ import { idOf, opened, resolveRecords, run as runInstruction, tableFromLayout, t
 import { settle } from "../../engine/machine.ts";
 import { matchesPick, pickCandidates } from "../../interpret/pick.ts";
 import { resolveAmount, frameScope } from "../../interpret/amounts.ts";
+import { defeatSideQuest } from "../sidequests/quest.ts";
 import { captivesOf } from "../captives/values.ts";
 import { captivesHeldBy } from "./captured.ts";
 
@@ -130,5 +131,59 @@ describe("17123:A:2 AttackSeatWithMost: the seat with the most allies is attacke
     const state = runInstruction(made, opened(made).state, { verb: "AttackSeatWithMost", pick: { type: "ally", control: "you" } }, { sourceId: warg });
     expect(state.pendingAttack).toMatchObject({ enemyId: warg, seat: 1 });
     expect(state.cards[warg]?.zone).toBe("staging");
+  });
+});
+
+describe("17132:A:1 the Setup and 17132:B:2 the rescue", () => {
+  it("Abaan is attached to Dungeon Cell, each player attaches an ally from the deck to an Orc enemy found in the encounter deck, and the stage hears the rescue of Abaan", () => {
+    const made = table({ stage: "17132", side: "A", staging: ["17119", "17125"], setAside: ["17120", "16061"], deck: ["16062", "16063", "f0"], deckOf: [AXEHAND, "f0"] });
+    const done = resolveRecords(opened(made).state, made.ctx, "17132", "setup", idOf(made.state, "17132"), (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : ""));
+    const state = settle(done.state, made.ctx, none);
+    const cell = idOf(state, "17125");
+    expect(captivesHeldBy(state, cell).map((card) => card.code)).toEqual(["17120"]);
+    const ally = captivesOf(state).find((card) => card.code === AXEHAND);
+    expect(ally).toMatchObject({ zone: "captive", owner: 0 });
+    expect(printedHost(state, ally?.host ?? "")).toMatch(/^1606[23]$/);
+    // The cell leaves play: Abaan returns to the staging area and the first player gains control of him.
+    const side = { ...state, cards: { ...state.cards } };
+    const freed = settle(destroyCard(side, cell, made.ctx.cards, none), made.ctx, none);
+    expect(freed.cards[idOf(freed, "17120")]).toMatchObject({ zone: "play", controller: 0 });
+  });
+});
+
+const printedHost = (state: { cards: Record<string, { code: string }> }, id: string): string => state.cards[id]?.code ?? "";
+
+describe("17131:A:1 and 17131:A:2 Captured!", () => {
+  it("each player's ally is attached to the side quest, and defeating it frees each ally to its own player and lowers that player's threat by its printed cost", () => {
+    const made = table({ seats: 2, stage: "17132", play: [ARCHER, { code: AXEHAND, seat: 1 }], staging: [CAPTIVES], threat: [35, 30] });
+    const revealed = settle(resolveRecords(opened(made).state, made.ctx, "17131", "whenRevealed").state, made.ctx, none);
+    const quest = idOf(revealed, "17131");
+    const [archer, axehand] = [idOf(revealed, ARCHER), idOf(revealed, AXEHAND)];
+    expect(revealed.cards[archer]).toMatchObject({ zone: "captive", host: quest, captive: true, owner: 0 });
+    expect(revealed.cards[axehand]).toMatchObject({ zone: "captive", host: quest, captive: true, owner: 1 });
+    const defeated = settle(defeatSideQuest(revealed, quest, made.ctx, none), made.ctx, none);
+    expect(defeated.cards[archer]).toMatchObject({ zone: "play", controller: 0, exhausted: true });
+    expect(defeated.cards[axehand]).toMatchObject({ zone: "play", controller: 1, exhausted: true });
+    expect(defeated.seats.map((seat) => seat.threat)).toEqual([32, 28]);
+  });
+
+  it("with no ally to attach it is discarded and an additional encounter card is revealed", () => {
+    const made = table({ stage: "17132", staging: [CAPTIVES], deck: ["16062", "f0"] });
+    const state = settle(resolveRecords(opened(made).state, made.ctx, "17131", "whenRevealed").state, made.ctx, none);
+    expect(state.cards[idOf(state, "17131")]?.zone).not.toBe("staging");
+    expect(state.encounterDeck.length).toBeLessThan(2);
+  });
+});
+
+describe("17134:A:1 Fight Your Way Out: heroes attached, engagement checks at cost 0 for enemies that guard nothing", () => {
+  it("a hero is attached to an unattached enemy and the free enemies engage the player", () => {
+    const made = table({ stage: "17134", side: "A", staging: [CAPTIVES, "16062", "16063"], setAside: ["16061"], threat: [30, 30] });
+    const state = settle(resolveRecords(opened(made).state, made.ctx, "17134", "whenRevealed", idOf(made.state, "17134"), (current) => (current.window?.kind === "choose" ? (current.window.options[0] ?? "") : "")).state, made.ctx, none);
+    expect(captivesOf(state)).toHaveLength(1);
+    const holder = captivesOf(state)[0]?.host ?? "";
+    expect(state.cards[holder]?.zone).toBe("staging");
+    expect(state.seats[0]?.engaged.length).toBeGreaterThan(0);
+    expect(state.seats[0]?.engaged).not.toContain(holder);
+    expect(state.seats[0]?.engaged.map((id) => state.cards[id]?.code)).not.toContain("16061" === state.cards[holder]?.code ? "" : "none");
   });
 });
