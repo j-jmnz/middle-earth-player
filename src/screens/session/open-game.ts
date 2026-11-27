@@ -9,7 +9,7 @@ import { contextOf, type Resumed } from "../../campaign/session";
 import type { ActiveScenario, ReplayObserver } from "../../campaign/replay";
 import type { World } from "../../campaign/world";
 import { cards, packs } from "../../catalog/schema";
-import { createTableStore, keepIntent, type EngineStep, type Kept, type PlayerIntent, type ReduceContext, type ScenarioState, type TableInput, type TableStore } from "../../play/store/store";
+import { createTableStore, keepIntent, type EngineStep, type Kept, type PlayerIntent, type ReduceContext, type ScenarioState, type TableStore } from "../../play/store/store";
 import type { Undoable } from "../../play/store/undo-history";
 
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
@@ -47,6 +47,6 @@ export function replayForTable<TRun>(catalog: Db<TRun>, world: World, resume: (o
  * The table store of a replayed game. `persist` gets each intent the reducer accepts and writes it at once; `takeBack`
  * drops the last one when Undo goes back over it (it is told the state it left, for what that state had written).
  */
-export function committingStore(game: ReplayedGame, persist: (intent: PlayerIntent, game: ScenarioState) => void, takeBack: (game: ScenarioState, left: ScenarioState) => void, landing?: TableInput["landing"]): TableStore {
-  return createTableStore({ ctx: game.ctx, game: game.game, roundSteps: game.roundSteps, history: game.history, destroyedHeroes: game.destroyedHeroes, onCommit: persist, onUndo: takeBack, ...(landing ? { landing } : {}) });
+export function committingStore(game: ReplayedGame, persist: (intent: PlayerIntent, game: ScenarioState) => void, takeBack: (game: ScenarioState, left: ScenarioState) => void, landed?: boolean): TableStore {
+  return createTableStore({ ctx: game.ctx, game: game.game, roundSteps: game.roundSteps, history: game.history, destroyedHeroes: game.destroyedHeroes, onCommit: persist, onUndo: takeBack, ...(landed ? { landed } : {}) });
 }

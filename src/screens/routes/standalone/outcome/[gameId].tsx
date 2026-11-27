@@ -19,7 +19,6 @@ import { goBack } from "../../../nav/go-back";
 import { routeCode } from "../../../nav/route-code";
 import { comparisonLossNote } from "../../../../play/readouts/against-the-shadow/amon-din";
 import { settleStandalone, standaloneStore, useStandaloneSession } from "../../../session/standalone-session";
-import { landOnUndo } from "../../../session/undo-landing";
 import { ResultUndo } from "../../../table/result-undo";
 import { outcomeLines } from "../../../history/standalone-words";
 
@@ -51,12 +50,11 @@ export default function StandaloneOutcome() {
     undoing.current = false;
     return () => settleOnLeave();
   }, [focused]);
-  // Undo went back over the move that ended the game, or a move after it: back to the table once the game is on again, on the moment taken back (undo-landing.ts).
+  // Undo went back over the move that ended the game, or a move after it: back to the table once the game is on again, with the route param that tells it (`landing=undo`).
   const undone = () => {
     if (!opened || !session?.ok || !gameId || !gameIsOn(opened.store.getState().game, session.world)) return;
     undoing.current = true;
-    landOnUndo(gameId, opened.game().active?.intents.length ?? 0, opened.store.getState().moment);
-    router.replace({ pathname: "/standalone/table/[gameId]", params: { gameId } });
+    router.replace({ pathname: "/standalone/table/[gameId]", params: { gameId, landing: "undo" } });
   };
   // Encounter at Amon Dîn's comparison loss says the two counts, as the Defeat sheet did (null for any other loss).
   const counts = session?.ok ? comparisonLossNote(session.game) : null;

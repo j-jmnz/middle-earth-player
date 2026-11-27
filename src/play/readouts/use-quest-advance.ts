@@ -24,6 +24,7 @@ export type QuestAdvanceState = {
 
 export function useQuestAdvance(store: TableStore): QuestAdvanceState {
   const moment = useStore(store, (state) => state.moment);
+  const landed = useStore(store, (state) => state.landed);
   // What the screen reads of the game, one value at a time: a state that changes none of them does not render this hook's caller.
   const questStage = useStore(store, (state) => questStageOf(state.game));
   const asking = useStore(store, (state) => askingStage(state.game));
@@ -34,8 +35,8 @@ export function useQuestAdvance(store: TableStore): QuestAdvanceState {
   const callerStage = useStore(store, (state) => callerLastStage(state.game));
   const view = useMemo((): QuestView => ({ questStage, asking, over, seatStages, callerStage }), [questStage, asking, over, seatStages, callerStage]);
   const spotlit = useSpotlightHold(store);
-  // The table that opens on an Undo a result screen made opens on that moment, not on the quest screen (store.ts, `landing`).
-  const [latch, setLatch] = useState(() => landedLatch(view, moment));
+  // The table that opens on an Undo a result screen made opens on the table, not on the quest screen (store.ts, `landed`).
+  const [latch, setLatch] = useState(() => landedLatch(view, landed));
   // Set during render (the derived-state pattern): React renders again before it commits, so no effect sees the old latch.
   const next = nextLatch(latch, advancedTo(moment, view), view);
   if (next !== latch) setLatch(next);

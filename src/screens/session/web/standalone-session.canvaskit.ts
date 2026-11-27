@@ -31,6 +31,6 @@ export function useStandaloneSessionAfterPaint(gameId: string | null, attempt: n
   return scene ? given : opened;
 }
 
-export function standaloneStore<TRun>(session: Extract<StandaloneSession, { ok: true }>, user: Parameters<typeof phoneStore<TRun>>[1], landing?: Parameters<typeof phoneStore<TRun>>[2]): StandaloneTable {
-  return session.stored.id === SCENE_GAME && e2eBuild() ? sceneStore(session) : phoneStore(session, user, landing);
+export function standaloneStore<TRun>(session: Extract<StandaloneSession, { ok: true }>, user: Parameters<typeof phoneStore<TRun>>[1], landed?: boolean): StandaloneTable {
+  return session.stored.id === SCENE_GAME && e2eBuild() ? sceneStore(session) : phoneStore(session, user, landed);
 }

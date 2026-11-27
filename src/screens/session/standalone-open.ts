@@ -19,7 +19,7 @@ import { dealSeed } from "../nav/e2e";
 import { gameStore } from "./game-store";
 import { continueChoice, gameWorld, restartChoice, staleFields } from "./stale-game";
 import type { StaleChoice } from "./stale-words";
-import type { TableMoment, TableStore } from "../../play/store/store";
+import type { TableStore } from "../../play/store/store";
 
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
@@ -93,10 +93,10 @@ export type StandaloneTable = { store: TableStore; game: () => StandaloneGame; c
  * The table store for an opened game (game-store.ts). Each intent the reducer accepts is appended and written at once; Undo takes it off. `game` is the game as last written. `clock`
  * counts the foreground time as the session store's does (table-open.ts): folded into each write, and written once on a pause.
  */
-export function standaloneStore<TRun>(session: Opened, user: Db<TRun>, landing?: Extract<TableMoment, { kind: "undone" }>): StandaloneTable {
+export function standaloneStore<TRun>(session: Opened, user: Db<TRun>, landed?: boolean): StandaloneTable {
   const { store, saved, clock } = gameStore<StandaloneGame, Opened>({
     session,
-    landing,
+    landed,
     initial: session.stored,
     cache: sessionCacheOf<Opened>(user, "standalone"),
     // The open's stamp is written already (table-open.ts, sessionStore).

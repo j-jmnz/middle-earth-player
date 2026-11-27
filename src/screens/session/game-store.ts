@@ -6,7 +6,7 @@ import { atPhaseBoundary, checkpointOf, type Checkpoint } from "../../campaign/c
 import { addActive, type ActiveScenario } from "../../campaign/replay";
 import { isWon, record, unrecord } from "../../campaign/session";
 import { CATALOG_VERSION } from "../../catalog/version";
-import type { ScenarioState, TableMoment, TableStore } from "../../play/store/store";
+import type { ScenarioState, TableStore } from "../../play/store/store";
 
 import { fingerprintOf, type SessionCache } from "./cache";
 import { committingStore, type ReplayedGame } from "./open-game";
@@ -16,8 +16,8 @@ import { createPlayClock, type PlayClock } from "./play-clock";
 export type Held = { id: string; active: ActiveScenario | null };
 
 export type GameStoreParts<H extends Held, O> = {
-  /** The Undo a result screen made just before the table opened (undo-landing.ts). */
-  landing?: Extract<TableMoment, { kind: "undone" }> | undefined;
+  /** The table opens on an Undo a result screen made (store.ts, `landed`). */
+  landed?: boolean | undefined;
   session: ReplayedGame;
   initial: H;
   cache: SessionCache<O>;
@@ -33,7 +33,7 @@ export type GameStoreParts<H extends Held, O> = {
 
 export type GameStore<H> = { store: TableStore; saved: () => H; clock: PlayClock };
 
-export function gameStore<H extends Held, O>({ session, landing, initial, cache, reopened, writers, onLost, onLostUndone }: GameStoreParts<H, O>): GameStore<H> {
+export function gameStore<H extends Held, O>({ session, landed, initial, cache, reopened, writers, onLost, onLostUndone }: GameStoreParts<H, O>): GameStore<H> {
   let saved: H = initial;
   const base = createPlayClock();
   // How many intents the checkpoint this session last wrote counted, or null when it has written none (the row may still hold an earlier one).
@@ -77,7 +77,7 @@ export function gameStore<H extends Held, O>({ session, landing, initial, cache,
       if (saved.active && checkpointed != null && checkpointed > saved.active.intents.length) checkpointed = null;
       follow();
     },
-    landing,
+    landed,
   );
   // A pause (the table left, the app in the background) writes the time since the last write, once, and the checkpoint when the game moved since it; a game that is over, won or lost, writes nothing
   // (its last intent folded the time already, and a pause must never write a finished scenario back).

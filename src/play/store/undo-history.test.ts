@@ -141,15 +141,10 @@ describe("Undo on the table", () => {
 });
 
 describe("a table that opens on an Undo a result screen made", () => {
-  it("holds the undone moment as the last moment and the one to tell, and goes on from its number", () => {
-    const [{ before, after, intent, steps }] = playGame(1).slice(0, 1);
-    const landing = { seq: 7, kind: "undone" as const, intent, left: after, after: before, steps };
-    const store = createTableStore({ ctx, game: before, landing });
-    expect(store.getState().moment).toBe(landing);
-    expect(store.getState().shown).toBe(landing);
-    expect(createTableStore({ ctx, game: before }).getState().moment).toBeNull();
-    expect(store.getState().dispatch(intent)).toBe(true);
-    expect(store.getState().moment?.seq).toBe(8);
+  it("is marked landed, and an ordinary table is not", () => {
+    const [{ before }] = playGame(1).slice(0, 1);
+    expect(createTableStore({ ctx, game: before, landed: true }).getState().landed).toBe(true);
+    expect(createTableStore({ ctx, game: before }).getState().landed).toBe(false);
   });
 });
 

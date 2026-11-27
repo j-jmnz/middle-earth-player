@@ -14,7 +14,7 @@ import { loadWorld, type World } from "../../campaign/world";
 import { CATALOG_VERSION } from "../../catalog/version";
 import { dealSeed } from "../nav/e2e";
 import { EFFECTS } from "../../effects";
-import type { ScenarioState, TableMoment, TableStore } from "../../play/store/store";
+import type { ScenarioState, TableStore } from "../../play/store/store";
 
 import { afterPaint } from "../nav/after-paint";
 import { campaignOf, scenarioOf } from "../data/campaign-data";
@@ -120,10 +120,10 @@ export type SessionStore = { store: TableStore; save: () => Save; clock: PlayClo
  * The table store for an opened session (game-store.ts). Each intent the reducer accepts is appended to the save and written at once, and an
  * undo takes the last one off, so a kill and relaunch replays the same game. `save` is the save as last written.
  */
-export function sessionStore<TRun>(session: Opened, user: Db<TRun>, landing?: Extract<TableMoment, { kind: "undone" }>): SessionStore {
+export function sessionStore<TRun>(session: Opened, user: Db<TRun>, landed?: boolean): SessionStore {
   const { store, saved, clock } = gameStore<Save, Opened>({
     session,
-    landing,
+    landed,
     initial: session.save,
     cache: sessionCacheOf<Opened>(user, "save"),
     // The open's stamp is written already: a session the cache hands out later carries none, so the Resolution's open never writes the save as it stood at the table's open.

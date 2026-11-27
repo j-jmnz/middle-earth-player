@@ -25,7 +25,6 @@ import { CardThumb } from "../../images/picture";
 import { GameReportView } from "../../campaign/game-report";
 import { routeCode } from "../../nav/route-code";
 import { ResultUndo } from "../../table/result-undo";
-import { landOnUndo } from "../../session/undo-landing";
 import { useBottomInset } from "../../nav/use-bottom-inset";
 import { usePalette } from "../../kit/palette-hook";
 import { sessionStore, useTableSession, type SessionStore, type TableSession } from "../../session/table-session";
@@ -97,14 +96,13 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   // resolution waits on the path (Resume).
   const back = <NavBar onBack={() => goBack(router, { pathname: "/path/[saveId]", params: { saveId } })} backTestID="resolution-path" backLabel="Path" />;
 
-  // Undo puts back an unconfirmed pick first, then takes back the move that ended the game, or a choice made since, and returns to the table once the game is on again, on the moment taken back (undo-landing.ts).
+  // Undo puts back an unconfirmed pick first, then takes back the move that ended the game, or a choice made since, and returns to the table once the game is on again, with the route param that tells it (`landing=undo`).
   // A pick never carries over a store Undo: the decline's id is the same in every group.
   const undone = () => {
     setChosen(null);
     const now = opened.store.getState();
     if (!gameIsOn(now.game, session.world, opened.save().log.beldisUses, session.destroyedHeroes)) return;
-    landOnUndo(saveId, opened.save().active?.intents.length ?? 0, now.moment);
-    router.replace({ pathname: "/table/[saveId]", params: { saveId } });
+    router.replace({ pathname: "/table/[saveId]", params: { saveId, landing: "undo" } });
   };
   const undo = <ResultUndo store={opened.store} testID="resolution-undo" onUndone={undone} picking={chosen != null} onPutBack={() => setChosen(null)} />;
   // A loss writes nothing to the log: the open scenario is dropped and the scenario stays current.

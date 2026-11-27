@@ -110,21 +110,13 @@ export function useLastMove(store: TableStore, ctx: ReduceContext, names: SheetN
   // Every moment worth telling since the last one told, oldest first: the table answers the windows after a send in the same tap (stops.ts,
   // followAnswers), so more than one can arrive before the next render, and each has its say.
   const waiting = useRef<TableMoment[]>([]);
-  // The moment the table opened on (an Undo a result screen made, store.ts `landing`) is told like any other, once: `queued` is the last moment's seq put on the list.
-  const queued = useRef(0);
-  useEffect(() => {
-    const opening = store.getState().shown;
-    if (opening && opening.seq > queued.current) {
-      queued.current = opening.seq;
-      waiting.current.push(opening);
-    }
-    return store.subscribe((state, before) => {
-      if (state.shown && state.shown !== before.shown) {
-        queued.current = state.shown.seq;
-        waiting.current.push(state.shown);
-      }
-    });
-  }, [store]);
+  useEffect(
+    () =>
+      store.subscribe((state, before) => {
+        if (state.shown && state.shown !== before.shown) waiting.current.push(state.shown);
+      }),
+    [store],
+  );
   const told = shown != null && !playing;
   const seq = shown?.seq ?? 0;
   // As the moments are told: the line (last-move-time.ts, heldLine), the notice sound of a result (the quest, a test, an elimination), once, and the
@@ -244,7 +236,8 @@ export function useAutoAnswer({
   const answer = useEffectEvent(() => {
     if (opened || hold) return;
     // The moment Undo went back to asks, even where the table would answer it; the next choice the player sends lifts that.
-    const held = moment?.kind === "undone";
+    // A table that opened on an Undo from a result screen has no moment yet: it asks until the player's first send.
+    const held = moment?.kind === "undone" || (moment == null && store.getState().landed);
     if (held) running.current = false;
     const intent = tableAnswer(game, sheet, legal, ctx, settings, running.current, held, seen.current);
     if (intent) {

@@ -188,10 +188,10 @@ export function openingLatch(game: QuestView): AdvanceLatch {
   return { latched: { seq: OPENING_SEQ, stageId: game.questStage }, done: OPENING_SEQ - 1, asked: OPENING_SEQ - 1 };
 }
 
-/** The latch a table opens with: the opening one, unless the table opened on an Undo a result screen made (store.ts, `landing`), which lands on that moment with no quest screen over it. */
-export function landedLatch(game: QuestView, moment: TableMoment | null): AdvanceLatch {
+/** The latch a table opens with: the opening one, unless the table opened on an Undo a result screen made (store.ts, `landed`), which lands on the table with no quest screen over it. */
+export function landedLatch(game: QuestView, landed: boolean): AdvanceLatch {
   const opening = openingLatch(game);
-  return moment?.kind === "undone" ? closeLatch(opening) : opening;
+  return landed ? closeLatch(opening) : opening;
 }
 
 /** The advance on screen: the latched one, until the player went back to the table from it or its stage is no longer the stage. */

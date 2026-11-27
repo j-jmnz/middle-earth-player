@@ -62,6 +62,8 @@ export type TableState = {
   // Whether the table opened on a save that had intents already (a resumed game, not a new deal): the quest screen the table opens on
   // then says Continue, not Begin (quest-advance.ts, advanceButton). Set once when the store is built.
   resumed: boolean;
+  // Whether the table opened on an Undo a result screen made (TableInput.landed). Set once when the store is built.
+  landed: boolean;
 };
 
 export type TableActions = {
@@ -136,8 +138,8 @@ export type TableInput = {
   roundSteps?: readonly EngineStep[];
   history?: readonly Undoable[];
   destroyedHeroes?: ReadonlySet<string>;
-  // The Undo a result screen made just before the table opened (screens/session/undo-landing.ts): the table opens on the moment taken back, with its "Taken back" banner and with no quest screen over it.
-  landing?: Extract<TableMoment, { kind: "undone" }>;
+  // The table opened on an Undo a result screen made (the table route's `landing` param): no quest screen over it, and the table answers nothing until the player's next send.
+  landed?: boolean;
   // Called after the reducer accepts an intent, with the state it returned. The screen writes the intent to the save here.
   onCommit?: (intent: PlayerIntent, game: ScenarioState) => void;
   // Called after an undo with the state it went back to and the state it left: the screen drops the last intent from the save and takes back what the left state wrote.
@@ -161,8 +163,9 @@ export function createTableStore(input: TableInput): TableStore {
     selected: null,
     targets: [],
     refusal: null,
-    moment: input.landing ?? null,
-    shown: input.landing ?? null,
+    moment: null,
+    shown: null,
+    landed: input.landed === true,
     history: input.history ?? [],
     destroyedHeroes: input.destroyedHeroes ?? new Set(),
     spotlight: NO_SPOTLIGHT,
