@@ -48,7 +48,7 @@ describe("a Reanimated Dead is named Reanimated Dead on every path", () => {
     const dead = deadIn(after);
     const moment = momentOf(made.state, after, [{ kind: "engage", seat: 0, enemyId: dead }], { card: sheetNames(made, after).card });
     expect(moment?.title).toBe("Reanimated Dead engages");
-    expect(moment?.lines.map((line) => line.text)).toEqual(["Reanimated Dead engages Player 1"]);
+    expect(moment?.lines.map((line) => line.text)).toEqual(["Engaged with Player 1"]);
   });
 
   it("names a dead in the row of a pick (the enemy a player attacks) and in the attackers' sheet", () => {

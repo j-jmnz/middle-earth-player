@@ -17,6 +17,7 @@ import { committedWillpower, failQuest, questPointsOf, questStatOf, stagingThrea
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { NO_SEATS_REMAIN } from "../../rules/core/eliminate.ts";
 import { livingSeats } from "../../rules/core/state.ts";
+import { syncConstants } from "../../rules/interpret/constants.ts";
 import { topFrame } from "../../rules/windows/windows.ts";
 
 import { damageOutcome, enemiesToFace, lossWords, outcomeWords } from "../store/foresight.ts";
@@ -198,7 +199,9 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const after = stagingThreat({ ...area, staging: area.staging.filter((id) => id !== location.id) }, ctx.cards);
     // The Blood of Gondor: the points the location has once it is active, and the hidden cards the travel takes (blood.ts).
     const blood = bloodTravel(game, ctx, location.id);
-    const points = blood ? blood.points : questPointsOf(game, location, ctx.cards);
+    // The points it has once it is active: a bonus that applies only while it is in the staging area no longer counts (Ancient Forest, Into Fangorn).
+    const active = syncConstants({ ...game, staging: game.staging.filter((id) => id !== location.id), activeLocation: game.separate ? game.activeLocation : location.id, cards: { ...game.cards, [location.id]: { ...location, zone: "activeLocation" } } }, ctx);
+    const points = blood ? blood.points : questPointsOf(active, active.cards[location.id] ?? location, ctx.cards);
     const said = valeTravel(game, location.id) ?? (points != null ? `It takes the next ${points} progress before the quest` : null);
     return { kind: "travel", stats: [THREAT(now), THREAT(after)], join: "then", result: blood?.cost ? (said ? `${said}; ${blood.cost}` : blood.cost) : said };
   }
