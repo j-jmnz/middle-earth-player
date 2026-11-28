@@ -116,6 +116,7 @@ import serpentFixtures from "./fixtures/the-black-serpent.json";
 import porosFixtures from "./fixtures/the-crossings-of-poros.json";
 import guratFixtures from "./fixtures/the-dungeons-of-cirith-gurat.json";
 import runningFixtures from "./fixtures/the-river-running.json";
+import dorwinionFixtures from "./fixtures/danger-in-dorwinion.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -250,6 +251,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-crossings-of-poros": porosFixtures,
   "the-dungeons-of-cirith-gurat": guratFixtures,
   "the-river-running": runningFixtures,
+  "danger-in-dorwinion": dorwinionFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
