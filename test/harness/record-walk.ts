@@ -21,7 +21,7 @@ const ENGINE_ASKING = [
   "DestroyHighestCostAlly", "DiscardAlliesToCost", "DiscardFromAnyDeck", "Discover", "EachExhaustsOne", "EngageFromVictory", "EngageLowestThreat", "EngageOrGrapple",
   "EngageSeatWith", "EngageSeatWithMost", "FitShips", "GainChosenTrait", "GuardStagedHeroes", "HealAmong", "HealLakeTownByProgress", "HealLocations", "KeepOneCopy", "LocateTest",
   "LookAtStages", "MakeEngagementChecks", "MayDiscardShadow", "MoveProgress", "MoveToHero", "NameCard", "NameEncounterType", "NameInvestigation", "OrderForced", "PayResources",
-  "PickFewestHitPoints", "PickFewestHitPointsLeft", "PickHighestEngagement", "PickHighestThreat", "PickLowestEngagement", "PickMostHitPoints", "PlaceHandUnderLocation",
+  "PickFewestHitPoints", "PickFewestHitPointsLeft", "PickHighestEngagement", "PickHighestThreat", "PickLowestDefense", "PickLowestEngagement", "PickMostHitPoints", "PlaceHandUnderLocation",
   "PlaceProgressInStaging", "PlayFrom", "PlayRevealedFree", "PrepareFleet", "PutCapturedIntoPlay", "PutIntoPlay", "PutIntoPlayFromHand", "PutSetAsideInPlay",
   "RaiseThreatToAttach", "ReleaseStagedHero", "RemoveProgressAmong", "RemoveWillpowerFromQuest", "ResolveBurn", "ResolveDiscover", "ResolveGrapple",
   "RevealChosenFromDiscard", "RiddleStep", "SearchAflame", "SearchNemesis", "SearchQuestDeck", "SearchShips", "ShuffleHighestCostIntoDeck", "ShuffleIntoPlayerDeck",

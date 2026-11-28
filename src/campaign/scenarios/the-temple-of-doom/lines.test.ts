@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { EFFECTS } from "../../../effects/index.ts";
 import { UNATTRIBUTED } from "../../../rules/core/cause.ts";
 import { placeDamage } from "../../../rules/core/damage.ts";
-import { flagged, updateCard, withMode } from "../../../rules/core/state.ts";
+import { expireModifiers, flagged, updateCard, withMode } from "../../../rules/core/state.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { moveCard } from "../../../rules/core/zones.ts";
 import { settle } from "../../../rules/engine/machine.ts";
@@ -19,6 +19,7 @@ import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { placeOnMainQuest, placeQuestProgress, stagingThreat } from "../../../rules/quest/quest.ts";
 import { idOf, legalIntents, resolveRecords, send, tableFromLayout, where, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
+import { attack, defend, endPhase, endRound, flag, rowProblems, stat, type Row } from "../../../../test/harness/card-spec.ts";
 
 const ID = "the-temple-of-doom";
 const LEGACY = "21081";
@@ -365,5 +366,36 @@ describe("Thane Ulchor (21054:A:2): he can be engaged with exactly 4 quest stage
   negative("21081:B:2", "with 3 quest stages in the victory display progress can be placed on the stage", () => {
     const made = table({ stage: LEGACY, victory: ["21080", "21083", "21084"] });
     expect(flagged(settled(made, made.state), idOf(made.state, LEGACY), "noProgressPlaced")).toBe(false);
+  });
+});
+
+// The end of a duration: the effect holds while the round or the phase goes on and is gone after it. Each check reads a card-spec row for each of the two moments.
+describe("21058:A:2, 21064:A:2, 21064:A:3 and 21085:B:2 last until the end of the phase or the round, and are gone after it", () => {
+  const during = (line: string, row: Omit<Row, "line" | "name">): Row => ({ line, name: "during", ...row });
+  const holds = (rows: readonly Row[]) => (effects: typeof EFFECTS) => {
+    for (const row of rows) expect(rowProblems(ID, row, effects), row.name).toEqual([]);
+  };
+  const guard = { stage: LEGACY, engaged: ["f3"] } as const;
+  lineSpec("21058:A:2", "the +2 Defense lasts until the end of the phase and is gone at the end of the phase", holds([
+    { ...during("21058:A:2", { layout: guard, act: attack("f3", { shadow: "21058", undefended: true }), expect: stat("f3", "defense", 3) }), name: "until the end of the phase" },
+    { ...during("21058:A:2", { layout: guard, act: [attack("f3", { shadow: "21058", undefended: true }), endPhase], expect: stat("f3", "defense", 1) }), name: "the end of the phase" },
+  ]));
+  lineSpec("21064:A:2", "each character's text box is blank until the end of the round and not after it", (effects) => {
+    const made = table({ stage: LEGACY, play: ["ally"] }, effects);
+    const state = resolveRecords(made.state, made.ctx, "21064", "whenRevealed").state;
+    const blank = (from: ScenarioState): boolean => from.modifiers.some((modifier) => modifier.stat === "blankText" && modifier.until === "endOfRound");
+    expect(blank(state)).toBe(true);
+    expect(blank(expireModifiers(state, ["endOfRound"]))).toBe(false);
+  });
+  lineSpec("21064:A:3", "the defending character cannot ready until the end of the round and can after it", holds([
+    { ...during("21064:A:3", { layout: { ...guard, play: ["ally"] }, act: [attack("f3", { shadow: "21064" }), defend("ally")], expect: flag("ally", "cannotReady") }), name: "until the end of the round" },
+    { ...during("21064:A:3", { layout: { ...guard, play: ["ally"] }, act: [attack("f3", { shadow: "21064" }), defend("ally"), endRound], expect: flag("ally", "cannotReady", false) }), name: "the end of the round" },
+  ]));
+  lineSpec("21085:B:2", "the cap holds until the end of the round: after it the stage takes progress again", (effects) => {
+    const made = table({ stage: LORD, hand: ["c0"] }, effects);
+    const state = resolveRecords(made.state, made.ctx, LORD, "forced", idOf(made.state, LORD)).state;
+    expect(progressOf(place(made, state, 2), LORD)).toBe(0);
+    const later = expireModifiers(state, ["endOfRound"]);
+    expect(progressOf(place(made, later, 2), LORD)).toBe(2);
   });
 });
