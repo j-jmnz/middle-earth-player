@@ -15,13 +15,15 @@ import { commanderWords, controlledWords, dialName, gateHeldWords, lostWords, pi
 import type { TableDial } from "../dials.ts";
 
 const SCENARIO = "assault-on-osgiliath";
+// Wrath and Ruin keeps the same control of locations (the pelargir family): its controlled locations, banner and log lines are worded here too.
+const WRATH = "wrath-and-ruin";
 const STAGE = "06091";
 const PINNED_DOWN = "06104";
 const COMMANDER = "06095";
 const WEST_GATE = "06096";
 
-/** Whether the game is Assault on Osgiliath: every hook below keys on it. */
-export const live = (game: ScenarioState): boolean => game.scenarioId === SCENARIO;
+/** Whether the game keeps control of locations as Assault on Osgiliath does (it and Wrath and Ruin): every hook below keys on it. */
+export const live = (game: ScenarioState): boolean => game.scenarioId === SCENARIO || game.scenarioId === WRATH;
 
 const isOsgiliath = (ctx: ReduceContext, card: CardInstance | undefined): boolean => {
   if (!card) return false;

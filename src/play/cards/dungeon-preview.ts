@@ -36,6 +36,7 @@ import { cairAndrosDetail } from "./against-the-shadow/cair-andros-preview.ts";
 import { amonDinDetail } from "../readouts/against-the-shadow/amon-din.ts";
 import { druadanDetail } from "./against-the-shadow/druadan-preview.ts";
 import { osgiliathControlSpeech, osgiliathDetail } from "../readouts/against-the-shadow/osgiliath.ts";
+import { wrathDetail } from "../readouts/mordor/wrath.ts";
 import { bloodDetail } from "../readouts/against-the-shadow/blood.ts";
 import { valeDetail } from "../readouts/against-the-shadow/vale.ts";
 
@@ -126,8 +127,9 @@ function ownDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name
   const ithilien = ithilienDetail(game, ctx, cardId);
   if (ithilien) return ithilien;
   // Assault on Osgiliath: a location a player controls, a unique location's undefended Forced line, Ruined Tower, Pinned Down and Southron Commander (keyed on the scenario).
-  const osgiliath = osgiliathDetail(game, ctx, cardId);
-  if (osgiliath) return osgiliath;
+  // Wrath and Ruin shares the control words and adds Gate of Dorwinion's Threat and travel bar and the Forced line of the two locations that return (keyed on the scenario).
+  const osgiliath = [osgiliathDetail(game, ctx, cardId), wrathDetail(game, ctx, cardId)].filter((line) => line != null);
+  if (osgiliath.length > 0) return osgiliath.join(" ");
   // The Blood of Gondor: a Travel cost of hidden cards, The Cross-roads, the two allies, Black Númenorean (keyed on the scenario).
   const blood = bloodDetail(game, ctx, cardId);
   if (blood) return blood;

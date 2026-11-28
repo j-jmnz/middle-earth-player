@@ -7,12 +7,16 @@ import type { ScenarioState } from "../../core/state.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { controlledLocations } from "../pelargir/location-control.ts";
 
-/** True when the players control more locations than the staging area holds; null for any other condition. */
-export function controlsOutnumberStaging(state: ScenarioState, condition: Condition, ctx: ReduceContext): boolean | null {
-  if (condition.kind !== "controlsOutnumberStaging") return null;
-  const staged = state.staging.filter((id) => {
+/** The locations in the staging area (the active location is not one): what the controlled ones are counted against. */
+export function stagedLocationCount(state: ScenarioState, ctx: ReduceContext): number {
+  return state.staging.filter((id) => {
     const card = state.cards[id];
     return card != null && printedOf(ctx.cards, card.code).type === "location";
   }).length;
-  return controlledLocations(state).length > staged;
+}
+
+/** True when the players control more locations than the staging area holds; null for any other condition. */
+export function controlsOutnumberStaging(state: ScenarioState, condition: Condition, ctx: ReduceContext): boolean | null {
+  if (condition.kind !== "controlsOutnumberStaging") return null;
+  return controlledLocations(state).length > stagedLocationCount(state, ctx);
 }
