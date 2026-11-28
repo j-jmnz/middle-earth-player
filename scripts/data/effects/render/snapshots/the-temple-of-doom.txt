@@ -8,8 +8,7 @@ Scenario piles that place cards with no record (quest: 21080 The Forgotten Templ
     who acts: the acting player is the first player (a phase has no player of its own)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - place 1 damage token(s) on this card (placed, not dealt: nothing cancels or reduces them)
-    - then, if not (damage of this card is less than 4) (checked when this step runs, after the steps above; not tied to whether they did anything): the first player reveals the top card of the Power of Mordor deck as an encounter card (an objective stays in the staging area, an enemy or a location is added to it; whatever leaves play goes to the encounter discard pile, never back to the deck); with no card to reveal the players lose the game
-    - then, if not (damage of this card is less than 4) (checked when this step runs, after the steps above; not tied to whether they did anything): up to 4 damage token(s) come off the card in play with printed code 21053; it stops at 0
+    - then, if not (damage of this card is less than 4) (checked when this step runs, after the steps above; not tied to whether they did anything): up to 4 damage token(s) come off the card in play with printed code 21053, then the first player reveals the top card of the Power of Mordor deck as an encounter card (an objective stays in the staging area, an enemy or a location is added to it; whatever leaves play goes to the encounter discard pile, never back to the deck); with no card to reveal the players lose the game
 
 21053:A:2 (front): This stage cannot be the active quest while Thane Ulchor has any hit points remaining. When this stage is defeated, the players win the game.
   21053:constant:1: Constant
@@ -107,9 +106,9 @@ Scenario piles that place cards with no record (quest: 21080 The Forgotten Templ
   21059:whenRevealed:1: When revealed
     who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose enemy (any player controls) named "Thane Ulchor"
+    - choose enemy (any player controls) or in the staging area, named "Thane Ulchor"
     - the picked enemy attacks the first player now, from where it is (the staging area, or engaged with a player; it does not move), dealt a shadow card
-    - then, if not (there is a enemy (any player controls) named "Thane Ulchor" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - then, if not (there is a enemy (any player controls) or in the staging area, named "Thane Ulchor" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 21059:A:2 (shadow): Shadow: Deal 1 damage to the defending character.
   21059:shadow:1: Shadow
@@ -121,8 +120,10 @@ Scenario piles that place cards with no record (quest: 21080 The Forgotten Templ
 
 21060:A:1 (front): While attached to an enemy, counts as a Condition attachment with the text: 'Attached enemy gets +1 Threat, +1 Attack, +1 Defense, and is immune to player card effects.'
   21060:constant:1: Constant
+    only if its host is a enemy (any player controls)
     - this card counts as a Condition attachment while it is attached
   21060:constant:2: Constant
+    only if its host is a enemy (any player controls)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - its host: stat threat 1, while this card is in play
     - its host: stat attack 1, while this card is in play
@@ -148,10 +149,9 @@ Scenario piles that place cards with no record (quest: 21080 The Forgotten Templ
 21061:A:2 (shadow): Shadow: Discard the top card of the encounter deck. If that card is an enemy, add it to the staging area.
   21061:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    (steps run in order; a step depends on an earlier one only through its own condition)
-    - discard 1 card(s) from the top of the encounter deck
-    - choose enemy (any player controls) among the cards this effect looked at or discarded
-    - then, if there is a enemy (any player controls) among the cards this effect looked at or discarded to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+    - repeat 1 times:
+      - the top card of the encounter deck goes to the encounter discard pile
+      - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 ## 21062 Narrow Opening
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -186,7 +186,7 @@ Scenario piles that place cards with no record (quest: 21080 The Forgotten Templ
 
 21064:A:2 (front): When Revealed: Until the end of the round, treat the printed text box of each character as if it were blank (except for Traits).
   21064:whenRevealed:1: When revealed
-    - each character (any player controls) (only the cards that match now: one that arrives later does not get it): stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
+    - every character in play, now and entering later: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
 
 21064:A:3 (shadow): Shadow: Defending character cannot ready until the end of the round.
   21064:shadow:1: Shadow
@@ -305,8 +305,8 @@ Scenario piles that place cards with no record (quest: 21080 The Forgotten Templ
       - choose hero (you control)
       - deal 1 damage to the picked card
       - exhaust the picked card
-      - the picked card: stat cannotReady 1, endOfCombat
-      - the picked card: stat cannotBeHealed 1, endOfCombat
+      - the picked card: stat cannotReady 1, until the combat phase ends, that is until the refresh phase begins
+      - the picked card: stat cannotBeHealed 1, until the combat phase ends, that is until the refresh phase begins
 
 21081:B:2 (back): While there are 4 quest stages in the victory display, progress cannot be placed here.
   21081:constant:1: Constant
@@ -376,11 +376,11 @@ Scenario piles that place cards with no record (quest: 21080 The Forgotten Templ
       - choose card (you control) in hand
       - the effect's X grows by printed cost of the picked card
       - discard the picked card
-    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all each round; progress that goes to the active location first does not count) X, until the end of the round
+    - this card: stat stageProgressCap (no more than this much progress can be placed on this stage this round, whoever places it; 0 holds it shut; a side quest that is the current quest is not capped) X, until the end of the round
 
 21085:B:3 (back): While there are 4 quest stages in the victory display, progress cannot be placed here.
   21085:constant:2: Constant
     only if not (the number of card (any player controls) in the victory display, of card type quest is less than 4)
     - this card: stat noProgressPlaced 1, while this card is in play
 
-(rendered pieces: 229 by template, 0 as JSON)
+(rendered pieces: 227 by template, 0 as JSON)

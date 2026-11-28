@@ -25,6 +25,7 @@ const pick = (value: unknown, ctx: Ctx): string => renderPick(value, ctx);
 export const STAT_UNTIL: Readonly<Record<string, string>> = {
   endOfPhase: "until the end of the phase",
   endOfRound: "until the end of the round",
+  endOfCombat: "until the combat phase ends, that is until the refresh phase begins",
   endOfAttack: "until the end of the attack",
   whileSourceInPlay: "while this card is in play",
   whileSourceActive: "while this card is active",

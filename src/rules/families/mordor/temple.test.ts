@@ -221,7 +221,7 @@ describe("the cards of the scenario that listen for an event", () => {
     const { defeatSideQuest } = await import("../sidequests/quest.ts");
     const defeated = defeatSideQuest(updateCard(made.state, tribute, { progress: 8 }), tribute, made.ctx, []);
     const won = resolveRecords(settle({ ...defeated, window: null, mode: "stopped" }, made.ctx, []), made.ctx, TRIBUTE, "forced", tribute);
-    expect(won.state.stageCleared || won.state.won === true).toBe(true);
+    expect(won.state.stageCleared).toBe(true);
   });
 
   it("21069:A:1 a non-unique enemy that engages a player cannot take damage until the end of the round", () => {

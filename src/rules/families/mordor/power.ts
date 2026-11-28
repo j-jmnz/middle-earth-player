@@ -6,13 +6,18 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { NAMED_PILES, topOf } from "../../core/piles.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { hostOf } from "../../core/state.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { startReveal } from "../../windows/frames.ts";
+import { changeDamageOn } from "../moria/index.ts";
 import { markPicked } from "../play/refs.ts";
 
 /** RevealPowerOfMordor: the first player reveals the top card of the Power of Mordor deck (the card becomes the picked card of the running effect). With no card to reveal, `onEmpty: loseGame` loses the game. */
 export function revealPowerOfMordor(state: ScenarioState, instruction: Extract<Instruction, { verb: "RevealPowerOfMordor" }>, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.lost) return state;
+  const removed = instruction.removeDamage;
+  const holder = removed ? hostOf(state, removed.code) : undefined;
+  if (removed && holder) state = changeDamageOn(state, holder, -removed.amount, steps, ctx);
   const top = topOf(state, NAMED_PILES.powerOfMordor.deck);
   if (top === undefined) return instruction.onEmpty === "loseGame" ? { ...state, lost: true, lossReason: "No card is left in the Power of Mordor deck to reveal", window: null } : state;
   return startReveal(markPicked(state, top), state.firstPlayer, ctx, steps, top);

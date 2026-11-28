@@ -20,9 +20,9 @@ const PLACE_ON_TRIBUTE: Instruction = { verb: "PlaceDamageOn", code: TRIBUTE, am
 // "If this attack destroys a character": the attack's X is the characters it destroyed.
 const DESTROYED_A_CHARACTER: Condition = { kind: "x", min: 1 };
 const AN_ENEMY: PickSpec = { type: "enemy", control: "any" };
-const ULCHOR_IN_PLAY: PickSpec = { type: "enemy", control: "any", names: ["Thane Ulchor"] };
-// The enemy among the cards the effect just discarded from the top of the encounter deck.
-const LOOKED_ENEMY: PickSpec = { type: "enemy", control: "any", looked: true };
+const ULCHOR_IN_PLAY: PickSpec = { type: "enemy", control: "any", names: ["Thane Ulchor"], staging: true };
+// "While attached to an enemy" (21060:A:1): the constant records hold only while the host is an enemy.
+const HOST_IS_ENEMY: Condition = { kind: "matches", card: "host", pick: AN_ENEMY };
 const PICKED_IS = (pick: PickSpec): Condition => ({ kind: "matches", card: "picked", pick, inPlay: false });
 // "The Easterling enemy (staging area or engaged) with the lowest Defense without a copy of Fanaticism" (21060:A:2).
 const FANATICISM_CANDIDATE: PickSpec = { type: "enemy", control: "any", staging: true, trait: "Easterling", hasAttachment: { names: ["Fanaticism"], none: true } };
@@ -44,8 +44,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     trigger: "endOfRound",
     instructions: [
       { verb: "PlaceDamage", amount: 1, card: "self" },
-      { verb: "RevealPowerOfMordor", onEmpty: "loseGame", when: { kind: "not", condition: { kind: "less", left: { stat: "damage", of: "self" }, right: 4 } } },
-      { verb: "RemoveDamageFrom", code: TRIBUTE, amount: 4, when: { kind: "not", condition: { kind: "less", left: { stat: "damage", of: "self" }, right: 4 } } },
+      { verb: "RevealPowerOfMordor", onEmpty: "loseGame", removeDamage: { code: TRIBUTE, amount: 4 }, when: { kind: "not", condition: { kind: "less", left: { stat: "damage", of: "self" }, right: 4 } } },
     ],
   },
   { id: "21053:constant:1", cardCode: TRIBUTE, lines: ["21053:A:2"], timing: "constant", condition: { kind: "hitPointsLeft", code: ULCHOR }, instructions: [{ verb: "ModifyStat", stat: "cannotBeCurrentQuest", amount: 1, until: "whileSourceInPlay", target: "self" }] },
@@ -109,12 +108,13 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 21060 Fanaticism (treachery, Easterling). While attached to an enemy it counts as a Condition attachment: the enemy gets +1 Threat, +1 Attack, +1 Defense and is immune to player card effects. When Revealed: it attaches to the Easterling enemy with the lowest Defense
   // without a copy of Fanaticism (the first player chooses among ties); with none it gains Surge.
-  { id: "21060:constant:1", cardCode: "21060", lines: ["21060:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }] },
+  { id: "21060:constant:1", cardCode: "21060", lines: ["21060:A:1"], timing: "constant", condition: HOST_IS_ENEMY, instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }] },
   {
     id: "21060:constant:2",
     cardCode: "21060",
     lines: ["21060:A:1"],
     timing: "constant",
+    condition: HOST_IS_ENEMY,
     instructions: [
       { verb: "ModifyStat", stat: "threat", amount: 1, until: "whileSourceInPlay", target: "host" },
       { verb: "ModifyStat", stat: "attack", amount: 1, until: "whileSourceInPlay", target: "host" },
@@ -134,9 +134,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     ],
   },
 
-  // 21061 Twisted Tunnel (location). When Revealed: cards are discarded from the top of the encounter deck until an enemy is, and it is added to the staging area (not revealed). Shadow: the top card of the encounter deck is discarded; an enemy is added to the staging area.
+  // 21061 Twisted Tunnel (location). When Revealed: cards are discarded from the top of the encounter deck until an enemy is, and it is added to the staging area (not revealed). Shadow: the top card of the encounter deck is discarded; an enemy is added to the staging area (a Shadow effect keeps the picked card only in a frame, so the Repeat of 1 gives it one).
   { id: "21061:whenRevealed:1", cardCode: "21061", lines: ["21061:A:1"], timing: "whenRevealed", instructions: [{ verb: "DiscardUntil", type: "enemy" }, { verb: "MoveEncounterCard", card: "picked", to: "staging", when: PICKED_IS(AN_ENEMY) }] },
-  { id: "21061:shadow:1", cardCode: "21061", lines: ["21061:A:2"], timing: "shadow", instructions: [{ verb: "DiscardEncounterTop", count: 1 }, { verb: "Pick", pick: LOOKED_ENEMY }, { verb: "MoveEncounterCard", card: "picked", to: "staging", when: { kind: "canPick", pick: LOOKED_ENEMY } }] },
+  { id: "21061:shadow:1", cardCode: "21061", lines: ["21061:A:2"], timing: "shadow", instructions: [{ verb: "Repeat", times: 1, instructions: [{ verb: "MoveEncounterCard", card: "deckTop", to: "discard" }, { verb: "MoveEncounterCard", card: "picked", to: "staging", when: PICKED_IS(AN_ENEMY) }] }] },
 
   // 21062 Narrow Opening (location). While it is the active location each player cannot play more than 1 card each round. Forced: when it leaves play each player discards 1 random card from his hand.
   { id: "21062:constant:1", cardCode: "21062", lines: ["21062:A:1"], timing: "constant", condition: { kind: "sourceIn", zone: "activeLocation" }, instructions: [{ verb: "LimitPlaysPerRound", max: 1 }] },
@@ -147,7 +147,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "21063:forced:1", cardCode: "21063", lines: ["21063:A:2"], timing: "forced", trigger: "leftPlay", subject: "self", instructions: [{ verb: "DamageEach", amount: 1, pick: { type: "character", control: "any", state: "exhausted" } }] },
 
   // 21064 Fearful Shadows (treachery, Doomed 1). When Revealed: until the end of the round the printed text box of each character is treated as blank, Traits kept. Shadow: the defending character cannot ready until the end of the round.
-  { id: "21064:whenRevealed:1", cardCode: "21064", lines: ["21064:A:2"], timing: "whenRevealed", instructions: [{ verb: "ModifyStat", stat: "blankText", amount: 1, until: "endOfRound", holders: { type: "character", control: "any" } }] },
+  { id: "21064:whenRevealed:1", cardCode: "21064", lines: ["21064:A:2"], timing: "whenRevealed", instructions: [{ verb: "ModifyStat", stat: "blankText", amount: 1, until: "endOfRound", target: "characters" }] },
   { id: "21064:shadow:1", cardCode: "21064", lines: ["21064:A:3"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "cannotReady", amount: 1, until: "endOfRound", target: "defender" }] },
 
   // 21065 Lost in the Dark (encounter side quest). When Revealed: each player puts the top 10 cards of his deck facedown under his threat dial; when it is defeated each player shuffles them back (the family's settle sweep). Forced: after a player raises his threat by any amount he discards the top card from under his dial.
@@ -249,7 +249,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     ...QUEST_PHASE_BEGINS,
     instructions: [
       EACH_PLAYER([{ verb: "Pick", pick: { type: "card", control: "you", from: "hand" } }, { verb: "AddToX", amount: { stat: "cost", of: "picked", printed: true } }, { verb: "Discard", target: { kind: "picked" } }]),
-      { verb: "ModifyStat", stat: "questProgressCap", amount: { x: true }, until: "endOfRound", target: "table" },
+      { verb: "ModifyStat", stat: "stageProgressCap", amount: { x: true }, until: "endOfRound", target: "self" },
     ],
   },
   NO_PROGRESS_AT_FOUR("21085", "21085:B:3", 2),

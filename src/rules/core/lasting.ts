@@ -37,6 +37,7 @@ export const ENGINE_MARKS: ReadonlySet<ModifierStat> = new Set<ModifierStat>([
   "progressPlacedShared",
   "progressPlacedHere",
   "questProgressPlaced",
+  "stageProgressPlaced",
   "questProgressPhase",
   "trackQuestPlaced",
   "spongeTaken",

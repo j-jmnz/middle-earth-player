@@ -251,7 +251,7 @@ Scenario piles that place cards with no record (staging: 16016 Narrow Alleyway; 
     - for each player, first player first:
       - choose ready character (you control)
       - exhaust the picked card
-    - every character in play, now and entering later: stat cannotReadyByPlayerCard 1, endOfCombat
+    - every character in play, now and entering later: stat cannotReadyByPlayerCard 1, until the combat phase ends, that is until the refresh phase begins
 
 16047:A:2 (shadow): Shadow: Until the end of the round, defending character cannot ready.
   16047:shadow:1: Shadow

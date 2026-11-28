@@ -41,8 +41,8 @@ const VERBS = [
   // (src/catalog/stage-order.ts) and each stage that prints Victory is added to the victory display when it is defeated, the last one defeated winning the game (families/quest/order.ts).
   z.strictObject({ verb: z.literal("ShuffleStagesUnder"), codes: z.array(z.string().min(1)).min(2) }),
   // "Reveal the top card of the Power of Mordor deck. If you cannot, the players lose the game" (21053:A:1; vom.power-of-mordor-deck-the-temple-of-doom): the first player reveals the top card of the pile `powerOfMordor` as an encounter card (rr.reveal); it goes to the staging area, or to the encounter discard pile, never
-  // back to its deck. `onEmpty: loseGame`: with no card to reveal the players lose the game.
-  verbFlags(z.strictObject({ verb: z.literal("RevealPowerOfMordor"), onEmpty: z.literal("loseGame"), ...when }), { runsInFrame: true }),
+  // back to its deck. `onEmpty: loseGame`: with no card to reveal the players lose the game. `removeDamage`: that many damage tokens come off the card with the code first, then the card is revealed (21053:A:1 "remove 4 of them and reveal").
+  verbFlags(z.strictObject({ verb: z.literal("RevealPowerOfMordor"), onEmpty: z.literal("loseGame"), removeDamage: z.strictObject({ code: z.string(), amount: z.number().int().positive() }).optional(), ...when }), { runsInFrame: true }),
   // "Attach to the Easterling enemy with the lowest Defense without a copy of Fanaticism" (21060:A:2): of the cards the pick matches, the one with the lowest Defense as the table shows it becomes the picked card; the first player chooses among those tied (rr.first-player).
   // Nothing is picked when none matches.
   z.strictObject({ verb: z.literal("PickLowestDefense"), pick: pickSchema, ...when }),
@@ -71,6 +71,9 @@ const FLAGS = [
   "engagesWithUlchor",
   // On an enemy (21066:A:3): only the player it is engaged with can declare defenders against it; the flag `attackOnlyByEngaged` bars the other attackers.
   "defendOnlyByEngaged",
+  // On a quest stage (21085:B:2): no more than this much progress can be placed on this stage this round, whoever places it; 0 holds it shut. `stageProgressPlaced` is the count of the round (engine use, src/rules/families/mordor/stage-cap.ts).
+  "stageProgressCap",
+  "stageProgressPlaced",
 ] as const;
 
 export const manifest = { name: "mordor", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;
