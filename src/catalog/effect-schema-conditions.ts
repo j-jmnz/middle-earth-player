@@ -438,6 +438,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("stageInPlayWholeRound") }),
   // A location was explored this round, active or in the staging area ("+2 Attack instead if a location was explored this round", 17017:A:2); false unless the table holds the flag `noteExplored`. Read by the haradrim family.
   z.strictObject({ kind: z.literal("locationExploredThisRound") }),
+  // The player (the actor) raised their threat this round ("+2 Attack instead if you raised your threat this round", 21048:A:2); false unless the table holds the flag `noteThreatRaised`. Read by the mordor family.
+  z.strictObject({ kind: z.literal("raisedThreatThisRound") }),
   // The players' main quest stage and the Orcs' stage have the same number (`sameStage`), or not (`differentStage`): "While the players are not at the same stage as the Orcs" (17040:A:1; hrd.orcs-area-different-stage); `at`: the Orcs' stage has this number ("if Uruk Chieftain is at stage 2D", 17049:B:2). False in a game with no Orcs' area. Read by the haradrim family.
   z.strictObject({ kind: z.literal("orcsStage"), is: z.enum(["sameStage", "differentStage"]).optional(), at: z.number().int().positive().optional() }),
   // The active location prints a Wizardry line ("If no Wizardry effect is triggered this way", 143062:A:1, read with `not`; false with no active location). Read by the wizardry family.

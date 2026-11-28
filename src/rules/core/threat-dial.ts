@@ -5,6 +5,7 @@ import { queueEvent } from "../windows/queue.ts";
 import type { ScenarioState } from "./state.ts";
 import { withThreat } from "./state.ts";
 import { doomedRaised } from "../families/play/hooks.ts";
+import { noteThreatRaised } from "../families/mordor/rounds.ts";
 import { eliminateEmpties } from "./eliminate.ts";
 
 export function raiseThreat(
@@ -17,7 +18,7 @@ export function raiseThreat(
   if (amount <= 0) return state;
   const current = state.seats[seat];
   if (!current || current.eliminated) return state;
-  const raised = doomedRaised(queueEvent(withThreat(state, seat, current.threat + amount), { trigger: "threatRaised", seat }), seat, cause);
+  const raised = noteThreatRaised(doomedRaised(queueEvent(withThreat(state, seat, current.threat + amount), { trigger: "threatRaised", seat }), seat, cause), seat);
   steps.push({ kind: "threat", seat, amount, cause });
   return eliminateEmpties(raised, steps);
 }
