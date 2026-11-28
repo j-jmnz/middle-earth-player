@@ -111,7 +111,7 @@ Scenario piles that place cards with no record (quest: 21077 A City in Turmoil; 
 
 21036:A:3 (front): When Evidence of the Cult is free of encounters, add it to the victory display. Then, place 1 resource on the main quest.
   21036:constant:2: Constant
-    - a constant marker: when this card in the staging area is free of encounters (nothing is attached to it as its guard) it is added to the victory display and 1 resource is placed on the main quest card
+    - (marker, does nothing when run) when this objective is free of encounters, the settle sweep moves it from the staging area to the victory display and then places 1 resource on the main quest card
 
 ## 21037 Hillside Manor
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -123,9 +123,7 @@ Scenario piles that place cards with no record (quest: 21077 A City in Turmoil; 
 
 21037:A:2 (front): Travel: Each player discards 1 random card from his hand.
   21037:travel:1: Travel
-    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player's hand holds fewer cards than they must discard
-    - for each player, first player first:
-      - if the actor has a card in hand: the acting player discards 1 random card(s) from hand
+    - each player discards 1 random card(s) from hand
 
 ## 21038 Disappearances
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -441,4 +439,4 @@ Scenario piles that place cards with no record (quest: 21077 A City in Turmoil; 
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
-(rendered pieces: 248 by template, 1 as JSON)
+(rendered pieces: 246 by template, 1 as JSON)

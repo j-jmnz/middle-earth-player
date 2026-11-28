@@ -429,7 +429,7 @@ describe("Overwhelmed (21042:A:2) and Darkness in the East (21048:A:2)", () => {
   });
 });
 
-describe("Servant of Sauron (21041:A:3)", () => {
+describe("Servant of Sauron (21041:A:3): limit once per phase, a second raise in the phase makes no second attack", () => {
   // The raises come one after the other with the attack of the first still open: two raises in the Encounter phase start one attack.
   const raisedTwice = (effects: readonly (typeof EFFECTS)[number][]) => {
     const made = table({ phase: "Encounter", engaged: ["21041"], threat: [30, 30] }, effects);
