@@ -139,7 +139,7 @@ Scenario piles that place cards with no record (quest: 21077 A City in Turmoil; 
   21038:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose attachment (you control) that a player controls (not an encounter attachment)
+    - choose attachment (you control)
     - discard the picked card
 
 ## 21039 Secret Cultist
