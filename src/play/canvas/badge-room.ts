@@ -13,7 +13,7 @@ export const BADGE_TOP_SHORT = 3;
 export const NAME_LINE = 14;
 
 /** What stands at the foot of a card, in the effect column's way: the held or counted pill (`under`: its rect's height, whether it counts something, whether the card wears a number at its foot), a lifted pill (the open pick's number), and the plain foot pills (an engagement cost, a progress or loss number). */
-export type FootMarks = { under: { height: number; counted: boolean; strip: boolean } | null; lifted: boolean; plain: boolean; committed: boolean; combat: boolean };
+export type FootMarks = { under: { height: number; counted: boolean; strip: boolean; belowName?: boolean } | null; lifted: boolean; plain: boolean; committed: boolean; combat: boolean };
 
 /** A committed hero's Willpower pill (`Badges`) and a defender's or attacker's combat pill (`CombatPill`): 15 pt tall, 3 pt above the card's foot. */
 const WILL_TOP = 15 + 3;
@@ -43,7 +43,7 @@ export function pillFits(pillWidth: number, s: number, room: number): boolean {
 /** How far below the card's top edge the highest pill at the foot stands (what the effect pills stop above), or null with none. `height` is the card's rect. */
 export function footStop(height: number, s: number, marks: FootMarks): number | null {
   const tops = [
-    marks.under ? underMarkTop(marks.under.height, s, marks.under.counted, marks.under.strip) : null,
+    marks.under ? underMarkTop(marks.under.height, s, marks.under.counted, marks.under.strip, marks.under.belowName === true) : null,
     marks.lifted ? height - (2 * TOKEN + FOOT_ROW + 2) * s : null,
     marks.plain ? height - (TOKEN + FOOT_ROW) * s : null,
     marks.committed || marks.combat ? height - WILL_TOP * s : null,

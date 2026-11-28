@@ -6,6 +6,7 @@ import { engagementCostOf } from "../../rules/quest/quest.ts";
 import { isReanimatedCode, printedOf } from "../../rules/core/printed.ts";
 import { inPlay, type CardInstance } from "../../rules/core/state.ts";
 
+import type { RowStat } from "../words/asks.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
 import { islandTell } from "../words/scenarios/uncharted.ts";
 import { STEP_WORDS } from "../phases/rail.ts";
@@ -25,16 +26,21 @@ export function statOf(game: ScenarioState, ctx: ReduceContext, id: string, stat
   return card ? [{ icon: stat, value: modifiedStat(game, card, stat, ctx.cards), word: STAT_WORDS[stat] }] : [];
 }
 
-/** The stats an asks entry's `rowStats` puts on each row of its pick: the Threat and the engagement cost of an enemy the players choose among (17132:A:1), each as the engine reads it now. */
-export function rowStats(game: ScenarioState, ctx: ReduceContext, id: string, kinds: readonly ("threat" | "engagementCost")[] | undefined): SheetStat[] {
+/** The stats an asks entry's `rowStats` puts on each row of its pick: the Threat and the engagement cost of an enemy the players choose among (17132:A:1), the Threat and quest points of a location (21077:A:1), each as the engine reads it now. */
+export function rowStats(game: ScenarioState, ctx: ReduceContext, id: string, kinds: readonly RowStat[] | undefined): SheetStat[] {
   const card = game.cards[id];
   if (!kinds || !card) return [];
   const cost = engagementCostOf(game, card, ctx.cards);
-  return kinds.flatMap((kind): SheetStat[] => (kind === "threat" ? statOf(game, ctx, id, "threat") : cost == null ? [] : [{ icon: "engagementCost", value: cost, word: "Engagement cost" }]));
+  const points = printedOf(ctx.cards, card.code).type === "location" ? modifiedStat(game, card, "questPoints", ctx.cards) : null;
+  return kinds.flatMap((kind): SheetStat[] => {
+    if (kind === "threat") return statOf(game, ctx, id, "threat");
+    if (kind === "questPoints") return points == null ? [] : [{ icon: "questPoints", value: points, word: "Quest points" }];
+    return cost == null ? [] : [{ icon: "engagementCost", value: cost, word: "Engagement cost" }];
+  });
 }
 
 /** The stats a row of a pick shows, as a sheet option takes them (`{ stats }`, none for none): the lists the row already has (a Willpower, the Eye icons, a Sack tie) and then the enemy stats its entry's `rowStats` names. */
-export function statsOf(game: ScenarioState, ctx: ReduceContext, id: string, kinds: readonly ("threat" | "engagementCost")[] | undefined, ...lists: readonly (readonly SheetStat[])[]): { stats?: SheetStat[] } {
+export function statsOf(game: ScenarioState, ctx: ReduceContext, id: string, kinds: readonly RowStat[] | undefined, ...lists: readonly (readonly SheetStat[])[]): { stats?: SheetStat[] } {
   const stats = [...lists.flat(), ...rowStats(game, ctx, id, kinds)];
   return stats.length > 0 ? { stats } : {};
 }

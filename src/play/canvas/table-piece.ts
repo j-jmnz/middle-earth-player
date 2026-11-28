@@ -126,7 +126,7 @@ export const wearsFootNumber = (info: { questPoints: number | null; willpower: n
 export function footStopOf(slot: CardSlot, info: SlotNumbers | null, optionMark: OptionMark | undefined, s: number): number | null {
   if (!info) return null;
   const rect = shownBounds(slot);
-  const under = info.under ? { height: underRect(rect, slot.zone === "hand", s).h, counted: info.under.count != null, strip: wearsFootNumber(info, slot.resources) } : null;
+  const under = info.under ? { height: underRect(rect, slot.zone === "hand", s).h, counted: info.under.count != null, strip: wearsFootNumber(info, slot.resources), belowName: info.under.belowName === true } : null;
   const plain = info.engagement != null || info.fire != null || info.side?.loses != null || info.loss != null;
   return footStop(rect.h, s, { under, lifted: slot.kind === "card" && optionMark != null, plain, committed: info.willpower != null, combat: info.combat != null });
 }

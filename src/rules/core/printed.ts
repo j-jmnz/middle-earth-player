@@ -318,7 +318,8 @@ function fallenOf(hero: PrintedCard): PrintedCard {
       name: hero.name,
       type: "enemy",
       traits: hero.traits,
-      threat: hero.willpower ?? 0,
+      // An ally made an enemy prints no Threat for it (Secret Cultist, 21039:A:1): 0.
+      threat: hero.type === "ally" ? 0 : (hero.willpower ?? 0),
       engagementCost: hero.threat ?? 0,
       attack: hero.attack,
       defense: hero.defense,

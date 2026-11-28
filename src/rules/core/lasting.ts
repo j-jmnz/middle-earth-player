@@ -64,6 +64,10 @@ export const ENGINE_MARKS: ReadonlySet<ModifierStat> = new Set<ModifierStat>([
 // Effects of an ability that engine code makes under a name of its own. Each ends when its holder leaves play; one held by the table or a seat is no
 // card's, so this step never meets it.
 export const ENGINE_MADE_EFFECTS: ReadonlySet<ModifierStat> = new Set<ModifierStat>([
+  // Danger in Dorwinion (families/mordor): the damage bar on the first player's engaged enemies this round, a seat's note that it raised its threat this round, and the mark that keeps a dealt shadow card faceup on Black Númenórean. Each is read while it lasts and ends with its holder or its round.
+  "noDamageToEngaged",
+  "raisedThreat",
+  "keptShadow",
   // The players a per-player Time X counted when its counters were put on the stage (families/angmar/time.ts); the dial reads it while the stage is in play.
   "timePlayers",
   // A location in the staging area that cannot leave it and was explored in place (core/destroy.ts): it ends with the card, so the sweep does not explore it again.

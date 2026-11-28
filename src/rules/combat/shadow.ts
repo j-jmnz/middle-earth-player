@@ -133,7 +133,7 @@ function nextExtraShadow(state: ScenarioState, enemyId: string): string | undefi
 export function discardShadows(state: ScenarioState): ScenarioState {
   let next = state;
   for (const instance of Object.values(state.cards)) {
-    // Stage 1B of The Battle of Carn Dûm: "Do not discard unresolved shadow cards at the end of the combat phase" (10125:B:2).
+    // Cards a table or an enemy keeps past the combat phase: unresolved shadow cards on stage 1B of The Battle of Carn Dûm (10125:B:2), shadow cards with a shadow effect on Black Númenórean (21032:A:2); `discardableShadow` says which.
     if (instance.zone === "shadow" && discardableShadow(state, instance.id)) next = moveCard(next, instance.id, { zone: "encounterDiscard" });
   }
   return next;
@@ -143,7 +143,7 @@ function hasShadowEffect(state: ScenarioState, enemyId: string, ctx: ReduceConte
   return cardHasShadowEffect(state, state.cards[enemyId]?.shadowId ?? "", ctx);
 }
 
-function cardHasShadowEffect(state: ScenarioState, shadowId: string, ctx: ReduceContext): boolean {
+export function cardHasShadowEffect(state: ScenarioState, shadowId: string, ctx: ReduceContext): boolean {
   const shadow = state.cards[shadowId];
   return shadow != null && ctx.effects.some((effect) => effect.cardCode === shadow.code && effect.timing === "shadow");
 }

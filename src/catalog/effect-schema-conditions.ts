@@ -156,8 +156,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("anyThreat"), max: z.number().int().min(0) }),
   // The living player in seat `seat` (0 for Player 1) has a threat of at least `min`: a warning that names the player a raise would eliminate (Chaos in the Night, 17103:A:1). With `plus`, the seat's threat and that amount, a raise read now (the resources on Off Track, 17079:A:1), are at least `min`. False for a seat that is not in the game or is eliminated.
   z.strictObject({ kind: z.literal("seatThreat"), seat: z.number().int().min(0), min: z.number().int().min(0), plus: amountSchema.optional() }),
-  // The living player in seat `seat` would reach its threat elimination level (50, or the level the game now holds) if its threat rose by `raise`: the same read as the names of the players such a raise eliminates (The Gate of Iron, 17124:A:2). False for a seat that is not in the game or is eliminated.
-  z.strictObject({ kind: z.literal("raiseEliminates"), seat: z.number().int().min(0), raise: z.number().int().min(1) }),
+  // The living player in seat `seat` (the acting player with none: the choice of one player's own raise, 21042:A:3) would reach its threat elimination level (50, or the level the game now holds) if its threat rose by `raise` (a number, or an amount read now: the active location's Threat, 21040:A:1): the same read as the names of the players such a raise eliminates (The Gate of Iron, 17124:A:2). False for a seat that is not in the game or is eliminated.
+  z.strictObject({ kind: z.literal("raiseEliminates"), seat: z.number().int().min(0).optional(), raise: amountSchema }),
   // The attack that left this effect for its end (AfterAttack), or the damage the answered event placed, dealt at least `min` damage (1 by default):
   // "If this attack deals damage to a Ship objective" (11051:A:2; read with a `matches` condition on the defender).
   // The attack that left this effect for its end sent at least `min` damage on past its defender (excessToShip; 11055:A:2).
@@ -438,6 +438,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("stageInPlayWholeRound") }),
   // A location was explored this round, active or in the staging area ("+2 Attack instead if a location was explored this round", 17017:A:2); false unless the table holds the flag `noteExplored`. Read by the haradrim family.
   z.strictObject({ kind: z.literal("locationExploredThisRound") }),
+  // The player (the actor) raised their threat this round ("+2 Attack instead if you raised your threat this round", 21048:A:2); false unless the table holds the flag `noteThreatRaised`. Read by the mordor family.
+  z.strictObject({ kind: z.literal("raisedThreatThisRound") }),
   // The players' main quest stage and the Orcs' stage have the same number (`sameStage`), or not (`differentStage`): "While the players are not at the same stage as the Orcs" (17040:A:1; hrd.orcs-area-different-stage); `at`: the Orcs' stage has this number ("if Uruk Chieftain is at stage 2D", 17049:B:2). False in a game with no Orcs' area. Read by the haradrim family.
   z.strictObject({ kind: z.literal("orcsStage"), is: z.enum(["sameStage", "differentStage"]).optional(), at: z.number().int().positive().optional() }),
   // The active location prints a Wizardry line ("If no Wizardry effect is triggered this way", 143062:A:1, read with `not`; false with no active location). Read by the wizardry family.

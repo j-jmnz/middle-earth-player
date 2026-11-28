@@ -12,6 +12,7 @@ import { refCard, frameScope } from "../../interpret/amounts.ts";
 import { dealAdditionalShadow, type ReduceContext } from "../../interpret/interpret.ts";
 import type { Focus } from "../index.ts";
 import { flipInPlace } from "../wilderland/gundabad.ts";
+import { keptShadow } from "../mordor/shadows.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
@@ -52,7 +53,7 @@ export function flipTwoSided(state: ScenarioState, instruction: Verb<"FlipTwoSid
   return flipInPlace(state, { verb: "FlipInPlace", code, into }, ctx, steps);
 }
 
-/** The shadow cards left dealt at the end of the combat phase while the table keeps them (`keepShadowCards`): the facedown ones; a card the attack of its enemy turned up was resolved and goes. */
+/** The shadow cards left dealt at the end of the combat phase that are discarded: while the table keeps them (`keepShadowCards`) only the faceup ones (a card the attack of its enemy turned up was resolved and goes); a card Black Númenórean keeps (`keptShadow`, 21032:A:2) stays. */
 export function discardableShadow(state: ScenarioState, shadowId: string): boolean {
-  return !flagged(state, "table", "keepShadowCards") || state.cards[shadowId]?.face === "up";
+  return (!flagged(state, "table", "keepShadowCards") || state.cards[shadowId]?.face === "up") && !keptShadow(state, shadowId);
 }

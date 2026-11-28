@@ -141,6 +141,20 @@ describe("pnpm scenario new", { timeout: 60_000 }, () => {
     expect(plan?.edits.map((edit) => edit.file)).toEqual(["src/campaign/fixtures/registry.ts", "src/campaign/fixtures.ts", "scripts/e2e/writers.ts", "test/harness/golden-registry.ts"]);
   });
 
+  it("picks a free short name when the default one is taken", () => {
+    const view = without("the-temple-of-doom");
+    // Mount Doom owns "doom": the Temple of Doom starts from another word of its id.
+    const taken = planScenario("the-temple-of-doom", { short: "doom" }, view.repo, view.exists);
+    expect(taken.plan).toBeNull();
+    const { plan, problems, note } = planScenario("the-temple-of-doom", {}, view.repo, view.exists);
+    expect(problems).toEqual([]);
+    expect(plan?.facts.short).not.toBe("doom");
+    expect(note).toContain('"doom" is taken');
+    expect(note).toContain(`"${plan?.facts.short}"`);
+    const free = planScenario("the-drowned-ruins", {}, without("the-drowned-ruins").repo, without("the-drowned-ruins").exists);
+    expect(free.note).toBeUndefined();
+  });
+
   it("refuses a short name that is not an identifier", () => {
     const view = without("the-drowned-ruins");
     const { plan, problems } = planScenario("the-drowned-ruins", { short: "dr-ruins" }, view.repo, view.exists);

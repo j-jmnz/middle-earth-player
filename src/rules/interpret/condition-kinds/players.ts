@@ -35,7 +35,7 @@ export const playerHandlers = {
   alliesWillpower: (state, condition, scope, ctx) => alliesWillpowerHolds(state, scope.actor, condition.min, scope.sourceId, ctx),
   survivorsThreat: (state, condition) => livingSeats(state).every((seat) => (state.seats[seat]?.threat ?? 0) <= condition.max),
   seatThreat: (state, condition, scope, ctx) => livingSeats(state).includes(condition.seat) && seatThreat(state, condition.seat) + (condition.plus ? resolveAmount(state, condition.plus, amountScope(scope), ctx) : 0) >= condition.min,
-  raiseEliminates: (state, condition) => raiseEliminates(state, condition.seat, condition.raise),
+  raiseEliminates: (state, condition, scope, ctx) => raiseEliminates(state, condition.seat ?? scope.actor, resolveAmount(state, condition.raise, amountScope(scope), ctx)),
   anyThreat: (state, condition) => livingSeats(state).some((seat) => seatThreat(state, seat) <= condition.max),
   heroExhausted: (state, _condition, scope) => (state.seats[scope.actor]?.heroes ?? []).some((id) => state.cards[id]?.exhausted === true),
   otherPlayer: (state, _condition, scope) => livingSeats(state).some((seat) => seat !== scope.actor),
