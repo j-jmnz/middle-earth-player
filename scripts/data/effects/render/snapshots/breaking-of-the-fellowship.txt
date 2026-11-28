@@ -349,6 +349,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 
 142079:A:1 (front): Travel: A player at this staging area must engage an enemy in any staging area to travel here.
   142079:travel:1: Travel
+    who acts: the acting player is the first player, who takes the travel opportunity (with separate staging areas, each player in turn): that player engages the enemy
     note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no enemy matches the choose step (read by the angmar family); or when no card matches the line's choose step
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in any player's staging area, in the staging area only

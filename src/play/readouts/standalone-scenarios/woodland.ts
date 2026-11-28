@@ -3,11 +3,11 @@
 // The two limits The Woodland Realm's stages set, as top-bar dials. Stage 2 caps the progress placed on it each round (5, or 10 when Mendor was committed: the cap is fixed at the staging step, so the dial appears then): the ring fills toward the cap
 // and says "near" at it, as a plain limit. Stage 3B "To the Elvenking's Halls" counts the progress placed on it in the quest phase against 10, the number that reveals a card after a successful quest: a goal dial, full at 10. The engine
 // decided every number (`questProgressCap`, `questProgressPlaced`, `questProgressPhase`); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
-import { heldLeast } from "../../../rules/core/state.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 
-import { capFullWords, capLimitWords, capWords, phaseLimitWords, phaseWords } from "./woodland-words.ts";
+import { capWords, phaseLimitWords, phaseWords } from "./woodland-words.ts";
 import type { TableDial } from "../dials.ts";
+import { roundCapDial } from "../round-cap.ts";
 
 const SCENARIO = "the-woodland-realm";
 const STAGE_TWO: ReadonlySet<string> = new Set(["51103", "51104", "51105"]);
@@ -25,12 +25,8 @@ export function woodlandDials(game: ScenarioState, nameOf: (code: string) => str
   if (!stage) return [];
   const name = nameOf(stage.code);
   if (STAGE_TWO.has(stage.code)) {
-    const cap = heldLeast(game, "table", "questProgressCap");
-    if (cap <= 0) return [];
-    const placed = total(game, "questProgressPlaced");
-    // A plain limit, not a loss: it says "near" once the cap is reached and never warms (as the Hunt's progress cap does).
-    const warn = placed >= cap ? { level: "near" as const, words: capFullWords(name) } : null;
-    return [{ id: "cap", testID: "woodland-cap", label: "Cap", name: `Progress placed on ${name} this round, no more than ${cap}:`, value: placed, limit: cap, limitWords: capLimitWords(), ...(warn ? { warn } : {}), cardId: stage.id, note: capWords(placed, cap, name) }];
+    const cap = roundCapDial(game, stage, name, "woodland-cap", (placed, limit) => capWords(placed, limit, name));
+    return cap ? [cap] : [];
   }
   if (stage.code === HALLS) {
     const placed = total(game, "questProgressPhase");

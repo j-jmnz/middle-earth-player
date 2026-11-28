@@ -833,6 +833,26 @@
     },
     {
       "match": {
+        "code": "21024"
+      },
+      "set": {
+        "questPoints": 8
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Warriors of the East no quest points. The scan prints a quest points box of 8 and Victory 10, so progress can be placed on it and it can be defeated.",
+      "source": "scan 21024.A, sha256 6ff747f2c4527130dc095bc8349d274c16563d643914e4f9947443499239d0a5 (data/printed/vengeance-of-mordor.json)"
+    },
+    {
+      "match": {
+        "code": "21029"
+      },
+      "set": {
+        "questPoints": 6
+      },
+      "reason": "Hall of Beorn gives the encounter side quest An Arduous Journey no quest points. The scan prints a quest points box of 6 and Victory 10, so progress can be placed on it and it can be defeated.",
+      "source": "scan 21029.A, sha256 62d38eb578c9cce258d63d6a8276fb9e9de4e60e12a03e85f835c9a756fc0efb (data/printed/vengeance-of-mordor.json)"
+    },
+    {
+      "match": {
         "code": "18029"
       },
       "set": {

@@ -16,7 +16,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "07035:forced:2 @0.0 Pick": { owned: true, why: "it deals 3 damage.", note: "Choose a character you control to take it.", verb: "Assign" },
 
   // 07036:A:1 (Constant): each player refreshes at most 5 characters. The player chooses which exhausted characters beyond 5 stay exhausted, one at a time.
-  "07036:forced:1 @0.0 CapRefresh": { owned: true, why: "only 5 of your characters ready this refresh phase.", note: "{ready} would ready. Choose {left} to stay exhausted.", verb: "Keep exhausted" },
+  "07036:forced:1 @0.0 CapRefresh": { owned: true, why: "only 5 of your characters ready this refresh phase.", note: "{ready} exhausted characters would ready. Choose {left} of them to stay exhausted.", verb: "Keep exhausted" },
 
   // 07037:A:1 (When Revealed): with no attack made by a Huorn, each player searches the encounter deck and discard pile for a Huorn enemy and puts it into play engaged with him.
   "07037:whenRevealed:1 @1.0 SearchMove": { owned: true, why: "no Huorn attacked.", note: "Search the encounter deck and discard pile for a Huorn enemy. It enters play engaged with you.", verb: "Engage" },

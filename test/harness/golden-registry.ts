@@ -111,6 +111,7 @@ import * as sands from "../scenarios/beneath-the-sands/game.ts";
 import * as serpent from "../scenarios/the-black-serpent/game.ts";
 import * as poros from "../scenarios/the-crossings-of-poros/game.ts";
 import * as gurat from "../scenarios/the-dungeons-of-cirith-gurat/game.ts";
+import * as running from "../scenarios/the-river-running/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -234,6 +235,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-black-serpent", "The Black Serpent", serpent.SERPENT_GOLDENS, serpent.serpentWorld, serpent.playGolden),
   entry("the-dungeons-of-cirith-gurat", "The Dungeons of Cirith Gurat", gurat.GURAT_GOLDENS, gurat.guratWorld, gurat.playGolden),
   entry("the-crossings-of-poros", "The Crossings of Poros", poros.POROS_GOLDENS, poros.porosWorld, poros.playGolden),
+  entry("the-river-running", "The River Running", running.RUNNING_GOLDENS, running.runningWorld, running.playGolden),
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
   entry("the-battle-of-lake-town", "The Battle of Lake-town", town.TOWN_GOLDENS, town.townWorld, town.playGolden),
   entry("the-stone-of-erech", "The Stone of Erech", erech.ERECH_GOLDENS, erech.erechWorld, erech.playGolden),
