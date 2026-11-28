@@ -89,7 +89,7 @@ const VERBS = [
   z.strictObject({ verb: z.literal("PickFewestHitPointsLeft"), ...when }),
   // "The first player takes control of that location" (06091:B:2; 06105:A:1, ats.controlling-locations): the location the reference names (`subject`, the explored location the Forced effect hears, by default; `picked`, the location a discard stopped at) goes from the discard pile, the victory display,
   // the staging area or the active slot into the first player's play area: faceup, ready, with no progress, its text working there. The table notes who controls it (the flag `controlSeat`), so the loss of that control is seen wherever it comes from. A location already in a play area, or a card that is no location, is left as it is.
-  z.strictObject({ verb: z.literal("TakeControlOfLocation"), card: cardRefSchema.optional(), ...when }),
+  z.strictObject({ verb: z.literal("TakeControlOfLocation"), card: cardRefSchema.optional(), who: z.literal("actor").optional(), ...when }),
   // "Return a location he controls to the staging area" (06093:A:1, 06100:A:2, 06106:A:2; ats.losing-control-of-locations): the location the reference names (`picked` by default) goes to the staging area with its progress removed and nobody controls it; the table announces `controlLost`. A card that is not controlled is left as it is.
   z.strictObject({ verb: z.literal("LoseControlOfLocation"), card: cardRefSchema.optional(), ...when }),
   // "that character's controller must ..." (06100:A:2, 06101:A:2, 06104:A:2; a Shadow effect the attack leaves for its end): the player who controlled the character the attack destroyed (a Sentinel defender may belong to another player than the one attacked) acts for the instructions that follow in the effect. Nothing changes when the attack destroyed no character.
@@ -136,6 +136,9 @@ const TRIGGERS = [
   // About a location a player controlled that left his play area for any reason: returned to the staging area, traveled to, made the active location, or sent to the discard pile with an eliminated player's cards ("loses control of a location", 06103:A:2). The seat is the player who controlled it, the subject the
   // location (src/rules/families/pelargir/location-control.ts, a settle sweep).
   "controlLost",
+  // About a location a player took control of (TakeControlOfLocation): the seat is the player who took it, the subject the location ("After a player takes control of Makeshift Fortification", 22017:A:2, 22018:A:2). Announced in a game with a record that names it
+  // (src/rules/families/pelargir/location-control.ts), so no other game's events change.
+  "controlTaken",
 ] as const;
 
 const FLAGS = [

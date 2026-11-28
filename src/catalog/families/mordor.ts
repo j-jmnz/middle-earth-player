@@ -74,6 +74,10 @@ const FLAGS = [
   // On a quest stage (21085:B:2): no more than this much progress can be placed on this stage this round, whoever places it; 0 holds it shut. `stageProgressPlaced` is the count of the round (engine use, src/rules/families/mordor/stage-cap.ts).
   "stageProgressCap",
   "stageProgressPlaced",
+  // On an enemy, granted by the constant record of the attachment on it (22019:A:2): when it would be destroyed it heals all its damage and the attachment is discarded instead (src/rules/families/mordor/fury.ts, called from core/destroy.ts).
+  "healsInsteadOfDestroyed",
+  // On the table until the end of the phase, set by a Forced effect at the end of the round (22025:B:3): the stage that restricts its advance to the end of the round lets go while it holds.
+  "roundEnding",
 ] as const;
 
 export const manifest = { name: "mordor", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

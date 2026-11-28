@@ -15,6 +15,7 @@ import { modifyHeld } from "./held.ts";
 import { discardedTypesAmount, discardCopiesOfLooked } from "./cards.ts";
 import { discardUnderDial, putUnderDial } from "./dial.ts";
 import { defenderBarredByEngagement, mordorSweep } from "./engage.ts";
+import { controlsOutnumberStaging } from "./outnumber.ts";
 import { pickLowestDefense } from "./pick.ts";
 import { revealPowerOfMordor } from "./power.ts";
 import { shuffleStages } from "../quest/order.ts";
@@ -69,7 +70,7 @@ export const manifest: RulesFamily = {
   name: "mordor",
   verbs: ["AttachTreachery", "ModifyHeld", "AddRandomSetAsideToStaging", "ConvertAttachedAlly", "ReturnConvertedAlly", "ResolveActiveTravel", "KeepDealtShadow", "ResolveHeldShadowEffects", "PlaceResourcePerDiscarded", "RevealFacedownUnder", "BarDamageToEngaged", "ShuffleStagesUnder", "PickLowestDefense", "RevealPowerOfMordor", "PutUnderDial", "DiscardUnderDial", "DiscardCopiesOfLooked"],
   run,
-  condition: mordorCondition,
+  condition: (state, condition, scope, ctx) => mordorCondition(state, condition, scope) ?? controlsOutnumberStaging(state, condition, ctx),
   amount: (state, found, _scope, ctx) => discardedTypesAmount(state, found, ctx),
   settle: { sweep: mordorSweep },
   combat: { defense: defenderBarredByEngagement },

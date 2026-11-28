@@ -16,10 +16,14 @@ import { eliminateEmpties, markLoss } from "./eliminate.ts";
 import { announceAllyLeft } from "./ally-left.ts";
 import { indestructible } from "./keyword-flags.ts";
 import { addModifier, modifiedStat } from "./modified-stat.ts";
+import { healedInsteadOfDestroyed } from "../families/mordor/fury.ts";
 
 // A hero, ally or enemy whose damage reached its hit points: the cards attached to it hear it ("When attached enemy is destroyed", families/attachments/hold.ts), it is
 // destroyed, and Responses and Forced effects hear that a hero or ally (rr.destroy) or an enemy was destroyed. Damage and the sweep below both end this way.
 export function destroyAndAnnounce(state: ScenarioState, instance: CardInstance, printed: PrintedCard, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[]): ScenarioState {
+  // Fury (22019:A:2): the enemy heals and keeps playing instead (inert unless it holds the flag).
+  const healed = printed.type === "enemy" ? healedInsteadOfDestroyed(state, instance, steps) : null;
+  if (healed) return healed;
   let next = state;
   if (printed.type === "enemy" || printed.type === "hero") next = noteHostDefeated(next, instance.id, printed.type === "hero" ? cards : undefined);
   next = destroyCard(next, instance.id, cards, steps, false, true);

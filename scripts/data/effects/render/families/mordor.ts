@@ -34,10 +34,11 @@ export const MORDOR_TEMPLATES: Templates = {
 };
 
 export const MORDOR_CONDITIONS: ConditionTemplates = {
+  controlsOutnumberStaging: () => ({ text: "the players control more locations than the staging area holds (the active location is not in the staging area)", read: [] }),
   raisedThreatThisRound: () => ({ text: "the acting player raised their threat this round, by any effect or cost (false unless the table holds the flag noteThreatRaised)", read: [] }),
 };
 
-export const MORDOR_CONDITION_SAMPLES: Samples = { raisedThreatThisRound: [{ kind: "raisedThreatThisRound" }] };
+export const MORDOR_CONDITION_SAMPLES: Samples = { raisedThreatThisRound: [{ kind: "raisedThreatThisRound" }], controlsOutnumberStaging: [{ kind: "controlsOutnumberStaging" }] };
 
 export const MORDOR_SAMPLES: Samples = {
   AddRandomSetAsideToStaging: [{ verb: "AddRandomSetAsideToStaging", trait: "Plot" }],

@@ -1,6 +1,6 @@
 // Rules: ats.controlling-locations, ats.losing-control-of-locations, rr.explored, rr.in-play-and-out-of-play, rr.ownership-and-control, rr.travel, rr.active-location, rr.player-elimination (data/rules/entries.json); ledger lines 06091:B:2, 06093:A:1, 06103:A:1, 06103:A:2, 06105:A:1
 // (docs/scenarios/against-the-shadow/assault-on-osgiliath.md, Engine notes).
-// A location a player controls lies in his play area (a seat's `play` list), faceup, with its text working. TakeControlOfLocation puts it there and notes the seat on the card (the flag `controlSeat`, the seat plus 1); the control is lost when the location is
+// A location a player controls lies in his play area (a seat's `play` list), faceup, with its text working. TakeControlOfLocation puts it there (it announces `controlTaken` when a record hears it) and notes the seat on the card (the flag `controlSeat`, the seat plus 1); the control is lost when the location is
 // in no play area any more. Every way to lose it is seen in one place, the settle sweep: a record that returns the location (LoseControlOfLocation, ReturnToStaging on the card itself), a travel to it or a card that makes it the active location (West Gate), and
 // the cards of an eliminated player, which the core sends to the encounter discard pile. A loss removes the progress, leaves the location in the staging area and announces `controlLost` for the seat that held it.
 import type { Instruction } from "../../../catalog/boundary.ts";
@@ -55,9 +55,12 @@ export function takeControlOfLocation(state: ScenarioState, instruction: Verb<"T
   const id = refCard(state, instruction.card ?? "subject", frameScope(state, focus.seat, focus.sourceId));
   const card = id ? state.cards[id] : undefined;
   if (!id || !card || card.zone === "play" || !isLocation(state, id, ctx)) return state;
-  const seat = state.firstPlayer;
+  // `who: actor`: the player who resolves the effect takes control (the Encounter Action of Ransacked House, 22016:A:1); the first player otherwise.
+  const seat = instruction.who === "actor" ? focus.seat : state.firstPlayer;
   const moved = updateCard(moveCard(state, id, { zone: "play", seat }), id, { face: "up", exhausted: false, progress: 0 });
-  return noted(moved, id, seat);
+  const taken = noted(moved, id, seat);
+  // "After a player takes control of" (22017:A:2, 22018:A:2): announced only in a game with a record that hears it.
+  return gameReads(state, ctx, '"controlTaken"') ? queueEvent(taken, { trigger: "controlTaken", seat, subject: id }) : taken;
 }
 
 /** The control of the location is lost: no progress, in the staging area, nobody controls it, and `controlLost` is announced for the seat that held it. */
