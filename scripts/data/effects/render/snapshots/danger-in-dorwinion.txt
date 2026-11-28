@@ -1,0 +1,444 @@
+Scenario piles that place cards with no record (quest: 21077 A City in Turmoil; quest: 21078 The Shadow of Mordor; quest: 21079 Leader of the Cult; setAside: 21030 Priest of Sauron; setAside: 21031 The Governor; setAside: 21032 Black Númenórean; setAside: 21033 Bribes; setAside: 21034 Submit or Die; setAside: 21035 Sauron Worship)
+
+## 21030 Priest of Sauron
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+21030:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+21030:A:2 (front): Cannot be optionally engaged.
+  21030:constant:1: Constant
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+21030:A:3 (front): Forced: After Priest of Sauron attacks and destroys an ally, raise each player's threat by 2.
+  21030:forced:1: Forced on the event characterDestroyedByAttack (heard about ally (any player controls))
+    only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - raise threat by 2 (each player)
+
+## 21031 The Governor
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+21031:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+21031:A:2 (front): Forced: After a location is revealed from the encounter deck, The Governor engages the first player and makes an immediate attack.
+  21031:forced:1: Forced after a card is revealed (heard about location (any player controls); only when the encounter deck revealed it)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this enemy, in the staging area or engaged with another player (it moves), engages the first player
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+## 21032 Black Númenórean
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+21032:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+21032:A:2 (front): Do not discard shadow cards dealt to Black Númenórean if they have a shadow effect.
+  21032:forced:1: Forced on the event shadowDealtTo (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the shadow card just dealt to this enemy becomes its first shadow card, the ones it held lying faceup beside it; when it has a shadow effect it is kept faceup on this enemy past the end of the combat phase, until the enemy leaves play
+
+21032:A:3 (front): Forced: When Black Númenórean attacks, resolve each of his faceup shadow cards as if they had been dealt this round.
+  21032:forced:2: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    who acts: the acting player is the defending player (the player the attack is against)
+    - each faceup shadow card this enemy holds with a shadow effect resolves that effect now against the attack in progress, the defending player resolving it, in the order they were dealt
+
+## 21033 Bribes
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+21033:A:1 (front): Add +1 to the total Threat in the staging area for each resource here.
+  21033:constant:1: Constant
+    - the table: stat moreStagingThreat resources of this card, while this card is in play
+
+21033:A:2 (front): Forced: When the active location is explored, discard the top X cards of each player's deck, where X is that location's Threat. Then, place 1 resource here for each event discarded this way.
+  21033:forced:1: Forced on the event activeExplored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the top threat of the card the event is about card(s) of the acting player's deck go to their discard pile
+    - 1 resource is placed on this card for each event card among those this effect discarded from the top of the players' decks, all the decks counted together
+
+## 21034 Submit or Die
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+21034:A:1 (front): Each non-unique enemy gets +1 Attack.
+  21034:constant:1: Constant
+    - each non-unique enemy (any player controls) or in the staging area: stat attack 1, while this card is in play
+
+21034:A:2 (front): Forced: After an enemy attacks and destroys a character, place 1 damage token here. Then, if there are X damage tokens here, the players lose the game. X is 4 more than the number of players.
+  21034:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - place 1 damage token(s) on this card (placed, not dealt: nothing cancels or reduces them)
+    - then, if not (damage of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game
+
+## 21035 Sauron Worship
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+21035:A:1 (front): Sauron Worship enters play with 1 damage token on it.
+  21035:triggered:1: Triggered (mandatory, not printed as Forced) on the event encounterEnteredPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - place 1 damage token(s) on this card (placed, not dealt: nothing cancels or reduces them)
+    - each player whose threat is at or above his threat elimination level now (50, less what the effects before this one took off) is eliminated at once
+
+21035:A:2 (front): Each player's threat elimination level is reduced by 1 for each damage token here.
+  21035:constant:1: Constant
+    - each player: stat eliminationReduction damage of this card, while this card is in play
+
+21035:A:3 (front): Forced: At the end of the round, place 1 damage token here.
+  21035:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - place 1 damage token(s) on this card (placed, not dealt: nothing cancels or reduces them)
+    - each player whose threat is at or above his threat elimination level now (50, less what the effects before this one took off) is eliminated at once
+
+## 21036 Evidence of the Cult
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21036:A:1 (front): Guarded (enemy).
+  21036:whenRevealed:1: When revealed
+    - the Guarded keyword: this objective in the staging area is guarded by the first encounter enemy discarded from the deck, added to the staging area
+
+21036:A:2 (front): Attached enemy gets +1 Threat, +1 Attack, and +1 Defense.
+  21036:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) or in the staging area, that is attached to this objective as its guard, or is the card this objective hangs on: stat threat 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, that is attached to this objective as its guard, or is the card this objective hangs on: stat attack 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, that is attached to this objective as its guard, or is the card this objective hangs on: stat defense 1, while this card is in play
+
+21036:A:3 (front): When Evidence of the Cult is free of encounters, add it to the victory display. Then, place 1 resource on the main quest.
+  21036:constant:2: Constant
+    - a constant marker: when this card in the staging area is free of encounters (nothing is attached to it as its guard) it is added to the victory display and 1 resource is placed on the main quest card
+
+## 21037 Hillside Manor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21037:A:1 (front): While Hillside Manor is in the staging area, each player's threat cannot be reduced by more than 1 each round by player card effects.
+  21037:constant:1: Constant
+    only if this card is in the staging area
+    - each player: stat playerThreatReductionCap 1, while this card is in play
+
+21037:A:2 (front): Travel: Each player discards 1 random card from his hand.
+  21037:travel:1: Travel
+    note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player's hand holds fewer cards than they must discard
+    - for each player, first player first:
+      - the acting player discards 1 random card(s) from hand
+
+## 21038 Disappearances
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21038:A:1 (front): When Revealed: Each player discards all ally cards from his hand. If no cards are discarded this way, Disappearances gains doomed 2.
+  21038:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player discards each ally (you control) in hand
+    - then, if the running effect has discarded no card (with DiscardEach) (checked when this step runs, after the steps above; not tied to whether they did anything): each player raises their threat by 2 from the doomed keyword this card gains (doomedRaised is announced for each)
+
+21038:A:2 (shadow): Shadow: Discard an attachment you control.
+  21038:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control) that a player controls (not an encounter attachment)
+    - discard the picked card
+
+## 21039 Secret Cultist
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21039:A:1 (front): When Revealed: Attach to the highest attack ally in play. (Counts as a Condition attachment with the text: 'Attached ally loses the ally card type, gains the enemy card type, and engages its owner. Treat attached ally's text box as if it were blank. If Secret Cultist is discarded, or the attached ally's owner is eliminated, discard attached ally.')
+  21039:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ally (any player controls) with the highest printed Attack among the allies in play, whatever they get now (ties: the chooser decides), chosen by the first player
+    - then, if there is a ally (any player controls) with the highest printed Attack among the allies in play, whatever they get now (ties: the chooser decides), chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this card attaches to the picked card (nowhere if that card carries one of its title already)
+    - the ally this card is attached to loses the ally card type and gains the enemy card type, its text box blank (its own Attack, Defense and hit points stay, its Threat is its Willpower), and it engages its owner (nothing when the host is not an ally in a player's area)
+  21039:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  21039:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - each ally made an enemy by Secret Cultist that no Secret Cultist is attached to any more (this one left play, or the enemy was defeated) goes to its owner's discard pile as the ally card it printed
+  21039:triggered:2: Triggered (mandatory, not printed as Forced) on the event playerEliminated
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - when the owner of the ally this card is attached to is eliminated, that ally goes to its owner's discard pile as the ally card it printed, and this card is discarded
+
+## 21040 Messenger from Mordor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21040:A:1 (front): When Revealed: Either raise each player's threat by X, where X is the active location's Threat, or Messenger from Mordor makes an immediate attack against the first player.
+  21040:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    - the first player chooses one of:
+      * option "threat":
+        - raise threat by threat of the active location (each player)
+      * option "attack":
+        - this card attacks the first player now, from the staging area, dealt a shadow card
+
+21040:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack.
+  21040:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack 1, until the end of the attack
+
+## 21041 Servant of Sauron
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21041:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+21041:A:2 (front): Servant of Sauron engages the first player.
+  21041:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this enemy, in the staging area, engages the first player
+
+21041:A:3 (front): Forced: After the engaged player raises his threat, Servant of Sauron makes an immediate attack. (Limit once per phase.)
+  21041:forced:2: Forced after a player's threat is raised (limit once per phase)
+    only if this card is an enemy engaged with the acting player
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+## 21042 Overwhelmed
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21042:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+21042:A:2 (front): When Revealed: Until the end of the round, enemies engaged with the first player cannot take damage.
+  21042:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    - until the end of the round, enemies engaged with the first player cannot take damage, read as the table stands (an enemy that engages that player later in the round is held too) [also {"until":"endOfRound"}]
+
+21042:A:3 (shadow): Shadow: Either raise your threat by 2, or attacking enemy cannot take damage this round.
+  21042:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by 2 (the acting player)
+      * option "damage":
+        - the attacking enemy: stat cannotTakeDamage 1, until the end of the round
+
+## 21043 Shadow of Fear
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21043:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+21043:A:2 (front): Forced: After an enemy engages a player, that player raises his threat by 1.
+  21043:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about enemy (any player controls))
+    who acts: the acting player is the player the enemy engaged
+    - raise threat by 1 (the player the event is about)
+
+21043:A:3 (front): Response: When Shadow of Fear is defeated, reduce each player's threat by 3.
+  21043:response:1: Response after a side quest is defeated (its progress reached its quest points) (heard about this card)
+    - lower threat by 3 (each player)
+
+## 21044 Rhûn Backstabber
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21044:A:1 (front): Forced: After Rhûn Backstabber engages you, either raise your threat by 2, or discard an ally you control with printed cost 2 or higher.
+  21044:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by 2 (the acting player)
+      * option "discard" (only if there is a ally (you control) with a printed cost of at least 2 (a card with no printed cost never matches) to choose):
+        - choose ally (you control) with a printed cost of at least 2 (a card with no printed cost never matches)
+        - discard the picked card
+
+21044:A:2 (shadow): Shadow: Raise your threat by 1 for each enemy engaged with you.
+  21044:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - raise threat by the number of enemy (any player controls) engaged with you (the acting player)
+
+## 21045 Treacherous Easterling
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21045:A:1 (front): Treacherous Easterling gets +1 Attack and +1 Defense for each resource token on it. (Limit +3 Attack and +3 Defense.)
+  21045:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack resources of this card, at most 3, while this card is in play
+    - this card: stat defense resources of this card, at most 3, while this card is in play
+
+21045:A:2 (front): Forced: After the engaged player raises his threat, place 1 resource token on Treacherous Easterling.
+  21045:forced:1: Forced after a player's threat is raised
+    only if this card is an enemy engaged with the acting player
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 1 resource tokens on this card
+
+## 21046 City Forum
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21046:A:1 (front): City Forum gets +1 Threat for each resource here.
+  21046:constant:1: Constant
+    - this card: stat threat resources of this card, while this card is in play
+
+21046:A:2 (front): While City Forum is in the staging area, it gains: 'Forced: After a location is explored, place 1 resource here.'
+  21046:forced:1: Forced on the event locationExplored
+    only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 1 resource tokens on this card
+
+21046:A:3 (front): Travel: Each player raises his threat by 1 for each resource here.
+  21046:travel:1: Travel
+    - raise threat by resources of this card (each player)
+
+## 21047 Seedy Tavern
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21047:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+21047:A:2 (front): Forced: When Seedy Tavern is explored, reveal each facedown card under it.
+  21047:forced:1: Forced on the event locationExplored (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - each card facedown under this card is revealed by the acting player as an encounter card that is not from the encounter deck (its When Revealed resolves, a location or enemy is added to the staging area)
+
+21047:A:3 (front): Travel: Look at the top 5 cards of the encounter deck. Put one of those cards facedown under Seedy Tavern and shuffle the rest back into the encounter deck.
+  21047:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player looks at the top 5 card(s) of the encounter deck (a card with a Forced effect for being looked at acts at once and is not one of them)
+    - choose an encounter card among the cards the effect looked at (none when no card matches)
+    - the last picked card is placed facedown under this location; while it is there it is out of play
+    - shuffle the encounter deck
+
+## 21048 Darkness in the East
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21048:A:1 (front): When Revealed: Raise each player's threat by X, where X is the active location's Threat. If there is no active location, Darkness in the East gains surge.
+  21048:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (there is a location (any player controls) that is the active location to choose): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - raise threat by threat of the active location (each player)
+
+21048:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you raised your threat this round).
+  21048:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the acting player raised their threat this round, by any effect or cost (false unless the table holds the flag noteThreatRaised): the attacking enemy: stat attack 2, until the end of the attack
+    - then, if not (the acting player raised their threat this round, by any effect or cost (false unless the table holds the flag noteThreatRaised)) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 21049 Side Street
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21049:A:1 (front): While Side Street is in the staging area, progress cannot be placed on other locations in the staging area.
+  21049:constant:1: Constant
+    only if this card is in the staging area
+    - each location (any player controls) in the staging area only, other than this card: stat noProgressPlaced 1, while this card is in play
+
+21049:A:2 (front): Travel: Shuffle the encounter discard pile into the encounter deck and discard cards until a location is discarded. Add that location to the staging area.
+  21049:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
+    - then, if the picked card is a location (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+
+## 21050 Catacombs
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21050:A:1 (front): While Catacombs is in the staging area, enemies in the staging area cannot take damage.
+  21050:constant:1: Constant
+    only if this card is in the staging area
+    - each enemy (any player controls) in the staging area only: stat cannotTakeDamage 1, while this card is in play
+
+21050:A:2 (front): Travel: Each player discards the top card of the encounter deck. If a player discards an enemy this way, he puts it into play engaged with him.
+  21050:travel:1: Travel
+    - for each player, first player first:
+      - the top card of the encounter deck goes to the encounter discard pile
+      - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
+
+## 21051 Under Guard
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21051:A:1 (front): When Revealed: Resolve the Travel effect on the active location. If there is no active location, discard cards from the encounter deck until a location is discarded. Add that location to the staging area.
+  21051:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the Travel effect of the active location resolves as an effect of that card: its cost is not paid and the players do not travel (nothing with no active location, a blank text box or no Travel effect)
+    - then, if not (there is a location (any player controls) that is the active location to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
+    - then, if the picked card is a location (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+
+21051:A:2 (shadow): Shadow: If this attack destroys a character, resolve the Travel effect on the active location.
+  21051:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the Travel effect of the active location resolves as an effect of that card: its cost is not paid and the players do not travel (nothing with no active location, a blank text box or no Travel effect)
+
+## 21052 Unwelcome Travelers
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21052:A:1 (front): Each location in the staging area gets +1 Threat.
+  21052:constant:1: Constant
+    - each location (any player controls) in the staging area only: stat threat 1, while this card is in play
+
+21052:A:2 (front): Forced: After Unwelcome Travelers becomes the current quest, the first player discards cards from the top of the encounter deck until an enemy is discarded and puts it into play engaged with him.
+  21052:forced:1: Forced on the event becameCurrentQuest (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - for each player (at most 1 players), first player first:
+      - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
+      - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
+
+## 21077 A City in Turmoil
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+21077:A:1 (front): Setup: Set each Plot objective and each Cultist enemy aside, out of play. Each player searches the encounter deck for a different location and adds it to the staging area. One of those locations must be Side Street. Shuffle the encounter deck.
+  21077:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one location in the encounter deck and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found; while the card with code 21049 is there to be found, the search must take it (the first search of the effect that can)
+    - shuffle the encounter deck
+    - the table: stat noteThreatRaised (the table notes each player's raised threat until the end of that round, for the condition raisedThreatThisRound; the Setup sets it for the rest of the game) 1, until the end of the game
+
+21077:B:1 (back): Forced: After the active location leaves play as an explored location, place 1 resource here.
+  21077:forced:1: Forced on the event activeExplored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 1 resource tokens on this card
+
+21077:B:2 (back): This stage cannot be defeated unless there are at least 2 resources here.
+  21077:constant:1: Constant
+    only if resources of this card is less than 2
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
+
+## 21078 The Shadow of Mordor
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+21078:A:1 (front): When Revealed: Add 1 random set aside Plot objective to the staging area. Reveal 1 encounter card per player.
+  21078:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one random set-aside card with the trait Plot (drawn by the game seed, by the player who resolves this) is added to the staging area, faceup and not revealed (nothing when none is set aside)
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+21078:B:1 (back): Forced: After the active location leaves play as an explored location, reveal the top card of the encounter deck. Then, place 1 resource here.
+  21078:forced:1: Forced on the event activeExplored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player reveals an encounter card
+    - place 1 resource tokens on this card
+
+21078:B:2 (back): This stage cannot be defeated unless there are at least X resources here, where X is 3 more than the number of players.
+  21078:constant:1: Constant
+    only if resources of this card is less than the number of players + 3
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
+
+## 21079 Leader of the Cult
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+21079:A:1 (front): When Revealed: Add 1 random set-aside Cultist enemy to the staging area. Shuffle the encounter discard pile into the encounter deck and discard cards until X enemies are discarded, where X is one less than the number of players. Add each enemy discarded this way to the staging area.
+  21079:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one random set-aside card with the trait Cultist (drawn by the game seed, by the player who resolves this) is added to the staging area, faceup and not revealed (nothing when none is set aside)
+    - shuffle the encounter discard pile into the encounter deck
+    - discard from the top of the encounter deck until 1 enemy for each player less 1 is discarded; add those enemies to the staging area
+
+21079:B:1 (back): The Cultist cannot take more than X damage each round, where X is the printed quest points of the active location.
+  21079:constant:1: Constant
+    only if there is a location (any player controls) that is the active location to choose
+    - each Cultist enemy (any player controls) or in the staging area: stat damageCap (it takes no more than this much damage each round; damage past it is not placed) printed quest points of the active location, while this card is in play
+  21079:constant:2: Constant
+    only if not (there is a location (any player controls) that is the active location to choose)
+    - each Cultist enemy (any player controls) or in the staging area: stat cannotTakeDamage 1, while this card is in play
+
+21079:B:2 (back): When the Cultist enemy is defeated, the players win the game.
+  21079:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about Cultist enemy (any player controls))
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players win the game
+
+(rendered pieces: 244 by template, 1 as JSON)
