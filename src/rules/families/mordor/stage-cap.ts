@@ -1,4 +1,4 @@
-// Rules: rr.lasting-effects, rr.progress (data/rules/entries.json); ledger line 21085:B:2 (docs/scenarios/vengeance-of-mordor/the-temple-of-doom.md, Readings).
+// Rules: rr.lasting-effects, rr.active-location (data/rules/entries.json); ledger line 21085:B:2 (docs/scenarios/vengeance-of-mordor/the-temple-of-doom.md, Readings).
 // "Until the end of the round, no more than X progress can be placed on this stage": the cap is held by the stage card itself (`stageProgressCap`), so a side quest chosen as the current quest takes progress freely; the progress the stage took this round is
 // a `stageProgressPlaced` count on the stage. A cap of 0 holds the stage shut, which is why the cap is read from the modifiers and not as a flag (a flag needs an amount above 0). The tightest cap held applies.
 import type { ScenarioState } from "../../core/state.ts";
