@@ -109,6 +109,7 @@ import { porosFixtures } from "./haradrim/the-crossings-of-poros.ts";
 import { guratFixtures } from "./haradrim/the-dungeons-of-cirith-gurat.ts";
 import { runningFixtures } from "./vengeance-of-mordor/the-river-running.ts";
 import { dorwinionFixtures } from "./vengeance-of-mordor/danger-in-dorwinion.ts";
+import { templedoomFixtures } from "./vengeance-of-mordor/the-temple-of-doom.ts";
 
 // The scenarios scenario 1's block writes by hand (`won` is the one fixture not committed that the registry names, `knife-lost` starts from its log).
 export const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
@@ -229,4 +230,5 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "the-dungeons-of-cirith-gurat": () => guratFixtures(),
   "the-river-running": () => runningFixtures(),
   "danger-in-dorwinion": () => dorwinionFixtures(),
+  "the-temple-of-doom": () => templedoomFixtures(),
 };
