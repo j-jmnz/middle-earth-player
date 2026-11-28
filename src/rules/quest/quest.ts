@@ -24,6 +24,7 @@ import { placeQuestingProgress, type QuestDamageCause } from "../families/defens
 import { travelsOverActive } from "../families/grapple/travel.ts";
 import { exploreIfFull, freeSlot, makeActiveIn, placeOnActive } from "../families/south/locations.ts";
 import { noteQuestPlaced, questRoom } from "../families/caves/progress.ts";
+import { noteStageCapPlaced, stageCapRoom } from "../families/mordor/stage-cap.ts";
 import { mainQuestBlocked } from "../families/haradrim/track.ts";
 import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts";
 import { attachedStageFrom, branchFrom, holdStage, reached as reachedStage } from "../families/quest/branch.ts";
@@ -266,11 +267,14 @@ export function putOnStage(from: ScenarioState, stageId: string, wanted: number,
   // `stageCappedPrinted` (17100:A:2): the cap is the quest points printed on the stage, not a value an effect changed.
   const printedCap = flagged(state, stageId, "stageCappedPrinted") ? (printedOf(cards, stage.code).questPoints ?? null) : null;
   const capped = printedCap ?? (points != null && flagged(state, stageId, "stageCapped") ? points : null);
-  const placed = advancing || capped != null ? Math.min(amount, Math.max(0, (capped ?? points ?? 0) - stage.progress)) : amount;
+  const room = advancing || capped != null ? Math.min(amount, Math.max(0, (capped ?? points ?? 0) - stage.progress)) : amount;
+  // "No more than X progress can be placed on this stage this round" (21085:B:2).
+  const placed = Math.min(room, stageCapRoom(state, stageId));
   let next = state;
   if (placed > 0) {
     next = updateCard(next, stageId, { progress: stage.progress + placed });
     if (counted) next = noteQuestPlaced(next, placed);
+    next = noteStageCapPlaced(next, stageId, placed);
     next = noteQuestPhase(next, placed);
     steps.push({ kind: "progress", targetId: stageId, amount: placed, cause });
   }

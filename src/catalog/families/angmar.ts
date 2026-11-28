@@ -194,6 +194,7 @@ const FLAGS = [
   // On a side quest, until the end of the round: progress was placed on it this round ("if no progress was placed on Lie Low this round", 10081:A:1; families/angmar/progress.ts). The engine notes it for every side quest that takes progress; a record reads it with the condition `flag`.
   "progressPlacedHere",
   // On the main quest card: it cannot be chosen as the current quest during the quest phase (10094:B:3); a side quest chosen at the start of the phase is the current quest, else there is none (families/wilderland/night-quest.ts currentQuestId).
+  // On a side quest (21053:A:2, Tribute to Mordor): it cannot be the current quest while the flag holds; the choice of the current quest leaves it out (families/wilderland/night.ts askCurrentQuest).
   "cannotBeCurrentQuest",
   // On the main quest card, from a constant "if" ("If there are no Treachery of Rhudaur side quests in play, immediately advance to stage 2", 10094:B:4): once nothing is resolving the quest advances (families/angmar/stage.ts advanceWhenFlagged, a settle sweep).
   "advanceNow",

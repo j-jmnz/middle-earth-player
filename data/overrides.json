@@ -843,6 +843,26 @@
     },
     {
       "match": {
+        "code": "21053"
+      },
+      "set": {
+        "questPoints": 12
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Tribute to Mordor no quest points. The scan prints a quest points box of 12 and Victory 10, so progress can be placed on it and it can be defeated.",
+      "source": "scan 21053.A, sha256 74bfaf844c57a359f85d3faa263b3f295695d094cfc10741096026776646892a (data/printed/vengeance-of-mordor.json)"
+    },
+    {
+      "match": {
+        "code": "21065"
+      },
+      "set": {
+        "questPoints": 8
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Lost in the Dark no quest points. The scan prints a quest points box of 8 and Victory 10, so progress can be placed on it and it can be defeated.",
+      "source": "scan 21065.A, sha256 7ce43f5f605b22d1b2b0c988c2a8fde1fe736f1c1a09d6da4a9661d30f5df234 (data/printed/vengeance-of-mordor.json)"
+    },
+    {
+      "match": {
         "code": "21029"
       },
       "set": {

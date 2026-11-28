@@ -1,6 +1,6 @@
-// Rules: rr.attachment-cards, rr.lasting-effects, rr.shadow-effects, rr.travel, rr.guarded (data/rules/entries.json); ledger lines 21017:A:1, 21021:A:1, 21024:A:2, 21025:A:1, 21027:A:2 and those of Danger in Dorwinion (21030 to 21052, 21077 to 21079).
+// Rules: rr.attachment-cards, rr.lasting-effects, rr.shadow-effects, rr.travel, rr.guarded, rr.reveal, rr.engaged, rr.threat-threat-dial (data/rules/entries.json); ledger lines 21017:A:1, 21021:A:1, 21024:A:2, 21025:A:1, 21027:A:2 and those of Danger in Dorwinion (21030 to 21052, 21077 to 21079) and The Temple of Doom (21053 to 21070, 21080 to 21085).
 // The verbs src/catalog/families/mordor.ts adds: a treachery of the discard pile attached to an enemy (attach.ts), a lasting effect held by a class of cards (held.ts), the ally Secret Cultist makes an enemy (convert.ts), the Travel effect of the active location resolved as an effect (travel.ts), the
-// shadow cards Black Númenórean keeps (shadows.ts), the cards facedown under Seedy Tavern and the events Bribes counts (under.ts), the random set-aside Plot and Cultist cards (set-aside.ts), the damage Overwhelmed bars and the threat raise Darkness in the East reads (rounds.ts).
+// shadow cards Black Númenórean keeps (shadows.ts), the cards facedown under Seedy Tavern and the events Bribes counts (under.ts), the random set-aside Plot and Cultist cards (set-aside.ts), the damage Overwhelmed bars and the threat raise Darkness in the East reads (rounds.ts), the Power of Mordor deck (power.ts), the cards under a threat dial (dial.ts), the enemies that engage by a constant line (engage.ts) and what the stage 2B cards read of discards (cards.ts).
 
 import type { Instruction } from "../../../catalog/boundary.ts";
 
@@ -12,6 +12,12 @@ import type { Focus } from "../index.ts";
 import { attachTreachery } from "./attach.ts";
 import { convertAttachedAlly, returnConvertedAlly } from "./convert.ts";
 import { modifyHeld } from "./held.ts";
+import { discardedTypesAmount, discardCopiesOfLooked } from "./cards.ts";
+import { discardUnderDial, putUnderDial } from "./dial.ts";
+import { defenderBarredByEngagement, mordorSweep } from "./engage.ts";
+import { pickLowestDefense } from "./pick.ts";
+import { revealPowerOfMordor } from "./power.ts";
+import { shuffleStages } from "../quest/order.ts";
 import { barDamageToEngaged, mordorCondition } from "./rounds.ts";
 import { addRandomSetAsideToStaging } from "./set-aside.ts";
 import { keepDealtShadow, resolveHeldShadowEffects } from "./shadows.ts";
@@ -42,6 +48,18 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return revealFacedownUnder(state, focus, ctx, steps);
     case "BarDamageToEngaged":
       return barDamageToEngaged(state, focus);
+    case "ShuffleStagesUnder":
+      return shuffleStages(state, instruction.codes);
+    case "PickLowestDefense":
+      return pickLowestDefense(state, instruction, focus, ctx, steps);
+    case "RevealPowerOfMordor":
+      return revealPowerOfMordor(state, instruction, ctx, steps);
+    case "PutUnderDial":
+      return putUnderDial(state, instruction, focus);
+    case "DiscardUnderDial":
+      return discardUnderDial(state, focus);
+    case "DiscardCopiesOfLooked":
+      return discardCopiesOfLooked(state, focus, ctx, steps);
     default:
       return null;
   }
@@ -49,7 +67,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "mordor",
-  verbs: ["AttachTreachery", "ModifyHeld", "AddRandomSetAsideToStaging", "ConvertAttachedAlly", "ReturnConvertedAlly", "ResolveActiveTravel", "KeepDealtShadow", "ResolveHeldShadowEffects", "PlaceResourcePerDiscarded", "RevealFacedownUnder", "BarDamageToEngaged"],
+  verbs: ["AttachTreachery", "ModifyHeld", "AddRandomSetAsideToStaging", "ConvertAttachedAlly", "ReturnConvertedAlly", "ResolveActiveTravel", "KeepDealtShadow", "ResolveHeldShadowEffects", "PlaceResourcePerDiscarded", "RevealFacedownUnder", "BarDamageToEngaged", "ShuffleStagesUnder", "PickLowestDefense", "RevealPowerOfMordor", "PutUnderDial", "DiscardUnderDial", "DiscardCopiesOfLooked"],
   run,
   condition: mordorCondition,
+  amount: (state, found, _scope, ctx) => discardedTypesAmount(state, found, ctx),
+  settle: { sweep: mordorSweep },
+  combat: { defense: defenderBarredByEngagement },
 };

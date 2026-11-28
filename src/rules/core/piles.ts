@@ -6,7 +6,7 @@ import type { CardInstance, ScenarioState } from "./state.ts";
 import { updateCard } from "./state.ts";
 
 /** The zones of the decks beside the encounter deck that are kept in `ScenarioState.piles` (the Caves, Evil Creatures, Balrog, Raven, Smaug, Spiders, Orc, Side Quest, Harad, Great Spider, Angmar Orc and Investigation decks, and the two seats' out-of-play decks of To Catch an Orc). The one list the zone types (`PileZone`, `ZoneName`, `Destination`, the dealt zones of the Setup) and the zone guard derive from. */
-export const PILE_ZONES = ["cavesDeck", "evilCreaturesDeck", "evilCreaturesDiscard", "balrogDeck", "balrogDiscard", "ravenDeck", "ravenDiscard", "smaugDeck", "smaugDiscard", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "investigationDeck", "sackDeck", "outOfPlay0", "outOfPlay1"] as const;
+export const PILE_ZONES = ["cavesDeck", "evilCreaturesDeck", "evilCreaturesDiscard", "balrogDeck", "balrogDiscard", "ravenDeck", "ravenDiscard", "smaugDeck", "smaugDiscard", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "powerOfMordorDeck", "investigationDeck", "sackDeck", "outOfPlay0", "outOfPlay1"] as const;
 export type PileZone = (typeof PILE_ZONES)[number];
 /** A zone that holds a list of card ids apart from the encounter deck: the Dream-chaser box's keep theirs in `corsairDeck`, `corsairDiscard` and `uncharted.deck`. */
 const DECK_ZONES = [...PILE_ZONES, "corsairDeck", "corsairDiscard", "unchartedDeck"] as const;
@@ -43,6 +43,8 @@ const PLAIN_PILES = {
   greatSpider: { deck: "greatSpiderDeck", discard: null },
   // The Weather Hills' Orc deck (mec108.orc-deck): the Angmar Orcs enemies and Concealed Orc-camps, shuffled beside the quest deck; its cards go to the encounter discard pile, an empty deck is ignored.
   angmarOrcs: { deck: "angmarOrcDeck", discard: null },
+  // The Temple of Doom's and The Fortress of Nurn's Power of Mordor deck (vom.power-of-mordor-deck-the-temple-of-doom): five encounter cards, revealed by Tribute to Mordor; a card of it that leaves play goes to the encounter discard pile, an empty deck loses the game.
+  powerOfMordor: { deck: "powerOfMordorDeck", discard: null },
   // Murder at the Prancing Pony's Investigation deck (50701:A:1; docs/scenarios/standalone-scenarios/murder-at-the-prancing-pony.md, Murder at the Prancing Pony): eight Suspects and Hideouts and Taken by Surprise, facedown beside the quest deck, looked at and never drawn; a card of it that leaves goes to the encounter discard pile or into play.
   investigation: { deck: "investigationDeck", discard: null },
 } as const satisfies Record<string, DeckZones>;

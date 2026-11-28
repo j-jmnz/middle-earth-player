@@ -165,14 +165,14 @@ export const CYCLE_DEFS: readonly CampaignDef[] = [
       // DragnCards loads the three Plot objectives as the second shared deck and the three Cultist enemies as the third; the Setup sets both kinds aside, out of play.
       vengeanceOfMordor(2, "danger-in-dorwinion", "A Shadow in the East", { setupSpan: "vom.setup-danger-in-dorwinion", groups: { sharedEncounterDeck2: "setAside", sharedEncounterDeck3: "setAside" } }),
       // DragnCards labels its deck "Temple of Doom"; the second shared deck is The Power of Mordor deck, which the Setup creates (vom.power-of-mordor-deck-the-temple-of-doom).
-      vengeanceOfMordor(3, "the-temple-of-doom", "A Shadow in the East", { setupSpan: "vom.setup-the-temple-of-doom", deck: { normal: "Q09.3", easy: "E09.3", label: "Temple of Doom" }, groups: { sharedEncounterDeck2: "encounterDeck2" } }),
+      vengeanceOfMordor(3, "the-temple-of-doom", "A Shadow in the East", { setupSpan: "vom.setup-the-temple-of-doom", deck: { normal: "Q09.3", easy: "E09.3", label: "Temple of Doom" }, groups: { sharedEncounterDeck2: "powerOfMordorDeck" } }),
       vengeanceOfMordor(4, "wrath-and-ruin", "Wrath and Ruin", { setupSpan: "vom.setup-wrath-and-ruin" }),
       vengeanceOfMordor(5, "the-city-of-ulfast", "The City of Ulfast", { setupSpan: "vom.setup-the-city-of-ulfast" }),
       vengeanceOfMordor(6, "challenge-of-the-wainriders", "Challenge of the Wainriders", { setupSpan: "vom.setup-challenge-of-the-wainriders" }),
       vengeanceOfMordor(7, "under-the-ash-mountains", "Under the Ash Mountains", { setupSpan: "vom.setup-under-the-ash-mountains" }),
       vengeanceOfMordor(8, "the-land-of-sorrow", "The Land of Sorrow", { setupSpan: "vom.setup-the-land-of-sorrow" }),
       // The second shared deck is The Power of Mordor deck (vom.power-of-mordor-deck-the-fortress-of-nurn); the Setup stages the four Storm the Castle side quests DragnCards loads on its map.
-      vengeanceOfMordor(9, "the-fortress-of-nurn", "The Fortress of Nurn", { setupSpan: "vom.setup-the-fortress-of-nurn", groups: { sharedEncounterDeck2: "encounterDeck2", sharedMap: "staging" } }),
+      vengeanceOfMordor(9, "the-fortress-of-nurn", "The Fortress of Nurn", { setupSpan: "vom.setup-the-fortress-of-nurn", groups: { sharedEncounterDeck2: "powerOfMordorDeck", sharedMap: "staging" } }),
     ],
     saga: false,
     ledger: "vengeance-of-mordor",

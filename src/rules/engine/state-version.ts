@@ -54,7 +54,7 @@ const ZONES: Readonly<Record<ZoneName, true>> = {
   deck: true, hand: true, discard: true, heroes: true, play: true, engaged: true, seatStaging: true, staging: true, activeLocation: true,
   secondActiveLocation: true, questDeck: true, questStage: true, encounterDeck: true, encounterDiscard: true, burdenDeck: true, corsairDeck: true,
   corsairDiscard: true, unchartedDeck: true, stormcallerArea: true, orcsArea: true, islandMap: true, cavesDeck: true, evilCreaturesDeck: true, evilCreaturesDiscard: true, balrogDeck: true, balrogDiscard: true, ravenDeck: true, ravenDiscard: true,
-  smaugDeck: true, smaugDiscard: true, spidersDeck: true, orcsDeck: true, sideQuestDeck: true, haradDeck: true, greatSpiderDeck: true, angmarOrcDeck: true, investigationDeck: true, sackDeck: true, outOfPlay0: true, outOfPlay1: true, victory: true, setAside: true, removed: true, shadow: true, attached: true,
+  smaugDeck: true, smaugDiscard: true, spidersDeck: true, orcsDeck: true, sideQuestDeck: true, haradDeck: true, greatSpiderDeck: true, angmarOrcDeck: true, powerOfMordorDeck: true, investigationDeck: true, sackDeck: true, outOfPlay0: true, outOfPlay1: true, victory: true, setAside: true, removed: true, shadow: true, attached: true,
   under: true, campaign: true, nightmare: true, modeCard: true, nightObjective: true, riddleArea: true, captive: true, captured: true, grappled: true,
 };
 const ZONE_SET: ReadonlySet<string> = new Set(Object.keys(ZONES));

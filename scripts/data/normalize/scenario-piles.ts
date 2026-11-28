@@ -78,7 +78,10 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
     case "stormcallerQuests":
       return stepExists("prepareStormcallerArea");
     case "encounterDeck2":
-      return stepExists("secondDeck", "buildDeck", "setSetsAside", "buildPowerOfMordorDeck") && setAsideBySet;
+      return stepExists("secondDeck", "buildDeck", "setSetsAside") && setAsideBySet;
+    // The Temple of Doom and The Fortress of Nurn's Power of Mordor deck: built by their Setup step (vom.power-of-mordor-deck-the-temple-of-doom).
+    case "powerOfMordorDeck":
+      return stepExists("buildPowerOfMordorDeck") && setAsideBySet;
     // Angmar Awakened's Orc deck: built by the Weather Hills' Setup step.
     case "smaugDeck":
       return stepExists("buildSmaugDeck");

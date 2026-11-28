@@ -1,0 +1,386 @@
+Scenario piles that place cards with no record (quest: 21080 The Forgotten Temple; quest: 21081 The Legacy of Mordor; quest: 21083 Memory of the Dark Years; quest: 21084 Shrine to Sauron; quest: 21085 The Lord of Middle-earth; staging: 21053 Tribute to Mordor; staging: 21054 Thane Ulchor; powerOfMordorDeck: 21066 Khamûl the Easterling; powerOfMordorDeck: 21067 The Tower of Barad-dûr; powerOfMordorDeck: 21068 Under the Watchful Eye; powerOfMordorDeck: 21069 The Armies of Mordor; powerOfMordorDeck: 21070 Covered in Darkness)
+
+## 21053 Tribute to Mordor
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+21053:A:1 (front): Forced: At the end of the round, place 1 damage token here. Then, if there are 4 or more damage tokens here, remove 4 of them and reveal the top card of the Power of Mordor deck. If you cannot, the players lose the game.
+  21053:forced:1: Forced at the end of the round
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - place 1 damage token(s) on this card (placed, not dealt: nothing cancels or reduces them)
+    - then, if not (damage of this card is less than 4) (checked when this step runs, after the steps above; not tied to whether they did anything): up to 4 damage token(s) come off the card in play with printed code 21053, then the first player reveals the top card of the Power of Mordor deck as an encounter card (an objective stays in the staging area, an enemy or a location is added to it; whatever leaves play goes to the encounter discard pile, never back to the deck); with no card to reveal the players lose the game
+
+21053:A:2 (front): This stage cannot be the active quest while Thane Ulchor has any hit points remaining. When this stage is defeated, the players win the game.
+  21053:constant:1: Constant
+    only if the card with code 21054 in play has damage below its hit points (any hit points remaining)
+    - this card: stat cannotBeCurrentQuest (in the quest phase it cannot be the current quest: only a side quest the first player chooses is, else there is none) 1, while this card is in play
+  21053:forced:2: Forced after a side quest is defeated (its progress reached its quest points) (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the players win the game
+
+## 21054 Thane Ulchor
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+21054:A:1: Indestructible. Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+21054:A:2 (front): X is 1 more than the number of quest stages in the victory display. Cannot be engaged unless X is equal to 5.
+  21054:constant:1: Constant
+    only if any of: (the number of card (any player controls) in the victory display, of card type quest is less than 4) or (4 is less than the number of card (any player controls) in the victory display, of card type quest)
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+
+21054:A:3 (front): Forced: When Thane Ulchor attacks and destroys a character, place 1 damage token on Tribute to Mordor.
+  21054:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 1 damage token(s) on the card in play with code 21053 (placed, not dealt: nothing cancels or reduces them)
+
+## 21055 Temple of Sauron
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21055:A:1 (front): Forced: When Temple of Sauron leaves play, place 1 damage token on Tribute to Mordor.
+  21055:forced:1: Forced after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 1 damage token(s) on the card in play with code 21053 (placed, not dealt: nothing cancels or reduces them)
+
+21055:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each quest stage in the victory display.
+  21055:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack the number of card (any player controls) in the victory display, of card type quest, until the end of the attack
+
+## 21056 Hall of Horrors
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21056:A:1 (front): X is 1 more than the number of quest stages in the victory display.
+  21056:forced:1: Forced after a card leaves play (heard about this card) (record also names 21056:A:2)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - for each player, first player first:
+      - choose character (you control)
+      - deal the number of card (any player controls) in the victory display, of card type quest + 1 damage to the picked card
+
+21056:A:2 (front): Forced: When Hall of Horrors leaves play, each player deals X damage to a character he controls.
+  21056:forced:1: Forced after a card leaves play (heard about this card) (record also names 21056:A:1)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - for each player, first player first:
+      - choose character (you control)
+      - deal the number of card (any player controls) in the victory display, of card type quest + 1 damage to the picked card
+
+## 21057 Place of Evil
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21057:A:1 (front): When Revealed: Place 1 damage token on Tribute to Mordor. Then, either place 1 additional damage token on Tribute to Mordor, or Place of Evil gains surge.
+  21057:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - place 1 damage token(s) on the card in play with code 21053 (placed, not dealt: nothing cancels or reduces them)
+    - the first player chooses one of:
+      * option "damage":
+        - place 1 damage token(s) on the card in play with code 21053 (placed, not dealt: nothing cancels or reduces them)
+      * option "surge":
+        - this card gains surge (one more encounter card is revealed when it has been resolved)
+
+21057:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place 1 damage token on Tribute to Mordor.
+  21057:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): place 1 damage token(s) on the card in play with code 21053 (placed, not dealt: nothing cancels or reduces them)
+
+## 21058 Ulchor's Guard
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21058:A:1 (front): While Thane Ulchor is engaged with a player, Ulchor's Guard engages that player.
+  21058:constant:1: Constant
+    - this card: stat engagesWithUlchor (the enemy engages the player Thane Ulchor is engaged with, at once and whatever its engagement cost; it stays engaged when he leaves) 1, while this card is in play
+
+21058:A:2 (shadow): Shadow: Attacking enemy gets +2 Defense until the end of the phase.
+  21058:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat defense 2, until the end of the phase
+
+## 21059 Ulchor's Rage
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21059:A:1 (front): When Revealed: Thane Ulchor makes an immediate attack against the first player. If no attack is made this way, Ulchor's Rage gains surge.
+  21059:whenRevealed:1: When revealed
+    who acts: the acting player is the first player (the record names the first player, not the player who revealed the card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Thane Ulchor"
+    - the picked enemy attacks the first player now, from where it is (the staging area, or engaged with a player; it does not move), dealt a shadow card
+    - then, if not (there is a enemy (any player controls) or in the staging area, named "Thane Ulchor" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+21059:A:2 (shadow): Shadow: Deal 1 damage to the defending character.
+  21059:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - deal 1 damage to the defender
+
+## 21060 Fanaticism
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21060:A:1 (front): While attached to an enemy, counts as a Condition attachment with the text: 'Attached enemy gets +1 Threat, +1 Attack, +1 Defense, and is immune to player card effects.'
+  21060:constant:1: Constant
+    only if its host is a enemy (any player controls)
+    - this card counts as a Condition attachment while it is attached
+  21060:constant:2: Constant
+    only if its host is a enemy (any player controls)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat threat 1, while this card is in play
+    - its host: stat attack 1, while this card is in play
+    - its host: stat defense 1, while this card is in play
+    - its host: stat immuneToPlayerCards 1, while this card is in play
+
+21060:A:2 (front): When Revealed: Attach to the Easterling enemy with the lowest Defense without a copy of Fanaticism. Otherwise, Fanaticism gains surge.
+  21060:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the card of the pick with the lowest Defense as the table shows it becomes the picked card (the first player chooses among those tied; nothing is picked when none matches): Easterling enemy (any player controls) or in the staging area, with no attachment named "Fanaticism"
+    - then, if there is a Easterling enemy (any player controls) or in the staging area, with no attachment named "Fanaticism" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this card attaches to the picked card (nowhere if that card carries one of its title already)
+    - then, if not (there is a Easterling enemy (any player controls) or in the staging area, with no attachment named "Fanaticism" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
+
+## 21061 Twisted Tunnel
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21061:A:1 (front): When Revealed: Discard cards from the top of the encounter deck until an enemy is discarded. Add that enemy to the staging area.
+  21061:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
+    - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+
+21061:A:2 (shadow): Shadow: Discard the top card of the encounter deck. If that card is an enemy, add it to the staging area.
+  21061:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - repeat 1 times:
+      - the top card of the encounter deck goes to the encounter discard pile
+      - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+
+## 21062 Narrow Opening
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21062:A:1 (front): While Narrow Opening is the active location, each player cannot play more than 1 card each round.
+  21062:constant:1: Constant
+    only if this card is the active location
+    - each player cannot play more than 1 card each round, in any phase (a card put into play is not played and does not count)
+
+21062:A:2 (front): Forced: When Narrow Opening leaves play, each player discards 1 random card from his hand.
+  21062:forced:1: Forced after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - each player discards 1 random card(s) from hand
+
+## 21063 Crumbling Passage
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21063:A:1 (front): When Revealed: Make Crumbling Passage the active location, returning any previously active location to the staging area.
+  21063:whenRevealed:1: When revealed
+    - this card (a location in the staging area) becomes the active location without traveling (another active location goes back to the staging area); a Forced effect "after it becomes the active location" resolves
+
+21063:A:2 (front): Forced: When Crumbling Passage leaves play, deal 1 damage to each exhausted character.
+  21063:forced:1: Forced after a card leaves play (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - deal 1 damage to each exhausted character (any player controls)
+
+## 21064 Fearful Shadows
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21064:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+21064:A:2 (front): When Revealed: Until the end of the round, treat the printed text box of each character as if it were blank (except for Traits).
+  21064:whenRevealed:1: When revealed
+    - every character in play, now and entering later: stat blankText (its text box is blank: its own effects do not apply, and its keywords do not unless keepsKeywords is also held; its Traits stay) 1, until the end of the round
+
+21064:A:3 (shadow): Shadow: Defending character cannot ready until the end of the round.
+  21064:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the defender: stat cannotReady 1, until the end of the round
+
+## 21065 Lost in the Dark
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+21065:A:1 (front): When Revealed: Each player places the top 10 cards of his deck facedown under his threat dial (without looking at them). When this stage is defeated, each player shuffles all cards under his threat dial back into his deck.
+  21065:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the top 10 cards of the acting player's deck are placed facedown under his threat dial (they lie under this card, still his, in the order of his deck)
+
+21065:A:2 (front): Forced: After a player raises his threat by any amount, he discards the top card from under his threat dial.
+  21065:forced:1: Forced after a player's threat is raised
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the top card under the acting player's threat dial goes to his discard pile (nothing with none under it); the cards under the dials go back into their owners' decks, shuffled, when this card is defeated
+
+## 21066 Khamûl the Easterling
+(the scenario deals it into the powerOfMordorDeck pile; the piles place it, no record does)
+
+21066:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+21066:A:2 (front): Khamûl the Easterling engages the first player.
+  21066:constant:1: Constant
+    - this card: stat engagesFirstPlayer (the enemy engages the first player at once, whatever its engagement cost, and stays engaged with him as the token passes; the engine sweeps it once nothing is resolving) 1, while this card is in play
+
+21066:A:3 (front): Only the engaged player can declare attackers or defenders against Khamûl the Easterling.
+  21066:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attackOnlyByEngaged 1, while this card is in play
+    - this card: stat defendOnlyByEngaged (only the characters of the player the enemy is engaged with can be declared as defenders against it) 1, while this card is in play
+
+## 21067 The Tower of Barad-dûr
+(the scenario deals it into the powerOfMordorDeck pile; the piles place it, no record does)
+
+21067:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+21067:A:2 (front): The players cannot travel here.
+  21067:constant:1: Constant
+    - the players cannot travel to this location while this holds
+
+21067:A:3 (front): Each player's threat elimination level is reduced by 5.
+  21067:constant:2: Constant
+    - each player: stat eliminationReduction 5, while this card is in play
+
+## 21068 Under the Watchful Eye
+(the scenario deals it into the powerOfMordorDeck pile; the piles place it, no record does)
+
+21068:A:1 (front): When Revealed: Each player with more than 5 cards in his hand discards cards from his hand until he has only 5.
+  21068:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - if 5 is less than the cards in your hand: discard the cards in your hand - 5 cards from hand (the player chooses which cards, until 5 cards are left)
+
+21068:A:2 (front): Forced: After a player draws any number of cards, he raises his threat by 1.
+  21068:forced:1: Forced on the event cardsDrawn
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - raise threat by 1 (the player the event is about)
+
+## 21069 The Armies of Mordor
+(the scenario deals it into the powerOfMordorDeck pile; the piles place it, no record does)
+
+21069:A:1 (front): Forced: After a non-unique enemy engages a player, that enemy cannot take damage until the end of the round.
+  21069:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about non-unique enemy (any player controls))
+    who acts: the acting player is the player the enemy engaged
+    - the card the event is about: stat cannotTakeDamage 1, until the end of the round
+
+## 21070 Covered in Darkness
+(the scenario deals it into the powerOfMordorDeck pile; the piles place it, no record does)
+
+21070:A:1: Doomed 5.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+21070:A:2 (front): Each player's threat cannot be reduced by more than 1 each round by player card effects.
+  21070:constant:1: Constant
+    - each player: stat playerThreatReductionCap 1, while this card is in play
+
+## 21080 The Forgotten Temple
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+21080:A:1 (front): Setup: Shuffle each of the stage 2 quest cards together and place them facedown under this stage. Create The Power of Mordor deck (see insert) and set it next to the quest deck. Add Thane Ulchor and Tribute to Mordor to the staging area. Shuffle the encounter deck.
+  21080:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the quest cards 21081, 21083, 21084, 21085 are shuffled together on top of the quest deck; the quest then advances in the order of its quest deck, each stage that prints Victory is added to the victory display when it is defeated, and defeating the last one wins the game
+    - shuffle the powerOfMordor deck
+    - shuffle the encounter deck
+
+21080:B:1 (back): Skip the quest phase.
+  21080:constant:1: Constant
+    - the table: stat skipQuestPhase 1, while this card is in play
+
+21080:B:2 (back): Forced: At the end of the planning phase, place 1 resource token here. Then, if there are 2 resource tokens here, add this stage to the victory display and advance to the topmost stage 2A.
+  21080:forced:1: Forced at the end of the phase
+    only if it is the Planning phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - place 1 resource tokens on this card
+    - then, if the card with code 21080 in play holds at least 2 resource token(s) (checked when this step runs, after the steps above; not tied to whether they did anything): advance to the next quest stage
+
+## 21081 The Legacy of Mordor
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+21081:A:1 (front): When Revealed: Reveal 1 encounter card per player.
+  21081:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+21081:B:1 (back): Forced: At the beginning of the quest phase, each player deals 1 damage to a hero he controls and exhausts that hero. That hero cannot ready or be healed until the refresh phase.
+  21081:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - for each player, first player first:
+      - choose hero (you control)
+      - deal 1 damage to the picked card
+      - exhaust the picked card
+      - the picked card: stat cannotReady 1, until the combat phase ends, that is until the refresh phase begins
+      - the picked card: stat cannotBeHealed 1, until the combat phase ends, that is until the refresh phase begins
+
+21081:B:2 (back): While there are 4 quest stages in the victory display, progress cannot be placed here.
+  21081:constant:1: Constant
+    only if not (the number of card (any player controls) in the victory display, of card type quest is less than 4)
+    - this card: stat noProgressPlaced 1, while this card is in play
+
+## 21083 Memory of the Dark Years
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+21083:A:1 (front): When Revealed: Reveal 1 encounter card per player.
+  21083:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+21083:B:1 (back): Forced: At the beginning of the quest phase, discard X cards from the top of the encounter deck, where X is 1 more than the number of quest stages in the victory display. Add 2 to the total Threat in the staging area for each different card type discarded this way.
+  21083:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard the number of card (any player controls) in the victory display, of card type quest + 1 card(s) from the top of the encounter deck
+    - the total Threat in the staging area is the number of different card types among the cards this effect discarded from the top of the encounter deck (enemy, location, treachery, objective and side quest each their own) x 2 higher until the end of the phase
+
+21083:B:2 (back): While there are 4 quest stages in the victory display, progress cannot be placed here.
+  21083:constant:1: Constant
+    only if not (the number of card (any player controls) in the victory display, of card type quest is less than 4)
+    - this card: stat noProgressPlaced 1, while this card is in play
+
+## 21084 Shrine to Sauron
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+21084:A:1 (front): When Revealed: Reveal 1 encounter card per player.
+  21084:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+21084:B:1 (back): Forced: At the beginning of the quest phase, each player discards the top X cards of his deck, where X is 1 more than the number of quest stages in the victory display. Each player examines the cards he controls and the cards in his hand. If any of these cards are copies of any of the cards he just discarded from the top of his deck, he must discard those copies as well.
+  21084:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - for each player, first player first:
+      - the top the number of card (any player controls) in the victory display, of card type quest + 1 card(s) of the acting player's deck go to their discard pile
+      - the acting player discards each card in his hand, and each card he controls in play, with the title of a card the last discard took from the top of his deck
+
+21084:B:2 (back): While there are 4 quest stages in the victory display, progress cannot be placed here.
+  21084:constant:1: Constant
+    only if not (the number of card (any player controls) in the victory display, of card type quest is less than 4)
+    - this card: stat noProgressPlaced 1, while this card is in play
+
+## 21085 The Lord of Middle-earth
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+21085:A:1 (front): When Revealed: Reveal 1 encounter card per player.
+  21085:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+21085:B:1 (back): This stage gets +4 quest points per player.
+  21085:constant:1: Constant
+    - this card: stat questPoints the number of players x 4, while this card is in play
+
+21085:B:2 (back): Forced: At the beginning of the quest phase, each player discards 1 card from his hand. Until the end of the round, no more than X progress can be placed on this stage. X is the total cost of each card discarded by this effect.
+  21085:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    who acts: the acting player is the first player (a phase has no player of its own)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - choose card (you control) in hand
+      - the effect's X grows by printed cost of the picked card
+      - discard the picked card
+    - this card: stat stageProgressCap (no more than this much progress can be placed on this stage this round, whoever places it; 0 holds it shut; a side quest that is the current quest is not capped) X, until the end of the round
+
+21085:B:3 (back): While there are 4 quest stages in the victory display, progress cannot be placed here.
+  21085:constant:2: Constant
+    only if not (the number of card (any player controls) in the victory display, of card type quest is less than 4)
+    - this card: stat noProgressPlaced 1, while this card is in play
+
+(rendered pieces: 227 by template, 0 as JSON)

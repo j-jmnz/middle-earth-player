@@ -113,6 +113,7 @@ import * as poros from "../scenarios/the-crossings-of-poros/game.ts";
 import * as gurat from "../scenarios/the-dungeons-of-cirith-gurat/game.ts";
 import * as running from "../scenarios/the-river-running/game.ts";
 import * as dorwinion from "../scenarios/danger-in-dorwinion/game.ts";
+import * as templedoom from "../scenarios/the-temple-of-doom/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -238,6 +239,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-crossings-of-poros", "The Crossings of Poros", poros.POROS_GOLDENS, poros.porosWorld, poros.playGolden),
   entry("the-river-running", "The River Running", running.RUNNING_GOLDENS, running.runningWorld, running.playGolden),
   entry("danger-in-dorwinion", "Danger in Dorwinion", dorwinion.DORWINION_GOLDENS, dorwinion.dorwinionWorld, dorwinion.playGolden),
+  entry("the-temple-of-doom", "The Temple of Doom", templedoom.TEMPLEDOOM_GOLDENS, templedoom.templedoomWorld, templedoom.playGolden),
   entry("the-massing-at-osgiliath", "The Massing at Osgiliath", osgiliath.OSGILIATH_GOLDENS, osgiliath.osgiliathWorld, osgiliath.playGolden),
   entry("the-battle-of-lake-town", "The Battle of Lake-town", town.TOWN_GOLDENS, town.townWorld, town.playGolden),
   entry("the-stone-of-erech", "The Stone of Erech", erech.ERECH_GOLDENS, erech.erechWorld, erech.playGolden),

@@ -39,7 +39,8 @@ export function revealSideQuest(state: ScenarioState, focus: Focus, ctx: ReduceC
 export function askCurrentQuest(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   if (state.sideAsked === state.round || !hasSideQuests(state)) return null;
   const marked: ScenarioState = { ...state, sideAsked: state.round };
-  const staged = stagedSideQuests(marked, ctx);
+  // A side quest that holds `cannotBeCurrentQuest` is not offered ("This stage cannot be the active quest while Thane Ulchor has any hit points remaining", 21053:A:2).
+  const staged = stagedSideQuests(marked, ctx).filter((id) => !flagged(marked, id, "cannotBeCurrentQuest"));
   const first = staged[0];
   if (first == null) return marked;
   // "May choose one": the main quest stays the quest when the first player declines.
