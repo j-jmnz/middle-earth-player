@@ -1,5 +1,5 @@
 // Rules: rr.forced, rr.shadow-effects, rr.reveal, rr.engaged, rr.travel, rr.victory, rr.cannot, rr.damage, rr.immune, rr.attachment-cards, rr.active-location, rr.threat-elimination-level, rr.lasting-effects, vom.quest-stages-vs-side-quests (data/rules/entries.json).
-import { announce, answer, attack, cardSpecs, damageOn, defend, flag, handCount, offers, reveal, stagingThreat, stat, threat, window, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, damageOn, defend, flag, handCount, offers, progressOn, reveal, stat, threat, window, zone, type Row } from "../../../../test/harness/card-spec.ts";
 // Card specs for The Temple of Doom (vengeance-of-mordor part 3): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/agents/agent-brief.md, Scenario procedure, Tests).
 // What a row cannot express (a tally over a round, the Power of Mordor deck, the cards under the dials, the Setup, the stages in the victory display, two attacks) is a test titled with its line id in lines.test.ts. The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; a layout's current stage is on its B side.
@@ -22,7 +22,6 @@ const CRUMBLING = "21063";
 const SHADOWS = "21064";
 const TOWER = "21067";
 const EYE = "21068";
-const DARKNESS = "21070";
 const RAIDER = "21020";
 // The scenario's quest stages stand in for the stages in the victory display (a side quest in it does not count); the current stage of a row is never one of them.
 const STAGES = (n: number, current = S1): readonly string[] => [S1, LEGACY, MEMORY, SHRINE, LORD].filter((code) => code !== current).slice(0, n);
@@ -63,6 +62,7 @@ const ROWS: readonly Row[] = [
   { line: "21062:A:2", name: "Forced: when it leaves play each player discards 1 random card from his hand", layout: { stage: LEGACY, staging: [NARROW], hand: ["ally", "ally", "event"] }, act: announce("leftPlay", NARROW), expect: handCount(2) },
 
   { line: "21063:A:1", name: "When Revealed: it becomes the active location and the previous one returns to the staging area", layout: { stage: LEGACY, active: "place" }, act: reveal(CRUMBLING), expect: [zone(CRUMBLING, "activeLocation"), zone("place", "staging")] },
+  { line: "21063:A:1", name: "When Revealed: the previous active location keeps its progress in the staging area", layout: { stage: LEGACY, active: { code: "place", progress: 1 } }, act: reveal(CRUMBLING), expect: [zone("place", "staging"), progressOn("place", 1)] },
   { line: "21063:A:2", name: "Forced: when it leaves play, 1 damage to each exhausted character", layout: { stage: LEGACY, staging: [CRUMBLING], exhaustedCards: ["dh1"] }, act: announce("leftPlay", CRUMBLING), expect: [damageOn("dh1", 1), damageOn("dh2", 0)] },
 
   { line: "21064:A:2", name: "When Revealed: until the end of the round each character's text box is blank", layout: { stage: LEGACY, play: ["ally"] }, act: reveal(SHADOWS), expect: [{ expect: "classFlag", code: "ally", name: "blankText", value: true }, { expect: "classFlag", code: "dh1", name: "blankText", value: true }] },
