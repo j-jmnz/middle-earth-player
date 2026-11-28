@@ -43,3 +43,19 @@ The statuses are those of the Readings bullet of `docs/scenarios/vengeance-of-mo
 - Stage 2B Shrine to Sauron (`21084:B:1`) (recommended). Each player discards the top X cards of his deck, then discards from his hand and from play any card with the same title as one he just discarded, without a choice; only his own cards. Not taken: match by card code, or the cards of other players. Why recommended: no source covers it; "copies" is the same title in all of the game's rules.
 - Stage 2B The Lord of Middle-earth (`21085:B:2`) (recommended). X is the sum of the printed costs of the cards discarded (no cost, a variable cost and an X cost count 0); the cap is on the total progress placed on the stage until the end of the round, whatever places it, on this stage only (a side quest that is the current quest is not capped); with X = 0 no progress can be placed. Not taken: the cost as paid. Why recommended: no source covers it; `rr.cost` names the printed cost.
 
+## Table
+
+Each piece a record creates, with the line that creates it (`docs/agents/agent-brief.md`, Scenario procedure, The Table step). The engine decides each number; the table only says it. The pieces are drawn in `docs/design-system-table.md`, The Temple of Doom's table pieces
+
+- **Power of Mordor deck** (`21080:A:1`, `21053:A:1`): the five cards form a second pile beside the quest deck (`powerOfMordorDeck`, label "Mordor", its count on the pile); a revealed card goes to the encounter discard pile. Code: `layout/layout.ts`, `store/pile-ids.ts`, `canvas/pile-piece.native.tsx`.
+- **Tribute dial** (`21053:A:1`): the damage on Tribute to Mordor against 4, warming near it, "critical" with 3 or more damage and the deck empty (`src/play/readouts/mordor/temple.ts`, words in `temple-words.ts`).
+- **Ulchor dial** (`21054:A:2`, `21053:A:2`): his hit points left; the note says X and the engagement rule. No limit and no warning.
+- **Temple dial** (`21080:B:2`): the resources on stage 1B against the 2 that advance the quest; a goal dial.
+- **Cap dial** (`21085:B:2`): the progress stage 2B took this round against the cap X, from the Forced effect (`stageProgressCap`); "near" at the cap.
+- **Seat mark, cards under the threat dial** (`21065:A:1`, `21065:A:2`): a count for each seat, "P1 7" (solo "Dark 7"); the cards are never shown. They lie facedown under the side quest (zone `under`, owner the seat).
+- **Seat mark, Narrow Opening** (`21062:A:1`): "P1 0/1" the cards a seat played this round against the 1 allowed, while the location is active.
+- **Seat mark, Covered in Darkness** (`21070:A:2`): "P1 0/1" the threat the seat's card effects took off this round against the 1 allowed.
+- **Quest stages in the victory display** (`21054:A:2`, `21056:A:1`): no widget; the victory pile shows the cards and Ulchor's note and Hall of Horrors' pick say the number now.
+- **Owner on a pick that spans seats**: the Easterling ties (`21022:A:3`, `21023:A:3`, `21024:A:2`, `21060:A:2`) and Place of Evil's Choose (`21057:A:1`) are the first player's for the group and not `owned`; the picks of one player's own (`21056:A:1`, `21068:A:1`, `21081:B:1`, `21085:B:2`) are `owned`.
+- **Setup records** `141085:A:1` (The One Ring) and `21080:A:1` (the stage 2 cards facedown under stage 1, shown by the quest stack as any facedown stage, and the Power of Mordor deck above) make no other tracker, zone or held card.
+- Test: `src/play/scenarios/the-temple-of-doom-table.test.ts`; asks in `src/play/words/asks/the-temple-of-doom.ts`; shot moments `test/scenarios/the-temple-of-doom/screens.ts`.

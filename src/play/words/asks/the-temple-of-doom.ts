@@ -40,8 +40,8 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "21056:forced:1 @0.0 Pick": {
     owned: true,
     why: "it left play.",
-    note: "Choose a character you control to take {x} damage (quest stages in the victory display: {stages}, plus 1).",
-    bind: { x: { count: { type: "card", control: "any", from: "victory", cardType: "quest" }, plus: 1 }, stages: { count: { type: "card", control: "any", from: "victory", cardType: "quest" } } },
+    note: "Choose a character you control to take {x} damage, 1 more than the quest stages in the victory display.",
+    bind: { x: { count: { type: "card", control: "any", from: "victory", cardType: "quest" }, plus: 1 } },
     verb: "Damage",
   },
 
