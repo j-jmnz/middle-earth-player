@@ -3,14 +3,15 @@
 // The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points; a layout's current stage is on its B side.
 import { describe, expect, it } from "vitest";
 
+import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { EFFECTS } from "../../../effects/index.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
-import { flagged, updateCard } from "../../../rules/core/state.ts";
+import { expireModifiers, flagged, updateCard } from "../../../rules/core/state.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
 import { queueEvent } from "../../../rules/windows/queue.ts";
 import { rowProblems } from "../../../../test/harness/card-spec.ts";
-import { finish, idOf, resolveRecords, revealFromTop, send, tableFromLayout, zoneOf, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { finish, idOf, idsOf, resolveRecords, revealFromTop, send, tableFromLayout, zoneOf, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
 
 const ID = "the-river-running";
@@ -123,5 +124,28 @@ describe("The Crossing of Araw (21076:B:2, 21076:B:3)", () => {
   it("21076:B:3 the players win the game when this stage is defeated", () => {
     const row = { line: "21076:B:3", layout: { stage: S2, progress: 11 }, act: { act: "quest", outcome: "success" }, expect: { expect: "won" } } as const;
     expect(rowProblems(ID, row, EFFECTS)).toEqual([]);
+  });
+});
+
+describe("Rolling Plains (21025:A:1) and Weary Lands (21027:A:2) last until the end of the phase", () => {
+  it("21025:A:1 a second Rolling Plains revealed again in the phase gives each copy another +2 Threat, and the end of the phase takes both away", () => {
+    const t = table({ stage: S1, staging: ["21025", "21025"] });
+    const threatOf = (state: typeof t.state, at: number) => modifiedStat(state, state.cards[idsOf(state, "21025")[at] ?? ""]!, "threat", t.ctx.cards);
+    const base = threatOf(t.state, 0);
+    const first = resolveRecords(t.state, t.ctx, "21025", "whenRevealed", idsOf(t.state, "21025")[0]).state;
+    expect([threatOf(first, 0), threatOf(first, 1)]).toEqual([base + 2, base + 2]);
+    const again = resolveRecords(first, t.ctx, "21025", "whenRevealed", idsOf(first, "21025")[1]).state;
+    expect([threatOf(again, 0), threatOf(again, 1)]).toEqual([base + 4, base + 4]);
+    const over = expireModifiers(again, ["endOfPhase"]);
+    expect([threatOf(over, 0), threatOf(over, 1)]).toEqual([base, base]);
+  });
+
+  it("21027:A:2 the -1 Willpower lasts to the end of the phase: it holds on an exhausted character and is gone at the end of the phase", () => {
+    const t = table({ stage: S1, phase: "Quest", staging: ["21027"], exhaustedCards: ["dh1"] });
+    const hero = idOf(t.state, "dh1");
+    const willpower = (state: typeof t.state) => modifiedStat(state, state.cards[hero]!, "willpower", t.ctx.cards);
+    const done = resolveRecords(t.state, t.ctx, "21027", "whenRevealed", idOf(t.state, "21027")).state;
+    expect(willpower(done)).toBe(willpower(t.state) - 1);
+    expect(willpower(expireModifiers(done, ["endOfPhase"]))).toBe(willpower(t.state));
   });
 });
