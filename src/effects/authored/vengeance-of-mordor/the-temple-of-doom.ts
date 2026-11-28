@@ -249,7 +249,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     ...QUEST_PHASE_BEGINS,
     instructions: [
       EACH_PLAYER([{ verb: "Pick", pick: { type: "card", control: "you", from: "hand" } }, { verb: "AddToX", amount: { stat: "cost", of: "picked", printed: true } }, { verb: "Discard", target: { kind: "picked" } }]),
-      { verb: "ModifyStat", stat: "progressCap", amount: { x: true }, until: "endOfRound", target: "self" },
+      { verb: "ModifyStat", stat: "questProgressCap", amount: { x: true }, until: "endOfRound", target: "table" },
     ],
   },
   NO_PROGRESS_AT_FOUR("21085", "21085:B:3", 2),

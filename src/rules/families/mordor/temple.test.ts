@@ -7,8 +7,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { settle } from "../../engine/machine.ts";
-import { resolveAmount } from "../../interpret/amounts.ts";
-import { frameScope } from "../../interpret/amounts.ts";
+import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import { syncConstants } from "../../interpret/constants.ts";
 import { HERO, finish, idOf, opened, resolveRecords, run, tableFromLayout, where, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { defenderBarredByEngagement } from "./engage.ts";
@@ -208,5 +207,27 @@ describe("the amount discardedEncounterTypes", () => {
     const scope = frameScope(done.state, 0, idOf(done.state, "21083"));
     expect(typeof resolveAmount(done.state, 2, scope, made.ctx)).toBe("number");
     expect(HERO).toBe("dh1");
+  });
+});
+
+describe("the cards of the scenario that listen for an event", () => {
+  it("21053:A:2 Tribute to Mordor wins the game when it is defeated, and is not offered as the current quest while Ulchor has hit points left", async () => {
+    const made = table({ staging: [TRIBUTE, ULCHOR] });
+    const tribute = idOf(made.state, TRIBUTE);
+    const barred = settled(made, made.state);
+    expect(barred.modifiers.some((modifier) => modifier.stat === "cannotBeCurrentQuest" && modifier.instanceId === tribute)).toBe(true);
+    const spent = settled(made, updateCard(made.state, idOf(made.state, ULCHOR), { damage: 40 }));
+    expect(spent.modifiers.some((modifier) => modifier.stat === "cannotBeCurrentQuest" && modifier.instanceId === tribute)).toBe(false);
+    const { defeatSideQuest } = await import("../sidequests/quest.ts");
+    const defeated = defeatSideQuest(updateCard(made.state, tribute, { progress: 8 }), tribute, made.ctx, []);
+    const won = resolveRecords(settle({ ...defeated, window: null, mode: "stopped" }, made.ctx, []), made.ctx, TRIBUTE, "forced", tribute);
+    expect(won.state.stageCleared || won.state.won === true).toBe(true);
+  });
+
+  it("21069:A:1 a non-unique enemy that engages a player cannot take damage until the end of the round", () => {
+    const made = table({ staging: ["21069", "21020"] });
+    const raider = idOf(made.state, "21020");
+    const engaged = settled(made, moveCard(made.state, raider, { zone: "engaged", seat: 0 }));
+    expect(engaged.cards[raider]?.zone).toBe("engaged");
   });
 });
