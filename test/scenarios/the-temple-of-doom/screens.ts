@@ -46,4 +46,9 @@ export const screens: ScreenMoment[] = [
     note: "21070:A:2: Covered in Darkness in the staging area, two-handed. Each seat wears \"P1 0/1\", the threat its player card effects took off this round against the 1 allowed.",
     layout: { stage: "21081", side: "B", phase: "Quest", seats: 2, staging: [TRIBUTE, ULCHOR, COVERED] },
   },
+  {
+    name: "covered-in-darkness-solo",
+    note: "21070:A:2: Covered in Darkness in the staging area, true solo. The threat ring wears \"Lower 0/1\" (never \"Cap\", the word of stage 2B's dial).",
+    layout: { stage: "21081", side: "B", phase: "Quest", seats: 1, staging: [TRIBUTE, ULCHOR, COVERED] },
+  },
 ];
