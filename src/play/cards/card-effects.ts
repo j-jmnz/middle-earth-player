@@ -28,6 +28,7 @@ import { valeShieldMark } from "../readouts/against-the-shadow/vale.ts";
 import { stagedSeatChip } from "../readouts/haradrim/staged.ts";
 import { consideredChip, guardedChip } from "../readouts/haradrim/serpent.ts";
 import { stackMark } from "../readouts/against-the-shadow/stewards-fear.ts";
+import { tavernMark } from "../readouts/mordor/tavern.ts";
 import { capturedPill } from "../words/scenarios/angmar/gram-table.ts";
 import { capturedOwners } from "../readouts/gram.ts";
 import { hiddenMark, isHeldFaceup, keptMark } from "../readouts/standalone-scenarios/wizards-quest.ts";
@@ -415,7 +416,7 @@ function handHeldMark(game: ScenarioState, cardId: string): UnderMark | null {
 // The Captives of The Uruk-hai lying under To Isengard! or held by Grishnákh are counted the same way (families/captives): "2 held", and the reader hears each hero's name.
 function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): UnderMark | null {
   // The facedown underworld cards under a location of The Steward's Fear: "2 underworld", never which cards (06018:A:1).
-  const stack = stackMark(game, cardId);
+  const stack = stackMark(game, cardId) ?? tavernMark(game, cardId);
   if (stack) return stack;
   // The enemy faceup under Narrow Alleyway in Escape from Umbar: "1 held", the enemy named to the reader (readouts/haradrim/umbar.ts).
   const alleyway = alleywayMark(game, ctx, cardId);
