@@ -9,6 +9,7 @@ import { scenarioDials, seatMarks } from "../readouts/scenario-dials.ts";
 import { spawn } from "../../rules/core/zones.ts";
 import { updateCard } from "../../rules/core/state.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
+import { holds } from "../../rules/interpret/conditions.ts";
 import { ASKS } from "../words/asks/the-temple-of-doom.ts";
 import { secondPilesOf } from "../store/pile-ids.ts";
 
@@ -35,6 +36,16 @@ describe("Tribute to Mordor's dial", () => {
     expect(empty?.warn?.level).toBe("critical");
     expect(empty?.warn?.words).toContain("the players lose the game");
     expect(dialsOf({ stage: "21080", staging: [{ code: "21053", damage: 2 }] }).find((dial) => dial.id === "tribute")?.warn).toBeUndefined();
+  });
+
+  it("21053:A:1 puts the Tribute dial first and its note says what the end of the round does at 3 damage", () => {
+    const dials = dialsOf({ stage: "21085", staging: [{ code: "21053", damage: 3 }, "21054"], piles: { powerOfMordorDeck: POWER } });
+    expect(dials.map((dial) => dial.id)).toEqual(["tribute", "ulchor"]);
+    expect(dials[0]?.note).toContain("At the end of this round the 4th token is placed, 4 come off and the top card of the deck is revealed.");
+    expect(dials[1]?.short).toBeUndefined();
+    const empty = dialsOf({ stage: "21080", staging: [{ code: "21053", damage: 3 }] }).find((dial) => dial.id === "tribute");
+    expect(empty?.note).toContain("the players lose the game.");
+    expect(dialsOf({ stage: "21080", staging: [{ code: "21053", damage: 2 }], piles: { powerOfMordorDeck: POWER } })[0]?.note).not.toContain("At the end of this round");
   });
 
   it("shows none of the dials in another scenario, and none without the cards", () => {
@@ -100,6 +111,8 @@ describe("the seat marks", () => {
   it("21070:A:2 marks each seat with the threat its card effects took off this round against the 1 allowed", () => {
     const pair = built({ seats: 2, stage: "21081", staging: ["21070"] });
     expect(seatMarks(pair.state, pair.ctx).map((mark) => mark.label)).toEqual(["P1 0/1", "P2 0/1"]);
+    const solo = built({ stage: "21081", staging: ["21070"] });
+    expect(seatMarks(solo.state, solo.ctx)).toMatchObject([{ seat: 0, label: "Lower 0/1" }]);
     const spent = { ...pair.state, playerThreatLoweredBy: { 0: 1 } } as ScenarioState;
     expect(seatMarks(spent, pair.ctx)[0]).toMatchObject({ label: "P1 1/1" });
     expect(seatMarks(spent, pair.ctx)[0]?.note).toContain("Covered in Darkness");
@@ -121,9 +134,15 @@ describe("the seat marks", () => {
     expect(marks.every((mark) => mark.label.length <= 5)).toBe(true);
   });
 
-  it("merges two pieces on one seat into one mark that keeps both counts", () => {
-    const made = built({ seats: 2, stage: "21081", active: "21062", staging: ["21070"] });
-    expect(seatMarks(made.state, made.ctx).map((mark) => mark.label)).toEqual(["P1 0/1 · 0/1", "P2 0/1 · 0/1"]);
+  it("shows one mark for each seat, Narrow Opening first, then Lost in the Dark, then Covered in Darkness, and keeps every piece in the note", () => {
+    const made = built({ seats: 2, stage: "21081", active: "21062", staging: ["21070", "21065"] });
+    const marks = seatMarks(made.state, made.ctx);
+    expect(marks.map((mark) => mark.label)).toEqual(["P1 0/1", "P2 0/1"]);
+    expect(marks[0]?.note).toContain("Narrow Opening");
+    expect(marks[0]?.note).toContain("Lost in the Dark");
+    expect(marks[0]?.note).toContain("Covered in Darkness");
+    const dark = built({ seats: 2, stage: "21081", staging: ["21070", "21065"] });
+    expect(seatMarks(dark.state, dark.ctx).map((mark) => mark.label)).toEqual(["P1 0", "P2 0"]);
   });
 });
 
@@ -147,8 +166,16 @@ describe("the asks name their owner and say the tie", () => {
 
   it("21057:A:1 says Tribute's damage and the result of each row, and no row can eliminate a player", () => {
     expect(ASKS["21057:whenRevealed:1 @1 Choose"]?.note).toContain("{tribute} of 4 damage");
-    expect(ASKS["21057:whenRevealed:1 @1 damage"]?.label).toContain("{tribute} to {next} of 4");
-    expect(ASKS["21057:whenRevealed:1 @1 surge"]?.label).toContain("gains surge");
-    for (const key of Object.keys(ASKS)) expect(ASKS[key]?.caution, key).toBeUndefined();
+    expect(JSON.stringify(ASKS["21057:whenRevealed:1 @1 damage"]?.label)).toContain("{tribute} to {next} of 4");
+    expect(ASKS["21057:whenRevealed:1 @1 surge"]?.label).toContain("reveal 1 more encounter card");
+    // The caution holds when that damage and the end of the round reach 4 and the Power of Mordor deck is empty, and in no other case.
+    const caution = ASKS["21057:whenRevealed:1 @1 damage"]?.caution?.when;
+    const armed = (damage: number, deck: readonly string[]): boolean => {
+      const made = built({ stage: "21080", staging: [{ code: "21053", damage }], piles: { powerOfMordorDeck: deck } });
+      return caution != null && holds(made.state, caution, { actor: 0, sourceId: null, returned: 0 }, made.ctx);
+    };
+    expect([armed(2, []), armed(1, []), armed(2, POWER), armed(3, [])]).toEqual([true, false, false, true]);
+    // Only Place of Evil's damage row arms a caution.
+    expect(Object.keys(ASKS).filter((key) => ASKS[key]?.caution)).toEqual(["21057:whenRevealed:1 @1 damage"]);
   });
 });

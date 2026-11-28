@@ -3,7 +3,7 @@
 Vengeance of Mordor part 3 (A Shadow in the East), standalone only, on Easy and Normal (Q09.3, E09.3; DragnCards labels the deck "Temple of Doom"). Encounter sets The Temple of Doom, Ulchor's Guard, Twisted Tunnels, Easterling Raiders and The Power of Mordor (`vom.setup-the-temple-of-doom`). The quest is a stage 1 and four stage 2 cards; the scenario adds Thane Ulchor and Tribute to Mordor.
 
 - **Setup.** Stage 1A prints "Setup: Shuffle each of the stage 2 quest cards together and place them facedown under this stage. Create The Power of Mordor deck (see insert) and set it next to the quest deck. Add Thane Ulchor and Tribute to Mordor to the staging area. Shuffle the encounter deck." (`21080:A:1`). The reader gives the steps `shuffleStageTwosUnder` and `buildPowerOfMordorDeck` (the set The Power of Mordor, `vom.power-of-mordor-deck-the-temple-of-doom`) and a staging clause.
-- **Piles.** The five Power of Mordor cards are the second encounter deck (`encounterDeck2`); Thane Ulchor and Tribute to Mordor are staged; the four stage 2 cards are quest cards dealt in any order.
+- **Piles.** The five Power of Mordor cards are the Power of Mordor deck (`powerOfMordorDeck`); Thane Ulchor and Tribute to Mordor are staged; the four stage 2 cards are quest cards dealt in any order.
 - **Quest stages.** "Quest stage" counts the double-sided cards from the quest deck in the victory display and no side quest (`vom.quest-stages-vs-side-quests`): stage 1B adds itself to the victory display when it advances, so it counts.
 
 ## Data
@@ -45,16 +45,19 @@ The statuses are those of the Readings bullet of `docs/scenarios/vengeance-of-mo
 
 ## Table
 
-Each piece a record creates, with the line that creates it (`docs/agents/agent-brief.md`, Scenario procedure, The Table step). The engine decides each number; the table only says it. The pieces are drawn in `docs/design-system-table.md`, The Temple of Doom's table pieces
+Each piece a record creates, with the line that creates it (`docs/agents/agent-brief.md`, Scenario procedure, The Table step). The engine decides each number; the table only says it. The pieces are drawn in `docs/design-system-table.md` (The Temple of Doom's table pieces).
 
 - **Power of Mordor deck** (`21080:A:1`, `21053:A:1`): the five cards form a second pile beside the quest deck (`powerOfMordorDeck`, label "Mordor", its count on the pile); a revealed card goes to the encounter discard pile. Code: `layout/layout.ts`, `store/pile-ids.ts`, `canvas/pile-piece.native.tsx`.
+- **Dial order**: Tribute, Ulchor, Temple, Cap.
+- **Place of Evil's damage row** (`21057:A:1`): when Tribute's damage then reaches 4 at the end of the round, the row says a Power of Mordor card is revealed then, or with the deck empty that the players lose, and the empty-deck row arms a caution.
 - **Tribute dial** (`21053:A:1`): the damage on Tribute to Mordor against 4, warming near it, "critical" with 3 or more damage and the deck empty (`src/play/readouts/mordor/temple.ts`, words in `temple-words.ts`).
 - **Ulchor dial** (`21054:A:2`, `21053:A:2`): his hit points left; the note says X and the engagement rule. No limit and no warning.
 - **Temple dial** (`21080:B:2`): the resources on stage 1B against the 2 that advance the quest; a goal dial.
 - **Cap dial** (`21085:B:2`): the progress stage 2B took this round against the cap X, from the Forced effect (`stageProgressCap`); "near" at the cap.
+- **Seat marks**: one for each seat, the first that applies of Narrow Opening, Lost in the Dark and Covered in Darkness; the note and the spoken words hold every piece that applies.
 - **Seat mark, cards under the threat dial** (`21065:A:1`, `21065:A:2`): a count for each seat, "P1 7" (solo "Dark 7"); the cards are never shown. They lie facedown under the side quest (zone `under`, owner the seat).
 - **Seat mark, Narrow Opening** (`21062:A:1`): "P1 0/1" the cards a seat played this round against the 1 allowed, while the location is active.
-- **Seat mark, Covered in Darkness** (`21070:A:2`): "P1 0/1" the threat the seat's card effects took off this round against the 1 allowed.
+- **Seat mark, Covered in Darkness** (`21070:A:2`): "P1 0/1" (solo "Lower 0/1") the threat the seat's card effects took off this round against the 1 allowed.
 - **Quest stages in the victory display** (`21054:A:2`, `21056:A:1`): no widget; the victory pile shows the cards and Ulchor's note and Hall of Horrors' pick say the number now.
 - **Owner on a pick that spans seats**: the Easterling ties (`21022:A:3`, `21023:A:3`, `21024:A:2`, `21060:A:2`) and Place of Evil's Choose (`21057:A:1`) are the first player's for the group and not `owned`; the picks of one player's own (`21056:A:1`, `21068:A:1`, `21081:B:1`, `21085:B:2`) are `owned`.
 - **Setup records** `141085:A:1` (The One Ring) and `21080:A:1` (the stage 2 cards facedown under stage 1, shown by the quest stack as any facedown stage, and the Power of Mordor deck above) make no other tracker, zone or held card.

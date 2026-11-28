@@ -10,6 +10,7 @@ import { expireModifiers, flagged, updateCard, withMode } from "../../../rules/c
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { moveCard } from "../../../rules/core/zones.ts";
 import { settle } from "../../../rules/engine/machine.ts";
+import { askCurrentQuest } from "../../../rules/families/wilderland/night.ts";
 import { defeatSideQuest } from "../../../rules/families/sidequests/quest.ts";
 import { drawMany, drawOpeningHand } from "../../../rules/interpret/interpret.ts";
 import { defenderBarredByEngagement } from "../../../rules/families/mordor/engage.ts";
@@ -30,7 +31,7 @@ const settled = (made: ReturnType<typeof table>, state: ScenarioState): Scenario
 const damageOf = (state: ScenarioState, code: string): number => state.cards[idOf(state, code)]?.damage ?? 0;
 const progressOf = (state: ScenarioState, code: string): number => state.cards[idOf(state, code)]?.progress ?? 0;
 // A line that holds with its records and with none (what stays unchanged): a plain test, beside the lineSpec checks that fail without the records.
-const negative = (line: string, name: string, check: (effects: typeof EFFECTS) => void): void => it(`${line} ${name}`, () => check(EFFECTS));
+const holdsWithout = (line: string, name: string, check: (effects: typeof EFFECTS) => void): void => it(`${line} ${name}`, () => check(EFFECTS));
 // Progress placed as a card effect does, the stage never advancing: what the stage holds afterwards is what it took.
 const place = (made: ReturnType<typeof table>, state: ScenarioState, amount: number): ScenarioState => placeQuestProgress(state, amount, made.ctx.cards, [], () => false);
 
@@ -77,6 +78,24 @@ describe("Tribute to Mordor (21053:A:1) and the Power of Mordor deck", () => {
     const defeated = defeatSideQuest(updateCard(made.state, tribute, { progress: 8 }), tribute, made.ctx, []);
     const won = resolveRecords(settle({ ...defeated, window: null, mode: "stopped" }, made.ctx, []), made.ctx, TRIBUTE, "forced", tribute);
     expect(won.state.stageCleared).toBe(true);
+  });
+  lineSpec("21053:A:2", "Ulchor is Indestructible with 9 hit points: Tribute is barred with 8 damage on him and free with 9", (effects) => {
+    const made = table({ staging: [TRIBUTE, "21054"] }, effects);
+    const tribute = idOf(made.state, TRIBUTE);
+    const withDamage = (damage: number): ScenarioState => settled(made, updateCard(made.state, idOf(made.state, "21054"), { damage }));
+    expect(flagged(withDamage(8), tribute, "cannotBeCurrentQuest")).toBe(true);
+    expect(flagged(withDamage(9), tribute, "cannotBeCurrentQuest")).toBe(false);
+  });
+  lineSpec("21053:A:2", "the first player is asked to choose the current quest among the side quests it is not barred from: with Ulchor undamaged only Lost in the Dark is offered", (effects) => {
+    const made = table({ staging: [TRIBUTE, "21065", "21054"] }, effects);
+    const offered = (state: ScenarioState): string => JSON.stringify(askCurrentQuest(settled(made, state), made.ctx, [])?.stack);
+    const tribute = idOf(made.state, TRIBUTE);
+    const dark = idOf(made.state, "21065");
+    expect(offered(made.state)).toContain(`"${dark}"`);
+    expect(offered(made.state)).not.toContain(`"${tribute}"`);
+    // Once Ulchor has no hit points left Tribute is offered as well.
+    const spent = updateCard(made.state, idOf(made.state, "21054"), { damage: 9 });
+    expect(offered(spent)).toContain(`"${tribute}"`);
   });
 });
 
@@ -226,7 +245,7 @@ describe("The enemies that engage by a constant line (21066:A:2, 21066:A:3, 2105
     const left = settled(made, moveCard(state, idOf(state, ULCHOR), { zone: "encounterDiscard" }));
     expect(left.cards[idOf(left, GUARD)]?.controller).toBe(1);
   });
-  negative("21058:A:1", "with Ulchor in the staging area the Guard stays there", (effects) => {
+  holdsWithout("21058:A:1", "with Ulchor in the staging area the Guard stays there", (effects) => {
     const made = table({ staging: [GUARD, ULCHOR] }, effects);
     expect(where(settled(made, made.state), GUARD)).toBe("staging");
   });
@@ -236,7 +255,13 @@ describe("The enemies that engage by a constant line (21066:A:2, 21066:A:3, 2105
     expect(where(state, GUARD)).toBe("engaged");
     expect(flagged(state, idOf(state, GUARD), "cannotTakeDamage")).toBe(true);
   });
-  negative("21069:A:1", "a unique enemy (Khamûl) that engages a player is not held", (effects) => {
+  it("21069:A:1 the enemy cannot take damage until the end of the round and can after it", () => {
+    const made = table({ staging: [GUARD, "21069"], engaged: [ULCHOR] });
+    const state = settled(made, made.state);
+    expect(flagged(state, idOf(state, GUARD), "cannotTakeDamage")).toBe(true);
+    expect(flagged(expireModifiers(state, ["endOfRound"]), idOf(state, GUARD), "cannotTakeDamage")).toBe(false);
+  });
+  holdsWithout("21069:A:1", "a unique enemy (Khamûl) that engages a player is not held", (effects) => {
     const made = table({ staging: [KHAMUL, "21069", "21020"] }, effects);
     const state = settled(made, made.state);
     expect(where(state, KHAMUL)).toBe("engaged");
@@ -290,7 +315,10 @@ describe("The Forgotten Temple (21080:A:1, 21080:B:2): the stage 2 cards are shu
     expect(done.state.victory.map((id) => done.state.cards[id]?.code)).toEqual(["21080"]);
     expect(done.state.cards[done.state.questStage ?? ""]?.code).toBe(top);
     expect(STAGES).toContain(top);
-    expect(done.state.cards[done.state.questStage ?? ""]?.face).not.toBe("down");
+    // Side A of the new stage is read (its When Revealed resolves), then the card shows side B.
+    const revealed = done.steps.filter((step) => step.kind === "push" && step.frame === "whenRevealed").map((step) => ("cardId" in step ? step.cardId : undefined));
+    expect(revealed).toEqual([done.state.questStage]);
+    expect(done.state.cards[done.state.questStage ?? ""]?.face).toBe("B");
   });
 });
 
@@ -317,7 +345,7 @@ describe("Narrow Opening (21062:A:1): each player cannot play more than 1 card e
     expect(playLimitBars({ ...played, activeSeat: 0 }, mine, t.ctx, {})).toBe(true);
     expect(playLimitBars({ ...played, activeSeat: 1 }, other, t.ctx, {})).toBe(false);
   });
-  negative("21062:A:1", "it holds only while it is the active location (in the staging area a player plays more than 1 card)", () => {
+  holdsWithout("21062:A:1", "it holds only while it is the active location (in the staging area a player plays more than 1 card)", () => {
     const t = made(EFFECTS, { staging: [NARROW] });
     const state = syncConstants(t.state, t.ctx);
     const played = play(t, state, firstCard(t, state));
@@ -356,14 +384,17 @@ describe("The stage 2B discards (21083:B:1, 21084:B:1) and The Tower of Barad-d�
 
 describe("Thane Ulchor (21054:A:2): he can be engaged with exactly 4 quest stages in the victory display", () => {
   const STAGE_CODES = ["21080", "21081", "21083", "21084", "21085"];
-  const engageable = (n: number): boolean => {
-    const made = table({ stage: "21085", staging: ["21054"], victory: STAGE_CODES.slice(0, n) });
+  const engageable = (n: number, effects: typeof EFFECTS): boolean => {
+    const made = table({ stage: "21085", staging: ["21054"], victory: STAGE_CODES.slice(0, n) }, effects);
     return !flagged(settled(made, made.state), idOf(made.state, "21054"), "cannotBeEngaged");
   };
-  negative("21054:A:2", "with 4 stages (X is 5) he can be engaged, with 3 or 5 he cannot", () => {
-    expect([3, 4, 5].map(engageable)).toEqual([false, true, false]);
+  lineSpec("21054:A:2", "with 4 stages (X is 5) he can be engaged, with 3 or 5 he cannot", (effects) => {
+    expect([3, 4, 5].map((n) => engageable(n, effects))).toEqual([false, true, false]);
   });
-  negative("21081:B:2", "with 3 quest stages in the victory display progress can be placed on the stage", () => {
+});
+
+describe("The Legacy of Mordor (21081:B:2): progress is shut out only with 4 quest stages in the victory display", () => {
+  holdsWithout("21081:B:2", "with 3 quest stages in the victory display progress can be placed on the stage", () => {
     const made = table({ stage: LEGACY, victory: ["21080", "21083", "21084"] });
     expect(flagged(settled(made, made.state), idOf(made.state, LEGACY), "noProgressPlaced")).toBe(false);
   });

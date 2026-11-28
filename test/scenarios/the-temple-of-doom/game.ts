@@ -50,7 +50,6 @@ export const DEFAULT_POLICY: TempledoomPolicy = { choose: "first" };
 //   engageUpTo(most, options)  the optional engagement step: engage the enemy of the lowest `rank` (`allow` permits) while engaged with fewer than `most`
 //   triggerActions(effectIds, oncePerRound)  an Action or Response of the records named, each time (or once a round) the engine offers it and the seat can pay
 //   passCommitWhile(when)  the quest commit: pass without committing while `when` holds
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go in the list, before the auto-player's.
 const TRIBUTE = "21053";
 const ULCHOR = "21054";
 // Thane Ulchor first: he is engageable only on the last stage, and his damage opens Tribute to Mordor.
@@ -69,7 +68,6 @@ export type TempledoomGame = PlayedGame;
 // The goldens (src/campaign/scenarios/the-temple-of-doom/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type TempledoomGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: TempledoomDecks; outcome: "won" | "lost"; policy?: Partial<TempledoomPolicy>; lossReason?: string };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Nightmare) and a few losses (each way the scenario can be lost), each on a fixed seed.
 export const TEMPLEDOOM_GOLDENS: readonly TempledoomGolden[] = [
   { name: "true solo, won, Normal", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed, won, Normal", seatCount: 2, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won" },
@@ -83,7 +81,7 @@ const game = standaloneGame<TempledoomDecks, TempledoomPolicy>({
   campaign: cycle,
   scenario: templedoom,
   stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles and its Nightmare deck.
+  // The scenario's own cards: it has no Nightmare deck.
   codes: [...templedoom.cards.map((card) => card.code)],
   intent: templedoomIntent,
   policy: DEFAULT_POLICY,

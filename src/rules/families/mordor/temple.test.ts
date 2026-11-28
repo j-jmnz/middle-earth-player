@@ -153,7 +153,7 @@ describe("ShuffleStagesUnder (21080:A:1): the stage 2 cards are shuffled under s
     expect(done.state.questDeck.map((id) => done.state.cards[id]?.code).sort()).toEqual(STAGES);
   });
 
-  it("stage 1 at 2 resources is added to the victory display and the quest goes to the top stage 2; each stage 2 defeated follows, the last wins", () => {
+  it("stage 1 at 2 resources is added to the victory display and the quest goes to the top stage 2", () => {
     const made = table({ stage: "21080", phase: "Planning" });
     const state = settled(made, resolveRecords(made.state, made.ctx, "21080", "setup", idOf(made.state, "21080")).state);
     const top = state.cards[state.questDeck[0] ?? ""]?.code;
@@ -222,12 +222,5 @@ describe("the cards of the scenario that listen for an event", () => {
     const defeated = defeatSideQuest(updateCard(made.state, tribute, { progress: 8 }), tribute, made.ctx, []);
     const won = resolveRecords(settle({ ...defeated, window: null, mode: "stopped" }, made.ctx, []), made.ctx, TRIBUTE, "forced", tribute);
     expect(won.state.stageCleared).toBe(true);
-  });
-
-  it("21069:A:1 a non-unique enemy that engages a player cannot take damage until the end of the round", () => {
-    const made = table({ staging: ["21069", "21020"] });
-    const raider = idOf(made.state, "21020");
-    const engaged = settled(made, moveCard(made.state, raider, { zone: "engaged", seat: 0 }));
-    expect(engaged.cards[raider]?.zone).toBe("engaged");
   });
 });

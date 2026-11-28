@@ -46,7 +46,7 @@ export type Text = string | readonly { when?: Condition; text: string }[];
  * - `bind`: a name for each number a template says, as the `Amount` the engine reads.
  * - `xRows`: the rows of a ChooseX (the entry keyed with the verb `ChooseX`), one for each number X the player may take: `label` says `{x}` and each `bind` name, and `less` names `{<name>}`, the amount `of` less X and at
  *   least `min`, with its `unit` ("4 cards"), so "Spend {x}: reveal {reveals}" says what each number buys.
- * - `named`: a name for each card a template says, as the `PickSpec` that finds it for the seat asked: the card's name when exactly one card matches, else the words `otherwise` ("your highest-cost ally"), so a row names the card it takes when there is no second step to choose; `{<name>Cost}` says that card's printed cost and `{<name>Attack}` its current Attack.
+ * - `named`: a name for each card a template says, as the `PickSpec` that finds it for the seat asked: the card's name when exactly one card matches, else the words `otherwise` ("your highest-cost ally"), so a row names the card it takes when there is no second step to choose; `{<name>Cost}` says that card's printed cost and `{<name>Attack}` its current Attack; `{<name>Defense}` is the lowest current Defense among the cards the pick finds and `{<name>Tied}` how many hold it.
  * - `caution`: the two-tap warning, said as "Tap again: ..." when `when` holds. It belongs to a row: on a Pick `when` is read once for each row with `picked` set to that row's id, so the confirm arms only on the row that loses
  *   the game, and on a Choose it is read for the branch the entry is keyed with. A warning that holds whatever is picked is a `when` that does not read `picked`; there is no sheet-wide caution.
  */
@@ -118,7 +118,7 @@ export function templatesOf(entry: Ask): string[] {
 
 /** The placeholders of an entry that no value answers: none of `card`, `owner`, `picked`, `host`, `subject`, `ringBearer`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` and `named` names. */
 export function unknownPlaceholders(entry: Ask, withN = true): string[] {
-  const known = new Set(["card", "owner", "x", "picked", "whose", "pickedCost", "discarded", "threat", "eliminated", "host", "subject", "ringBearer", "hero", "pair", "left", "ready", "forced", "dealt", "pursuitLimit", ...(entry.countdown != null ? ["countdown"] : []), ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...(entry.xRows?.less ? [entry.xRows.less.name] : []), ...Object.keys(entry.named ?? {}), ...Object.keys(entry.named ?? {}).flatMap((name) => [`${name}Cost`, `${name}Attack`])]);
+  const known = new Set(["card", "owner", "x", "picked", "whose", "pickedCost", "discarded", "threat", "eliminated", "host", "subject", "ringBearer", "hero", "pair", "left", "ready", "forced", "dealt", "pursuitLimit", ...(entry.countdown != null ? ["countdown"] : []), ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...(entry.xRows?.less ? [entry.xRows.less.name] : []), ...Object.keys(entry.named ?? {}), ...Object.keys(entry.named ?? {}).flatMap((name) => [`${name}Cost`, `${name}Attack`, `${name}Defense`, `${name}Tied`])]);
   return [...new Set(templatesOf(entry).flatMap(placeholdersOf))].filter((name) => !known.has(name));
 }
 
@@ -239,6 +239,11 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
     // `{<name>Attack}`: the current Attack of the card the pick finds (the cards tied for the highest Attack share one; 0 with no card).
     const found = only[0] === undefined ? undefined : a.game.cards[only[0]];
     values[`${name}Attack`] = found ? modifiedStat(a.game, found, "attack", a.ctx.cards) : 0;
+    // `{<name>Defense}` the lowest current Defense among the cards the pick finds and `{<name>Tied}` how many hold it (0 with no card): a pick that offers every candidate while a verb keeps the lowest (PickLowestDefense).
+    const defenses = only.flatMap((id) => { const card = a.game.cards[id]; return card ? [modifiedStat(a.game, card, "defense", a.ctx.cards)] : []; });
+    const lowest = defenses.length > 0 ? Math.min(...defenses) : 0;
+    values[`${name}Defense`] = lowest;
+    values[`${name}Tied`] = defenses.filter((defense) => defense === lowest).length;
   }
   return { values, scope };
 }

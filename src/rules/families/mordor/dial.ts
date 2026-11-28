@@ -8,6 +8,8 @@ import { livingSeats, updateCard } from "../../core/state.ts";
 import { shuffleSeatDeck } from "../deck/moves.ts";
 import type { Focus } from "../index.ts";
 
+const LOST_IN_THE_DARK = "21065";
+
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
 /** The cards under the dial of the seat that the source holds, the top one first. */
@@ -37,8 +39,9 @@ export function discardUnderDial(state: ScenarioState, focus: Focus): ScenarioSt
  * go back into their owners' decks, which are shuffled. A side quest that leaves play any other way leaves them where they are.
  */
 export function returnUnderDialSweep(state: ScenarioState): ScenarioState {
-  if (state.victory.length === 0) return state;
-  const held = state.victory.filter((id) => cardsUnder(state, id).some((under) => state.cards[under]?.owner != null && state.cards[under]?.stackedAt != null));
+  // Only Lost in the Dark holds cards under the dials: a game with no such card in its victory display pays one scan of that display.
+  const held = state.victory.filter((id) => state.cards[id]?.code === LOST_IN_THE_DARK && cardsUnder(state, id).some((under) => state.cards[under]?.owner != null && state.cards[under]?.stackedAt != null));
+  if (held.length === 0) return state;
   return held.reduce((next, quest) => livingSeats(next).reduce((current, seat) => {
     const cards = underDial(current, quest, seat);
     if (cards.length === 0) return current;

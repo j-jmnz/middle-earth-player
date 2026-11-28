@@ -4,12 +4,18 @@
 import type { ScenarioState } from "../../core/state.ts";
 import { modifierActive } from "../../core/state.ts";
 
+/** The tightest cap the stage card holds this round and the progress it took under it, or null with no cap. */
+export function stageCapOf(state: ScenarioState, stageId: string): { cap: number; placed: number } | null {
+  const caps = state.modifiers.filter((modifier) => modifier.stat === "stageProgressCap" && modifier.instanceId === stageId && modifierActive(state, modifier)).map((modifier) => modifier.amount);
+  if (caps.length === 0) return null;
+  const placed = state.modifiers.filter((modifier) => modifier.stat === "stageProgressPlaced" && modifier.instanceId === stageId).reduce((sum, modifier) => sum + modifier.amount, 0);
+  return { cap: Math.min(...caps), placed };
+}
+
 /** How much more progress the stage card can take this round under the caps it holds; Number.MAX_SAFE_INTEGER with none. */
 export function stageCapRoom(state: ScenarioState, stageId: string): number {
-  const caps = state.modifiers.filter((modifier) => modifier.stat === "stageProgressCap" && modifier.instanceId === stageId && modifierActive(state, modifier)).map((modifier) => modifier.amount);
-  if (caps.length === 0) return Number.MAX_SAFE_INTEGER;
-  const placed = state.modifiers.filter((modifier) => modifier.stat === "stageProgressPlaced" && modifier.instanceId === stageId).reduce((sum, modifier) => sum + modifier.amount, 0);
-  return Math.max(0, Math.min(...caps) - placed);
+  const held = stageCapOf(state, stageId);
+  return held == null ? Number.MAX_SAFE_INTEGER : Math.max(0, held.cap - held.placed);
 }
 
 /** Notes the progress the stage took, for its cap this round. */

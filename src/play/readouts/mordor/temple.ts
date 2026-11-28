@@ -3,15 +3,17 @@
 // The numbers The Temple of Doom keeps in view: the damage on Tribute to Mordor against the 4 that reveal a Power of Mordor card (a plain limit that warms), Thane Ulchor's hit points left, the resources on stage 1B against the 2 that advance it (a goal dial), the progress stage 2B took this round against its cap, and a mark on each seat for the cards under its threat dial (Lost in the Dark), the cards it played this round under Narrow Opening and the threat its card effects took off under Covered in Darkness.
 // The engine decided every number (`damage`, `resources`, `stageProgressCap`, the cards under a side quest, `played`, `playerThreatLoweredBy`); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
 import { cardsUnder } from "../../../rules/core/zones.ts";
+import { stageCapOf } from "../../../rules/families/mordor/stage-cap.ts";
+import { frameScope, resolveAmount } from "../../../rules/interpret/amounts.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
-import { printedOf } from "../../../rules/core/printed.ts";
 import { livingSeats } from "../../../rules/core/state.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
+import type { Amount } from "../../../catalog/boundary.ts";
 import type { ReduceContext } from "../../../rules/interpret/interpret.ts";
 import { cardsOf, type TableDial } from "../dials.ts";
 import type { HandMark } from "../isengard.ts";
-import { capMarkLabel, capMarkWords } from "./dorwinion-words.ts";
-import { darkMarkLabel, darkMarkWords, lordCapWords, playMarkLabel, playMarkWords, templeGateLimitWords, templeGateWords, tributeLimitWords, tributeLoseWords, tributeWords, ulchorWords } from "./temple-words.ts";
+import { capMarkWords } from "./dorwinion-words.ts";
+import { coveredMarkLabel, darkMarkLabel, darkMarkWords, lordCapWords, playMarkLabel, playMarkWords, templeGateLimitWords, templeGateWords, tributeLimitWords, tributeLoseWords, tributeWords, ulchorWords } from "./temple-words.ts";
 
 const SCENARIO = "the-temple-of-doom";
 const TRIBUTE = "21053";
@@ -27,23 +29,13 @@ const TEMPLE_AT = 2;
 
 const stagingOrEngaged = (zone: string): boolean => zone === "staging" || zone === "engaged";
 
-/** The dials the table holds now: stage 1B's gate, the stage 2B cap once the Forced effect set it, Tribute to Mordor and Thane Ulchor while each is in play. None in any other scenario. */
+/** The X of Thane Ulchor, Hall of Horrors and Temple of Sauron: 1 more than the quest stages in the victory display (the engine's own reading of the amount). */
+const STAGES_PLUS_ONE: Amount = { count: { type: "card", control: "any", from: "victory", cardType: "quest" }, plus: 1 };
+
+/** The dials the table holds now: Tribute to Mordor and Thane Ulchor while each is in play, stage 1B's gate, and the stage 2B cap once the Forced effect set it. None in any other scenario. */
 export function templeDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
   if (game.scenarioId !== SCENARIO) return [];
   const dials: TableDial[] = [];
-  const stage = game.questStage ? game.cards[game.questStage] : undefined;
-  if (stage?.code === TEMPLE && stage.face === "B") {
-    dials.push({ id: "gate", testID: "temple-gate", label: "Temple", name: `Resources on ${nameOf(TEMPLE)}:`, value: stage.resources, limit: TEMPLE_AT, goal: true, limitWords: templeGateLimitWords(), cardId: stage.id, note: templeGateWords(stage.resources) });
-  }
-  if (stage?.code === LORD && stage.face === "B") {
-    const caps = game.modifiers.filter((modifier) => modifier.stat === "stageProgressCap" && modifier.instanceId === stage.id).map((modifier) => modifier.amount);
-    if (caps.length > 0) {
-      const cap = Math.min(...caps);
-      const placed = game.modifiers.filter((modifier) => modifier.stat === "stageProgressPlaced" && modifier.instanceId === stage.id).reduce((sum, modifier) => sum + modifier.amount, 0);
-      const name = nameOf(LORD);
-      dials.push({ id: "cap", testID: "temple-cap", label: "Cap", name: `Progress placed on ${name} this round, no more than ${cap}:`, value: placed, limit: cap, limitWords: `No more than ${cap} progress this round`, ...(placed >= cap ? { warn: { level: "near" as const, words: `No more progress can be placed on ${name} this round.` } } : {}), cardId: stage.id, note: lordCapWords(placed, cap) });
-    }
-  }
   const tribute = cardsOf(game, TRIBUTE)[0];
   if (tribute) {
     const deck = game.piles?.powerOfMordorDeck?.length ?? 0;
@@ -53,38 +45,54 @@ export function templeDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
   const ulchor = cardsOf(game, ULCHOR).find((card) => stagingOrEngaged(card.zone));
   if (ulchor) {
     const left = Math.max(0, modifiedStat(game, ulchor, "hitPoints", ctx.cards) - ulchor.damage);
-    const x = game.victory.filter((id) => game.cards[id] && printedOf(ctx.cards, game.cards[id].code).type === "quest").length + 1;
-    dials.push({ id: "ulchor", testID: "temple-ulchor", label: "Ulchor", short: "Ulc", name: `Hit points left on ${nameOf(ULCHOR)}:`, value: left, cardId: ulchor.id, note: ulchorWords(left, x) });
+    const x = resolveAmount(game, STAGES_PLUS_ONE, frameScope(game, 0, ulchor.id), ctx);
+    dials.push({ id: "ulchor", testID: "temple-ulchor", label: "Ulchor", name: `Hit points left on ${nameOf(ULCHOR)}:`, value: left, cardId: ulchor.id, note: ulchorWords(left, x) });
+  }
+  const stage = game.questStage ? game.cards[game.questStage] : undefined;
+  if (stage?.code === TEMPLE && stage.face === "B") {
+    dials.push({ id: "gate", testID: "temple-gate", label: "Temple", name: `Resources on ${nameOf(TEMPLE)}:`, value: stage.resources, limit: TEMPLE_AT, goal: true, limitWords: templeGateLimitWords(), cardId: stage.id, note: templeGateWords(stage.resources) });
+  }
+  const held = stage?.code === LORD && stage.face === "B" ? stageCapOf(game, stage.id) : null;
+  if (stage && held) {
+    const { cap, placed } = held;
+    const name = nameOf(LORD);
+    dials.push({ id: "cap", testID: "temple-cap", label: "Cap", name: `Progress placed on ${name} this round, no more than ${cap}:`, value: placed, limit: cap, limitWords: `No more than ${cap} progress this round`, ...(placed >= cap ? { warn: { level: "near" as const, words: `No more progress can be placed on ${name} this round.` } } : {}), cardId: stage.id, note: lordCapWords(placed, cap) });
   }
   return dials;
 }
 
-/** Each living seat's marks: the cards under its threat dial while Lost in the Dark is in play, the cards it played this round while Narrow Opening is the active location, and the threat its card effects took off while Covered in Darkness is in play. None otherwise. */
+/** One piece of a seat's mark: the short label the dial wears and the words a tap and a screen reader hear. */
+type Piece = { label: string; note: string };
+
+/**
+ * Each living seat's mark: one label for the seat, the first of Narrow Opening's plays this round (while it is the active location), the cards under its threat dial (Lost in the Dark in play) and the threat its card effects took off (Covered in Darkness in play).
+ * The note holds every piece that applies, so a seat that wears the first still hears the others. None otherwise.
+ */
 export function templeHands(game: ScenarioState): readonly HandMark[] {
   if (game.scenarioId !== SCENARIO) return [];
-  const seats = livingSeats(game);
-  const solo = game.seatCount > 1 ? null : 0;
-  const label = (seat: number): number | null => (solo === 0 ? null : seat);
-  const marks: HandMark[] = [];
+  const solo = game.seatCount <= 1;
+  const label = (seat: number): number | null => (solo ? null : seat);
+  const narrow = game.activeLocation != null && game.cards[game.activeLocation]?.code === NARROW;
   const dark = cardsOf(game, DARK)[0];
-  if (dark) {
-    const under = cardsUnder(game, dark.id).filter((id) => game.cards[id]?.stackedAt != null);
-    for (const seat of seats) {
-      const held = under.filter((id) => game.cards[id]?.owner === seat).length;
-      marks.push({ seat, label: darkMarkLabel(label(seat), held), note: darkMarkWords(held) });
-    }
-  }
-  if (game.activeLocation != null && game.cards[game.activeLocation]?.code === NARROW) {
-    for (const seat of seats) {
+  const covered = cardsOf(game, COVERED).some((card) => stagingOrEngaged(card.zone));
+  const underDark = dark ? cardsUnder(game, dark.id).filter((id) => game.cards[id]?.stackedAt != null) : [];
+  const marks: HandMark[] = [];
+  for (const seat of livingSeats(game)) {
+    const pieces: Piece[] = [];
+    if (narrow) {
       const played = (game.played ?? []).filter((entry) => entry.round === game.round && entry.seat === seat).length;
-      marks.push({ seat, label: playMarkLabel(label(seat), played), note: playMarkWords(played) });
+      pieces.push({ label: playMarkLabel(label(seat), played), note: playMarkWords(played) });
     }
-  }
-  if (cardsOf(game, COVERED).some((card) => stagingOrEngaged(card.zone))) {
-    for (const seat of seats) {
+    if (dark) {
+      const held = underDark.filter((id) => game.cards[id]?.owner === seat).length;
+      pieces.push({ label: darkMarkLabel(label(seat), held), note: darkMarkWords(held) });
+    }
+    if (covered) {
       const lowered = game.playerThreatLoweredBy?.[seat] ?? 0;
-      marks.push({ seat, label: capMarkLabel(label(seat), lowered), note: capMarkWords(lowered).replace("Hillside Manor", "Covered in Darkness") });
+      pieces.push({ label: coveredMarkLabel(label(seat), lowered), note: capMarkWords(lowered, "Covered in Darkness") });
     }
+    const first = pieces[0];
+    if (first) marks.push({ seat, label: first.label, note: pieces.map((piece) => piece.note).join(" ") });
   }
   return marks;
 }

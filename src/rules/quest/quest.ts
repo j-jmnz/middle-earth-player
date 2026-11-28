@@ -267,7 +267,9 @@ export function putOnStage(from: ScenarioState, stageId: string, wanted: number,
   // `stageCappedPrinted` (17100:A:2): the cap is the quest points printed on the stage, not a value an effect changed.
   const printedCap = flagged(state, stageId, "stageCappedPrinted") ? (printedOf(cards, stage.code).questPoints ?? null) : null;
   const capped = printedCap ?? (points != null && flagged(state, stageId, "stageCapped") ? points : null);
-  const placed = Math.min(advancing || capped != null ? Math.min(amount, Math.max(0, (capped ?? points ?? 0) - stage.progress)) : amount, stageCapRoom(state, stageId)); // "no more than X progress this round" (21085:B:2)
+  const room = advancing || capped != null ? Math.min(amount, Math.max(0, (capped ?? points ?? 0) - stage.progress)) : amount;
+  // "No more than X progress can be placed on this stage this round" (21085:B:2).
+  const placed = Math.min(room, stageCapRoom(state, stageId));
   let next = state;
   if (placed > 0) {
     next = updateCard(next, stageId, { progress: stage.progress + placed });

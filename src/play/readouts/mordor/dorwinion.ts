@@ -47,6 +47,6 @@ export function dorwinionHands(game: ScenarioState): readonly HandMark[] {
   if (game.scenarioId !== SCENARIO || !cardsOf(game, MANOR).some((card) => card.zone === "staging")) return [];
   return livingSeats(game).map((seat) => {
     const lowered = game.playerThreatLoweredBy?.[seat] ?? 0;
-    return { seat, label: capMarkLabel(game.seatCount > 1 ? seat : null, lowered), note: capMarkWords(lowered) };
+    return { seat, label: capMarkLabel(game.seatCount > 1 ? seat : null, lowered), note: capMarkWords(lowered, "Hillside Manor") };
   });
 }

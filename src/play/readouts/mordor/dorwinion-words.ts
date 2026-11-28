@@ -20,5 +20,6 @@ export const worshipWords = (damage: number): string =>
 /** The seat mark of Hillside Manor's cap (short enough for a two-handed bar's caption, which keeps the count): the threat the player's card effects took off this round against the 1 allowed. */
 export const capMarkLabel = (seat: number | null, lowered: number): string => `${seat == null ? "Cap" : `P${seat + 1}`} ${Math.min(lowered, 1)}/1`;
 
-export const capMarkWords = (lowered: number): string =>
-  lowered >= 1 ? "Hillside Manor: player card effects have already lowered this threat by 1 this round. No more can be lowered by them this round." : "Hillside Manor: player card effects can lower this threat by no more than 1 in all each round.";
+/** What a tap on the cap mark says; `card` is the card that holds the cap (Hillside Manor, Covered in Darkness). */
+export const capMarkWords = (lowered: number, card: string): string =>
+  lowered >= 1 ? `${card}: player card effects have already lowered this threat by 1 this round. No more can be lowered by them this round.` : `${card}: player card effects can lower this threat by no more than 1 in all each round.`;
