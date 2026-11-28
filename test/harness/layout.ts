@@ -56,6 +56,8 @@ export type Layout = {
   side?: "A" | "B";
   // The heat tracker of Desert Crossing, as its Setup left it (16068:A:1): one table modifier with this value.
   temperature?: number;
+  // The progress placed on the quest card this round, as the tally a progress cap reads (`questProgressPlaced`, families/caves/progress.ts): the cap dial shows it against the cap.
+  progressPlaced?: number;
   // The Orcs' area of Race Across Harad as the Setup leaves it (17047:A:1): the set-aside stages (listed in `setAside` too) become the Orcs' quest deck, `place` joins the area, `members` are the cards of `staging` that move into it,
   // and `progress` sits on the Orcs' current stage.
   orcs?: { stages: readonly string[]; place?: readonly string[]; members?: readonly string[]; progress?: number };
@@ -216,6 +218,7 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   }
   if (layout.heroResources) for (const id of Object.keys(state.cards)) if (state.cards[id]?.zone === "heroes") state = updateCard(state, id, { resources: layout.heroResources });
   if (layout.temperature != null) state = withTemperature(state, layout.temperature);
+  if (layout.progressPlaced) state = { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "table", stat: "questProgressPlaced", amount: layout.progressPlaced, until: "endOfRound" }] };
   if (layout.noteEncounterDiscards) state = { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "table", stat: "noteEncounterDiscards", amount: 1, until: "endOfGame" }] };
   if (layout.sagaHero && "hero" in (world.data.sagaStart ?? {})) {
     const saga = spawn(state, (world.data.sagaStart as { hero: string }).hero, { zone: "heroes", seat: 0 });

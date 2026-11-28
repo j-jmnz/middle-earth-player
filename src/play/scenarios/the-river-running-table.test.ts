@@ -16,14 +16,24 @@ const dials = (layout: Layout) => {
 };
 
 describe("the Pursuit dial", () => {
-  it("21012:A:1 counts the resources on Easterling Pursuit toward the 3 that add enemies, and warms one short of it", () => {
+  it("21012:A:1 counts the resources on Easterling Pursuit toward the 3 that add enemies, and warms at 2 or more", () => {
     const none = dials({ stage: "21075", staging: ["21012"] }).find((dial) => dial.id === "pursuit");
     expect(none).toMatchObject({ testID: "river-pursuit", label: "Pursuit", value: 0, limit: 3 });
     expect(none?.warn).toBeUndefined();
     const two = dials({ stage: "21075", staging: [{ code: "21012", resources: 2 }] }).find((dial) => dial.id === "pursuit");
     expect(two).toMatchObject({ value: 2, limit: 3, warms: true, warn: { level: "near" } });
     expect(dialProps(two!).limit).toBe(3);
-    expect(two?.note).toContain("2 of the 3 resources on Easterling Pursuit");
+    expect(two?.note).toContain("2 resources on Easterling Pursuit.");
+    expect(two?.warn?.words).toBe("At the end of this round it reaches 3: 1 enemy for each player is added to the staging area.");
+    expect(two?.limitWords).toBe("3 resources add 1 enemy for each player at the end of the round");
+  });
+
+  it("21012:A:1 stays warm at 3 or more (a card adds resources during the round) and says the end of the round takes 3 off", () => {
+    for (const resources of [3, 4]) {
+      const dial = dials({ stage: "21075", staging: [{ code: "21012", resources }] }).find((item) => item.id === "pursuit");
+      expect(dial, String(resources)).toMatchObject({ value: resources, limit: 3, warms: true, warn: { level: "near", words: "At the end of this round 3 come off and 1 enemy for each player is added to the staging area." } });
+      expect(dial?.note, String(resources)).not.toContain("of the 3");
+    }
   });
 
   it("21012:A:1 shows no dial with Easterling Pursuit out of play, nor in another scenario", () => {
@@ -40,8 +50,13 @@ describe("the progress cap dial of stage 2B", () => {
 
   it("21076:B:2 fills toward the 5 a round while a player is engaged with an enemy", () => {
     const cap = dials({ stage: "21076", engaged: ["21013"] }).find((dial) => dial.id === "cap");
-    expect(cap).toMatchObject({ testID: "river-cap", label: "Cap", value: 0, limit: 5 });
+    expect(cap).toMatchObject({ testID: "river-cap", label: "Cap", value: 0, limit: 5, limitWords: "No more than 5 progress each round" });
     expect(cap?.note).toContain("0 of the 5 progress");
+  });
+
+  it("21076:B:2 comes before the Pursuit dial, so it shows when the bar is short of room", () => {
+    const ids = dials({ stage: "21076", engaged: ["21013"], staging: ["21012"] }).map((dial) => dial.id);
+    expect(ids).toEqual(["cap", "pursuit"]);
   });
 });
 

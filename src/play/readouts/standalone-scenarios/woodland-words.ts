@@ -4,11 +4,6 @@
 export const capWords = (placed: number, cap: number, stage: string): string =>
   `${placed} of the ${cap} progress that can be placed on ${stage} this round. The cap is 5, or 10 when Mendor was committed to the quest.`;
 
-export const capLimitWords = (): string => "progress that can be placed this round";
-
-/** The warning at the cap. */
-export const capFullWords = (stage: string): string => `No more progress can be placed on ${stage} this round.`;
-
 /** What a tap on the phase tally dial says. */
 export const phaseWords = (placed: number, stage: string): string =>
   `${placed} progress placed on ${stage} this phase. After a successful quest with 10 or more, the top card of the encounter deck is revealed.`;

@@ -209,7 +209,7 @@ describe("Heart of Fangorn's refresh cap", () => {
     let state = made.state;
     for (const card of Object.values(state.cards)) if ((card.zone === "play" || card.zone === "heroes") && card.controller === 0) state = updateCard(state, card.id, { exhausted: true });
     const sheets = sheetsOf({ ...made, state }, "07036", "forced", (_n, ids) => ids[0] ?? "");
-    expect(sheets.map((sheet) => sheet.note.replace(/^.*phase\. /, ""))).toEqual(["9 would ready. Choose 4 to stay exhausted.", "8 would ready. Choose 3 to stay exhausted.", "7 would ready. Choose 2 to stay exhausted.", "6 would ready. Choose 1 to stay exhausted."]);
+    expect(sheets.map((sheet) => sheet.note.replace(/^.*phase\. /, ""))).toEqual(["9 exhausted characters would ready. Choose 4 of them to stay exhausted.", "8 exhausted characters would ready. Choose 3 of them to stay exhausted.", "7 exhausted characters would ready. Choose 2 of them to stay exhausted.", "6 exhausted characters would ready. Choose 1 of them to stay exhausted."]);
   });
 
   it("07036:A:1 names the cap, the count of exhausted characters and the player who chooses", () => {
@@ -217,10 +217,10 @@ describe("Heart of Fangorn's refresh cap", () => {
     let state = made.state;
     for (const card of Object.values(state.cards)) if ((card.zone === "play" || card.zone === "heroes") && card.controller === 0) state = updateCard(state, card.id, { exhausted: true });
     const sheet = sheetsOf({ ...made, state }, "07036", "forced", (_n, ids) => ids[0] ?? "")[0];
-    expect(sheet?.note).toBe("Heart of Fangorn: only 5 of your characters ready this refresh phase. 6 would ready. Choose 1 to stay exhausted.");
+    expect(sheet?.note).toBe("Heart of Fangorn: only 5 of your characters ready this refresh phase. 6 exhausted characters would ready. Choose 1 of them to stay exhausted.");
     const two = built({ seats: 2, phase: "Refresh", play: ["ally", "ally", "ally", "ally"] });
     let twoState = two.state;
     for (const card of Object.values(twoState.cards)) if ((card.zone === "play" || card.zone === "heroes") && card.controller === 0) twoState = updateCard(twoState, card.id, { exhausted: true });
-    expect(sheetsOf({ ...two, state: twoState }, "07036", "forced", (_n, ids) => ids[0] ?? "")[0]?.note).toBe("Player 1, Heart of Fangorn: only 5 of your characters ready this refresh phase. 6 would ready. Choose 1 to stay exhausted.");
+    expect(sheetsOf({ ...two, state: twoState }, "07036", "forced", (_n, ids) => ids[0] ?? "")[0]?.note).toBe("Player 1, Heart of Fangorn: only 5 of your characters ready this refresh phase. 6 exhausted characters would ready. Choose 1 of them to stay exhausted.");
   });
 });
