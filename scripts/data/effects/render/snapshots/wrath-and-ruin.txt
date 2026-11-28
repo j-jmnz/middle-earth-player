@@ -81,7 +81,7 @@ Scenario piles that place cards with no record (staging: 22015 Contested Square;
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 22015:A:2 (front): Forced: After an enemy is defeated, place 1 progress on Contested Square if it is in the staging area.
-  22015:forced:1: Forced after an enemy is destroyed (heard about enemy (any player controls))
+  22015:forced:1: Forced after an enemy is destroyed (heard about enemy (any player controls) or in the staging area)
     only if this card is in the staging area
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 progress on this card
@@ -115,7 +115,8 @@ Scenario piles that place cards with no record (staging: 22015 Contested Square;
 
 22017:A:1 (front): While Makeshift Fortification is the active location, it gains archery 3.
   22017:constant:1: Constant
-    - this card: stat archery 3, while this card is active
+    only if this card is the active location
+    - this card: stat archery 3, while this card is in play
 
 22017:A:2 (front): Forced: After a player takes control of Makeshift Fortification, return the topmost enemy in the encounter discard pile to the staging area.
   22017:forced:1: Forced after a player takes control of a location (the event happened to that player, about that location) (heard about this card)
@@ -129,7 +130,8 @@ Scenario piles that place cards with no record (staging: 22015 Contested Square;
 
 22018:A:1 (front): While Captured Tower is the active location, encounter card effects cannot be canceled.
   22018:constant:1: Constant
-    - the table: stat encounterUncancelable (no Response cancels an encounter card's When Revealed or Shadow effect, and no paid cancel is offered against one) 1, while this card is active
+    only if this card is the active location
+    - the table: stat encounterUncancelable (no Response cancels an encounter card's When Revealed or Shadow effect, and no paid cancel is offered against one) 1, while this card is in play
 
 22018:A:2 (front): Forced: After a player takes control of Captured Tower, he shuffles the encounter discard pile into the encounter deck and discards cards from the top until he discards an enemy and puts that enemy into play engaged with him.
   22018:forced:1: Forced after a player takes control of a location (the event happened to that player, about that location) (heard about this card)
@@ -147,8 +149,10 @@ Scenario piles that place cards with no record (staging: 22015 Contested Square;
 
 22019:A:2 (front): While attached to an enemy, counts as a Condition attachment with the text: 'Forced: When attached enemy would be destroyed, heal all damage from it and discard Fury instead.'
   22019:constant:1: Constant
+    only if its host is a enemy (any player controls)
     - this card counts as a Condition attachment while it is attached
   22019:constant:2: Constant
+    only if its host is a enemy (any player controls)
     - its host: stat healsInsteadOfDestroyed 1, while this card is in play
 
 22019:A:3 (front): When Revealed: Attach to the lowest engagement cost Easterling enemy without Fury.
@@ -288,4 +292,4 @@ Scenario piles that place cards with no record (staging: 22015 Contested Square;
     who acts: the acting player is the first player (a phase has no player of its own)
     - the players win the game
 
-(rendered pieces: 190 by template, 2 as JSON)
+(rendered pieces: 196 by template, 2 as JSON)

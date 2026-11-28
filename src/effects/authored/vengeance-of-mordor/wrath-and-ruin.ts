@@ -26,6 +26,8 @@ const ULCHOR_IN_STAGING: PickSpec = { type: "enemy", control: "any", names: ["Th
 const ULCHOR_PICKED: Instruction = { verb: "Pick", pick: ULCHOR_IN_STAGING };
 const ULCHOR_ABLE: Condition = { kind: "canPick", pick: ULCHOR_IN_STAGING };
 const HOST_IS_ENEMY: Condition = { kind: "matches", card: "host", pick: { type: "enemy", control: "any" } };
+// "While this is the active location": a constant that holds only while the card lies in the active location slot (the archery total and the cancel bar read every card in play).
+const ACTIVE: Condition = { kind: "sourceIn", zone: "activeLocation" };
 const FOUND_ENEMY: Condition = { kind: "matches", card: "picked", pick: { type: "enemy", control: "any" }, inPlay: false };
 const FOUND_LOCATION: Condition = { kind: "matches", card: "picked", pick: { type: "location", control: "any" }, inPlay: false };
 // "Discard cards from the top of the encounter deck until an enemy is discarded and put it into play engaged with you": the other discards stay discarded and with no enemy nothing is put into play.
@@ -122,7 +124,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "22016:forced:1", cardCode: "22016", lines: ["22016:A:2"], timing: "forced", trigger: "controlLost", subject: { type: "location", control: "any", other: true }, condition: I_CONTROL_THIS, instructions: [{ verb: "LoseControlOfLocation", card: "self" }] },
 
     // 22017 Makeshift Fortification. A:1: while it is the active location it has archery 3. A:2: after a player takes control of it, the topmost enemy of the encounter discard pile returns to the staging area.
-    { id: "22017:constant:1", cardCode: "22017", lines: ["22017:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "archery", amount: 3, until: "whileSourceActive", target: "self" }] },
+    { id: "22017:constant:1", cardCode: "22017", lines: ["22017:A:1"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ModifyStat", stat: "archery", amount: 3, until: "whileSourceInPlay", target: "self" }] },
     {
       id: "22017:forced:1",
       cardCode: "22017",
@@ -134,7 +136,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
 
     // 22018 Captured Tower. A:1: while it is the active location no encounter card effect can be canceled. A:2: after a player takes control of it, he shuffles the encounter discard pile into the deck and discards until an enemy is discarded, which engages him.
-    { id: "22018:constant:1", cardCode: "22018", lines: ["22018:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "encounterUncancelable", amount: 1, until: "whileSourceActive", target: "table" }] },
+    { id: "22018:constant:1", cardCode: "22018", lines: ["22018:A:1"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "ModifyStat", stat: "encounterUncancelable", amount: 1, until: "whileSourceInPlay", target: "table" }] },
     { id: "22018:forced:1", cardCode: "22018", lines: ["22018:A:2"], timing: "forced", trigger: "controlTaken", subject: "self", instructions: [{ verb: "ShuffleEncounterDiscard" }, ...ENEMY_ENGAGES_ME] },
 
     // 22019 Fury (Surge is a keyword). A:2: attached to an enemy it counts as a Condition attachment, and the enemy that would be destroyed heals all damage and Fury is discarded instead (src/rules/families/mordor/fury.ts). A:3: it attaches to the Easterling enemy without Fury that has

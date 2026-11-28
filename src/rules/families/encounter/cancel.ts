@@ -1,7 +1,7 @@
 // Rules: rr.cancel, rr.effects (data/rules/entries.json); ledger line 41010:A:1.
 //
 // "While The Eaves of Mirkwood is the active location, encounter card effects cannot be canceled." The table holds the flag
-// `encounterUncancelable` while it is: no cancel Response is offered against a When Revealed or Shadow effect (A Test of Will, Hasty Stroke), while a Response that does not cancel is, and the
+// `encounterUncancelable` while it is: no cancel Response is offered against a When Revealed or Shadow effect (A Test of Will, Hasty Stroke) or the whole revealed card (The Master Ring), while a Response that does not cancel is, and the
 // paid cancel an encounter card's own Forced effect offers (141077:A:2) is not offered either.
 import type { Effect } from "../../../catalog/boundary.ts";
 import type { GameEvent, ScenarioState } from "../../core/state.ts";
@@ -29,5 +29,6 @@ export function cancelBarred(state: ScenarioState, event: GameEvent, effect: Eff
   if (event.trigger === "shadowPending" && cancels && flagged(state, "table", "allShadowsUncancelable")) return true;
   // The card SearchTopReveal revealed (51003:A:1): its When Revealed effects cannot be canceled.
   if (event.trigger === "whenRevealedPending" && cancels && flagged(state, event.subject ?? event.cardId ?? "", "revealUncancelable")) return true;
-  return (event.trigger === "whenRevealedPending" || event.trigger === "shadowPending") && encounterUncancelable(state) && cancels;
+  // "Encounter card effects cannot be canceled" bars the cancel of the whole card too (faq.cancel-encounter-card, the Master Ring's Response to the reveal; Captured Tower, 22018:A:1).
+  return (event.trigger === "whenRevealedPending" || event.trigger === "shadowPending" || event.trigger === "encounterRevealed") && encounterUncancelable(state) && cancels;
 }
