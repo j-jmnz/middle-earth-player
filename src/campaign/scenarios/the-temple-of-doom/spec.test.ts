@@ -39,6 +39,9 @@ const ROWS: readonly Row[] = [
   { line: "21056:A:1", name: "Forced: when it leaves play each player deals X damage to a character he controls (X is 1 more than the stages)", layout: { stage: LEGACY, staging: [HORRORS], victory: STAGES(2, LEGACY) }, act: [announce("leftPlay", HORRORS), answer("dh1")], expect: damageOn("dh1", 3) },
   { line: "21056:A:2", name: "Forced: with no stage in the victory display X is 1", layout: { stage: LEGACY, staging: [HORRORS] }, act: [announce("leftPlay", HORRORS), answer("dh1")], expect: damageOn("dh1", 1) },
 
+  { line: "21057:A:1", name: "When Revealed: 1 damage token on Tribute to Mordor, then the first player places 1 more", layout: { stage: LEGACY, staging: [TRIBUTE], deck: ["f0", "f3"] }, act: [reveal(EVIL), answer("damage")], expect: [damageOn(TRIBUTE, 2), zone("f0", "encounterDeck")] },
+  { line: "21057:A:1", name: "When Revealed: or the first player has Place of Evil gain surge, and the next card is revealed", layout: { stage: LEGACY, staging: [TRIBUTE], deck: ["f0", "f3"] }, act: [reveal(EVIL), answer("surge")], expect: [damageOn(TRIBUTE, 1), zone("f0", "staging")] },
+  { line: "21057:A:1", name: "When Revealed: with Tribute to Mordor out of play the choice is still offered and surge still works", layout: { stage: LEGACY, deck: ["f0", "f3"] }, act: [reveal(EVIL), answer("surge")], expect: zone("f0", "staging") },
   { line: "21057:A:2", name: "Shadow: the attacking enemy gets +1 Attack", layout: { stage: LEGACY, staging: [TRIBUTE], engaged: ["f3"] }, act: attack("f3", { shadow: EVIL, undefended: true }), expect: damageOn("dh1", 2) },
   { line: "21057:A:2", name: "Shadow: if the attack destroys a character, 1 damage token on Tribute to Mordor", layout: { stage: LEGACY, staging: [TRIBUTE], engaged: [ULCHOR] }, act: attack(ULCHOR, { shadow: EVIL, undefended: true }), expect: damageOn(TRIBUTE, 2) },
 
