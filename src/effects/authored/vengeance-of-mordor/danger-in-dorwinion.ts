@@ -122,7 +122,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 21046 City Forum. +1 Threat for each resource here. In the staging area: after a location is explored it gets 1 resource. Travel: each player raises his threat by 1 for each resource here (a cost of 0 with none).
   { id: "21046:constant:1", cardCode: "21046", lines: ["21046:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { stat: "resources", of: "self" }, until: "whileSourceInPlay", target: "self" }] },
-  { id: "21046:forced:1", cardCode: "21046", lines: ["21046:A:2"], timing: "forced", trigger: "locationExplored", condition: IN_STAGING, instructions: [{ verb: "PlaceResourceTokens", amount: 1, on: "self" }] },
+  { id: "21046:forced:1", cardCode: "21046", lines: ["21046:A:2"], timing: "forced", trigger: "locationExplored", subject: A_LOCATION, condition: IN_STAGING, instructions: [{ verb: "PlaceResourceTokens", amount: 1, on: "self" }] },
   { id: "21046:travel:1", cardCode: "21046", lines: ["21046:A:3"], timing: "travel", instructions: [{ verb: "RaiseThreat", amount: { stat: "resources", of: "self" }, who: "eachSeat" }] },
 
   // 21047 Seedy Tavern (immune to player card effects). Travel: look at the top 5 cards of the encounter deck, put one of them facedown under it and shuffle the rest back. Forced: when it is explored each facedown card under it is revealed.

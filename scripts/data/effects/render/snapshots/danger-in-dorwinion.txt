@@ -272,7 +272,7 @@ Scenario piles that place cards with no record (quest: 21077 A City in Turmoil; 
     - this card: stat threat resources of this card, while this card is in play
 
 21046:A:2 (front): While City Forum is in the staging area, it gains: 'Forced: After a location is explored, place 1 resource here.'
-  21046:forced:1: Forced on the event locationExplored
+  21046:forced:1: Forced on the event locationExplored (heard about location (any player controls))
     only if this card is in the staging area
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - place 1 resource tokens on this card
@@ -441,4 +441,4 @@ Scenario piles that place cards with no record (quest: 21077 A City in Turmoil; 
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
-(rendered pieces: 247 by template, 1 as JSON)
+(rendered pieces: 248 by template, 1 as JSON)
