@@ -62,7 +62,7 @@ Scenario piles that place cards with no record (staging: 21014 River Running; qu
   21015:travel:1: Travel
     note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no card matches the line's choose step
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose objective (any player controls) named "Easterling Pursuit"
+    - choose card (any player controls) in the staging area only, named "Easterling Pursuit"
     - place 1 resource tokens on the picked card
 
 ## 21016 Enemies Close Behind
@@ -211,7 +211,7 @@ Scenario piles that place cards with no record (staging: 21014 River Running; qu
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
 
 21024:A:2 (front): Forced: After an Easterling enemy enters play, attach the top Easterling treachery in the discard pile to that enemy.
-  21024:forced:1: Forced on the event encounterEnteredPlay (heard about Easterling enemy (any player controls))
+  21024:forced:1: Forced on the event encounterEnteredPlay (heard about Easterling enemy (any player controls) or in the staging area)
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the topmost Easterling treachery in the encounter discard pile (the last card put there; nothing when none lies there) is attached to the subject enemy as an attachment, its When Revealed effects and Surge not resolved (nothing when the enemy is not in play or cannot have it)
 
@@ -270,8 +270,8 @@ Scenario piles that place cards with no record (staging: 21014 River Running; qu
   21028:whenRevealed:1: When revealed
     - for each player, first player first:
       - choose ready character (you control)
+      - then, if there is a ready character (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to the picked card
       - then, if there is a ready character (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): exhaust the picked card
-      - then, if there is a exhausted character (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to the picked card
 
 21028:A:2 (shadow): Shadow: Either exhaust a character you control, or return attacking enemy to the staging area after this attack.
   21028:shadow:1: Shadow

@@ -67,7 +67,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 21015 Exposed Riverbank (location). While it is in the staging area, after a "when revealed" effect is canceled 1 resource goes on Easterling Pursuit. Travel: place 1 resource on Easterling Pursuit (payable only while it is in play).
   { id: "21015:forced:1", cardCode: "21015", lines: ["21015:A:1"], timing: "forced", trigger: "whenRevealedCanceled", condition: IN_STAGING, instructions: [PLACE_ON_PURSUIT] },
-  { id: "21015:travel:1", cardCode: "21015", lines: ["21015:A:2"], timing: "travel", instructions: [{ verb: "Pick", pick: { type: "objective", control: "any", names: ["Easterling Pursuit"] } }, { verb: "PlaceResourceTokens", amount: 1, on: "picked" }] },
+  { id: "21015:travel:1", cardCode: "21015", lines: ["21015:A:2"], timing: "travel", instructions: [{ verb: "Pick", pick: { type: "card", control: "any", stagingOnly: true, names: ["Easterling Pursuit"] } }, { verb: "PlaceResourceTokens", amount: 1, on: "picked" }] },
 
   // 21016 Enemies Close Behind (treachery). When Revealed: 1 resource on Easterling Pursuit, then each player raises his threat by the resources on it (the new one included). Shadow: the attacking enemy gets +1 Attack; if this attack destroys a character, 1 resource goes on Easterling Pursuit.
   { id: "21016:whenRevealed:1", cardCode: "21016", lines: ["21016:A:1"], timing: "whenRevealed", instructions: [PLACE_ON_PURSUIT, { verb: "RaiseThreat", amount: PURSUIT_RESOURCES, who: "eachSeat" }] },
@@ -141,7 +141,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 21024 Warriors of the East (encounter side quest, Surge is a keyword). Forced: after an Easterling enemy enters play the top Easterling treachery of the encounter discard pile attaches to it. Forced: after it becomes the current quest the highest Attack Easterling enemy in the staging area (the first player
   // chooses among ties) attacks the first player.
-  { id: "21024:forced:1", cardCode: "21024", lines: ["21024:A:2"], timing: "forced", trigger: "encounterEnteredPlay", subject: { type: "enemy", control: "any", trait: "Easterling" }, instructions: [{ verb: "AttachTreachery", from: "discardTop", trait: "Easterling", to: "subject" }] },
+  { id: "21024:forced:1", cardCode: "21024", lines: ["21024:A:2"], timing: "forced", trigger: "encounterEnteredPlay", subject: { type: "enemy", control: "any", staging: true, trait: "Easterling" }, instructions: [{ verb: "AttachTreachery", from: "discardTop", trait: "Easterling", to: "subject" }] },
   { id: "21024:forced:2", cardCode: "21024", lines: ["21024:A:3"], timing: "forced", trigger: "becameCurrentQuest", subject: "self", instructions: [{ verb: "Pick", pick: { ...EASTERLING_IN_STAGING, highestAttack: true, who: "firstPlayer" } }, { verb: "AttackFromStaging", who: "firstPlayer" }] },
 
   // 21025 Rolling Plains (location). When Revealed: each copy of Rolling Plains in play gets +2 Threat until the end of the phase, a copy revealed later in the phase too. Travel: each player raises his threat by 2.
@@ -156,13 +156,13 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "21027:whenRevealed:1", cardCode: "21027", lines: ["21027:A:2"], timing: "whenRevealed", instructions: [{ verb: "ModifyHeld", stat: "willpower", amount: -1, holders: "exhaustedCharacters", until: "endOfPhase" }] },
   { id: "21027:shadow:1", cardCode: "21027", lines: ["21027:A:3"], timing: "shadow", instructions: [{ verb: "DamageCard", amount: 1, target: "defender" }] },
 
-  // 21028 Painful Fatigue (treachery). When Revealed: each player exhausts a ready character he controls and deals 1 damage to it. Shadow: the defending player either exhausts a ready character he controls, or the attacking enemy returns to the staging area after this attack.
+  // 21028 Painful Fatigue (treachery). When Revealed: each player exhausts a ready character he controls and deals 1 damage to it (the damage is gated on the pick still being ready, before the exhaust). Shadow: the defending player either exhausts a ready character he controls, or the attacking enemy returns to the staging area after this attack.
   {
     id: "21028:whenRevealed:1",
     cardCode: "21028",
     lines: ["21028:A:1"],
     timing: "whenRevealed",
-    instructions: [EACH_PLAYER([{ verb: "Pick", pick: READY_CHARACTER }, { verb: "Exhaust", target: { kind: "picked" }, when: { kind: "canPick", pick: READY_CHARACTER } }, { verb: "DamageCard", amount: 1, target: "picked", when: { kind: "canPick", pick: { type: "character", control: "you", state: "exhausted" } } }])],
+    instructions: [EACH_PLAYER([{ verb: "Pick", pick: READY_CHARACTER }, { verb: "DamageCard", amount: 1, target: "picked", when: { kind: "canPick", pick: READY_CHARACTER } }, { verb: "Exhaust", target: { kind: "picked" }, when: { kind: "canPick", pick: READY_CHARACTER } }])],
   },
   {
     id: "21028:shadow:1",
