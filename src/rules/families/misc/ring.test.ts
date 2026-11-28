@@ -1,4 +1,4 @@
-// Rules: mec109.setup, rr.threat-elimination-level, rr.immune, rr.first-player, rr.ownership-and-control, rr.encounter-deck,
+// Rules: vom.the-one-ring, mec109.setup, rr.threat-elimination-level, rr.immune, rr.first-player, rr.ownership-and-control, rr.encounter-deck,
 // rr.cancel (data/rules/entries.json).
 // The One Ring, the Master cards and the saga heroes of the misc family, run through its real records.
 import { describe, expect, it } from "vitest";
@@ -18,13 +18,15 @@ import { MISC_CARDS, choices, miscCtx } from "./fixture.ts";
 import { play, put, run, seat, send, triggers } from "../play/fixture.ts";
 import { enemy, hero, offered, send as sendIntent, table as defenseTable, until } from "../defense/table.ts";
 import { definePrinted } from "../../core/printed.ts";
+import { checkState, migrateState, restoredState, storedState, type StoredState } from "../../engine/state-version.ts";
 
-// "If Bilbo / Aragorn leaves play, the players lose the game" (131001:A:3, 146002:A:3) is a generated record.
-const RECORDS = [...AUTHORED, ...[...POOL_GENERATED_EFFECTS, ...HOBBIT_GENERATED].filter((record) => record.lines.some((line) => line === "131001:A:3" || line === "146002:A:3"))];
+// "If The One Ring / Bilbo / Aragorn leaves play, the players lose the game" (21001:A:4, 131001:A:3, 146002:A:3) is a generated record.
+const RECORDS = [...AUTHORED, ...[...POOL_GENERATED_EFFECTS, ...HOBBIT_GENERATED].filter((record) => record.lines.some((line) => line === "21001:A:4" || line === "131001:A:3" || line === "146002:A:3"))];
 const ctx = miscCtx(RECORDS);
 const filler = codes("f", 8);
 
-function started(deck: readonly string[], heroes: readonly string[] = ["dwarf", "rohan"], seatCount: 1 | 2 = 1) {
+// `decks`: a deck for each seat, in place of `deck` for all of them.
+function started(deck: readonly string[], heroes: readonly string[] = ["dwarf", "rohan"], seatCount: 1 | 2 = 1, decks?: readonly (readonly string[])[]) {
   const cards = cardMap([...MISC_CARDS.values(), ...filler.map((code) => ({ ...MISC_CARDS.get("filler")!, code, name: code }))]);
   const world = { effects: RECORDS, cards };
   const state = startScenario(
@@ -33,7 +35,7 @@ function started(deck: readonly string[], heroes: readonly string[] = ["dwarf", 
       seed: 5,
       threatModifier: 0,
       definition: fixtureDefinition(["stage"]),
-      seats: Array.from({ length: seatCount }, () => ({ heroes, deck })),
+      seats: Array.from({ length: seatCount }, (_, at) => ({ heroes, deck: decks?.[at] ?? deck })),
       encounterDeck: [],
       questDeck: ["stage"],
     },
@@ -43,24 +45,139 @@ function started(deck: readonly string[], heroes: readonly string[] = ["dwarf", 
 }
 
 describe("The One Ring (21001)", () => {
-  it("is attached to a hero the player chooses after the opening hand, with a Master card fetched into the hand (21001:A:3)", () => {
+  it("is attached to a hero the player chooses right after the heroes are placed, before the opening hand, with a Master card fetched into the hand (21001:A:2)", () => {
     const { state, world } = started(["21001", "master", ...filler]);
-    // The Ring left the deck for its Setup, which waits for the opening hand and the mulligan.
+    // The Setup asks first: the Ring is out of the deck and nothing is drawn yet, so there is no mulligan window.
     expect(Object.values(state.cards).find((card) => card.code === "21001")?.zone).toBe("setAside");
-    let next = expectOk(reduce(state, { type: "Keep" }, world)).state;
+    expect(state.window).toMatchObject({ kind: "choose" });
+    expect(state.mode).toBe("openingHands");
+    expect(state.seats[0]?.hand).toHaveLength(0);
     // Two heroes: the player chooses.
-    expect(next.window).toMatchObject({ kind: "choose" });
-    const options = choices(next);
+    const options = choices(state);
     expect(options).toHaveLength(2);
     const [chosen] = options;
-    next = expectOk(reduce(next, { type: "Choose", optionId: chosen ?? "" }, world)).state;
+    const next = expectOk(reduce(state, { type: "Choose", optionId: chosen ?? "" }, world)).state;
     const ring = Object.values(next.cards).find((card) => card.code === "21001");
     expect(ring?.host).toBe(chosen);
     expect(ring?.zone).toBe("play");
-    // The Master card is in the hand (it may already have been in the opening hand).
+    // The Master card was fetched before the draw, so it is in the hand and the opening hand is 6 more cards.
     const master = Object.values(next.cards).find((card) => card.code === "master");
     expect(master?.zone).toBe("hand");
+    expect(next.seats[0]?.hand).toHaveLength(7);
+    // The mulligan opens only now.
+    expect(next.mode).toBe("mulligan");
+    expect(next.window).toMatchObject({ kind: "mulligan" });
     void legalIntents;
+  });
+
+  it("keeps the fetched Master card in the hand through a mulligan, and shuffles back only the cards drawn (vom.the-one-ring, rr.mulligan)", () => {
+    const { state, world } = started(["21001", "master", ...filler]);
+    const [chosen] = choices(state);
+    const opened = expectOk(reduce(state, { type: "Choose", optionId: chosen ?? "" }, world)).state;
+    const drawn = opened.seats[0]?.hand.filter((id) => opened.cards[id]?.code !== "master") ?? [];
+    expect(drawn).toHaveLength(6);
+    const next = expectOk(reduce(opened, { type: "Mulligan" }, world)).state;
+    const hand = next.seats[0]?.hand ?? [];
+    // The Master card, the six cards of the new hand and the Resource phase's draw, which the game reaches at once.
+    expect(hand).toHaveLength(8);
+    expect(hand.filter((id) => next.cards[id]?.code === "master")).toHaveLength(1);
+    expect(next.cards[Object.values(opened.cards).find((card) => card.code === "master")?.id ?? ""]?.zone).toBe("hand");
+  });
+
+  it("21001:A:2 with two Rings the first player decides which is put into play, the other copy is removed, and only that seat's Setup runs before either seat draws (vom.the-one-ring)", () => {
+    const { state, world } = started(["21001", "master", ...filler], ["dwarf", "rohan"], 2);
+    // The first player is asked first, and nothing is drawn while the Setup asks.
+    expect(state.mode).toBe("openingHands");
+    expect(state.window).toMatchObject({ kind: "choose", seat: state.firstPlayer });
+    expect(state.seats.every((seat) => seat.hand.length === 0)).toBe(true);
+    const rings = choices(state);
+    expect(rings).toHaveLength(2);
+    expect(rings.map((id) => state.cards[id]?.owner).sort()).toEqual([0, 1]);
+    // The first player picks the copy of the other seat.
+    const other = 1 - state.firstPlayer;
+    const kept = rings.find((id) => state.cards[id]?.owner === other) ?? "";
+    let next = expectOk(reduce(state, { type: "Choose", optionId: kept }, world)).state;
+    const copies = Object.values(next.cards).filter((card) => card.code === "21001");
+    expect(copies.filter((card) => card.id !== kept).map((card) => card.zone)).toEqual(["removed"]);
+    // The chosen seat's Setup runs: its player attaches the Ring to one of that seat's heroes, and no other Ring Setup asks.
+    expect(next.window).toMatchObject({ kind: "choose", seat: other });
+    expect(next.seats.every((seat) => seat.hand.length === 0)).toBe(true);
+    next = expectOk(reduce(next, { type: "Choose", optionId: choices(next)[0] ?? "" }, world)).state;
+    expect(next.cards[kept]).toMatchObject({ zone: "play" });
+    expect(next.cards[kept]?.host).toBeDefined();
+    expect(next.mode).toBe("mulligan");
+    expect(next.seats[other]?.hand.some((id) => next.cards[id]?.code === "master")).toBe(true);
+    // The seat whose Ring was removed fetched nothing: its hand is the six drawn cards.
+    expect(next.seats[1 - other]?.hand).toHaveLength(6);
+    expect(next.seats[other]?.hand).toHaveLength(7);
+  });
+
+  it("21001:A:2 the first player may keep the copy of their own seat: the other copy is removed and its Setup does not run", () => {
+    // Only the first player's deck holds a Master card, so the other seat's Setup would be the one to fetch nothing: its hand is the six drawn cards.
+    const { state, world } = started([], ["dwarf", "rohan"], 2, [["21001", "master", ...filler], ["21001", ...filler]]);
+    expect(state.firstPlayer).toBe(0);
+    const own = choices(state).find((id) => state.cards[id]?.owner === 0) ?? "";
+    let next = expectOk(reduce(state, { type: "Choose", optionId: own }, world)).state;
+    expect(next.window).toMatchObject({ kind: "choose", seat: 0 });
+    next = expectOk(reduce(next, { type: "Choose", optionId: choices(next)[0] ?? "" }, world)).state;
+    expect(next.cards[own]).toMatchObject({ zone: "play" });
+    const removed = Object.values(next.cards).filter((card) => card.code === "21001" && card.zone === "removed");
+    expect(removed).toHaveLength(1);
+    expect(removed[0]?.owner).toBe(1);
+    expect(next.mode).toBe("mulligan");
+    // The removed copy's Setup did not run: that seat fetched no Master card and drew only its six.
+    expect(next.seats[1]?.hand).toHaveLength(6);
+    expect(next.seats[1]?.hand.some((id) => next.cards[id]?.code === "master")).toBe(false);
+    expect(next.seats[0]?.hand).toHaveLength(7);
+    expect(next.seats[0]?.hand.some((id) => next.cards[id]?.code === "master")).toBe(true);
+  });
+
+  it("21001:A:2 asks nobody which Ring to keep when only one of two decks holds it, and that seat's Setup runs", () => {
+    const { state, world } = started([], ["dwarf", "rohan"], 2, [["21001", "master", ...filler], filler]);
+    // The only question is the hero: every option is a hero of the seat that holds the Ring.
+    expect(state.window).toMatchObject({ kind: "choose", seat: 0 });
+    expect(choices(state)).toHaveLength(2);
+    expect(choices(state).every((id) => state.cards[id]?.zone === "heroes" && state.cards[id]?.controller === 0)).toBe(true);
+    const next = expectOk(reduce(state, { type: "Choose", optionId: choices(state)[0] ?? "" }, world)).state;
+    const ring = Object.values(next.cards).find((card) => card.code === "21001");
+    expect(ring).toMatchObject({ zone: "play" });
+    expect(next.seats[0]?.hand.some((id) => next.cards[id]?.code === "master")).toBe(true);
+    expect(Object.values(next.cards).filter((card) => card.zone === "removed")).toHaveLength(0);
+  });
+
+  it("21001:A:2 with one seat asks only for the hero", () => {
+    const { state } = started(["21001", "master", ...filler], ["dwarf", "rohan"], 1);
+    expect(choices(state)).toHaveLength(2);
+    expect(choices(state).every((id) => state.cards[id]?.code !== "21001")).toBe(true);
+  });
+
+  it("attaches the Ring and fetches the Master card after Keep for a checkpoint saved when the Setup waited for the start of the game (vom.the-one-ring)", () => {
+    // The old shape: the Ring set aside, its Delay waiting for `startOfGame`, the opening hand drawn and the mulligan open.
+    const { state: plain, world } = started(["master", ...filler]);
+    const ring = spawn(plain, "21001", { zone: "setAside" });
+    const delay = AUTHORED.find((record) => record.id === "21001:setup:1")?.instructions[0];
+    if (delay?.verb !== "Delay") throw new Error("The Ring's Setup is not a Delay");
+    const old = { ...ring.state, delayed: [{ id: "d0:0", until: "startOfGame", sourceId: ring.id, seat: 0, phase: "Setup", instructions: delay.instructions, uncancelable: null }] };
+    expect(plain.mode).toBe("mulligan");
+    const stored = JSON.parse(JSON.stringify(storedState(old as unknown as ScenarioState))) as StoredState;
+    const migrated = migrateState(1, stored);
+    expect(migrated).not.toBeNull();
+    const restored = restoredState(migrated!);
+    expect(checkState(restored, world)).toEqual([]);
+    let next = expectOk(reduce(restored, { type: "Keep" }, world)).state;
+    if (next.window?.kind === "choose") next = expectOk(reduce(next, { type: "Choose", optionId: choices(next)[0] ?? "" }, world)).state;
+    expect(Object.values(next.cards).find((card) => card.code === "21001")).toMatchObject({ zone: "play" });
+    expect(Object.values(next.cards).find((card) => card.code === "master")?.zone).toBe("hand");
+  });
+
+  it("carries the steps of a Setup that asked nothing into the first intent's steps (vom.the-one-ring)", () => {
+    const { state, world } = started(["21001", "master", ...filler], ["dwarf"]);
+    // One hero, one Master card: nothing is asked, so the table opens on the mulligan with the Ring attached.
+    expect(state.window).toMatchObject({ kind: "mulligan" });
+    expect(state.openingSteps?.length).toBeGreaterThan(0);
+    const result = expectOk(reduce(state, { type: "Keep" }, world));
+    expect(result.steps.slice(0, state.openingSteps?.length)).toEqual(state.openingSteps);
+    expect(result.state.openingSteps).toBeUndefined();
   });
 
   it("lowers the threat elimination level by 5 (21001:A:3)", () => {
@@ -74,7 +191,7 @@ describe("The One Ring (21001)", () => {
     expect(eliminateEmpties(withThreat(syncConstants(run(table.state, ctx), ctx), 0, 45), []).seats[0]?.eliminated).toBeFalsy();
   });
 
-  it("loses the game for the players when it leaves play (21001:A:3)", () => {
+  it("loses the game for the players when it leaves play (21001:A:4)", () => {
     const table = seat(1, ["dwarf", "rohan"]);
     const ring = put(table.state, "21001", "play");
     let state = attachTo(ring.state, ring.id, table.heroes[0] ?? "");

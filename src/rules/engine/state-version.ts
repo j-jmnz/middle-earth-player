@@ -1,14 +1,14 @@
 // Rules: brief, Persistence and shipping (docs/brief.md). The stored form of a table, so a game another engine version cannot replay can go on from where it was:
 // the state without `undo` (a checkpoint, or the base of a rebased game), its version, the ordered migrations from each version to the next, and the check that
 // refuses a state the current engine cannot play. Pure. Bump STATE_VERSION and add the migration from the old version when a state field changes shape.
-import type { ScenarioState, ZoneName } from "../core/state.ts";
+import type { DelayedEffect, ScenarioState, ZoneName } from "../core/state.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { printedOf } from "../core/printed.ts";
 import { legalIntents } from "./legal.ts";
 import { snapshotOf } from "./undo.ts";
 
 /** The version of the stored state's shape. It changes only when a state field changes shape, not with a rule. */
-export const STATE_VERSION = 1;
+export const STATE_VERSION = 2;
 
 /** A table as stored: the scenario state without its Undo log, which a restored table starts afresh. Plain JSON. */
 export type StoredState = Omit<ScenarioState, "undo">;
@@ -17,7 +17,13 @@ export type StoredState = Omit<ScenarioState, "undo">;
  * The migration from each version to the next: entry 0 takes a version-1 state to version 2, entry 1 version 2 to 3. Each is pure and returns a new object.
  * There are `STATE_VERSION - 1` of them.
  */
-export const STATE_MIGRATIONS: readonly ((state: StoredState) => StoredState)[] = [];
+export const STATE_MIGRATIONS: readonly ((state: StoredState) => StoredState)[] = [
+  // 1 to 2: The One Ring's Setup waited for `startOfGame`, after the mulligan; it is now `beforeOpeningHand`, which the opening of a game resolves before the hands
+  // and `afterOpening` resolves for an entry that is still waiting. A table saved under the old engine keeps the old order: the entry resolves after its mulligan.
+  (state) => (state.delayed.some((entry) => (entry.until as string) === "startOfGame")
+    ? { ...state, delayed: state.delayed.map((entry) => ((entry.until as string) === "startOfGame" ? { ...entry, until: "beforeOpeningHand" as const } : entry)) }
+    : state),
+];
 
 /** The state brought to `STATE_VERSION`, or null when it is from a version this build does not know (a newer one, or none). */
 export function migrateState(version: number, state: StoredState): StoredState | null {
@@ -53,6 +59,10 @@ const ZONES: Readonly<Record<ZoneName, true>> = {
 };
 const ZONE_SET: ReadonlySet<string> = new Set(Object.keys(ZONES));
 
+// Every moment a delayed effect can wait for. A value the engine adds is a type error here until it is listed.
+const UNTILS: Readonly<Record<DelayedEffect["until"], true>> = { endOfPhase: true, endOfRound: true, questSucceeded: true, questFailed: true, endOfAttack: true, beforeOpeningHand: true, beginningOfTravel: true };
+const UNTIL_SET: ReadonlySet<string> = new Set(Object.keys(UNTILS));
+
 /** What a caller knows about the game the state must be: its scenario and its seat count. */
 export type ExpectedState = { scenarioId?: string; seatCount?: number };
 
@@ -86,6 +96,7 @@ export function checkState(state: ScenarioState, ctx: ReduceContext, expected: E
     if (!ZONE_SET.has(card.zone)) problems.push(`card ${id} is in an unknown zone ${String(card.zone)}`);
     if (card.host != null && !(card.host in cards)) missingHosts.add(`${id} on ${card.host}`);
   }
+  for (const entry of Array.isArray(state.delayed) ? state.delayed : []) if (!UNTIL_SET.has(entry.until)) problems.push(`a delayed effect waits for ${String(entry.until)}, which this engine does not know`);
   for (const code of missingCodes) problems.push(`code ${code} is not in this game's world`);
   for (const host of missingHosts) problems.push(`card ${host} has no host`);
   const lists: readonly (readonly string[] | undefined)[] = [state.staging, state.encounterDeck, state.encounterDiscard, state.questDeck, state.victory, state.setAside, state.removed, ...(Array.isArray(state.seats) ? state.seats.flatMap((seat) => [seat.deck, seat.hand, seat.discard, seat.heroes, seat.play, seat.engaged]) : [])];

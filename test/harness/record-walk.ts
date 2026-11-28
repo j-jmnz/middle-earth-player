@@ -19,7 +19,7 @@ const ENGINE_ASKING = [
   "AttachCollectionHero", "AttachLootFromDiscard", "AttachRandomTreasure", "AttachSacked", "AttachSearched", "AttachToActiveLocation", "AttachToHighestThreatCost",
   "AttackHighestWillpower", "AttackSeatWithMost", "ChooseAttackers", "ChooseBoon", "ChooseBoonToHand", "ChooseCurrentQuest", "ChooseQuestStage", "ChooseStageToFlip", "ClaimRandomTreasure",
   "DestroyHighestCostAlly", "DiscardAlliesToCost", "DiscardFromAnyDeck", "Discover", "EachExhaustsOne", "EngageFromVictory", "EngageLowestThreat", "EngageOrGrapple",
-  "EngageSeatWith", "EngageSeatWithMost", "FitShips", "GainChosenTrait", "GuardStagedHeroes", "HealAmong", "HealLakeTownByProgress", "HealLocations", "LocateTest",
+  "EngageSeatWith", "EngageSeatWithMost", "FitShips", "GainChosenTrait", "GuardStagedHeroes", "HealAmong", "HealLakeTownByProgress", "HealLocations", "KeepOneCopy", "LocateTest",
   "LookAtStages", "MakeEngagementChecks", "MayDiscardShadow", "MoveProgress", "MoveToHero", "NameCard", "NameEncounterType", "NameInvestigation", "OrderForced", "PayResources",
   "PickFewestHitPoints", "PickFewestHitPointsLeft", "PickHighestEngagement", "PickHighestThreat", "PickLowestEngagement", "PickMostHitPoints", "PlaceHandUnderLocation",
   "PlaceProgressInStaging", "PlayFrom", "PlayRevealedFree", "PrepareFleet", "PutCapturedIntoPlay", "PutIntoPlay", "PutIntoPlayFromHand", "PutSetAsideInPlay",

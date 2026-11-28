@@ -1,0 +1,3489 @@
+{
+  "campaign": "vengeance-of-mordor",
+  "conventions": [
+    "One entry per code and side. Side A is the front, side B the back of a double-sided card; a shadow effect is a line of side A.",
+    "lines are the ability text of the text box in print order, one ability per line: no title, traits, stats, flavor text, or Victory line. Keyword lines (Surge., Hide 2.) stay.",
+    "Icons are written as the words Hall of Beorn uses (Willpower, Attack, Defense, Threat, Lore, Fellowship). Apostrophes are straight.",
+    "A printed typo is written corrected in lines, and the printed wording is kept under misprints.",
+    "inert lists line numbers that need no effect record, with the reason. A line that is only keywords the engine reads is owned by the keyword."
+  ],
+  "entries": [
+    {
+      "code": "21012",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Easterling-Pursuit.jpg",
+        "sha256": "c156c7ccaf6e8e645d8ad3b6f670ca388685a3e91b0cff696851bd5515d4c7b1"
+      },
+      "lines": [
+        "Forced: At the end of the round, place 1 resource here. Then, if there are at least 3 resources here, remove 3 of them and shuffle the encounter discard pile into the encounter deck. Discard cards from the top until X enemies are discarded, where X is the number of players. Add each enemy discarded this way to the staging area."
+      ],
+      "inert": [],
+      "misprints": [
+        {
+          "line": 1,
+          "printed": "Forced: At the end of the round, place 1 resource here. Then, if there are at least 3 resource here, remove 3 of them and shuffle the encounter discard pile into the encounter deck. Discard cards from the top until X enemies are discarded, where X is the number of players. Add each enemy discarded this way to the staging area."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21013",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Easterling-Outrider.jpg",
+        "sha256": "0b6a4dd0e96718502be7298e41ae513f00443dcffa0f32b03868c249ef0a9afc"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: After Easterling Outrider engages a player, either place 1 resource on Easterling Pursuit, or Easterling Outrider makes an immediate attack.",
+        "Shadow: Discard an attachment you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21014",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/River-Running.jpg",
+        "sha256": "1fe9190a8402ec44297aac32a301cffc1eccfb1fe1cfe0ec8ad2a29ab3baee3e"
+      },
+      "lines": [
+        "While River Running is in the staging area, enemies cannot be optionally engaged.",
+        "Travel: The first player engages the highest engagement cost enemy in the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21015",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Exposed-Riverbank.jpg",
+        "sha256": "4805865689bac3bcb3614c599eb43cfec61579b983f9807a036d0c68eda63b32"
+      },
+      "lines": [
+        "While Exposed Riverbank is in the staging area, it gains: 'Forced: After a 'when revealed' effect is canceled, place 1 resource on Easterling Pursuit.'",
+        "Travel: Place 1 resource on Easterling Pursuit."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21016",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Enemies-Close-Behind.jpg",
+        "sha256": "b5eb4c7d1b1b694cab571d6a42b41c9d557cf3f3fb6aedb9c868a63d87a49a39"
+      },
+      "lines": [
+        "When Revealed: Place 1 resource on Easterling Pursuit. Then, raise each player's threat by 1 for each resource on Easterling Pursuit.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place 1 resource on Easterling Pursuit."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21017",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Easterling-Captain.jpg",
+        "sha256": "a1e771f7cf01cc681fdb716ebf9239e2f9918d4f590112950c82fd2a3c58a1ff"
+      },
+      "lines": [
+        "Forced: When Easterling Captain enters play, discard cards from the encounter deck until an Easterling treachery is discarded. Attach that treachery to Easterling Captain.",
+        "Forced: When Easterling Captain would take any amount of damage, discard an Easterling attachment from him. Then, cancel the damage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21018",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Rider-of-Rhûn.jpg",
+        "sha256": "72aef3062acc999297d855447b7c9fb7742f1a28e895b672ffe18d40986d85be"
+      },
+      "lines": [
+        "Archery 2.",
+        "Rider of Rhûn gets -10 engagement cost for each Easterling attachment it has.",
+        "When Revealed: Search the encounter deck and discard pile for an Easterling Horse and attach it to Rider of Rhûn. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21019",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Easterling-Horse.jpg",
+        "sha256": "40cd80e4e928c9f0d7d2b3b3a8f4576234505e749e7f2cd1ee629218d612c450"
+      },
+      "lines": [
+        "While attached to an enemy, counts as a Mount attachment with the text: 'Attached enemy gets +2 Threat. Forced: At the end of the round, return attached enemy to the staging area.'",
+        "When Revealed: Attach to the lowest engagement cost Easterling enemy without an Easterling Horse and return it to the staging area. Otherwise, Easterling Horse gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21020",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Easterling-Raider.jpg",
+        "sha256": "29d578041c9d3445f09e34df5a8044c26eb391376f5a9198fa29a75fb92e9790"
+      },
+      "lines": [
+        "Archery 1.",
+        "Easterling Raider gets +1 Attack and +1 Defense for each Easterling attachment on it.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it has an Easterling attachment)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21021",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Warrior-of-Rhûn.jpg",
+        "sha256": "3dbf42e961bc3e538ef20386c5aa73a3cdb41d2693c76b0949975f022f9dc9ff"
+      },
+      "lines": [
+        "Forced: When Warrior of Rhûn attacks, attach the top Easterling treachery in the discard pile to it.",
+        "Shadow: Attach the top Easterling treachery in the discard pile to attacking enemy."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21022",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Sword-of-Rhûn.jpg",
+        "sha256": "13a76f93c06d97cad33fabb8f231b4079b519923616769fe19322a2fb9a263ef"
+      },
+      "lines": [
+        "Surge.",
+        "While attached to an enemy, counts as a Weapon attachment with the text: 'Attached enemy gets +2 Attack.'",
+        "When Revealed: Attach to the Easterling enemy with the lowest Attack without a Sword of Rhûn."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21023",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Recurve-Bow.jpg",
+        "sha256": "653b2694034a50e857b9ed565e7c6b97692e0af2c6750cc5c92a3bcd10f70465"
+      },
+      "lines": [
+        "Surge.",
+        "While attached to an enemy, counts as a Weapon attachment with the text: 'Attached enemy gains Archery 2.'",
+        "When Revealed: Attach to the highest engagement cost Easterling enemy without a Recurve Bow."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21024",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Warriors-of-the-East.jpg",
+        "sha256": "6ff747f2c4527130dc095bc8349d274c16563d643914e4f9947443499239d0a5"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: After an Easterling enemy enters play, attach the top Easterling treachery in the discard pile to that enemy.",
+        "Forced: After Warriors of the East becomes the current quest, the highest Attack Easterling enemy in the staging area attacks the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21025",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Rolling-Plains.jpg",
+        "sha256": "f0b2112fb2cb96989e0d4fbdc0933ee1cd7e9421002300e683d72302c455c407"
+      },
+      "lines": [
+        "When Revealed: Each copy of Rolling Plains gets +2 Threat until the end of the phase.",
+        "Travel: Raise each player's threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21026",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Rocky-Outcrop.jpg",
+        "sha256": "0e4ed22a97e3da4ac6cbe67cf35d111bd4a1689d7bb00ec24ac93185afcb135c"
+      },
+      "lines": [
+        "While Rocky Outcrop is in the staging area, characters cannot be readied by player card effects.",
+        "Travel: The first player exhausts a hero he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21027",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Weary-Lands.jpg",
+        "sha256": "ba44d0fe18a299a9a5c7a6bdbf41c0a6551a3513629e0276088c820fbd1c61f2"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Each exhausted character gets -1 Willpower until the end of the phase.",
+        "Shadow: Deal 1 damage to the defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21028",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Painful-Fatigue.jpg",
+        "sha256": "6a9f6aea3e45eeecadcae33a6b5479d69c7975fa91f72718d8d534f8fabcf50c"
+      },
+      "lines": [
+        "When Revealed: Each player exhausts a character he controls and deals 1 damage to it.",
+        "Shadow: Either exhaust a character you control, or return attacking enemy to the staging area after this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21029",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/An-Arduous-Journey.jpg",
+        "sha256": "62d38eb578c9cce258d63d6a8276fb9e9de4e60e12a03e85f835c9a756fc0efb"
+      },
+      "lines": [
+        "Each player cannot ready more than 6 characters he controls during the refresh phase.",
+        "Response: When this stage is defeated, each player may ready a hero he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21030",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Priest-of-Sauron.jpg",
+        "sha256": "38f524cb7d5f4be35d46fc7869c79fa1c95b4840866c92e1e4d9822f8fabb028"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Cannot be optionally engaged.",
+        "Forced: After Priest of Sauron attacks and destroys an ally, raise each player's threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21031",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Governor.jpg",
+        "sha256": "b6c766721c5eab9bdbcb03a643947225e51bfdb5bf421f547edf01e5e8702bf4"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Forced: After a location is revealed from the encounter deck, The Governor engages the first player and makes an immediate attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21032",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Black-Númenórean.jpg",
+        "sha256": "2ef3e43561b9c6f34ecce20f67ba6a9dfe7f78d8876384d0ba7722b86994d014"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Do not discard shadow cards dealt to Black Númenórean if they have a shadow effect.",
+        "Forced: When Black Númenórean attacks, resolve each of his faceup shadow cards as if they had been dealt this round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21033",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Bribes.jpg",
+        "sha256": "21846e00182c66b1468b7b9b63015ac5668b6a92b8b4e2560025a1bac3ceece4"
+      },
+      "lines": [
+        "Add +1 to the total Threat in the staging area for each resource here.",
+        "Forced: When the active location is explored, discard the top X cards of each player's deck, where X is that location's Threat. Then, place 1 resource here for each event discarded this way."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21034",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Submit-or-Die.jpg",
+        "sha256": "8f3ba61170281dcc2eaa15dee27f64efe275bf9f342e9bb05ad8651d2a26987f"
+      },
+      "lines": [
+        "Each non-unique enemy gets +1 Attack.",
+        "Forced: After an enemy attacks and destroys a character, place 1 damage token here. Then, if there are X damage tokens here, the players lose the game. X is 4 more than the number of players."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21035",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Sauron-Worship.jpg",
+        "sha256": "e789ce2391ce8be7bcfb7e27d1477afbcf08915d912cb445a0b9bbfd047ed319"
+      },
+      "lines": [
+        "Sauron Worship enters play with 1 damage token on it.",
+        "Each player's threat elimination level is reduced by 1 for each damage token here.",
+        "Forced: At the end of the round, place 1 damage token here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21036",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Evidence-of-the-Cult.jpg",
+        "sha256": "98d49569b0ecaffd7fe4a80dd49be4d5e18529b230ecca3ae4050c7d788f18e3"
+      },
+      "lines": [
+        "Guarded (enemy).",
+        "Attached enemy gets +1 Threat, +1 Attack, and +1 Defense.",
+        "When Evidence of the Cult is free of encounters, add it to the victory display. Then, place 1 resource on the main quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21037",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Hillside-Manor.jpg",
+        "sha256": "f210aada980bf3cde17722cfa80419766b4a0bdf1b395e5d51084caa5855a285"
+      },
+      "lines": [
+        "While Hillside Manor is in the staging area, each player's threat cannot be reduced by more than 1 each round by player card effects.",
+        "Travel: Each player discards 1 random card from his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21038",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Disappearances.jpg",
+        "sha256": "ad3daec2119ac11ce5466a8675a3273ead464bcac7c619e685235623dc5acda0"
+      },
+      "lines": [
+        "When Revealed: Each player discards all ally cards from his hand. If no cards are discarded this way, Disappearances gains doomed 2.",
+        "Shadow: Discard an attachment you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21039",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Secret-Cultist.jpg",
+        "sha256": "faee53d0eabd2507d193ec0dc97b95f4bd6ccc5e6e96f66c42d76b44f0d1ac7c"
+      },
+      "lines": [
+        "When Revealed: Attach to the highest attack ally in play. (Counts as a Condition attachment with the text: 'Attached ally loses the ally card type, gains the enemy card type, and engages its owner. Treat attached ally's text box as if it were blank. If Secret Cultist is discarded, or the attached ally's owner is eliminated, discard attached ally.')"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21040",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Messenger-from-Mordor.jpg",
+        "sha256": "c87a63699fa0aad871b51e4a63d7c3343a452b74b8f16197a6dcbfb5d4d07375"
+      },
+      "lines": [
+        "When Revealed: Either raise each player's threat by X, where X is the active location's Threat, or Messenger from Mordor makes an immediate attack against the first player.",
+        "Shadow: Attacking enemy gets +1 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21041",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Servant-of-Sauron.jpg",
+        "sha256": "babff1787d897c8a936c08095cdd2f36da3c74594198ff9ba84ce0c23d296a4c"
+      },
+      "lines": [
+        "Surge.",
+        "Servant of Sauron engages the first player.",
+        "Forced: After the engaged player raises his threat, Servant of Sauron makes an immediate attack. (Limit once per phase.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21042",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Overwhelmed.jpg",
+        "sha256": "41acc80cda5389b48f02d4103ce02fa982cb29a09c2286b908182b9fcb1a48de"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Until the end of the round, enemies engaged with the first player cannot take damage.",
+        "Shadow: Either raise your threat by 2, or attacking enemy cannot take damage this round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21043",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Shadow-of-Fear.jpg",
+        "sha256": "3c8820ffe881328e9c8f256b02bd82b234108d8889146e547eb88ebc075940ec"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: After an enemy engages a player, that player raises his threat by 1.",
+        "Response: When Shadow of Fear is defeated, reduce each player's threat by 3."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21044",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Rhûn-Backstabber.jpg",
+        "sha256": "b14f0ec541ab37957b29a089945b3e808b404a2ad4493ceb8cb1e2a335ccb2ee"
+      },
+      "lines": [
+        "Forced: After Rhûn Backstabber engages you, either raise your threat by 2, or discard an ally you control with printed cost 2 or higher.",
+        "Shadow: Raise your threat by 1 for each enemy engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21045",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Treacherous-Easterling.jpg",
+        "sha256": "d1b9ebed94555aae65ce3db074ef518eab4f2e616e7599779cb858c7ebcd1593"
+      },
+      "lines": [
+        "Treacherous Easterling gets +1 Attack and +1 Defense for each resource token on it. (Limit +3 Attack and +3 Defense.)",
+        "Forced: After the engaged player raises his threat, place 1 resource token on Treacherous Easterling."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21046",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/City-Forum.jpg",
+        "sha256": "3dee00dc10f7367d11c3bcbc9ad68614cb5aa5c8bdb2f3c7bb6ac30ede399bc3"
+      },
+      "lines": [
+        "City Forum gets +1 Threat for each resource here.",
+        "While City Forum is in the staging area, it gains: 'Forced: After a location is explored, place 1 resource here.'",
+        "Travel: Each player raises his threat by 1 for each resource here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21047",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Seedy-Tavern.jpg",
+        "sha256": "9c9fa7f1eb3066f1716c044cd574d84843a9c191b75dfc1a0190823bc9129727"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Forced: When Seedy Tavern is explored, reveal each facedown card under it.",
+        "Travel: Look at the top 5 cards of the encounter deck. Put one of those cards facedown under Seedy Tavern and shuffle the rest back into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21048",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Darkness-in-the-East.jpg",
+        "sha256": "d0b2fc4d9299c72f1dfe8f6f27dae800a176d29f90e37882ac40a768b8a0eee2"
+      },
+      "lines": [
+        "When Revealed: Raise each player's threat by X, where X is the active location's Threat. If there is no active location, Darkness in the East gains surge.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you raised your threat this round)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21049",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Side-Street.jpg",
+        "sha256": "c66179fca7730cbf248f0693cae7523a676bf080ee95dfc81092e37d09b150d1"
+      },
+      "lines": [
+        "While Side Street is in the staging area, progress cannot be placed on other locations in the staging area.",
+        "Travel: Shuffle the encounter discard pile into the encounter deck and discard cards until a location is discarded. Add that location to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21050",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Catacombs.jpg",
+        "sha256": "fd6c4270f1d7d46702ac1953f9a1679626033e2417eb9e92b476fa7611f0d0f3"
+      },
+      "lines": [
+        "While Catacombs is in the staging area, enemies in the staging area cannot take damage.",
+        "Travel: Each player discards the top card of the encounter deck. If a player discards an enemy this way, he puts it into play engaged with him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21051",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Under-Guard.jpg",
+        "sha256": "3cafd9a9742d2ab870ee5448afc749f4b5717756a49fb41302411a0b69a11c34"
+      },
+      "lines": [
+        "When Revealed: Resolve the Travel effect on the active location. If there is no active location, discard cards from the encounter deck until a location is discarded. Add that location to the staging area.",
+        "Shadow: If this attack destroys a character, resolve the Travel effect on the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21052",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Unwelcome-Travelers.jpg",
+        "sha256": "85e30a8f121868371529cf65ddf55cf5bed24c2cb1aaf1f85aae9143fd835e58"
+      },
+      "lines": [
+        "Each location in the staging area gets +1 Threat.",
+        "Forced: After Unwelcome Travelers becomes the current quest, the first player discards cards from the top of the encounter deck until an enemy is discarded and puts it into play engaged with him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21053",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Tribute-to-Mordor.jpg",
+        "sha256": "74bfaf844c57a359f85d3faa263b3f295695d094cfc10741096026776646892a"
+      },
+      "lines": [
+        "Forced: At the end of the round, place 1 damage token here. Then, if there are 4 or more damage tokens here, remove 4 of them and reveal the top card of the Power of Mordor deck. If you cannot, the players lose the game.",
+        "This stage cannot be the active quest while Thane Ulchor has any hit points remaining. When this stage is defeated, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [
+        {
+          "line": 2,
+          "printed": "This stage cannot be the active quest while Thane Ulcor has any hit points remaining. When this stage is defeated, the players win the game."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21054",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Thane-Ulchor.jpg",
+        "sha256": "ceda728bbfa426501b8a310ec728792bb0d7e1216384afcb6b3e0d9b97a5bcf9"
+      },
+      "lines": [
+        "Indestructible. Immune to player card effects.",
+        "X is 1 more than the number of quest stages in the victory display. Cannot be engaged unless X is equal to 5.",
+        "Forced: When Thane Ulchor attacks and destroys a character, place 1 damage token on Tribute to Mordor."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21055",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Temple-of-Sauron.jpg",
+        "sha256": "9b1e4e9fadd9d70bbf1fc560cd78a1381c58d879f902f057863f90b397235ff3"
+      },
+      "lines": [
+        "Forced: When Temple of Sauron leaves play, place 1 damage token on Tribute to Mordor.",
+        "Shadow: Attacking enemy gets +1 Attack for each quest stage in the victory display."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21056",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Hall-of-Horrors.jpg",
+        "sha256": "c934dee066eb75180e202b723908c41bd85bfcb52379c0639595a483fafffb81"
+      },
+      "lines": [
+        "X is 1 more than the number of quest stages in the victory display.",
+        "Forced: When Hall of Horrors leaves play, each player deals X damage to a character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21057",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Place-of-Evil.jpg",
+        "sha256": "be896943deccfa7b350db9986df61962e357f8914dc83eef343c6b73f99572cf"
+      },
+      "lines": [
+        "When Revealed: Place 1 damage token on Tribute to Mordor. Then, either place 1 additional damage token on Tribute to Mordor, or Place of Evil gains surge.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place 1 damage token on Tribute to Mordor."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21058",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Ulchor's-Guard.jpg",
+        "sha256": "c24eb87e32af6ca49f635deee097e662d2cbc0020840ead64980f169ac71fb19"
+      },
+      "lines": [
+        "While Thane Ulchor is engaged with a player, Ulchor's Guard engages that player.",
+        "Shadow: Attacking enemy gets +2 Defense until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21059",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Ulchor's-Rage.jpg",
+        "sha256": "cc06057845364de5a015e73efb4ad1d933d812c7d77ea551920db16e06df521e"
+      },
+      "lines": [
+        "When Revealed: Thane Ulchor makes an immediate attack against the first player. If no attack is made this way, Ulchor's Rage gains surge.",
+        "Shadow: Deal 1 damage to the defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21060",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Fanaticism.jpg",
+        "sha256": "c266460794b5b73b2220c98d5116ddca7897d4ee3df4bc9aa72e8ea3a4e96f80"
+      },
+      "lines": [
+        "While attached to an enemy, counts as a Condition attachment with the text: 'Attached enemy gets +1 Threat, +1 Attack, +1 Defense, and is immune to player card effects.'",
+        "When Revealed: Attach to the Easterling enemy with the lowest Defense without a copy of Fanaticism. Otherwise, Fanaticism gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21061",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Twisted-Tunnel.jpg",
+        "sha256": "b5684ee6506a80b23325b0f65d9461ad1121db9d917eee5ca66bb575bfb80b9a"
+      },
+      "lines": [
+        "When Revealed: Discard cards from the top of the encounter deck until an enemy is discarded. Add that enemy to the staging area.",
+        "Shadow: Discard the top card of the encounter deck. If that card is an enemy, add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21062",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Narrow-Opening.jpg",
+        "sha256": "69f89bb60b192ace4a986b3df731b717bdefa94213863bf171e424c0ad0b84f0"
+      },
+      "lines": [
+        "While Narrow Opening is the active location, each player cannot play more than 1 card each round.",
+        "Forced: When Narrow Opening leaves play, each player discards 1 random card from his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21063",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Crumbling-Passage.jpg",
+        "sha256": "75244b07afd4bd0a8ff87acf9bfcd4d5080bd265fde3cd978301d2f3d9c68927"
+      },
+      "lines": [
+        "When Revealed: Make Crumbling Passage the active location, returning any previously active location to the staging area.",
+        "Forced: When Crumbling Passage leaves play, deal 1 damage to each exhausted character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21064",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Fearful-Shadows.jpg",
+        "sha256": "db002857c44cbb0a1f58e11f75ccc994f753906d54235fb4683510376894efef"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Until the end of the round, treat the printed text box of each character as if it were blank (except for Traits).",
+        "Shadow: Defending character cannot ready until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21065",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Lost-in-the-Dark.jpg",
+        "sha256": "7ce43f5f605b22d1b2b0c988c2a8fde1fe736f1c1a09d6da4a9661d30f5df234"
+      },
+      "lines": [
+        "When Revealed: Each player places the top 10 cards of his deck facedown under his threat dial (without looking at them). When this stage is defeated, each player shuffles all cards under his threat dial back into his deck.",
+        "Forced: After a player raises his threat by any amount, he discards the top card from under his threat dial."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21066",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Khamûl-the-Easterling.jpg",
+        "sha256": "4a233268857266d402f6aea30213f8fa3f45ad80af37b26b7d301d2aff69141f"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Khamûl the Easterling engages the first player.",
+        "Only the engaged player can declare attackers or defenders against Khamûl the Easterling."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21067",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Tower-of-Barad-dûr.jpg",
+        "sha256": "35d609c7250f87ba4021e7347778a07f7fd1b0aa320142a52ec7d5d332c676ff"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "The players cannot travel here.",
+        "Each player's threat elimination level is reduced by 5."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21068",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Under-the-Watchful-Eye.jpg",
+        "sha256": "686c535058737f7ad37911ee0d4465366c1e2d60df8c49b058dc339ae1af22ff"
+      },
+      "lines": [
+        "When Revealed: Each player with more than 5 cards in his hand discards cards from his hand until he has only 5.",
+        "Forced: After a player draws any number of cards, he raises his threat by 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21069",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Armies-of-Mordor.jpg",
+        "sha256": "4dd99fa1455bd7abf4800f2cb184f7a67af9589f03dfe355f828ea500d10740d"
+      },
+      "lines": [
+        "Forced: After a non-unique enemy engages a player, that enemy cannot take damage until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21070",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Covered-in-Darkness.jpg",
+        "sha256": "00d300ee127d87b37447964a210875052840903d3680634e76999eae674a08ae"
+      },
+      "lines": [
+        "Doomed 5.",
+        "Each player's threat cannot be reduced by more than 1 each round by player card effects."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21075",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Chased-by-Easterlings-1A.jpg",
+        "sha256": "e51a52d046e34de65e21dc0ae2666f87b39ba3b04f5646b24e5ead007a7c75ba"
+      },
+      "lines": [
+        "Setup: Set Warriors of the East aside, out of play. Add Easterling Pursuit and 1 copy of River Running to the staging area. Each player adds 1 different Easterling enemy to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21075",
+      "side": "B",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Chased-by-Easterlings-1B.jpg",
+        "sha256": "f31412c88691e1d1ccbd37d744c9e14d9c00210af8bfc957e3e6e4c1f2b1b079"
+      },
+      "lines": [
+        "This stage gets +5 quest points per player.",
+        "Add +1 Threat to the total threat in the staging area for each resource token on Easterling Pursuit."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21076",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Crossing-of-Araw-2A.jpg",
+        "sha256": "a3e481d9b163a1722b31518df410a9ce60df8d69f3df2b9d138c9c042d162b1a"
+      },
+      "lines": [
+        "When Revealed: Add Warriors of the East to the staging area. Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X enemies are discarded, where X is the number of players. Add each enemy discarded this way to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21076",
+      "side": "B",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Crossing-of-Araw-2B.jpg",
+        "sha256": "4e2cdb92efe37f8263053829dc28e0a3c4261ed0b877b546fb3a25488771f88b"
+      },
+      "lines": [
+        "Each enemy in the staging area gets -10 engagement cost.",
+        "While at least one player is engaged with an enemy, no more than 5 progress can be placed here each round.",
+        "When this stage is defeated, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21077",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/A-City-in-Turmoil-1A.jpg",
+        "sha256": "1526016f397e1d0eb8f594b97fef6235288d622344affa60070f3e81758c9767"
+      },
+      "lines": [
+        "Setup: Set each Plot objective and each Cultist enemy aside, out of play. Each player searches the encounter deck for a different location and adds it to the staging area. One of those locations must be Side Street. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21077",
+      "side": "B",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/A-City-in-Turmoil-1B.jpg",
+        "sha256": "d916caf1696fac9268addbcb1f832aa03022f42765d458964223b2d88443cffb"
+      },
+      "lines": [
+        "Forced: After the active location leaves play as an explored location, place 1 resource here.",
+        "This stage cannot be defeated unless there are at least 2 resources here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21078",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Shadow-of-Mordor-2A.jpg",
+        "sha256": "425856ec4123cf161147c407d0cf8652f96c2043815de2a2f546e4b541c9bbcb"
+      },
+      "lines": [
+        "When Revealed: Add 1 random set aside Plot objective to the staging area. Reveal 1 encounter card per player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21078",
+      "side": "B",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Shadow-of-Mordor-2B.jpg",
+        "sha256": "54a80d8b489b1b39a75f3c2d10a13f291ab8d0668d377cc400b7646a6e3fb24b"
+      },
+      "lines": [
+        "Forced: After the active location leaves play as an explored location, reveal the top card of the encounter deck. Then, place 1 resource here.",
+        "This stage cannot be defeated unless there are at least X resources here, where X is 3 more than the number of players."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21079",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Leader-of-the-Cult-3A.jpg",
+        "sha256": "1222aee1b008ad972da8baa15eb2f0ff1af2a452d488577ede4eef79fcd99181"
+      },
+      "lines": [
+        "When Revealed: Add 1 random set-aside Cultist enemy to the staging area. Shuffle the encounter discard pile into the encounter deck and discard cards until X enemies are discarded, where X is one less than the number of players. Add each enemy discarded this way to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21079",
+      "side": "B",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Leader-of-the-Cult-3B.jpg",
+        "sha256": "30602c8e2d6481a7d2bc3d40f4444f3d1852e1c102695861104bcdb4557c8582"
+      },
+      "lines": [
+        "The Cultist cannot take more than X damage each round, where X is the printed quest points of the active location.",
+        "When the Cultist enemy is defeated, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21080",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Forgotten-Temple-1A.jpg",
+        "sha256": "e482d620b7b8feb6e1e4225aec89f75b25a0894e8e7ba468814e850c7fd9b1d6"
+      },
+      "lines": [
+        "Setup: Shuffle each of the stage 2 quest cards together and place them facedown under this stage. Create The Power of Mordor deck (see insert) and set it next to the quest deck. Add Thane Ulchor and Tribute to Mordor to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21080",
+      "side": "B",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Forgotten-Temple-1B.jpg",
+        "sha256": "e67e6d1bf8d78c138c38ca27849ee111433a55f20147fe777f8357db6814f251"
+      },
+      "lines": [
+        "Skip the quest phase.",
+        "Forced: At the end of the planning phase, place 1 resource token here. Then, if there are 2 resource tokens here, add this stage to the victory display and advance to the topmost stage 2A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21081",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Legacy-of-Mordor-2A.jpg",
+        "sha256": "d24516c3c30d333a0970d148d4f21293bbeb1aca5ce6f6f7b727cbd36ed209ec"
+      },
+      "lines": [
+        "When Revealed: Reveal 1 encounter card per player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21081",
+      "side": "B",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Legacy-of-Mordor-2B.jpg",
+        "sha256": "d1825c59274d9e218ad1eca565b7de99f340e3de04493e22367787e039bb5865"
+      },
+      "lines": [
+        "Forced: At the beginning of the quest phase, each player deals 1 damage to a hero he controls and exhausts that hero. That hero cannot ready or be healed until the refresh phase.",
+        "While there are 4 quest stages in the victory display, progress cannot be placed here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21083",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Memory-of-the-Dark-Years-2A.jpg",
+        "sha256": "15f084c7de91c8885d73d35e3eca43119f98a2e89ad31f38f7d5c4687eb66d6d"
+      },
+      "lines": [
+        "When Revealed: Reveal 1 encounter card per player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21083",
+      "side": "B",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Memory-of-the-Dark-Years-2B.jpg",
+        "sha256": "7ebcf0ab353d3d6fa007b5ef1066bd6a4e4bbf84c16a0f102e6d0eb9f809bdad"
+      },
+      "lines": [
+        "Forced: At the beginning of the quest phase, discard X cards from the top of the encounter deck, where X is 1 more than the number of quest stages in the victory display. Add 2 to the total Threat in the staging area for each different card type discarded this way.",
+        "While there are 4 quest stages in the victory display, progress cannot be placed here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21084",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Shrine-to-Sauron-2A.jpg",
+        "sha256": "a94de660fc8a43e4755b240f3c037a3b68f9486f276576f75b40d7c1af24a672"
+      },
+      "lines": [
+        "When Revealed: Reveal 1 encounter card per player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21084",
+      "side": "B",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Shrine-to-Sauron-2B.jpg",
+        "sha256": "dc61589b1e70f8845ddacdfd86d5bf7d9c7369d5333370454b9a80ceecc0d39e"
+      },
+      "lines": [
+        "Forced: At the beginning of the quest phase, each player discards the top X cards of his deck, where X is 1 more than the number of quest stages in the victory display. Each player examines the cards he controls and the cards in his hand. If any of these cards are copies of any of the cards he just discarded from the top of his deck, he must discard those copies as well.",
+        "While there are 4 quest stages in the victory display, progress cannot be placed here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21085",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Lord-of-Middle-earth-2A.jpg",
+        "sha256": "39f4584ca1661662161b806949f8ef8273629c0569a3c7d13b7168c532a1d750"
+      },
+      "lines": [
+        "When Revealed: Reveal 1 encounter card per player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21085",
+      "side": "B",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Lord-of-Middle-earth-2B.jpg",
+        "sha256": "5c08e1585e4230f954ff65680c12e75a46d61d8b86e38c517188bd18bda226af"
+      },
+      "lines": [
+        "This stage gets +4 quest points per player.",
+        "Forced: At the beginning of the quest phase, each player discards 1 card from his hand. Until the end of the round, no more than X progress can be placed on this stage. X is the total cost of each card discarded by this effect.",
+        "While there are 4 quest stages in the victory display, progress cannot be placed here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22011",
+      "side": "A",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Thane-Ulchor.jpg",
+        "sha256": "15ab3fc8b526dbc7f389c16726cd3799fea4408ddd4703d8a6fa465198e707c3"
+      },
+      "lines": [
+        "Immune to player card effects. Cannot leave the staging area.",
+        "Forced: After the active location is explored, the first player must choose: either discard cards from the top of the encounter deck until a location is discarded and add it to the staging area, or Thane Ulchor attacks you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22012",
+      "side": "A",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Champion-of-Rhûn.jpg",
+        "sha256": "18d6284c5ab3a0de30ee3dc4aaa8242d0bc410cdcd78745117c1dc33ec6f562f"
+      },
+      "lines": [
+        "Forced: After Champion of Rhûn engages you, either return a location you control to the staging area, or Champion of Rhûn makes an attack.",
+        "Shadow: Deal 1 damage to defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22013",
+      "side": "A",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Easterling-Skirmisher.jpg",
+        "sha256": "5c5f8a3e9aff6c8d6aafd34a15553aecf44b2d563b9f71a3a294ef0829746c6d"
+      },
+      "lines": [
+        "Surge. Archery 1.",
+        "Forced: After Easterling Skirmisher attacks and destroys a character, that character's controller must return the location he controls with the highest Threat to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22014",
+      "side": "A",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Gate-of-Dorwinion.jpg",
+        "sha256": "b2ef9e47a05c51f391026ddf8d22820e7bba7b165a84e7fde6a0170d3b6f2882"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "X is 1 more than the number of locations controlled by the players.",
+        "The players cannot travel here unless stage 2B has at least 12 progress on it.",
+        "Travel: Thane Ulchor attacks each player in turn order."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22015",
+      "side": "A",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Contested-Square.jpg",
+        "sha256": "aaa6bcded0f1655e95c08f6b958d0a4df1a0ad33bb29e08b564571f347b0eaa2"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: After an enemy is defeated, place 1 progress on Contested Square if it is in the staging area.",
+        "While you control Contested Square, it gains: 'Forced: After a character you control is destroyed, if you control Contested Square, return Contested Square to the staging area.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22016",
+      "side": "A",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Ransacked-House.jpg",
+        "sha256": "ede9afef2afbff8d1e25952d03b0197203d21ebd54b596f4a85ed769939dba0a"
+      },
+      "lines": [
+        "Encounter Action: Put the topmost enemy in the encounter discard pile into play engaged with you to take control of Ransacked House.",
+        "While you control Ransacked House, it gains: 'Forced: After the player who controls Ransacked House loses control of a location, return Ransacked House to the staging area.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22017",
+      "side": "A",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Makeshift-Fortification.jpg",
+        "sha256": "0b49266ccaaf4ff0a8727924a74dbe501557e174eaa592a604b6287cdfaf7f07"
+      },
+      "lines": [
+        "While Makeshift Fortification is the active location, it gains archery 3.",
+        "Forced: After a player takes control of Makeshift Fortification, return the topmost enemy in the encounter discard pile to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22018",
+      "side": "A",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Captured-Tower.jpg",
+        "sha256": "c32dc1f15d7e5738065c9d61793efbbe1fb9dcac406235f47bd25f98e34801e4"
+      },
+      "lines": [
+        "While Captured Tower is the active location, encounter card effects cannot be canceled.",
+        "Forced: After a player takes control of Captured Tower, he shuffles the encounter discard pile into the encounter deck and discards cards from the top until he discards an enemy and puts that enemy into play engaged with him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22019",
+      "side": "A",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Fury.jpg",
+        "sha256": "37438d237d5572280c3fdfa58d00e2a82b4806ed5e2aecc01cf3dde6791ef413"
+      },
+      "lines": [
+        "Surge.",
+        "While attached to an enemy, counts as a Condition attachment with the text: 'Forced: When attached enemy would be destroyed, heal all damage from it and discard Fury instead.'",
+        "When Revealed: Attach to the lowest engagement cost Easterling enemy without Fury."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22020",
+      "side": "A",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Caught-Off-Guard.jpg",
+        "sha256": "c63ccbc7a6bdd83eb666b31c63c64ac7af699bce4611f003a4f00cbb18880287"
+      },
+      "lines": [
+        "When Revealed: Each player must choose: either return a location you control to the staging area, or discard cards from the top of the encounter deck until an enemy is discarded and put it into play engaged with you.",
+        "Shadow: Attacking enemy makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22021",
+      "side": "A",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Street-Fighting.jpg",
+        "sha256": "e0e91e09deb1da2026477b50fae495397d23b006bc37e174493249ad5027ae24"
+      },
+      "lines": [
+        "When Revealed: Each player assigns X damage among characters he controls, where X is 1 more than the number of locations he controls.",
+        "Shadow: Assign X damage among characters you control, where X is 1 more than the number of locations you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22022",
+      "side": "A",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Under-Siege.jpg",
+        "sha256": "72e79603d060a960e13c6b1d510de2cb260962258994c06051858e2d02088c58"
+      },
+      "lines": [
+        "When Revealed: Until the end of the phase, add X Threat to the staging area, where X is 1 more than the number of locations the players control.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, return the highest Threat location you control to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22023",
+      "side": "A",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Ulchor's-Revenge.jpg",
+        "sha256": "f5484bc4eb02197f26c28562b20e8c920ce070f5a7480b1fa89d5238b386c766"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Thane Ulchor makes an attack against each player that controls a location (in turn order).",
+        "Shadow: Attacking enemy gets +1 Attack for each location you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22025",
+      "side": "A",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Inside-the-Walls-1A.jpg",
+        "sha256": "85cb9a5699219e9fd98abdc4ae6efff639a433dcfd731318ee9ea20a834fca67"
+      },
+      "lines": [
+        "Setup: Add Thane Ulchor and Gate of Dorwinion to the staging area. Each player adds a different location to the staging area. Make a copy of Makeshift Fortification the active location. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22025",
+      "side": "B",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Inside-the-Walls-1B.jpg",
+        "sha256": "c3edefc235119ae15f0688d9efdf1bb8e07e8227736907a3a05e58b1a5ec2d36"
+      },
+      "lines": [
+        "This stage gets +4 quest points per player. Progress cannot be placed on locations in the staging area by player card effects.",
+        "Forced: When a location is explored, the first player takes control of it.",
+        "This stage cannot be defeated unless there are more locations under the players' control than in the staging area at the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22026",
+      "side": "A",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Drive-them-Out-2A.jpg",
+        "sha256": "23e4147e80d8112c694a90f2f610b30e68698017ddd995cebda2b95bb9aedbc9"
+      },
+      "lines": [
+        "When Revealed: Each player returns the highest Threat location he controls to the staging area. Shuffle the encounter discard pile into the encounter deck. Starting with the first player, each player discards cards from the top of the encounter deck until he discards an enemy and puts that enemy into play engaged with him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22026",
+      "side": "B",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Drive-them-Out-2B.jpg",
+        "sha256": "728be4a8bc3c1453c1bf8f237ca842281dcd8509dc77b798fc44389890cb1e83"
+      },
+      "lines": [
+        "Progress cannot be placed on locations in the staging area by player card effects.",
+        "The players cannot travel to Gate of Dorwinion unless there are more locations under the players' control than in the staging area.",
+        "Forced: When a location is explored, the first player takes control of it.",
+        "At the end of the round, if the players control Gate of Dorwinion, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22037",
+      "side": "A",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/City-Guard.jpg",
+        "sha256": "308661b85abc302c5592ce838e68b4c407b7782ebd395a8b9ee674b0fba47ae7"
+      },
+      "lines": [
+        "Immune to player card effects. Indestructible.",
+        "X is 1 more than the number of resources on the main quest.",
+        "City Guard cannot leave the staging area but is considered to be engaged with each player whose threat is equal to or higher than its engagement cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22038",
+      "side": "A",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Ulfast-Sentry.jpg",
+        "sha256": "4b483e3452115f8536a0ac9446d40fb24d731a79b126a45cfde6ac2c4c3ab501"
+      },
+      "lines": [
+        "X is 1 more than the number of resources on the main quest.",
+        "Forced: After Ulfast Sentry engages you, either place 1 resource on the main quest or Ulfast Sentry makes an attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22039",
+      "side": "A",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/The-King's-Elite.jpg",
+        "sha256": "803dac0e7e19b3d16d044c1304cfa4d54919932423d4179ba8898e89bd3990b1"
+      },
+      "lines": [
+        "Cannot have player card attachments.",
+        "Forced: When The King's Elite attacks, place 1 resource on the main quest.",
+        "Shadow: Attacking enemy makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22040",
+      "side": "A",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Ulchor's-Agent.jpg",
+        "sha256": "30b89dfa46e342dd4766af40712889fc1fd839203f4a81485dcdaf6a703e956c"
+      },
+      "lines": [
+        "When Revealed: Raise each player's threat by 3.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, raise each player's threat by 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22041",
+      "side": "A",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/The-King's-Lawn.jpg",
+        "sha256": "c4dd778bb8ab2085edaef6e2eead181853b0c4a3b0603451cbb357638ed95853"
+      },
+      "lines": [
+        "While The King's Lawn is in the staging area, each player must raise his threat by 1 additional point during the refresh phase.",
+        "Travel: Place 1 resource on the main quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22042",
+      "side": "A",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Guarded-Archway.jpg",
+        "sha256": "b3c4a081f29e6f4397a9eb5da4edf7f09d25812d09c7e2fdde06441e0163c81c"
+      },
+      "lines": [
+        "While Guarded Archway is in the staging area, each player engaged with City Guard cannot reduce his threat.",
+        "Travel: City Guard makes an attack against the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22043",
+      "side": "A",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Crowded-Market.jpg",
+        "sha256": "dc651b1a83cbfaa1ef3d59cba4da5e6a79b4074ef85fc7c6478230f1652df76f"
+      },
+      "lines": [
+        "While Crowded Market is the active location, City Guard gets +20 engagement cost.",
+        "Travel: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until an enemy is discarded. Add that enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22044",
+      "side": "A",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Streets-of-Ulfast.jpg",
+        "sha256": "e9ac021c228559dc1a6b9f2f366bf6e0a366e58cd3f25dc17a197928100159e8"
+      },
+      "lines": [
+        "X is 1 more than the number of resources on the main quest.",
+        "Travel: Raise each player's threat by X.",
+        "Shadow: Return attacking enemy to the staging area after this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22045",
+      "side": "A",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Extra-Vigil.jpg",
+        "sha256": "30710ff13fea38aa515b39a7ea77227321df4791a381119a5f71b9df24ceba0d"
+      },
+      "lines": [
+        "When Revealed: Attach to City Guard. (Counts as a Condition attachment with the text: 'City Guard gets -10 engagement cost. Response: After you attack and damage City Guard, raise your threat by 1 to discard Extra Vigil.')",
+        "Shadow: If attacking enemy is City Guard, attach Extra Vigil to it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22046",
+      "side": "A",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/We've-Been-Seen.jpg",
+        "sha256": "46fc3e408ca72992288db83bf1a551d487d6c801f13c884e3b04525a4bed629d"
+      },
+      "lines": [
+        "When Revealed: Each player must choose: either City Guard makes an attack against you, or raise your threat by X, where X is 1 more than the number of allies you control.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, excess damage must be assigned among characters you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22047",
+      "side": "A",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Patrolling-the-Streets.jpg",
+        "sha256": "816184645b041274b77c4f8f372a890bfb76017e0b50296b702e498b9d2a027e"
+      },
+      "lines": [
+        "When Revealed: Place 1 resource on the main quest. Then, either progress cannot be placed on the current quest this phase, or raise each player's threat by X, where X is 1 more than the number of resources on the main quest.",
+        "Shadow: Attacking enemy gets +1 Attack for each resource on the main quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22048",
+      "side": "A",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Cat-and-Mouse.jpg",
+        "sha256": "a8f29f5466b99a4b5378555f95f02dcf10bb07e0f115fd198a287b01bb5b4fc9"
+      },
+      "lines": [
+        "Each enemy in the staging area gets -10 engagement cost.",
+        "Response: After Cat and Mouse is defeated, each player may discard a non-unique enemy engaged with him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22050",
+      "side": "A",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Searching-for-Ulchor-1A.jpg",
+        "sha256": "53307ec8bc9b912b11d3e90d4877cdd0e05c15f86d3a32c78d48592b42522c77"
+      },
+      "lines": [
+        "Setup: Add City Guard to the staging area. Each player adds a different location to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22050",
+      "side": "B",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Searching-for-Ulchor-1B.jpg",
+        "sha256": "72b1d3bb670f89abfa42eba98c692465f4bcc4e1521f60bf137d834eed896a96"
+      },
+      "lines": [
+        "City Guard cannot have more than 5 damage, and it gets -5 engagement cost for each resource here.",
+        "Forced: At the end of the round, place 1 resource here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22051",
+      "side": "A",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Trying-to-Blend-In-2A.jpg",
+        "sha256": "130b742df989af4563dcd3fdb1f7ffab30d67b1880e532f940103609e3bc2f89"
+      },
+      "lines": [
+        "When Revealed: Each player must choose: either raise your threat by 5, or reveal an encounter card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22051",
+      "side": "B",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Trying-to-Blend-In-2B.jpg",
+        "sha256": "151a7cbfdb1d5705955941111319f8f176c196c909568a143fd485ef4711b03c"
+      },
+      "lines": [
+        "City Guard cannot have more than 10 damage, and it gets -5 engagement cost for each resource here.",
+        "Forced: At the end of the round, place 1 resource here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22052",
+      "side": "A",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Drawing-Attention-3A.jpg",
+        "sha256": "540cceb353abad47fcfe8102f442da5a4f7e4700d8ae11a6b872da01f9eace84"
+      },
+      "lines": [
+        "When Revealed: Each player must choose: either raise your threat by 5, or City Guard makes an immediate attack against you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22052",
+      "side": "B",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Drawing-Attention-3B.jpg",
+        "sha256": "26d2e84d9ca58a54dc01ce3b2305178468e88c7239a9b8e9754bf3e9c686c86b"
+      },
+      "lines": [
+        "City Guard cannot have more than 15 damage, and it gets -5 engagement cost for each resource here.",
+        "Forced: At the end of the round, place 1 resource here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22053",
+      "side": "A",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Ulchor's-Trap-4A.jpg",
+        "sha256": "c3d510c3ae6dd224c469b4781248d0ae33a34d8d58411e205e099e63cdf1688b"
+      },
+      "lines": [
+        "When Revealed: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X enemies are discarded. X is the number of players. Add each enemy discarded this way to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22053",
+      "side": "B",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Ulchor's-Trap-4B.jpg",
+        "sha256": "75f60dcd3490b403b36853a59a7786ff70cafba3dbdd7e7d440927a9906ff9d2"
+      },
+      "lines": [
+        "City Guard cannot have more than 20 damage, and it gets -5 engagement cost for each resource here.",
+        "Forced: At the end of the round, place 1 resource here.",
+        "This stage cannot be defeated while City Guard has hit points remaining. When this stage is defeated, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22064",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/The-Wainriders.jpg",
+        "sha256": "ec6732c6997574d6edafa2e6cc45a35c2e05ee69aa66aa2ace61e88acddc6b7b"
+      },
+      "lines": [
+        "If The Wainriders' stage has damage equal to or greater than its quest points, The Wainriders advances to the next stage in the circuit. Place any excess damage on that stage.",
+        "Forced: At the end of the quest phase, place X damage on The Wainriders' stage, where X is the total Threat of each enemy in the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22065",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/The-Challengers.jpg",
+        "sha256": "976ad2279b819e8820156a4542b81543236760815307ec5f74afd595a405b462"
+      },
+      "lines": [
+        "Forced: When the players defeat a quest stage with the race keyword, advance this card to the next quest stage in the circuit.",
+        "If The Challengers completes two circuits before The Wainriders, the players win the game. If The Wainriders completes two circuits before The Challengers, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22066",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Wainrider-Champion.jpg",
+        "sha256": "e026801f59c588bd583245fdaad8e75550e80d8366d27559b5a31bcadf8b36bd"
+      },
+      "lines": [
+        "X is 2 per player. Indestructible.",
+        "Immune to player card effects. Cannot leave the staging area.",
+        "While The Challengers is at the same stage as The Wainriders, Wainrider Champion is considered to be engaged with each player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22067",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Aggressive-Racer.jpg",
+        "sha256": "040da3892e81da85e4b91edd00123901c4622adc06d1426136a9abdb690bca54"
+      },
+      "lines": [
+        "Archery 1.",
+        "While The Challengers is ahead of The Wainriders, Aggressive Racer gains surge.",
+        "Forced: After Aggressive Racer attacks and destroys a character, place 2 damage on The Wainriders' stage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22068",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Chariot-Driver.jpg",
+        "sha256": "4c6af716e71128e85d23f13b848aa46c376feb5bf34eaf0d7062b9fcc1a1acb1"
+      },
+      "lines": [
+        "When Revealed: Either place 3 damage on The Wainriders' stage, or Chariot Driver makes an attack against the first player.",
+        "Shadow: If this attack destroys a character, return attacking enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22069",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Veteran-Wainrider.jpg",
+        "sha256": "40c1f83a9bc914f09e33adbc2f3bbc821c1e462442da29cace30737fa124a363"
+      },
+      "lines": [
+        "While The Challengers is ahead of The Wainriders, Veteran Wainrider gets +2 Threat and cannot leave the staging area.",
+        "Shadow: Attacking enemy gets +2 Attack if The Challengers is ahead of The Wainriders."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22070",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Narrow-Pass.jpg",
+        "sha256": "ce840d5ad0b34cd1eb4cfc4fb29fec73c79937d9c46fe1f11ac37b0d84f35c31"
+      },
+      "lines": [
+        "While Narrow Pass is the active location, it gains: 'Response: When damage would be placed on Wainrider Champion, remove an equal amount of damage from The Wainriders' stage instead.'"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22071",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Crowded-Track.jpg",
+        "sha256": "0b5360bcef7301a4bafb146454c776bb9907110c8de5d62e9b229d67777676eb"
+      },
+      "lines": [
+        "Crowded Track gets +1 Threat for each character controlled by the first player.",
+        "Forced: After Crowded Track becomes the active location, each player searches the encounter deck and discard pile for an enemy and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22072",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Ravine-Ledge.jpg",
+        "sha256": "68d38cbcdb79aedcdf666351d3a2a8b61f6c1e2688b03e6f566b9d0f7a9a808f"
+      },
+      "lines": [
+        "While Ravine Ledge is in the staging area, each racing test requires 1 additional matching result.",
+        "Travel: The first player makes a racing Attack test. To pass requires 1 TURN result. If the players pass the test, each player draws 1 card. If the players fail the test, each player discards 1 random card from his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22073",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Wainrider-Chariot.jpg",
+        "sha256": "04ebae075232f161027e573c3d857b0dfbdb9768738cdd28d8e453ee57bbb12f"
+      },
+      "lines": [
+        "Surge.",
+        "While attached, counts as a Weapon attachment with the text: 'Attached enemy gets +1 Attack. Excess damage dealt by attached enemy must be placed on The Wainriders' stage.'",
+        "When Revealed: Attach to a non-unique Easterling enemy without a Wainrider Chariot attached."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22075",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Wainrider-Camp-1A.jpg",
+        "sha256": "1d9ffa304f9ee69926cf9161569aee61057e1ae02ab5ef36b4e06e7c0173a5ad"
+      },
+      "lines": [
+        "Setup: Build the circuit (see insert). Place The Wainriders and The Challengers objective cards at this stage. The first player adds Wainrider Champion to the staging area. Each other player adds 1 different location to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22075",
+      "side": "B",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Wainrider-Camp-1B.jpg",
+        "sha256": "e8e2b57e3da8d003feb9b453b14edd41611dbcfc8535daa0a0b33be04549c583"
+      },
+      "lines": [
+        "Race. This stage gets +4 quest points per player.",
+        "Forced: When this stage is defeated, make a racing Defense test. To pass requires 1 STRAIGHT result, plus an additional STRAIGHT result for each stage you have completed this round. If the players pass the test, excess progress is placed on the next stage. If the players fail the test, each player discards 1 random card from his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22076",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/First-Sprint-2A.jpg",
+        "sha256": "03866aa9672f5bc1f61046f6baafb3f1fddd1a03c43f1cf6e4d5be710fcf494b"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22076",
+      "side": "B",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/First-Sprint-2B.jpg",
+        "sha256": "1582d92ea0280e7f33237d99d4e41d2e94f77f5fd49e169b722d3284b6132f66"
+      },
+      "lines": [
+        "Race. This stage gets +4 quest points per player.",
+        "Forced: When this stage is defeated, make a racing Attack test. To pass requires 1 STRAIGHT result, plus an additional STRAIGHT result for each stage you have completed this round. If the players pass the test, excess progress is placed on the next stage. If the players fail the test, deal 1 damage to each character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22077",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/The-Turnaround-3A.jpg",
+        "sha256": "33a974456a458cdab171bd82b91083e4916a8fb76f54f0e9c5ee3f3efabc3963"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22077",
+      "side": "B",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/The-Turnaround-3B.jpg",
+        "sha256": "51150e57ac2111636343b5b6286878f049b5dc79c2ccdfb9dd01afeebcf9564e"
+      },
+      "lines": [
+        "Race. This stage gets +4 quest points per player.",
+        "Forced: When this stage is defeated, make a racing Willpower test. To pass requires 1 TURN result, plus an additional TURN result for each stage you have completed this round. If the players pass the test, excess progress is placed on the next stage. If the players fail the test, each player discards an ally he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22078",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/The-Farthest-Edge-4A.jpg",
+        "sha256": "96eae5df15a7eb98d2c49848a4d1e79b89cb793b460a181829282b4276bc90e7"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22078",
+      "side": "B",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/The-Farthest-Edge-4B.jpg",
+        "sha256": "8ede78e983bdcbdba40fa7f29cdb988294f7f006eb12f0c15b2c74f89a09a40c"
+      },
+      "lines": [
+        "Race. This stage gets +4 quest points per player.",
+        "Forced: When this stage is defeated, make a racing Defense test. To pass requires 1 STRAIGHT result, plus an additional STRAIGHT result for each stage you have completed this round. If the players pass the test, excess progress is placed on the next stage. If the players fail the test, reveal the top card of the encounter deck (top 2 cards instead if there are 3 or more players)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22079",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Last-Climb-5A.jpg",
+        "sha256": "105addbf1f92a423f2a5a31ca36c49725edcc4ac71adac2570e37c4f34ee1bfc"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22079",
+      "side": "B",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Last-Climb-5B.jpg",
+        "sha256": "866c73c954956079d228d89f6955ffd9b0ac6620d0a676ed1c78ff40b1310425"
+      },
+      "lines": [
+        "Race. This stage gets +4 quest points per player.",
+        "Forced: When this stage is defeated, make a racing Willpower test. To pass requires 1 STRAIGHT result, plus an additional STRAIGHT result for each stage you have completed this round. If the players pass the test, excess progress is placed on the next stage. If the players fail the test, place 2 damage per player on The Wainriders' stage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22080",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Home-Stretch-6A.jpg",
+        "sha256": "1fb6d4c88dc6cfa5e0c527d8253501af41e24615d2a5e628e06ca5628fd5e12f"
+      },
+      "lines": [],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22080",
+      "side": "B",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Home-Stretch-6B.jpg",
+        "sha256": "d19b3cc7f4f9bd144560b3748161a6e89d845222a7e5df0990c0c6b9f03eee3c"
+      },
+      "lines": [
+        "Race. This stage gets +4 quest points per player.",
+        "Forced: When this stage is defeated, make a racing Attack test. To pass requires 1 TURN result, plus an additional TURN result for each stage you have completed this round. If the players pass the test, excess progress is placed on the next stage. If the players fail the test, this stage is not defeated and all progress here is discarded."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22092",
+      "side": "A",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/The-Tunnels-of-Torech-Gorgor.jpg",
+        "sha256": "5bdce6c3f08f3d38f82fe116cbf19094914c90943fe880456e2ab1c59221a501"
+      },
+      "lines": [
+        "During the travel phase, the players must travel to a location, if able.",
+        "Forced: When the active location is explored, place 1 resource here.",
+        "Progress cannot be placed on this quest unless there are at least 3 resources here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22093",
+      "side": "A",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/A-Haunt-for-Beasts.jpg",
+        "sha256": "3b5559a9384a8e1ebaa6b0f6c44d4af2d09b7a9dd0c83b7a9289de0c28b1fe85"
+      },
+      "lines": [
+        "Each enemy cannot take more than 4 damage each round.",
+        "While there is at least one enemy in the staging area, this stage cannot be chosen as the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22094",
+      "side": "A",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Overwhelming-Darkness.jpg",
+        "sha256": "c3a0682bac3db9b56734fde37a8839e433f32824b6e05913ae57f6aa2a79337c"
+      },
+      "lines": [
+        "Forced: After a player plays a card, he discards the top card of his deck.",
+        "Response: When this stage is defeated, each player shuffles the top 3 cards of his discard pile into his deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22095",
+      "side": "A",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Nameless-Beast.jpg",
+        "sha256": "13e3dcae2efad07b297c0fea9822d24eca8d7be5954bf2a430abf5b6d2aaaba6"
+      },
+      "lines": [
+        "Forced: When Nameless Beast attacks you, discard the top card of your deck. Nameless Beast gets +X Attack for this attack, where X is that card's cost.",
+        "Shadow: Attacking enemy gets +X Attack, where X is the cost of the top card in your discard pile."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22096",
+      "side": "A",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Mordor-Cave-Troll.jpg",
+        "sha256": "740803225ed51eed1beca3c9260d919255918560f935572a8f271ef5eef24972"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Forced: After Mordor Cave Troll attacks and destroys a character, discard the top card of your deck for each point of excess damage dealt by this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22097",
+      "side": "A",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Ash-Mountain-Werewolf.jpg",
+        "sha256": "afa268dd4e78a86b868949c1f9b9ee88ab1ddd16fd17e73eb8c4a140e5680613"
+      },
+      "lines": [
+        "Forced: After Ash Mountain Werewolf attacks you, discard the top card of your deck (top 2 cards instead if this attack destroyed a character).",
+        "Shadow: If this attack destroys a character, discard the top 2 cards of your deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22098",
+      "side": "A",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Spawn-of-Shelob.jpg",
+        "sha256": "7c032517d350c0c2e1fcb5363b00d35333bc64fbd5878d9c34dfc71d260cce09"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: After Spawn of Shelob engages you, either discard the top card of your deck, or Spawn of Shelob gets +2 Attack until the end of the round.",
+        "Shadow: Exhaust a character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22099",
+      "side": "A",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Torech-Gorgor-Patrol.jpg",
+        "sha256": "789a730bf415d34204522007cf17961a2d95387b16d9c4bb0154f35cbb6aea6e"
+      },
+      "lines": [
+        "X is 1 more than the number of quest cards in play.",
+        "While Torech Gorgor Patrol is in the staging area, no more than 5 progress can be placed on the main quest each round.",
+        "Forced: After Torech Gorgor Patrol engages a player, it makes an attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22100",
+      "side": "A",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Fiery-Chasm.jpg",
+        "sha256": "54661e149d7f52801fa4e4608669087661a378486a1dc336dc7070967e410041"
+      },
+      "lines": [
+        "X is 1 more than the number of quest cards in play.",
+        "Forced: When Fiery Chasm is explored, discard the top X cards of your deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22101",
+      "side": "A",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Hideous-Deeps.jpg",
+        "sha256": "3d9019ede4572cff83ba40d09d700b8aef69d39a9b162060443dbf4674f749c1"
+      },
+      "lines": [
+        "When Revealed: Each player places the top 3 cards of his deck facedown under Hideous Deeps.",
+        "Forced: When Hideous Deeps is explored as the active location, shuffle each facedown card under it into its owner's deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22102",
+      "side": "A",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Orc-Passage.jpg",
+        "sha256": "ec1e5811a0ee2e7c70ece0615cca9c507763069d2bd7cc643319f1b61c926933"
+      },
+      "lines": [
+        "While Orc Passage is in the staging area, encounter card effects cannot be canceled.",
+        "Forced: When Orc Passage is explored, search the encounter deck and discard pile for a copy of Torech Gorgor Patrol and add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22103",
+      "side": "A",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Ransacked-Supplies.jpg",
+        "sha256": "f501cbc0fd11ba71c24f5ce8a4029ce00f27f2e23cfb74dbbe2cd6099f24802b"
+      },
+      "lines": [
+        "When Revealed: Each player discards the top card of his deck. Until the end of the phase, add the total cost of each card discarded this way to the Threat in the staging area.",
+        "Shadow: Discard an attachment you control. If this attack destroys a character, discard another attachment you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22104",
+      "side": "A",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Burning-Reek.jpg",
+        "sha256": "d8f1362592f7a5a7a5df846759aee05048c9548c7bef53a53af061561ad72976"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Each player discards 1 card from the top of his deck for each character he controls.",
+        "Shadow: Either discard the top 2 cards of your deck, or return attacking enemy to the staging area after this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22105",
+      "side": "A",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Writhing-Shadows.jpg",
+        "sha256": "cf18efa2fc788b750a2d73cb4c8046a235da0114f8f0e150d100434057e59861"
+      },
+      "lines": [
+        "When Revealed: Each player assigns X damage among characters he controls, where X is 1 more than the number of quest cards in play. Exhaust each character damaged by this effect.",
+        "Shadow: Attacking enemy makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22106",
+      "side": "A",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Passage-into-Mordor-1A.jpg",
+        "sha256": "32cd73a095f47b5d4ec5b8210be3823b93d66a1427c0f04bdf789ff9edfcfc23"
+      },
+      "lines": [
+        "Setup: Each player with more than 40 cards in his deck discards cards from the top of his deck until he has 40 cards left. The first player adds a copy of Torech Gorgor Patrol to the staging area. Each other player adds 1 different location to the staging area. Shuffle the encounter deck and discard cards from the top until a side quest is discarded. Reveal that side quest. Shuffle the encounter discard pile into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22106",
+      "side": "B",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Passage-into-Mordor-1B.jpg",
+        "sha256": "7eb236fad13ce839ed6528c9a66ed52c32cadc812a4c3bf6cca055cc583defed"
+      },
+      "lines": [
+        "Event cards cannot shuffle cards from a player's discard pile into his deck.",
+        "Forced: At the end of the round, each player discards X cards from the top of his deck, where X is 1 more than the number of quest cards in play. If a player has no cards left in his deck, he is eliminated from the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22107",
+      "side": "A",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/An-Evil-Place-2A.jpg",
+        "sha256": "d47f7159caeb6dcb5e945c4e961dc9b111fe0d7a54d5ac47296caddad5ef82fd"
+      },
+      "lines": [
+        "When Revealed: Search the encounter deck and discard pile for an encounter side quest and reveal it. Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X enemies are discarded, where X is the number of players. Add each enemy discarded this way to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22107",
+      "side": "B",
+      "printing": "UtAM",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/An-Evil-Place-2B.jpg",
+        "sha256": "0a714636f7bd58e01acc55ea5fd5eab00cdbd93579d1aa68d1dace272deda60a"
+      },
+      "lines": [
+        "Event cards cannot shuffle cards from a player's discard pile into his deck.",
+        "Forced: At the end of the round, each player discards X cards from the top of his deck, where X is 1 more than the number of quest cards in play. If a player has no cards left in his deck, he is eliminated from the game.",
+        "If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22118",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Ulwarth.jpg",
+        "sha256": "2605371f3fc47ba03931854d0daf52700a1c17ce47f448d096ef33b3002fd531"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Only the engaged player can declare attackers or defenders against Ulwarth.",
+        "Allies cannot be declared as attackers or defenders against Ulwarth."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22119",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Lorgan.jpg",
+        "sha256": "a0f92f2d0b7bf2994ffb489e8060fada9b709cec9142b1cd0ab8b502d4befb70"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Only the engaged player can declare attackers or defenders against Lorgan.",
+        "Forced: After Lorgan attacks, raise each player's threat by 1 (2 instead if this attack destroyed a character)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22120",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Borlach.jpg",
+        "sha256": "2d279470f252623369a235c2ec33fa2bd3139e1eaadfd508c38fdf5f7c1474a6"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Only the engaged player can declare attackers or defenders against Borlach.",
+        "Forced: After Borlach attacks and destroys a character, any excess damage must be assigned among characters you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22121",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/The-Barracks.jpg",
+        "sha256": "df1ef838f62c412ebf83be7186677a58439fe1e2575dee58b178442f4f6deebb"
+      },
+      "lines": [
+        "Forced: After The Barracks becomes the active location, add the enemy under it to the staging area. That enemy cannot take damage this round.",
+        "Forced: When The Barracks is explored, the first player gains control of the objective ally it was guarding."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22122",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Slave-Quarters.jpg",
+        "sha256": "5f26f921342093788d5b709511e334eb554711b8733a5c25885764a6f8dfb0d7"
+      },
+      "lines": [
+        "Forced: After Slave Quarters becomes the active location, the enemy under it engages the first player and makes an immediate attack.",
+        "Forced: When Slave Quarters is explored, the first player gains control of the objective ally it was guarding."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22123",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/The-Storehouse.jpg",
+        "sha256": "124e1c9c5a54d0e5cdb35ede6ab90016da7c3150706663fb161b9235468f02ec"
+      },
+      "lines": [
+        "Forced: After The Storehouse becomes the active location, add the enemy under it to the staging area. That enemy gets +3 Attack and -30 engagement cost until the end of the round.",
+        "Forced: When The Storehouse is explored, the first player gains control of the objective ally it was guarding."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22124",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Edrahil.jpg",
+        "sha256": "d5aef31c7ae420ae54f6b71061a3ab03671d9b365932718acccdfe937a408af7"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Response: After Edrahil quests successfully, choose a player to draw 1 card.",
+        "If Edrahil leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22125",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Arador.jpg",
+        "sha256": "151ffef1ceb2b5dfb8e8e7daa67c5a4c56f6f5381edfd5753e34407d29b31302"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Response: After Arador is declared as a defender, ready him. (Limit once per round.)",
+        "If Arador leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22126",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Farin.jpg",
+        "sha256": "f8ebc5dee78c5619719c1e1a868d6539e77bddf458e448a2171244620f931158"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Response: After Farin is declared as an attacker against an enemy, deal 1 damage to an enemy engaged with a player.",
+        "If Farin leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22127",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Easterling-Guard.jpg",
+        "sha256": "622f0c29afaa3bdf865283328bd00dd065a942fe675abd2198aded36a63b4061"
+      },
+      "lines": [
+        "Archery 2.",
+        "When Revealed: Assign X damage among characters in play. X is the current archery total.",
+        "Shadow: Defending character cannot ready this round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22128",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Nurn-Slaver.jpg",
+        "sha256": "27465e1dae4fb1326a840071df44edf28b6ebe403318c92a16b6be85cc47eb28"
+      },
+      "lines": [
+        "While the number of Camp locations in the staging area is less than the number of players, Nurn Slaver gains surge.",
+        "Shadow: Attacking enemy gets +1 Attack for each Camp location in the victory display."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22129",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Working-Fields.jpg",
+        "sha256": "ecfd562b87803567f27b5d1e0ac9f9296142d70bd529f78c84c6c0b4a8b028c7"
+      },
+      "lines": [
+        "While Working Fields is in the staging area, characters cannot be healed.",
+        "Travel: Each player deals 1 damage to a character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22130",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Watch-Tower.jpg",
+        "sha256": "2263f64fd73a6a779012f923a585332aef2a0841bb96b8697c5a45368655ab7a"
+      },
+      "lines": [
+        "While Watch Tower is in the staging area, it gains archery X.",
+        "X is 1 more than the number of Captive objective allies the players control.",
+        "Travel: Reveal the top card of the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22131",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Overseer's-Whip.jpg",
+        "sha256": "3c3761d06aae3e327a9798d655f574cb6b6f8ba819462bf18a8e85f5808fca1f"
+      },
+      "lines": [
+        "Surge.",
+        "While attached to an enemy, counts as a Weapon attachment with the text: 'Forced: When attached enemy attacks, deal 1 damage to an exhausted character you control.'",
+        "When Revealed: Attach to the Easterling enemy with the lowest engagement cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22132",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Cruelty-of-Mordor.jpg",
+        "sha256": "da9f936f1243d0fda723f6d52609c51d52decd35ab6405907974a5c0865004cd"
+      },
+      "lines": [
+        "When Revealed: Each player deals 1 damage to a character he controls. Then, each player must choose: either deal 1 damage to each damaged character you control, or raise your threat by 1 for each damaged character you control.",
+        "Shadow: Attacking enemy gets +2 Defense until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22133",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Broken-Captives.jpg",
+        "sha256": "03148cedea3ae9bdde638d83f4b12e7b02904331b23704fead5fe7a1280d44cd"
+      },
+      "lines": [
+        "When Revealed: Exhaust each damaged character. If no characters are exhausted by this effect, Broken Captives gains surge and doomed 1.",
+        "Shadow: If attacking enemy is a Warden, it makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22135",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Slaves-of-the-Dark-Lord-1A.jpg",
+        "sha256": "786d8299056b0ae2e0246c639f0e804bbd3d70cf68d53d2c67210ed3c59d3e29"
+      },
+      "lines": [
+        "Setup: Add each Camp location to the staging area. Attach a random Captive objective-ally to each Camp location as a guarded objective. Place one random Warden enemy faceup (but not in play) under each Camp location. Shuffle the encounter deck and discard cards from the top until X locations are discarded, where X is 1 less than the number of players. Add each discarded this way to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22135",
+      "side": "B",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Slaves-of-the-Dark-Lord-1B.jpg",
+        "sha256": "f0549acde32d4b7ec035cff412d6f526276980a5d5d23dee3b461e681560d391"
+      },
+      "lines": [
+        "Each Camp location is immune to player card effects, and players cannot travel there while a Warden enemy is in play.",
+        "Forced: At the end of the round, raise each player's threat by 1 for each Camp location in the staging area.",
+        "This stage cannot be defeated unless the players control all 3 Captive objective-allies."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22136",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Lead-the-Revolt-2A.jpg",
+        "sha256": "cb60cf4b5aa1364a6f0421870414703496ae5615b27ff14f4ac051f97d700446"
+      },
+      "lines": [
+        "When Revealed: The first player returns each Warden enemy in the victory display to the staging area. Each other player discards cards from the top of the encounter deck until he discards an enemy and adds that enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22136",
+      "side": "B",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Lead-the-Revolt-2B.jpg",
+        "sha256": "55e077173b8a4babb12d04728ea530a8f246a44c94cb1138420408d8b23961f0"
+      },
+      "lines": [
+        "This stage gets +10 quest points per player.",
+        "Forced: After a player commits characters to the quest, if he is not engaged with a Warden enemy he must reveal an encounter card.",
+        "This stage cannot be defeated while a Warden enemy is in play. When this stage is defeated, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22148",
+      "side": "A",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Thane-Ulchor.jpg",
+        "sha256": "caac7b343695623e9a0ffb46f960aeebefba51183459c830024176025172c9a3"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "X is 1 more than the number of Castle side quests in the victory display.",
+        "Forced: After Thane Ulchor attacks, reveal the top card of the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22149",
+      "side": "A",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Soldier-of-Nurn.jpg",
+        "sha256": "8ba08f2d5618041458ba5cdc856c81d6aa5b948cc7b91cd7cf0a85ea7ad0406a"
+      },
+      "lines": [
+        "Forced: After Soldier of Nurn attacks, place 1 card from your hand facedown under a Castle side quest.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place 1 card from your hand facedown under a Castle side quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22150",
+      "side": "A",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Easterling-Mercenary.jpg",
+        "sha256": "236dbd0c859fae959a126d75b21fbfbf56ebf5d2da1a40abf2ce509970d4c3db"
+      },
+      "lines": [
+        "When Revealed: Either reveal an additional encounter card, or no progress can be placed on the current quest this phase.",
+        "Shadow: Attacking enemy gets +1 Attack for each Castle side quest in the victory display."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22151",
+      "side": "A",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Mordor-Olog-hai.jpg",
+        "sha256": "05e7237941e81fa94b52bd14acbb8598b00e3c7929faf7bd734fa9bd20160ef0"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Forced: After Mordor Olog-hai attacks and destroys a character you control, exhaust a character you control.",
+        "Shadow: Attacking enemy gets +2 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22152",
+      "side": "A",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Guard-Dogs.jpg",
+        "sha256": "989de71f8ad875692563629c197aada1ef18371ce67f99461ca173d942495a7c"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: After Guard Dogs engages you, deal 1 damage to a character you control.",
+        "Shadow: Put Guard Dogs into play engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22153",
+      "side": "A",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Fortress-Walls.jpg",
+        "sha256": "63e2b972aa1d242d1fbe551dd1dfd2a1c843a0ffe95ad0e298d0274209fcd6f3"
+      },
+      "lines": [
+        "While Fortress Walls is in the staging area, the cost to play each ally is increased by 1.",
+        "Travel: Each player places 1 card from his hand under a Castle side quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22154",
+      "side": "A",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Guard-Tower.jpg",
+        "sha256": "b8472f7d6faf5fc3c17719d771fe649a3e76ca1b7d42a0e5e93dd438328dba7d"
+      },
+      "lines": [
+        "While Guard Tower is in the staging area, players cannot draw cards or gain resources from player card effects.",
+        "Travel: Each player exhausts a character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22155",
+      "side": "A",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Plaza-of-Nurn.jpg",
+        "sha256": "4014bea1494b35c09f36dad575ab6fa5a66e07f1ec0aac28d8a2bcbe6e1396c6"
+      },
+      "lines": [
+        "X is 1 more than the number of Castle side quests in the victory display.",
+        "Travel: Each player assigns X damage among characters he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22156",
+      "side": "A",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Determined-Defense.jpg",
+        "sha256": "df67f9152a4974e16de974a9ef4cc87cea4ef082f2fd8756bd1b7aa20af659fc"
+      },
+      "lines": [
+        "When Revealed: Until the end of the phase, add 2 Threat to the staging area. Add 2 additional Threat for each Castle side quest in the victory display.",
+        "Shadow: Exhaust a character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22157",
+      "side": "A",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/The-Dark-Lord's-Reach.jpg",
+        "sha256": "7c73443fe1d3e5fa1155c5e5938d38b3673e858e259c0e00d824b37cbfdea3e3"
+      },
+      "lines": [
+        "When Revealed: Deal 1 damage to each exhausted character. Discard an attachment from each character damaged by this effect.",
+        "Shadow: Discard an attachment you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22158",
+      "side": "A",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/254444df-3e65-4531-b6db-2fdacd0788b4.jpg",
+        "sha256": "b1a67b0c08b727e55e199540d5449be8a0f080265ee7fac8ede53cde8451fef0"
+      },
+      "lines": [
+        "Surge.",
+        "No more than 4 progress can be placed on the current quest each round.",
+        "Response: When this stage is defeated, the first player chooses a Castle side quest. Each player looks at his facedown cards under that quest and adds 1 to his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22159",
+      "side": "A",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Assault-on-Dol-Rhugar-1A.jpg",
+        "sha256": "6ccb6431cd57164a7b9c4ac3f5ebc99d01b1232f19cf847074f93d2c09a43568"
+      },
+      "lines": [
+        "Setup: Player decks cannot exceed 50 cards. Create the Power of Mordor deck (see insert) and set it next to the quest deck. Each player puts 1 copy of Ulchor's Guard into play engaged with him. Add Thane Ulchor and all 4 copies of the Storm the Castle side quest to the staging area. Place the top card of The Power of Mordor deck faceup under each side quest in play. Each player places 8 cards from top of his deck under the quest deck and each side quest in play."
+      ],
+      "inert": [],
+      "misprints": [
+        {
+          "line": 1,
+          "printed": "Setup: Player decks cannot excede 50 cards. Create the Power of Mordor deck (see insert) and set it next to the quest deck. Each player puts 1 copy of Ulchor's Guard into play engaged with him. Add Thane Ulchor and all 4 copies of the Storm the Castle side quest to the staging area. Place the top card of The Power of Mordor deck faceup under each side quest in play. Each player places 8 cards from top of his deck under the quest deck and each side quest in play."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22159",
+      "side": "B",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Assault-on-Dol-Rhugar-1B.jpg",
+        "sha256": "6a625e72b7799cbdd591e92d645bff2eb12f785b3276fdfbb09e5a868900b7db"
+      },
+      "lines": [
+        "Thane Ulchor cannot leave the staging area.",
+        "While there are at least 3 progress tokens on this stage, it cannot be chosen as the current quest stage during the quest phase.",
+        "This stage cannot be defeated unless it is the end of the round and there are 3 Castle side quests in the victory display."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22160",
+      "side": "A",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/The-Final-Confrontation-2A.jpg",
+        "sha256": "dd527d0186149d64d9761d74c26c71c91ea1dea623d44873c0ae0aad7d1236d4"
+      },
+      "lines": [
+        "When Revealed: Reveal the top card of The Power of Mordor deck. Shuffle the encounter discard pile into the encounter deck. Thane Ulchor makes an immediate attack against each player in turn order."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22160",
+      "side": "B",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/The-Final-Confrontation-2B.jpg",
+        "sha256": "7a4a6e3f03b7db2e0ca52f6e6b691acf8efaa80361b5781d58e4e55ad2dd63db"
+      },
+      "lines": [
+        "Encounter card effects cannot be canceled.",
+        "The number of damage tokens on Than Ulchor cannot exceed the number of progress tokens here.",
+        "When Thane Ulchor is defeated, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22161",
+      "side": "A",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Storm-the-Castle-Castle-Garrison.jpg",
+        "sha256": "278fa38902570a126d29c4f53c096254f183ccb37879b93d5a0d681f28765358"
+      },
+      "lines": [
+        "The faceup encounter card underneath this quest is not in play.",
+        "Forced: When this quest becomes the current quest, reveal the faceup encounter card under it. Then, flip this card over and make it the current quest until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22162",
+      "side": "A",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Storm-the-Castle-Lethal-Counterattack.jpg",
+        "sha256": "278fa38902570a126d29c4f53c096254f183ccb37879b93d5a0d681f28765358"
+      },
+      "lines": [
+        "The faceup encounter card underneath this quest is not in play.",
+        "Forced: When this quest becomes the current quest, reveal the faceup encounter card under it. Then, flip this card over and make it the current quest until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22163",
+      "side": "A",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Storm-the-Castle-No-Quarter.jpg",
+        "sha256": "278fa38902570a126d29c4f53c096254f183ccb37879b93d5a0d681f28765358"
+      },
+      "lines": [
+        "The faceup encounter card underneath this quest is not in play.",
+        "Forced: When this quest becomes the current quest, reveal the faceup encounter card under it. Then, flip this card over and make it the current quest until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22164",
+      "side": "A",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Storm-the-Castle-Stronghold-of-Mordor.jpg",
+        "sha256": "278fa38902570a126d29c4f53c096254f183ccb37879b93d5a0d681f28765358"
+      },
+      "lines": [
+        "The faceup encounter card underneath this quest is not in play.",
+        "Forced: When this quest becomes the current quest, reveal the faceup encounter card under it. Then, flip this card over and make it the current quest until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21071",
+      "side": "A",
+      "printing": "A Shadow in the East",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Stinker.jpg",
+        "sha256": "5c90eeee10bb8a14f3700895092827896b781f78e601fea93a448c7ba7341e9d"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Gollum makes an immediate attack. If no attack was made this way, discard all tokens from Sméagol and flip him to Gollum.",
+        "Shadow: Raise your threat by 2 (by 4 instead if Gollum is engaged with you). Shuffle Stinker back into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21073",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Gollum.jpg",
+        "sha256": "89fa19a3b9bb4f073bdf373760b774541e21c34c4094f90ffe4dc3a22e1b2421"
+      },
+      "lines": [
+        "Immune to non-Gollum card effects.",
+        "Gollum engages the first player.",
+        "Forced: When Gollum is defeated, flip him to Sméagol and return him to his owner's control, exhausted."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "220730",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/The-Champion's-Cunning.jpg",
+        "sha256": "215c03beda51295db312e6626fb3d8b03f9cafd2ffc025d7a089733337005cd3"
+      },
+      "lines": [
+        "When Revealed: Wainrider Champion makes an attack against each engaged player. If no attacks were made, place damage on The Wainriders' stage equal to the Wainrider Champion's Threat.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place 2 damage on The Wainriders' stage."
+      ],
+      "inert": [],
+      "misprints": [
+        {
+          "line": 1,
+          "printed": "When Revealed: Wainrider Champion makes an attack against each engaged player. If no attacks were made, place damage on the Wainrider's stage equal to the Wainrider Champion's Threat."
+        },
+        {
+          "line": 2,
+          "printed": "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place 2 damage on the The Wainriders' stage."
+        }
+      ],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22161",
+      "side": "B",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/dc074506-e478-4b63-88e4-9d6e4f8eb6d4.B.jpg",
+        "sha256": "6bff87b7849af95eb70aec1d00717f4dc76351354677b6c80e654ecc780ae4da"
+      },
+      "lines": [
+        "When Revealed: Discard cards from the top of the encounter deck until X enemies are discarded, where X is the number of players. Add each enemy discarded this way to the staging area.",
+        "When this stage is defeated, shuffle each player card underneath it into its owner's deck. Then, each player draws 1 card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22162",
+      "side": "B",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/6860f9ad-0f09-450a-adf9-6ebe9b872a49.B.jpg",
+        "sha256": "dffae5de4453c827b8315135f34e7ef3e45f82d15c0dc0c3a5fc061a00f5696b"
+      },
+      "lines": [
+        "When Revealed: Deal 1 damage to each character in play.",
+        "When this stage is defeated, shuffle each player card underneath it into its owner's deck. Then, each player draws 1 card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22163",
+      "side": "B",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/107805c4-6abf-4eb1-87fd-0ad7ffcfbf42.B.jpg",
+        "sha256": "6db96f1db86f4b7c31e9fbdf57f2cb6db07618dd0c1c5edae3a4e7c2e09b3f62"
+      },
+      "lines": [
+        "When Revealed: Each player randomly discards 4 of his cards from under this quest. Then, each player discards each card he controls, or holds in his hand, that share a title with one of the cards he just discarded.",
+        "When this stage is defeated, shuffle each player card underneath it into its owner's deck. Then, each player draws 1 card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22164",
+      "side": "B",
+      "printing": "TFoN",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/63f46289-b5ef-44d1-b6cb-ce382031a768.B.jpg",
+        "sha256": "56f3a55cf12cd9855fe3f8a1529a37700c3a1bf79c1fa5cbafb95d18d9ec427e"
+      },
+      "lines": [
+        "When Revealed: Discard cards from the top of the encounter deck until X locations are discarded, where X is the number of players. Add each location discarded this way to the staging area.",
+        "When this stage is defeated, shuffle each player card underneath it into its owner's deck. Then, each player draws 1 card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    }
+  ]
+}

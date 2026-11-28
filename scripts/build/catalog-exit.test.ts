@@ -151,7 +151,7 @@ describe("built catalog", () => {
       expect(eastRing?.name).toBe("The One Ring");
       expect(eastRing?.type_code).toBe("attachment");
       expect(eastRing?.deck_legal).toBe(1);
-      expect(eastRing?.campaign_id).toBeNull();
+      expect(eastRing?.campaign_id).toBe("vengeance-of-mordor");
       expect(database.prepare("select name from cards where code = ?").get("141017")?.name).toBe("Mr. Underhill");
       expect(database.prepare("select name from cards where code = ?").get("141077")?.name).toBe("Gildor Inglorion");
       expect(database.prepare("select name from cards where code = ?").get("141078")?.name).toBe("Gandalf's Delay");

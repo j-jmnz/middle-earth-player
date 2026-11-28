@@ -1,0 +1,18 @@
+{
+  "id": "vengeance-of-mordor",
+  "name": "Vengeance of Mordor",
+  "scenarios": [
+    "the-river-running",
+    "danger-in-dorwinion",
+    "the-temple-of-doom",
+    "wrath-and-ruin",
+    "the-city-of-ulfast",
+    "challenge-of-the-wainriders",
+    "under-the-ash-mountains",
+    "the-land-of-sorrow",
+    "the-fortress-of-nurn"
+  ],
+  "kind": "cycle",
+  "starterDecks": [],
+  "saga": false
+}

@@ -1,7 +1,7 @@
 // Rules: rr.response, rr.action, rr.resource-match, rr.doomed-x, rr.triggered-ability, rr.engagement-check, rr.search, rr.destroy,
 // rr.deckbuilding (data/rules/entries.json).
 // The Challenge of the Wainriders heroes, allies, events and contract, written from their card text (data/cards/CotW.json; data/printed
-// holds no ledger for this pack, so the lines are the text of data/cards and every intent goes through sendUnledgered): Saruman 22054:A:2
+// holds the pack's ledger, so every line is checked against it): Saruman 22054:A:2
 // and A:3, Nori 22059:A:1, Rohirrim Scout 22061:A:1, The Muster of Rohan 22062:A:1 and A:2, The Grey Wanderer 22074:A:1. The attachments
 // are in challenge-of-the-wainriders-attachments.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -15,8 +15,8 @@ import { updateCard } from "../../rules/core/state.ts";
 import { refusal, starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { attacking, choices, deckSaveFacts, discarded, endRound, enter, fillers, packRow, play, playableCards, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, type Table } from "../../../test/harness/scene.ts";
+import { attacking, choices, deckSaveFacts, discarded, endRound, enter, fillers, packRow, play, playableCards, playerTableFor, triggers } from "../../../test/harness/player-table.ts";
 
 const SARUMAN = "22054";
 const NORI = "22059";
@@ -67,9 +67,9 @@ describe("Saruman (22054:A:2, A:3)", () => {
     const saruman = idsOf(tab, SARUMAN);
     expect(refusal(tab.state, { type: "PlayCard", cardId: idsOf(tab, STRIKE), payments: [{ heroId: saruman, amount: 1 }] }, tab.ctx)).not.toBeNull();
     // Defiant Challenge readies an exhausted character: the Rider is exhausted, so the event can change the game.
-    let run = sendUnledgered(begin(updateCard(tab.state, idsOf(tab, RIDER), { exhausted: true })), { type: "PlayCard", cardId: idsOf(tab, DEFIANT), payments: [{ heroId: saruman, amount: 0 }] }, tab.ctx);
+    let run = send(begin(updateCard(tab.state, idsOf(tab, RIDER), { exhausted: true })), { type: "PlayCard", cardId: idsOf(tab, DEFIANT), payments: [{ heroId: saruman, amount: 0 }] }, tab.ctx);
     // The first player chooses whether to ready the Rider; the event resolves once he declines.
-    run = sendUnledgered(run, { type: "Choose", optionId: "skip" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "skip" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, DEFIANT)]?.zone).not.toBe("hand");
   });
 
@@ -85,9 +85,9 @@ describe("Saruman (22054:A:2, A:3)", () => {
   lineSpec("22054:A:3", "Saruman: after you play a card with the doomed keyword, ready him", (effects) => {
     const tab = exhausted(effects);
     const saruman = idsOf(tab, SARUMAN);
-    let run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, WATERS), payments: [{ heroId: saruman, amount: 3 }] }, tab.ctx);
+    let run = send(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, WATERS), payments: [{ heroId: saruman, amount: 3 }] }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("22054:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: saruman, effectId: "22054:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: saruman, effectId: "22054:response:1" }, tab.ctx);
     expect(run.state.cards[saruman]?.exhausted).toBe(false);
   });
 
@@ -103,7 +103,7 @@ describe("Saruman (22054:A:2, A:3)", () => {
   it("22054:A:3 Saruman: not offered while he is ready", () => {
     const start = exhausted(EFFECTS);
     const tab = { ...start, state: updateCard(start.state, idsOf(start, SARUMAN), { exhausted: false }) };
-    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, WATERS), payments: [{ heroId: idsOf(tab, SARUMAN), amount: 3 }] }, tab.ctx);
+    const run = send(begin(tab.state), { type: "PlayCard", cardId: idsOf(tab, WATERS), payments: [{ heroId: idsOf(tab, SARUMAN), amount: 3 }] }, tab.ctx);
     expect(triggers(run.state, tab)).not.toContain("22054:response:1");
   });
 });
@@ -120,10 +120,10 @@ describe("Nori (22059:A:1)", () => {
   // deck.": Nori (Attack 2) and the Pal attack the Frail and destroy it; the Snowbourn Scout goes to the bottom of the deck and the Ally stays.
   lineSpec("22059:A:1", "Nori: after an attack he joins destroys an enemy, the top card of the discard pile goes to the bottom of the deck", (effects) => {
     const { tab, top, under } = nori(effects, FRAIL);
-    let run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, FRAIL), attackerIds: [idsOf(tab, PAL), idsOf(tab, NORI)] }, tab.ctx);
+    let run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, FRAIL), attackerIds: [idsOf(tab, PAL), idsOf(tab, NORI)] }, tab.ctx);
     expect(run.state.cards[idsOf(tab, FRAIL)]?.zone).not.toBe("engaged");
     expect(triggers(run.state, tab)).toContain("22059:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, NORI), effectId: "22059:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, NORI), effectId: "22059:response:1" }, tab.ctx);
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[top]?.zone).toBe("deck");
     expect(run.state.seats[0]?.deck.at(-1)).toBe(top);
@@ -134,7 +134,7 @@ describe("Nori (22059:A:1)", () => {
   // The Wall survives the attack: no Response.
   it("22059:A:1 Nori: not offered when the attack destroys no enemy", () => {
     const { tab } = nori(EFFECTS, WALL);
-    const run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WALL), attackerIds: [idsOf(tab, NORI)] }, tab.ctx);
+    const run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, WALL), attackerIds: [idsOf(tab, NORI)] }, tab.ctx);
     expect(run.state.cards[idsOf(tab, WALL)]?.zone).toBe("engaged");
     expect(triggers(run.state, tab)).not.toContain("22059:response:1");
   });
@@ -142,7 +142,7 @@ describe("Nori (22059:A:1)", () => {
   // The Pal destroys the Frail alone: Nori did not participate.
   it("22059:A:1 Nori: not offered when he did not participate in the attack", () => {
     const { tab } = nori(EFFECTS, FRAIL);
-    const run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, FRAIL), attackerIds: [idsOf(tab, PAL)] }, tab.ctx);
+    const run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, FRAIL), attackerIds: [idsOf(tab, PAL)] }, tab.ctx);
     expect(run.state.cards[idsOf(tab, FRAIL)]?.zone).not.toBe("engaged");
     expect(triggers(run.state, tab)).not.toContain("22059:response:1");
   });
@@ -150,7 +150,7 @@ describe("Nori (22059:A:1)", () => {
   // An empty discard pile: nothing can move, so the Response is not offered (rr.triggered-ability).
   it("22059:A:1 Nori: not offered with an empty discard pile", () => {
     const { tab } = nori(EFFECTS, FRAIL, false);
-    const run = sendUnledgered(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, FRAIL), attackerIds: [idsOf(tab, NORI)] }, tab.ctx);
+    const run = send(begin(attacking(tab.state)), { type: "DeclareAttackers", enemyId: idsOf(tab, FRAIL), attackerIds: [idsOf(tab, NORI)] }, tab.ctx);
     expect(run.state.cards[idsOf(tab, FRAIL)]?.zone).not.toBe("engaged");
     expect(triggers(run.state, tab)).not.toContain("22059:response:1");
   });
@@ -166,7 +166,7 @@ describe("Rohirrim Scout (22061:A:1)", () => {
   lineSpec("22061:A:1", "Rohirrim Scout: discard it so a non-unique staged enemy makes no engagement checks against you this round", (effects) => {
     const tab = scouted(effects);
     const [scout, raider, chief] = [idsOf(tab, SCOUT), idsOf(tab, RAIDER), idsOf(tab, CHIEF)];
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: scout, effectId: "22061:action:1" }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: scout, effectId: "22061:action:1" }, tab.ctx);
     expect(run.state.cards[scout]?.zone).toBe("discard");
     expect(run.state.window?.kind).not.toBe("choose");
     const encounter = enter(run.state, tab, "engagement");
@@ -191,7 +191,7 @@ describe("The Muster of Rohan (22062:A:1, A:2)", () => {
     const tab = table(effects, { heroes: [{ code: THEODRED, seat: 0 }, { code: BERAVOR, seat: 0 }], hand: [{ code: MUSTER, seat: 0 }], playerDeck: [{ code: SNOWBOURN, seat: 0 }, ...fillers(CARD, 3)] });
     const muster = idsOf(tab, MUSTER);
     expect(refusal(tab.state, { type: "PlayCard", cardId: muster, payments: [{ heroId: idsOf(tab, BERAVOR), amount: 4 }] }, tab.ctx)).not.toBeNull();
-    const run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: muster, payments: [{ heroId: idsOf(tab, THEODRED), amount: 4 }] }, tab.ctx);
+    const run = send(begin(tab.state), { type: "PlayCard", cardId: muster, payments: [{ heroId: idsOf(tab, THEODRED), amount: 4 }] }, tab.ctx);
     expect(run.state.cards[idsOf(tab, THEODRED)]?.resources).toBe(6 - 4);
     // Its search asks for the Snowbourn Scout.
     expect(choices(run.state, tab)).toContain(idsOf(tab, SNOWBOURN));
@@ -211,7 +211,7 @@ describe("The Muster of Rohan (22062:A:1, A:2)", () => {
     for (const id of taken) {
       expect(choices(run.state, tab)).toContain(id);
       expect(choices(run.state, tab)).not.toContain(scouts[5]);
-      run = sendUnledgered(run, { type: "Choose", optionId: id }, tab.ctx);
+      run = send(run, { type: "Choose", optionId: id }, tab.ctx);
     }
     // Four are taken: the search asks no more.
     expect(run.state.window?.kind).not.toBe("choose");
@@ -229,9 +229,9 @@ describe("The Muster of Rohan (22062:A:1, A:2)", () => {
     const tab = table(EFFECTS, { heroes: [{ code: THEODRED, seat: 0 }], hand: [{ code: MUSTER, seat: 0 }], playerDeck: [SNOWBOURN, RIDER, CARD].map((code) => ({ code, seat: 0 })) });
     let run = play(begin(tab.state), tab, idsOf(tab, MUSTER));
     expect(choices(run.state, tab)).toEqual(expect.arrayContaining([idsOf(tab, SNOWBOURN), idsOf(tab, RIDER)]));
-    run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, RIDER) }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: idsOf(tab, RIDER) }, tab.ctx);
     expect(choices(run.state, tab)).toEqual([idsOf(tab, SNOWBOURN), "done"]);
-    run = sendUnledgered(run, { type: "Choose", optionId: "done" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "done" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, RIDER)]?.zone).toBe("play");
     expect(run.state.cards[idsOf(tab, SNOWBOURN)]?.zone).toBe("deck");
   });

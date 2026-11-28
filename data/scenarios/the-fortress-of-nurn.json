@@ -1,0 +1,214 @@
+{
+  "id": "the-fortress-of-nurn",
+  "name": "The Fortress of Nurn",
+  "number": 6,
+  "stages": [
+    "22159",
+    "22160"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Fortress of Nurn",
+      "count": 24
+    },
+    {
+      "name": "Ulchor's Guard",
+      "count": 5
+    },
+    {
+      "name": "Under Guard",
+      "count": 8
+    },
+    {
+      "name": "The Power of Mordor",
+      "count": 5
+    }
+  ],
+  "cards": [
+    {
+      "code": "22149",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "22150",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "22151",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "22152",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "22153",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "22154",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "22155",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "22156",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "22157",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "22158",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "21059",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "21060",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "21049",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "21050",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "21051",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "21052",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "22159",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "22160",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "22148",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "22161",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "22162",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "22163",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "22164",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "21058",
+      "normal": 4,
+      "easy": 3,
+      "pile": "setAside"
+    },
+    {
+      "code": "21066",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "21067",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "21068",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "21069",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    },
+    {
+      "code": "21070",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounterDeck2"
+    }
+  ],
+  "campaignPlaced": [],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q09.9",
+    "dragnEasy": "E09.9",
+    "hobSlug": "The-Fortress-of-Nurn"
+  }
+}

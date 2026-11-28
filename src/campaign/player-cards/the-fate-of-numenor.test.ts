@@ -1,5 +1,5 @@
 // Rules: rr.response, rr.step-3-4, rr.search (data/rules/entries.json).
-// Haleth 22140:A:1, written from its card text (data/cards/TFoN.json; data/printed holds no ledger for this box yet): "Response: After Haleth quests successfully,
+// Haleth 22140:A:1, written from its card text (data/cards/TFoN.json; data/printed holds the pack's ledger): "Response: After Haleth quests successfully,
 // search the top 5 cards of your deck for an attachment and add it to your hand. Shuffle your deck."
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -9,8 +9,8 @@ import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { choices, playerTable, questUntil, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, type Table } from "../../../test/harness/scene.ts";
+import { choices, playerTable, questUntil, triggers } from "../../../test/harness/player-table.ts";
 
 const HALETH = "22140";
 // Unexpected Courage and Steward of Gondor, attachments; the filler cards are not.
@@ -34,7 +34,7 @@ beforeAll(async () => {
 const quested = (tab: Table, commit: readonly string[]) => questUntil(tab, commit.map((code) => idsOf(tab, code)), (run) => triggers(run.state, tab).includes("22140:response:1"));
 
 describe("Haleth (22140:A:1)", () => {
-  const trigger = (tab: Table, run: ReturnType<typeof quested>) => sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, HALETH), effectId: "22140:response:1" }, tab.ctx);
+  const trigger = (tab: Table, run: ReturnType<typeof quested>) => send(run, { type: "Trigger", cardId: idsOf(tab, HALETH), effectId: "22140:response:1" }, tab.ctx);
 
   // The quest resolves and clears the live committed marks before the Response is read; the round's record of who quested answers (rr.step-3-4).
   lineSpec("22140:A:1", "after Haleth quests successfully, an attachment of the top 5 goes to the hand and the deck is shuffled", (effects) => {
@@ -46,7 +46,7 @@ describe("Haleth (22140:A:1)", () => {
     let next = trigger(tab, run);
     expect(next.state.window?.kind).toBe("choose");
     expect(choices(next.state, tab).sort()).toEqual([idsOf(tab, ATTACHMENT), idsOf(tab, OTHER)].sort());
-    next = sendUnledgered(next, { type: "Choose", optionId: idsOf(tab, ATTACHMENT) }, tab.ctx);
+    next = send(next, { type: "Choose", optionId: idsOf(tab, ATTACHMENT) }, tab.ctx);
     expect(next.state.seats[0]?.hand).toContain(idsOf(tab, ATTACHMENT));
     expect(next.state.seats[0]?.hand).not.toContain(idsOf(tab, OTHER));
     // The deck lost the one card, kept the rest, and was shuffled.
@@ -88,15 +88,15 @@ describe("Haleth (22140:A:1)", () => {
       instructions: [{ verb: "Pick", pick: { type: "character", control: "you", committed: true } }, { verb: "RemoveFromQuest" }],
     };
     const tab = table([...EFFECTS, remove], deckOf(FILLER, ATTACHMENT));
-    let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, HALETH), idsOf(tab, "01001")] }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, HALETH), idsOf(tab, "01001")] }, tab.ctx);
     expect(triggers(run.state, tab)).toContain("22140:response:removal");
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, HALETH), effectId: "22140:response:removal" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, HALETH), effectId: "22140:response:removal" }, tab.ctx);
     expect(run.state.window?.kind).toBe("choose");
-    run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, HALETH) }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: idsOf(tab, HALETH) }, tab.ctx);
     expect(run.state.cards[idsOf(tab, HALETH)]?.committed).toBe(false);
     for (let guard = 0; guard < 20 && run.state.mode !== "travel" && legalIntents(run.state, tab.ctx).some((intent) => intent.type === "Pass"); guard += 1) {
       expect(triggers(run.state, tab)).not.toContain("22140:response:1");
-      run = sendUnledgered(run, { type: "Pass" }, tab.ctx);
+      run = send(run, { type: "Pass" }, tab.ctx);
     }
     expect(run.state.quested?.succeeded).toEqual([0]);
     expect(triggers(run.state, tab)).not.toContain("22140:response:1");

@@ -6,6 +6,7 @@ export function miscPickWords(instruction: Instruction): { verb: string; prompt:
   if (instruction.verb === "SwapHero") return { verb: "Swap in", prompt: "Choose the hero from your collection that takes the place of the chosen hero." };
   if (instruction.verb === "TakeHeroFromCollection") return { verb: "Take", prompt: "Choose a hero from your collection to put into play." };
   if (instruction.verb === "AttachCollectionHero") return { verb: "Attach", prompt: "Choose the version of the hero from your collection to attach to this card." };
+  if (instruction.verb === "KeepOneCopy") return { verb: "Put into play", prompt: "Choose which player puts a copy of this card into play. Each other copy is removed from the game." };
   return null;
 }
 
@@ -32,6 +33,8 @@ export function miscWords(instruction: Instruction): string | null {
       return "attach this card to an ally";
     case "LoseGame":
       return "the players lose the game";
+    case "KeepOneCopy":
+      return "the first player decides which copy is put into play; each other copy is removed from the game";
     case "DiscardCanceled":
       return "discard that card";
     case "ShuffleIntoEncounterDeck":

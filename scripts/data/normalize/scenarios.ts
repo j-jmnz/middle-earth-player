@@ -22,6 +22,7 @@ import { nightmareOf } from "./nightmare.ts";
 import { sagaStartOf } from "./saga-start.ts";
 import { reprintsOf, isReprint } from "./reprints.ts";
 import { dragnResolver } from "./dragn-resolve.ts";
+import { applyCountRule } from "./count-rules.ts";
 import { campaignsOf, indexCards, mentions } from "./scenario-indexes.ts";
 import { isNightmareCard } from "../nightmare-defs.ts";
 import type { RawData } from "./load-raw.ts";
@@ -312,12 +313,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     }
     // A printed count the sources disagree on: the card's own set size or Setup text settles it (overrides.scenarioCounts).
     for (const rule of overrides.scenarioCounts.filter((item) => item.scenario === id)) {
-      const item = placed.find((candidate) => candidate.code === rule.code && candidate.pile === (rule.pile ?? "encounter"));
-      if (!item) local.push(`${id}: scenarioCounts names ${nameOf(rule.code)}, which the ${rule.pile ?? "encounter"} pile does not hold`);
-      else if (rule.normal != null) item.normal = rule.normal;
-      if (item && rule.easy != null) item.easy = rule.easy;
-      if (item) item.easy = Math.min(item.easy, item.normal);
-      if (item && item.normal === 0) placed.splice(placed.indexOf(item), 1);
+      applyCountRule(placed, rule, id, nameOf, local);
     }
     // The campaign card's Setup also deals cards the load list put in an encounter deck or a hand.
     for (const code of codesOf(camp, ["stage", "attachRingBearer", "shuffleInto"])) {

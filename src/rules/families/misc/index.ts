@@ -18,6 +18,7 @@ import { playerSource } from "../quest/threat.ts";
 import type { Focus } from "../index.ts";
 import { attachCollectionHero, swapHero, takeFromCollection } from "./collection.ts";
 import { attachAsMount } from "./mount.ts";
+import { keepOneCopy } from "./copies.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
@@ -66,6 +67,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "TakeHeroFromCollection":
     case "TakeCardFromCollection":
       return takeFromCollection(state, instruction, focus, ctx);
+    case "KeepOneCopy":
+      return keepOneCopy(state, instruction, focus);
     case "AttachAsMount":
       return attachAsMount(state, focus, ctx, steps);
     case "LoseGame": {
@@ -89,4 +92,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "misc", verbs: ["DrawEach", "MoveDamage", "ShuffleIntoEncounterDeck", "PayFromHero", "SwapHero", "AttachCollectionHero", "AddPhaseInstance", "TakeHeroFromCollection", "TakeCardFromCollection", "AttachAsMount", "LoseGame", "DiscardCanceled"], run };
+export const manifest: RulesFamily = { name: "misc", verbs: ["DrawEach", "MoveDamage", "ShuffleIntoEncounterDeck", "PayFromHero", "SwapHero", "AttachCollectionHero", "AddPhaseInstance", "TakeHeroFromCollection", "TakeCardFromCollection", "AttachAsMount", "LoseGame", "DiscardCanceled", "KeepOneCopy"], run };

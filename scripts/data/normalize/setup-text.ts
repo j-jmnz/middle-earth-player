@@ -184,6 +184,20 @@ export type SetupStep =
   | "createOrcsArea" // Race Across Harad, "Create the Orc's area with a second quest deck consisting of stage 1C, 2C, 3C, and 4C as well as Uruk Chieftain": `codes` the four stages and the Chieftain (hrd.prepare-the-orcs-area)
   | "revealRandomAsideObjective" // The Black Serpent, "The first player randomly selects 1 set aside Harad objective, reveals it, and adds it to the staging area": `codes` the three Harad objectives (hrd.guarded-x)
   | "captureAllyFromDeck" // The Dungeons of Cirith Gurat, "each player discards cards from the top of his deck until an ally that is not in play is discarded and attaches that ally to an unattached enemy in the staging area" (hrd.captives-of-cirith-gurat)
+  // The Vengeance of Mordor cycle (scripts/data/normalize/setup-vengeance-of-mordor.ts).
+  | "buildPowerOfMordorDeck" // The Temple of Doom, The Fortress of Nurn, "Create The Power of Mordor deck (see insert) and set it next to the quest deck": `asideSets` the set (vom.power-of-mordor-deck-the-temple-of-doom)
+  | "shuffleStageTwosUnder" // The Temple of Doom, "Shuffle each of the stage 2 quest cards together and place them facedown under this stage"
+  | "mustBeLocation" // Danger in Dorwinion, "One of those locations must be Side Street": `codes` the location
+  | "buildCircuit" // Challenge of the Wainriders, "Build the circuit (see insert)" (vom.the-circuit)
+  | "placeCircuitObjectives" // Challenge of the Wainriders, "Place The Wainriders and The Challengers objective cards at this stage": `codes` the two objectives
+  | "trimDecks" // Under the Ash Mountains, "Each player with more than 40 cards in his deck discards cards from the top of his deck until he has 40 cards left": `count` the cards
+  | "revealSideQuestFromDeck" // Under the Ash Mountains, "Shuffle the encounter deck and discard cards from the top until a side quest is discarded. Reveal that side quest."
+  | "reshuffleDiscardIntoDeck" // Under the Ash Mountains, "Shuffle the encounter discard pile into the encounter deck"
+  | "attachRandomCaptives" // The Land of Sorrow, "Attach a random Captive objective-ally to each Camp location as a guarded objective": `codes` the Captive objective-allies
+  | "placeWardensUnderCamps" // The Land of Sorrow, "Place one random Warden enemy faceup (but not in play) under each Camp location": `codes` the Warden enemies
+  | "limitDeckSize" // The Fortress of Nurn, "Player decks cannot exceed 50 cards": `count` the cards
+  | "placePowerCardUnderSideQuests" // The Fortress of Nurn, "Place the top card of The Power of Mordor deck faceup under each side quest in play"
+  | "placeDeckCardsUnder" // The Fortress of Nurn, "Each player places 8 cards from top of his deck under the quest deck and each side quest in play": `count` the cards
   | "shuffleAsideBack"; // "Then shuffle 1 'Sacked!' card per player back into the encounter deck" (Shadows of Mirkwood), "... 1 copy of A Foe Beyond per player ..." (Dwarrowdelf): `count` cards, `players` for each player
 
 export type ParsedSetup = { clauses: SetupClause[]; unread: string[] };

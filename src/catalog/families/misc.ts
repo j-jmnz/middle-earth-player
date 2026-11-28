@@ -56,6 +56,9 @@ const VERBS = [
   // encounter deck ("cancel the effects of an encounter card just revealed ... and discard that card", 21009:A:1). The same player
   // then reveals another card.
   z.strictObject({ verb: z.literal("DiscardCanceled"), ...when }),
+  // "If two or more players have The One Ring in their decks, the first player decides which player will put his copy of The One Ring into play. Each other copy is removed from the game" (vom.the-one-ring):
+  // leads the Setup of each seat's copy. With one copy set aside it does nothing; with two or more the first player chooses one, the others are removed from the game and their Setup does not run.
+  z.strictObject({ verb: z.literal("KeepOneCopy"), ...when }),
 ] as const;
 
 const TRIGGERS = [

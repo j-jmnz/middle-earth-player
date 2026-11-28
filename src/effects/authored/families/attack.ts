@@ -283,7 +283,7 @@ export const RECORDS: readonly Effect[] = [
   { id: "17112:response:1", cardCode: "17112", lines: ["17112:A:1"], timing: "response", trigger: "declaredAttacker", subject: "self", instructions: [{ verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfAttack" }, { verb: "Delay", until: "endOfAttack", instructions: [{ verb: "Discard", target: { kind: "self" } }] }] },
 
   // Derufin: discarded, he lowers the threat of the player the destroyed enemy was engaged with by its printed Threat.
-  { id: "21006:response:1", cardCode: "21006", lines: ["21006:A:3"], timing: "response", trigger: "attackDestroyedEngaged", subject: "self", cost: { kind: "discardSelf" }, instructions: [{ verb: "LowerThreat", amount: { stat: "threat", of: "other", printed: true }, who: "eventSeat" }] },
+  { id: "21006:response:1", cardCode: "21006", lines: ["21006:A:2"], timing: "response", trigger: "attackDestroyedEngaged", subject: "self", cost: { kind: "discardSelf" }, instructions: [{ verb: "LowerThreat", amount: { stat: "threat", of: "other", printed: true }, who: "eventSeat" }] },
 
   // Charge into Battle: an attack against each non-unique enemy in the staging area, as if engaged with the player.
   { id: "22007:action:1", cardCode: "22007", lines: ["22007:A:2"], timing: "action", condition: { kind: "all", conditions: [{ kind: "phase", is: "Quest" }, { kind: "canPick", pick: { ...IN_STAGING, nonUnique: true } }] }, instructions: [{ verb: "OfferAttacks", pick: { ...IN_STAGING, nonUnique: true } }] },

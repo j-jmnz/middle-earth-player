@@ -10,8 +10,9 @@ import type { OrcsArea } from "../families/haradrim/orcs-types.ts";
 import type { UnchartedState } from "../families/uncharted/types.ts";
 import type { PileZone } from "./piles.ts";
 import type { Discount } from "./discount-types.ts";
+import type { ModeName, Phase } from "./mode-types.ts";
 
-export type { Discount };
+export type { Discount, ModeName, Phase };
 export type {
   DelayedEffect,
   EffectData,
@@ -200,41 +201,6 @@ export type Seat = {
   // Encounter cards attached to the top of this seat's deck, oldest first (Iron Shackles, 01105:A:1; families/dungeon.ts). Absent when none.
   deckAttached?: readonly string[];
 };
-
-export type Phase =
-  | "Setup"
-  | "Mulligan"
-  | "Beginning of round"
-  | "Resource"
-  | "Planning"
-  | "Quest"
-  | "Travel"
-  | "Encounter"
-  | "Combat"
-  | "Refresh"
-  | "End of round";
-
-export type ModeName =
-  | "mulligan"
-  | "afterOpening"
-  | "beginRound"
-  | "resourceGrant"
-  | "resourceActions"
-  | "planning"
-  | "questCommit"
-  | "staging"
-  | "resolution"
-  | "travel"
-  | "optionalEngage"
-  | "engagement"
-  | "combatStart"
-  | "combatShadows"
-  | "combatActions"
-  | "enemyAttacks"
-  | "playerAttacks"
-  | "refresh"
-  | "endRound"
-  | "stopped";
 
 export type Window =
   | { kind: "mulligan" }
@@ -456,6 +422,10 @@ export type ScenarioState = {
   // The cards each seat adds to its hand once every player has finished the mulligan (AddToHandAfterMulligan), by seat; dealt and
   // dropped when the opening hands are final.
   afterMulligan?: readonly (readonly string[])[];
+  // The steps of a Setup that ran before the opening hands (The One Ring, startScenario in engine/reduce.ts): the first intent carries them in its steps, then the field is dropped.
+  openingSteps?: readonly EngineStep[];
+  // The cards a Setup before the opening hands put into a hand (The One Ring's Master card): a mulligan keeps them (docs/scenarios/vengeance-of-mordor.md, Player card readings). Absent in every other game.
+  keptThroughMulligan?: readonly string[];
   // Cost reductions waiting for the next matching card a seat plays (ReduceNextCost). They end with the phase or the round.
   discounts?: readonly Discount[];
   // The player cards played from a hand this round, in order ("the first time you played a copy of ~ this round", "the first

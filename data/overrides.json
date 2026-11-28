@@ -4771,6 +4771,94 @@
       "from": "encounter",
       "reason": "DragnCards' Easy deck (E07.9) leaves The Black Serpent in the encounter deck, and its Normal deck (Q07.9) stages it. The quest card (17157) prints \"The first player adds The Black Serpent to the staging area\", so it is staged at both difficulties.",
       "source": "scan 17157.A; dragncards preBuiltDecks.json (Q07.9, E07.9)"
+    },
+    {
+      "scenario": "the-river-running",
+      "code": "21013",
+      "from": "staging",
+      "pile": "encounter",
+      "reason": "DragnCards stages one copy of Easterling Outrider (Q09.1, E09.1). The quest card (21075) prints \"Setup: ... Each player adds 1 different Easterling enemy to the staging area.\", so the Setup finds the enemies in the encounter deck.",
+      "source": "scan 21075.A; dragncards preBuiltDecks.json (Q09.1, E09.1)"
+    },
+    {
+      "scenario": "the-river-running",
+      "code": "21020",
+      "from": "staging",
+      "pile": "encounter",
+      "reason": "DragnCards stages one copy of Easterling Raider (Q09.1, E09.1). The quest card (21075) prints \"Setup: ... Each player adds 1 different Easterling enemy to the staging area.\", so the Setup finds the enemies in the encounter deck.",
+      "source": "scan 21075.A; dragncards preBuiltDecks.json (Q09.1, E09.1)"
+    },
+    {
+      "scenario": "the-river-running",
+      "code": "21018",
+      "from": "staging",
+      "pile": "encounter",
+      "reason": "DragnCards stages one copy of Rider of Rhûn (Q09.1, E09.1). The quest card (21075) prints \"Setup: ... Each player adds 1 different Easterling enemy to the staging area.\", so the Setup finds the enemies in the encounter deck.",
+      "source": "scan 21075.A; dragncards preBuiltDecks.json (Q09.1, E09.1)"
+    },
+    {
+      "scenario": "the-river-running",
+      "code": "21017",
+      "from": "staging",
+      "pile": "encounter",
+      "reason": "DragnCards stages one copy of Easterling Captain (Q09.1, E09.1). The quest card (21075) prints \"Setup: ... Each player adds 1 different Easterling enemy to the staging area.\", so the Setup finds the enemies in the encounter deck.",
+      "source": "scan 21075.A; dragncards preBuiltDecks.json (Q09.1, E09.1)"
+    },
+    {
+      "scenario": "wrath-and-ruin",
+      "code": "22017",
+      "from": "staging",
+      "pile": "activeLocation",
+      "reason": "DragnCards stages one copy of Makeshift Fortification (Q09.4). The quest card (22025) prints \"Setup: ... Make a copy of Makeshift Fortification the active location.\", so a copy is the active location at the start of the game. The copy comes from the encounter deck, not from the locations the players add (ruling of 10 Dec 2020, ALeP item 3.363).",
+      "source": "scan 22025.A; dragncards preBuiltDecks.json (Q09.4); https://alongextendedparty.com/semi-official-errata-faq-1-10/ (item 3.363, Caleb Grace)"
+    },
+    {
+      "scenario": "challenge-of-the-wainriders",
+      "code": "22066",
+      "from": "setAside",
+      "pile": "staging",
+      "reason": "DragnCards loads Wainrider Champion set aside (Q09.6, E09.6). The quest card (22075) prints \"Setup: ... The first player adds Wainrider Champion to the staging area.\", so it is staged.",
+      "source": "scan 22075.A; dragncards preBuiltDecks.json (Q09.6, E09.6)"
+    },
+    {
+      "scenario": "challenge-of-the-wainriders",
+      "code": "22076",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads First Sprint set aside (Q09.6, E09.6). The circuit (vom.the-circuit) is the scenario's quest deck: stage 1 and stages 2 to 6 are quest cards from the start, and the Setup builds the circuit from them (\"Build the circuit (see insert)\", 22075:A:1), so First Sprint is a stage of the quest deck.",
+      "source": "scan 22075.A; rulesheet vom.the-circuit; dragncards preBuiltDecks.json (Q09.6, E09.6)"
+    },
+    {
+      "scenario": "challenge-of-the-wainriders",
+      "code": "22077",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads The Turnaround set aside (Q09.6, E09.6). The circuit (vom.the-circuit) is the scenario's quest deck: stage 1 and stages 2 to 6 are quest cards from the start, and the Setup builds the circuit from them (\"Build the circuit (see insert)\", 22075:A:1), so The Turnaround is a stage of the quest deck.",
+      "source": "scan 22075.A; rulesheet vom.the-circuit; dragncards preBuiltDecks.json (Q09.6, E09.6)"
+    },
+    {
+      "scenario": "challenge-of-the-wainriders",
+      "code": "22078",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads The Farthest Edge set aside (Q09.6, E09.6). The circuit (vom.the-circuit) is the scenario's quest deck: stage 1 and stages 2 to 6 are quest cards from the start, and the Setup builds the circuit from them (\"Build the circuit (see insert)\", 22075:A:1), so The Farthest Edge is a stage of the quest deck.",
+      "source": "scan 22075.A; rulesheet vom.the-circuit; dragncards preBuiltDecks.json (Q09.6, E09.6)"
+    },
+    {
+      "scenario": "challenge-of-the-wainriders",
+      "code": "22079",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads Last Climb set aside (Q09.6, E09.6). The circuit (vom.the-circuit) is the scenario's quest deck: stage 1 and stages 2 to 6 are quest cards from the start, and the Setup builds the circuit from them (\"Build the circuit (see insert)\", 22075:A:1), so Last Climb is a stage of the quest deck.",
+      "source": "scan 22075.A; rulesheet vom.the-circuit; dragncards preBuiltDecks.json (Q09.6, E09.6)"
+    },
+    {
+      "scenario": "challenge-of-the-wainriders",
+      "code": "22080",
+      "from": "setAside",
+      "pile": "quest",
+      "reason": "DragnCards loads Home Stretch set aside (Q09.6, E09.6). The circuit (vom.the-circuit) is the scenario's quest deck: stage 1 and stages 2 to 6 are quest cards from the start, and the Setup builds the circuit from them (\"Build the circuit (see insert)\", 22075:A:1), so Home Stretch is a stage of the quest deck.",
+      "source": "scan 22075.A; rulesheet vom.the-circuit; dragncards preBuiltDecks.json (Q09.6, E09.6)"
     }
   ],
   "scenarioRemovals": [
@@ -5140,27 +5228,28 @@
       "easy": 0,
       "reason": "Hall of Beorn lists Umbar Street with 2 copies at Normal and 1 at Easy; DragnCards' E07.1 stages 1 and leaves 1 in the encounter deck, 2 in all. The Easy deck holds the staged copy only.",
       "source": "hallofbeorn.com/Export/Scenarios/Escape-from-Umbar and Export/EncounterCards (Quantity); dragncards preBuiltDecks.json (Q07.1, E07.1)"
-    }
-  ],
-  "campaigns": [
+    },
     {
-      "id": "vengeance-of-mordor",
-      "name": "Vengeance of Mordor",
-      "kind": "cycle",
-      "products": [
-        "A Shadow in the East",
-        "Wrath and Ruin",
-        "The City of Ulfast",
-        "Challenge of the Wainriders",
-        "Under the Ash Mountains",
-        "The Land of Sorrow",
-        "The Fortress of Nurn"
-      ],
-      "released": "2019-08-02",
-      "reason": "No source names a cycle. Hall of Beorn lists the scenarios of A Shadow in the East and of its six Adventure Packs under each product; RingsDB numbers the deluxe expansion and the six packs as cycles 28 and 29. The cycle has no Campaign Mode, so it is a cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 28 and 29; hallofgondor.com/release-dates (released: US release of the first product)"
+      "scenario": "wrath-and-ruin",
+      "code": "21024",
+      "pile": "encounter",
+      "normal": 1,
+      "easy": 1,
+      "reason": "Hall of Beorn's scenario file and its card export agree on 1 copy of the encounter side quest Warriors of the East, a card of the Easterling Raiders set, which the Wrath and Ruin rulesheet (vom.setup-wrath-and-ruin) names. DragnCards' Q09.4 and E09.4 have no line for it (the override adds the placement), and no Setup line of the quest card sets it aside. The Land of Sorrow's Q09.8 and E09.8 load it. The printed set holds it, so it is in the encounter deck at both difficulties.",
+      "source": "hallofbeorn.com/Export/Scenarios/Wrath-and-Ruin and Export/EncounterCards (Quantity); rulesheet vom.setup-wrath-and-ruin; dragncards preBuiltDecks.json (Q09.4, Q09.8)",
+      "add": true
+    },
+    {
+      "scenario": "under-the-ash-mountains",
+      "code": "22097",
+      "pile": "encounter",
+      "normal": 3,
+      "easy": 3,
+      "reason": "Hall of Beorn's scenario file and its card export agree on 3 copies of Ash Mountain Werewolf (Easy 3); DragnCards' Q09.7 and E09.7 load 2. The scan prints the card as 8/29 and Spawn of Shelob, the next card of the set, as 11/29, so the set holds three copies (8, 9 and 10) and the set has 29 cards in all. The printed count wins over a load list that leaves a copy out.",
+      "source": "scan 22097.A (8/29) and 22098.A (11/29); hallofbeorn.com/Export/Scenarios/Under-the-Ash-Mountains and Export/EncounterCards (Quantity); dragncards preBuiltDecks.json (Q09.7, E09.7)"
     }
   ],
+  "campaigns": [],
   "outOfScope": [
     {
       "pack": "MotKA",
@@ -5578,6 +5667,12 @@
       "set": "Journey Along the Anduin",
       "reason": "The Revised Core Set's Learn to Play (p25) and the Easy Mode sheet (p2) call the second core scenario and its encounter set \"Journey Down the Anduin\". The scenario's own campaign card, quest cards and encounter set icon print \"Journey Along the Anduin\" (Mirkwood Paths - Part 2, scan 01130.A), and Hall of Beorn follows the cards. The card wins (authority order); the booklet's name is an alias.",
       "source": "Learn to Play p25 (ltp.setup-journey-along-the-anduin); scan 01130.A; hallofbeorn.com/Export/Scenarios/Journey-Along-the-Anduin-(Campaign)"
+    },
+    {
+      "booklet": "Twisting Tunnels",
+      "set": "Twisted Tunnels",
+      "reason": "The Under the Ash Mountains rulesheet spells the set \"Twisting Tunnels\". The cards' set (Twisted Tunnel, Narrow Opening, Crumbling Passage) and Hall of Beorn print \"Twisted Tunnels\". The card wins; the booklet's spelling is an alias.",
+      "source": "rulesheet vom.setup-under-the-ash-mountains; hallofbeorn.com/Export/EncounterCards (EncounterSet Twisted Tunnels)"
     }
   ],
   "scenarioCampaignPlaced": [
@@ -5799,6 +5894,14 @@
       "code": "100158",
       "reason": "Protect the Innocent and Arnor Ravaged are the two sides of one card (#158; the Deadmen's Dike campaign card: \"Add Arnor Ravaged to the Campaign Pool in its place (found on the opposite side of Protect the Innocent)\"), and Hall of Beorn gives both RingsDbCardId 10158. Protect the Innocent keeps RingsDB's code; Arnor Ravaged, which RingsDB lists no record for, takes '100' and the collector number, which no other card bears.",
       "source": "data/raw/hallofbeorn (EncounterCards.json); data/raw/ringsdb/cards/AACE.json; mec108.campaign-setup-deadmens-dike"
+    },
+    {
+      "set": "Challenge of the Wainriders",
+      "number": 73,
+      "title": "The Champion's Cunning",
+      "code": "220730",
+      "reason": "Wainrider Chariot (printed 73) and The Champion's Cunning share Hall of Beorn's collector number 73 and RingsDbCardId 22073, so one of the two cards was dropped when the pack was built. RingsDB's code 22074 is The Grey Wanderer, a player card of the pack. Wainrider Chariot keeps 22073; The Champion's Cunning, which RingsDB lists no record for, takes '22073' and a zero, which no other card bears.",
+      "source": "hallofbeorn.com/Export/EncounterCards (Wainrider-Chariot-CotW and The-Champion's-Cunning-CotW, Number 73, RingsDbCardId 22073); ringsdb.com packs (CotW 22074 The Grey Wanderer); scan 22073.A (printed 73)"
     }
   ],
   "scenarioStages": [

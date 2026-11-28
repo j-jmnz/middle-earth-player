@@ -188,7 +188,7 @@ describe("Sméagol's Setup", () => {
 });
 
 describe("The One Ring is immune to the effects of cards without the Master trait", () => {
-  it("a Condition-chasing Response skips it, and an effect of a Master card does not (21001:A:2)", () => {
+  it("a Condition-chasing Response skips it, and an effect of a Master card does not (21001:A:1)", () => {
     const table = seat(1, ["dwarf", "rohan"]);
     const ring = put(table.state, "21001", "play");
     const miner = put(ring.state, "01061", "hand");

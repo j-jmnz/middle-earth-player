@@ -1,7 +1,7 @@
 // Rules: bts.valour, rr.modifiers, rr.quest-phase, rr.action, rr.ready, rr.response, rr.enters-play, rr.then, rr.planning-phase,
 // rr.play-and-put-into-play, rr.cost, rr.deckbuilding (data/rules/entries.json).
-// The City of Ulfast allies, events and contract, written from their card text (data/cards/TCoU.json; data/printed holds no ledger for this
-// pack, so every intent goes through sendUnledgered): Angbor the Fearless 22028:A:1, Need Drives Them 22029:A:1, Knight of Belfalas 22034:A:1,
+// The City of Ulfast allies, events and contract, written from their card text (data/cards/TCoU.json; data/printed holds the
+// pack's ledger, so every line is checked against it): Angbor the Fearless 22028:A:1, Need Drives Them 22029:A:1, Knight of Belfalas 22034:A:1,
 // Host of Galadhrim 22036:A:1, Forth, The Three Hunters! 22049:A:1. The attachments are in the-city-of-ulfast-attachments.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -14,8 +14,8 @@ import { legalIntents } from "../../rules/engine/reduce.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf, type Table } from "../../../test/harness/scene.ts";
-import { choices, combat, deckSaveFacts, discarded, packRow, playCode, playerTableFor, questing, sendUnledgered, stat, threatened, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send, type Table } from "../../../test/harness/scene.ts";
+import { choices, combat, deckSaveFacts, discarded, packRow, playCode, playerTableFor, questing, stat, threatened, triggers } from "../../../test/harness/player-table.ts";
 
 const ANGBOR = "22028";
 const NEED = "22029";
@@ -57,7 +57,7 @@ describe("Angbor the Fearless (22028:A:1)", () => {
     const card = idsOf(tab, ANGBOR);
     const run = playCode(tab, ANGBOR);
     expect(stat(run.state, tab, card, "attack")).toBe(1 + 2);
-    const quested = sendUnledgered(begin(questing(run.state)), { type: "Commit", cardIds: [card] }, tab.ctx);
+    const quested = send(begin(questing(run.state)), { type: "Commit", cardIds: [card] }, tab.ctx);
     expect(quested.state.cards[card]).toMatchObject({ committed: true, exhausted: false });
   });
 
@@ -67,7 +67,7 @@ describe("Angbor the Fearless (22028:A:1)", () => {
     const card = idsOf(tab, ANGBOR);
     const run = playCode(tab, ANGBOR);
     expect(stat(run.state, tab, card, "attack")).toBe(1);
-    expect(sendUnledgered(begin(questing(run.state)), { type: "Commit", cardIds: [card] }, tab.ctx).state.cards[card]?.exhausted).toBe(true);
+    expect(send(begin(questing(run.state)), { type: "Commit", cardIds: [card] }, tab.ctx).state.cards[card]?.exhausted).toBe(true);
   });
 
   // "your threat": the other player at 45 does not count.
@@ -114,9 +114,9 @@ describe("Knight of Belfalas (22034:A:1)", () => {
     const { tab, pile: [guard = "", spearman = "", scout = "", denethor = ""], theirs } = knight(effects, [GUARD, SPEARMAN, SNOWBOURN, DENETHOR]);
     let run = playCode(tab, KNIGHT);
     expect(triggers(run.state, tab)).toContain("22034:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: idsOf(tab, KNIGHT), effectId: "22034:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: idsOf(tab, KNIGHT), effectId: "22034:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([guard, spearman].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: spearman }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: spearman }, tab.ctx);
     expect(run.state.cards[spearman]?.zone).toBe("hand");
     for (const id of [guard, scout, denethor, theirs]) expect(run.state.cards[id]?.zone).toBe("discard");
   });

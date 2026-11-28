@@ -13,8 +13,8 @@ import { loadAnyScenario, loadCampaign } from "./load-scenarios.ts";
 import { DATA_DIR } from "./paths.ts";
 import { nightmareDeckOf } from "./nightmare-defs.ts";
 
-// The cycles whose scenarios have no Nightmare block: the Standalone scenarios were printed on their own, with none (guide/roadmap.md, Roadmap); The Hobbit's decks (9055 to 9060), Against the Shadow's (9019 to 9027), The Ring-maker's and Haradrim's are in no scenario until their Nightmare decks are read.
-const NO_NIGHTMARE: ReadonlySet<string> = new Set(["standalone-scenarios", "the-hobbit", "against-the-shadow", "the-ring-maker", "haradrim"]);
+// The cycles whose scenarios have no Nightmare block: the Standalone scenarios were printed on their own, with none (guide/roadmap.md, Roadmap); The Hobbit's decks (9055 to 9060), Against the Shadow's (9019 to 9027), The Ring-maker's, Haradrim's and Vengeance of Mordor's are in no scenario until their Nightmare decks are read.
+const NO_NIGHTMARE: ReadonlySet<string> = new Set(["standalone-scenarios", "the-hobbit", "against-the-shadow", "the-ring-maker", "haradrim", "vengeance-of-mordor"]);
 const cycles = CAMPAIGNS.filter((campaign) => campaign.kind === "cycle");
 const index = JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "index.json"), "utf8")) as { id: string; kind: string; scenarioCount: number; box: string | null }[];
 

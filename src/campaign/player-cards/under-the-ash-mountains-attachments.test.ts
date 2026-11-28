@@ -1,7 +1,7 @@
 // Rules: rr.attachment-cards, rr.modifiers, bts.valour, wor.guarded-x, rr.guarded, rr.staging-area, rr.step-1-3, rr.hit-points,
 // mec109.the-one-ring, rr.explored (data/rules/entries.json).
-// The Under the Ash Mountains attachments, written from their card text (data/cards/UtAM.json; data/printed holds no ledger for this pack,
-// so the lines are the text of data/cards and every intent goes through sendUnledgered): Valiant Sword 22083:A:2, Stone of Elostirion
+// The Under the Ash Mountains attachments, written from their card text (data/cards/UtAM.json; data/printed holds the pack's ledger,
+// so every line is checked against it): Valiant Sword 22083:A:1 and A:3, Stone of Elostirion
 // 22084:A:1 and A:2, Well Preserved 22085:A:1 and A:2. The heroes, allies, events and contract are in under-the-ash-mountains.test.ts.
 import { beforeAll, describe, expect } from "vitest";
 
@@ -11,8 +11,8 @@ import { withThreat } from "../../rules/core/state.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, FRODO, idsOf, RING, type Table } from "../../../test/harness/scene.ts";
-import { choices, enter, fillers, hosts, passAll, passWhile, play, playerTableFor, printed, questing, sendUnledgered, stat } from "../../../test/harness/player-table.ts";
+import { begin, FRODO, idsOf, RING, send, type Table } from "../../../test/harness/scene.ts";
+import { choices, enter, fillers, hosts, passAll, passWhile, play, playerTableFor, printed, questing, stat } from "../../../test/harness/player-table.ts";
 
 const SWORD = "22083";
 const STONE = "22084";
@@ -44,7 +44,7 @@ beforeAll(async () => {
   base = { ...starter, cards };
 });
 
-describe("Valiant Sword (22083:A:2)", () => {
+describe("Valiant Sword (22083:A:1, A:3)", () => {
   // Aragorn and Théodred (Noble heroes), Beravor and the Noble ally; two Swords in hand; the threat at `threat`.
   const swords = (effects: readonly Effect[], threat: number): Table => {
     const tab = table(effects, { heroes: [{ code: ARAGORN, seat: 0 }, { code: THEODRED, seat: 0 }, { code: BERAVOR, seat: 0 }], allies: [{ code: NOBLE_ALLY, seat: 0 }], hand: [{ code: SWORD, seat: 0 }, { code: SWORD, seat: 0 }] });
@@ -54,7 +54,7 @@ describe("Valiant Sword (22083:A:2)", () => {
   // "Attach to a Noble hero. Limit 1 per hero. ... Attached hero gets +1 Attack (+2 Attack if your threat is 40 or higher).": Aragorn and
   // Théodred are offered, Beravor and the Noble ally are not; at threat 39 Aragorn has his Attack + 1, and the second Sword is offered only
   // Théodred. At threat 40 the Sword gives +2.
-  lineSpec("22083:A:2", "Valiant Sword: on a Noble hero, limit 1 per hero, +1 Attack, +2 at threat 40", (effects) => {
+  lineSpec("22083:A:3", "Valiant Sword: on a Noble hero, limit 1 per hero, +1 Attack, +2 at threat 40", (effects) => {
     const tab = swords(effects, 39);
     const [first = "", second = ""] = tab.ids[SWORD] ?? [];
     const [aragorn, theodred] = [idsOf(tab, ARAGORN), idsOf(tab, THEODRED)];
@@ -76,19 +76,19 @@ describe("Stone of Elostirion (22084:A:1, A:2)", () => {
     const tab = table(effects, { heroes: [{ code: STRIDER, seat: 0 }, { code: BERAVOR, seat: 0 }], hand: [{ code: STONE, seat: 0 }], deck: ["f0", PLACE, "f0", "f0", "f0"] });
     const [stone, place, strider] = [idsOf(tab, STONE), idsOf(tab, PLACE), idsOf(tab, STRIDER)];
     expect(hosts(tab, stone)).toEqual(["staging"]);
-    let run = sendUnledgered(begin(tab.state), { type: "PlayCard", cardId: stone, hostId: "staging", payments: [{ heroId: strider, amount: 1 }] }, tab.ctx);
+    let run = send(begin(tab.state), { type: "PlayCard", cardId: stone, hostId: "staging", payments: [{ heroId: strider, amount: 1 }] }, tab.ctx);
     expect(run.state.staging).toEqual([place]);
     expect(run.state.encounterDiscard).toEqual([tab.ids.f0?.[0]]);
     expect(run.state.cards[stone]).toMatchObject({ zone: "setAside", host: place });
     run = enter(run.state, tab, "travel");
-    run = sendUnledgered(run, { type: "Travel", locationId: place }, tab.ctx);
+    run = send(run, { type: "Travel", locationId: place }, tab.ctx);
     expect(run.state.activeLocation).toBe(place);
-    run = sendUnledgered(begin(questing(run.state)), { type: "Commit", cardIds: [strider] }, tab.ctx);
+    run = send(begin(questing(run.state)), { type: "Commit", cardIds: [strider] }, tab.ctx);
     run = passWhile(run, tab, (run) => run.state.mode === "questCommit", 4);
     run = passAll(run, tab.ctx, { responses: true });
     expect(run.state.cards[place]?.zone).toBe("encounterDiscard");
     expect(choices(run.state, tab).sort()).toEqual([strider, idsOf(tab, BERAVOR)].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, BERAVOR) }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: idsOf(tab, BERAVOR) }, tab.ctx);
     expect(run.state.cards[stone]).toMatchObject({ zone: "play", host: idsOf(tab, BERAVOR), controller: 0 });
   });
 

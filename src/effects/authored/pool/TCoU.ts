@@ -6,8 +6,8 @@ export const RECORDS: readonly Effect[] = [
   // 22028 Angbor the Fearless
   {"id":"22028:constant:1","cardCode":"22028","lines":["22028:A:1"],"timing":"constant","condition":{"kind":"threat","min":40,"valour":true},"instructions":[{"verb":"ModifyStat","stat":"attack","amount":2,"until":"whileSourceInPlay"},{"verb":"ModifyStat","stat":"noExhaustQuest","amount":1,"until":"whileSourceInPlay"}]},
   // 22031 Keen Longbow (line 1 is the generated 22031:constant:1; Restricted is a keyword the engine reads)
-  {"id":"22031:constant:2","cardCode":"22031","lines":["22031:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"ranged","amount":1,"until":"whileSourceInPlay","target":"host"}]},
-  {"id":"22031:response:1","cardCode":"22031","lines":["22031:A:3"],"timing":"response","trigger":"declaredAttacker","subject":"host","condition":{"kind":"handHasCard"},"instructions":[{"verb":"Choose","who":"actor","options":[
+  {"id":"22031:constant:2","cardCode":"22031","lines":["22031:A:3"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"ranged","amount":1,"until":"whileSourceInPlay","target":"host"}]},
+  {"id":"22031:response:1","cardCode":"22031","lines":["22031:A:4"],"timing":"response","trigger":"declaredAttacker","subject":"host","condition":{"kind":"handHasCard"},"instructions":[{"verb":"Choose","who":"actor","options":[
     {"id":"discard1","requires":{"kind":"count","pick":{"type":"card","control":"you","from":"hand"},"min":1},"instructions":[{"verb":"DiscardFromHand","amount":1},{"verb":"DamageCard","amount":1,"target":"other"}]},
     {"id":"discard2","requires":{"kind":"count","pick":{"type":"card","control":"you","from":"hand"},"min":2},"instructions":[{"verb":"DiscardFromHand","amount":2},{"verb":"DamageCard","amount":2,"target":"other"}]},
     {"id":"discard3","requires":{"kind":"count","pick":{"type":"card","control":"you","from":"hand"},"min":3},"instructions":[{"verb":"DiscardFromHand","amount":3},{"verb":"DamageCard","amount":3,"target":"other"}]}]}]},

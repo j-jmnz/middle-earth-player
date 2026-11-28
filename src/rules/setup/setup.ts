@@ -24,6 +24,7 @@ import { blankScenario, livingSeats, updateCard, withMode, withSeat, withThreat,
 import type { CampaignFacts } from "../core/campaign-state.ts";
 import { placeCampaignCard } from "../families/burden/campaign.ts";
 import { snapshotOf } from "../engine/undo.ts";
+import { pushDue } from "../windows/delayed.ts";
 import { attachTo, moveCard, spawn } from "../core/zones.ts";
 import { corsairTrait, stampRoutes } from "../families/sea/routes.ts";
 import { markSideQuests } from "../families/wilderland/night-quest.ts";
@@ -102,7 +103,8 @@ function ownEncounterCopies(state: ScenarioState, owners: readonly { code: strin
   return next;
 }
 
-export function startScenario(input: StartScenario, ctx: ReduceContext): ScenarioState {
+// The table dealt for `input`, before the engine settles anything: `startScenario` (engine/reduce.ts) is the public start and settles a Setup that fires before the opening hands.
+export function dealScenario(input: StartScenario, ctx: ReduceContext): ScenarioState {
   let state = blankScenario({
     seatCount: input.seatCount,
     seed: input.seed,
@@ -198,16 +200,24 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   const quiet: EngineStep[] = [];
   state = searchSetup(state, "player", ctx, quiet);
   state = handSetup(state, ctx, quiet);
-  for (const seat of livingSeats(state)) state = drawOpeningHand(state, seat, quiet, ctx);
-  state = {
-    ...withMode(state, "mulligan"),
-    window: { kind: "mulligan" },
-    activeSeat: state.firstPlayer,
-  };
+  // A player Setup that fires right after the heroes are placed and may ask (The One Ring, vom.the-one-ring) resolves before the hands are drawn.
+  const waiting = pushDue(withMode(state, "openingHands"), "Setup", "beforeOpeningHand", quiet);
+  if (waiting.stack.length > 0) return { ...waiting, undo: snapshotOf(waiting) };
+  state = openMulligan(state, ctx, quiet);
   return {
     ...state,
     undo: snapshotOf(state),
   };
+}
+
+// The opening hands are drawn, and the mulligan opens for the first player (rr.setup, rr.mulligan).
+export function openMulligan(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  let next = state;
+  // Cards a Setup before the hands put into a hand stay there through a mulligan.
+  const held = state.mode === "openingHands" ? livingSeats(state).flatMap((seat) => state.seats[seat]?.hand ?? []) : [];
+  if (held.length > 0) next = { ...next, keptThroughMulligan: held };
+  for (const seat of livingSeats(next)) next = drawOpeningHand(next, seat, steps, ctx);
+  return { ...withMode(next, "mulligan"), window: { kind: "mulligan" }, activeSeat: next.firstPlayer };
 }
 
 export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -269,7 +279,8 @@ function campaignBeforeReveal(state: ScenarioState, ctx: ReduceContext, steps: E
 
 export function mulliganSeat(state: ScenarioState, seat: number, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   let next = unannounceHand(state, seat);
-  for (const id of [...(next.seats[seat]?.hand ?? [])]) next = moveCard(next, id, { zone: "deck", seat });
+  const kept = new Set(state.keptThroughMulligan ?? []);
+  for (const id of [...(next.seats[seat]?.hand ?? [])].filter((held) => !kept.has(held))) next = moveCard(next, id, { zone: "deck", seat });
   const seatState = next.seats[seat];
   if (!seatState) return next;
   const shuffled = shuffleIds(seatState.deck, next.seed, next.seedCursor);
@@ -280,7 +291,8 @@ export function mulliganSeat(state: ScenarioState, seat: number, steps: EngineSt
 // A card of the hand a mulligan shuffles back never entered the player's hand for good: the draw's announcement of it ("Forced: After you draw this card",
 // mec112.poisoned-counsels-searching-eye) is withdrawn, and only the cards of the new hand are announced.
 function unannounceHand(state: ScenarioState, seat: number): ScenarioState {
-  const hand = new Set(state.seats[seat]?.hand ?? []);
+  const kept0 = new Set(state.keptThroughMulligan ?? []);
+  const hand = new Set((state.seats[seat]?.hand ?? []).filter((id) => !kept0.has(id)));
   const kept = (state.pendingEvents ?? []).filter((event) => !(event.trigger === "enteredHand" && event.cardId != null && hand.has(event.cardId)));
   return kept.length === (state.pendingEvents ?? []).length ? state : { ...state, pendingEvents: kept };
 }

@@ -4483,6 +4483,1415 @@
       "misprints": [],
       "readBy": "Claude Code, read from the scan image",
       "confirmedBy": null
+    },
+    {
+      "code": "21001",
+      "side": "A",
+      "printing": "A Shadow in the East",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-One-Ring.jpg",
+        "sha256": "05601247e9e9591f4665aaaeb005c4dd961aa52700ef0112ef50bf35fd8cfe82"
+      },
+      "lines": [
+        "Restricted. Immune to non-Master card effects.",
+        "Setup: Attach to a hero you control and search your deck for a Master card. Add it to your hand and shuffle your deck.",
+        "Your threat elimination level is reduced by 5.",
+        "If The One Ring leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21002",
+      "side": "A",
+      "printing": "A Shadow in the East",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Frodo-Baggins.jpg",
+        "sha256": "aaf3749db2a200426f8ffcc1a570f1b4c2673f2ec9e7ac18d4cc45e37a949c0b"
+      },
+      "lines": [
+        "Response: After Frodo Baggins commits to the quest, spend 1 resource from his resource pool to ready another unique character committed to the quest. If you quest successfully this phase, reduce your threat by 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21003",
+      "side": "A",
+      "printing": "A Shadow in the East",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Merry.jpg",
+        "sha256": "eebe1997bd230467f32f3d12e3246b4ac7fa0a9b48d31a43e2d773954e6cc2b4"
+      },
+      "lines": [
+        "Response: After Merry enters play, each unique ally you control gets +1 Willpower until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21004",
+      "side": "A",
+      "printing": "A Shadow in the East",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Pippin.jpg",
+        "sha256": "23a392ad742bfa3066919c1a2b2df55518c013c984dc0b27098d1241fdbe493e"
+      },
+      "lines": [
+        "Pippin gets +2 Attack while attacking an enemy with an engagement cost higher than your threat.",
+        "Response: After you engage an enemy with an engagement cost higher than your threat, ready Pippin."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21005",
+      "side": "A",
+      "printing": "A Shadow in the East",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Faramir.jpg",
+        "sha256": "9c3e67835058827cbf7ee3debf15ff3d83500b0f358057872f7af69dc2aafd16"
+      },
+      "lines": [
+        "Response: After Faramir enters play, choose a non-unique enemy in the staging area. Engage that enemy and deal 2 damage to it (4 damage instead if it has an attachment on it)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21006",
+      "side": "A",
+      "printing": "A Shadow in the East",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Derufin.jpg",
+        "sha256": "27246fb4cc3ca0297e7c8bf7497bc73a025cb6a0405fe8f15fbbe54406623669"
+      },
+      "lines": [
+        "Ranged.",
+        "Response: After Derufin participates in an attack that destroys an enemy engaged with a player, discard Derufin to reduce the engaged player's threat by X, where X is the destroyed enemy's printed Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21007",
+      "side": "A",
+      "printing": "A Shadow in the East",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Gathering-Storm.jpg",
+        "sha256": "fbda39697f5b29a70b2693ec4e869f82b9f7c44e99e515a6a10ae2c7972edd04"
+      },
+      "lines": [
+        "Planning Action: Search the top 5 cards of the encounter deck for an enemy. Add that enemy to the staging area to reduce the cost of the first ally you play this phase by X, where X is that enemy's Threat. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21008",
+      "side": "A",
+      "printing": "A Shadow in the East",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Put-Off-Pursuit.jpg",
+        "sha256": "1cb5b7233b8bb6e8d058f3e8ce20484093661fca1b396e7c0c7fdd7c93a6b9f6"
+      },
+      "lines": [
+        "Attach to the active location. Limit 1 per location.",
+        "Attached location gets +2 quest points.",
+        "Response: When attached location is explored, discard cards from the encounter deck until a location is discarded. Add that location to the staging area to choose a non-unique enemy in the staging area and shuffle it into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21009",
+      "side": "A",
+      "printing": "A Shadow in the East",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Master-Ring.jpg",
+        "sha256": "917263055b0c14998d6ccc5b649e0ec948135b554fbbb75e9307bedb6ab08591"
+      },
+      "lines": [
+        "Response: Exhaust The One Ring and raise your threat by 1 to cancel the effects of an encounter card just revealed from the encounter deck and discard that card. Then, reveal an encounter card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21010",
+      "side": "A",
+      "printing": "A Shadow in the East",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Ruling-Ring.jpg",
+        "sha256": "db66459edad4a64b24cac3575ea9d7693a751252e2cb9278f0224eaf7a9cfeb4"
+      },
+      "lines": [
+        "Combat Action: Exhaust The One Ring and raise your threat by 1 to choose a non-Nazgûl enemy engaged with you. Until the end of the phase, that enemy cannot attack you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21011",
+      "side": "A",
+      "printing": "A Shadow in the East",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Ring-of-Power.jpg",
+        "sha256": "02eed101ca2360af9a68aeaaebb297b78a38a460446bf71a54f29d9e94eb1610"
+      },
+      "lines": [
+        "Action: Exhaust The One Ring and raise your threat by 1 to ready the hero with The One Ring attached. That hero gets +1 Willpower, +1 Attack, and +1 Defense until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21072",
+      "side": "A",
+      "printing": "A Shadow in the East",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Sméagol.jpg",
+        "sha256": "9c597226b991aefa0f0c5e87e1c87df1c1bc4dbb01fac56724ac6ff6d0a40598"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Setup: Shuffle 2 copies of Stinker into the encounter deck.",
+        "Response: After you travel to a location, raise your threat by 1 to draw 1 card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21074",
+      "side": "A",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/Fellowship-SideA.jpg",
+        "sha256": "793e90e10c7a8888ef1f1ad1e1b7013f218ff02f34592cd349976910d76fd39a"
+      },
+      "lines": [
+        "You cannot play non-unique allies or put non-unique allies into play.",
+        "Forced: When you control exactly 9 unique characters, flip this card over."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "21074",
+      "side": "B",
+      "printing": "ASitE",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/cf207eaa-2897-430e-9988-c557173055b5.B.jpg",
+        "sha256": "c99cd810df5973c3e0dddedd756509a268f769ffc524835a1d19a48e8761e373"
+      },
+      "lines": [
+        "You cannot play allies or put allies into play.",
+        "Each character you control gets +1 Willpower, +1 Attack, and +1 Defense.",
+        "Forced: After a character you control leaves play, flip this card over."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22001",
+      "side": "A",
+      "printing": "Two-Player Limited Edition Starter",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Two-Player-Limited-Edition-Starter/Thorin-Stonehelm.jpg",
+        "sha256": "59d56fc091192a0e0eb6b9cef19f20cb55aef3bba61d7fe8ad1b5b273f0840b3"
+      },
+      "lines": [
+        "Response: After Thorin Stonehelm is declared as an attacker, discard the top card of your deck to deal 1 damage to an enemy engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22002",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Soldier-of-Gondor.jpg",
+        "sha256": "f82ad8c0b8df52ce7a8cabaffb029ab747cab0dce091ddfe9ecdb8441abbc988"
+      },
+      "lines": [
+        "Response: After Soldier of Gondor enters play, search the top 5 cards of your deck for a Gondor ally and add it to your hand (any number of Gondor allies instead if your threat is 40 or higher). Shuffle your deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22003",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Pillars-of-the-Kings.jpg",
+        "sha256": "a9929da6ab19a186abae39d792c21eabd5afcd1875a116816a333b71b0e94701"
+      },
+      "lines": [
+        "While your threat is less than 40, reduce the cost to play Pillars of the Kings by 4.",
+        "Action: Set your threat to 40. If this effect raised your threat, draw a card (draw 4 cards instead if it raised your threat by 10 or more)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22004",
+      "side": "A",
+      "printing": "Wrath and Ruin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Cautious-Halfling.jpg",
+        "sha256": "664ec6e7f1d3607174afbc4c66d080dc1895f0ac28be9b65713c9701b194d31a"
+      },
+      "lines": [
+        "Response: After Cautious Halfling enters play, look at the top card of the encounter deck. If that card is not an enemy, draw a card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22005",
+      "side": "A",
+      "printing": "Wrath and Ruin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Tom-Bombadillo.jpg",
+        "sha256": "999d0ed59e35587d122431e72a51dcba56fe05e15586eb2779f3c3fc774c4616"
+      },
+      "lines": [
+        "Play only if you control a Hobbit hero. You cannot play this card if there is a copy of Tom Bombadillo! in the victory display.",
+        "Planning Action: Add Tom Bombadillo! to the victory display to shuffle a set-aside copy of Tom Bombadil into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22006",
+      "side": "A",
+      "printing": "Wrath and Ruin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Durin's-Axe.jpg",
+        "sha256": "08ff80cd4a2e62cd09b63a75a92137016226e8527c7a6cdaed7315edf59e83aa"
+      },
+      "lines": [
+        "Guarded (enemy). Restricted.",
+        "Attach to a hero. Attached hero gets +2 Attack.",
+        "Response: After attached hero attacks and destroys an enemy, deal 1 damage to an enemy engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22007",
+      "side": "A",
+      "printing": "Wrath and Ruin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Charge-into-Battle.jpg",
+        "sha256": "4b68e172f6cf702d8ad844779bf5d49f53f8fcb8197d092da84b875aa4b63853"
+      },
+      "lines": [
+        "Play only after the staging step.",
+        "Quest Action: You may declare and resolve an attack against each non-unique enemy in the staging area as if it were engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22008",
+      "side": "A",
+      "printing": "Wrath and Ruin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Silver-Circlet.jpg",
+        "sha256": "3d55c69ea640641f3dcee9bcc2a6e1d06ff3f2dd4dbf3440f140afa196c41479"
+      },
+      "lines": [
+        "Attach to a Spirit hero. Limit 1 per hero.",
+        "Restricted.",
+        "Attached hero gets +2 Willpower."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22009",
+      "side": "A",
+      "printing": "Wrath and Ruin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Inner-Strength.jpg",
+        "sha256": "62cd110749a14795c25bbfd9b1d909f1380ac76b8f4c5ae8da65ef9a3183601b"
+      },
+      "lines": [
+        "Attach to the hero with The One Ring.",
+        "Limit 1 per hero. Attached hero gets +1 Defense.",
+        "Response: Exhaust The One Ring and raise your threat by 1 to cancel a shadow effect just triggered during an attack the attached hero is defending."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22010",
+      "side": "A",
+      "printing": "Wrath and Ruin",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/Tom-Bombadil.jpg",
+        "sha256": "f0392673c6c6e6e381f1ec4ecd1e4d9294959ae9910be7c25e8f6b83547b84dd"
+      },
+      "lines": [
+        "Encounter.",
+        "When Revealed: Choose a player. That player gains control of Tom Bombadil, ready and committed to the quest. At the end of the round, remove Tom Bombadil and a copy of Tom Bombadillo! in the victory display from the game. This effect cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22024",
+      "side": "A",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Wrath-and-Ruin/The-Burglar's-Turn-SideA.jpg",
+        "sha256": "ff39620f3c055e2a6dc4fe8f77f31adb4002b6195fe7fd4ba23aae66302439d4"
+      },
+      "lines": [
+        "You cannot include attachments in your deck.",
+        "Setup: Choose 14 different Item or Artifact attachments from your collection and shuffle them together. This is your loot deck. Flip this card over and place your loot deck facedown under it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22024",
+      "side": "B",
+      "printing": "WaR",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/e91aae6d-3708-4580-8598-9ccceb213839.B.jpg",
+        "sha256": "dcc30fbd97bec810e44271840fe89e66ef0b05295974a5f75bed5692037f439c"
+      },
+      "lines": [
+        "The active location gets +1 quest point for each attachment attached to it.",
+        "Forced: After you travel to a location, attach the top card of your loot deck faceup to that location as a guarded objective. If that attachment has the guarded X keyword, ignore it.",
+        "Forced: When the active location is explored, you may put each guarded attachment on that location into play at no cost, or add it to your hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22027",
+      "side": "A",
+      "printing": "Riders of Rohan",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Lothíriel.jpg",
+        "sha256": "2e7bda598cae69384a1846f0bc536db247d58cef42e085fd924ab9ac6c423690"
+      },
+      "lines": [
+        "If Éomer is in play, Lothíriel gains the Rohan trait.",
+        "Response: After Lothíriel commits to a quest, choose an ally in your hand. If that ally shares a Trait with her, put that ally into play exhausted and committed to the quest. At the end of the phase, if that ally is still in play, shuffle it into your deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22028",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Angbor-the-Fearless.jpg",
+        "sha256": "6d6279d96b53f8c061fab92aff4929a481e5bd09b583f80add22363f2120e135"
+      },
+      "lines": [
+        "While your threat is 40 or higher, Angbor the Fearless gets +2 Attack and does not exhaust to quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22029",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Need-Drives-Them.jpg",
+        "sha256": "8e6dc27ee700a91097130e87c5a751364d676f379ae4d29a23c07f4807f691bb"
+      },
+      "lines": [
+        "Action: Each player whose threat is 40 or higher readies all characters he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22030",
+      "side": "A",
+      "printing": "The City of Ulfast",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Woodland-Sentry.jpg",
+        "sha256": "dc606f0cb884f4db39f3399f4edad28373234d1636a4507772228ef86c03b7ad"
+      },
+      "lines": [
+        "Response: After you play Woodland Sentry from your hand, choose an enemy or location in play. If there is a copy of that card in the victory display, discard the chosen card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22031",
+      "side": "A",
+      "printing": "The City of Ulfast",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Keen-Longbow.jpg",
+        "sha256": "2ab2fc7485bc7d5a854ffdd2a8752efaf73aad3a0a94080c6e5c32fe3fff505a"
+      },
+      "lines": [
+        "Attach to a Lore hero. Limit 1 per hero.",
+        "Restricted.",
+        "Attached hero gains ranged.",
+        "Response: After attached hero is declared as an attacker against an enemy, discard up to 3 cards from your hand to deal 1 damage to that enemy for each card discarded this way."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22032",
+      "side": "A",
+      "printing": "Riders of Rohan",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/War-Axe.jpg",
+        "sha256": "6448e90c02da04926905844befb2b4f6d0a3b709b6f948e4c5c1362e06ac4d6a"
+      },
+      "lines": [
+        "Attach to a Tactics character. Limit 1 per character.",
+        "Restricted.",
+        "Attached character gets +1 Attack for each attachment it has with the restricted keyword."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22033",
+      "side": "A",
+      "printing": "The City of Ulfast",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Strength-and-Courage.jpg",
+        "sha256": "fed5d333437ba362664c41e6495b3254453de683cb65980622fd0713c70dac09"
+      },
+      "lines": [
+        "Attach to the hero with The One Ring.",
+        "Limit 1 per hero. Attached hero gets +1 Attack.",
+        "Response: After attached hero is declared as an attacker, exhaust The One Ring and raise your threat by 1 to double attached hero's printed Attack for this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22034",
+      "side": "A",
+      "printing": "The City of Ulfast",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Knight-of-Belfalas.jpg",
+        "sha256": "42bf8575cf960e8e24dcefcc4b0f907cdc2550610fb6f629345fa27fe5b12b29"
+      },
+      "lines": [
+        "Response: After Knight of Belfalas enters play, return a Gondor ally from your discard pile to your hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22035",
+      "side": "A",
+      "printing": "Riders of Rohan",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Horn-of-the-Mark.jpg",
+        "sha256": "2310571fb3b617951d48efb2343fb187bfe46e26bab040fe4aa416de71f84857"
+      },
+      "lines": [
+        "Attach to a Rohan hero or Merry. Restricted.",
+        "Response: When a character leaves play, if that character shares at least one trait with the attached hero, exhaust Horn of the Mark to draw 1 card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22036",
+      "side": "A",
+      "printing": "Elves of Lórien",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Elves-of-Lorien/Host-of-Galadhrim.jpg",
+        "sha256": "3f59bc68b25445f592a11914022610031167f37f2d8cea71025c568265e46ef7"
+      },
+      "lines": [
+        "Planning Action: Return each Silvan ally you control to your hand. Then, play each of those allies from your hand one at a time at no cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22049",
+      "side": "A",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-City-of-Ulfast/Forth-The-Three-Hunters-SideA.jpg",
+        "sha256": "86544ccba75d61377eeec40cdfb4465321499282666042a3c3823c57000c8b03"
+      },
+      "lines": [
+        "Your deck cannot include ally cards.",
+        "Each of your heroes can have 1 additional restricted attachment. Reduce the cost of the first restricted attachment you play on each of your heroes each round by 1.",
+        "Refresh Action: If each of your heroes has at least 2 restricted attachments, flip this card over."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22049",
+      "side": "B",
+      "printing": "TCoU",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/4a0d8846-9a30-455e-9bf7-a2f5c77b787b.B.jpg",
+        "sha256": "181718cb440ab37686355bd8d85a5adc2cd12cc7119a90b10c07dbd83799c985"
+      },
+      "lines": [
+        "Each of your heroes can have 1 additional restricted attachment and gets +1 Willpower for each restricted attachment on it.",
+        "Action: Exhaust this card to heal 1 damage from each of your heroes."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22054",
+      "side": "A",
+      "printing": "Challenge of the Wainriders",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Saruman.jpg",
+        "sha256": "97e994b78d0e42c429702df7c21449dbf682d28c1a446aa3138f19e5fdfa0a07"
+      },
+      "lines": [
+        "When a player card effect would reduce your threat by any amount, reduce that amount to 1.",
+        "While playing an event with the printed doomed keyword, Saruman gains the printed Leadership, Spirit, and Tactics icons.",
+        "Response: After you play a card with the doomed keyword, ready Saruman."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22055",
+      "side": "A",
+      "printing": "Challenge of the Wainriders",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Power-of-Command.jpg",
+        "sha256": "2df201a12945fd8a5efcf028c3de4010a76debdf58f3598f0e6bf22113683544"
+      },
+      "lines": [
+        "Attach to the hero with The One Ring.",
+        "Limit 1 per hero. Attached hero gets +1 Willpower.",
+        "Response: After attached hero commits to the quest, exhaust The One Ring and raise your threat by 1 to give each other unique character you control +1 Willpower until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22056",
+      "side": "A",
+      "printing": "Challenge of the Wainriders",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Horns-Horns-Horns.jpg",
+        "sha256": "7a6d0e305e670ea62f9c0fa1898185394805da32b39ac133ea66730d6d6be865"
+      },
+      "lines": [
+        "Doomed 2.",
+        "Action: Each player may put one ally card into play from his hand. At the end of the phase, shuffle each of those allies that are still in play into their owners' decks."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22057",
+      "side": "A",
+      "printing": "Challenge of the Wainriders",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Soldier-of-Isengard.jpg",
+        "sha256": "4c16f7e7e5d4d6d9c0cdcb119ad8269bd92c455ced854ad09f0e351f4e5e206f"
+      },
+      "lines": [
+        "Doomed 2.",
+        "Response: After a player raises his threat from the doomed keyword, give control of Soldier of Isengard to that player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22058",
+      "side": "A",
+      "printing": "Challenge of the Wainriders",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Far-sighted.jpg",
+        "sha256": "e02863cb9d425bcce459cc04aad5dcc55ab15088066b4a2668b5b4e0cb4ef4e9"
+      },
+      "lines": [
+        "Doomed 1.",
+        "Action: Look at the top 5 cards of the encounter deck. Put them back in the same order."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22059",
+      "side": "A",
+      "printing": "Challenge of the Wainriders",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Nori.jpg",
+        "sha256": "f77450e20b8f164bb06fcec9055d5c4538bcb7317a10d9d36d48eb50fa2f78f4"
+      },
+      "lines": [
+        "Response: After Nori participates in an attack that destroys an enemy, put the top card of your discard pile on the bottom of your deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22060",
+      "side": "A",
+      "printing": "Challenge of the Wainriders",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Golden-Belt.jpg",
+        "sha256": "9daaa9aaa4488a60c74e615cd3ce830b04d519d27ebcbcddcf1163954ab6b302"
+      },
+      "lines": [
+        "Attach to a hero. Limit 1 per hero.",
+        "Attached hero can have 1 additional restricted attachment."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22061",
+      "side": "A",
+      "printing": "Challenge of the Wainriders",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Rohirrim-Scout.jpg",
+        "sha256": "b01c9a7285499a3a2bda25388edb85a860f799038d15618a201c29497b40dda3"
+      },
+      "lines": [
+        "Action: Discard Rohirrim Scout to choose a non-unique enemy in the staging area. That enemy does not make engagement checks against you this round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22062",
+      "side": "A",
+      "printing": "Riders of Rohan",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/The-Muster-of-Rohan.jpg",
+        "sha256": "de596e6c6b542573479e97d2fcccbe8b9e87f16012fd80bbf1bcf925fa2aa7cf"
+      },
+      "lines": [
+        "While paying for The Muster of Rohan, each Rohan hero you control is considered to have a Spirit icon.",
+        "Planning Action: Search the top 10 cards of your deck for up to 4 Rohan allies and put them into play. Shuffle your deck. If any of those allies are still in play at the end of the round, discard them."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22063",
+      "side": "A",
+      "printing": "Challenge of the Wainriders",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/Saruman's-Staff.jpg",
+        "sha256": "7bc4b6c368f60be18a1e14bb518d3ae79b98cb5cf2faabe73efb834cbb74d6ca"
+      },
+      "lines": [
+        "Attach to Saruman. Restricted.",
+        "Action: Exhaust Saruman's Staff to (choose one): Reduce the X value of the next Doomed X event you play this phase by 2, or search the top 5 cards of your deck for a Doomed event and add it to your hand. (Shuffle your deck.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22074",
+      "side": "A",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Challenge-of-the-Wainriders/The-Grey-Wanderer-SideA.jpg",
+        "sha256": "2d92c23ca672869efa6519e83af48631fbad476baaf7e4f38e0903b1f97cf212"
+      },
+      "lines": [
+        "You cannot choose more than 1 starting hero.",
+        "Setup: Search your deck for an attachment with a printed cost of 1 and put it into play. Then, flip this card over."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22074",
+      "side": "B",
+      "printing": "CotW",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/ab909b87-a7c0-4841-83e4-84776262e552.B.jpg",
+        "sha256": "b931ecdd5e66bf340f751930074ba842bfd7467b956ef6b26dd3adc765e4ede5"
+      },
+      "lines": [
+        "The first non-unique card you play each planning phase does not require a resource match.",
+        "Action: Exhaust this card and raise your threat by 1 to (choose two): Ready your starting hero, add 2 resources to your starting hero's resource pool, or heal 3 damage from your starting hero."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22081",
+      "side": "A",
+      "printing": "Two-Player Limited Edition Starter",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Two-Player-Limited-Edition-Starter/Gildor-Inglorion.jpg",
+        "sha256": "5d9214c18b9db480105bbcef6d69a9647d83f26384856357ec4e61cdb9d9c535"
+      },
+      "lines": [
+        "Action: Pay 1 resource from Gildor Inglorion's resource pool to choose a player to draw 1 card. (Limit once per round.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22082",
+      "side": "A",
+      "printing": "Under the Ash Mountains",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Wandering-Exile.jpg",
+        "sha256": "a426ddadcef3b0e29ee8a55854ddaaf0cc4b6b5a97065079f31aabe9a135e789"
+      },
+      "lines": [
+        "Response: After Wandering Exile commits to the quest, discard a card from your hand to ready Wandering Exile."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22083",
+      "side": "A",
+      "printing": "Defenders of Gondor",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Defenders-of-Gondor/Valiant-Sword.jpg",
+        "sha256": "721a213919e715c8b8faf40c83dbdd848cc199a90cac7c6c3c6ee436f3e970ff"
+      },
+      "lines": [
+        "Attach to a Noble hero. Limit 1 per hero.",
+        "Restricted.",
+        "Attached hero gets +1 Attack (+2 Attack instead if your threat is 40 or higher)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22084",
+      "side": "A",
+      "printing": "Under the Ash Mountains",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Stone-of-Elostirion.jpg",
+        "sha256": "c8e86a808f12405e5b81c6561dd634a6edbbf94101ac8e96faeeb3e65ccb150a"
+      },
+      "lines": [
+        "Guarded (location). Restricted.",
+        "Attach to a hero. Attached hero gets +2 Willpower.",
+        "You draw 1 additional card during the resource phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22085",
+      "side": "A",
+      "printing": "Under the Ash Mountains",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Well-Preserved.jpg",
+        "sha256": "af3aa02d2604276e388b4217d53b41ad33cf1ef9d2922ff1f7273bfc807db013"
+      },
+      "lines": [
+        "Attach to the hero with The One Ring.",
+        "Limit 1 per hero. Attached hero gets +1 hit point.",
+        "Response: At the beginning of the round, exhaust The One Ring and raise your threat by 1 to heal all damage from attached hero."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22086",
+      "side": "A",
+      "printing": "Under the Ash Mountains",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Northern-Bowmaster.jpg",
+        "sha256": "df50708d86578f902b753d4dba8deb30f9adff9f329084186f86856cec9a2858"
+      },
+      "lines": [
+        "Ranged.",
+        "You cannot play Northern Bowmaster from your hand unless you are engaged with an enemy."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22087",
+      "side": "A",
+      "printing": "Under the Ash Mountains",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Reckless-Attack.jpg",
+        "sha256": "9cce88701fe25833fe344e858e162fbab7263b722c13e31528fd95dbd41c512a"
+      },
+      "lines": [
+        "Doomed 2.",
+        "Action: Each player deals 2 damage to an enemy engaged with him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22088",
+      "side": "A",
+      "printing": "Under the Ash Mountains",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Odo-Proudfoot.jpg",
+        "sha256": "380cf682fc270c446117e1a79fb94eeb585a12a1401a31be263f7e0cafa3ad92"
+      },
+      "lines": [
+        "Response: After Odo Proudfoot enters play, search the top 5 cards of your deck for a Hobbit ally and add it to your hand. Shuffle the other cards back into your deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22089",
+      "side": "A",
+      "printing": "Under the Ash Mountains",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Defiant-Challenge.jpg",
+        "sha256": "c859f06c739503328cdc5cb835cd57187572541b5f0cddc50815a3a4aec47346"
+      },
+      "lines": [
+        "Doomed 2.",
+        "Action: Each player may ready a character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22091",
+      "side": "A",
+      "printing": "Under the Ash Mountains",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Under-the-Ash-Mountains/Council-of-the-Wise.jpg",
+        "sha256": "b5fe8948436095f7c1c33ff160958f10862774567a3650e9160925ac904dc39f"
+      },
+      "lines": [
+        "You cannot include more than 1 copy of a card, by title, in your deck.",
+        "Response: After you play an event from your hand, choose one: reduce your threat by 1, draw 1 card, or add 1 resource to your hero's resource pool. You can only choose each option once per round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22108",
+      "side": "A",
+      "printing": "The Land of Sorrow",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Gwaihir.jpg",
+        "sha256": "9a7293e145bff73c8d2fac2a1cbd75d13e42bf1825800c808b35e9e4404cc441"
+      },
+      "lines": [
+        "Ranged. Sentinel.",
+        "Cannot have restricted attachments. Gwaihir does not ready during the refresh phase.",
+        "Response: After an Eagle ally enters or leaves play, ready Gwaihir. (Limit once per phase.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22109",
+      "side": "A",
+      "printing": "The Land of Sorrow",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Hobbit-Archer.jpg",
+        "sha256": "7d970814734d3b1d1a34d5d844c4ba16f26cc14f864dfe7268c2b0cff1ef4ae7"
+      },
+      "lines": [
+        "Ranged.",
+        "Hobbit Archer gets +1 Attack while attacking an enemy with a higher engagement cost than your threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22110",
+      "side": "A",
+      "printing": "The Land of Sorrow",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Red-Book-of-Westmarch.jpg",
+        "sha256": "b49924ca09e50a7e8e7b6a1cccb72d9b5deb1606f162f302e0f051a69b3074c8"
+      },
+      "lines": [
+        "Attach to a Hobbit hero. Restricted.",
+        "While attached hero is committed to the quest, each Hobbit character gets +1 Willpower.",
+        "Response: After you quest successfully, exhaust Red Book of Westmarch to add 1 resource to attached hero's resource pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22111",
+      "side": "A",
+      "printing": "The Land of Sorrow",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Dale-Messenger.jpg",
+        "sha256": "06899f797a8fe88aa99bcebca0bfbb94b8e2ab06e37e85301d4a26d8e5ceb93b"
+      },
+      "lines": [
+        "Response: After Dale Messenger enters play, choose a player. That player heals 1 damage from each character he controls with a player card attachment."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22112",
+      "side": "A",
+      "printing": "The Land of Sorrow",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Song-of-Healing.jpg",
+        "sha256": "c31f03417f75ec803edc3e1e99e5bdfafdeba06e822e9fd7de5ae527e815484b"
+      },
+      "lines": [
+        "Attach to a hero. Limit 1 per hero.",
+        "Action: Discard 1 card from your hand to heal 1 damage from attached hero. Any player may trigger this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22113",
+      "side": "A",
+      "printing": "The Land of Sorrow",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Eagle-Emissary.jpg",
+        "sha256": "5a7fe9c8881dc14547f4e2bdd1b349e4b4491cfbbf4927eea9abba57c032b52f"
+      },
+      "lines": [
+        "Cannot have restricted attachments.",
+        "Forced: After Eagle Emissary quests successfully, pay 1 Tactics resource or discard it from play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22114",
+      "side": "A",
+      "printing": "The Land of Sorrow",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Bilbo's-Plan.jpg",
+        "sha256": "99ddf6e96ce797307d4171e0ca065eb2d03639189f0fcfdd7cc941845372667f"
+      },
+      "lines": [
+        "Response: After you attack and destroy an enemy, shuffle the encounter discard pile into the encounter deck and discard cards from the top until an enemy is discarded. Add that enemy to the staging area to discard a non-unique location with Threat equal to or less than that enemy's Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22115",
+      "side": "A",
+      "printing": "The Land of Sorrow",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Spare-Pipe.jpg",
+        "sha256": "41b31e887b23b10e0a7b05fe58949838f434f3e36a83dddd94b9a191eba5bbd1"
+      },
+      "lines": [
+        "Attach to a character.",
+        "Attached character gets +1 hit point.",
+        "Response: After you play Spare Pipe, search the top 5 cards of your deck for an event and add it to your hand. Shuffle your deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22116",
+      "side": "A",
+      "printing": "The Land of Sorrow",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Smoke-and-Think.jpg",
+        "sha256": "b8c9606c5c9c8e0579fb93ac5463b6342c54b2058aa18563eb468139edf417c8"
+      },
+      "lines": [
+        "Action: Reduce the cost of the next card you play by 1 for each Pipe you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22117",
+      "side": "A",
+      "printing": "The Land of Sorrow",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Wilyador.jpg",
+        "sha256": "b167319ec0d55c0008b242ecaa4b8cde05a6bbd63c941a469ddb9c9ab5a89c81"
+      },
+      "lines": [
+        "Ranged. Sentinel.",
+        "Cannot have restricted attachments.",
+        "Forced: At the end of the round, discard Wilyador unless the players as a group spend 1 resource."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22134",
+      "side": "A",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Land-of-Sorrow/Messenger-of-the-King-SideA.jpg",
+        "sha256": "38afc1dc5ca1e8df54203a2d56ddea82aadf93e7594a84c26622cadf1fe58fa3"
+      },
+      "lines": [
+        "You cannot choose more than 2 heroes during setup.",
+        "Setup: Choose a non-neutral unique ally from your deck and put it into play. Add the sum of that ally's printed Willpower, Attack, Defense, and hit points to your starting threat. Then, flip this card over and attach it to that ally."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22134",
+      "side": "B",
+      "printing": "TLoS",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/1200dd24-3d0a-485d-baa3-6eac91f87779.B.jpg",
+        "sha256": "71d3b46a4f1e984722b4f1b9692b60838ecb9a26e328ffede1ac3ef024dd7f85"
+      },
+      "lines": [
+        "Attached ally loses the ally card type and gains the hero card type.",
+        "Attached character cannot be readied more than once per phase.",
+        "Messenger of the King is immune to card effects while attached character is in play.",
+        "If attached character leaves play, remove Messenger of the King from the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22137",
+      "side": "A",
+      "printing": "The Fortress of Nurn",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Aragorn.jpg",
+        "sha256": "5b49e4be1fcf6917c1882fd318d36356d75adf515ec0720fbddb7187735cc7c4"
+      },
+      "lines": [
+        "Sentinel.",
+        "Action: Exhaust Aragorn to choose a location in the staging area. Until the end of the phase, that location gets -X Threat, where X is Aragorn's Willpower. If this effect reduces the location's Threat to 0, place 1 progress on it. (Limit once per round.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22138",
+      "side": "A",
+      "printing": "The Fortress of Nurn",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Shining-Shield.jpg",
+        "sha256": "8edc76026000b7fd7f9254aaf06d25d369bb89462544b175ce9c77f2e3560b1a"
+      },
+      "lines": [
+        "Attach to a Noble hero. Limit 1 per hero.",
+        "Restricted.",
+        "Attached hero gets +1 Defense (+2 Defense instead if your threat is 40 or higher)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22139",
+      "side": "A",
+      "printing": "The Fortress of Nurn",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Knowledge-of-the-Enemy.jpg",
+        "sha256": "15920a531c7e7318fac7535842ccc4affef206ebeae98f279bb65ce33a597d76"
+      },
+      "lines": [
+        "Planning Action: Choose a hero you control. Add 1 resource to its resource pool for each enemy engaged with you. You can only play 1 Knowledge of the Enemy each round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22140",
+      "side": "A",
+      "printing": "The Fortress of Nurn",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Haleth.jpg",
+        "sha256": "f2a183f2b69a549e72dfcb48eafeb4af7af1d71a6b5698629694be2003047bbd"
+      },
+      "lines": [
+        "Response: After Haleth quests successfully, search the top 5 cards of your deck for an attachment and add it to your hand. Shuffle your deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22141",
+      "side": "A",
+      "printing": "The Fortress of Nurn",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Woodman-Lore.jpg",
+        "sha256": "b268547de6f8e7186f4f77176300a43e629d4b3c9404e51b146929db250df05a"
+      },
+      "lines": [
+        "Action: Ready up to X Woodman characters you control, where X is the number of locations with player card attachments."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22142",
+      "side": "A",
+      "printing": "Riders of Rohan",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Riders-of-Rohan/Westfold-Lancer.jpg",
+        "sha256": "eb5b78cea2debe617699d45952e1ebc8a8ccbd7590b3608d618974a5e453328a"
+      },
+      "lines": [
+        "Response: After Westfold Lancer quests successfully, discard it to choose a non-unique enemy in the staging area. Deal 2 damage to the chosen enemy."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22143",
+      "side": "A",
+      "printing": "The Fortress of Nurn",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Tireless-Thoroughbred.jpg",
+        "sha256": "c78855a9c5547492bce424129f564c9e7980902bf4a4f3fc184536aa70d4dc17"
+      },
+      "lines": [
+        "Attach to a Warrior character.",
+        "Restricted.",
+        "Attached character gains ranged and sentinel."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22144",
+      "side": "A",
+      "printing": "The Fortress of Nurn",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Misty-Mountain-Journeyman.jpg",
+        "sha256": "823f6d6bec59a570ea75cd0526412ebbc36146de72b3c1c044ab317f6cb42bc9"
+      },
+      "lines": [
+        "You cannot play Misty Mountain Journeyman from your hand unless you are engaged with an enemy."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22145",
+      "side": "A",
+      "printing": "The Fortress of Nurn",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/A-Desperate-Path.jpg",
+        "sha256": "43cc4a31eda1e715c989311cc001b407835a6e83d7d16403ead70245ff2beab4"
+      },
+      "lines": [
+        "Response: At the end of the staging step, discard cards from the top of the encounter deck until you discard a treachery. Resolve its 'when revealed' effects to ready each of your questing characters. Each of your questing characters gets +1 Willpower until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22146",
+      "side": "A",
+      "printing": "The Fortress of Nurn",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Thorongil.jpg",
+        "sha256": "b66a4ede7295b7608c3851d019bf85a90cf65930c706f83d14a73416526fe418"
+      },
+      "lines": [
+        "Attach to a non-Fellowship, non-Baggins hero you control.",
+        "Response: After you attach Thorongil to a hero, search your collection for a different non-Fellowship, non-Baggins version of that hero and attach it to Thorongil. While Thorongil is in play, attached hero gains the game text and resource icon of the attached hero card. If Thorongil leaves play, remove the hero card attached to it from the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "22147",
+      "side": "A",
+      "printing": "The Fortress of Nurn",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fortress-of-Nurn/Bond-of-Friendship.jpg",
+        "sha256": "29f112555b183f7e47774e418e9f73be91031f08af3126aaa0fc2c54fabcd882"
+      },
+      "lines": [
+        "Your deck must be exactly 50 player cards and include exactly 10 cards from each of these four spheres: Leadership, Lore, Spirit, and Tactics. You cannot include more than 2 copies of any card by title in your deck.",
+        "When choosing your starting heroes, you may choose 4 heroes instead of 3. Each of your heroes must belong to a different sphere."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Code, read from the scan image",
+      "confirmedBy": null
     }
   ]
 }

@@ -69,7 +69,7 @@ const DELAY_UNTIL: Readonly<Record<string, string>> = {
   questSucceeded: "if the players quest successfully this phase (never, if they do not)",
   questFailed: "if the players quest unsuccessfully this phase (never, if they do not)",
   endOfAttack: "when the attack ends",
-  startOfGame: "once the opening hands are done, before the first round",
+  beforeOpeningHand: "right after the heroes are placed, before the opening hand is drawn",
   beginningOfTravel: "when the next travel phase begins",
 };
 const CHOOSE_CARDS_WHO: Readonly<Record<string, string>> = { eachSeat: "each player in turn", firstPlayer: "the first player", onePlayer: "each player in turn (the offer ends once one has taken it)" };
@@ -408,6 +408,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   // Only the `different` form is worded (a stage 2 that comes up again, 147002:B:2); Roam Across Rhovanion's each-once order prints as JSON.
   AdvanceToRandomStage: (i, ctx) => (i.different === true && Array.isArray(i.codes) ? { text: `advance to a random stage out of ${i.codes.map(String).join(", ")}, chosen with the game's seed and never the one the quest is at (that stage goes back into the quest deck with no progress and no attachments; the stage reached resolves its When Revealed)${i.stageSet === true ? "" : "; the quest advances at once, by this set alone"}`, read: ["codes", "different", "otherwise", "remove", "stageSet"] } : (FAMILY_TEMPLATES.AdvanceToRandomStage?.(i, ctx) ?? null)),
   WinGame: () => ({ text: "the players win the game", read: [] }),
+  KeepOneCopy: () => ({ text: "if two or more players have a copy of this card set aside, the first player decides which copy is put into play: each other copy is removed from the game and its Setup does not run", read: [] }),
   LoseGame: (i) => ({ text: `the players lose the game${typeof i.reason === "string" ? ` (${i.reason})` : ""}${i.saysHow === true ? " (the loss says whether the card was destroyed or left play another way)" : ""}`, read: ["reason", "saysHow"] }),
   StageDiscarded: (i) => ({ text: `add the discarded ${i.trait != null ? `${str(i.trait)} ` : ""}${plural(str(i.type), 2)} to the staging area`, read: ["type", "trait"] }),
   SearchStageCard: (i) => ({ text: `search for the card with code ${str(i.code)} and add it to the staging area`, read: ["code"] }),

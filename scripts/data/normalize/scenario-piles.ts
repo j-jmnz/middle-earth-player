@@ -52,7 +52,7 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
   const fleet = stepExists("prepareFleet") && (/Fleet/.test(printed?.encounterSet ?? "") || printed?.type === "ship-objective");
   switch (pile) {
     case "setAside":
-      return said(["aside", "putIntoPlay"]) || putEngaged || steps("takeControl", "attach", "prepareStormcallerArea", "attachToDifferentHeroes", "attachToThreatDial", "secrets", "shuffleIntoDecks", "buildUnderworldDeck", "hideOneAside", "shuffleIntoOutOfPlayDecks", "buildRavenDeck", "takeObjectiveHero", "createOrcsArea", "revealRandomAsideObjective") || setAsideBySet || loggedHarad(quest, printed) || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective") || steps("hideLoot", "hideSuspectAndHideout", "buildInvestigationDeck");
+      return said(["aside", "putIntoPlay"]) || putEngaged || steps("takeControl", "attach", "prepareStormcallerArea", "attachToDifferentHeroes", "attachToThreatDial", "secrets", "shuffleIntoDecks", "buildUnderworldDeck", "hideOneAside", "shuffleIntoOutOfPlayDecks", "buildRavenDeck", "takeObjectiveHero", "createOrcsArea", "revealRandomAsideObjective", "placeCircuitObjectives", "attachRandomCaptives", "placeWardensUnderCamps", "putCopyEngagedEachPlayer") || setAsideBySet || loggedHarad(quest, printed) || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective") || steps("hideLoot", "hideSuspectAndHideout", "buildInvestigationDeck");
     case "activeLocation":
       return said(["active"]);
     case "attachedChosen":
@@ -78,7 +78,7 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
     case "stormcallerQuests":
       return stepExists("prepareStormcallerArea");
     case "encounterDeck2":
-      return stepExists("secondDeck", "buildDeck", "setSetsAside") && setAsideBySet;
+      return stepExists("secondDeck", "buildDeck", "setSetsAside", "buildPowerOfMordorDeck") && setAsideBySet;
     // Angmar Awakened's Orc deck: built by the Weather Hills' Setup step.
     case "smaugDeck":
       return stepExists("buildSmaugDeck");

@@ -43,7 +43,7 @@ import { advanceFreed, resolutionStep } from "../quest/stage-reveal.ts";
 import { pushDue } from "../windows/delayed.ts";
 import { crossBoundary } from "../windows/triggers.ts";
 import { constantWin, heldStat, NO_COUNTS } from "../interpret/constants.ts";
-import { finishMulliganChoice, finishSetup, mulliganSeat } from "../setup/setup.ts";
+import { finishMulliganChoice, finishSetup, mulliganSeat, openMulligan } from "../setup/setup.ts";
 import { attackResumes, discardShadows, resolveAttack, resumeAttack } from "../combat/shadow.ts";
 import { stepWindow, stepWindowResumes } from "./step-window.ts";
 import { areaSeats } from "../families/breaking/areas.ts";
@@ -216,9 +216,12 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
   const phaseOver = phaseEnds(state);
   if (phaseOver) return phaseOver;
   switch (state.mode) {
+    // A Setup that fires before the opening hands (The One Ring) has resolved: the hands are drawn and the mulligan opens (setup/setup.ts).
+    case "openingHands":
+      return openMulligan(state, ctx, steps);
     case "afterOpening": {
-      // A Setup that waits for the opening hands (The One Ring: attach it to a hero, search the deck) resolves first.
-      const waiting = pushDue(state, "Setup", "startOfGame", steps);
+      // A Setup entry still waiting here (a checkpoint saved before The One Ring's Setup moved ahead of the opening hands, state-version.ts) resolves first.
+      const waiting = pushDue(state, "Setup", "beforeOpeningHand", steps);
       return waiting !== state ? waiting : finishSetup(state, ctx, steps);
     }
     case "beginRound":

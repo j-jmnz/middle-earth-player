@@ -106,6 +106,17 @@ export const RULE_PDFS = [
     ["dcg", "mec60_web_the_dungeons_of_cirith-rules.pdf"],
     ["cop", "mec61_web_the_crossing_of_poros-rules.pdf"],
   ].map(([doc, file]) => ({ doc: doc as string, file: file as string, url: `${FFG}/${file as string}` })),
+  // The Vengeance of Mordor cycle's rules insert (A Shadow in the East, MEC77, three scenarios) and the Adventure Pack rulesheets (MEC78 to MEC83): the scenario's encounter sets, its setup paragraph and the keywords it introduces.
+  // The FFG host has no copy under a name we know; Hall of Beorn's S3 host serves the PDFs (as it does `rr`). All seven are scans, so each is hand-read (`handRead` in data/rules/columns.json): MEC77 to MEC80 carry an OCR text layer with wrong words, MEC81 to MEC83 only outlines.
+  ...[
+    ["asite", "MEC77.pdf"],
+    ["war", "MEC78.pdf"],
+    ["tcou", "MEC79.pdf"],
+    ["cotw", "MEC80.pdf"],
+    ["utam", "MEC81.pdf"],
+    ["tlos", "MEC82.pdf"],
+    ["tfon", "MEC83.pdf"],
+  ].map(([doc, file]) => ({ doc: doc as string, file: file as string, url: `https://hallofbeorn-resources.s3.amazonaws.com/Images/LotR/Rules/${file as string}` })),
 ] as const;
 
 // PDFs stay out of git. They are fetched into .cache/pdf and pinned by sha256 in data/sources.json.

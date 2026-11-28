@@ -175,11 +175,11 @@ const delaySchema = z.strictObject({
   verb: z.literal("Delay"),
   // `questSucceeded`: when the players quest successfully this phase, and never if they do not ("If the players quest
   // successfully, deal 1 damage to that enemy", 19112:A:1).
-  // `startOfGame`: once the opening hands and mulligans are done, before the first round (a Setup that needs the players to choose).
+  // `beforeOpeningHand`: right after the starting heroes are placed, before the opening hand is drawn (a Setup that needs the players to choose: The One Ring, vom.the-one-ring).
   // `beginningOfTravel`: when the next travel phase begins ("advance to stage 3B at the beginning of the travel phase", 148004:B:2; rr.delayed-effects).
   // `questFailed`: when the players quest unsuccessfully this phase, and never if they do not ("If the players quest unsuccessfully this phase,
   // put the Nazgûl of Dol Guldur into play", 900307:A:1; rr.step-3-4).
-  until: z.enum(["endOfPhase", "endOfRound", "questSucceeded", "questFailed", "endOfAttack", "startOfGame", "beginningOfTravel"]),
+  until: z.enum(["endOfPhase", "endOfRound", "questSucceeded", "questFailed", "endOfAttack", "beforeOpeningHand", "beginningOfTravel"]),
   uncancelable: conditionSchema.optional(),
   // With `endOfPhase`: the named phase, not the one running now ("At the end of the quest phase", 131073:A:1; revealed in another phase it waits for the next quest phase).
   phase: z.literal("Quest").optional(),

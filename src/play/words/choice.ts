@@ -233,12 +233,13 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
 }
 
 /** Where an out-of-play card is, for an option that names one copy among several: "Ringwraith set aside", "Old Bridge from the encounter deck". */
-export function outOfPlayLabel(game: ScenarioState, cardId: string, names: ChoiceNames): string {
+export function outOfPlayLabel(game: ScenarioState, cardId: string, names: ChoiceNames, owner?: string | null): string {
   const card = game.cards[cardId];
   const name = card ? names.code(card.code) : cardId;
   switch (card?.zone) {
+    // `owner` is the sheet's ownerTag: set when the options hold the copies of more than one player (The One Ring's Setup), so two players' copies do not read alike.
     case "setAside":
-      return `${name} set aside`;
+      return owner != null ? `${name} of ${owner}` : `${name} set aside`;
     case "encounterDeck":
       return `${name} from the encounter deck`;
     case "encounterDiscard":

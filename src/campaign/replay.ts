@@ -1,6 +1,4 @@
-import type { EngineStep, PlayerIntent, ReduceContext, ScenarioState } from "../rules/engine/reduce.ts";
-import { reduce } from "../rules/engine/reduce.ts";
-import { startScenario, type StartScenario } from "../rules/setup/setup.ts";
+import { reduce, startScenario, type EngineStep, type PlayerIntent, type ReduceContext, type ScenarioState, type StartScenario } from "../rules/engine/reduce.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
 import { migrateState, restoredState, STATE_VERSION, type StoredState } from "../rules/engine/state-version.ts";
 import { CATALOG_VERSION } from "../catalog/version.ts";

@@ -1,7 +1,7 @@
 // Rules: rr.action, rr.response, rr.cost, rr.limits, rr.triggered-ability, rr.ready, rr.search, rr.quest-phase, rr.doomed-x,
 // rr.play-restrictions-and-permissions, rr.engaged, rr.hero-cards, rr.the-word-choose, rr.deckbuilding (data/rules/entries.json).
 // The Under the Ash Mountains heroes, allies, events and contract, written from their card text (data/cards/UtAM.json; data/printed holds
-// no ledger for this pack, so the lines are the text of data/cards and every intent goes through sendUnledgered): Gildor Inglorion
+// the pack's ledger, so every line is checked against it): Gildor Inglorion
 // 22081:A:1, Wandering Exile 22082:A:1, Northern Bowmaster 22086:A:2, Reckless Attack 22087:A:2, Odo Proudfoot 22088:A:1, Defiant
 // Challenge 22089:A:2, Helm of Secrecy 22090:A:1 and A:2, Council of the Wise 22091:A:1. The attachments are in
 // under-the-ash-mountains-attachments.test.ts.
@@ -16,8 +16,8 @@ import { updateCard } from "../../rules/core/state.ts";
 import { starterBase } from "../../../test/scenarios/a-shadow-of-the-past/starter-scene.ts";
 import { loadPrinted } from "../../../test/harness/catalog.ts";
 import { lineSpec } from "../../../test/harness/line-spec.ts";
-import { begin, idsOf } from "../../../test/harness/scene.ts";
-import { canPlay, choices, deckSaveFacts, endRound, fillers, hosts, packRow, play, playerTableFor, sendUnledgered, triggers } from "../../../test/harness/player-table.ts";
+import { begin, idsOf, send } from "../../../test/harness/scene.ts";
+import { canPlay, choices, deckSaveFacts, endRound, fillers, hosts, packRow, play, playerTableFor, triggers } from "../../../test/harness/player-table.ts";
 
 const GILDOR = "22081";
 const EXILE = "22082";
@@ -72,9 +72,9 @@ describe("Gildor Inglorion (22081:A:1)", () => {
     const tab = gildor(effects);
     const id = idsOf(tab, GILDOR);
     expect(triggers(tab.state, tab)).toContain("22081:action:1");
-    let run = sendUnledgered(begin(tab.state), { type: "Trigger", cardId: id, effectId: "22081:action:1", payments: [{ heroId: id, amount: 1 }] }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Trigger", cardId: id, effectId: "22081:action:1", payments: [{ heroId: id, amount: 1 }] }, tab.ctx);
     expect(choices(run.state, tab)).toEqual(["seat:0", "seat:1"]);
-    run = sendUnledgered(run, { type: "Choose", optionId: "seat:1" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "seat:1" }, tab.ctx);
     expect(run.state.seats[1]?.hand).toHaveLength(1);
     expect(run.state.seats[0]?.hand).toHaveLength(0);
     expect(run.state.cards[id]?.resources).toBe(6 - 1);
@@ -102,12 +102,12 @@ describe("Wandering Exile (22082:A:1)", () => {
     const tab = exile(effects, 2);
     const id = idsOf(tab, EXILE);
     const [kept, thrown] = [idsOf(tab, CARD), idsOf(tab, MAN)];
-    let run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [id] }, tab.ctx);
+    let run = send(begin(tab.state), { type: "Commit", cardIds: [id] }, tab.ctx);
     expect(run.state.cards[id]).toMatchObject({ committed: true, exhausted: true });
     expect(triggers(run.state, tab)).toContain("22082:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: id, effectId: "22082:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: id, effectId: "22082:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([kept, thrown].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: thrown }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: thrown }, tab.ctx);
     expect(run.state.seats[0]?.hand).toEqual([kept]);
     expect(run.state.seats[0]?.discard).toEqual([thrown]);
     expect(run.state.cards[id]).toMatchObject({ committed: true, exhausted: false });
@@ -116,7 +116,7 @@ describe("Wandering Exile (22082:A:1)", () => {
   // With an empty hand the cost cannot be paid: no Response.
   it("22082:A:1 Wandering Exile: not offered with an empty hand", () => {
     const tab = exile(EFFECTS, 0);
-    const run = sendUnledgered(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, EXILE)] }, tab.ctx);
+    const run = send(begin(tab.state), { type: "Commit", cardIds: [idsOf(tab, EXILE)] }, tab.ctx);
     expect(run.state.cards[idsOf(tab, EXILE)]?.committed).toBe(true);
     expect(triggers(run.state, tab)).not.toContain("22082:response:1");
   });
@@ -144,7 +144,7 @@ describe("Reckless Attack (22087:A:2)", () => {
     const [first = "", second = "", theirs = ""] = tab.ids[WALL] ?? [];
     let run = play(begin(tab.state), tab, idsOf(tab, RECKLESS));
     expect(choices(run.state, tab).sort()).toEqual([first, second].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: second }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: second }, tab.ctx);
     expect(run.state.window?.kind).not.toBe("choose");
     expect(run.state.cards[second]?.damage).toBe(2);
     expect(run.state.cards[first]?.damage).toBe(0);
@@ -168,9 +168,9 @@ describe("Odo Proudfoot (22088:A:1)", () => {
     const deck = tab.state.seats[0]?.deck ?? [];
     let run = play(begin(tab.state), tab, odo);
     expect(triggers(run.state, tab)).toContain("22088:response:1");
-    run = sendUnledgered(run, { type: "Trigger", cardId: odo, effectId: "22088:response:1" }, tab.ctx);
+    run = send(run, { type: "Trigger", cardId: odo, effectId: "22088:response:1" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, HOBBIT), idsOf(tab, HOBBIT_TWO)].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, HOBBIT_TWO) }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: idsOf(tab, HOBBIT_TWO) }, tab.ctx);
     expect(run.state.seats[0]?.hand).toEqual([idsOf(tab, HOBBIT_TWO)]);
     const left = deck.filter((id) => id !== idsOf(tab, HOBBIT_TWO));
     expect([...(run.state.seats[0]?.deck ?? [])].sort()).toEqual([...left].sort());
@@ -188,11 +188,11 @@ describe("Defiant Challenge (22089:A:2)", () => {
     const tab = { ...placed, state };
     let run = play(begin(tab.state), tab, idsOf(tab, DEFIANT));
     expect(choices(run.state, tab).sort()).toEqual(["ready", "skip"]);
-    run = sendUnledgered(run, { type: "Choose", optionId: "ready" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "ready" }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual([idsOf(tab, ARAGORN), idsOf(tab, ALLY)].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: idsOf(tab, ALLY) }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: idsOf(tab, ALLY) }, tab.ctx);
     expect(choices(run.state, tab).sort()).toEqual(["ready", "skip"]);
-    run = sendUnledgered(run, { type: "Choose", optionId: "ready" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "ready" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, ALLY)]?.exhausted).toBe(false);
     expect(run.state.cards[idsOf(tab, ARAGORN)]?.exhausted).toBe(true);
     expect(run.state.cards[idsOf(tab, PAL)]?.exhausted).toBe(false);
@@ -205,8 +205,8 @@ describe("Defiant Challenge (22089:A:2)", () => {
     for (const code of [ALLY, PAL]) state = updateCard(state, idsOf(placed, code), { exhausted: true });
     const tab = { ...placed, state };
     let run = play(begin(tab.state), tab, idsOf(tab, DEFIANT));
-    run = sendUnledgered(run, { type: "Choose", optionId: "skip" }, tab.ctx);
-    run = sendUnledgered(run, { type: "Choose", optionId: "ready" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "skip" }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: "ready" }, tab.ctx);
     expect(run.state.cards[idsOf(tab, ALLY)]?.exhausted).toBe(true);
     expect(run.state.cards[idsOf(tab, PAL)]?.exhausted).toBe(false);
   });
@@ -239,13 +239,13 @@ describe("Helm of Secrecy (22090:A:1, A:2)", () => {
     const tab = { ...placed, state: updateCard(placed.state, beravor, { damage: 2 }) };
     let run = play(begin(tab.state), tab, idsOf(tab, HELM));
     expect(choices(run.state, tab).sort()).toEqual([aragorn, beravor].sort());
-    run = sendUnledgered(run, { type: "Choose", optionId: beravor }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: beravor }, tab.ctx);
     expect(run.state.cards[beravor]).toMatchObject({ damage: 0, resources: 0 });
     const offered = choices(run.state, tab).map((id) => tab.ctx.cards.get(run.state.cards[id]?.code ?? ""));
     expect(offered.length).toBeGreaterThan(1);
     expect(offered.every((card) => card?.type === "hero" && (card.threat ?? 99) <= 10 && card.sphere !== "fellowship" && card.sphere !== "baggins" && card.name !== "Beravor")).toBe(true);
     const eowyn = choices(run.state, tab).find((id) => run.state.cards[id]?.code === EOWYN) ?? "";
-    run = sendUnledgered(run, { type: "Choose", optionId: eowyn }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: eowyn }, tab.ctx);
     expect(run.state.seats[0]?.heroes).toEqual([aragorn, eowyn]);
     expect(run.state.cards[steward]?.host).toBe(eowyn);
     expect(run.state.cards[beravor]?.zone).toBe("removed");
@@ -259,9 +259,9 @@ describe("Helm of Secrecy moves another player's attachment (22090:A:2)", () => 
     const [beravor, spyglass] = [idsOf(placed, BERAVOR), idsOf(placed, SPYGLASS)];
     const tab = { ...placed, state: updateCard(placed.state, spyglass, { owner: 1 }) };
     let run = play(begin(tab.state), tab, idsOf(tab, HELM));
-    run = sendUnledgered(run, { type: "Choose", optionId: beravor }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: beravor }, tab.ctx);
     const eowyn = choices(run.state, tab).find((id) => run.state.cards[id]?.code === EOWYN) ?? "";
-    run = sendUnledgered(run, { type: "Choose", optionId: eowyn }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: eowyn }, tab.ctx);
     expect(run.state.cards[spyglass]).toMatchObject({ host: eowyn, zone: "play" });
   });
 });
@@ -272,9 +272,9 @@ describe("Helm of Secrecy leaves a Permanent attachment behind (22090:A:2)", () 
     const tab = table(EFFECTS, { heroes: [{ code: ARAGORN, seat: 0 }, { code: BERAVOR, seat: 0 }], attached: [{ code: INTIMIDATION, host: BERAVOR }, { code: STEWARD, host: BERAVOR }], hand: [{ code: HELM, seat: 0 }] });
     const [beravor, boon, steward] = [idsOf(tab, BERAVOR), idsOf(tab, INTIMIDATION), idsOf(tab, STEWARD)];
     let run = play(begin(tab.state), tab, idsOf(tab, HELM));
-    run = sendUnledgered(run, { type: "Choose", optionId: beravor }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: beravor }, tab.ctx);
     const eowyn = choices(run.state, tab).find((id) => run.state.cards[id]?.code === EOWYN) ?? "";
-    run = sendUnledgered(run, { type: "Choose", optionId: eowyn }, tab.ctx);
+    run = send(run, { type: "Choose", optionId: eowyn }, tab.ctx);
     expect(run.state.cards[boon]?.zone).toBe("removed");
     expect(run.state.cards[eowyn]?.attachments).not.toContain(boon);
     expect(run.state.cards[steward]).toMatchObject({ host: eowyn, zone: "play" });
