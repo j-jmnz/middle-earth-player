@@ -6,7 +6,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import { settle } from "../../engine/machine.ts";
 import { pileOf } from "../../core/piles.ts";
-import { startScenario } from "../../setup/setup.ts";
+import { startScenario } from "../../engine/reduce.ts";
 import { fixtureDefinition } from "../../core/test-fixture.ts";
 import { moveCard, spawn } from "../../core/zones.ts";
 import type { ScenarioState } from "../../core/state.ts";

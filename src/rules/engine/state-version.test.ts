@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { cardMap, codes, expectOk, fixtureDefinition, hero } from "../core/test-fixture.ts";
 import { definePrinted } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";
+import type { StoredState } from "./state-version.ts";
 import { reduce, startScenario } from "./reduce.ts";
 import { checkState, migrateState, restoredState, STATE_MIGRATIONS, STATE_VERSION, storedState } from "./state-version.ts";
 
@@ -44,6 +45,17 @@ describe("the stored state", () => {
     expect(restored.undo.intents).toEqual([]);
     expect(restored.undo.phase).toBe(played.phase);
     if (played.undo.intents.length === 0) expect(restored).toEqual(played);
+  });
+});
+
+describe("the version 1 checkpoint of The One Ring's Setup", () => {
+  const entry = { id: "ring", sourceId: "x", seat: 0, phase: "Setup", instructions: [], uncancelable: null, cause: undefined };
+  it("is migrated to the moment the new engine resolves, and refused while it names an unknown one", () => {
+    const old = { ...storedState(start), delayed: [{ ...entry, until: "startOfGame" }] } as unknown as StoredState;
+    const migrated = migrateState(1, old);
+    expect(migrated?.delayed.map((waiting) => waiting.until)).toEqual(["beforeOpeningHand"]);
+    expect(checkState(restoredState(old), ctx)).toEqual(["a delayed effect waits for startOfGame, which this engine does not know"]);
+    expect(checkState(restoredState(migrated!), ctx)).toEqual([]);
   });
 });
 

@@ -1,4 +1,4 @@
-// Rules: mec109.setup, rr.threat-elimination-level, rr.immune, rr.first-player, rr.ownership-and-control, rr.encounter-deck,
+// Rules: vom.the-one-ring, mec109.setup, rr.threat-elimination-level, rr.immune, rr.first-player, rr.ownership-and-control, rr.encounter-deck,
 // rr.cancel (data/rules/entries.json).
 // The One Ring, the Master cards and the saga heroes of the misc family, run through its real records.
 import { describe, expect, it } from "vitest";
@@ -18,6 +18,7 @@ import { MISC_CARDS, choices, miscCtx } from "./fixture.ts";
 import { play, put, run, seat, send, triggers } from "../play/fixture.ts";
 import { enemy, hero, offered, send as sendIntent, table as defenseTable, until } from "../defense/table.ts";
 import { definePrinted } from "../../core/printed.ts";
+import { checkState, migrateState, restoredState, storedState, type StoredState } from "../../engine/state-version.ts";
 
 // "If The One Ring / Bilbo / Aragorn leaves play, the players lose the game" (21001:A:4, 131001:A:3, 146002:A:3) is a generated record.
 const RECORDS = [...AUTHORED, ...[...POOL_GENERATED_EFFECTS, ...HOBBIT_GENERATED].filter((record) => record.lines.some((line) => line === "21001:A:4" || line === "131001:A:3" || line === "146002:A:3"))];
@@ -66,6 +67,64 @@ describe("The One Ring (21001)", () => {
     expect(next.mode).toBe("mulligan");
     expect(next.window).toMatchObject({ kind: "mulligan" });
     void legalIntents;
+  });
+
+  it("keeps the fetched Master card in the hand through a mulligan, and shuffles back only the cards drawn (vom.the-one-ring, rr.mulligan)", () => {
+    const { state, world } = started(["21001", "master", ...filler]);
+    const [chosen] = choices(state);
+    const opened = expectOk(reduce(state, { type: "Choose", optionId: chosen ?? "" }, world)).state;
+    const drawn = opened.seats[0]?.hand.filter((id) => opened.cards[id]?.code !== "master") ?? [];
+    expect(drawn).toHaveLength(6);
+    const next = expectOk(reduce(opened, { type: "Mulligan" }, world)).state;
+    const hand = next.seats[0]?.hand ?? [];
+    // The Master card, the six cards of the new hand and the Resource phase's draw, which the game reaches at once.
+    expect(hand).toHaveLength(8);
+    expect(hand.filter((id) => next.cards[id]?.code === "master")).toHaveLength(1);
+    expect(next.cards[Object.values(opened.cards).find((card) => card.code === "master")?.id ?? ""]?.zone).toBe("hand");
+  });
+
+  it("resolves each seat's Ring Setup before either seat draws (vom.the-one-ring)", () => {
+    const { state, world } = started(["21001", "master", ...filler], ["dwarf", "rohan"], 2);
+    // Nothing is drawn while the Setup asks.
+    expect(state.mode).toBe("openingHands");
+    expect(state.seats.every((seat) => seat.hand.length === 0)).toBe(true);
+    let next = state;
+    for (let guard = 0; guard < 8 && next.mode === "openingHands"; guard += 1) {
+      const [pick] = choices(next);
+      next = expectOk(reduce(next, { type: "Choose", optionId: pick ?? "" }, world)).state;
+    }
+    // "The first player decides which Ring is put into play" is not built: both copies are attached.
+    expect(Object.values(next.cards).filter((card) => card.code === "21001" && card.zone === "play")).toHaveLength(2);
+    expect(next.mode).toBe("mulligan");
+  });
+
+  it("attaches the Ring and fetches the Master card after Keep for a checkpoint saved when the Setup waited for the start of the game (vom.the-one-ring)", () => {
+    // The old shape: the Ring set aside, its Delay waiting for `startOfGame`, the opening hand drawn and the mulligan open.
+    const { state: plain, world } = started(["master", ...filler]);
+    const ring = spawn(plain, "21001", { zone: "setAside" });
+    const delay = AUTHORED.find((record) => record.id === "21001:setup:1")?.instructions[0];
+    if (delay?.verb !== "Delay") throw new Error("The Ring's Setup is not a Delay");
+    const old = { ...ring.state, delayed: [{ id: "d0:0", until: "startOfGame", sourceId: ring.id, seat: 0, phase: "Setup", instructions: delay.instructions, uncancelable: null }] };
+    expect(plain.mode).toBe("mulligan");
+    const stored = JSON.parse(JSON.stringify(storedState(old as unknown as ScenarioState))) as StoredState;
+    const migrated = migrateState(1, stored);
+    expect(migrated).not.toBeNull();
+    const restored = restoredState(migrated!);
+    expect(checkState(restored, world)).toEqual([]);
+    let next = expectOk(reduce(restored, { type: "Keep" }, world)).state;
+    if (next.window?.kind === "choose") next = expectOk(reduce(next, { type: "Choose", optionId: choices(next)[0] ?? "" }, world)).state;
+    expect(Object.values(next.cards).find((card) => card.code === "21001")).toMatchObject({ zone: "play" });
+    expect(Object.values(next.cards).find((card) => card.code === "master")?.zone).toBe("hand");
+  });
+
+  it("carries the steps of a Setup that asked nothing into the first intent's steps (vom.the-one-ring)", () => {
+    const { state, world } = started(["21001", "master", ...filler], ["dwarf"]);
+    // One hero, one Master card: nothing is asked, so the table opens on the mulligan with the Ring attached.
+    expect(state.window).toMatchObject({ kind: "mulligan" });
+    expect(state.openingSteps?.length).toBeGreaterThan(0);
+    const result = expectOk(reduce(state, { type: "Keep" }, world));
+    expect(result.steps.slice(0, state.openingSteps?.length)).toEqual(state.openingSteps);
+    expect(result.state.openingSteps).toBeUndefined();
   });
 
   it("lowers the threat elimination level by 5 (21001:A:3)", () => {

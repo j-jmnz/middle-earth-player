@@ -5,7 +5,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
 import { gameReads } from "../../core/game-reads.ts";
-import { flagged, inPlay, updateCard, type CardInstance, type ScenarioState } from "../../core/state.ts";
+import { flagged, inPlay, phaseOf, updateCard, type CardInstance, type ScenarioState } from "../../core/state.ts";
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { restricted } from "../../interpret/restrictions.ts";
@@ -72,7 +72,7 @@ export function moveVillagerTokens(state: ScenarioState, instruction: Move, focu
 export function advanceWithoutVillagers(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const stage = state.questStage;
   if (state.modifiers.length === 0 || !gameReads(state, ctx, '"advancesWithoutVillagers"')) return state;
-  if (state.mode === "mulligan" || state.mode === "afterOpening" || state.lost || state.stageCleared || state.stack.length > 0 || state.pendingAttack || state.pendingStrike || !stage || !flagged(state, stage, "advancesWithoutVillagers")) return state;
+  if (phaseOf(state.mode) === "Setup" || state.mode === "mulligan" || state.lost || state.stageCleared || state.stack.length > 0 || state.pendingAttack || state.pendingStrike || !stage || !flagged(state, stage, "advancesWithoutVillagers")) return state;
   if ((state.cards[stage]?.resources ?? 0) > 0 || (state.pendingEvents?.length ?? 0) > 0 || restricted(state, ctx, "advance").length > 0) return state;
   return advanceNow(state, ctx, steps);
 }

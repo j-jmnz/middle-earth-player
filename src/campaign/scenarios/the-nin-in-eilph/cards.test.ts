@@ -11,8 +11,7 @@ import { definePrinted, type PrintedCard } from "../../../rules/core/printed.ts"
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
 import { legalIntents } from "../../../rules/engine/legal.ts";
 import type { EngineStep, PlayerIntent } from "../../../rules/core/intents.ts";
-import { startScenario } from "../../../rules/setup/setup.ts";
-import { reduce } from "../../../rules/engine/reduce.ts";
+import { reduce, startScenario } from "../../../rules/engine/reduce.ts";
 import { eilphStart, eilphWorld } from "../../../../test/scenarios/the-nin-in-eilph/game.ts";
 import { fightEnemy, finish, idOf, resolveRecords, run, send, statOf, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
