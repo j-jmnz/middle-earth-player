@@ -76,7 +76,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 07029 Mugash's Lair. Forced: at the beginning of the encounter phase each player reveals the top card of his out-of-play deck; an enemy joins the staging area, any other card is discarded. Shadow: the defending player discards an attachment he controls.
   { id: "07029:forced:1", cardCode: "07029", lines: ["07029:A:1"], timing: "forced", trigger: "beginningOfPhase", condition: { kind: "phase", is: "Encounter" }, instructions: [EACH_PLAYER([{ verb: "RevealOutOfPlay", amount: 1 }])] },
-  { id: "07029:shadow:1", cardCode: "07029", lines: ["07029:A:2"], timing: "shadow", instructions: [{ verb: "Pick", pick: { type: "attachment", control: "you", controlled: true } }, { verb: "Discard", target: { kind: "picked" } }] },
+  { id: "07029:shadow:1", cardCode: "07029", lines: ["07029:A:2"], timing: "shadow", instructions: [{ verb: "Pick", pick: { type: "attachment", control: "you" } }, { verb: "Discard", target: { kind: "picked" } }] },
 
   // 07030 Orc Territory. When Revealed: each player adds a location from the deck or the discard pile to the staging area and the deck is shuffled; if the staging area's total Threat is below the total Willpower committed, each engaged Orc attacks.
   {

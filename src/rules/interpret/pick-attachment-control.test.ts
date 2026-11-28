@@ -1,4 +1,4 @@
-// Rules: rr.attachment-cards (data/rules/entries.json); "an attachment you control" (shadow lines of 142071:A:3, 50919:A:3, 50727:A:2 and the like).
+// Rules: rr.ownership-and-control (data/rules/entries.json); "an attachment you control" (shadow lines of 142071:A:3, 50919:A:3, 50727:A:2 and the like).
 // A player controls the player cards he plays and no encounter card: an encounter attachment on an enemy engaged with him is not "an attachment you control".
 import { describe, expect, it } from "vitest";
 
@@ -24,7 +24,7 @@ function scene() {
 }
 const pick = (t: ReturnType<typeof scene>["t"], spec: PickSpec, seat: number) => pickCandidates(t.state, spec, seat, [], null, t.ctx);
 
-describe("an attachment you control (rr.attachment-cards)", () => {
+describe("an attachment you control (rr.ownership-and-control)", () => {
   it("leaves out an encounter attachment on an enemy engaged with the player", () => {
     const { t, encounter, player } = scene();
     expect(encounter).not.toBe("");
