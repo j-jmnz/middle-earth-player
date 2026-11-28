@@ -153,13 +153,13 @@ Scenario piles that place cards with no record (quest: 04138 Nearing the Gate; q
 04148:A:1 (front): When Revealed: Each player must discard 1 attachment he controls, if able.
   04148:whenRevealed:1: When revealed
     - for each player, first player first:
-      - choose attachment (you control) that a player controls (not an encounter attachment)
+      - choose attachment (you control)
       - discard the picked card
 
 04148:A:2 (shadow): Shadow: If attacking enemy is Durin's Bane, the defending player discards all attachments he controls.
   04148:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
-    - if the attacking enemy is a enemy (any player controls) named "Durin's Bane": the acting player discards each attachment (you control) that a player controls (not an encounter attachment)
+    - if the attacking enemy is a enemy (any player controls) named "Durin's Bane": the acting player discards each attachment (you control)
 
 ## 04149 Leaping Flame
 (the scenario deals it into the encounter pile; the piles place it, no record does)

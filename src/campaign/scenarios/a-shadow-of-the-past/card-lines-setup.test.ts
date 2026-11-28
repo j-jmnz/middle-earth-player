@@ -7,6 +7,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../../../effects/index.ts";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { reduce, startScenario, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
+import { pickCandidates } from "../../../rules/interpret/pick.ts";
 import { heroLimitExempt } from "../../../rules/interpret/restrictions.ts";
 import { spawn } from "../../../rules/core/zones.ts";
 import { buildStart } from "../../start.ts";
@@ -85,6 +86,19 @@ describe("141085 The One Ring", () => {
     expect(state.cards[idOf(state, UNDERHILL)]?.controller).toBe(1);
     // The hero without The One Ring stays where it was.
     expect(state.seats[0]?.heroes).toContain(made.hero2);
+  });
+
+  // rr.ownership-and-control: encounter cards are under the control of the scenario, so a Condition on the Ring-bearer keeps no controller when the token passes, and "an attachment you control" does not name it.
+  it("141085:A:2 an encounter attachment on the Ring-bearer keeps no controller when the token passes, and a Shadow pick of an attachment you control does not offer it", () => {
+    const made = table({ seats: 2, phase: "Combat", heroResources: 2, attached: [{ code: RING, to: "dh1" }, { code: UNDERHILL, to: "dh1" }, { code: "attachment", to: "dh1", encounter: true }], deck: ["f0", "f0"] });
+    const condition = Object.values(made.state.cards).find((card) => card.code === "attachment")?.id ?? "";
+    expect(made.state.cards[condition]?.controller ?? null).toBeNull();
+    const state = toNextRound(made);
+    expect(state.seats[1]?.heroes).toContain(made.hero);
+    expect(state.cards[condition]?.host).toBe(made.hero);
+    expect(state.cards[condition]?.controller ?? null).toBeNull();
+    expect(state.cards[idOf(state, UNDERHILL)]?.controller).toBe(1);
+    expect(pickCandidates(state, { type: "attachment", control: "you" }, 1, [], null, made.ctx)).not.toContain(condition);
   });
 });
 

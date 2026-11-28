@@ -20,8 +20,8 @@ const DESTROYED_A_CHARACTER: Condition = { kind: "x", min: 1 };
 const EASTERLING_ATTACHMENTS = { type: "attachment", control: "any", attachedTo: "source", trait: "Easterling" } as const satisfies PickSpec;
 // "An Easterling enemy in play (staging area or engaged) without the attachment": the candidates of an Easterling treachery that attaches itself when revealed; the first player chooses among those the stat leaves tied.
 const CANDIDATE = (title: string, narrowed: Partial<PickSpec>): PickSpec => ({ type: "enemy", control: "any", staging: true, trait: "Easterling", hasAttachment: { names: [title], none: true }, who: "firstPlayer", ...narrowed });
-// "An attachment you control": `controlled` leaves out an encounter attachment (an Easterling treachery on an enemy, no controller), which a bare `control: "you"` filter sees.
-const OWN_ATTACHMENT: PickSpec = { type: "attachment", control: "you", controlled: true };
+// "An attachment you control": the `you` filter leaves out an encounter attachment (an Easterling treachery on an enemy, no controller).
+const OWN_ATTACHMENT: PickSpec = { type: "attachment", control: "you" };
 const READY_CHARACTER: PickSpec = { type: "character", control: "you", state: "ready" };
 const EXHAUSTED_HERO: PickSpec = { type: "hero", control: "you", state: "exhausted" };
 const EASTERLING_IN_STAGING: PickSpec = { type: "enemy", control: "any", stagingOnly: true, trait: "Easterling" };

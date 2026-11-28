@@ -25,7 +25,7 @@ const CANNOT_DEFEAT_UNLESS = (right: number | { players: true; plus: number }): 
 const ENGAGED_PLAYER_RAISED: Condition = { kind: "engagedWithActor" };
 // "The ally in play with the highest Attack": the first player chooses among those tied (21039:A:1).
 const HIGHEST_ALLY: PickSpec = { type: "ally", control: "any", highestAttack: true, who: "firstPlayer" };
-const OWN_ATTACHMENT: PickSpec = { type: "attachment", control: "you", controlled: true };
+const OWN_ATTACHMENT: PickSpec = { type: "attachment", control: "you" };
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   [

@@ -211,9 +211,10 @@ export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 63, scenarios: "all", note: "A card that prints Immune to player card effects as the first words of a line is immune in every box, not only in the ones whose source lists the keyword: Spider Burrow, Poros Garrison, Smaug, the Siege of Annúminas cards and others can no longer be chosen by a player card." },
   { version: 64, scenarios: "all", note: "When two or more Forced effects of different cards trigger at the same moment, the first player chooses the order they initiate in, whoever controls the cards; each resolves completely before the next. A window asks for the order only when the effects differ, and never offers an order a card forbids (Attack on Dol Guldur's stage 3 and Dol Guldur go before the mode card's)." },
   { version: 65, scenarios: "all", note: "The One Ring is attached to a hero, and its Master card searched, right after the starting heroes are placed, before the opening hand is drawn and the mulligan is offered; a mulligan keeps the Master card it fetched, and shuffles back only the six drawn; with two Rings the first player chooses which copy is put into play and the other copy is removed from the game." },
+  { version: 66, scenarios: "all", note: "An attachment you control, or another player controls, is a player card: an encounter attachment (a Condition on an enemy engaged with you, or on a hero) has no controller, so Shadow and When Revealed lines such as discard an attachment you control no longer choose it; and the One Ring passing to a new first player leaves such an attachment on the Ring-bearer without a controller." },
 ];
 
-export const ENGINE_VERSION = 65;
+export const ENGINE_VERSION = 66;
 
 /** The notes of the changes after `fromVersion`, up to the build's version, that can move a game of `scenarioId`. */
 export function changesReaching(scenarioId: string, fromVersion: number, changes: readonly EngineChange[] = ENGINE_CHANGES): readonly string[] {

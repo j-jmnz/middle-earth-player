@@ -280,6 +280,8 @@ function transferHost(state: ScenarioState, focus: VerbFocus, seat: number, step
   const owners = new Map([hostId, ...attachments].map((id) => [id, state.cards[id]?.owner ?? state.cards[id]?.controller ?? undefined]));
   let next = moveCard(state, hostId, { zone: "heroes", seat });
   for (const id of attachments) {
+    // An encounter attachment (a Condition or burden on the hero) has no controller and keeps none: the scenario controls encounter cards (rr.ownership-and-control).
+    if (state.cards[id]?.controller == null) { next = attachTo(next, id, hostId); continue; }
     if (next.cards[id]?.zone === "play") next = moveCard(next, id, { zone: "play", seat });
     else next = updateCard(next, id, { controller: seat });
     next = attachTo(next, id, hostId);

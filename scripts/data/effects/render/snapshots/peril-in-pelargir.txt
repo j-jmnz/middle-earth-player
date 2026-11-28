@@ -103,9 +103,9 @@ Scenario piles that place cards with no record (quest: 05065 The Leaping Fish; q
   05037:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if not (the attack has no defender): choose attachment (you control) that a player controls (not an encounter attachment)
+    - if not (the attack has no defender): choose attachment (you control)
     - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
-    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): for each attachment (you control) that a player controls (not an encounter attachment):
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): for each attachment (you control):
       - discard the picked card
 
 ## 05038 City Street

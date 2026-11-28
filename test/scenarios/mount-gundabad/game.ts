@@ -208,7 +208,7 @@ const HUNT = { hunt: true, engage: true } as const;
 const BYPASS = { bypass: "always" } as const;
 export const GUNDABAD_GOLDENS: readonly GundabadGolden[] = [
   { name: "true solo, won from a blank log, no stage bypassed, the Hoard searched", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "true solo, won from a blank log, every stage that outlasts a round bypassed", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", policy: BYPASS },
+  { name: "true solo, won from a blank log, every stage that outlasts a round bypassed", seatCount: 1, seed: 21, difficulty: "Normal", decks: "strong", outcome: "won", policy: BYPASS },
   { name: "true solo, Easy, won from a blank log, no stage bypassed", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "true solo, Easy, won from a blank log, a stage bypassed, the Hoard searched", seatCount: 1, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won", policy: BYPASS },
   { name: "true solo, Easy, won from a blank log, Dagnir hunted and engaged", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won", policy: HUNT },
@@ -219,7 +219,7 @@ export const GUNDABAD_GOLDENS: readonly GundabadGolden[] = [
   { name: "two-handed, won from a blank log, no stage bypassed, the Hoard searched", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "two-handed, won from a blank log, a stage bypassed", seatCount: 2, seed: 6, difficulty: "Normal", decks: "strong", outcome: "won", policy: BYPASS },
   { name: "two-handed, Easy, won from a blank log, no stage bypassed", seatCount: 2, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
-  { name: "two-handed, Easy, won from a blank log, a stage bypassed", seatCount: 2, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won", policy: BYPASS },
+  { name: "two-handed, Easy, won from a blank log, a stage bypassed", seatCount: 2, seed: 3, difficulty: "Easy", decks: "strong", outcome: "won", policy: BYPASS },
   { name: "two-handed, won, after the earlier parts, Misplaced Trust, no stage bypassed", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "pool" },
   { name: "two-handed, won, after the earlier parts, Misplaced Trust, Dagnir hunted and engaged", seatCount: 2, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "pool", policy: HUNT },
   { name: "two-handed, won, after the earlier parts, Urdug's Cunning, Dragon-sickness in the encounter deck", seatCount: 2, seed: 6, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "cunning" },
@@ -227,7 +227,7 @@ export const GUNDABAD_GOLDENS: readonly GundabadGolden[] = [
   { name: "two-handed, Easy, won, the oath and guidance lines, a stage bypassed", seatCount: 2, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won", after: true, variant: "oath", policy: BYPASS },
   { name: "two-handed, Easy, won, the oath and guidance lines, Dagnir hunted and engaged", seatCount: 2, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won", after: true, variant: "oath", policy: HUNT },
   { name: "true solo, won, after the earlier parts, A Growing Threat in the pool removed by the Resolution", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "pool", growing: true },
-  { name: "two-handed, won, after the earlier parts, Misplaced Trust, A Growing Threat in the pool removed by the Resolution", seatCount: 2, seed: 10, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "pool", growing: true },
+  { name: "two-handed, won, after the earlier parts, Misplaced Trust, A Growing Threat in the pool removed by the Resolution", seatCount: 2, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "pool", growing: true },
   { name: "true solo, weak, lost on threat", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed, weak, lost on threat", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "true solo, brittle, lost with the hero who carries Wormsbane destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "q1 left play" },

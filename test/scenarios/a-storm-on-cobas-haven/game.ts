@@ -145,7 +145,7 @@ export const HAVEN_GOLDENS: readonly HavenGolden[] = [
   { name: "two-handed, Raider Flagship held under Belfalas Islet, won", seatCount: 2, seed: 35, difficulty: "Normal", decks: "strong", outcome: "won", policy: ACT },
   { name: "two-handed, an added phase, won", seatCount: 2, seed: 15, difficulty: "Normal", decks: "strong", outcome: "won", policy: ACT },
   { name: "two-handed, Expert Mode card, Upgraded Black Key and Calaerion, won", seatCount: 2, seed: 9, difficulty: "Normal", decks: "strong", outcome: "won", mode: "expert", upgraded: true },
-  { name: "true solo, weak, lost on threat", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: THREAT_LOST },
+  { name: "true solo, weak, lost on threat", seatCount: 1, seed: 2, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: THREAT_LOST },
   { name: "two-handed, weak, lost on threat", seatCount: 2, seed: 3, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: THREAT_LOST },
   { name: "true solo, brittle heroes, lost", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: THREAT_LOST },
   { name: "true solo, the Dream-chaser destroyed, lost", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", policy: SHIPS_DEFEND, lossReason: DREAM_CHASER_LOST },

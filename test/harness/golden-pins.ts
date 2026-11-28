@@ -383,14 +383,6 @@ export const GOLDEN_PINS: Readonly<Record<string, readonly string[]>> = {
     "solo win",
     "two-handed win",
   ],
-  "the-dunland-trap": [
-    "Easy solo win",
-    "Easy two-handed win",
-    "solo loss: a hero destroyed by the 3B attacks",
-    "solo win",
-    "two-handed loss: a hero destroyed by the 3B attacks",
-    "two-handed win",
-  ],
   "to-catch-an-orc": [
     "Easy solo win",
     "Easy two-handed win",

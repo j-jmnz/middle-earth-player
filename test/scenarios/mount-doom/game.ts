@@ -91,7 +91,7 @@ export const DOOM_GOLDENS: readonly DoomGolden[] = [
   { name: "true solo, Easy, after the earlier parts, The One Ring kept", seatCount: 1, seed: 3, difficulty: "Easy", decks: "strong", outcome: "won", after: true, policy: { ring: "keep" } },
   { name: "true solo, Normal, with no earlier log, The One Ring destroyed", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", policy: { ring: "destroy" } },
   { name: "two-handed, Normal, after the earlier parts, The One Ring destroyed", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", after: true, policy: { ring: "destroy" } },
-  { name: "two-handed, Easy, after the earlier parts, The One Ring kept", seatCount: 2, seed: 4, difficulty: "Easy", decks: "strong", outcome: "won", after: true, policy: { ring: "keep" } },
+  { name: "two-handed, Easy, after the earlier parts, The One Ring kept", seatCount: 2, seed: 7, difficulty: "Easy", decks: "strong", outcome: "won", after: true, policy: { ring: "keep" } },
   { name: "true solo, lost, the last Fortitude test fails", seatCount: 1, seed: 3, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, lossReason: "The Ring-bearer claimed The One Ring" },
   { name: "two-handed, lost, the last Fortitude test fails", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, lossReason: "The Ring-bearer claimed The One Ring" },
   { name: "true solo, lost, the threat reaches 99", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain" },

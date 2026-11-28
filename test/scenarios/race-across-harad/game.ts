@@ -66,7 +66,7 @@ export const HARAD_GOLDENS: readonly HaradGolden[] = [
   { name: "two-handed, won, Normal", seatCount: 2, seed: 10, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, lost, the Orcs fill stage 2D", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", policy: HOME, lossReason: "The Orcs completed Racing North (stage 2) while the players were at stage 2" },
   { name: "true solo, lost, the Orcs fill stage 3D", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "The Orcs completed Hunted in Harad (stage 3) while the players were at stage 3" },
-  { name: "true solo, lost, the Orcs fill stage 4D", seatCount: 1, seed: 12, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "The Orcs have caught you" },
+  { name: "true solo, lost, the Orcs fill stage 4D", seatCount: 1, seed: 97, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "The Orcs have caught you" },
   { name: "true solo, lost, the Tamed Mûmak leaves play", seatCount: 1, seed: 6, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "Tamed Mûmak was destroyed: Player 1 is eliminated" },
   { name: "two-handed, lost, both Tamed Mûmakil leave play", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "Tamed Mûmak was destroyed: Player 2 is eliminated" },
   { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 11, difficulty: "Normal", decks: "weak", outcome: "lost", policy: HOME, lossReason: "No seats remain" },
