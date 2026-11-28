@@ -76,7 +76,7 @@ describe("The Vengeance of Mordor cycle", () => {
     const codesOf = (pile: string) => [...new Set(scenario.cards.filter((card) => card.pile === pile && byCode.get(card.code)?.type !== "quest").map((card) => card.code))].sort();
     expect(codesOf("staging")).toEqual([...pin.staging]);
     expect(codesOf("setAside")).toEqual([...pin.setAside]);
-    expect(codesOf("encounterDeck2")).toEqual([...pin.deck2]);
+    expect(codesOf("powerOfMordorDeck")).toEqual([...pin.deck2]);
   });
 
   it("names the rules span that prints each scenario's encounter sets as its Setup span, which the build reads them from (the insert for A Shadow in the East, the rulesheet for a pack)", () => {
