@@ -4,6 +4,7 @@ import type { ModifierStat, ModifierUntil } from "../../catalog/boundary.ts";
 import { cardTypeOf, isCharacterType, isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import type { CardInstance, Modifier, ScenarioState } from "./state.ts";
 import { flagged, inPlay, modifierActive } from "./state.ts";
+import { isMordorHolder, mordorHeldBy } from "../families/mordor/held.ts";
 
 // The holder of a modifier on every ally in play, now and entering play later: an encounter card's lasting effect
 // (rr.lasting-effects, 141071:A:1). It stands in the modifier's instance id.
@@ -50,6 +51,7 @@ export type TraitCheck = (trait: string) => boolean;
 export function heldBy(modifier: { instanceId: string }, instance: CardInstance, printed: PrintedCard, has?: TraitCheck): boolean {
   if (modifier.instanceId === instance.id) return true;
   if (!inPlay(instance.zone)) return false;
+  if (isMordorHolder(modifier.instanceId)) return mordorHeldBy(modifier.instanceId, instance, printed);
   const traited = (trait: string): boolean => (has ?? ((name: string) => printed.traits.includes(name)))(trait);
   if (modifier.instanceId === ALLIES_CLASS) return cardTypeOf(instance, printed) === "ally";
   if (modifier.instanceId === STAGING_CLASS) return instance.zone === "staging" && (cardTypeOf(instance, printed) === "enemy" || cardTypeOf(instance, printed) === "location");
