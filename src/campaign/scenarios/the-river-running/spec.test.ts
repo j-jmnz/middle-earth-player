@@ -40,6 +40,14 @@ const ROWS: readonly Row[] = [
   { line: "21016:A:2", name: "Shadow: the attacker gets +1 Attack", layout: { stage: S1, staging: [PURSUIT] }, act: attack("f3", { shadow: "21016", undefended: true }), expect: [damageOn("dh1", 2), resourcesOn(PURSUIT, 0)] },
   { line: "21016:A:2", name: "Shadow: a character destroyed by the attack puts 1 resource on Easterling Pursuit", layout: { stage: S1, staging: [PURSUIT], play: ["ally"] }, act: [attack(CAPTAIN, { shadow: "21016" }), defend("ally")], expect: resourcesOn(PURSUIT, 1) },
 
+  { line: "21017:A:1", name: "Forced when it enters play: cards are discarded until an Easterling treachery, which is attached to it", layout: { stage: S1, deck: ["f0", SWORD, "f0"] }, act: reveal(CAPTAIN), expect: attachedTo(SWORD, CAPTAIN) },
+  { line: "21021:A:1", name: "Forced when it attacks: the top Easterling treachery of the discard pile is attached to it", layout: { stage: S1, discard: [HORSE] }, act: attack("21021", { undefended: true }), expect: attachedTo(HORSE, "21021") },
+  { line: "21021:A:2", name: "Shadow: the top Easterling treachery of the discard pile is attached to the attacking enemy", layout: { stage: S1, discard: [HORSE] }, act: attack("f3", { shadow: "21021", undefended: true }), expect: attachedTo(HORSE, "f3") },
+  { line: "21024:A:2", name: "Forced after an Easterling enemy enters play in the staging area: the top Easterling treachery in the discard pile is attached to it", layout: { stage: S1, staging: [WARRIORS], discard: [SWORD] }, act: reveal(RAIDER), expect: attachedTo(SWORD, RAIDER) },
+  { line: "21025:A:1", name: "When Revealed: each copy of Rolling Plains in play gets +2 Threat", layout: { stage: S1, staging: ["21025"] }, act: reveal("21025"), expect: stat("21025", "threat", 4) },
+  { line: "21027:A:2", name: "When Revealed: each exhausted character gets -1 Willpower", layout: { stage: S1, exhaustedCards: ["dh1"] }, act: reveal("21027"), expect: stat("dh1", "willpower", 1) },
+  { line: "21076:B:2", name: "While a player is engaged with an enemy, no more than 5 progress can be placed each round", layout: { stage: S2, engaged: [OUTRIDER] }, act: [], expect: flag("table", "questProgressCap") },
+
   { line: "21018:A:2", name: "-10 engagement cost for each Easterling attachment", layout: { stage: S1, staging: [RIDER], attached: [horseOn(RIDER)] }, act: [], expect: stat(RIDER, "engagementCost", 30) },
   { line: "21018:A:3", name: "When Revealed: the Easterling Horse in the deck is attached to it", layout: { stage: S1, deck: ["f0", HORSE] }, act: reveal(RIDER), expect: attachedTo(HORSE, RIDER) },
 
