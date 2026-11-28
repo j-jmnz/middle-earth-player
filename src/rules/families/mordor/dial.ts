@@ -14,7 +14,7 @@ type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name 
 function underDial(state: ScenarioState, source: string | null, seat: number): string[] {
   if (source == null) return [];
   return cardsUnder(state, source)
-    .filter((id) => state.cards[id]?.owner === seat)
+    .filter((id) => state.cards[id]?.owner === seat && state.cards[id]?.stackedAt != null)
     .sort((left, right) => (state.cards[left]?.stackedAt ?? 0) - (state.cards[right]?.stackedAt ?? 0));
 }
 
@@ -32,12 +32,17 @@ export function discardUnderDial(state: ScenarioState, focus: Focus): ScenarioSt
   return top == null ? state : updateCard(moveCard(state, top, { zone: "discard", seat: focus.seat }), top, { owner: undefined, stackedAt: undefined });
 }
 
-/** ReturnUnderDial: every card under each player's threat dial goes back into its owner's deck, which is shuffled. */
-export function returnUnderDial(state: ScenarioState, focus: Focus): ScenarioState {
-  return livingSeats(state).reduce((next, seat) => {
-    const cards = underDial(next, focus.sourceId, seat);
-    if (cards.length === 0) return next;
-    const back = cards.reduce((current, id) => updateCard(moveCard(current, id, { zone: "deck", seat }), id, { owner: undefined, stackedAt: undefined }), next);
+/**
+ * The settle sweep that ends the hold: "When this stage is defeated, each player shuffles all cards under his threat dial back into his deck" (21065:A:1). A side quest that is defeated lies in the victory display; the cards it holds under the dials
+ * go back into their owners' decks, which are shuffled. A side quest that leaves play any other way leaves them where they are.
+ */
+export function returnUnderDialSweep(state: ScenarioState): ScenarioState {
+  if (state.victory.length === 0) return state;
+  const held = state.victory.filter((id) => cardsUnder(state, id).some((under) => state.cards[under]?.owner != null && state.cards[under]?.stackedAt != null));
+  return held.reduce((next, quest) => livingSeats(next).reduce((current, seat) => {
+    const cards = underDial(current, quest, seat);
+    if (cards.length === 0) return current;
+    const back = cards.reduce((inner, id) => updateCard(moveCard(inner, id, { zone: "deck", seat }), id, { owner: undefined, stackedAt: undefined }), current);
     return shuffleSeatDeck(back, seat);
-  }, state);
+  }, next), state);
 }

@@ -48,10 +48,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("PickLowestDefense"), pick: pickSchema, ...when }),
   // "Each player places the top 10 cards of his deck facedown under his threat dial (without looking at them)" (21065:A:1): the top `count` cards of the actor's deck lie facedown under the source, still his, in the order of his deck.
   z.strictObject({ verb: z.literal("PutUnderDial"), count: z.number().int().positive(), ...when }),
-  // "he discards the top card from under his threat dial" (21065:A:2): the top card the source holds under the actor's threat dial goes to his discard pile; with none under it nothing happens.
+  // "he discards the top card from under his threat dial" (21065:A:2): the top card the source holds under the actor's threat dial goes to his discard pile; with none under it nothing happens. The cards go back into their owners' decks, shuffled, when the source is defeated (the settle sweep, src/rules/families/mordor/dial.ts).
   z.strictObject({ verb: z.literal("DiscardUnderDial"), ...when }),
-  // "each player shuffles all cards under his threat dial back into his deck" (21065:A:1): the cards the source holds under each player's threat dial go back into their owners' decks, which are shuffled.
-  z.strictObject({ verb: z.literal("ReturnUnderDial"), ...when }),
   // "he must discard those copies as well" (21084:B:1): after a DiscardFromDeck, the actor discards each card in his hand and each card he controls in play that has the title of a card that discard took from his deck.
   z.strictObject({ verb: z.literal("DiscardCopiesOfLooked"), ...when }),
 ] as const;

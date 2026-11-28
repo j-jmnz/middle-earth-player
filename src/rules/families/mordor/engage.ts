@@ -6,6 +6,8 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
+import { returnUnderDialSweep } from "./dial.ts";
+import { eliminateAtTowerLevel } from "./level.ts";
 import { engageEnemies } from "../ring-maker/engage.ts";
 
 const ULCHOR = "21054";
@@ -15,6 +17,11 @@ const FLAGS: readonly string[] = ["engagesFirstPlayer", "engagesWithUlchor"];
 function ulchorSeat(state: ScenarioState): number | null {
   const ulchor = Object.values(state.cards).find((card) => card.code === ULCHOR && card.zone === "engaged");
   return ulchor?.controller ?? null;
+}
+
+/** The settle sweep of the family: the engaging enemies, the cards a defeated Lost in the Dark held under the dials, and the seats The Tower of Barad-dûr eliminates. */
+export function mordorSweep(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  return eliminateAtTowerLevel(returnUnderDialSweep(engageSweep(state, ctx, steps)), steps);
 }
 
 /** The settle sweep: each enemy that holds `engagesFirstPlayer` engages the first player, each that holds `engagesWithUlchor` the seat Ulchor is engaged with (and stays where it is while he is engaged with none). */
