@@ -4,13 +4,13 @@ import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/ru
 import { loadAnyScenario, loadCampaign } from "../../../scripts/data/load-scenarios.ts";
 import type { PolicyOptions } from "../../harness/auto-player.ts";
 import { fillerLoadout, HERO_STATS, standaloneGame, type PlayedGame } from "../../harness/game-kit.ts";
-import { chooseFirstOrLast, policyIntent, type Policy } from "../../harness/policy-kit.ts";
+import { archeryLeastDamaged, attackAllTogether, chooseFirstOrLast, commitAllBut, engageUpTo, policyIntent, undefendedLeastDamaged, type Policy } from "../../harness/policy-kit.ts";
 
 const cycle = loadCampaign("vengeance-of-mordor");
 const running = loadAnyScenario("the-river-running");
 
 // Test helper. A whole standalone game of The River Running played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. TODO: say how the players travel, engage and answer the choices this scenario asks.
+// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. There is no campaign: no checklist, no log, no earlier part, no Resolution. The players quest with all but one character, engage the enemies of the staging area (the Easterlings chase them), the hero kept home attacks, and each Choose window takes the option the policy names (the first or the last).
 export const RUNNING_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type RunningDecks = "strong" | "weak" | "brittle";
@@ -42,8 +42,7 @@ export const DEFAULT_POLICY: RunningPolicy = { choose: "first" };
 //   engageUpTo(most, options)  the optional engagement step: engage the enemy of the lowest `rank` (`allow` permits) while engaged with fewer than `most`
 //   triggerActions(effectIds, oncePerRound)  an Action or Response of the records named, each time (or once a round) the engine offers it and the seat can pay
 //   passCommitWhile(when)  the quest commit: pass without committing while `when` holds
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go in the list, before the auto-player's.
-const rules = (policy: RunningPolicy): Policy => [chooseFirstOrLast(policy.choose)];
+const rules = (policy: RunningPolicy): Policy => [chooseFirstOrLast(policy.choose), commitAllBut(1), archeryLeastDamaged(), undefendedLeastDamaged(), engageUpTo(), attackAllTogether()];
 
 // Every intent is one the reducer listed.
 export function runningIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: RunningPolicy = DEFAULT_POLICY): PlayerIntent {
@@ -55,14 +54,20 @@ export type RunningGame = PlayedGame;
 // The goldens (src/campaign/scenarios/the-river-running/golden.test.ts). A standalone game has no earlier parts, Upgraded sides or Mode card.
 export type RunningGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: RunningDecks; outcome: "won" | "lost"; policy?: Partial<RunningPolicy>; lossReason?: string };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Nightmare) and a few losses (each way the scenario can be lost), each on a fixed seed.
-export const RUNNING_GOLDENS: readonly RunningGolden[] = [];
+// The games pinned (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost): wins true solo (the first and the last option of each Choose, which an Easterling Outrider asks) and two-handed on Normal and Easy, and a loss for each way to lose, each on a fixed seed.
+export const RUNNING_GOLDENS: readonly RunningGolden[] = [
+  { name: "true solo, won, Normal", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, won, Normal, every choice the last option", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", policy: { choose: "last" } },
+  { name: "two-handed, won, Normal", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "two-handed, won, Easy", seatCount: 2, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won" },
+  { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
+  { name: "true solo, lost, every hero destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },
+];
 
 const game = standaloneGame<RunningDecks, RunningPolicy>({
   campaign: cycle,
   scenario: running,
   stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles and its Nightmare deck.
   codes: [...running.cards.map((card) => card.code)],
   intent: runningIntent,
   policy: DEFAULT_POLICY,
