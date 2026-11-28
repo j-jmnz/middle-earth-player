@@ -15,7 +15,12 @@ import { headingIs } from "../sea/heading.ts";
 
 /** The quest advances in the order of its quest deck: some stage of it names LookAtStages, or is a stage of a quest deck whose cards flip at the quest phase (FlipAtQuestPhase, Mount Gundabad). */
 export function orderedQuest(state: Pick<ScenarioState, "stages">): boolean {
-  return state.stages.some((stage) => stage.look != null || stage.deck === true);
+  return state.stages.some((stage) => stage.look != null || stage.deck === true || stage.ordered === true);
+}
+
+/** A quest deck of stage 2s with no stage 3 beside it: Mount Gundabad's, flipped at the quest phase (`deck`), or one the Setup shuffled under stage 1 (`ordered`, ShuffleStagesUnder). */
+function stageDeck(state: Pick<ScenarioState, "stages">): boolean {
+  return state.stages.some((stage) => stage.deck === true || stage.ordered === true);
 }
 
 /** The stage `code` is a stage 2 of Mount Gundabad's quest deck: it arrives with side A up and the quest has no stage 3 (emce.gundabad-quest-deck). */
@@ -46,7 +51,7 @@ export function orderedNext(state: ScenarioState, currentCode: string): OrderedN
   if (!orderedQuest(state)) return null;
   const top = state.questDeck[0];
   // A quest deck of stage 2s (Mount Gundabad) has no stage 3: every stage leads to the top of the deck and the last one defeated wins the game.
-  const deck = state.stages.some((stage) => stage.deck === true);
+  const deck = stageDeck(state);
   // A stage that does not look at the next ones is the last the quest has (Corsair Pursuit, 11021): defeating it wins the game, whatever stage cards are left in the deck.
   const look = state.stages.find((stage) => stage.code === currentCode)?.look;
   if (top == null || (look == null && !deck)) return { kind: "end" };
@@ -84,6 +89,6 @@ export function keepStage(state: ScenarioState, looked: readonly string[], chose
  * goes where it always went, and no other quest in a game with ships is told apart. */
 export function stageToVictory(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, code: string): boolean {
   // A quest deck of stage 2s: the stage 1 and each stage 2 that is defeated are added to the victory display (19134:B:1, emce.bypassing "players will either add it to their victory display or win the game").
-  if (state.stages.some((stage) => stage.deck === true)) return printedOf(cards, code).victory != null;
+  if (stageDeck(state)) return printedOf(cards, code).victory != null;
   return state.sea != null && printedOf(cards, code).victory != null;
 }

@@ -85,7 +85,7 @@ export function rulesFamilies(): readonly RulesFamily[] {
 export const SETTLE_ORDER: Readonly<Record<"before" | "after" | "sweep", readonly string[]>> = {
   before: ["burden", "island", "south", "quest", "sack"],
   after: ["sea", "stormcaller", "island", "wilderland", "captives", "haradrim"],
-  sweep: ["aflame", "objectives", "sea", "wilderland", "south", "deck", "angmar", "quest", "escape", "nameless", "encounter", "erech", "wizards-quest", "poison", "pelargir", "ring-maker", "haradrim"],
+  sweep: ["aflame", "objectives", "sea", "wilderland", "south", "deck", "angmar", "quest", "escape", "nameless", "encounter", "erech", "wizards-quest", "poison", "pelargir", "ring-maker", "haradrim", "mordor"],
 };
 
 /** Runs a verb a mechanic family adds (src/catalog/families), or returns null when no family owns it. */

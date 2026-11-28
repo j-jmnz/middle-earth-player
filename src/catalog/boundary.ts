@@ -167,6 +167,8 @@ const stageSchema = z.strictObject({
   attachedNext: z.strictObject({ code: z.string(), then: z.string(), otherwise: z.string() }).optional(),
   // A stage 2 of a quest deck that is not flipped when it is revealed: it arrives side A up and shows side B from the beginning of the quest phase (FlipAtQuestPhase, 19135:A:2; emce.gundabad-quest-deck).
   deck: z.literal(true).optional(),
+  // The stage 2 cards of a quest deck the Setup shuffled under this stage (ShuffleStagesUnder, 21080:A:1): the quest advances in the order of its quest deck and each stage that prints Victory is added to the victory display when it is defeated.
+  ordered: z.literal(true).optional(),
 });
 
 const widgetsSchema = z.strictObject({

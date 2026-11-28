@@ -3,6 +3,7 @@ import { z } from "zod";
 import { scenarioDefinitionSchema, type Effect, type Instruction, type ScenarioDefinition } from "./boundary.ts";
 import { originSchema } from "./origin.ts";
 import { randomNextOf, type RandomNext } from "./random-next.ts";
+import { ordersStages } from "./stage-order.ts";
 
 // A scenario as data/scenarios/<id>.json stores it: which cards go to which pile, in Normal and Easy
 // counts. The sync adapters and the quest cards' Setup text both agree on it before the build writes it.
@@ -22,7 +23,7 @@ import { randomNextOf, type RandomNext } from "./random-next.ts";
 // placed facedown under The Cross-roads) and `greatSpiderDeck` (The Great Spider set, set aside). Neither is part of the encounter deck.
 // Angmar Awakened's Orc deck (mec108.orc-deck): `angmarOrcDeck`, the Angmar Orcs enemies and Concealed Orc-camp The Weather Hills' Setup takes out of the encounter deck.
 // The Battle of Lake-town's Smaug deck (docs/scenarios/standalone-scenarios/the-battle-of-lake-town.md, The Battle of Lake-town): `smaugDeck`, the nine Smaug cards its Setup shuffles into a separate deck, with a discard pile of its own.
-export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen", "corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "smaugDeck"] as const;
+export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen", "corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "powerOfMordorDeck", "smaugDeck"] as const;
 export type Pile = (typeof PILES)[number];
 
 const placementSchema = z
@@ -320,7 +321,7 @@ export function corsairCodes(data: AnyScenarioData, difficulty: Difficulty = "No
 }
 
 // The decks of Ered Mithrin a scenario deals, copy by copy (emce.caves-deck, emce.evil-creatures-deck): each of these piles at the difficulty played, by pile. A pile the scenario does not deal is left out.
-export const DEAL_PILES = ["cavesDeck", "evilCreaturesDeck", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "smaugDeck"] as const;
+export const DEAL_PILES = ["cavesDeck", "evilCreaturesDeck", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck", "powerOfMordorDeck", "smaugDeck"] as const;
 export function dealtPiles(data: AnyScenarioData, difficulty: Difficulty = "Normal"): Partial<Record<(typeof DEAL_PILES)[number], string[]>> {
   const piles: Partial<Record<(typeof DEAL_PILES)[number], string[]>> = {};
   for (const card of placementsAt(data, difficulty)) {
@@ -407,7 +408,7 @@ export function campaignScenario<T extends AnyScenarioData>(data: T): T {
 // A stage that names AdvanceToRandomStage (19048:B:2) carries the stages it proceeds to, in a random order, as its `randomNext`.
 // A stage that names AdvanceIfAttached (50601:B:3) carries the Loot card its branch asks about and the two stages it leads to as its `attachedNext`.
 // A stage that names FlipAtQuestPhase (19135:A:2), or flips with its When Revealed resolving (FlipCurrentQuest `resolve`, 03070:A:1), is a stage of a quest deck (`deck`): it is not flipped when revealed.
-export function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[]; look?: number; catchUp?: number; randomNext?: RandomNext; attachedNext?: { code: string; then: string; otherwise: string }; deck?: true } {
+export function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[]; look?: number; catchUp?: number; randomNext?: RandomNext; attachedNext?: { code: string; then: string; otherwise: string }; deck?: true; ordered?: true } {
   const branch = recordInstructions(effects, code, "forced").find((instruction) => instruction.verb === "BranchStage");
   const look = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "LookAtStages");
   const catchUp = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "CatchUpWins");
@@ -417,7 +418,7 @@ export function stageOf(code: string, effects: readonly Effect[]): { code: strin
   const attached = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "AdvanceIfAttached");
   const attachedNext = attached?.verb === "AdvanceIfAttached" ? { code: attached.code, then: attached.then, otherwise: attached.otherwise } : undefined;
   const deck = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).some((instruction) => instruction.verb === "FlipAtQuestPhase" || (instruction.verb === "FlipCurrentQuest" && instruction.resolve === true));
-  return { code, ...(randomNext ? { randomNext } : {}), ...(attachedNext ? { attachedNext } : {}), ...(deck ? { deck: true as const } : {}), ...(branch?.verb === "BranchStage" ? { branch: branch.codes } : {}), ...(look?.verb === "LookAtStages" ? { look: look.count } : {}), ...(catchUp?.verb === "CatchUpWins" ? { catchUp: catchUp.stage } : {}) };
+  return { code, ...(randomNext ? { randomNext } : {}), ...(attachedNext ? { attachedNext } : {}), ...(deck ? { deck: true as const } : {}), ...(ordersStages(effects, code) ? { ordered: true as const } : {}), ...(branch?.verb === "BranchStage" ? { branch: branch.codes } : {}), ...(look?.verb === "LookAtStages" ? { look: look.count } : {}), ...(catchUp?.verb === "CatchUpWins" ? { catchUp: catchUp.stage } : {}) };
 }
 
 // The pursuit value at which the players lose, when a stage's Setup sets a pursuit tracker (mec112.pursuit, SetPursuit): the `min` of the pursuit condition on a LoseGame record of a card the scenario places. Undefined

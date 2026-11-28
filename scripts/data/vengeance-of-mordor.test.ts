@@ -122,7 +122,7 @@ describe("The Vengeance of Mordor cycle", () => {
   it("sets the Plot objectives and the Cultist enemies of Danger in Dorwinion aside, and the Power of Mordor deck of the two scenarios that build it", () => {
     const aside = loadAnyScenario("danger-in-dorwinion").cards.filter((card) => card.pile === "setAside").map((card) => byCode.get(card.code)?.traits.join());
     expect(aside.sort()).toEqual(["Cultist", "Cultist", "Cultist", "Plot", "Plot", "Plot"]);
-    for (const id of ["the-temple-of-doom", "the-fortress-of-nurn"]) expect(loadAnyScenario(id).cards.filter((card) => card.pile === "encounterDeck2").every((card) => byCode.get(card.code)?.encounterSet === "The Power of Mordor"), id).toBe(true);
+    for (const id of ["the-temple-of-doom", "the-fortress-of-nurn"]) expect(loadAnyScenario(id).cards.filter((card) => card.pile === "powerOfMordorDeck").every((card) => byCode.get(card.code)?.encounterSet === "The Power of Mordor"), id).toBe(true);
   });
 
   it("deals the four double-sided Storm the Castle side quests of The Fortress of Nurn to the staging area, each with its reverse side", () => {
