@@ -56,7 +56,7 @@ import { asksCollection, collectionLabel, collectionOrder } from "./collection-s
 import { answeredCard, hideCommitNote, hideNumbers, lookNote, optionalEngageNote, responseNote } from "./sheet-notes.ts";
 import { orcsLabel } from "./orcs-label.ts";
 import { gainedSentence } from "./gained-line.ts";
-import { captiveLabel, cardLabel, copyLabel, has, option, seatedLabel, stagedAllyLabel, statOf, statsOf, step, tiedLabel } from "./sheet-parts.ts";
+import { captiveLabel, cardLabel, copyLabel, has, option, ownerTag, seatedLabel, stagedAllyLabel, statOf, statsOf, step, tiedLabel } from "./sheet-parts.ts";
 import { sackStat } from "./sack-rows.ts";
 import { nightActionNote } from "../words/scenarios/night.ts";
 import { framsburgActionCaution, framsburgActionNote } from "../words/scenarios/framsburg.ts";
@@ -360,7 +360,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const rowCaution = asked.cautions?.[id] ?? fire?.caution ?? ship?.caution ?? crown?.caution ?? kingsCaution;
           // A plain card row that shares its name with another row says what tells the copies apart (Mr. Underhill's two Black Riders).
           const plainLabel = card.label === names.card(id) ? (copyLabel(game, names, id, window.options) ?? card.label) : card.label;
-          const label = asked.rows?.[id]?.label ?? (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? crown?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? stagedAllyLabel(game, ctx, names, id, window.options) ?? seatedLabel(game, ctx, names, id, window.options) ?? orcsLabel(game, names, id, window.options) ?? tiedLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay || zoned ? outOfPlayLabel(game, id, words) : plainLabel);
+          const label = asked.rows?.[id]?.label ?? (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? crown?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? stagedAllyLabel(game, ctx, names, id, window.options) ?? seatedLabel(game, ctx, names, id, window.options) ?? orcsLabel(game, names, id, window.options) ?? tiedLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay || zoned ? outOfPlayLabel(game, id, words, game.cards[id] ? ownerTag(game, game.cards[id], window.options) : null) : plainLabel);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
           return { ...card, label, ...(asked.rows?.[id]?.detail ? { detail: asked.rows[id].detail } : {}), ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction) || isBoonCode(wait.item.instruction, id)) ? { code: id } : {}), ...statsOf(game, ctx, id, asked.rowStats, willpower, eyes, tied), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };

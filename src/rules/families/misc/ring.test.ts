@@ -25,7 +25,8 @@ const RECORDS = [...AUTHORED, ...[...POOL_GENERATED_EFFECTS, ...HOBBIT_GENERATED
 const ctx = miscCtx(RECORDS);
 const filler = codes("f", 8);
 
-function started(deck: readonly string[], heroes: readonly string[] = ["dwarf", "rohan"], seatCount: 1 | 2 = 1) {
+// `decks`: a deck for each seat, in place of `deck` for all of them.
+function started(deck: readonly string[], heroes: readonly string[] = ["dwarf", "rohan"], seatCount: 1 | 2 = 1, decks?: readonly (readonly string[])[]) {
   const cards = cardMap([...MISC_CARDS.values(), ...filler.map((code) => ({ ...MISC_CARDS.get("filler")!, code, name: code }))]);
   const world = { effects: RECORDS, cards };
   const state = startScenario(
@@ -34,7 +35,7 @@ function started(deck: readonly string[], heroes: readonly string[] = ["dwarf", 
       seed: 5,
       threatModifier: 0,
       definition: fixtureDefinition(["stage"]),
-      seats: Array.from({ length: seatCount }, () => ({ heroes, deck })),
+      seats: Array.from({ length: seatCount }, (_, at) => ({ heroes, deck: decks?.[at] ?? deck })),
       encounterDeck: [],
       questDeck: ["stage"],
     },
@@ -112,17 +113,39 @@ describe("The One Ring (21001)", () => {
   });
 
   it("21001:A:2 the first player may keep the copy of their own seat: the other copy is removed and its Setup does not run", () => {
-    const { state, world } = started(["21001", "master", ...filler], ["dwarf", "rohan"], 2);
-    const own = choices(state).find((id) => state.cards[id]?.owner === state.firstPlayer) ?? "";
+    // Only the first player's deck holds a Master card, so the other seat's Setup would be the one to fetch nothing: its hand is the six drawn cards.
+    const { state, world } = started([], ["dwarf", "rohan"], 2, [["21001", "master", ...filler], ["21001", ...filler]]);
+    expect(state.firstPlayer).toBe(0);
+    const own = choices(state).find((id) => state.cards[id]?.owner === 0) ?? "";
     let next = expectOk(reduce(state, { type: "Choose", optionId: own }, world)).state;
-    expect(next.window).toMatchObject({ kind: "choose", seat: state.firstPlayer });
+    expect(next.window).toMatchObject({ kind: "choose", seat: 0 });
     next = expectOk(reduce(next, { type: "Choose", optionId: choices(next)[0] ?? "" }, world)).state;
     expect(next.cards[own]).toMatchObject({ zone: "play" });
-    expect(Object.values(next.cards).filter((card) => card.code === "21001" && card.zone === "removed")).toHaveLength(1);
+    const removed = Object.values(next.cards).filter((card) => card.code === "21001" && card.zone === "removed");
+    expect(removed).toHaveLength(1);
+    expect(removed[0]?.owner).toBe(1);
     expect(next.mode).toBe("mulligan");
+    // The removed copy's Setup did not run: that seat fetched no Master card and drew only its six.
+    expect(next.seats[1]?.hand).toHaveLength(6);
+    expect(next.seats[1]?.hand.some((id) => next.cards[id]?.code === "master")).toBe(false);
+    expect(next.seats[0]?.hand).toHaveLength(7);
+    expect(next.seats[0]?.hand.some((id) => next.cards[id]?.code === "master")).toBe(true);
   });
 
-  it("21001:A:2 asks nobody which Ring to keep when one seat holds it", () => {
+  it("21001:A:2 asks nobody which Ring to keep when only one of two decks holds it, and that seat's Setup runs", () => {
+    const { state, world } = started([], ["dwarf", "rohan"], 2, [["21001", "master", ...filler], filler]);
+    // The only question is the hero: every option is a hero of the seat that holds the Ring.
+    expect(state.window).toMatchObject({ kind: "choose", seat: 0 });
+    expect(choices(state)).toHaveLength(2);
+    expect(choices(state).every((id) => state.cards[id]?.zone === "heroes" && state.cards[id]?.controller === 0)).toBe(true);
+    const next = expectOk(reduce(state, { type: "Choose", optionId: choices(state)[0] ?? "" }, world)).state;
+    const ring = Object.values(next.cards).find((card) => card.code === "21001");
+    expect(ring).toMatchObject({ zone: "play" });
+    expect(next.seats[0]?.hand.some((id) => next.cards[id]?.code === "master")).toBe(true);
+    expect(Object.values(next.cards).filter((card) => card.zone === "removed")).toHaveLength(0);
+  });
+
+  it("21001:A:2 with one seat asks only for the hero", () => {
     const { state } = started(["21001", "master", ...filler], ["dwarf", "rohan"], 1);
     expect(choices(state)).toHaveLength(2);
     expect(choices(state).every((id) => state.cards[id]?.code !== "21001")).toBe(true);
