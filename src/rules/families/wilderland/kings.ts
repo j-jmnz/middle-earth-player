@@ -67,7 +67,9 @@ export function attachSelfToPicked(state: ScenarioState, instruction: Verb<"Atta
 
 /** AttachSearched: the first player chooses among the cards of the type and trait in the encounter deck and discard pile (one of each title) that the enemy named `to` does not carry; it attaches to that enemy in play. */
 export function attachSearched(state: ScenarioState, instruction: Verb<"AttachSearched">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const host = Object.values(state.cards).find((card) => (card.zone === "staging" || card.zone === "engaged") && printedOf(ctx.cards, card.code).name === instruction.to);
+  // The source itself when it bears the title (two copies of the enemy in play: the one whose line runs, 21018:A:3).
+  const own = focus.sourceId ? state.cards[focus.sourceId] : undefined;
+  const host = own && (own.zone === "staging" || own.zone === "engaged") && printedOf(ctx.cards, own.code).name === instruction.to ? own : Object.values(state.cards).find((card) => (card.zone === "staging" || card.zone === "engaged") && printedOf(ctx.cards, card.code).name === instruction.to);
   if (!host) return state;
   const carried = new Set(host.attachments.map((id) => state.cards[id]?.code));
   const titles = new Set<string>();
