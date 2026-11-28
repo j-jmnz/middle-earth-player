@@ -83,19 +83,49 @@ describe("The One Ring (21001)", () => {
     expect(next.cards[Object.values(opened.cards).find((card) => card.code === "master")?.id ?? ""]?.zone).toBe("hand");
   });
 
-  it("resolves each seat's Ring Setup before either seat draws (vom.the-one-ring)", () => {
+  it("21001:A:2 with two Rings the first player decides which is put into play, the other copy is removed, and only that seat's Setup runs before either seat draws (vom.the-one-ring)", () => {
     const { state, world } = started(["21001", "master", ...filler], ["dwarf", "rohan"], 2);
-    // Nothing is drawn while the Setup asks.
+    // The first player is asked first, and nothing is drawn while the Setup asks.
     expect(state.mode).toBe("openingHands");
+    expect(state.window).toMatchObject({ kind: "choose", seat: state.firstPlayer });
     expect(state.seats.every((seat) => seat.hand.length === 0)).toBe(true);
-    let next = state;
-    for (let guard = 0; guard < 8 && next.mode === "openingHands"; guard += 1) {
-      const [pick] = choices(next);
-      next = expectOk(reduce(next, { type: "Choose", optionId: pick ?? "" }, world)).state;
-    }
-    // "The first player decides which Ring is put into play" is not built: both copies are attached.
-    expect(Object.values(next.cards).filter((card) => card.code === "21001" && card.zone === "play")).toHaveLength(2);
+    const rings = choices(state);
+    expect(rings).toHaveLength(2);
+    expect(rings.map((id) => state.cards[id]?.owner).sort()).toEqual([0, 1]);
+    // The first player picks the copy of the other seat.
+    const other = 1 - state.firstPlayer;
+    const kept = rings.find((id) => state.cards[id]?.owner === other) ?? "";
+    let next = expectOk(reduce(state, { type: "Choose", optionId: kept }, world)).state;
+    const copies = Object.values(next.cards).filter((card) => card.code === "21001");
+    expect(copies.filter((card) => card.id !== kept).map((card) => card.zone)).toEqual(["removed"]);
+    // The chosen seat's Setup runs: its player attaches the Ring to one of that seat's heroes, and no other Ring Setup asks.
+    expect(next.window).toMatchObject({ kind: "choose", seat: other });
+    expect(next.seats.every((seat) => seat.hand.length === 0)).toBe(true);
+    next = expectOk(reduce(next, { type: "Choose", optionId: choices(next)[0] ?? "" }, world)).state;
+    expect(next.cards[kept]).toMatchObject({ zone: "play" });
+    expect(next.cards[kept]?.host).toBeDefined();
     expect(next.mode).toBe("mulligan");
+    expect(next.seats[other]?.hand.some((id) => next.cards[id]?.code === "master")).toBe(true);
+    // The seat whose Ring was removed fetched nothing: its hand is the six drawn cards.
+    expect(next.seats[1 - other]?.hand).toHaveLength(6);
+    expect(next.seats[other]?.hand).toHaveLength(7);
+  });
+
+  it("21001:A:2 the first player may keep the copy of their own seat: the other copy is removed and its Setup does not run", () => {
+    const { state, world } = started(["21001", "master", ...filler], ["dwarf", "rohan"], 2);
+    const own = choices(state).find((id) => state.cards[id]?.owner === state.firstPlayer) ?? "";
+    let next = expectOk(reduce(state, { type: "Choose", optionId: own }, world)).state;
+    expect(next.window).toMatchObject({ kind: "choose", seat: state.firstPlayer });
+    next = expectOk(reduce(next, { type: "Choose", optionId: choices(next)[0] ?? "" }, world)).state;
+    expect(next.cards[own]).toMatchObject({ zone: "play" });
+    expect(Object.values(next.cards).filter((card) => card.code === "21001" && card.zone === "removed")).toHaveLength(1);
+    expect(next.mode).toBe("mulligan");
+  });
+
+  it("21001:A:2 asks nobody which Ring to keep when one seat holds it", () => {
+    const { state } = started(["21001", "master", ...filler], ["dwarf", "rohan"], 1);
+    expect(choices(state)).toHaveLength(2);
+    expect(choices(state).every((id) => state.cards[id]?.code !== "21001")).toBe(true);
   });
 
   it("attaches the Ring and fetches the Master card after Keep for a checkpoint saved when the Setup waited for the start of the game (vom.the-one-ring)", () => {

@@ -310,6 +310,7 @@ export const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   RevealEncounter: [{ verb: "RevealEncounter", who: "firstPlayer" }, { verb: "RevealEncounter", times: 2 }, { verb: "RevealEncounter", times: 3, lessX: true }],
   AdvanceStage: [{ verb: "AdvanceStage" }],
   WinGame: [{ verb: "WinGame" }],
+  KeepOneCopy: [{ verb: "KeepOneCopy" }],
   LoseGame: [{ verb: "LoseGame", reason: "the ring is lost" }, { verb: "LoseGame", saysHow: true }],
   StageDiscarded: [{ verb: "StageDiscarded", type: "enemy" }, { verb: "StageDiscarded", type: "enemy", trait: "Goblin" }],
   SearchStageCard: [{ verb: "SearchStageCard", code: "12345" }],

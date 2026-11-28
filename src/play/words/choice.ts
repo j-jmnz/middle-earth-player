@@ -237,8 +237,9 @@ export function outOfPlayLabel(game: ScenarioState, cardId: string, names: Choic
   const card = game.cards[cardId];
   const name = card ? names.code(card.code) : cardId;
   switch (card?.zone) {
+    // A copy a player holds out of the deck (The One Ring's Setup) says whose it is; two players' copies read alike otherwise.
     case "setAside":
-      return `${name} set aside`;
+      return (card.owner ?? card.controller) != null && game.seatCount > 1 ? `${name} of Player ${(card.owner ?? card.controller ?? 0) + 1}` : `${name} set aside`;
     case "encounterDeck":
       return `${name} from the encounter deck`;
     case "encounterDiscard":

@@ -322,7 +322,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const amountNow = wait?.kind === "target" ? dealtNow(game, ctx, data?.queue[0]?.instruction, window.seat, source) : undefined;
       const queue = (data?.queue ?? []).map((item) => item.instruction);
       const asked: AskedWords = wait?.kind === "target" ? askWords({ game, ctx, names: words, instruction: wait.item.instruction, queue, options: window.options, source, ...(wait.item.origin ? { origin: wait.item.origin, ...(wait.item.nth != null && wait.item.of != null ? { place: { nth: wait.item.nth, of: wait.item.of } } : {}) } : {}), picked: data?.kind === "effect" ? (data.picked?.at(-1) ?? null) : null, amountNow, ...(data?.effectId ? { effectId: data.effectId } : {}), ...(wait.item.cause ? { cause: wait.item.cause } : {}) }) : { verb: "Choose", prompt: "Choose one." };
-      const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
+      const outOfPlay = wait?.kind === "target" && (wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck" || wait.item.instruction.verb === "KeepOneCopy");
       // A search that spans the encounter deck and its discard pile (West Gate, 06096:A:1) names where each card lies, since two copies or two places read alike.
       const zoned = wait?.kind === "target" && wait.item.instruction.verb === "SearchReveal" && new Set(window.options.map((id) => game.cards[id]?.zone)).size > 1;
       const collection = wait?.kind === "target" && asksCollection(wait.item.instruction);

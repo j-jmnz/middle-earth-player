@@ -135,10 +135,11 @@ export const RECORDS: readonly Effect[] = [
 
   // The One Ring and the Master cards (player deck).
   // 21001 The One Ring: immune to non-Master card effects (line 1); its Setup (line 2) resolves right after the heroes are placed, before the opening hand (Delay `beforeOpeningHand`, vom.the-one-ring), attaches it
-  // to a hero its player chooses and searches the deck for a Master card; the sentence after it lowers the threat elimination level by 5 (line 3, which
+  // to a hero its player chooses (with two Rings in the game the first player first decides which copy is put into play and the others are removed, KeepOneCopy) and searches the deck for a Master card; the sentence after it lowers the threat elimination level by 5 (line 3, which
   // also names the attachment: a Setup line cannot name a constant record); the players lose if it leaves play (line 4, the generated record).
   {"id":"21001:constant:1","cardCode":"21001","lines":["21001:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"immuneToNonMaster","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"21001:setup:1","cardCode":"21001","lines":["21001:A:2"],"timing":"setup","instructions":[{"verb":"Delay","until":"beforeOpeningHand","instructions":[
+    {"verb":"KeepOneCopy"},
     {"verb":"PutIntoPlay","card":"self"},
     {"verb":"Pick","pick":{"type":"card","control":"you","from":"deck","trait":"Master"}},{"verb":"MovePicked","to":"hand"},{"verb":"ShuffleDeck"}]}]},
   {"id":"21001:constant:2","cardCode":"21001","lines":["21001:A:3"],"timing":"constant","instructions":[{"verb":"AttachesTo","hosts":[{"type":"hero","control":"you"}]},{"verb":"ModifyStat","stat":"eliminationReduction","amount":5,"until":"whileSourceInPlay","target":"actorSeat"}]},
