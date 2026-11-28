@@ -3,10 +3,16 @@
 // The engine decided each; nothing here changes one.
 import { describe, expect, it } from "vitest";
 
-import { idOf, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
+import { allyCard, idOf, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
 import { slotNumbers } from "../cards/card-effects.ts";
 import { dialProps } from "../readouts/dials.ts";
 import { scenarioDials, seatMarks } from "../readouts/scenario-dials.ts";
+import { spawn } from "../../rules/core/zones.ts";
+import { EFFECTS } from "../../effects/index.ts";
+import { rowStats } from "../choice/sheet-parts.ts";
+import type { Instruction } from "../../catalog/boundary.ts";
+import type { ScenarioState } from "../../rules/core/state.ts";
+import { asksOption, asksPick, type AskFacts } from "../words/asks.ts";
 import { ASKS } from "../words/asks/danger-in-dorwinion.ts";
 
 const ID = "danger-in-dorwinion";
@@ -115,5 +121,48 @@ describe("the cards facedown under Seedy Tavern", () => {
     const pill = slotNumbers(held.state, held.ctx, idOf(held.state, "21047")).under;
     expect(pill).toMatchObject({ text: "2 facedown", count: 2, loses: false, belowName: true });
     expect(pill?.speech).toContain("2 encounter cards facedown underneath");
+  });
+});
+
+// The choice words read off a table: the record's own instruction at path 0, the window asking `seat`.
+describe("the words of the choices", () => {
+  const names = { card: (key: string) => key, code: (code: string) => code };
+  const instructionOf = (id: string, at = 0): Instruction => EFFECTS.find((effect) => effect.id === id)!.instructions[at]!;
+  const asking = (layout: Layout, id: string, code: string, seat: number): AskFacts => {
+    const made = built(layout);
+    const game = { ...made.state, window: { kind: "choose", seat, options: [] } } as unknown as ScenarioState;
+    return { game, ctx: made.ctx, names: { card: (key) => made.cards.get(game.cards[key]?.code ?? key)?.name ?? key, code: names.code }, instruction: instructionOf(id), source: idOf(made.state, code) };
+  };
+
+  it("21042:A:3 the raise row arms the caution for the player who would be eliminated, not for the other", () => {
+    const layout: Layout = { seats: 2, stage: "21077", threat: [30, 49], staging: ["21042"] };
+    expect(asksOption(asking(layout, "21042:shadow:1", "21042", 1), "threat")?.caution).toBe("Tap again: Player 2 is eliminated. If no player is left, the game is lost");
+    expect(asksOption(asking(layout, "21042:shadow:1", "21042", 0), "threat")?.caution).toBeUndefined();
+  });
+
+  it("21040:A:1 the raise row arms its caution when the active location's Threat takes a player to the elimination level, and says the number", () => {
+    const near = asking({ stage: "21077", threat: [48, 30], active: "21037", staging: ["21040"] }, "21040:whenRevealed:1", "21040", 0);
+    expect(asksOption(near, "threat")).toMatchObject({ label: "Each player raises threat by 2", caution: "Tap again: you are eliminated and the game is lost" });
+    const far = asking({ stage: "21077", threat: [47, 30], active: "21037", staging: ["21040"] }, "21040:whenRevealed:1", "21040", 0);
+    expect(asksOption(far, "threat")?.caution).toBeUndefined();
+    const none = asking({ stage: "21077", threat: [49, 30], staging: ["21040"] }, "21040:whenRevealed:1", "21040", 0);
+    expect(asksOption(none, "threat")).toMatchObject({ label: "Each player raises threat by 0 (no active location)" });
+    expect(asksOption(none, "threat")?.caution).toBeUndefined();
+    expect(asksOption(near, "attack")?.label).toContain("attacks Player 1 now (");
+  });
+
+  it("21039:A:1 the Secret Cultist's tie says how many allies tie and for what Attack", () => {
+    const made = built({ stage: "21077", play: ["ally"] });
+    made.cards.set("twin", allyCard("twin", 3, { attack: 4 }));
+    const one = spawn(made.state, "twin", { zone: "play", seat: 0 });
+    const two = spawn(one.state, "twin", { zone: "play", seat: 0 });
+    const facts: AskFacts = { game: two.state, ctx: made.ctx, names: { card: (key) => made.cards.get(two.state.cards[key]?.code ?? key)?.name ?? key, code: names.code }, instruction: instructionOf("21039:whenRevealed:1"), source: "21039", options: [one.id, two.id] };
+    expect(asksPick(facts)?.prompt).toContain("2 allies are tied for the highest Attack (4).");
+  });
+
+  it("21077:A:1 the Setup search rows show a location's Threat and quest points", () => {
+    const made = built({ stage: "21077", seats: 1, staging: ["21037"] });
+    const stats = rowStats(made.state, made.ctx, idOf(made.state, "21037"), ASKS["21077:setup:1 @0.0 SearchMove"]?.rowStats);
+    expect(stats.map((stat) => [stat.icon, stat.value])).toEqual([["threat", 2], ["questPoints", 4]]);
   });
 });

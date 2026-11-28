@@ -17,7 +17,7 @@ describe("the captured pill", () => {
   it("stands above the engagement cost's foot row on an enemy host in staging, and above the combat number, at every card width", () => {
     for (const w of [34, 44, 56, 70, 90, 120]) {
       const rect = card(w);
-      const box = underMarkBox(rect, width("3 captured"), width("3"), 1, true);
+      const box = underMarkBox(rect, width("3 captured"), width("3"), 1, { counted: true });
       expect(box.y + box.height, `w ${w}`).toBeLessThanOrEqual(footRow(rect).top);
       // The combat number's pill is 15 pt high at 3 pt from the bottom edge.
       expect(box.y + box.height, `w ${w}`).toBeLessThanOrEqual(rect.y + rect.h - 18);
@@ -30,7 +30,7 @@ describe("the captured pill", () => {
     for (const s of [0.85, 1, 1.25, 1.5]) {
       for (const w of [34, 56, 90, 120]) {
         const rect = card(w * s);
-        const box = underMarkBox(rect, width("10 captured", s), width("10", s), s, true);
+        const box = underMarkBox(rect, width("10 captured", s), width("10", s), s, { counted: true });
         expect(box.y + box.height, `w ${w} s ${s}`).toBeLessThanOrEqual(strip(rect, s).top);
         expect(box.y, `w ${w} s ${s}`).toBeGreaterThanOrEqual(rect.y);
       }
@@ -38,18 +38,18 @@ describe("the captured pill", () => {
   });
 
   it("says the words where they fit and a bare count with a glyph where they do not, even for two digits, on the smallest card", () => {
-    expect(underMarkBox(card(120), width("3 captured"), width("3"), 1, true).kind).toBe("words");
+    expect(underMarkBox(card(120), width("3 captured"), width("3"), 1, { counted: true }).kind).toBe("words");
     for (const w of [34, 44, 56]) {
-      const box = underMarkBox(card(w), width("10 captured"), width("10"), 1, true);
+      const box = underMarkBox(card(w), width("10 captured"), width("10"), 1, { counted: true });
       expect(box.kind, `w ${w}`).not.toBe("words");
       expect(box.width, `w ${w}`).toBeLessThanOrEqual(w - 4);
     }
-    expect(underMarkBox(card(44), width("3 captured"), width("3"), 1, true).kind).toBe("count");
+    expect(underMarkBox(card(44), width("3 captured"), width("3"), 1, { counted: true }).kind).toBe("count");
   });
 
   it("keeps the foot row for the pills that count nothing captured (Havens Burn's 2/5, a held card)", () => {
     const rect = card(70);
-    const box = underMarkBox(rect, width("2/5"), 0, 1, false);
+    const box = underMarkBox(rect, width("2/5"), 0, 1);
     expect(box.y).toBe(footRow(rect).top);
     expect(box.kind).toBe("words");
   });
@@ -59,8 +59,8 @@ describe("the pill of a poisoned character turned sideways (hob.venom-poison)", 
   it("stands at the right end of the card with the glyph and the count, clear of the name at its left, inside the card at every width", () => {
     for (const w of [56, 70, 90, 120]) {
       const rect = card(w);
-      const middle = underMarkBox(rect, width("2 poison"), width("2"), 1, true);
-      const end = underMarkBox(rect, width("2 poison"), width("2"), 1, true, true);
+      const middle = underMarkBox(rect, width("2 poison"), width("2"), 1, { counted: true });
+      const end = underMarkBox(rect, width("2 poison"), width("2"), 1, { counted: true, atEnd: true });
       expect(end.kind, `w ${w}`).not.toBe("words");
       expect(end.x + end.width, `w ${w}`).toBeLessThanOrEqual(rect.x + rect.w);
       expect(end.x, `w ${w}`).toBeGreaterThanOrEqual(rect.x + rect.w / 2 - 1);
@@ -70,7 +70,7 @@ describe("the pill of a poisoned character turned sideways (hob.venom-poison)", 
 
   it("says the short word Out on a card of any width: it fits the card, which the word Unconscious does not", () => {
     for (const w of [34, 44, 56]) {
-      const box = underMarkBox(card(w), width("Out"), 0, 1, false);
+      const box = underMarkBox(card(w), width("Out"), 0, 1);
       expect(box.width, `w ${w}`).toBeLessThanOrEqual(w - 4);
       expect(box.width, `w ${w}`).toBeGreaterThanOrEqual(width("Out"));
     }
@@ -78,8 +78,8 @@ describe("the pill of a poisoned character turned sideways (hob.venom-poison)", 
 
   it("lifts a pill with no count one row when the card wears the progress strip, and no other", () => {
     const rect = card(70);
-    const flat = underMarkBox(rect, width("1 held"), 0, 1, false);
-    const lifted = underMarkBox(rect, width("1 held"), 0, 1, false, false, true);
+    const flat = underMarkBox(rect, width("1 held"), 0, 1);
+    const lifted = underMarkBox(rect, width("1 held"), 0, 1, { strip: true });
     expect(flat.y).toBe(footRow(rect).top);
     expect(lifted.y).toBe(flat.y - (TOKEN + 2));
     expect(lifted.x).toBe(flat.x);
@@ -91,7 +91,7 @@ describe("the pill of a card in the hand", () => {
     for (const s of [0.85, 1, 1.25, 1.5]) {
       for (const w of [34, 56, 90, 120]) {
         const rect = card(w * s);
-        const box = underMarkBox(underRect(rect, true, s), width("held", s), width("", s), s, false);
+        const box = underMarkBox(underRect(rect, true, s), width("held", s), width("", s), s);
         // The strip is no more than 0.56 of the card or the 52 pt target, and the pill is clear of its lower edge.
         expect(box.y + box.height, `w ${w} s ${s}`).toBeLessThanOrEqual(rect.y + underRect(rect, true, s).h);
         expect(box.y + box.height, `w ${w} s ${s}`).toBeLessThan(rect.y + rect.h);
@@ -108,7 +108,7 @@ describe("the pill's top edge", () => {
       for (const h of [34, 44, 53, 62, 70, 84, 101]) {
         const rect = { x: 10, y: 20, w: 44 * s, h };
         for (const [counted, lifted] of [[false, false], [false, true], [true, false]] as const) {
-          const box = underMarkBox(rect, width("1 held", s), width("1", s), s, counted, false, lifted);
+          const box = underMarkBox(rect, width("1 held", s), width("1", s), s, { counted, strip: lifted });
           expect(box.y - rect.y, `h ${h} s ${s}`).toBeCloseTo(underMarkTop(h, s, counted, lifted), 6);
           expect(underMarkTop(h, s, counted, lifted)).toBeLessThanOrEqual(underMarkTop(h, s, false, false));
         }

@@ -11,6 +11,9 @@ export const FOOT_ROW = 4;
 /** The height of the progress strip a quest card or an active location wears at its foot, in points at Medium. */
 export const STRIP = 15;
 
+/** What the pill's place depends on besides the card: see `underMarkBox`. */
+export type UnderOptions = { counted?: boolean; atEnd?: boolean; strip?: boolean; belowName?: boolean };
+
 /**
  * `wordWidth` and `countWidth` are the text's width in the badge font ("3 captured" and "3"), `s` the UI scale. A pill that counts captured cards (`counted`) stands one row above the foot row, as the open pick's number does, clear of the engagement cost, the combat number and the
  * quest strip, which the foot of an enemy, a stage and an active location wear. A pill with no count (The Havens Burn's, a held card's) keeps the foot row, except as `strip` says.
@@ -18,7 +21,8 @@ export const STRIP = 15;
  * `belowName`: see `underMarkTop`.
  * `atEnd`: the pill of an exhausted character (its sideways footprint) stands at the right end of the card, clear of the name and the stat chip at its left, and keeps to the glyph and count so it stays short.
  */
-export function underMarkBox(rect: Rect, wordWidth: number, countWidth: number, s: number, counted: boolean, atEnd = false, strip = false, belowName = false): UnderBox {
+export function underMarkBox(rect: Rect, wordWidth: number, countWidth: number, s: number, options: UnderOptions = {}): UnderBox {
+  const { counted = false, atEnd = false, strip = false, belowName = false } = options;
   const token = TOKEN * s;
   const room = rect.w - 4 * s;
   const top = rect.y + underMarkTop(rect.h, s, counted, strip, belowName);

@@ -1,4 +1,4 @@
-// Rules: rr.shadow-effects, rr.step-6-4-2, rr.reveal, rr.in-play-and-out-of-play, rr.explored (data/rules/entries.json); ledger lines 101156:A:1, 101158:A:1, 101158:A:2.
+// Rules: rr.shadow-effects, rr.step-6-4-2, rr.reveal, rr.in-play-and-out-of-play, rr.explored (data/rules/entries.json); ledger lines 101156:A:1, 101158:A:1, 101158:A:2, 21032:A:3.
 // Cards that go facedown onto an enemy or are read after they leave the encounter deck: the shadow cards of an attack whose "when revealed" effects the Witch of Angmar resolves, the cards a shadow effect discards from the top of the encounter deck, and Sinister Dungeon dealt to the
 // Reanimated Dead its exploring made.
 import type { Instruction } from "../../../../catalog/boundary.ts";

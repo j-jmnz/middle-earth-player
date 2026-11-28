@@ -107,7 +107,7 @@ export function UnderMarkView({ rect, mark, sideways, strip, fonts, t, s }: { re
   // Captured cards (a `count`) stand a row above the foot, clear of the engagement cost, the combat number and the quest strip; where "3 captured" does not fit, a facedown-card glyph and the bare count stand in.
   const counted = mark.count != null;
   const count = String(mark.count ?? "");
-  const box = underMarkBox(rect, fonts.badge.getTextWidth(mark.text), fonts.badge.getTextWidth(count), s, counted, sideways && mark.clearName === true, strip, mark.belowName === true);
+  const box = underMarkBox(rect, fonts.badge.getTextWidth(mark.text), fonts.badge.getTextWidth(count), s, { counted, atEnd: sideways && mark.clearName === true, strip, belowName: mark.belowName === true });
   const text = box.kind === "words" ? mark.text : count;
   const words = fonts.badge.getTextWidth(text);
   const token = box.height;
@@ -185,7 +185,7 @@ export function DeterminedMarkView({ rect, word, clear, fonts, t, s }: { rect: R
  */
 export function BlankMarkView({ rect, word, lifted, fonts, t, s }: { rect: Rect; word: string; lifted: boolean; fonts: Fonts; t: TableTokens; s: number }) {
   const words = fonts.badge.getTextWidth(word);
-  const box = underMarkBox(rect, words, 0, s, false, false, lifted);
+  const box = underMarkBox(rect, words, 0, s, { strip: lifted });
   const fits = words + 10 * s <= rect.w - 4 * s;
   const text = fits ? word : (shortGlyph(word) ?? word.slice(0, 1));
   const width = fits ? box.width : box.height;

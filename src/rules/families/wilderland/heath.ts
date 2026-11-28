@@ -1,5 +1,5 @@
-// Rules: emce.caves-deck, emce.dragon-signs, emce.guarded-x, rr.guarded, rr.cancel, rr.search, rr.in-play-and-out-of-play, rr.attacks-outside-the-combat-phase (data/rules/entries.json); ledger lines 12175:B:7, 19012:A:3, 19015:A:1, 19018:A:1, 19022:A:1,
-// 19022:B:1, 19024:A:1, 19024:B:2, 12176:A:4, 12179:A:4.
+// Rules: emce.caves-deck, emce.dragon-signs, emce.guarded-x, rr.guarded, rr.victory, rr.cancel, rr.search, rr.in-play-and-out-of-play, rr.attacks-outside-the-combat-phase (data/rules/entries.json); ledger lines 12175:B:7, 19012:A:3, 19015:A:1, 19018:A:1, 19022:A:1,
+// 19022:B:1, 19024:A:1, 19024:B:2, 12176:A:4, 12179:A:4, 21036:A:3.
 // The verbs The Withered Heath adds to the wilderland family: Dragon Signs shuffled into the Caves deck, searched out of it and sent to the victory display once nothing guards them, Cold-Drake set aside with its damage and healed there, the Weather
 // treacheries Mountain Pass keeps from being canceled, the three cards looked at that are discarded but one, the cards of a deck put on top and on the bottom, and the attack the Accolade Dragon-slayer starts.
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
@@ -20,6 +20,7 @@ import { askTarget } from "../../windows/choices.ts";
 import { attackWith } from "../attack/immediate.ts";
 import { lookedDeckSeat } from "../deck/rules.ts";
 import { addResourceTokens } from "../nightmare/dungeon.ts";
+import { effectsOf } from "../../windows/listen.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
 import { cancelsReveal } from "../encounter/cancel.ts";
 import { moveOtherLooked } from "../encounter/items.ts";
@@ -73,8 +74,8 @@ export function attachGuardedFromPile(state: ScenarioState, instruction: Verb<"A
 
 // The resources a VictoryWhenFree marker of the card puts on the main quest once it is free (none without an `amount`).
 function freeAmount(ctx: ReduceContext, code: string): number {
-  for (const effect of ctx.effects) {
-    if (effect.cardCode !== code || effect.timing !== "constant") continue;
+  for (const effect of effectsOf(ctx, code)) {
+    if (effect.timing !== "constant") continue;
     for (const instruction of effect.instructions) if (instruction.verb === "VictoryWhenFree") return instruction.amount ?? 0;
   }
   return 0;
