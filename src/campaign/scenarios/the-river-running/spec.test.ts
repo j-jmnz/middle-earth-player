@@ -28,6 +28,7 @@ const ROWS: readonly Row[] = [
   { line: "21013:A:2", name: "Forced after it engages a player: 1 resource on Easterling Pursuit", layout: { stage: S1, staging: [PURSUIT], engaged: [OUTRIDER] }, act: [announce("engaged", OUTRIDER), answer("pursuit")], expect: resourcesOn(PURSUIT, 1) },
   { line: "21013:A:2", name: "Forced after it engages a player: or it makes an immediate attack", layout: { stage: S1, staging: [PURSUIT], engaged: [OUTRIDER] }, act: [announce("engaged", OUTRIDER), answer("attack")], expect: [resourcesOn(PURSUIT, 0), window("defense")] },
   { line: "21013:A:3", name: "Shadow: the defending player discards an attachment they control", layout: { stage: S1, attached: [{ code: "attachment", to: "dh1" }] }, act: attack("f3", { shadow: OUTRIDER, undefended: true }), expect: zone("attachment", "discard") },
+  { line: "21013:A:3", name: "Shadow: an Easterling attachment on an enemy is not one the defending player controls", layout: { stage: S1, attached: [{ code: "attachment", to: "dh1" }, horseOn("f3")] }, act: attack("f3", { shadow: OUTRIDER, undefended: true }), expect: [zone("attachment", "discard"), attachedTo(HORSE, "f3")] },
 
   { line: "21014:A:1", name: "While in the staging area enemies cannot be optionally engaged", layout: { stage: S1, phase: "Encounter", staging: [RIVER, OUTRIDER] }, act: [], expect: offers("Engage", undefined, false) },
   { line: "21014:A:2", name: "Travel: the first player engages the highest engagement cost enemy in the staging area", layout: { stage: S1, phase: "Travel", staging: [RIVER, OUTRIDER, RIDER] }, act: travel(RIVER), expect: [zone(RIDER, "engaged"), zone(OUTRIDER, "staging")] },
@@ -85,7 +86,7 @@ const ROWS: readonly Row[] = [
   { line: "21075:B:1", name: "This stage gets +5 quest points per player", layout: { stage: S1, seats: 2 }, act: [], expect: stat(S1, "questPoints", 15) },
   { line: "21075:B:2", name: "+1 Threat in the staging area for each resource on Easterling Pursuit", layout: { stage: S1, staging: [{ code: PURSUIT, resources: 3 }] }, act: [], expect: stagingThreat(3) },
 
-  { line: "21076:A:1", name: "When Revealed: Warriors of the East is added to the staging area, then an enemy is discarded from the deck and added", layout: { stage: S2, side: "A", setAside: [WARRIORS], deck: ["f0", RAIDER] }, act: resolve(S2, "whenRevealed"), expect: [zone(WARRIORS, "staging")] },
+  { line: "21076:A:1", name: "When Revealed: Warriors of the East is added to the staging area, then an enemy is discarded from the deck and added", layout: { stage: S2, side: "A", setAside: [WARRIORS], deck: ["f0", RAIDER] }, act: resolve(S2, "whenRevealed"), expect: [zone(WARRIORS, "staging"), zone(RAIDER, "staging")] },
   { line: "21076:B:1", name: "Each enemy in the staging area gets -10 engagement cost", layout: { stage: S2, staging: [OUTRIDER] }, act: [], expect: stat(OUTRIDER, "engagementCost", 14) },
 ];
 

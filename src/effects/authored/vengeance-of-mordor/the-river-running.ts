@@ -20,6 +20,8 @@ const DESTROYED_A_CHARACTER: Condition = { kind: "x", min: 1 };
 const EASTERLING_ATTACHMENTS = { type: "attachment", control: "any", attachedTo: "source", trait: "Easterling" } as const satisfies PickSpec;
 // "An Easterling enemy in play (staging area or engaged) without the attachment": the candidates of an Easterling treachery that attaches itself when revealed; the first player chooses among those the stat leaves tied.
 const CANDIDATE = (title: string, narrowed: Partial<PickSpec>): PickSpec => ({ type: "enemy", control: "any", staging: true, trait: "Easterling", hasAttachment: { names: [title], none: true }, who: "firstPlayer", ...narrowed });
+// "An attachment you control": `controlled` leaves out an encounter attachment (an Easterling treachery on an enemy, no controller), which a bare `control: "you"` filter sees.
+const OWN_ATTACHMENT: PickSpec = { type: "attachment", control: "you", controlled: true };
 const READY_CHARACTER: PickSpec = { type: "character", control: "you", state: "ready" };
 const EXHAUSTED_HERO: PickSpec = { type: "hero", control: "you", state: "exhausted" };
 const EASTERLING_IN_STAGING: PickSpec = { type: "enemy", control: "any", stagingOnly: true, trait: "Easterling" };
@@ -27,6 +29,8 @@ const EASTERLING_IN_STAGING: PickSpec = { type: "enemy", control: "any", staging
 const SOME_PLAYER_ENGAGED: Condition = { kind: "any", conditions: [{ kind: "canPick", pick: { type: "enemy", control: "any", engaged: "you" } }, { kind: "canPick", pick: { type: "enemy", control: "any", engaged: "other" } }] };
 // "Easterling Horse", "Sword of Rhûn" and "Recurve Bow" attach to an enemy while they are in play (rr.attachment-cards): the Weapon and Mount lines are their texts.
 const CARRIED_ATTACHMENT = (code: string, line: string, trait: "Mount" | "Weapon"): Effect => ({ id: `${code}:constant:1`, cardCode: code, lines: [line], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait }] });
+// 21017:A:1: cards are discarded until an Easterling treachery is, and it attaches to the Captain.
+const CAPTAIN_ATTACHES: Instruction[] = [{ verb: "DiscardUntil", type: "treachery", trait: "Easterling" }, { verb: "AttachTreachery", from: "picked", to: "self" }];
 const ATTACH_TO_PICKED = (title: string, narrowed: Partial<PickSpec>): Instruction[] => [
   { verb: "Pick", pick: CANDIDATE(title, narrowed) },
   { verb: "AttachSelfToPicked", when: { kind: "canPick", pick: CANDIDATE(title, narrowed) } },
@@ -59,7 +63,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     subject: "self",
     instructions: [{ verb: "Choose", who: "actor", options: [{ id: "pursuit", requires: { kind: "inPlay", code: PURSUIT, is: true }, instructions: [PLACE_ON_PURSUIT] }, { id: "attack", instructions: [{ verb: "ImmediateAttack" }] }] }],
   },
-  { id: "21013:shadow:1", cardCode: "21013", lines: ["21013:A:3"], timing: "shadow", instructions: [{ verb: "Pick", pick: { type: "attachment", control: "you" } }, { verb: "DiscardPicked" }] },
+  { id: "21013:shadow:1", cardCode: "21013", lines: ["21013:A:3"], timing: "shadow", instructions: [{ verb: "Pick", pick: OWN_ATTACHMENT }, { verb: "DiscardPicked" }] },
 
   // 21014 River Running (location). While it is in the staging area enemies cannot be optionally engaged (the optional engagement step only: engagement checks and its Travel still engage). Travel: the first player engages the highest engagement cost enemy in the staging area (the players cannot travel here with none).
   { id: "21014:constant:1", cardCode: "21014", lines: ["21014:A:1"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "ModifyStat", stat: "cannotBeOptionallyEngaged", amount: 1, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", staging: true } }] },
@@ -75,7 +79,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 21017 Easterling Captain. Forced: when it enters play, cards are discarded from the top of the encounter deck until an Easterling treachery is discarded, and that treachery is attached to the Captain (its When Revealed and Surge do not resolve; with none the deck is all discarded and nothing attaches).
   // Forced: when it would take damage, the players choose an Easterling attachment on it, it is discarded and the damage is canceled; with none the Captain takes the damage.
-  { id: "21017:forced:1", cardCode: "21017", lines: ["21017:A:1"], timing: "forced", trigger: "encounterEnteredPlay", subject: "self", instructions: [{ verb: "DiscardUntil", type: "treachery", trait: "Easterling" }, { verb: "AttachTreachery", from: "picked", to: "self" }] },
+  // A Captain a search puts into play (the Setup pick) enters play without announcing it as revealed, so the same instructions hear `searchedIntoPlay` too (21017:forced:3).
+  { id: "21017:forced:1", cardCode: "21017", lines: ["21017:A:1"], timing: "forced", trigger: "encounterEnteredPlay", subject: "self", instructions: CAPTAIN_ATTACHES },
+  { id: "21017:forced:3", cardCode: "21017", lines: ["21017:A:1"], timing: "forced", trigger: "searchedIntoPlay", subject: "self", instructions: CAPTAIN_ATTACHES },
   {
     id: "21017:forced:2",
     cardCode: "21017",
@@ -156,13 +162,13 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "21027:whenRevealed:1", cardCode: "21027", lines: ["21027:A:2"], timing: "whenRevealed", instructions: [{ verb: "ModifyHeld", stat: "willpower", amount: -1, holders: "exhaustedCharacters", until: "endOfPhase" }] },
   { id: "21027:shadow:1", cardCode: "21027", lines: ["21027:A:3"], timing: "shadow", instructions: [{ verb: "DamageCard", amount: 1, target: "defender" }] },
 
-  // 21028 Painful Fatigue (treachery). When Revealed: each player exhausts a ready character he controls and deals 1 damage to it (the damage is gated on the pick still being ready, before the exhaust). Shadow: the defending player either exhausts a ready character he controls, or the attacking enemy returns to the staging area after this attack.
+  // 21028 Painful Fatigue (treachery). When Revealed: each player exhausts a ready character he controls and then deals 1 damage to it (the damage is gated on the exhausted character that this player's own pick named, so a player with no ready character takes none). Shadow: the defending player either exhausts a ready character he controls, or the attacking enemy returns to the staging area after this attack.
   {
     id: "21028:whenRevealed:1",
     cardCode: "21028",
     lines: ["21028:A:1"],
     timing: "whenRevealed",
-    instructions: [EACH_PLAYER([{ verb: "Pick", pick: READY_CHARACTER }, { verb: "DamageCard", amount: 1, target: "picked", when: { kind: "canPick", pick: READY_CHARACTER } }, { verb: "Exhaust", target: { kind: "picked" }, when: { kind: "canPick", pick: READY_CHARACTER } }])],
+    instructions: [EACH_PLAYER([{ verb: "Pick", pick: READY_CHARACTER }, { verb: "Exhaust", target: { kind: "picked" }, when: { kind: "canPick", pick: READY_CHARACTER } }, { verb: "DamageCard", amount: 1, target: "picked", when: { kind: "matches", card: "picked", pick: { type: "character", control: "you", state: "exhausted" } } }])],
   },
   {
     id: "21028:shadow:1",

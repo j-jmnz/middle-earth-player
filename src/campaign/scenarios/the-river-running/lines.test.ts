@@ -7,6 +7,7 @@ import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { EFFECTS } from "../../../effects/index.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import { expireModifiers, flagged, updateCard } from "../../../rules/core/state.ts";
+import { placeQuestProgress } from "../../../rules/quest/quest.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
 import { queueEvent } from "../../../rules/windows/queue.ts";
@@ -25,6 +26,14 @@ const HORSE = "21019";
 const RAIDER = "21020";
 const WARRIORS = "21024";
 
+describe("Easterling Outrider (21013:A:3)", () => {
+  it("21013:A:3 shadow: with no attachment the defending player controls nothing is discarded and no choice opens", () => {
+    // The Horse on the attacker is an encounter attachment: no player controls it.
+    const row = { line: "21013:A:3", layout: { stage: S1, attached: [{ code: HORSE, to: "f3", encounter: true }] }, act: { act: "attack", enemy: "f3", shadow: OUTRIDER, undefended: true }, expect: [{ expect: "attachedTo", code: HORSE, host: "f3" }, { expect: "window", kind: "choose", value: false }] } as const;
+    expect(rowProblems(ID, row, EFFECTS)).toEqual([]);
+  });
+});
+
 describe("Easterling Captain (21017:A:2)", () => {
   // "When Easterling Captain would take any amount of damage, discard an Easterling attachment from him. Then, cancel the damage."
   lineSpec("21017:A:2", "the damage is canceled and an Easterling attachment is discarded from the Captain", (effects) => {
@@ -34,6 +43,15 @@ describe("Easterling Captain (21017:A:2)", () => {
     const dealt = settle(queueEvent(hurt, { trigger: "damageDealt", seat: 0, cardId: captain, subject: captain, amount: 3 }), t.ctx, []);
     const done = finish({ state: dealt, steps: [] }, t.ctx).state;
     expect(done.cards[captain]?.damage).toBe(0);
+    expect(zoneOf(done, HORSE)).not.toBe("attached");
+  });
+
+  it("21017:A:2 damage that would destroy the Captain is canceled too: he is not destroyed and the attachment is discarded", () => {
+    const t = table({ stage: S1, staging: [CAPTAIN], attached: [{ code: HORSE, to: CAPTAIN, encounter: true }] });
+    const captain = idOf(t.state, CAPTAIN);
+    const dealt = settle(queueEvent(updateCard(t.state, captain, { damage: 30 }), { trigger: "damageDealt", seat: 0, cardId: captain, subject: captain, amount: 30 }), t.ctx, []);
+    const done = finish({ state: dealt, steps: [] }, t.ctx).state;
+    expect(done.cards[captain]).toMatchObject({ damage: 0, zone: "staging" });
     expect(zoneOf(done, HORSE)).not.toBe("attached");
   });
 
@@ -61,8 +79,8 @@ describe("An Arduous Journey (21029:A:1)", () => {
   });
 
   it("21029:A:1 with 2 players each keeps his own 6: the cap is not shared", () => {
-    const seven = Array.from({ length: 6 }, () => ({ code: "ally", seat: 1 }));
-    expect(held({ seats: 2, play: seven })).toEqual([0, 1]);
+    const six = Array.from({ length: 6 }, () => ({ code: "ally", seat: 1 }));
+    expect(held({ seats: 2, play: six })).toEqual([0, 1]);
   });
 
   // The phase begins: the engine announces it to the Forced effects, so the cap is held only while the side quest is in play.
@@ -116,6 +134,13 @@ describe("Warriors of the East (21024:A:3) and the Setup (21075:A:1)", () => {
 });
 
 describe("The Crossing of Araw (21076:B:2, 21076:B:3)", () => {
+  // The quest row of the spec file commits two heroes (4 Willpower), too few to reach the cap, so the cap's size is read here: 6 progress placed, 5 on the stage.
+  lineSpec("21076:B:2", "with a player engaged, 6 progress placed on the stage leaves 5 on it", (effects) => {
+    const t = table({ stage: S2, engaged: [OUTRIDER] }, effects);
+    const placed = placeQuestProgress(t.state, 6, t.ctx.cards, [], () => false);
+    expect(placed.cards[idOf(placed, S2)]?.progress).toBe(5);
+  });
+
   it("21076:B:2 with no player engaged with an enemy the progress is not capped", () => {
     const t = table({ stage: S2, staging: [OUTRIDER] });
     expect(flagged(t.state, "table", "questProgressCap")).toBe(false);

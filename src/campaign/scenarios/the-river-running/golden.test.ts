@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { RUNNING_GOLDENS, playGolden, runningWorld, type RunningDecks, type RunningGolden } from "../../../../test/scenarios/the-river-running/game.ts";
 import { printedOf } from "../../../rules/core/printed.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
+import { questPointsOf } from "../../../rules/quest/quest.ts";
 import { loadAnyScenario, loadCampaign } from "../../../../scripts/data/load-scenarios.ts";
 import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
 
@@ -47,10 +48,12 @@ describe("The River Running golden", () => {
       },
     },
     wins: "ends when stage 2B is defeated, settles at once with a score and earns nothing",
-    won(state, golden) {
+    won(state, golden, world) {
       expect(state.stageCleared, golden.name).toBe(true);
-      expect(state.cards[state.questStage ?? ""]?.code, golden.name).toBe(STAGE_2);
-      expect(state.cards[state.questStage ?? ""]?.progress ?? 0, golden.name).toBeGreaterThanOrEqual(0);
+      const stage = state.cards[state.questStage ?? ""];
+      expect(stage?.code, golden.name).toBe(STAGE_2);
+      // The stage was defeated: its progress reached its quest points.
+      expect(stage?.progress ?? 0, golden.name).toBeGreaterThanOrEqual(stage ? (questPointsOf(state, stage, world.ctx.cards) ?? 0) : 0);
       // Stage 2A added Warriors of the East to the game: it left the set aside zone.
       expect(zonesOf(state, WARRIORS), golden.name).not.toContain("setAside");
     },
@@ -72,7 +75,7 @@ describe("The River Running golden", () => {
         expect(lost.some((golden) => golden.decks === "brittle")).toBe(true);
       });
 
-      it("21075:B:1 and 21076:A:1 a won game ran stage 2A (X enemies and Warriors of the East in play) and cleared stage 2B", () => {
+      it("21076:A:1 a won game took Warriors of the East out of the set aside zone (one copy in the game) and cleared stage 2B", () => {
         for (const golden of RUNNING_GOLDENS.filter((item) => item.outcome === "won")) {
           const state = game(golden).state;
           expect(zonesOf(state, WARRIORS), golden.name).toHaveLength(1);
