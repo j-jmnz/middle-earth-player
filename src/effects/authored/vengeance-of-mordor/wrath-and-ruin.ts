@@ -25,6 +25,7 @@ const DESTROYS_A_CHARACTER = { trigger: "characterDestroyedByAttack", subject: {
 const ULCHOR_IN_STAGING: PickSpec = { type: "enemy", control: "any", names: ["Thane Ulchor"], staging: true };
 const ULCHOR_PICKED: Instruction = { verb: "Pick", pick: ULCHOR_IN_STAGING };
 const ULCHOR_ABLE: Condition = { kind: "canPick", pick: ULCHOR_IN_STAGING };
+const HOST_IS_ENEMY: Condition = { kind: "matches", card: "host", pick: { type: "enemy", control: "any" } };
 const FOUND_ENEMY: Condition = { kind: "matches", card: "picked", pick: { type: "enemy", control: "any" }, inPlay: false };
 const FOUND_LOCATION: Condition = { kind: "matches", card: "picked", pick: { type: "location", control: "any" }, inPlay: false };
 // "Discard cards from the top of the encounter deck until an enemy is discarded and put it into play engaged with you": the other discards stay discarded and with no enemy nothing is put into play.
@@ -95,7 +96,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "22014:travel:1", cardCode: GATE, lines: ["22014:A:4"], timing: "travel", instructions: [EACH_PLAYER([ULCHOR_PICKED, { verb: "AttackFromStaging", when: ULCHOR_ABLE }])] },
 
     // 22015 Contested Square. A:2: after any enemy is defeated, 1 progress goes on it while it is in the staging area. A:3: while a player controls it, it returns to the staging area after a character he controls is destroyed.
-    { id: "22015:forced:1", cardCode: "22015", lines: ["22015:A:2"], timing: "forced", trigger: "enemyDestroyed", subject: { type: "enemy", control: "any" }, condition: { kind: "sourceIn", zone: "staging" }, instructions: [{ verb: "PlaceProgressOn", amount: 1, target: "self" }] },
+    { id: "22015:forced:1", cardCode: "22015", lines: ["22015:A:2"], timing: "forced", trigger: "enemyDestroyed", subject: { type: "enemy", control: "any", staging: true }, condition: { kind: "sourceIn", zone: "staging" }, instructions: [{ verb: "PlaceProgressOn", amount: 1, target: "self" }] },
     {
       id: "22015:forced:2",
       cardCode: "22015",
@@ -138,8 +139,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 22019 Fury (Surge is a keyword). A:2: attached to an enemy it counts as a Condition attachment, and the enemy that would be destroyed heals all damage and Fury is discarded instead (src/rules/families/mordor/fury.ts). A:3: it attaches to the Easterling enemy without Fury that has
     // the lowest engagement cost, in the staging area or engaged, the first player choosing among those tied.
-    { id: "22019:constant:1", cardCode: "22019", lines: ["22019:A:2"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }] },
-    { id: "22019:constant:2", cardCode: "22019", lines: ["22019:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "healsInsteadOfDestroyed", amount: 1, until: "whileSourceInPlay", target: "host" }] },
+    { id: "22019:constant:1", cardCode: "22019", lines: ["22019:A:2"], timing: "constant", condition: HOST_IS_ENEMY, instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }] },
+    { id: "22019:constant:2", cardCode: "22019", lines: ["22019:A:2"], timing: "constant", condition: HOST_IS_ENEMY, instructions: [{ verb: "ModifyStat", stat: "healsInsteadOfDestroyed", amount: 1, until: "whileSourceInPlay", target: "host" }] },
     {
       id: "22019:whenRevealed:1",
       cardCode: "22019",

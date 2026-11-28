@@ -93,9 +93,9 @@ function setRecord(state: ScenarioState, source: CardInstance, effectId: string,
   }));
 }
 
-// A location that gives the quest Siege or Battle "while it is the active location" (06100:A:1, 06101:A:1) holds the keyword only while it is an active location. Only the two keyword stats read the record's `until` here: every other constant keeps the modifier for as long as its source is in play.
+// A location that gives the quest Siege or Battle, or itself Archery, "while it is the active location" (06100:A:1, 06101:A:1, 22017:A:1) holds the keyword only while it is an active location (the archery total counts every card in play). Only these keyword stats read the record's `until` here: every other constant keeps the modifier for as long as its source is in play.
 function keywordWhileActive(instruction: Extract<Instruction, { verb: "ModifyStat" }>): boolean {
-  return instruction.until === "whileSourceActive" && (instruction.stat === "siege" || instruction.stat === "battle");
+  return instruction.until === "whileSourceActive" && (instruction.stat === "siege" || instruction.stat === "battle" || instruction.stat === "archery");
 }
 
 function wanted(state: ScenarioState, ctx: ReduceContext): Modifier[] {
