@@ -3,7 +3,7 @@ import type { ScreenMoment } from "../../harness/screens.ts";
 // The table moments the screen review shoots (`pnpm browser shot --moment danger-in-dorwinion --landscape`; test/harness/screens.ts): one for each new widget of Danger in Dorwinion's table (docs/scenarios/vengeance-of-mordor/danger-in-dorwinion.md, Table), a layout (the same JSON
 // `pnpm game scene` takes) and a note that says which printed line or widget it shows. `scripts/browser/scene.test.ts` builds each one in Node and fails when a layout no longer builds. The dials are src/play/readouts/mordor/dorwinion.ts, the pill is
 // src/play/readouts/mordor/tavern.ts. The loss fixture `dorwinion-lost` (`pnpm browser shot --fixture dorwinion-lost --at <n>`) shows the same widgets in a played game. Checked by tests only (src/play/scenarios/danger-in-dorwinion-table.test.ts): the Hillside Manor
-// mark at "Cap 1/1" with its "near" warning (a layout cannot set the threat player card effects lowered this round).
+// mark at "Cap 1/1" (a layout cannot set the threat player card effects lowered this round).
 const SIDE_STREET = "21049";
 const MANOR = "21037";
 const TAVERN = "21047";
@@ -13,8 +13,8 @@ const WORSHIP = "21035";
 export const screens: ScreenMoment[] = [
   {
     name: "gate-dial",
-    note: "21077:B:2: stage 1B with 1 resource on it. The top bar's \"Gate\" dial counts the resources against the 2 that let the stage be defeated; it is a goal dial (never warm) and says \"near\" while the stage holds progress but too few resources. 2 progress here.",
-    layout: { stage: "21077", side: "B", phase: "Quest", seats: 1, progress: 2, staging: [SIDE_STREET] },
+    note: "21077:B:2: stage 1B with no resources on it and 5 progress, its 5 quest points. The top bar's \"Gate\" dial counts the resources against the 2 that let the stage be defeated; it is a goal dial (never warm) and says \"near\" once the progress would defeat the stage but the resources do not.",
+    layout: { stage: "21077", side: "B", phase: "Quest", seats: 1, progress: 5, staging: [SIDE_STREET] },
   },
   {
     name: "gate-dial-two-players",
@@ -38,7 +38,7 @@ export const screens: ScreenMoment[] = [
   },
   {
     name: "manor-seat-mark",
-    note: "21037:A:1: Hillside Manor in the staging area. Two-handed: each seat's label is \"P1 · Cap 0/1\", but a crowded top bar captions a ring with the part before the \" · \" (captionOf), so the shots show \"P1\" and the count reaches the player in the ring's note and its spoken words.",
+    note: "21037:A:1: Hillside Manor in the staging area. Two-handed: each seat's label is \"P1 0/1\", short enough for a crowded top bar's caption (captionOf), so the count shows under each ring.",
     layout: { stage: "21077", side: "B", phase: "Quest", seats: 2, staging: [SIDE_STREET, MANOR] },
   },
   {

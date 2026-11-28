@@ -71,7 +71,7 @@ export const WILDERLAND_TEMPLATES: Templates = {
   ReplaceFromCaves: () => ({ text: "this card, the active location, is discarded and the top card of the Caves deck takes its place, as the Deep keyword does but not ignored by a card that ignores the keyword (nothing with the Caves deck empty)", read: [] }),
   ReturnGuardedToHand: () => ({ text: "(marker, does nothing when run) when this enemy leaves play, the card it was guarding returns to its owner's hand (the settle sweep returns a card held under an enemy that is out of play)", read: [] }),
   PutOnPileBottom: (i) => ({ text: `the set-aside (or encounter deck) card with code ${str(i.code)} goes to the bottom of ${PILE(i.pile)}, facedown (a game with no such pile dealt, or no such card, changes nothing)`, read: ["pile", "code"] }),
-  VictoryWhenFree: () => ({ text: "(marker, does nothing when run) when this objective is free of encounters, the settle sweep moves it from the staging area to the victory display", read: [] }),
+  VictoryWhenFree: (i) => ({ text: `(marker, does nothing when run) when this objective is free of encounters, the settle sweep moves it from the staging area to the victory display${i.amount == null ? "" : ` and then places ${str(i.amount)} resource on the main quest card`}`, read: ["amount"] }),
   AttachGuardedFromPile: (i) => ({ text: `the first card with code ${str(i.code)} of ${PILE(i.pile)} enters the staging area and this card, in play as the active location, becomes its guard (it is free of encounters once this card leaves play; nothing with no such card in the pile; the shuffle is the record's)`, read: ["pile", "code"] }),
   RemoveSetAsideDamage: (i) => ({ text: `up to ${str(i.amount)} damage tokens come off the set-aside card with code ${str(i.code)}`, read: ["code", "amount"] }),
 };
@@ -138,7 +138,7 @@ export const WILDERLAND_SAMPLES: Samples = {
   ReplaceFromCaves: [{ verb: "ReplaceFromCaves" }],
   ReturnGuardedToHand: [{ verb: "ReturnGuardedToHand" }],
   PutOnPileBottom: [{ verb: "PutOnPileBottom", pile: "caves", code: "18043" }],
-  VictoryWhenFree: [{ verb: "VictoryWhenFree" }],
+  VictoryWhenFree: [{ verb: "VictoryWhenFree" }, { verb: "VictoryWhenFree", amount: 1 }],
   AttachGuardedFromPile: [{ verb: "AttachGuardedFromPile", pile: "caves", code: "19012" }],
   RemoveSetAsideDamage: [{ verb: "RemoveSetAsideDamage", code: "19011", amount: 3 }],
 };

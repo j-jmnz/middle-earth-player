@@ -23,14 +23,14 @@ const converted = (state: ScenarioState, id: string, ctx: ReduceContext): boolea
   return code.endsWith(FALLEN_SUFFIX) && printedOf(ctx.cards, fallenBase(code)).type === "ally";
 };
 
-/** The source is attached to an ally in play: the ally becomes an enemy engaged with its owner. Nothing happens to a host that is not an ally in a player's area. */
+/** The source is attached to an ally in play: the ally becomes an enemy engaged with its owner (the seat whose card it is, not the one that controls it now). Nothing happens to a host that is not an ally in a player's area. */
 export function convertAttachedAlly(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
   const ally = source?.host ? state.cards[source.host] : undefined;
-  const seat = ally?.controller;
-  if (!ally || ally.zone !== "play" || seat == null || printedOf(ctx.cards, ally.code).type !== "ally" || state.seats[seat]?.eliminated) return state;
-  const made = updateCard(state, ally.id, { code: ally.code + FALLEN_SUFFIX, owner: seat, exhausted: false, committed: false });
-  return engageWith(made, seat, ally.id, steps);
+  const owner = ally ? (ally.owner ?? ally.controller) : null;
+  if (!ally || ally.zone !== "play" || owner == null || printedOf(ctx.cards, ally.code).type !== "ally" || state.seats[owner]?.eliminated) return state;
+  const made = updateCard(state, ally.id, { code: ally.code + FALLEN_SUFFIX, owner, exhausted: false, committed: false });
+  return engageWith(made, owner, ally.id, steps);
 }
 
 /** An ally made an enemy goes back to its owner's discard pile with its own code, wherever the enemy lies (engaged, in the staging area or in the encounter discard pile once defeated). */

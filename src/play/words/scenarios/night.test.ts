@@ -33,7 +33,7 @@ describe("the words of Fire in the Night", () => {
     const pair = withWindow(2, 0);
     expect(nightChooseNote(MANY, pair.game, pair.ctx, names)?.startsWith("Player 1: make 1 of the 2 side quests in the staging area the current quest until the end of the phase, or keep Hrogar's Hill?")).toBe(true);
     expect(nightBranchWords(CURRENT, MAIN_QUEST, names)).toBe("Keep Hrogar's Hill as the current quest");
-    expect(nightBranchWords(CURRENT, "i-draw", names)).toBe("Make Draw Her Fire the current quest");
+    expect(nightBranchWords(CURRENT, "i-draw", names)).toBe("Make Draw Her Fire current");
   });
 
   it("19075:A:1 The Dragon's Thrall's question says what each choice does to the player who was engaged", () => {

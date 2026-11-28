@@ -1,5 +1,8 @@
 import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
+import { copyLine, withCopies } from "../reprint.ts";
+import { AUTHORED_EFFECTS as THE_RUINS_OF_BELEGOST } from "../standalone-scenarios/the-ruins-of-belegost.ts";
+
 // Records for Danger in Dorwinion (Vengeance of Mordor part 2, A Shadow in the East, no campaign card): the three Cultist enemies and the three Plot objectives set aside at Setup, Evidence of the Cult, the City, Servants of Sauron and Under Guard encounter cards, the two encounter side quests and the
 // three quest stages. Every line is read from the scan ledger (data/printed/vengeance-of-mordor.json); a line a template already writes (pnpm data build) needs no record here. The scenario's readings are in docs/scenarios/vengeance-of-mordor/danger-in-dorwinion.md; the vocabulary the
 // box adds is in src/catalog/families/mordor.ts (a Secret Cultist's ally made an enemy, the Travel of the active location resolved as an effect, the shadow cards Black Númenórean keeps, the cards facedown under Seedy Tavern).
@@ -24,7 +27,8 @@ const ENGAGED_PLAYER_RAISED: Condition = { kind: "engagedWithActor" };
 const HIGHEST_ALLY: PickSpec = { type: "ally", control: "any", highestAttack: true, who: "firstPlayer" };
 const OWN_ATTACHMENT: PickSpec = { type: "attachment", control: "you", controlled: true };
 
-export const AUTHORED_EFFECTS: readonly Effect[] = [
+export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
+  [
   // 21030 Priest of Sauron (Cultist). Cannot be optionally engaged. Forced: after it attacks and destroys an ally, each player's threat is raised by 2.
   { id: "21030:constant:1", cardCode: "21030", lines: ["21030:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "cannotBeOptionallyEngaged", amount: 1, until: "whileSourceInPlay", target: "self" }] },
   { id: "21030:forced:1", cardCode: "21030", lines: ["21030:A:3"], timing: "forced", trigger: "characterDestroyedByAttack", subject: { type: "ally", control: "any" }, condition: { kind: "matches", card: "other", pick: { ...AN_ENEMY, isSource: true } }, instructions: [{ verb: "RaiseThreat", amount: 2, who: "eachSeat" }] },
@@ -60,11 +64,12 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 21036 Evidence of the Cult (Clue). Guarded (enemy): when revealed it is guarded by the first enemy discarded. The attached enemy gets +1 Threat, +1 Attack and +1 Defense. Free of encounters it goes to the victory display and the main quest gets 1 resource.
   { id: "21036:whenRevealed:1", cardCode: "21036", lines: ["21036:A:1"], timing: "whenRevealed", instructions: [{ verb: "GuardObjective", types: ["enemy"] }] },
   { id: "21036:constant:1", cardCode: "21036", lines: ["21036:A:2"], timing: "constant", instructions: (["threat", "attack", "defense"] as const).map((stat): Instruction => ({ verb: "ModifyStat", stat, amount: 1, until: "whileSourceInPlay", holders: { ...AN_ENEMY, staging: true, linkedToSource: true } })) },
-  { id: "21036:constant:2", cardCode: "21036", lines: ["21036:A:3"], timing: "constant", instructions: [{ verb: "VictoryWhenFreeAddsResource", amount: 1 }] },
+  { id: "21036:constant:2", cardCode: "21036", lines: ["21036:A:3"], timing: "constant", instructions: [{ verb: "VictoryWhenFree", amount: 1 }] },
 
   // 21037 Hillside Manor. While in the staging area no player's threat is lowered by more than 1 each round by player card effects. Travel: each player discards 1 random card from his hand.
   { id: "21037:constant:1", cardCode: "21037", lines: ["21037:A:1"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "ModifyStat", stat: "playerThreatReductionCap", amount: 1, until: "whileSourceInPlay", target: "eachSeat" }] },
-  { id: "21037:travel:1", cardCode: "21037", lines: ["21037:A:2"], timing: "travel", instructions: [EACH_PLAYER([{ verb: "DiscardRandomFromHand", when: { kind: "handHasCard" } }])] },
+  // Word for word the Travel of Sunken Treasury (The Ruins of Belegost): an empty hand discards nothing, so travel is open.
+  copyLine("50625:A:3", "21037:A:2"),
 
   // 21038 Disappearances. When Revealed: each player discards all allies from his hand; if no card is discarded it gains Doomed 2. Shadow: discard an attachment you control.
   { id: "21038:whenRevealed:1", cardCode: "21038", lines: ["21038:A:1"], timing: "whenRevealed", instructions: [EACH_PLAYER([{ verb: "DiscardEach", pick: { type: "ally", control: "you", from: "hand" } }]), { verb: "Doomed", amount: 2, when: { kind: "noneDiscarded" } }] },
@@ -196,6 +201,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "21079:constant:1", cardCode: "21079", lines: ["21079:B:1"], timing: "constant", condition: ACTIVE_LOCATION, instructions: [{ verb: "ModifyStat", stat: "damageCap", amount: { stat: "questPoints", of: "activeLocation", printed: true }, until: "whileSourceInPlay", holders: { ...CULTIST, staging: true } }] },
   { id: "21079:constant:2", cardCode: "21079", lines: ["21079:B:1"], timing: "constant", condition: NO_ACTIVE_LOCATION, instructions: [{ verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "whileSourceInPlay", holders: { ...CULTIST, staging: true } }] },
   { id: "21079:triggered:1", cardCode: "21079", lines: ["21079:B:2"], timing: "triggered", trigger: "enemyDestroyed", subject: CULTIST, instructions: [{ verb: "WinGame" }] },
-];
+],
+  { pool: THE_RUINS_OF_BELEGOST },
+);
 
 export const AUTHORED_REPLACES: readonly string[] = [];

@@ -163,8 +163,7 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
       }
       // "Each player must exhaust 1 hero he controls to travel here" (01077:A:1): every player needs a card to choose.
       // "Each player must discard 1 random card from his hand to travel here" (41011:A:2): every player needs the cards.
-      // A discard gated on the hand holding a card (`when`) is owed only by a hand that has one: an empty hand pays nothing (Hillside Manor, 21037:A:2).
-      const discards = instruction.verb === "ForEachPlayer" ? instruction.instructions.find((inner) => inner.verb === "DiscardRandomFromHand" && inner.when == null) : undefined;
+      const discards = instruction.verb === "ForEachPlayer" ? instruction.instructions.find((inner) => inner.verb === "DiscardRandomFromHand") : undefined;
       if (discards?.verb === "DiscardRandomFromHand") {
         const amount = discards.amount ?? 1;
         return typeof amount === "number" && livingSeats(state).some((seat) => (state.seats[seat]?.hand.length ?? 0) < amount);

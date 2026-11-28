@@ -19,6 +19,7 @@ import { raiseThreat } from "../../../rules/core/threat-dial.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
 import { queueEvent } from "../../../rules/windows/queue.ts";
 import { allyCard, drive, fightEnemy, finish, idOf, idsOf, legalIntents, opened, resolveRecords, revealedTop, revealFromTop, run, send, start, statOf, tableFromLayout, where, zoneOf, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { definePrinted } from "../../../rules/core/printed.ts";
 import { lineSpec } from "../../../../test/harness/line-spec.ts";
 
 const ID = "danger-in-dorwinion";
@@ -95,6 +96,44 @@ describe("Black Númenórean (21032:A:2, 21032:A:3): the held shadow cards resol
   });
 });
 
+// Round 2 with a stand-in Response that cancels a shadow effect (Hasty Stroke): it cancels the new card's effect, and the held cards still resolve (21032:A:3 does not rest on the new card's effect).
+describe("Black Númenórean (21032:A:3): the new shadow effect is canceled", () => {
+  const WARD = { id: "ward:response:1", cardCode: "ward", lines: ["ward:A:1"], timing: "response" as const, trigger: "shadowPending" as const, instructions: [{ verb: "CancelEffect" as const }] };
+  function round2Damage(cancel: boolean): number {
+    const effects = [...EFFECTS, WARD];
+    const made = table({ phase: "Encounter", engaged: [BLACK], deck: ["21048", "f0", "21044", "f0", "f0", "f0"], hand: ["filler", "filler"] }, effects);
+    made.cards.set("ward", definePrinted({ code: "ward", name: "Ward", type: "attachment" }));
+    const noting = { ...made.state, modifiers: [...made.state.modifiers, { instanceId: "table", sourceId: idOf(made.state, S1), stat: "noteThreatRaised" as const, amount: 1, until: "endOfGame" as const }] };
+    const state = syncConstants(noting, made.ctx);
+    const first = drive(made, start(state), (current) => current.window?.kind === "defense" && current.round === 0);
+    const firstHit = drive(made, send(first, { type: "Undefended", heroId: idOf(state, "dh1") }, made.ctx), (current) => current.round === 1 || current.lost === true);
+    const warded = spawn(firstHit.state, "ward", { zone: "play", seat: 0 }).state;
+    const second = drive(made, { ...firstHit, state: syncConstants(warded, made.ctx) }, (current) => current.window?.kind === "defense" && current.round === 1);
+    const other = idOf(state, "dh2");
+    let current = send(second, { type: "Undefended", heroId: other }, made.ctx);
+    let canceled = false;
+    for (let guard = 0; guard < 60 && current.state.pendingAttack != null && !current.state.lost; guard += 1) {
+      const intents = legalIntents(current.state, made.ctx);
+      const offer = intents.find((intent) => intent.type === "Trigger" && intent.effectId === WARD.id);
+      if (cancel && !canceled && offer) {
+        canceled = true;
+        current = send(current, offer as never, made.ctx);
+        continue;
+      }
+      const pass = intents.find((intent) => intent.type === "Pass");
+      if (!pass) break;
+      current = send(current, pass, made.ctx);
+    }
+    expect(canceled).toBe(cancel);
+    return current.state.cards[other]?.damage ?? 0;
+  }
+
+  it("21032:A:3 with the new card's effect canceled the held card still resolves: +1 Attack, and no +2 (nothing raised the threat)", () => {
+    expect(round2Damage(false)).toBe(7);
+    expect(round2Damage(true)).toBe(6);
+  });
+});
+
 describe("Secret Cultist (21039:A:1): the ally with the highest Attack becomes an enemy engaged with its owner", () => {
   // A weak ally (attack 1) in play and a strong one (attack 4); the Cultist is revealed from the top of the deck.
   function cultist(layout: Layout, effects = EFFECTS, strong: { attack: number; seat?: number } = { attack: 4 }) {
@@ -163,10 +202,27 @@ describe("Secret Cultist (21039:A:1): the ally with the highest Attack becomes a
   });
 });
 
+describe("Secret Cultist (21039:A:1): an ally under another player's control", () => {
+  lineSpec("21039:A:1", "the ally is engaged with its owner, not the player who controls it, and goes back to the owner's discard pile", (effects) => {
+    const made = table({ seats: 2, play: ["ally"] }, effects);
+    made.cards.set("strong", allyCard("strong", 3, { attack: 4, willpower: 2 }));
+    const spawned = spawn(made.state, "strong", { zone: "play", seat: 0 });
+    const taken = updateCard(spawned.state, spawned.id, { owner: 1 });
+    const state = revealedTop({ ...made, state: taken }, SECRET);
+    expect(state.cards[spawned.id]).toMatchObject({ code: "strong~enemy", zone: "engaged", controller: 1, owner: 1 });
+    expect(state.seats[1]?.engaged).toContain(spawned.id);
+    expect(state.seats[0]?.engaged).not.toContain(spawned.id);
+    const gone = settle(run(made, state, { verb: "Discard", target: { kind: "self" } }, { sourceId: idOf(state, SECRET) }), made.ctx, []);
+    expect(gone.cards[spawned.id]).toMatchObject({ code: "strong", zone: "discard" });
+    expect(gone.seats[1]?.discard).toContain(spawned.id);
+    expect(gone.seats[0]?.discard).not.toContain(spawned.id);
+  });
+});
+
 describe("The stages' Forced effects and Bribes when the active location is explored (21077:B:1, 21078:B:1, 21033:A:2)", () => {
   const withDecks = (layout: Layout, effects = EFFECTS) => table({ staging: [BRIBES], active: MANOR, deckOf: ["event", "ally", "event", "event", "event", "event"], ...layout }, effects);
 
-  lineSpec("21077:B:1", "when the active location leaves play explored the stage gets 1 resource, and the first player orders it with Bribes", (effects) => {
+  lineSpec("21077:B:1", "when the active location leaves play explored the stage gets 1 resource (Bribes hears the same event)", (effects) => {
     const made = withDecks({}, effects);
     const explored = explore(made, opened(made).state);
     expect(where(explored, MANOR)).not.toBe("activeLocation");
@@ -384,9 +440,6 @@ describe("Servant of Sauron (21041:A:3)", () => {
     expect(twice.pendingAttack).not.toBeNull();
   };
   lineSpec("21041:A:3", "a threat raise makes the immediate attack once, a second raise in the same phase makes none", raisedTwice);
-  it("21041:A:3 limit once per phase: a second raise in the phase makes no second attack, again with the records", () => {
-    raisedTwice(EFFECTS);
-  });
 });
 
 describe("Treacherous Easterling (21045:A:1)", () => {
@@ -429,8 +482,13 @@ describe("Leader of the Cult (21079:B:1)", () => {
     const state = opened(made).state;
     const cultist = idOf(state, PRIEST);
     const points = made.ctx.cards.get(MANOR)?.questPoints ?? 0;
-    const hit = (from: ScenarioState): number => placeDamage(from, cultist, 99, made.ctx.cards, [], "framework", UNATTRIBUTED).cards[cultist]?.damage ?? 0;
-    expect(hit(state)).toBe(points);
+    const hit = (from: ScenarioState, amount: number): ScenarioState => placeDamage(from, cultist, amount, made.ctx.cards, [], "framework", UNATTRIBUTED);
+    // Two hits in one round: the second adds nothing once the cap is reached.
+    const once = hit(state, 1);
+    expect(once.cards[cultist]?.damage).toBe(1);
+    const twice = hit(once, 99);
+    expect(twice.cards[cultist]?.damage).toBe(points);
+    expect(hit(twice, 3).cards[cultist]?.damage).toBe(points);
     const bare = table({ stage: "21079", staging: [PRIEST] }, effects);
     expect(placeDamage(opened(bare).state, idOf(bare.state, PRIEST), 3, bare.ctx.cards, [], "framework", UNATTRIBUTED).cards[idOf(bare.state, PRIEST)]?.damage).toBe(0);
   });

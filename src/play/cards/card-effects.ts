@@ -400,8 +400,8 @@ function stagingPlace(game: ScenarioState, cardId: string): PlaceMark | null {
   return at ? { row: at.row, col: at.col, from: marker } : null;
 }
 
-/** The pill on The Havens Burn: "2/5" (cards under it against the number that loses), threat red when the next card placed under it loses the game; `speech` is "2 under, lose at 5". `clearName`: on a card turned sideways the pill stands at its far end, clear of the name (a character with poison). */
-export type UnderMark = { text: string; loses: boolean; speech: string; count?: number; clearName?: true };
+/** The pill on The Havens Burn: "2/5" (cards under it against the number that loses), threat red when the next card placed under it loses the game; `speech` is "2 under, lose at 5". `clearName`: on a card turned sideways the pill stands at its far end, clear of the name (a character with poison). `belowName`: a counted pill on a card with nothing else at its foot stays below the last line of the name (a location with cards under it). */
+export type UnderMark = { text: string; loses: boolean; speech: string; count?: number; clearName?: true; belowName?: true };
 
 function underMark(tally: { count: number; limit: number } | null): UnderMark | null {
   return tally ? burnMark(tally) : null;
@@ -415,7 +415,7 @@ function handHeldMark(game: ScenarioState, cardId: string): UnderMark | null {
 // The Ship enemy Belfalas Islet holds out of play while it is the active location (12129:A:2) is the same night pill as the cards under The Havens Burn: "1 held", and the reader hears the enemy's name.
 // The Captives of The Uruk-hai lying under To Isengard! or held by Grishnákh are counted the same way (families/captives): "2 held", and the reader hears each hero's name.
 function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): UnderMark | null {
-  // The facedown underworld cards under a location of The Steward's Fear: "2 underworld", never which cards (06018:A:1).
+  // The facedown underworld cards under a location of The Steward's Fear: "2 underworld", never which cards (06018:A:1); the encounter cards facedown under Seedy Tavern of Danger in Dorwinion: "2 facedown" (21047:A:3).
   const stack = stackMark(game, cardId) ?? tavernMark(game, cardId);
   if (stack) return stack;
   // The enemy faceup under Narrow Alleyway in Escape from Umbar: "1 held", the enemy named to the reader (readouts/haradrim/umbar.ts).

@@ -68,9 +68,9 @@ export function stackTakes(before: ScenarioState, after: ScenarioState, nameOf: 
 }
 
 /** The pill on a location that holds an underworld stack, or null. Any location in staging or active counts: Sewers puts its card under the active location, whatever that is (06018:A:2). */
-export function stackMark(game: ScenarioState, cardId: string): ReturnType<typeof stackPill> | null {
+export function stackMark(game: ScenarioState, cardId: string): (ReturnType<typeof stackPill> & { belowName: true }) | null {
   const count = stackUnder(game, cardId).length;
-  return count > 0 ? stackPill(count) : null;
+  return count > 0 ? { ...stackPill(count), belowName: true } : null;
 }
 
 /** The preview line of an Underworld location in play, or of any location that holds a stack: what lies under it. Null for any other card. */

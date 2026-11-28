@@ -36,8 +36,6 @@ const VERBS = [
   verbFlags(z.strictObject({ verb: z.literal("RevealFacedownUnder"), ...when }), { runsInFrame: true }),
   // "Until the end of the round, enemies engaged with the first player cannot take damage" (21042:A:2): a lasting effect of an encounter card read live (faq.lasting-effects): every enemy engaged with the first player now cannot take damage, one that engages him later too.
   z.strictObject({ verb: z.literal("BarDamageToEngaged"), who: z.literal("firstPlayer"), until: z.literal("endOfRound"), ...when }),
-  // A constant marker on an objective: "When Evidence of the Cult is free of encounters, add it to the victory display. Then, place 1 resource on the main quest" (21036:A:3). The settle sweep adds the card in the staging area to the victory display once nothing guards it and places `amount` resources on the main quest.
-  z.strictObject({ verb: z.literal("VictoryWhenFreeAddsResource"), amount: z.number().int().positive() }),
 ] as const;
 
 const TRIGGERS = [] as const;

@@ -104,7 +104,7 @@ export function nightBranchWords(choose: Choose, optionId: string, names: Choice
   if (kind === "current") {
     if (optionId === MAIN_QUEST) return now?.main?.barred ? "Have no current quest this phase" : `Keep ${now?.main?.name ?? HILL} as the current quest`;
     const held = now?.quests?.[optionId];
-    return `Make ${names.card(optionId)} the current quest${held ? ` (${held})` : ""}`;
+    return `Make ${names.card(optionId)} current${held ? ` (${held})` : ""}`;
   }
   // `source` is the card's name, as the branch words are handed it.
   if (kind === "thrall") return optionId === "hill" ? `Deal ${hillDamage(choose, "hill")} damage to ${HILL}` : `${source ?? "The Dragon's Thrall"} makes an immediate attack against you`;

@@ -26,12 +26,28 @@ describe("the stage gate", () => {
     expect(dialProps(gate!).limit).toBe(2);
   });
 
-  it("21077:B:2 warns when the stage has progress but too few resources, and not on side A", () => {
-    const made = built({ stage: "21077", progress: 3 });
+  it("21077:B:2 warns only when the stage's progress fills its quest points with too few resources, and not on side A", () => {
+    const some = built({ stage: "21077", progress: 3 });
+    expect(scenarioDials(some.state, some.ctx, nameOf(some)).find((dial) => dial.id === "gate")?.warn).toBeUndefined();
+    const made = built({ stage: "21077", progress: 5 });
     const gate = scenarioDials(made.state, made.ctx, nameOf(made)).find((dial) => dial.id === "gate");
     expect(gate?.warn?.level).toBe("near");
-    expect(gate?.warn?.words).toContain("needs 2 more resources");
+    expect(gate?.warn?.words).toBe("A City in Turmoil has all its progress but needs 2 more resources before it can be defeated.");
     expect(dials({ stage: "21077", side: "A" }).find((dial) => dial.id === "gate")).toBeUndefined();
+  });
+
+  it("21078:B:2 prints 0 quest points, so any progress with too few resources warns", () => {
+    const none = dials({ stage: "21078" }).find((dial) => dial.id === "gate");
+    expect(none?.warn).toBeUndefined();
+    const made = built({ stage: "21078", progress: 1 });
+    const gate = scenarioDials(made.state, made.ctx, nameOf(made)).find((dial) => dial.id === "gate");
+    expect(gate?.warn?.words).toBe("The Shadow of Mordor holds progress but needs 4 more resources before it can be defeated.");
+  });
+
+  it("the gate's spoken words repeat the count once in the note and once in the limit, and join with no \".,\"", () => {
+    const gate = dials({ stage: "21077" }).find((dial) => dial.id === "gate");
+    expect(`${gate?.name} ${gate?.note} ${gate?.limitWords}`.match(/\b2\b/g)).toHaveLength(2);
+    expect(gate?.note?.endsWith(".")).toBe(false);
   });
 
   it("21078:B:2 needs 3 more resources than there are players", () => {
@@ -67,9 +83,12 @@ describe("Hillside Manor's cap", () => {
     const marks = seatMarks(made.state, made.ctx);
     expect(marks).toHaveLength(1);
     expect(marks[0]).toMatchObject({ seat: 0, label: "Cap 0/1" });
+    const pair = built({ seats: 2, stage: "21077", staging: ["21037"] });
+    expect(seatMarks(pair.state, pair.ctx).map((mark) => mark.label)).toEqual(["P1 0/1", "P2 0/1"]);
     expect(marks[0]?.warn).toBeUndefined();
     const spent = { ...made.state, playerThreatLoweredBy: { 0: 1 } };
-    expect(seatMarks(spent, made.ctx)[0]).toMatchObject({ label: "Cap 1/1", warn: { level: "near" } });
+    expect(seatMarks(spent, made.ctx)[0]).toMatchObject({ label: "Cap 1/1" });
+    expect(seatMarks(spent, made.ctx)[0]?.warn).toBeUndefined();
   });
 
   it("21037:A:1 marks no seat once Hillside Manor is not in the staging area", () => {
@@ -94,7 +113,7 @@ describe("the cards facedown under Seedy Tavern", () => {
     expect(slotNumbers(empty.state, empty.ctx, idOf(empty.state, "21047")).under).toBeNull();
     const held = built({ stage: "21077", staging: ["21047"], under: [{ code: "21034", to: "21047" }, { code: "21035", to: "21047" }] });
     const pill = slotNumbers(held.state, held.ctx, idOf(held.state, "21047")).under;
-    expect(pill).toMatchObject({ text: "2 facedown", count: 2, loses: false });
+    expect(pill).toMatchObject({ text: "2 facedown", count: 2, loses: false, belowName: true });
     expect(pill?.speech).toContain("2 encounter cards facedown underneath");
   });
 });

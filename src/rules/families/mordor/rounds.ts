@@ -7,11 +7,9 @@ import { flagged, modifierActive } from "../../core/state.ts";
 import type { Scope } from "../../interpret/conditions.ts";
 import type { Focus } from "../index.ts";
 
-const NO_DAMAGE = "mordor:noDamage:";
-
-/** BarDamageToEngaged: the enemies engaged with the first player now, and any that engage him before the end of the round, cannot take damage (the holder names the seat, not the enemies). */
+/** BarDamageToEngaged: the enemies engaged with the first player now, and any that engage him before the end of the round, cannot take damage (the holder is the seat, like the note of a raised threat, not the enemies). */
 export function barDamageToEngaged(state: ScenarioState, focus: Focus): ScenarioState {
-  return { ...state, modifiers: [...state.modifiers, { instanceId: `${NO_DAMAGE}${state.firstPlayer}`, sourceId: focus.sourceId ?? "table", stat: "noDamageToEngaged", amount: 1, until: "endOfRound" }] };
+  return { ...state, modifiers: [...state.modifiers, { instanceId: `seat:${state.firstPlayer}`, sourceId: focus.sourceId ?? "table", stat: "noDamageToEngaged", amount: 1, until: "endOfRound" }] };
 }
 
 /** Whether a lasting effect bars damage to the enemy: it is engaged with the seat a BarDamageToEngaged named. Read by the damage rules; false with no such effect. */
@@ -19,7 +17,7 @@ export function mordorDamageBarred(state: ScenarioState, id: string): boolean {
   if (state.modifiers.length === 0) return false;
   const card = state.cards[id];
   if (!card || card.zone !== "engaged") return false;
-  return state.modifiers.some((modifier) => modifier.stat === "noDamageToEngaged" && modifier.instanceId === `${NO_DAMAGE}${card.controller}` && modifierActive(state, modifier));
+  return state.modifiers.some((modifier) => modifier.stat === "noDamageToEngaged" && modifier.instanceId === `seat:${card.controller}` && modifierActive(state, modifier));
 }
 
 /** A seat raised its threat: with the table flag `noteThreatRaised` the seat holds `raisedThreat` until the end of the round. Every other game has no flag, so its state never changes. */

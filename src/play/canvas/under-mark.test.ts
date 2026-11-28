@@ -2,7 +2,8 @@
 import { describe, expect, it } from "vitest";
 
 import { TOKEN } from "./token-spots.ts";
-import { FOOT_ROW, STRIP, underMarkBox, underMarkTop, underRect } from "./under-mark.ts";
+import { BADGE_TOP, NAME_LINE } from "./badge-room.ts";
+import { FOOT_ROW, NAME_BOTTOM, STRIP, underMarkBox, underMarkTop, underRect } from "./under-mark.ts";
 
 const card = (w: number) => ({ x: 100, y: 50, w, h: w * 1.4 });
 // The badge font's width: about 5.5 pt a character at Medium.
@@ -113,5 +114,25 @@ describe("the pill's top edge", () => {
         }
       }
     }
+  });
+});
+
+describe("the counted pill and a two-line name", () => {
+  it("NAME_BOTTOM is the bottom of a two-line name", () => {
+    expect(NAME_BOTTOM).toBe(BADGE_TOP + NAME_LINE);
+  });
+
+  it("belowName: a counted pill on a card with nothing at its foot stands below the name's last line, lifted only when the lift clears it", () => {
+    for (const s of [0.85, 1, 1.25, 1.5]) {
+      for (const h of [34, 44, 53, 62, 70, 84, 101]) {
+        const top = underMarkTop(h, s, true, false, true);
+        expect(top, `h ${h} s ${s}`).toBeGreaterThanOrEqual(Math.min(NAME_BOTTOM * s, underMarkTop(h, s, false, false)));
+        // Without the flag, or with a number at the foot, the pill is lifted as before.
+        expect(underMarkTop(h, s, true, false), `h ${h} s ${s}`).toBeLessThan(underMarkTop(h, s, false, false));
+        expect(underMarkTop(h, s, true, true, true), `h ${h} s ${s}`).toBeLessThan(underMarkTop(h, s, false, false));
+      }
+    }
+    // The phone's 62 pt card holds no lift under a two-line name.
+    expect(underMarkTop(62, 1, true, false, true)).toBe(underMarkTop(62, 1, false, false));
   });
 });

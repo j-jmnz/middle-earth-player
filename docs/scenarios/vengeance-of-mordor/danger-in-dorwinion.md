@@ -9,6 +9,7 @@ Vengeance of Mordor part 2 (A Shadow in the East), standalone only, on Easy and 
 ## Data
 
 - Evidence of the Cult has Guarded (enemy) (`hrd.guarded-x`, `hrd.guarded-x-example`); Priest of Sauron, The Governor and Black Númenórean are Victory 6 and immune to player card effects.
+- Stage 2B (21078) prints its quest points as 0 (the scan shows a 0 in the quest-points shield, read against `https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/A-Shadow-in-the-East/The-Shadow-of-Mordor-2B.jpg`), so `data/cards/ASitE.json` is right and needs no override; the preview says "No quest points" for it, which is right, and the gate (21078:B:2) is the stage's only hold.
 - Stage 3B: the Cultist takes at most X damage each round, X the printed quest points of the active location; when it is defeated the players win.
 
 ## Readings
@@ -41,10 +42,10 @@ The statuses are those of the Readings bullet of `docs/scenarios/vengeance-of-mo
 
 Each piece a record creates, with the line that creates it (`docs/agents/agent-brief.md`, Scenario procedure, The Table step). The engine decides each number; the table only says it.
 
-- **Stage gate dial** (`21077:B:2`, `21078:B:2`): the resources on stage 1B against the 2 that let it be defeated, and on stage 2B against the players plus 3. A goal dial (the players' way out, never warms) with a "near" warning while the stage holds progress but too few resources (`src/play/readouts/mordor/dorwinion.ts`, words in `dorwinion-words.ts`). The resources come from the Forced effects of `21077:B:1` and `21078:B:1`.
+- **Stage gate dial** (`21077:B:2`, `21078:B:2`): the resources on stage 1B against the 2 that let it be defeated, and on stage 2B against the players plus 3. A goal dial (the players' way out, never warms) with a "near" warning while the stage holds the progress that would defeat it (its quest points; stage 2B prints 0, so any progress) but too few resources (`src/play/readouts/mordor/dorwinion.ts`, words in `dorwinion-words.ts`). The resources come from the Forced effects of `21077:B:1` and `21078:B:1`.
 - **Bribes dial** (`21033:A:1`, `21033:A:2`): the resources on Bribes, each adding 1 Threat to the staging area. No limit; a tap says what the Forced effect does with them. Shown while Bribes is in the staging area.
 - **Sauron Worship dial** (`21035:A:2`, `21035:A:3`): the damage tokens on Sauron Worship, each lowering every player's elimination level by 1. No limit; the note says that one more is placed at the end of each round.
-- **Hillside Manor seat mark** (`21037:A:1`): while Hillside Manor is in the staging area each seat wears "Cap n/1" (short so it does not cut at 667x375), the threat player card effects took off it this round (`playerThreatLoweredBy`) against the 1 allowed; it says "near" at 1. The count restarts each round.
+- **Hillside Manor seat mark** (`21037:A:1`): while Hillside Manor is in the staging area each seat's dial label is "Cap n/1" (solo) or "P1 n/1" (two-handed, short so the bar's caption keeps the count), the threat player card effects took off it this round (`playerThreatLoweredBy`) against the 1 allowed; it never warns. The count restarts each round.
 - **Cards facedown under Seedy Tavern** (`21047:A:3`, `21047:A:2`): a pill "N facedown" on the location, never which cards, spoken as "N encounter cards facedown underneath" (`src/play/readouts/mordor/tavern.ts`, one call in `heldMark` of `src/play/cards/card-effects.ts`). The Forced effect reveals each when the location is explored.
 - **Shadow cards held by Black Númenórean** (`21032:A:2`, `21032:A:3`): a kept shadow card stays faceup attached to the enemy, so the table draws it under its host in every zone the enemy can be in, as any shadow card; no zone or widget.
 - **Converted ally under Secret Cultist** (`21039:A:1`): the ally becomes an enemy engaged with its owner (the card `<code>~enemy`) with Secret Cultist attached to it, drawn under its host as any attachment; no zone or widget.

@@ -14,14 +14,15 @@ import { lastPicked } from "../../../interpret/player-verbs.ts";
 import { effectData } from "../../encounter/moves.ts";
 import { listened, queueHeard } from "../../defense/listen.ts";
 import type { Focus } from "../../index.ts";
+import { holdsKeptShadow } from "../../mordor/shadows.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
-/** The attack's shadow cards have resolved (their shadow effects first): announced once about the attacking enemy when it holds a shadow card and some card hears it, and before damage is dealt (`shadowsResolved`, the Witch of Angmar's Forced). */
+/** The attack's shadow cards have resolved (their shadow effects first): announced once about the attacking enemy when it holds a shadow card and some card hears it, and before damage is dealt (`shadowsResolved`, the Witch of Angmar's Forced and Black Númenórean's, which resolves the shadow cards he keeps: it is announced when the new card's effect was canceled only for an enemy that keeps some). */
 export function announceShadowsResolved(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   const attack = state.pendingAttack;
   const enemy = attack ? state.cards[attack.enemyId] : undefined;
-  if (!attack || !enemy || attack.shadowCanceled || shadowCards(enemy).length === 0 || !listened(state, ctx, ["shadowsResolved"])) return state;
+  if (!attack || !enemy || (attack.shadowCanceled && !holdsKeptShadow(state, enemy.id)) || shadowCards(enemy).length === 0 || !listened(state, ctx, ["shadowsResolved"])) return state;
   return queueHeard(state, ctx, { trigger: "shadowsResolved", seat: attack.seat, cardId: enemy.id, subject: enemy.id });
 }
 

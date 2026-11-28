@@ -24,7 +24,6 @@ export const MORDOR_TEMPLATES: Templates = {
   PlaceResourcePerDiscarded: (i) => ({ text: `1 resource is placed on this card for each ${str(i.cardType)} card among those this effect discarded from the top of the players' decks, all the decks counted together`, read: ["cardType"] }),
   RevealFacedownUnder: () => ({ text: "each card facedown under this card is revealed by the acting player as an encounter card that is not from the encounter deck (its When Revealed resolves, a location or enemy is added to the staging area)", read: [] }),
   BarDamageToEngaged: (i) => ({ text: `until the end of the round, enemies engaged with the ${i.who === "firstPlayer" ? "first player" : str(i.who)} cannot take damage, read as the table stands (an enemy that engages that player later in the round is held too)`, read: ["who"] }),
-  VictoryWhenFreeAddsResource: (i) => ({ text: `a constant marker: when this card in the staging area is free of encounters (nothing is attached to it as its guard) it is added to the victory display and ${str(i.amount)} resource is placed on the main quest card`, read: ["amount"] }),
   ModifyHeld: (i) => ({ text: `${HOLDERS[String(i.holders)] ?? str(i.holders)} gets ${Number(i.amount) > 0 ? "+" : ""}${i.amount} ${str(i.stat)}${i.until === "endOfPhase" ? " until the end of the phase" : ""}`, read: ["stat", "amount", "holders", "until"] }),
 };
 
@@ -44,7 +43,6 @@ export const MORDOR_SAMPLES: Samples = {
   PlaceResourcePerDiscarded: [{ verb: "PlaceResourcePerDiscarded", cardType: "event" }],
   RevealFacedownUnder: [{ verb: "RevealFacedownUnder" }],
   BarDamageToEngaged: [{ verb: "BarDamageToEngaged", who: "firstPlayer", until: "endOfRound" }],
-  VictoryWhenFreeAddsResource: [{ verb: "VictoryWhenFreeAddsResource", amount: 1 }],
   AttachTreachery: [{ verb: "AttachTreachery", from: "discardTop", trait: "Easterling", to: "self" }, { verb: "AttachTreachery", from: "picked", to: "self" }],
   ModifyHeld: [{ verb: "ModifyHeld", stat: "threat", amount: 2, holders: "sourceTitle", until: "endOfPhase" }, { verb: "ModifyHeld", stat: "willpower", amount: -1, holders: "exhaustedCharacters", until: "endOfPhase" }],
 };
