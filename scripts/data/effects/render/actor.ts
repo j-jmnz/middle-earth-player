@@ -1,5 +1,5 @@
 // Who "the acting player" is in a record's steps, read from the record's own fields and the type of its card (the engine's rules: forcedActor in src/rules/windows/triggers.ts, resolveShadowCard in src/rules/combat/shadow.ts, actionEffect in src/rules/player/actions.ts).
-import type { Ctx, Obj } from "./kit.ts";
+import { isObj, type Ctx, type Obj } from "./kit.ts";
 
 // The card types a player owns: a Forced effect of one answers to its controller. Any other card's Forced effect answers to the player the event happened to.
 const PLAYER_TYPES: ReadonlySet<string> = new Set(["hero", "ally", "attachment", "event", "player-side-quest", "contract", "treasure"]);
@@ -25,6 +25,10 @@ export function actorNote(effect: Obj, ctx: Ctx): string {
   const encounterCard = ctx.cardType !== undefined && !PLAYER_TYPES.has(ctx.cardType);
   // A When Revealed record that itself makes the first player act: `who: firstPlayer` on a step, or a ForEachPlayer with no seats filter (a filter such as engaged or guardian does not start at the first player) that starts with the first player and stops after one.
   if (timing === "whenRevealed" && encounterCard && Array.isArray(effect.instructions) && effect.instructions.some(makesFirstPlayerAct)) return "the acting player is the first player (the record names the first player, not the player who revealed the card)";
+  // A Travel effect that engages an enemy: the player who takes the travel opportunity is the first player, so the first player engages it (the engine: the travel window opens for the first living seat, src/rules/engine/machine.ts).
+  // Not when a step switches the actor (a player chosen to engage: Chetwood Forest, 09018:A:1).
+  const stepVerbs = Array.isArray(effect.instructions) ? effect.instructions.map((step) => (isObj(step) ? step.verb : undefined)) : [];
+  if (timing === "travel" && stepVerbs.includes("Engage") && !stepVerbs.includes("SwitchActor")) return "the acting player is the first player, who takes the travel opportunity (with separate staging areas, each player in turn): that player engages the enemy";
   if (timing === "shadow") return "the acting player is the defending player (the player the attack is against)";
   // A card that leaves play names the seat that controlled it in the event (it has no controller afterwards): the objective-hero's "If it leaves play, you are eliminated" is that player's.
   if ((timing === "forced" || timing === "triggered") && encounterCard && trigger === "leftPlay" && effect.subject === "self" && /"verb":"Eliminate(Player|AfterAttack)"/.test(JSON.stringify(effect.instructions ?? null))) return "the acting player is the player who controlled the card when it left play (the leave-play event names that player, the card having no controller afterwards)";

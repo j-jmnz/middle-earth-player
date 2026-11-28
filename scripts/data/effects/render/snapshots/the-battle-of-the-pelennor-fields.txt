@@ -523,7 +523,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145077:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the card with code 145080 is added to the staging area (the copy a Setup search found, else one the Setup deals)
-    - the first player chooses a treachery with the trait Morgul titled "Fell Beast" in the encounter deck or its discard pile (one of each title) that the enemy named "The Witch-king" does not carry yet, and it is attached to that enemy in play (the deck is shuffled by the step after)
+    - the first player chooses a treachery with the trait Morgul titled "Fell Beast" in the encounter deck or its discard pile (one of each title) that the enemy named "The Witch-king" does not carry yet, and it is attached to that enemy in play: the card whose line this is when it bears that title (a second copy in play does not take it), else the first card in play with that title (the deck is shuffled by the step after)
     - shuffle the encounter deck
     - for each player, first player first:
       - if not (the actor holds the first player token): the acting player reveals an encounter card

@@ -31,7 +31,7 @@ Scenario piles that place cards with no record (staging: 21014 River Running; qu
   21013:shadow:1: Shadow
     who acts: the acting player is the defending player (the player the attack is against)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose attachment (you control)
+    - choose attachment (you control) that a player controls (not an encounter attachment)
     - discard the picked card
 
 ## 21014 River Running
@@ -44,6 +44,7 @@ Scenario piles that place cards with no record (staging: 21014 River Running; qu
 
 21014:A:2 (front): Travel: The first player engages the highest engagement cost enemy in the staging area.
   21014:travel:1: Travel
+    who acts: the acting player is the first player, who takes the travel opportunity (with separate staging areas, each player in turn): that player engages the enemy
     note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no enemy matches the choose step (read by the angmar family); or when no card matches the line's choose step
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, with the highest current engagement cost of those (ties: the chooser decides), chosen by the first player
@@ -91,6 +92,11 @@ Scenario piles that place cards with no record (staging: 21014 River Running; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - cards are discarded from the top of the encounter deck until a treachery with the trait Easterling is discarded, or the deck is empty; that card becomes the picked card
     - the card this effect picked last, if it lies in the encounter discard pile and is a treachery, is attached to the self enemy as an attachment, its When Revealed effects and Surge not resolved (nothing when the enemy is not in play or cannot have it)
+  21017:forced:3: Forced on the event searchedIntoPlay (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - cards are discarded from the top of the encounter deck until a treachery with the trait Easterling is discarded, or the deck is empty; that card becomes the picked card
+    - the card this effect picked last, if it lies in the encounter discard pile and is a treachery, is attached to the self enemy as an attachment, its When Revealed effects and Surge not resolved (nothing when the enemy is not in play or cannot have it)
 
 21017:A:2 (front): Forced: When Easterling Captain would take any amount of damage, discard an Easterling attachment from him. Then, cancel the damage.
   21017:forced:2: Forced on the event damageDealt (heard about this card)
@@ -113,7 +119,7 @@ Scenario piles that place cards with no record (staging: 21014 River Running; qu
 21018:A:3 (front): When Revealed: Search the encounter deck and discard pile for an Easterling Horse and attach it to Rider of Rhûn. Shuffle the encounter deck.
   21018:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the first player chooses a treachery with the trait Easterling titled "Easterling Horse" in the encounter deck or its discard pile (one of each title) that the enemy named "Rider of Rhûn" does not carry yet, and it is attached to that enemy in play (the deck is shuffled by the step after)
+    - the first player chooses a treachery with the trait Easterling titled "Easterling Horse" in the encounter deck or its discard pile (one of each title) that the enemy named "Rider of Rhûn" does not carry yet, and it is attached to that enemy in play: the card whose line this is when it bears that title (a second copy in play does not take it), else the first card in play with that title (the deck is shuffled by the step after)
     - shuffle the encounter deck
 
 ## 21019 Easterling Horse
@@ -270,8 +276,8 @@ Scenario piles that place cards with no record (staging: 21014 River Running; qu
   21028:whenRevealed:1: When revealed
     - for each player, first player first:
       - choose ready character (you control)
-      - then, if there is a ready character (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to the picked card
       - then, if there is a ready character (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): exhaust the picked card
+      - then, if the picked card is a exhausted character (you control) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to the picked card
 
 21028:A:2 (shadow): Shadow: Either exhaust a character you control, or return attacking enemy to the staging area after this attack.
   21028:shadow:1: Shadow
@@ -344,4 +350,4 @@ Scenario piles that place cards with no record (staging: 21014 River Running; qu
   21076:constant:3: Constant
     (no instructions: this is the quest's last stage, so when the players defeat it no stage follows and the engine ends the game as a win by its own rule)
 
-(rendered pieces: 205 by template, 0 as JSON)
+(rendered pieces: 208 by template, 0 as JSON)

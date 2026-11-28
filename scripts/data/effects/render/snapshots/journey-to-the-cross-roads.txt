@@ -139,6 +139,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 
 144033:A:2 (front): Travel: The first player engages an enemy in the staging area to travel here.
   144033:travel:1: Travel
+    who acts: the acting player is the first player, who takes the travel opportunity (with separate staging areas, each player in turn): that player engages the enemy
     note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when no enemy matches the choose step (read by the angmar family); or when no card matches the line's choose step
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, chosen by the first player
