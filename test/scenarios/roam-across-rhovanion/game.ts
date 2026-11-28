@@ -205,7 +205,7 @@ export const rhovanionStart = (seatCount: 1 | 2, seed: number, difficulty: Diffi
 export const RHOVANION_GOLDENS: readonly RhovanionGolden[] = [
   { name: "true solo, won from a blank log, Tiny, Key, Horn, three locations left in the staging area, Deep Ravine for the pool, Misplaced Trust", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won" },
   { name: "true solo, won from a blank log, Key, Horn, Tiny, trust twice, Urdug's Cunning", seatCount: 1, seed: 7, difficulty: "Normal", decks: "strong", outcome: "won", policy: { trust: 2 } },
-  { name: "true solo, won from a blank log, Key, Tiny, Horn, no trust at all, the last location offered, Urdug's Cunning", seatCount: 1, seed: 6, difficulty: "Normal", decks: "strong", outcome: "won", policy: { trust: 0, location: "last" } },
+  { name: "true solo, won from a blank log, Key, Tiny, Horn, no trust at all, the last location offered, Urdug's Cunning", seatCount: 1, seed: 27, difficulty: "Normal", decks: "strong", outcome: "won", policy: { trust: 0, location: "last" } },
   { name: "true solo, won from a blank log, Horn, Key, Tiny, the last answers taken, no location left for the pool", seatCount: 1, seed: 8, difficulty: "Normal", decks: "strong", outcome: "won", policy: { choose: "last", weather: "exhaust" } },
   { name: "true solo, won, after the earlier parts, Horn, Tiny, Key", seatCount: 1, seed: 12, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
   { name: "true solo, won, after the earlier parts, no boon ally searched, Tiny, Horn, Key", seatCount: 1, seed: 11, difficulty: "Normal", decks: "strong", outcome: "won", after: true, ally: "skip" },

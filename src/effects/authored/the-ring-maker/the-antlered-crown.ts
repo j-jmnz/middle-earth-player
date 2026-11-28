@@ -95,7 +95,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 08153 Raven Warrior. Forced: after it engages a player, X time counters come off the locations in play, X the cards in that player's hand when it resolves; the first player divides them one at a time (recommended reading).
   // Shadow: the defending player discards an attachment he controls, if he has one.
   { id: "08153:forced:1", cardCode: WARRIOR, lines: ["08153:A:1"], timing: "forced", trigger: "engaged", subject: "self", instructions: [{ verb: "RemoveTimeCounters", target: "locations", amount: { hand: true }, distribute: "firstPlayer" }] },
-  { id: "08153:shadow:1", cardCode: WARRIOR, lines: ["08153:A:2"], timing: "shadow", instructions: [{ verb: "Pick", pick: { type: "attachment", control: "you", controlled: true } }, { verb: "Discard", target: { kind: "picked" } }] },
+  { id: "08153:shadow:1", cardCode: WARRIOR, lines: ["08153:A:2"], timing: "shadow", instructions: [{ verb: "Pick", pick: { type: "attachment", control: "you" } }, { verb: "Discard", target: { kind: "picked" } }] },
 
   // 08154 Raven Skirmisher. When Revealed: the first player chooses to remove 1 counter from the active location (only while it holds one) or to reveal an additional encounter card. Shadow: the attacker gets +X Attack, X the printed Time X of the active location.
   {

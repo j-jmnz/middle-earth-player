@@ -31,8 +31,8 @@ Scenario piles that place cards with no record (quest: 08011 The Road to Tharbad
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the set-aside card with code 08015 becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free
     - for each player, first player first:
-      - the acting player discards each Item attachment (you control) that a player controls (not an encounter attachment)
-      - the acting player discards each Mount attachment (you control) that a player controls (not an encounter attachment)
+      - the acting player discards each Item attachment (you control)
+      - the acting player discards each Mount attachment (you control)
       - then, if there is a ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose ally (you control)
       - the acting player discards each ally (you control) other than the cards this effect already picked
 

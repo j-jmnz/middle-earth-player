@@ -123,9 +123,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["05037:A:2"],
       timing: "shadow",
       instructions: [
-        { verb: "Pick", pick: { type: "attachment", control: "you", controlled: true }, when: { kind: "not", condition: UNDEFENDED } },
+        { verb: "Pick", pick: { type: "attachment", control: "you" }, when: { kind: "not", condition: UNDEFENDED } },
         { verb: "DiscardPicked", when: { kind: "not", condition: UNDEFENDED } },
-        { verb: "Each", pick: { type: "attachment", control: "you", controlled: true }, instructions: [{ verb: "DiscardPicked" }], when: UNDEFENDED },
+        { verb: "Each", pick: { type: "attachment", control: "you" }, instructions: [{ verb: "DiscardPicked" }], when: UNDEFENDED },
       ],
     },
 

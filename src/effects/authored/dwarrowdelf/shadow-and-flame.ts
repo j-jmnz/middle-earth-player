@@ -130,8 +130,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   { id: "04147:whenRevealed:1", cardCode: "04147", lines: ["04147:A:2"], timing: "whenRevealed", instructions: [cancelByRemoving({ verb: "Heal", amount: 5, target: "picked" })] },
 
   // 04148 Whip Lash. When Revealed: each player discards 1 attachment he controls, if able. Shadow: the defending player discards all attachments he controls when the attacker is Durin's Bane.
-  { id: "04148:whenRevealed:1", cardCode: "04148", lines: ["04148:A:1"], timing: "whenRevealed", instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Pick", pick: { type: "attachment", control: "you", controlled: true } }, { verb: "DiscardPicked" }] }] },
-  { id: "04148:shadow:1", cardCode: "04148", lines: ["04148:A:2"], timing: "shadow", instructions: [{ verb: "DiscardEach", pick: { type: "attachment", control: "you", controlled: true }, when: ATTACKER_IS_BANE }] },
+  { id: "04148:whenRevealed:1", cardCode: "04148", lines: ["04148:A:1"], timing: "whenRevealed", instructions: [{ verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Pick", pick: { type: "attachment", control: "you" } }, { verb: "DiscardPicked" }] }] },
+  { id: "04148:shadow:1", cardCode: "04148", lines: ["04148:A:2"], timing: "shadow", instructions: [{ verb: "DiscardEach", pick: { type: "attachment", control: "you" }, when: ATTACKER_IS_BANE }] },
 
   // 04149 Leaping Flame. When Revealed: Durin's Bane makes an immediate attack against the first player, whatever his threat (a shadow card is dealt for it). The Shadow is Inner Flame's.
   { id: "04149:whenRevealed:1", cardCode: "04149", lines: ["04149:A:1"], timing: "whenRevealed", instructions: [{ verb: "Pick", pick: DURINS_BANE }, { verb: "AttackFromStaging", who: "firstPlayer" }] },
