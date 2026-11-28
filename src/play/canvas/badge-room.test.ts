@@ -84,7 +84,7 @@ function boxes(h: number, s: number, effects: number, held: (typeof HELD)[number
   for (let i = 0; i < shown + (hidden > 0 ? 1 : 0); i++) out.push({ name: `row ${i}`, x: 2 * s, y: top + i * (pill + 2 * s), w: 32 * s, h: pill });
   if (resources) out.push({ name: "token", x: 0, y: h - (TOKEN + 1) * s, w: (TOKEN + 1) * s, h: (TOKEN + 1) * s });
   if (marks.under) {
-    const box = underMarkBox({ x: 0, y: 0, w, h }, 40 * s, 6 * s, s, held.counted, false, lift);
+    const box = underMarkBox({ x: 0, y: 0, w, h }, 40 * s, 6 * s, s, { counted: held.counted, strip: lift });
     out.push({ name: "held", x: box.x, y: box.y, w: box.width, h: box.height });
   }
   if (held.strip) out.push({ name: "willpower", x: w / 2 - 16 * s, y: h - pill - 3 * s, w: 32 * s, h: pill });

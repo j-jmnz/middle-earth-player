@@ -67,7 +67,7 @@ describe("the first player's choice of the current quest (emce.side-quests-in-pl
       const sheet = sheetOf(t, run.state);
       expect(sheet.note).toBe(`${lead} in the staging area the current quest until the end of the phase, or keep Hrogar's Hill? Progress goes on the active location first, then on the current quest instead of Hrogar's Hill. Progress beyond its quest points is discarded.`);
       expect(sheet.note).not.toContain("chooses");
-      expect(labels(sheet)).toEqual(["Keep Hrogar's Hill as the current quest", "Make Hold the Door the current quest (0 of 10 progress)"]);
+      expect(labels(sheet)).toEqual(["Keep Hrogar's Hill as the current quest", "Make Hold the Door current (0 of 10 progress)"]);
     }
   });
 
@@ -77,7 +77,7 @@ describe("the first player's choice of the current quest (emce.side-quests-in-pl
     expect(run.state.window?.kind).toBe("choose");
     const sheet = sheetOf(t, run.state);
     expect(sheet.note).toMatch(/^Player 1: make 1 of the 2 side quests in the staging area the current quest until the end of the phase, or keep Hrogar's Hill\?/);
-    expect(labels(sheet)).toEqual(["Keep Hrogar's Hill as the current quest", "Make Hold the Door the current quest (0 of 10 progress)", "Make Face the Dragon the current quest (0 of 10 progress)"]);
+    expect(labels(sheet)).toEqual(["Keep Hrogar's Hill as the current quest", "Make Hold the Door current (0 of 10 progress)", "Make Face the Dragon current (0 of 10 progress)"]);
     const kept = take(t, run.state, "main");
     expect(currentSideQuest(kept)).toBeNull();
     run = { state: take(t, run.state, idOf(run.state, CODES.faceTheDragon)), steps: [] };
@@ -87,8 +87,8 @@ describe("the first player's choice of the current quest (emce.side-quests-in-pl
   it("a row shows the side quest's progress, and Draw Her Fire's says Dagnir then attacks the first player (19066:A:2)", () => {
     const t = nightTable(world, { seats: 1, phase: "Planning", sideQuests: [CODES.holdTheDoor], staging: [CODES.dagnir, CODES.drawHerFire] });
     const sheet = sheetOf(t, toQuestQuestion(t).state);
-    expect(labels(sheet)).toContain("Make Draw Her Fire the current quest (0 of 5 progress; Dagnir then attacks the first player)");
-    expect(labels(sheet)).toContain("Make Hold the Door the current quest (0 of 10 progress)");
+    expect(labels(sheet)).toContain("Make Draw Her Fire current (0 of 5 progress; Dagnir then attacks the first player)");
+    expect(labels(sheet)).toContain("Make Hold the Door current (0 of 10 progress)");
   });
 
   it("the commit sheet names the side quest that is the current quest", () => {

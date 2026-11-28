@@ -75,6 +75,24 @@ function defaultShort(id: string): string {
   return SHORT_OF[id] ?? id.split("-").at(-1) ?? id;
 }
 
+const STOP_WORDS = new Set(["the", "of", "and", "in", "at", "to", "from", "for", "a", "an", "on"]);
+
+/** True when a registry already holds a fixture name, a `<short>Fixtures` identifier or a golden import that starts from `short`. */
+function shortTaken(short: string, texts: readonly string[]): boolean {
+  const fixtures = new RegExp(`\\b${camel(short)}Fixtures\\b`);
+  return texts.some((text) => text.includes(`"${short}-lost"`) || fixtures.test(text) || new RegExp(`import \\* as ${short} `).test(text));
+}
+
+/** The default short name, or the first free one from the id's other words (last word first, then the last two joined) when the registries already use it. */
+export function freeShort(id: string, repo: Repo): string {
+  const first = defaultShort(id);
+  const texts = [FIXTURE_REGISTRY, FIXTURES, WRITERS, GOLDEN_REGISTRY].map((file) => repo.read(file) ?? "");
+  const words = id.split("-").filter((word) => word !== "" && !STOP_WORDS.has(word));
+  const joined = words.length > 1 ? [`${words.at(-2)}${words.at(-1)}`] : [];
+  const free = [first, ...[...words].reverse(), ...joined].find((candidate) => /^[a-z][a-z0-9]*$/.test(candidate) && !shortTaken(candidate, texts));
+  return free ?? first;
+}
+
 /** The facts of the scenario: its data, the campaign that plays it and the part before it. */
 function factsOf(id: string, short: string, repo: Repo): Facts {
   const scenario = loadAnyScenario(id);
@@ -173,7 +191,7 @@ function insert(text: string, file: string, place: { block?: Block; anchor?: Reg
   return [...lines.slice(0, at), line, ...lines.slice(at)].join("\n");
 }
 
-export function planScenario(id: string, options: { short?: string }, repo: Repo, exists: (file: string) => boolean): { plan: Plan | null; problems: string[] } {
+export function planScenario(id: string, options: { short?: string }, repo: Repo, exists: (file: string) => boolean): { plan: Plan | null; problems: string[]; note?: string } {
   const problems: string[] = [];
   let facts: Facts;
   try {
@@ -181,7 +199,8 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
   } catch {
     return { plan: null, problems: [`${id} is not in data/scenarios (the scenario files are built by pnpm data build)`] };
   }
-  const short = options.short ?? defaultShort(id);
+  const short = options.short ?? freeShort(id, repo);
+  const note = options.short === undefined && short !== defaultShort(id) ? `short name "${defaultShort(id)}" is taken by another scenario: using "${short}" (pass --short to choose another)` : undefined;
   // The short name starts identifiers (`${camel}Fixtures`, `${SHORT}_SEEDS`, `import * as ${short}`), so it must be one.
   if (!/^[a-z][a-z0-9]*$/.test(short)) return { plan: null, problems: [`--short ${short} is not a valid identifier (lower-case letters and digits, starting with a letter, no hyphen)`] };
   try {
@@ -264,7 +283,7 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
     return insert(next, GOLDEN_REGISTRY, { block: GOLDEN_ARRAY }, registered, "before", problems);
   });
   if (problems.length > 0) return { plan: null, problems };
-  return { plan: { files, edits, facts }, problems };
+  return { plan: { files, edits, facts }, problems, ...(note ? { note } : {}) };
 }
 
 function describePlan(plan: Plan, log: Log, dry: boolean): void {
@@ -322,12 +341,13 @@ function main(log: Log): void {
       }
     },
   };
-  const { plan, problems } = planScenario(id, short === undefined ? {} : { short }, repo, (file) => existsSync(path.join(ROOT, file)));
+  const { plan, problems, note } = planScenario(id, short === undefined ? {} : { short }, repo, (file) => existsSync(path.join(ROOT, file)));
   if (!plan) {
     for (const problem of problems) log.error(problem);
     process.exitCode = 1;
     return;
   }
+  if (note) log.info(note);
   describePlan(plan, log, dry);
   if (!dry) {
     for (const item of plan.files) {

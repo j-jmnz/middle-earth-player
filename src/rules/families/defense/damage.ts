@@ -18,6 +18,7 @@ import { flagged, inPlay, modifierActive, updateCard } from "../../core/state.ts
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { defendingAgainst } from "../angmar/combat.ts";
+import { mordorDamageBarred } from "../mordor/rounds.ts";
 import { scrollDamageTarget } from "../pelargir/scroll.ts";
 import { bodyguardTarget } from "../pelargir/vale/bodyguard.ts";
 import { listened, queueHeard, trimFollowUps } from "./listen.ts";
@@ -96,7 +97,7 @@ function assignedTo(state: ScenarioState, id: string): string {
 
 // Damage a card does not take from this source: Bilbo Baggins in the riddle area takes it only from Gollum (families/riddles/gollum.ts).
 export function damageBarred(state: ScenarioState, id: string, source: string, sourceId: string | null | undefined): boolean {
-  return bilboDamageBarred(state, id, source, sourceId);
+  return bilboDamageBarred(state, id, source, sourceId) || mordorDamageBarred(state, id);
 }
 
 // Characters of any player that may take the damage of an undefended attack against `seat` because a card that player controls

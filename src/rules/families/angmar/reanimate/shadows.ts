@@ -1,4 +1,4 @@
-// Rules: rr.shadow-effects, rr.step-6-4-2, rr.reveal, rr.in-play-and-out-of-play, rr.explored (data/rules/entries.json); ledger lines 101156:A:1, 101158:A:1, 101158:A:2.
+// Rules: rr.shadow-effects, rr.step-6-4-2, rr.reveal, rr.in-play-and-out-of-play, rr.explored (data/rules/entries.json); ledger lines 101156:A:1, 101158:A:1, 101158:A:2, 21032:A:3.
 // Cards that go facedown onto an enemy or are read after they leave the encounter deck: the shadow cards of an attack whose "when revealed" effects the Witch of Angmar resolves, the cards a shadow effect discards from the top of the encounter deck, and Sinister Dungeon dealt to the
 // Reanimated Dead its exploring made.
 import type { Instruction } from "../../../../catalog/boundary.ts";
@@ -14,14 +14,15 @@ import { lastPicked } from "../../../interpret/player-verbs.ts";
 import { effectData } from "../../encounter/moves.ts";
 import { listened, queueHeard } from "../../defense/listen.ts";
 import type { Focus } from "../../index.ts";
+import { holdsKeptShadow } from "../../mordor/shadows.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
-/** The attack's shadow cards have resolved (their shadow effects first): announced once about the attacking enemy when it holds a shadow card and some card hears it, and before damage is dealt (`shadowsResolved`, the Witch of Angmar's Forced). */
+/** The attack's shadow cards have resolved (their shadow effects first): announced once about the attacking enemy when it holds a shadow card and some card hears it, and before damage is dealt (`shadowsResolved`, the Witch of Angmar's Forced and Black Númenórean's, which resolves the shadow cards he keeps: it is announced when the new card's effect was canceled only for an enemy that keeps some). */
 export function announceShadowsResolved(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   const attack = state.pendingAttack;
   const enemy = attack ? state.cards[attack.enemyId] : undefined;
-  if (!attack || !enemy || attack.shadowCanceled || shadowCards(enemy).length === 0 || !listened(state, ctx, ["shadowsResolved"])) return state;
+  if (!attack || !enemy || (attack.shadowCanceled && !holdsKeptShadow(state, enemy.id)) || shadowCards(enemy).length === 0 || !listened(state, ctx, ["shadowsResolved"])) return state;
   return queueHeard(state, ctx, { trigger: "shadowsResolved", seat: attack.seat, cardId: enemy.id, subject: enemy.id });
 }
 

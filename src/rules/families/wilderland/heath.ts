@@ -1,5 +1,5 @@
-// Rules: emce.caves-deck, emce.dragon-signs, emce.guarded-x, rr.guarded, rr.cancel, rr.search, rr.in-play-and-out-of-play, rr.attacks-outside-the-combat-phase (data/rules/entries.json); ledger lines 12175:B:7, 19012:A:3, 19015:A:1, 19018:A:1, 19022:A:1,
-// 19022:B:1, 19024:A:1, 19024:B:2, 12176:A:4, 12179:A:4.
+// Rules: emce.caves-deck, emce.dragon-signs, emce.guarded-x, rr.guarded, rr.victory, rr.cancel, rr.search, rr.in-play-and-out-of-play, rr.attacks-outside-the-combat-phase (data/rules/entries.json); ledger lines 12175:B:7, 19012:A:3, 19015:A:1, 19018:A:1, 19022:A:1,
+// 19022:B:1, 19024:A:1, 19024:B:2, 12176:A:4, 12179:A:4, 21036:A:3.
 // The verbs The Withered Heath adds to the wilderland family: Dragon Signs shuffled into the Caves deck, searched out of it and sent to the victory display once nothing guards them, Cold-Drake set aside with its damage and healed there, the Weather
 // treacheries Mountain Pass keeps from being canceled, the three cards looked at that are discarded but one, the cards of a deck put on top and on the bottom, and the attack the Accolade Dragon-slayer starts.
 import type { Effect, Instruction } from "../../../catalog/boundary.ts";
@@ -19,6 +19,8 @@ import { distinctChoices, flagged, updateCard, withSeat } from "../../core/state
 import { askTarget } from "../../windows/choices.ts";
 import { attackWith } from "../attack/immediate.ts";
 import { lookedDeckSeat } from "../deck/rules.ts";
+import { addResourceTokens } from "../nightmare/dungeon.ts";
+import { effectsOf } from "../../windows/listen.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
 import { cancelsReveal } from "../encounter/cancel.ts";
 import { moveOtherLooked } from "../encounter/items.ts";
@@ -70,6 +72,15 @@ export function attachGuardedFromPile(state: ScenarioState, instruction: Verb<"A
   return guardWith(moveEncounter(state, found, "staging", focus.seat, ctx, steps), guardId, found);
 }
 
+// The resources a VictoryWhenFree marker of the card puts on the main quest once it is free (none without an `amount`).
+function freeAmount(ctx: ReduceContext, code: string): number {
+  for (const effect of effectsOf(ctx, code)) {
+    if (effect.timing !== "constant") continue;
+    for (const instruction of effect.instructions) if (instruction.verb === "VictoryWhenFree") return instruction.amount ?? 0;
+  }
+  return 0;
+}
+
 /**
  * The settle sweep for VictoryWhenFree ("When Dragon Sign is free of encounters, add it to the victory display"): a card with the marker in the staging area that nothing guards goes to the victory display. Nothing resolves while a frame is open, so a sign
  * just added to the staging area is guarded (its Guarded keyword resolved) before it is looked at. Only a game that has a card with a record of the verb looks (`gameReads`); every other game does no work here.
@@ -80,7 +91,11 @@ export function victoryWhenFree(state: ScenarioState, ctx: ReduceContext, steps:
   let next = state;
   for (const id of state.staging) {
     const card = next.cards[id];
-    if (card && card.zone === "staging" && codes.has(card.code) && freeOfEncounters(next, id)) next = moveEncounter(next, id, "victory", state.firstPlayer, ctx, steps);
+    if (!card || card.zone !== "staging" || !codes.has(card.code) || !freeOfEncounters(next, id)) continue;
+    next = moveEncounter(next, id, "victory", state.firstPlayer, ctx, steps);
+    // "Then, place 1 resource on the main quest" (21036:A:3): the marker's `amount`.
+    const amount = freeAmount(ctx, card.code);
+    if (amount > 0) next = addResourceTokens(next, next.questStage, amount);
   }
   return next;
 }

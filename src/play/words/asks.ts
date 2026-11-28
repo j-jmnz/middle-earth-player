@@ -8,6 +8,7 @@ import type { Amount, Condition, Instruction, PickSpec } from "../../catalog/bou
 import type { Cause } from "../../rules/core/cause.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import { embassyPairNow } from "../readouts/black-gate.ts";
+import { modifiedStat } from "../../rules/core/keywords.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import { ringBearerId } from "../../rules/families/burden/deck.ts";
 import { poisonOf } from "../../rules/families/poison/poison.ts";
@@ -45,7 +46,7 @@ export type Text = string | readonly { when?: Condition; text: string }[];
  * - `bind`: a name for each number a template says, as the `Amount` the engine reads.
  * - `xRows`: the rows of a ChooseX (the entry keyed with the verb `ChooseX`), one for each number X the player may take: `label` says `{x}` and each `bind` name, and `less` names `{<name>}`, the amount `of` less X and at
  *   least `min`, with its `unit` ("4 cards"), so "Spend {x}: reveal {reveals}" says what each number buys.
- * - `named`: a name for each card a template says, as the `PickSpec` that finds it for the seat asked: the card's name when exactly one card matches, else the words `otherwise` ("your highest-cost ally"), so a row names the card it takes when there is no second step to choose; `{<name>Cost}` says that card's printed cost.
+ * - `named`: a name for each card a template says, as the `PickSpec` that finds it for the seat asked: the card's name when exactly one card matches, else the words `otherwise` ("your highest-cost ally"), so a row names the card it takes when there is no second step to choose; `{<name>Cost}` says that card's printed cost and `{<name>Attack}` its current Attack.
  * - `caution`: the two-tap warning, said as "Tap again: ..." when `when` holds. It belongs to a row: on a Pick `when` is read once for each row with `picked` set to that row's id, so the confirm arms only on the row that loses
  *   the game, and on a Choose it is read for the branch the entry is keyed with. A warning that holds whatever is picked is a `when` that does not read `picked`; there is no sheet-wide caution.
  */
@@ -66,14 +67,17 @@ export type Ask = {
   xRows?: { label: Text; less?: { name: string; of: Amount; min: number; unit: string } };
   named?: Readonly<Record<string, { pick: PickSpec; otherwise: string }>>;
   caution?: { when: Condition; text: Text };
-  /** The stats each row of a Pick shows beside its name: an enemy's Threat and engagement cost, where the choice turns on them. */
-  rowStats?: readonly ("threat" | "engagementCost")[];
+  /** The stats each row of a Pick shows beside its name: an enemy's Threat and engagement cost, a location's Threat and quest points, where the choice turns on them. */
+  rowStats?: readonly RowStat[];
 };
+
+/** A stat a row of a Pick can show (`rowStats`). */
+export type RowStat = "threat" | "engagementCost" | "questPoints";
 
 export type AsksTable = Readonly<Record<string, Ask>>;
 
 /** What a Pick's entry says: the words the chain returns, with the rows that are no card and the warning of each row an entry can add. */
-export type AskedWords = PickWords & { labels?: Readonly<Record<string, string>>; cautions?: Readonly<Record<string, string>>; bare?: true; rows?: Readonly<Record<string, { label: string; detail: string | null }>>; rowStats?: readonly ("threat" | "engagementCost")[] };
+export type AskedWords = PickWords & { labels?: Readonly<Record<string, string>>; cautions?: Readonly<Record<string, string>>; bare?: true; rows?: Readonly<Record<string, { label: string; detail: string | null }>>; rowStats?: readonly RowStat[] };
 
 /** Where the instruction stands: the record (its id), the path in it, and the table of the scenario that worded it. Worked out once for a sheet (askAt) and handed to every row's lookup. */
 export type AskAt = { id: string; path: string; table: AsksTable };
@@ -114,7 +118,7 @@ export function templatesOf(entry: Ask): string[] {
 
 /** The placeholders of an entry that no value answers: none of `card`, `owner`, `picked`, `host`, `subject`, `ringBearer`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` and `named` names. */
 export function unknownPlaceholders(entry: Ask, withN = true): string[] {
-  const known = new Set(["card", "owner", "x", "picked", "whose", "pickedCost", "discarded", "threat", "eliminated", "host", "subject", "ringBearer", "hero", "pair", "left", "ready", "forced", "dealt", "pursuitLimit", ...(entry.countdown != null ? ["countdown"] : []), ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...(entry.xRows?.less ? [entry.xRows.less.name] : []), ...Object.keys(entry.named ?? {}), ...Object.keys(entry.named ?? {}).map((name) => `${name}Cost`)]);
+  const known = new Set(["card", "owner", "x", "picked", "whose", "pickedCost", "discarded", "threat", "eliminated", "host", "subject", "ringBearer", "hero", "pair", "left", "ready", "forced", "dealt", "pursuitLimit", ...(entry.countdown != null ? ["countdown"] : []), ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...(entry.xRows?.less ? [entry.xRows.less.name] : []), ...Object.keys(entry.named ?? {}), ...Object.keys(entry.named ?? {}).flatMap((name) => [`${name}Cost`, `${name}Attack`])]);
   return [...new Set(templatesOf(entry).flatMap(placeholdersOf))].filter((name) => !known.has(name));
 }
 
@@ -232,6 +236,9 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
     // `{<name>Cost}`: the printed cost of the card the pick finds (cards tied for the highest cost share one; 0 with no card), where a line turns on it.
     const cost = only[0] === undefined ? undefined : a.ctx.cards.get(a.game.cards[only[0]]?.code ?? "")?.cost;
     values[`${name}Cost`] = cost ?? 0;
+    // `{<name>Attack}`: the current Attack of the card the pick finds (the cards tied for the highest Attack share one; 0 with no card).
+    const found = only[0] === undefined ? undefined : a.game.cards[only[0]];
+    values[`${name}Attack`] = found ? modifiedStat(a.game, found, "attack", a.ctx.cards) : 0;
   }
   return { values, scope };
 }
