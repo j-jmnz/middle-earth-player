@@ -105,9 +105,9 @@ export function controlSweep(state: ScenarioState, ctx: ReduceContext, _steps: E
   return next;
 }
 
-/** The locations a player controls are places the players may travel to (Caleb, FFG: "the rules for the scenario do allow it"; the control is lost as the location leaves the play area). */
+/** The locations a player controls are places the players may travel to (Caleb, FFG: "the rules for the scenario do allow it"; the control is lost as the location leaves the play area), in a game whose records ask for it (`travelTo` on TakeControlOfLocation: Assault on Osgiliath's). Wrath and Ruin's rules say nothing of travel to a controlled location (rr.travel: a location in the staging area), so there it is no target. */
 export function controlledTravelReach(state: ScenarioState, ctx: ReduceContext): readonly string[] {
-  return state.modifiers.length === 0 || !gameReads(state, ctx, '"TakeControlOfLocation"') ? [] : controlledLocations(state);
+  return state.modifiers.length === 0 || !gameReads(state, ctx, '"travelTo":true') ? [] : controlledLocations(state);
 }
 
 /** Traveling to a location a player controls first takes it out of his play area: the control is lost (progress removed, in the staging area), then the location's own Travel line and the travel itself follow as for any location in the staging area (Caleb: "You would lose control of the location when it leaves your play area"). */

@@ -67,7 +67,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       ],
     },
     { id: "06091:constant:1", cardCode: "06091", lines: ["06091:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "noProgressInStagingByPlayer", amount: 1, until: "whileSourceInPlay", target: "table" }] },
-    { id: "06091:forced:1", cardCode: "06091", lines: ["06091:B:2"], timing: "forced", ...A_LOCATION_LEFT_PLAY, instructions: [{ verb: "TakeControlOfLocation" }] },
+    { id: "06091:forced:1", cardCode: "06091", lines: ["06091:B:2"], timing: "forced", ...A_LOCATION_LEFT_PLAY, instructions: [{ verb: "TakeControlOfLocation", travelTo: true }] },
     { id: "06091:forced:2", cardCode: "06091", lines: ["06091:B:3"], timing: "forced", trigger: "endOfRound", condition: NONE_UNCONTROLLED, instructions: [{ verb: "WinGame" }] },
 
     // 06092 Uruk Lieutenant. A:1: the topmost Orc enemy of the encounter discard pile is added to the staging area, not revealed. A:2 (Shadow): the defending player discards an attachment he controls, all of them when undefended.

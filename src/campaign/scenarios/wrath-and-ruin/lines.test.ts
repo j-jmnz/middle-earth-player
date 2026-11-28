@@ -1,6 +1,6 @@
 // Rules: vom.controlling-locations, vom.losing-control-of-a-location, rr.forced, rr.travel, rr.cancel, rr.destroy, rr.first-player, rr.the-letter-x, rr.reveal, faq.cancel-encounter-card (data/rules/entries.json).
 // What a spec row cannot show (a second seat, a sentinel defender, a travel the engine refuses, the order of two seats' attacks, a cancel offer, X fixed at reveal, the stage gates). Each title starts with its line id.
-import { describe, expect } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
@@ -143,6 +143,26 @@ describe("22014 Gate of Dorwinion travel", () => {
       else break;
     }
     expect(seats).toEqual([0, 1]);
+  });
+});
+
+describe("22025:B:2 a controlled location is not a travel target", () => {
+  const travelRefused = (effects: typeof EFFECTS, layout: Layout, code: string): boolean => {
+    const made = table({ phase: "Travel", ...layout }, effects);
+    const state = opened(made).state;
+    const target = controlledLocations(state).find((id) => state.cards[id]?.code === code);
+    expect(target).toBeDefined();
+    try {
+      send({ state, steps: [] }, { type: "Travel", locationId: target ?? "" }, made.ctx);
+      return false;
+    } catch (error) {
+      if (error instanceof IntentRefused) return true;
+      throw error;
+    }
+  };
+  test("22025:B:2 the players never travel to a location they control, the Gate included", () => {
+    expect(travelRefused(EFFECTS, { stage: S2, progress: 12, controlled: [GATE, "place"] }, GATE)).toBe(true);
+    expect(travelRefused(EFFECTS, { stage: S2, progress: 12, staging: [ULCHOR], controlled: [GATE, "22015"] }, "22015")).toBe(true);
   });
 });
 
