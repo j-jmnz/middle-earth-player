@@ -41,8 +41,8 @@ Scenario piles that place cards with no record (quest: 21077 A City in Turmoil; 
     - the shadow card just dealt to this enemy becomes its first shadow card, the ones it held lying faceup beside it; when it has a shadow effect it is kept faceup on this enemy past the end of the combat phase, until the enemy leaves play
 
 21032:A:3 (front): Forced: When Black Númenórean attacks, resolve each of his faceup shadow cards as if they had been dealt this round.
-  21032:forced:2: Forced when this enemy attacks, before the defender is declared (heard about this card)
-    who acts: the acting player is the defending player (the player the attack is against)
+  21032:forced:2: Forced on the event shadowsResolved (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - each faceup shadow card this enemy holds with a shadow effect resolves that effect now against the attack in progress, the defending player resolving it, in the order they were dealt
 
 ## 21033 Bribes
@@ -58,7 +58,7 @@ Scenario piles that place cards with no record (quest: 21077 A City in Turmoil; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - the top threat of the card the event is about card(s) of the acting player's deck go to their discard pile
-    - 1 resource is placed on this card for each event card among those this effect discarded from the top of the players' decks, all the decks counted together
+    - then, if every draw, every discard from a deck, every discard of resources and every ready this effect ran so far resolved in full: a draw or a discard that found fewer cards or tokens than it named, and a ready that did not happen (the card was ready already, or cannot ready), did not (what follows "then" is attempted only when they all did) (checked when this step runs, after the steps above; not tied to whether they did anything): 1 resource is placed on this card for each event card among those this effect discarded from the top of the players' decks, all the decks counted together
 
 ## 21034 Submit or Die
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -125,7 +125,7 @@ Scenario piles that place cards with no record (quest: 21077 A City in Turmoil; 
   21037:travel:1: Travel
     note: this Travel effect is a cost: the engine refuses the travel to this location while the players cannot pay it, that is, when some player's hand holds fewer cards than they must discard
     - for each player, first player first:
-      - the acting player discards 1 random card(s) from hand
+      - if the actor has a card in hand: the acting player discards 1 random card(s) from hand
 
 ## 21038 Disappearances
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -150,8 +150,8 @@ Scenario piles that place cards with no record (quest: 21077 A City in Turmoil; 
 21039:A:1 (front): When Revealed: Attach to the highest attack ally in play. (Counts as a Condition attachment with the text: 'Attached ally loses the ally card type, gains the enemy card type, and engages its owner. Treat attached ally's text box as if it were blank. If Secret Cultist is discarded, or the attached ally's owner is eliminated, discard attached ally.')
   21039:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose ally (any player controls) with the highest printed Attack among the allies in play, whatever they get now (ties: the chooser decides), chosen by the first player
-    - then, if there is a ally (any player controls) with the highest printed Attack among the allies in play, whatever they get now (ties: the chooser decides), chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this card attaches to the picked card (nowhere if that card carries one of its title already)
+    - choose ally (any player controls) with the highest Attack of those, as the table shows it (ties: the chooser decides), chosen by the first player
+    - then, if there is a ally (any player controls) with the highest Attack of those, as the table shows it (ties: the chooser decides), chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this card attaches to the picked card (nowhere if that card carries one of its title already)
     - the ally this card is attached to loses the ally card type and gains the enemy card type, its text box blank (its own Attack, Defense and hit points stay, its Threat is its Willpower), and it engages its owner (nothing when the host is not an ally in a player's area)
   21039:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
@@ -411,7 +411,7 @@ Scenario piles that place cards with no record (quest: 21077 A City in Turmoil; 
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player reveals an encounter card
-    - place 1 resource tokens on this card
+    - then, if every draw, every discard from a deck, every discard of resources and every ready this effect ran so far resolved in full: a draw or a discard that found fewer cards or tokens than it named, and a ready that did not happen (the card was ready already, or cannot ready), did not (what follows "then" is attempted only when they all did) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on this card
 
 21078:B:2 (back): This stage cannot be defeated unless there are at least X resources here, where X is 3 more than the number of players.
   21078:constant:1: Constant
@@ -441,4 +441,4 @@ Scenario piles that place cards with no record (quest: 21077 A City in Turmoil; 
     who acts: the acting player is the player the event happened to (the first player when the event names no player)
     - the players win the game
 
-(rendered pieces: 244 by template, 1 as JSON)
+(rendered pieces: 247 by template, 1 as JSON)

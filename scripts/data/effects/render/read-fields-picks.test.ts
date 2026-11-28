@@ -106,7 +106,6 @@ describe("effects render read fields, picks", () => {
     engageable: true,
     highestThreat: true,
     highestAttack: true,
-    highestPrintedAttack: true,
     notHost: true,
   };
   const SAMPLES: readonly Obj[] = [

@@ -20,8 +20,8 @@ const ACTIVE_THREAT: Instruction = { verb: "RaiseThreat", amount: { stat: "threa
 const CANNOT_DEFEAT_UNLESS = (right: number | { players: true; plus: number }): Condition => ({ kind: "less", left: { stat: "resources", of: "self" }, right });
 // "The engaged player raises his threat" (21041:A:3, 21045:A:2): the actor of a threat raise is the player who raised it.
 const ENGAGED_PLAYER_RAISED: Condition = { kind: "engagedWithActor" };
-// "The ally in play with the highest printed Attack": the first player chooses among those tied (21039:A:1).
-const HIGHEST_ALLY: PickSpec = { type: "ally", control: "any", highestPrintedAttack: true, who: "firstPlayer" };
+// "The ally in play with the highest Attack": the first player chooses among those tied (21039:A:1).
+const HIGHEST_ALLY: PickSpec = { type: "ally", control: "any", highestAttack: true, who: "firstPlayer" };
 const OWN_ATTACHMENT: PickSpec = { type: "attachment", control: "you", controlled: true };
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
@@ -32,13 +32,13 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 21031 The Governor (Cultist). Forced: after a location is revealed from the encounter deck he engages the first player (from another player's area too) and makes an immediate attack.
   { id: "21031:forced:1", cardCode: "21031", lines: ["21031:A:2"], timing: "forced", trigger: "revealed", byEncounterDeck: true, subject: A_LOCATION, instructions: [{ verb: "EngageFirstPlayer", moves: true }, { verb: "ImmediateAttack" }] },
 
-  // 21032 Black Númenórean (Cultist). A shadow card with a shadow effect dealt to him stays faceup on him (KeepDealtShadow, as it is dealt); when he attacks each faceup shadow card he holds resolves its shadow effect against that attack, in the order dealt.
+  // 21032 Black Númenórean (Cultist). A shadow card with a shadow effect dealt to him stays faceup on him (KeepDealtShadow, as it is dealt); when the shadow effects of his attack have resolved (the new card's own first) each older faceup shadow card he holds resolves its shadow effect against that attack, in the order dealt.
   { id: "21032:forced:1", cardCode: "21032", lines: ["21032:A:2"], timing: "forced", trigger: "shadowDealtTo", subject: "self", instructions: [{ verb: "KeepDealtShadow" }] },
-  { id: "21032:forced:2", cardCode: "21032", lines: ["21032:A:3"], timing: "forced", trigger: "attacks", subject: "self", instructions: [{ verb: "ResolveHeldShadowEffects" }] },
+  { id: "21032:forced:2", cardCode: "21032", lines: ["21032:A:3"], timing: "forced", trigger: "shadowsResolved", subject: "self", instructions: [{ verb: "ResolveHeldShadowEffects" }] },
 
   // 21033 Bribes (Plot). +1 total Threat in the staging area for each resource here. Forced: when the active location is explored, the top X cards of each player's deck are discarded (X its Threat), then 1 resource is placed here for each event discarded.
   { id: "21033:constant:1", cardCode: "21033", lines: ["21033:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "moreStagingThreat", amount: { stat: "resources", of: "self" }, until: "whileSourceInPlay", target: "table" }] },
-  { id: "21033:forced:1", cardCode: "21033", lines: ["21033:A:2"], timing: "forced", trigger: "activeExplored", instructions: [EACH_PLAYER([{ verb: "DiscardFromDeck", amount: { stat: "threat", of: "subject" } }]), { verb: "PlaceResourcePerDiscarded", cardType: "event" }] },
+  { id: "21033:forced:1", cardCode: "21033", lines: ["21033:A:2"], timing: "forced", trigger: "activeExplored", instructions: [EACH_PLAYER([{ verb: "DiscardFromDeck", amount: { stat: "threat", of: "subject" } }]), { verb: "PlaceResourcePerDiscarded", cardType: "event", when: { kind: "thenResolves" } }] },
 
   // 21034 Submit or Die (Plot). Each non-unique enemy gets +1 Attack. Forced: after an enemy attacks and destroys a character it gets 1 damage token; with X (4 more than the players) the players lose.
   { id: "21034:constant:1", cardCode: "21034", lines: ["21034:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "attack", amount: 1, until: "whileSourceInPlay", holders: { ...AN_ENEMY, staging: true, nonUnique: true } }] },
@@ -64,13 +64,13 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
 
   // 21037 Hillside Manor. While in the staging area no player's threat is lowered by more than 1 each round by player card effects. Travel: each player discards 1 random card from his hand.
   { id: "21037:constant:1", cardCode: "21037", lines: ["21037:A:1"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "ModifyStat", stat: "playerThreatReductionCap", amount: 1, until: "whileSourceInPlay", target: "eachSeat" }] },
-  { id: "21037:travel:1", cardCode: "21037", lines: ["21037:A:2"], timing: "travel", instructions: [EACH_PLAYER([{ verb: "DiscardRandomFromHand" }])] },
+  { id: "21037:travel:1", cardCode: "21037", lines: ["21037:A:2"], timing: "travel", instructions: [EACH_PLAYER([{ verb: "DiscardRandomFromHand", when: { kind: "handHasCard" } }])] },
 
   // 21038 Disappearances. When Revealed: each player discards all allies from his hand; if no card is discarded it gains Doomed 2. Shadow: discard an attachment you control.
   { id: "21038:whenRevealed:1", cardCode: "21038", lines: ["21038:A:1"], timing: "whenRevealed", instructions: [EACH_PLAYER([{ verb: "DiscardEach", pick: { type: "ally", control: "you", from: "hand" } }]), { verb: "Doomed", amount: 2, when: { kind: "noneDiscarded" } }] },
   { id: "21038:shadow:1", cardCode: "21038", lines: ["21038:A:2"], timing: "shadow", instructions: [{ verb: "Pick", pick: OWN_ATTACHMENT }, { verb: "DiscardPicked" }] },
 
-  // 21039 Secret Cultist. When Revealed: it attaches to the ally in play with the highest printed Attack (the first player chooses among those tied) and the ally becomes an enemy engaged with its owner, its text box blank; with no ally it is discarded. It counts as a Condition attachment.
+  // 21039 Secret Cultist. When Revealed: it attaches to the ally in play with the highest Attack (the first player chooses among those tied) and the ally becomes an enemy engaged with its owner, its text box blank; with no ally it is discarded. It counts as a Condition attachment.
   // When it leaves play, or the ally's owner is eliminated, the ally goes back to its owner's discard pile.
   { id: "21039:whenRevealed:1", cardCode: "21039", lines: ["21039:A:1"], timing: "whenRevealed", instructions: [{ verb: "Pick", pick: HIGHEST_ALLY }, { verb: "AttachSelfToPicked", when: { kind: "canPick", pick: HIGHEST_ALLY } }, { verb: "ConvertAttachedAlly" }] },
   { id: "21039:constant:1", cardCode: "21039", lines: ["21039:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }] },
@@ -187,7 +187,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 21078 The Shadow of Mordor (stage 2). When Revealed: 1 random set-aside Plot objective is added to the staging area and each player reveals 1 encounter card. 2B: Forced: when the active location leaves play explored, the top card of the encounter deck is revealed and 1 resource is placed here; the stage
   // cannot be defeated with fewer than X (3 more than the players).
   { id: "21078:whenRevealed:1", cardCode: "21078", lines: ["21078:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddRandomSetAsideToStaging", trait: "Plot" }, EACH_PLAYER([{ verb: "RevealEncounter" }])] },
-  { id: "21078:forced:1", cardCode: "21078", lines: ["21078:B:1"], timing: "forced", trigger: "activeExplored", instructions: [{ verb: "RevealEncounter" }, { verb: "PlaceResourceTokens", amount: 1, on: "self" }] },
+  { id: "21078:forced:1", cardCode: "21078", lines: ["21078:B:1"], timing: "forced", trigger: "activeExplored", instructions: [{ verb: "RevealEncounter" }, { verb: "PlaceResourceTokens", amount: 1, on: "self", when: { kind: "thenResolves" } }] },
   { id: "21078:constant:1", cardCode: "21078", lines: ["21078:B:2"], timing: "constant", condition: CANNOT_DEFEAT_UNLESS({ players: true, plus: 3 }), instructions: [{ verb: "Restrict", what: "advance" }] },
 
   // 21079 Leader of the Cult (stage 3). When Revealed: 1 random set-aside Cultist is added to the staging area, the discard pile is shuffled into the deck and cards are discarded until X enemies (one less than the players) are discarded, each added to the staging area. 3B: a Cultist takes at most X damage a round, X the

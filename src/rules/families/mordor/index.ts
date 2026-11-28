@@ -18,7 +18,6 @@ import { addRandomSetAsideToStaging } from "./set-aside.ts";
 import { keepDealtShadow, resolveHeldShadowEffects } from "./shadows.ts";
 import { resolveActiveTravel } from "./travel.ts";
 import { placeResourcePerDiscarded, revealFacedownUnder } from "./under.ts";
-import { mordorPick } from "./pick.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
@@ -57,6 +56,5 @@ export const manifest: RulesFamily = {
   verbs: ["AttachTreachery", "ModifyHeld", "AddRandomSetAsideToStaging", "ConvertAttachedAlly", "ReturnConvertedAlly", "ResolveActiveTravel", "KeepDealtShadow", "ResolveHeldShadowEffects", "PlaceResourcePerDiscarded", "RevealFacedownUnder", "BarDamageToEngaged", "VictoryWhenFreeAddsResource"],
   run,
   condition: mordorCondition,
-  pick: mordorPick,
   settle: { sweep: victoryWhenFreeAddsResource },
 };

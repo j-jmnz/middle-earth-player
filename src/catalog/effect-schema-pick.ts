@@ -400,8 +400,6 @@ export const pickSchema = z.strictObject({
   // only those holding the most resources in their pool, every one when tied and then the chooser decides ("the hero with the most resources", 132051:A:1).
   burgleMatch: z.literal(true).optional(),
   mostResources: z.literal(true).optional(),
-  // Of the allies in play, only those with the highest printed Attack, every one when tied and then the chooser decides ("the highest attack ally in play", 21039:A:1). Read by the mordor family.
-  highestPrintedAttack: z.literal(true).optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;

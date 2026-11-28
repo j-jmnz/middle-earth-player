@@ -163,12 +163,14 @@ describe("Black Númenórean (21032:A:2, 21032:A:3): the shadow cards with a sha
     expect(gone.cards[old]?.zone).toBe("encounterDiscard");
   });
 
-  it("ResolveHeldShadowEffects resolves the faceup cards' shadow effects against the attack in progress (21042: attacking enemy cannot take damage or raise threat)", () => {
-    const made = table({ phase: "Combat", engaged: [BLACK], deck: ["21040"] });
+  it("ResolveHeldShadowEffects resolves the older faceup cards' shadow effects against the attack in progress, not the card dealt for it (21048: +1 Attack)", () => {
+    const made = table({ phase: "Combat", engaged: [BLACK], deck: ["21048", "21040"] });
     const first = dealt(made, opened(made).state);
     const enemy = idOf(first, BLACK);
     const held = first.cards[enemy]?.shadowId ?? "";
-    const attacking = { ...updateCard(first, held, { face: "up" }), pendingAttack: { enemyId: enemy, seat: 0, defenderId: null, undefended: true } } as unknown as ScenarioState;
+    const second = dealt(made, discardShadows(first));
+    expect(second.cards[enemy]?.extraShadowIds).toEqual([held]);
+    const attacking = { ...updateCard(second, held, { face: "up" }), pendingAttack: { enemyId: enemy, seat: 0, defenderId: null, undefended: true } } as unknown as ScenarioState;
     const before = modifiedStat(attacking, attacking.cards[enemy]!, "attack", made.ctx.cards);
     const after = run(made, attacking, { verb: "ResolveHeldShadowEffects" }, { sourceId: enemy });
     expect(modifiedStat(after, after.cards[enemy]!, "attack", made.ctx.cards)).toBe(before + 1);
@@ -230,14 +232,15 @@ describe("raisedThreatThisRound (21048:A:2): a seat that raised its threat this 
   });
 });
 
-describe("highestPrintedAttack (21039:A:1): of the allies in play only those with the highest printed Attack, whatever they have now", () => {
-  it("a weak ally with a bonus is not chosen over a strong one; allies tied are all candidates", () => {
+describe("highestAttack (21039:A:1): of the allies in play only those with the highest Attack they have now", () => {
+  it("an ally with a bonus is chosen over a stronger printed one; allies tied are all candidates", () => {
     const { made, strong } = cultistTable();
     const weak = idOf(made.state, "ally");
     const state = { ...opened(made).state, modifiers: [{ instanceId: weak, sourceId: weak, stat: "attack" as const, amount: 5, until: "endOfPhase" as const }] };
-    const candidates = (from: ScenarioState): string[] => pickCandidates(from, { type: "ally", control: "any", highestPrintedAttack: true }, 0, [], null, made.ctx);
-    expect(candidates(state)).toEqual([strong]);
-    const tied = spawn(state, "strong", { zone: "play", seat: 0 });
+    const candidates = (from: ScenarioState): string[] => pickCandidates(from, { type: "ally", control: "any", highestAttack: true }, 0, [], null, made.ctx);
+    expect(candidates(state)).toEqual([weak]);
+    expect(candidates(opened(made).state)).toEqual([strong]);
+    const tied = spawn(opened(made).state, "strong", { zone: "play", seat: 0 });
     expect(candidates(tied.state).sort()).toEqual([strong, tied.id].sort());
   });
 });

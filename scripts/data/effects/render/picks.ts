@@ -86,7 +86,6 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["minCost"], typeof pick.minCost === "number" ? `with a printed cost of at least ${pick.minCost} (a card with no printed cost never matches)` : null);
   note(["highestCost"], pick.highestCost === true ? "with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides)" : null);
   note(["highestThreat"], pick.highestThreat === true ? (pick.type === "player" ? "with the highest threat among the players still in the game (ties: the chooser decides)" : "with the highest current Threat of those (no Threat counts 0; ties: the chooser decides)") : null);
-  note(["highestPrintedAttack"], pick.highestPrintedAttack === true ? "with the highest printed Attack among the allies in play, whatever they get now (ties: the chooser decides)" : null);
   note(["highestAttack"], pick.highestAttack === true ? "with the highest Attack of those, as the table shows it (ties: the chooser decides)" : null);
   note(["notHost"], pick.notHost === true ? "other than the card this card is attached to" : null);
   note(["lowestThreat"], pick.lowestThreat === true ? "with the lowest Threat of those (ties: the chooser decides)" : null);

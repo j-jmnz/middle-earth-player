@@ -24,11 +24,11 @@ export function keepDealtShadow(state: ScenarioState, focus: Focus, ctx: ReduceC
   return hasShadowEffect(placed, ctx, dealt) ? { ...placed, modifiers: [...placed.modifiers, { instanceId: dealt, sourceId: enemy.id, stat: "keptShadow", amount: 1, until: "endOfGame" }] } : placed;
 }
 
-/** ResolveHeldShadowEffects: the faceup shadow cards of the source that have a shadow effect resolve it against the attack in progress, in the order dealt, the defending player resolving them (each a frame on top of the stack, so the last one pushed resolves first). */
+/** ResolveHeldShadowEffects: the faceup shadow cards of the source that have a shadow effect, but the one dealt for this attack (the engine resolved it), resolve it against the attack in progress, in the order dealt, the defending player resolving them (each a frame on top of the stack, so the last one pushed resolves first). */
 export function resolveHeldShadowEffects(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const attack = state.pendingAttack;
   const enemy = focus.sourceId ? state.cards[focus.sourceId] : undefined;
   if (!attack || !enemy || attack.enemyId !== enemy.id) return state;
-  const held = shadowCards(enemy).filter((id) => state.cards[id]?.zone === "shadow" && state.cards[id]?.face === "up" && hasShadowEffect(state, ctx, id));
+  const held = shadowCards(enemy).filter((id) => state.cards[id]?.zone === "shadow" && id !== enemy.shadowId && state.cards[id]?.face === "up" && hasShadowEffect(state, ctx, id));
   return [...held].reverse().reduce((next, id) => pushCardEffects(next, "ResolveEffect", id, attack.seat, false, ctx.effects.filter((effect) => effect.cardCode === next.cards[id]?.code && effect.timing === "shadow"), ctx, steps), state);
 }
