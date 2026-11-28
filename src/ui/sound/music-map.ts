@@ -174,6 +174,7 @@ const SCENARIO_MUSIC: Readonly<Record<string, Pair>> = {
   "the-river-running": { calm: "river", combat: "chase" },
   "danger-in-dorwinion": { calm: "shadow", combat: "nazgul" },
   "the-temple-of-doom": UNDERGROUND,
+  "wrath-and-ruin": { calm: "shadow", combat: "siege" },
 };
 
 /** The loop a table plays: its scenario's combat loop during the Combat phase, its calm loop otherwise, and the menu's for a scenario with no pair. */

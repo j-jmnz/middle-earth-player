@@ -1,0 +1,291 @@
+Scenario piles that place cards with no record (staging: 22015 Contested Square; staging: 22016 Ransacked House; activeLocation: 22017 Makeshift Fortification; staging: 22018 Captured Tower; staging: 21046 City Forum; staging: 21047 Seedy Tavern; quest: 22025 Inside the Walls; quest: 22026 Drive them Out; staging: 22011 Thane Ulchor; staging: 22014 Gate of Dorwinion)
+
+## 22011 Thane Ulchor
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+22011:A:1 (front): Immune to player card effects. Cannot leave the staging area.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot leave the staging area.)
+  22011:constant:1: Constant
+    - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+
+22011:A:2 (front): Forced: After the active location is explored, the first player must choose: either discard cards from the top of the encounter deck until a location is discarded and add it to the staging area, or Thane Ulchor attacks you.
+  22011:forced:1: Forced on the event activeExplored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the first player chooses one of:
+      * option "location":
+        - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
+        - then, if the picked card is a location (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+      * option "attack":
+        - this card attacks the first player now, from the staging area, dealt a shadow card
+
+## 22012 Champion of Rhûn
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+22012:A:1 (front): Forced: After Champion of Rhûn engages you, either return a location you control to the staging area, or Champion of Rhûn makes an attack.
+  22012:forced:1: Forced after an enemy engages a player (by an engagement check, or by an effect that engages it or puts it into play engaged; a move to another player is heard only when its effect announces it) (heard about this card)
+    who acts: the acting player is the player the enemy engaged
+    - the acting player chooses one of:
+      * option "return" (only if there is a location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active) to choose):
+        - choose location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active)
+        - the player who controls the picked card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+      * option "attack":
+        - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+22012:A:2 (shadow): Shadow: Deal 1 damage to defending character.
+  22012:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - deal 1 damage to the defender
+
+## 22013 Easterling Skirmisher
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+22013:A:1: Surge. Archery 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+22013:A:2 (front): Forced: After Easterling Skirmisher attacks and destroys a character, that character's controller must return the location he controls with the highest Threat to the staging area.
+  22013:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) that is this card itself
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (you control) with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), that lies in a player's play area (a location the first player took control of, not one in the staging area or active)
+    - the player who controls the picked card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+
+## 22014 Gate of Dorwinion
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+22014:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+22014:A:2 (front): X is 1 more than the number of locations controlled by the players.
+  22014:constant:1: Constant
+    - this card: stat threat the number of location (any player controls) that lies in a player's play area (a location the first player took control of, not one in the staging area or active) + 1, while this card is in play
+
+22014:A:3 (front): The players cannot travel here unless stage 2B has at least 12 progress on it.
+  22014:constant:2: Constant
+    only if not (the main quest stage (the main quest card, also while a side quest is the current quest) holds at least 12 progress)
+    - the players cannot travel to this location while this holds
+  22014:constant:3: Constant
+    only if not (the players are on stage 2)
+    - the players cannot travel to this location while this holds
+
+22014:A:4 (front): Travel: Thane Ulchor attacks each player in turn order.
+  22014:travel:1: Travel
+    - for each player, first player first:
+      - choose enemy (any player controls) or in the staging area, named "Thane Ulchor"
+      - then, if there is a enemy (any player controls) or in the staging area, named "Thane Ulchor" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
+
+## 22015 Contested Square
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+22015:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+22015:A:2 (front): Forced: After an enemy is defeated, place 1 progress on Contested Square if it is in the staging area.
+  22015:forced:1: Forced after an enemy is destroyed (heard about enemy (any player controls))
+    only if this card is in the staging area
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - place 1 progress on this card
+
+22015:A:3 (front): While you control Contested Square, it gains: 'Forced: After a character you control is destroyed, if you control Contested Square, return Contested Square to the staging area.'
+  22015:forced:2: Forced on the event characterDestroyed (heard about character (you control))
+    only if the number of location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active), that is this card itself is at least 1
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the player who controls this card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+
+## 22016 Ransacked House
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+22016:A:1 (front): Encounter Action: Put the topmost enemy in the encounter discard pile into play engaged with you to take control of Ransacked House.
+  22016:action:1: Action (any player may use it)
+    only if all of: (this card is in the staging area) and (there is a enemy in the encounter discard pile [also {"topmost":true}] to choose)
+    who acts: any player may trigger it; the acting player is the one who does
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the topmost enemy in the encounter discard pile (the last put there) is picked (nothing with none)
+    - the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
+    - the first player takes control of this card, a location in the discard pile, the victory display, the staging area or the active slot: it comes into his play area faceup and ready with no progress, its text working there, and the table notes that he controls it; a location already in a play area, or a card that is no location, stays as it is [also {"who":"actor"}]
+
+22016:A:2 (front): While you control Ransacked House, it gains: 'Forced: After the player who controls Ransacked House loses control of a location, return Ransacked House to the staging area.'
+  22016:forced:1: Forced after a player loses control of a location (it left his play area for any reason; the event happened to that player, about that location) (heard about location (any player controls) other than this card)
+    only if the number of location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active), that is this card itself is at least 1
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the player who controls this card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+
+## 22017 Makeshift Fortification
+(the scenario deals it into the activeLocation pile; the piles place it, no record does)
+
+22017:A:1 (front): While Makeshift Fortification is the active location, it gains archery 3.
+  22017:constant:1: Constant
+    - this card: stat archery 3, while this card is active
+
+22017:A:2 (front): Forced: After a player takes control of Makeshift Fortification, return the topmost enemy in the encounter discard pile to the staging area.
+  22017:forced:1: Forced after a player takes control of a location (the event happened to that player, about that location) (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the topmost enemy in the encounter discard pile (the last put there) is picked (nothing with none)
+    - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
+
+## 22018 Captured Tower
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+22018:A:1 (front): While Captured Tower is the active location, encounter card effects cannot be canceled.
+  22018:constant:1: Constant
+    - the table: stat encounterUncancelable (no Response cancels an encounter card's When Revealed or Shadow effect, and no paid cancel is offered against one) 1, while this card is active
+
+22018:A:2 (front): Forced: After a player takes control of Captured Tower, he shuffles the encounter discard pile into the encounter deck and discards cards from the top until he discards an enemy and puts that enemy into play engaged with him.
+  22018:forced:1: Forced after a player takes control of a location (the event happened to that player, about that location) (heard about this card)
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
+    - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
+
+## 22019 Fury
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+22019:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+22019:A:2 (front): While attached to an enemy, counts as a Condition attachment with the text: 'Forced: When attached enemy would be destroyed, heal all damage from it and discard Fury instead.'
+  22019:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  22019:constant:2: Constant
+    - its host: stat healsInsteadOfDestroyed 1, while this card is in play
+
+22019:A:3 (front): When Revealed: Attach to the lowest engagement cost Easterling enemy without Fury.
+  22019:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose Easterling enemy (any player controls) or in the staging area, with the lowest current engagement cost of those (ties: the chooser decides), chosen by the first player, with no attachment named "Fury"
+    - then, if there is a Easterling enemy (any player controls) or in the staging area, with the lowest current engagement cost of those (ties: the chooser decides), chosen by the first player, with no attachment named "Fury" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this card attaches to the picked card (nowhere if that card carries one of its title already)
+
+## 22020 Caught Off Guard
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+22020:A:1 (front): When Revealed: Each player must choose: either return a location you control to the staging area, or discard cards from the top of the encounter deck until an enemy is discarded and put it into play engaged with you.
+  22020:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "return" (only if there is a location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active) to choose):
+          - choose location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active)
+          - the player who controls the picked card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+        * option "enemy":
+          - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
+          - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
+
+22020:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
+  22020:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
+
+## 22021 Street Fighting
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+22021:A:1 (front): When Revealed: Each player assigns X damage among characters he controls, where X is 1 more than the number of locations he controls.
+  22021:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player assigns the number of location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active) + 1 damage among the character (you control), one at a time
+
+22021:A:2 (shadow): Shadow: Assign X damage among characters you control, where X is 1 more than the number of locations you control.
+  22021:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the acting player assigns the number of location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active) + 1 damage among the character (you control), one at a time
+
+## 22022 Under Siege
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+22022:A:1 (front): When Revealed: Until the end of the phase, add X Threat to the staging area, where X is 1 more than the number of locations the players control.
+  22022:whenRevealed:1: When revealed
+    - the table: stat moreStagingThreat the number of location (any player controls) that lies in a player's play area (a location the first player took control of, not one in the staging area or active) + 1, until the end of the phase
+
+22022:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, return the highest Threat location you control to the staging area.
+  22022:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose location (you control) with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), that lies in a player's play area (a location the first player took control of, not one in the staging area or active)
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the player who controls the picked card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+
+## 22023 Ulchor's Revenge
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+22023:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+22023:A:2 (front): When Revealed: Thane Ulchor makes an attack against each player that controls a location (in turn order).
+  22023:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - choose enemy (any player controls) or in the staging area, named "Thane Ulchor"
+      - then, if all of: (there is a enemy (any player controls) or in the staging area, named "Thane Ulchor" to choose) and (the number of location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active) is at least 1) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area, dealt a shadow card
+
+22023:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack for each location you control.
+  22023:shadow:1: Shadow
+    who acts: the acting player is the defending player (the player the attack is against)
+    - the attacking enemy: stat attack the number of location (you control) that lies in a player's play area (a location the first player took control of, not one in the staging area or active), until the end of the attack
+
+## 22025 Inside the Walls
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+22025:A:1 (front): Setup: Add Thane Ulchor and Gate of Dorwinion to the staging area. Each player adds a different location to the staging area. Make a copy of Makeshift Fortification the active location. Shuffle the encounter deck.
+  22025:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one non-unique location in the encounter deck and adds it to the staging area (it is not revealed); its title must differ from every card an earlier search of this effect found
+    - shuffle the encounter deck
+
+22025:B:1 (back): This stage gets +4 quest points per player. Progress cannot be placed on locations in the staging area by player card effects.
+  22025:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat questPoints the number of players x 4, while this card is in play
+    - the table: stat noProgressInStagingByPlayer (held by the table while the stage is in play: progress a player card's effect would place on a location in the staging area is not placed; an active location, a location in a play area and any encounter card's or location's own effect are not barred) 1, while this card is in play
+
+22025:B:2 (back): Forced: When a location is explored, the first player takes control of it.
+  22025:forced:1: Forced after a card leaves play (heard about location (any player controls))
+    only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the first player takes control of the card the event is about, a location in the discard pile, the victory display, the staging area or the active slot: it comes into his play area faceup and ready with no progress, its text working there, and the table notes that he controls it; a location already in a play area, or a card that is no location, stays as it is
+
+22025:B:3 (back): This stage cannot be defeated unless there are more locations under the players' control than in the staging area at the end of the round.
+  22025:constant:2: Constant
+    only if the table does not hold the flag roundEnding
+    - the players cannot defeat this stage while this holds (progress that meets or passes its quest points stays on it, faq.progress-without-advancing, and it is defeated at once when this stops holding, rr.quest-advancement)
+  22025:forced:2: Forced at the end of the round
+    only if the players control more locations than the staging area holds (the active location is not in the staging area)
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the table: stat roundEnding 1, until the end of the phase
+
+## 22026 Drive them Out
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+22026:A:1 (front): When Revealed: Each player returns the highest Threat location he controls to the staging area. Shuffle the encounter discard pile into the encounter deck. Starting with the first player, each player discards cards from the top of the encounter deck until he discards an enemy and puts that enemy into play engaged with him.
+  22026:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - choose location (you control) with the highest current Threat of those (no Threat counts 0; ties: the chooser decides), that lies in a player's play area (a location the first player took control of, not one in the staging area or active)
+      - the player who controls the picked card, a location in his play area, loses control of it: it goes to the staging area with all its progress removed and nobody controls it, and the table announces the loss of control for that player; a location no player controls stays as it is
+    - shuffle the encounter discard pile into the encounter deck
+    - for each player, first player first:
+      - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
+      - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
+
+22026:B:1 (back): Progress cannot be placed on locations in the staging area by player card effects.
+  22026:constant:1: Constant
+    - the table: stat noProgressInStagingByPlayer (held by the table while the stage is in play: progress a player card's effect would place on a location in the staging area is not placed; an active location, a location in a play area and any encounter card's or location's own effect are not barred) 1, while this card is in play
+
+22026:B:2 (back): The players cannot travel to Gate of Dorwinion unless there are more locations under the players' control than in the staging area.
+  22026:constant:2: Constant
+    only if not (the players control more locations than the staging area holds (the active location is not in the staging area))
+    - the players cannot travel to the location with code 22014 while this holds
+
+22026:B:3 (back): Forced: When a location is explored, the first player takes control of it.
+  22026:forced:1: Forced after a card leaves play (heard about location (any player controls))
+    only if the card the event is about had enough progress to be explored
+    who acts: the acting player is the player the event happened to (the first player when the event names no player)
+    - the first player takes control of the card the event is about, a location in the discard pile, the victory display, the staging area or the active slot: it comes into his play area faceup and ready with no progress, its text working there, and the table notes that he controls it; a location already in a play area, or a card that is no location, stays as it is
+
+22026:B:4 (back): At the end of the round, if the players control Gate of Dorwinion, they win the game.
+  22026:forced:2: Forced at the end of the round
+    only if the number of location (any player controls) named "Gate of Dorwinion", that lies in a player's play area (a location the first player took control of, not one in the staging area or active) is at least 1
+    who acts: the acting player is the first player (a phase has no player of its own)
+    - the players win the game
+
+(rendered pieces: 190 by template, 2 as JSON)
