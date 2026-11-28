@@ -143,7 +143,7 @@
     "id": "vengeance-of-mordor",
     "name": "Vengeance of Mordor",
     "scenarioCount": 9,
-    "playable": false,
+    "playable": true,
     "kind": "cycle",
     "box": null,
     "released": "2019-08-02",
